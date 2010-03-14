@@ -27,6 +27,7 @@
 
 #include "inputparser.hpp"
 #include "cell.hpp"
+#include "formula_lexer.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -95,6 +96,7 @@ void model_parser::parse()
     vector<char> buf;
     buf.reserve(255);
     vector<string_cell> cells;
+    vector<formula_cell> fcells;
     while (file.get(c))
     {
         switch (c)
@@ -102,9 +104,11 @@ void model_parser::parse()
             case '=':
                 if (buf.empty())
                     throw parse_error("left hand side is empty");
+
                 buf.push_back(0);
                 name = &buf[0];
                 buf.clear();
+
                 break;
             case ' ':
                 break;
@@ -113,11 +117,22 @@ void model_parser::parse()
                 {
                     if (name.empty())
                         throw parse_error("'=' is missing");
+
                     buf.push_back(0);
                     formula = &buf[0];
+                    buf.clear();
+
                     string_cell ce(name, formula);
                     cells.push_back(ce);
-                    buf.clear();
+
+                    // tokenize the formula string, and create a formula cell 
+                    // with the tokens.
+                    formula_lexer lexer(formula);
+                    lexer.tokenize();
+                    tokens_t tokens;
+                    lexer.swap_tokens(tokens);
+                    formula_cell fcell(name, tokens);
+                    fcells.push_back(fcell);
                 }
                 name.clear();
                 formula.clear();
