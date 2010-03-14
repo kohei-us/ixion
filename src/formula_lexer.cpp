@@ -27,14 +27,27 @@
 
 #include "formula_lexer.hpp"
 
+using namespace std;
+
 namespace ixion {
 
-formula_lexer::formula_lexer()
+formula_lexer::formula_lexer(const string& formula) :
+    m_formula(formula)
 {
 }
 
 formula_lexer::~formula_lexer()
 {
+}
+
+void formula_lexer::tokenize()
+{
+
+}
+
+void formula_lexer::swap_tokens(tokens_t& tokens)
+{
+    m_tokens.swap(tokens);
 }
 
 }

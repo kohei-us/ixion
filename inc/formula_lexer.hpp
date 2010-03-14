@@ -28,14 +28,33 @@
 #ifndef __FORMULA_LEXER_HPP__
 #define __FORMULA_LEXER_HPP__
 
+#include <string>
+#include <boost/noncopyable.hpp>
+
+#include "global.hpp"
+
 namespace ixion {
 
-class formula_lexer
+class formula_lexer : public ::boost::noncopyable
 {
 public:
-    formula_lexer();
+    formula_lexer(const ::std::string& formula);
     ~formula_lexer();
+
+    void tokenize();
+
+    /** 
+     * Note that this will empty the tokens stored inside the lexer instance.
+     *
+     * @param tokens token container to move the tokens to.
+     */
+    void swap_tokens(tokens_t& tokens);
+
 private:
+    formula_lexer();
+
+    tokens_t m_tokens;
+    ::std::string m_formula;
 };
 
 }

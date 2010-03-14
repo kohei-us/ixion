@@ -28,6 +28,8 @@
 #ifndef __GLOBAL_HPP__
 #define __GLOBAL_HPP__
 
+#include "tokens.hpp"
+
 #include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {

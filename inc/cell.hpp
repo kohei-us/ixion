@@ -28,9 +28,14 @@
 #ifndef __CELL_HPP__
 #define __CELL_HPP__
 
+#include "tokens.hpp"
+#include "global.hpp"
+
 #include <string>
 
 namespace ixion {
+
+// ============================================================================
 
 class address
 {
@@ -57,6 +62,20 @@ private:
     ::std::string m_name;
     ::std::string m_formula;
 };
+
+// ============================================================================
+
+class formula_cell
+{
+public:
+    formula_cell(const ::std::string& name, tokens_t& tokens);
+
+private:
+    ::std::string m_name;
+    tokens_t m_tokens;
+};
+
+// ============================================================================
 
 }
 
