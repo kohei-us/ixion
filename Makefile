@@ -14,6 +14,7 @@ OBJFILES= \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/cell.o \
 	$(OBJDIR)/tokens.o \
+	$(OBJDIR)/formula_lexer.o \
 	$(OBJDIR)/inputparser.o
 
 all: $(EXEC)
@@ -29,6 +30,9 @@ $(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp
 
 $(OBJDIR)/tokens.o: $(SRCDIR)/tokens.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/tokens.cpp
+
+$(OBJDIR)/formula_lexer.o: $(SRCDIR)/formula_lexer.cpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_lexer.cpp
 
 $(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp
