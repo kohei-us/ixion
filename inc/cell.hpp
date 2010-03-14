@@ -42,17 +42,17 @@ private:
 
 // ============================================================================
 
-class cell
+class string_cell
 {
 public:
-    cell(const ::std::string& name, const ::std::string& formula);
-    cell(const cell& r);
+    string_cell(const ::std::string& name, const ::std::string& formula);
+    string_cell(const string_cell& r);
 
     const char* print() const;
 
-    ~cell();
+    ~string_cell();
 private:
-    cell();
+    string_cell();
 
     ::std::string m_name;
     ::std::string m_formula;

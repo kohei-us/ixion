@@ -43,7 +43,7 @@ bool parse_model_input(const string& fpath)
     try
     {
         parser.parse();
-        const vector<cell>& cells = parser.get_cells();
+        const vector<string_cell>& cells = parser.get_cells();
         for (size_t i = 0; i < cells.size(); ++i)
             cout << cells[i].print() << endl;
     }

@@ -94,7 +94,7 @@ void model_parser::parse()
     string name, formula;
     vector<char> buf;
     buf.reserve(255);
-    vector<cell> cells;
+    vector<string_cell> cells;
     while (file.get(c))
     {
         switch (c)
@@ -115,7 +115,7 @@ void model_parser::parse()
                         throw parse_error("'=' is missing");
                     buf.push_back(0);
                     formula = &buf[0];
-                    cell ce(name, formula);
+                    string_cell ce(name, formula);
                     cells.push_back(ce);
                     buf.clear();
                 }
@@ -129,7 +129,7 @@ void model_parser::parse()
     m_cells.swap(cells);
 }
 
-const vector<cell>& model_parser::get_cells() const
+const vector<string_cell>& model_parser::get_cells() const
 {
     return m_cells;
 }

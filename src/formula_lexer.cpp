@@ -29,6 +29,12 @@
 
 namespace ixion {
 
+formula_lexer::formula_lexer()
+{
+}
 
+formula_lexer::~formula_lexer()
+{
+}
 
 }

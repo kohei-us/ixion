@@ -63,14 +63,14 @@ public:
     ~model_parser();
 
     void parse();
-    const ::std::vector<cell>& get_cells() const;
+    const ::std::vector<string_cell>& get_cells() const;
 
 private:
     model_parser(); // disabled
     model_parser(const model_parser&); // disabled
 
 private:
-    ::std::vector<cell> m_cells;
+    ::std::vector<string_cell> m_cells;
     ::std::string m_filepath;
 };
 

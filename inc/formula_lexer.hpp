@@ -30,7 +30,13 @@
 
 namespace ixion {
 
-
+class formula_lexer
+{
+public:
+    formula_lexer();
+    ~formula_lexer();
+private:
+};
 
 }
 

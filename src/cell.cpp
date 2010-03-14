@@ -44,22 +44,22 @@ address::~address()
 
 // ============================================================================
 
-cell::cell(const string& name, const string& formula) :
+string_cell::string_cell(const string& name, const string& formula) :
     m_name(name),
     m_formula(formula)
 {
 }
 
-cell::cell(const cell& r) :
+string_cell::string_cell(const string_cell& r) :
     m_name(r.m_name), m_formula(r.m_formula)
 {
 }
 
-cell::~cell()
+string_cell::~string_cell()
 {
 }
 
-const char* cell::print() const
+const char* string_cell::print() const
 {
     ostringstream os;
     os << m_name << " = " << m_formula;
