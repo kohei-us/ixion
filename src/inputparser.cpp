@@ -91,32 +91,40 @@ void model_parser::parse()
         throw file_not_found(m_filepath);
 
     char c;
-    ostringstream buf;
     string name, formula;
+    vector<char> buf;
+    buf.reserve(255);
     vector<cell> cells;
     while (file.get(c))
     {
         switch (c)
         {
             case '=':
-                name = buf.str();
-                if (name.empty())
+                if (buf.empty())
                     throw parse_error("left hand side is empty");
-                buf.seekp(0);
+                buf.push_back(0);
+                name = &buf[0];
+                buf.clear();
                 break;
             case ' ':
                 break;
             case '\n':
-                formula = buf.str();
-                buf.seekp(0);
-                if (!formula.empty())
+                if (!buf.empty())
                 {
-                    cell c(name, formula);
-                    cells.push_back(c);
+                    if (name.empty())
+                        throw parse_error("'=' is missing");
+                    buf.push_back(0);
+                    formula = &buf[0];
+                    cell ce(name, formula);
+                    cells.push_back(ce);
+                    buf.clear();
+                    cout << name << " = " << formula << endl;
                 }
+                name.clear();
+                formula.clear();
                 break;
             default:
-                buf << c;
+                buf.push_back(c);
         }
     }
     m_cells.swap(cells);
