@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2008-2009 Kohei Yoshida
+ * Copyright (c) 2010 Kohei Yoshida
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,3 +24,16 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  ************************************************************************/
+
+#ifndef __INPUTPARSER_HPP__
+#define __INPUTPARSER_HPP__
+
+class ModelParser
+{
+public:
+    ModelParser();
+    ~ModelParser();
+private:
+};
+
+#endif

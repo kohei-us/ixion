@@ -11,12 +11,16 @@ HEADERS= \
 	$(INCDIR)/inputparser.hpp
 
 OBJFILES= \
+	$(OBJDIR)/main.o \
 	$(OBJDIR)/inputparser.o
 
 all: $(EXEC)
 
 pre:
 	mkdir $(OBJDIR) 2>/dev/null || /bin/true
+
+$(OBJDIR)/main.o: $(SRCDIR)/main.cpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/main.cpp
 
 $(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp

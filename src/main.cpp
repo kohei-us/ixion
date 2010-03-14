@@ -27,10 +27,7 @@
 
 #include "inputparser.hpp"
 
-ModelParser::ModelParser()
-{
-}
-ModelParser::~ModelParser()
+int main()
 {
 }
 
