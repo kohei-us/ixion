@@ -113,13 +113,21 @@ int main (int argc, char** argv)
     if (argc - optind > 1)
     {
         fprintf(stderr, "takes exactly one argument\n");
-        exit (1);
+        exit (EXIT_FAILURE);
     }
 
     string fpath = argv[optind];
     cout << fpath << endl;
 
     model_parser parser(fpath);
-    parser.parse();
+    try
+    {
+        parser.parse();
+    }
+    catch (const exception& e)
+    {
+        cout << e.what() << endl;
+        exit(EXIT_FAILURE);
+    }
 }
 

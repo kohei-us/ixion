@@ -29,12 +29,23 @@
 #define __INPUTPARSER_HPP__
 
 #include <string>
+#include <exception>
 
 namespace ixion {
 
 class model_parser
 {
 public:
+    class file_not_found : public ::std::exception
+    {
+    public:
+        explicit file_not_found(const ::std::string& fpath);
+        ~file_not_found() throw();
+        virtual const char * what() const throw();
+    private:
+        ::std::string m_fpath;
+    };
+
     model_parser(const ::std::string& filepath);
     ~model_parser();
 
