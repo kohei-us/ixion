@@ -12,6 +12,8 @@ HEADERS= \
 
 OBJFILES= \
 	$(OBJDIR)/main.o \
+	$(OBJDIR)/cell.o \
+	$(OBJDIR)/tokens.o \
 	$(OBJDIR)/inputparser.o
 
 all: $(EXEC)
@@ -21,6 +23,12 @@ pre:
 
 $(OBJDIR)/main.o: $(SRCDIR)/main.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/main.cpp
+
+$(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell.cpp
+
+$(OBJDIR)/tokens.o: $(SRCDIR)/tokens.cpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/tokens.cpp
 
 $(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp

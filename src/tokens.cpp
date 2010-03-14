@@ -25,65 +25,12 @@
  *
  ************************************************************************/
 
-#include "inputparser.hpp"
+#include "tokens.hpp"
 
-#include <sstream>
-#include <fstream>
-#include <iostream>
-
-using namespace std;
-
-namespace ixion {
-
-// ============================================================================
-
-model_parser::file_not_found::file_not_found(const string& fpath) : 
-    m_fpath(fpath)
+token_base::token_base()
 {
 }
 
-model_parser::file_not_found::~file_not_found() throw()
+token_base::~token_base()
 {
 }
-
-const char* model_parser::file_not_found::what() const throw()
-{
-    ostringstream oss;
-    oss << "specified file not found: " << m_fpath;
-    return oss.str().c_str();
-}
-
-model_parser::model_parser(const string& filepath) :
-    m_filepath(filepath)
-{
-}
-
-model_parser::~model_parser()
-{
-}
-
-void model_parser::parse()
-{
-    ifstream file(m_filepath.c_str());
-    if (!file)
-        // failed to open the specified file.
-        throw file_not_found(m_filepath);
-
-    char c;
-    ostringstream buf;
-    while (file.get(c))
-    {
-        switch (c)
-        {
-            case '=':
-                break;
-            case ' ':
-                break;
-            default:
-                buf << c;
-        }
-    }
-}
-
-}
-
