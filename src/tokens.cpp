@@ -62,6 +62,17 @@ double token_base::get_value() const
 
 const char* token_base::print() const
 {
+    switch (m_opcode)
+    {
+        case oc_plus:
+            return "+";
+        case oc_minus:
+            return "-";
+        case oc_divide:
+            return "/";
+        case oc_multiply:
+            return "*";
+    }
     return "";
 }
 

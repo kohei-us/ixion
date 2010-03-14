@@ -39,7 +39,14 @@ class tokenizer : public ::boost::noncopyable
 {
 public:
     tokenizer(tokens_t& tokens, string& formula) :
-        m_tokens(tokens), m_formula(formula), m_pos(0), m_size(formula.size()), m_char(0) {}
+        m_tokens(tokens), 
+        m_formula(formula), 
+        m_buffer_type(buf_name), 
+        m_pos(0), 
+        m_size(formula.size()), 
+        m_char(0) 
+    {
+    }
 
     void run();
 
@@ -56,12 +63,20 @@ private:
     void open_bracket();
     void close_bracket();
 
+    void flush_buffer();
+
 private:
+    enum buffer_t {
+        buf_numeral,
+        buf_name
+    };
+
     tokens_t& m_tokens;
     string& m_formula;
 
-    vector<char> m_numeral_buf;
-
+    vector<char> m_buffer;
+    buffer_t m_buffer_type;
+    
     size_t m_pos;
     size_t m_size;
     char   m_char;
@@ -119,41 +134,52 @@ void tokenizer::run()
         }
     }
 
-    if (!m_numeral_buf.empty())
-    {
-        double val = strtod(&m_numeral_buf[0], NULL);
-        m_numeral_buf.clear();
-        m_tokens.push_back(new value_token(val));
-    }
+    flush_buffer();
 }
 
 void tokenizer::numeral()
 {
-    m_numeral_buf.push_back(m_char);
+    if (m_buffer.empty())
+        m_buffer_type = buf_numeral;
+
+    m_buffer.push_back(m_char);
 }
 
 void tokenizer::space()
 {
+    // space is ignored for now.
 }
 
 void tokenizer::name()
 {
+    if (m_buffer_type != buf_name)
+        flush_buffer();
+
+    m_buffer.push_back(m_char);
 }
 
 void tokenizer::plus()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_plus));
 }
 
 void tokenizer::minus()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_minus));
 }
 
 void tokenizer::divide()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_divide));
 }
 
 void tokenizer::multiply()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_multiply));
 }
 
 void tokenizer::dot()
@@ -170,6 +196,23 @@ void tokenizer::open_bracket()
 
 void tokenizer::close_bracket()
 {
+}
+
+void tokenizer::flush_buffer()
+{
+    if (m_buffer.empty())
+        return;
+
+    switch (m_buffer_type)
+    {
+        case buf_numeral:
+        {
+            double val = strtod(&m_buffer[0], NULL);
+            m_buffer.clear();
+            m_tokens.push_back(new value_token(val));
+        }
+        break;
+    }
 }
 
 // ============================================================================
