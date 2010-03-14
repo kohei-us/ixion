@@ -28,12 +28,26 @@
 #ifndef __INPUTPARSER_HPP__
 #define __INPUTPARSER_HPP__
 
-class ModelParser
+#include <string>
+
+namespace ixion {
+
+class model_parser
 {
 public:
-    ModelParser();
-    ~ModelParser();
+    model_parser(const ::std::string& filepath);
+    ~model_parser();
+
+    void parse();
+
 private:
+    model_parser(); // disabled
+    model_parser(const model_parser&); // disabled
+
+private:
+    ::std::string m_filepath;
 };
+
+}
 
 #endif

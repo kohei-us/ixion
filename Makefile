@@ -29,7 +29,7 @@ $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
 
 test: $(EXEC)
-	./$(EXEC)
+	./$(EXEC) ./test/simple-model.txt
 
 clean:
 	rm -rf $(OBJDIR)

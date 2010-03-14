@@ -27,10 +27,22 @@
 
 #include "inputparser.hpp"
 
-ModelParser::ModelParser()
+using namespace std;
+
+namespace ixion {
+
+model_parser::model_parser(const string& filepath) :
+    m_filepath(filepath)
 {
 }
-ModelParser::~ModelParser()
+
+model_parser::~model_parser()
 {
+}
+
+void model_parser::parse()
+{
+}
+
 }
 
