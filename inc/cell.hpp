@@ -28,6 +28,10 @@
 #ifndef __CELL_HPP__
 #define __CELL_HPP__
 
+#include <string>
+
+namespace ixion {
+
 class address
 {
 public:
@@ -41,10 +45,16 @@ private:
 class cell
 {
 public:
-    cell();
+    cell(const ::std::string& name, const ::std::string& formula);
+    cell(const cell& r);
     ~cell();
 private:
+    cell();
 
+    ::std::string m_name;
+    ::std::string m_formula;
 };
+
+}
 
 #endif

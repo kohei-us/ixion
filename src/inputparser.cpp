@@ -26,10 +26,13 @@
  ************************************************************************/
 
 #include "inputparser.hpp"
+#include "cell.hpp"
 
 #include <sstream>
 #include <fstream>
 #include <iostream>
+
+#include <vector>
 
 using namespace std;
 
@@ -53,6 +56,24 @@ const char* model_parser::file_not_found::what() const throw()
     return oss.str().c_str();
 }
 
+// ============================================================================
+
+model_parser::parse_error::parse_error(const string& msg) :
+    m_msg(msg)
+{
+}
+
+model_parser::parse_error::~parse_error() throw()
+{
+}
+
+const char* model_parser::parse_error::what() const throw()
+{
+    ostringstream oss;
+    oss << "parse error: " << m_msg;
+    return oss.str().c_str();
+}
+
 model_parser::model_parser(const string& filepath) :
     m_filepath(filepath)
 {
@@ -71,18 +92,39 @@ void model_parser::parse()
 
     char c;
     ostringstream buf;
+    string name, formula;
+    vector<cell> cells;
     while (file.get(c))
     {
         switch (c)
         {
             case '=':
+                name = buf.str();
+                if (name.empty())
+                    throw parse_error("left hand side is empty");
+                buf.seekp(0);
                 break;
             case ' ':
+                break;
+            case '\n':
+                formula = buf.str();
+                buf.seekp(0);
+                if (!formula.empty())
+                {
+                    cell c(name, formula);
+                    cells.push_back(c);
+                }
                 break;
             default:
                 buf << c;
         }
     }
+    m_cells.swap(cells);
+}
+
+const vector<cell>& model_parser::get_cells() const
+{
+    return m_cells;
 }
 
 }

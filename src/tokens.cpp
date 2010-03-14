@@ -27,6 +27,8 @@
 
 #include "tokens.hpp"
 
+namespace ixion {
+
 token_base::token_base()
 {
 }
@@ -34,3 +36,6 @@ token_base::token_base()
 token_base::~token_base()
 {
 }
+
+}
+

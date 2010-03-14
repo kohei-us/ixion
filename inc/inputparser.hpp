@@ -28,8 +28,11 @@
 #ifndef __INPUTPARSER_HPP__
 #define __INPUTPARSER_HPP__
 
+#include "cell.hpp"
+
 #include <string>
 #include <exception>
+#include <vector>
 
 namespace ixion {
 
@@ -41,21 +44,33 @@ public:
     public:
         explicit file_not_found(const ::std::string& fpath);
         ~file_not_found() throw();
-        virtual const char * what() const throw();
+        virtual const char* what() const throw();
     private:
         ::std::string m_fpath;
+    };
+
+    class parse_error : public ::std::exception
+    {
+    public:
+        explicit parse_error(const ::std::string& msg);
+        ~parse_error() throw();
+        virtual const char* what() const throw();
+    private:
+        ::std::string m_msg;
     };
 
     model_parser(const ::std::string& filepath);
     ~model_parser();
 
     void parse();
+    const ::std::vector<cell>& get_cells() const;
 
 private:
     model_parser(); // disabled
     model_parser(const model_parser&); // disabled
 
 private:
+    ::std::vector<cell> m_cells;
     ::std::string m_filepath;
 };
 

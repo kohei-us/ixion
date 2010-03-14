@@ -28,6 +28,8 @@
 #ifndef __TOKENS_HPP__
 #define __TOKENS_HPP__
 
+namespace ixion {
+
 class token_base
 {
 public:
@@ -35,5 +37,7 @@ public:
     ~token_base();
 private:
 };
+
+}
 
 #endif

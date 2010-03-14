@@ -27,6 +27,12 @@
 
 #include "cell.hpp"
 
+#include <string>
+
+using namespace std;
+
+namespace ixion {
+
 address::address()
 {
 }
@@ -37,10 +43,19 @@ address::~address()
 
 // ============================================================================
 
-cell::cell()
+cell::cell(const string& name, const string& formula) :
+    m_name(name),
+    m_formula(formula)
+{
+}
+
+cell::cell(const cell& r) :
+    m_name(r.m_name), m_formula(r.m_formula)
 {
 }
 
 cell::~cell()
 {
+}
+
 }

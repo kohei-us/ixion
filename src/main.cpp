@@ -123,6 +123,7 @@ int main (int argc, char** argv)
     try
     {
         parser.parse();
+        const vector<cell>& cells = parser.get_cells();
     }
     catch (const exception& e)
     {
