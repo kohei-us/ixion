@@ -47,6 +47,9 @@ class cell
 public:
     cell(const ::std::string& name, const ::std::string& formula);
     cell(const cell& r);
+
+    const char* print() const;
+
     ~cell();
 private:
     cell();

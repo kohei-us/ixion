@@ -118,7 +118,6 @@ void model_parser::parse()
                     cell ce(name, formula);
                     cells.push_back(ce);
                     buf.clear();
-                    cout << name << " = " << formula << endl;
                 }
                 name.clear();
                 formula.clear();

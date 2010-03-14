@@ -37,6 +37,24 @@
 using namespace std;
 using namespace ixion;
 
+bool parse_model_input(const string& fpath)
+{
+    model_parser parser(fpath);
+    try
+    {
+        parser.parse();
+        const vector<cell>& cells = parser.get_cells();
+        for (size_t i = 0; i < cells.size(); ++i)
+            cout << cells[i].print() << endl;
+    }
+    catch (const exception& e)
+    {
+        cout << e.what() << endl;
+        return false;
+    }
+    return true;
+}
+
 int main (int argc, char** argv)
 {
     /* Flag set by '--verbose'. */
@@ -119,16 +137,7 @@ int main (int argc, char** argv)
     string fpath = argv[optind];
     cout << fpath << endl;
 
-    model_parser parser(fpath);
-    try
-    {
-        parser.parse();
-        const vector<cell>& cells = parser.get_cells();
-    }
-    catch (const exception& e)
-    {
-        cout << e.what() << endl;
-        exit(EXIT_FAILURE);
-    }
+    if (!parse_model_input(fpath))
+        exit (EXIT_FAILURE);
 }
 

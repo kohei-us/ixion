@@ -28,6 +28,7 @@
 #include "cell.hpp"
 
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -56,6 +57,13 @@ cell::cell(const cell& r) :
 
 cell::~cell()
 {
+}
+
+const char* cell::print() const
+{
+    ostringstream os;
+    os << m_name << " = " << m_formula;
+    return os.str().c_str();
 }
 
 }
