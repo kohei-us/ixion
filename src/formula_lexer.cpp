@@ -39,7 +39,7 @@ class tokenizer : public ::boost::noncopyable
 {
 public:
     tokenizer(tokens_t& tokens, string& formula) :
-        m_tokens(tokens), m_formula(formula), m_pos(0), m_size(formula.size()) {}
+        m_tokens(tokens), m_formula(formula), m_pos(0), m_size(formula.size()), m_char(0) {}
 
     void run();
 
@@ -58,15 +58,16 @@ private:
     string& m_formula;
     size_t m_pos;
     size_t m_size;
+    char m_char;
 };
 
 void tokenizer::run()
 {
     for (m_pos = 0; m_pos < m_size; ++m_pos)
     {
-        char c = m_formula[m_pos];
+        m_char = m_formula[m_pos];
         cout << "char: '" << c << "'" << endl;
-        switch (c)
+        switch (m_char)
         {
             case '0':
             case '1':
