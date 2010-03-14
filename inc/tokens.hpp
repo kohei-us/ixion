@@ -30,13 +30,73 @@
 
 namespace ixion {
 
+// ============================================================================
+
+enum opcode_t {
+    oc_value,
+    oc_string,
+    oc_plus,
+    oc_minus,
+    oc_divide,
+    oc_multiply
+};
+
+// ============================================================================
+
 class token_base
 {
 public:
-    token_base();
-    ~token_base();
+    token_base(opcode_t oc);
+    token_base(const token_base& r);
+    virtual ~token_base();
+
+    virtual double get_value() const;
+    virtual const char* print() const;
+
+    opcode_t get_opcode() const;
 private:
+    opcode_t m_opcode;
 };
+
+
+// ============================================================================
+
+class value_token : public token_base
+{
+public:
+    value_token(double val);
+    value_token(const value_token& r);
+    virtual ~value_token();
+
+    virtual double get_value() const;
+    virtual const char* print() const;
+
+private:
+    double m_val;
+};
+
+// ============================================================================
+
+// We need the following inline functions for boost::ptr_container.
+
+inline token_base* new_clone(const token_base& r)
+{
+    opcode_t oc = r.get_opcode();
+    switch (oc)
+    {
+        case oc_value:
+            return new value_token(r.get_value());
+    }
+
+    return new token_base(r);
+}
+
+inline void delete_clone(const token_base* p)
+{
+    delete p;
+}
+
+// ============================================================================
 
 }
 

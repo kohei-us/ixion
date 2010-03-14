@@ -45,20 +45,26 @@ public:
 
 private:
     void numeral();
+    void space();
     void name();
     void plus();
     void minus();
     void divide();
     void multiply();
+    void dot();
+    void comma();
     void open_bracket();
     void close_bracket();
 
 private:
     tokens_t& m_tokens;
     string& m_formula;
+
+    vector<char> m_numeral_buf;
+
     size_t m_pos;
     size_t m_size;
-    char m_char;
+    char   m_char;
 };
 
 void tokenizer::run()
@@ -66,7 +72,7 @@ void tokenizer::run()
     for (m_pos = 0; m_pos < m_size; ++m_pos)
     {
         m_char = m_formula[m_pos];
-        cout << "char: '" << c << "'" << endl;
+        cout << "char: '" << m_char << "'" << endl;
         switch (m_char)
         {
             case '0':
@@ -80,6 +86,15 @@ void tokenizer::run()
             case '8':
             case '9':
                 numeral();
+                break;
+            case ' ':
+                space();
+                break;
+            case '.':
+                dot();
+                break;
+            case ',':
+                comma();
                 break;
             case '+':
                 plus();
@@ -103,9 +118,21 @@ void tokenizer::run()
                 name();
         }
     }
+
+    if (!m_numeral_buf.empty())
+    {
+        double val = strtod(&m_numeral_buf[0], NULL);
+        m_numeral_buf.clear();
+        m_tokens.push_back(new value_token(val));
+    }
 }
 
 void tokenizer::numeral()
+{
+    m_numeral_buf.push_back(m_char);
+}
+
+void tokenizer::space()
 {
 }
 
@@ -126,6 +153,14 @@ void tokenizer::divide()
 }
 
 void tokenizer::multiply()
+{
+}
+
+void tokenizer::dot()
+{
+}
+
+void tokenizer::comma()
 {
 }
 

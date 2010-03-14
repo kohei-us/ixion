@@ -27,15 +27,75 @@
 
 #include "tokens.hpp"
 
+#include <iostream>
+#include <sstream>
+
+using namespace std;
+
 namespace ixion {
 
-token_base::token_base()
+// ============================================================================
+
+token_base::token_base(opcode_t oc) :
+    m_opcode(oc)
+{
+}
+
+token_base::token_base(const token_base& r) :
+    m_opcode(r.m_opcode)
 {
 }
 
 token_base::~token_base()
 {
 }
+
+opcode_t token_base::get_opcode() const
+{
+    return m_opcode;
+}
+
+double token_base::get_value() const
+{
+    return 0.0;
+}
+
+const char* token_base::print() const
+{
+    return "";
+}
+
+// ============================================================================
+
+value_token::value_token(double val) :
+    token_base(oc_value),
+    m_val(val) 
+{
+}
+
+value_token::value_token(const value_token& r) :
+    token_base(r),
+    m_val(r.m_val) 
+{
+}
+
+value_token::~value_token()
+{
+}
+
+double value_token::get_value() const
+{
+    return m_val;
+}
+
+const char* value_token::print() const
+{
+    ostringstream os;
+    os << m_val;
+    return os.str().c_str();
+}
+
+// ============================================================================
 
 }
 

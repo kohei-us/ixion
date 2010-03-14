@@ -32,12 +32,20 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
-
 #include <vector>
+#include <functional>
 
 using namespace std;
 
 namespace ixion {
+
+struct token_printer : public unary_function<token_base, void>
+{
+    void operator() (const token_base& r) const
+    {
+        cout << r.print();
+    }
+};
 
 // ============================================================================
 
@@ -110,8 +118,6 @@ void model_parser::parse()
                 buf.clear();
 
                 break;
-            case ' ':
-                break;
             case '\n':
                 if (!buf.empty())
                 {
@@ -131,6 +137,12 @@ void model_parser::parse()
                     lexer.tokenize();
                     tokens_t tokens;
                     lexer.swap_tokens(tokens);
+
+                    // test-print tokens.
+                    cout << "tokens: ";
+                    for_each(tokens.begin(), tokens.end(), token_printer());
+                    cout << endl;
+
                     formula_cell fcell(name, tokens);
                     fcells.push_back(fcell);
                 }
