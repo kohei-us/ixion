@@ -42,6 +42,7 @@ const char* get_opcode_name(opcode_t oc)
     {
         case oc_value:      return "value";
         case oc_string:     return "string";
+        case oc_name:       return "name";
         case oc_divide:     return "divide";
         case oc_minus:      return "minus";
         case oc_multiply:   return "multiply";
@@ -86,9 +87,20 @@ string token_base::get_string() const
     return string();
 }
 
-const char* token_base::print() const
+// ============================================================================
+
+token::token(opcode_t oc) :
+    token_base(oc)
 {
-    switch (m_opcode)
+}
+
+token::~token()
+{
+}
+
+const char* token::print() const
+{
+    switch (get_opcode())
     {
         case oc_plus:
             return "+";
@@ -156,6 +168,28 @@ string string_token::get_string() const
 const char* string_token::print() const
 {
     return m_str.c_str();
+}
+
+// ============================================================================
+
+name_token::name_token(const string& name) :
+    token_base(oc_name),
+    m_name(name)
+{
+}
+
+name_token::~name_token()
+{
+}
+
+string name_token::get_string() const
+{
+    return m_name;
+}
+
+const char* name_token::print() const
+{
+    return m_name.c_str();
 }
 
 // ============================================================================

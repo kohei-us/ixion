@@ -171,25 +171,25 @@ void tokenizer::name()
 void tokenizer::plus()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_plus));
+    m_tokens.push_back(new token(oc_plus));
 }
 
 void tokenizer::minus()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_minus));
+    m_tokens.push_back(new token(oc_minus));
 }
 
 void tokenizer::divide()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_divide));
+    m_tokens.push_back(new token(oc_divide));
 }
 
 void tokenizer::multiply()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_multiply));
+    m_tokens.push_back(new token(oc_multiply));
 }
 
 void tokenizer::dot()
@@ -199,19 +199,19 @@ void tokenizer::dot()
 void tokenizer::sep()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_sep));
+    m_tokens.push_back(new token(oc_sep));
 }
 
 void tokenizer::open_bracket()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_open));
+    m_tokens.push_back(new token(oc_open));
 }
 
 void tokenizer::close_bracket()
 {
     flush_buffer();
-    m_tokens.push_back(new token_base(oc_close));
+    m_tokens.push_back(new token(oc_close));
 }
 
 void tokenizer::flush_buffer()
@@ -231,7 +231,7 @@ void tokenizer::flush_buffer()
         case buf_name:
         {
             string str = &m_buffer[0];
-            m_tokens.push_back(new string_token(str));
+            m_tokens.push_back(new name_token(str));
         }
         break;
         default:

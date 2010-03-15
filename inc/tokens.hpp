@@ -38,6 +38,7 @@ enum opcode_t {
     // data types
     oc_value,
     oc_string,
+    oc_name,
 
     // arithmetic operators
     oc_plus,
@@ -64,13 +65,22 @@ public:
 
     virtual double get_value() const;
     virtual ::std::string get_string() const;
-    virtual const char* print() const;
+    virtual const char* print() const = 0;
 
     opcode_t get_opcode() const;
 private:
     opcode_t m_opcode;
 };
 
+// ============================================================================
+
+class token : public token_base
+{
+public:
+    token(opcode_t oc);
+    virtual ~token();
+    virtual const char* print() const;
+};
 
 // ============================================================================
 
@@ -104,6 +114,20 @@ private:
 
 // ============================================================================
 
+class name_token : public token_base
+{
+public:
+    name_token(const ::std::string& name);
+    virtual ~name_token();
+
+    virtual ::std::string get_string() const;
+    virtual const char* print() const;
+private:
+    ::std::string m_name;
+};
+
+// ============================================================================
+
 // We need the following inline functions for boost::ptr_container.
 
 inline token_base* new_clone(const token_base& r)
@@ -115,9 +139,11 @@ inline token_base* new_clone(const token_base& r)
             return new value_token(r.get_value());
         case oc_string:
             return new string_token(r.get_string());
+        case oc_name:
+            return new name_token(r.get_string());
     }
 
-    return new token_base(r);
+    return new token(oc);
 }
 
 inline void delete_clone(const token_base* p)
