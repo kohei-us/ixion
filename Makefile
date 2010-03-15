@@ -45,7 +45,7 @@ $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
 
 test: $(EXEC)
-	./$(EXEC) ./test/simple-model.txt
+	./$(EXEC) ./test/simple-arithmetic.txt
 
 clean:
 	rm -rf $(OBJDIR)
