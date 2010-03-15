@@ -35,12 +35,20 @@ namespace ixion {
 // ============================================================================
 
 enum opcode_t {
+    // data types
     oc_value,
     oc_string,
+
+    // arithmetic operators
     oc_plus,
     oc_minus,
     oc_divide,
-    oc_multiply
+    oc_multiply,
+
+    // parentheses, separators
+    oc_open,
+    oc_close,
+    oc_sep,
 };
 
 const char* get_opcode_name(opcode_t oc);

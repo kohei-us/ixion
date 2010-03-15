@@ -44,7 +44,8 @@ public:
         m_buffer_type(buf_name), 
         m_pos(0), 
         m_size(formula.size()), 
-        m_char(0) 
+        m_char(0),
+        m_csep(',')
     {
     }
 
@@ -59,7 +60,7 @@ private:
     void divide();
     void multiply();
     void dot();
-    void comma();
+    void sep();
     void open_bracket();
     void close_bracket();
 
@@ -80,6 +81,9 @@ private:
     size_t m_pos;
     size_t m_size;
     char   m_char;
+    
+    // data that influence tokenization behavior.
+    char m_csep; // function argument separator
 };
 
 void tokenizer::run()
@@ -88,6 +92,12 @@ void tokenizer::run()
     {
         m_char = m_formula[m_pos];
         cout << "char: '" << m_char << "'" << endl;
+        if (m_char == m_csep)
+        {
+            sep();
+            continue;
+        }
+
         switch (m_char)
         {
             case '0':
@@ -107,9 +117,6 @@ void tokenizer::run()
                 break;
             case '.':
                 dot();
-                break;
-            case ',':
-                comma();
                 break;
             case '+':
                 plus();
@@ -189,16 +196,22 @@ void tokenizer::dot()
 {
 }
 
-void tokenizer::comma()
+void tokenizer::sep()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_sep));
 }
 
 void tokenizer::open_bracket()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_open));
 }
 
 void tokenizer::close_bracket()
 {
+    flush_buffer();
+    m_tokens.push_back(new token_base(oc_close));
 }
 
 void tokenizer::flush_buffer()

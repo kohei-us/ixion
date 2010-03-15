@@ -46,6 +46,9 @@ const char* get_opcode_name(opcode_t oc)
         case oc_minus:      return "minus";
         case oc_multiply:   return "multiply";
         case oc_plus:       return "plus";
+        case oc_open:       return "open";
+        case oc_close:      return "close";
+        case oc_sep:        return "sep";
         default:
             ;
     }
@@ -95,6 +98,10 @@ const char* token_base::print() const
             return "/";
         case oc_multiply:
             return "*";
+        case oc_open:
+            return "(";
+        case oc_close:
+            return ")";
     }
     return "";
 }
