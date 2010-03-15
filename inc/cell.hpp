@@ -47,34 +47,50 @@ private:
 
 // ============================================================================
 
-class string_cell
+class base_cell
+{
+public:
+    base_cell(const ::std::string& name);
+    base_cell(const base_cell& r);
+    virtual ~base_cell() = 0;
+
+    virtual const char* print() const = 0;
+
+    const ::std::string& get_name() const;
+
+private:
+    ::std::string m_name;
+};
+
+// ============================================================================
+
+class string_cell : public base_cell
 {
 public:
     string_cell(const ::std::string& name, const ::std::string& formula);
     string_cell(const string_cell& r);
+    virtual ~string_cell();
 
     const char* print() const;
 
-    ~string_cell();
 private:
     string_cell();
 
-    ::std::string m_name;
     ::std::string m_formula;
 };
 
 // ============================================================================
 
-class formula_cell
+class formula_cell : public base_cell
 {
 public:
     formula_cell(const ::std::string& name, tokens_t& tokens);
     formula_cell(const formula_cell& r);
+    virtual ~formula_cell();
 
     const char* print() const;
 
 private:
-    ::std::string m_name;
     tokens_t m_tokens;
 };
 

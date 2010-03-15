@@ -46,14 +46,36 @@ address::~address()
 
 // ============================================================================
 
+base_cell::base_cell(const string& name) :
+    m_name(name)
+{
+}
+
+base_cell::base_cell(const base_cell& r) :
+    m_name(r.m_name)
+{
+}
+
+base_cell::~base_cell()
+{
+}
+
+const string& base_cell::get_name() const
+{
+    return m_name;
+}
+
+// ============================================================================
+
 string_cell::string_cell(const string& name, const string& formula) :
-    m_name(name),
+    base_cell(name),
     m_formula(formula)
 {
 }
 
 string_cell::string_cell(const string_cell& r) :
-    m_name(r.m_name), m_formula(r.m_formula)
+    base_cell(r),
+    m_formula(r.m_formula)
 {
 }
 
@@ -64,22 +86,26 @@ string_cell::~string_cell()
 const char* string_cell::print() const
 {
     ostringstream os;
-    os << m_name << " = " << m_formula;
+    os << get_name() << " = " << m_formula;
     return os.str().c_str();
 }
 
 // ============================================================================
 
 formula_cell::formula_cell(const string& name, tokens_t& tokens) :
-    m_name(name)
+    base_cell(name)
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
 }
 
 formula_cell::formula_cell(const formula_cell& r) :
-    m_name(r.m_name),
+    base_cell(r),
     m_tokens(r.m_tokens)
+{
+}
+
+formula_cell::~formula_cell()
 {
 }
 
