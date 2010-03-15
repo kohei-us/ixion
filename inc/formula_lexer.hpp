@@ -29,6 +29,7 @@
 #define __FORMULA_LEXER_HPP__
 
 #include <string>
+#include <exception>
 #include <boost/noncopyable.hpp>
 
 #include "global.hpp"
@@ -38,6 +39,16 @@ namespace ixion {
 class formula_lexer : public ::boost::noncopyable
 {
 public:
+    class tokenize_error : public ::std::exception
+    {
+    public:
+        tokenize_error(const ::std::string& msg);
+        virtual ~tokenize_error() throw();
+        virtual const char* what() const throw();
+    private:
+        ::std::string m_msg;
+    };
+
     formula_lexer(const ::std::string& formula);
     ~formula_lexer();
 

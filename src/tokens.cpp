@@ -60,6 +60,11 @@ double token_base::get_value() const
     return 0.0;
 }
 
+string token_base::get_string() const
+{
+    return string();
+}
+
 const char* token_base::print() const
 {
     switch (m_opcode)
@@ -104,6 +109,28 @@ const char* value_token::print() const
     ostringstream os;
     os << m_val;
     return os.str().c_str();
+}
+
+// ============================================================================
+
+string_token::string_token(const string& str) :
+    token_base(oc_string),
+    m_str(str)
+{
+}
+
+string_token::~string_token()
+{
+}
+
+string string_token::get_string() const
+{
+    return m_str;
+}
+
+const char* string_token::print() const
+{
+    return m_str.c_str();
 }
 
 // ============================================================================

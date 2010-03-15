@@ -34,9 +34,11 @@
 #include <exception>
 #include <vector>
 
+#include <boost/noncopyable.hpp>
+
 namespace ixion {
 
-class model_parser
+class model_parser : public ::boost::noncopyable
 {
 public:
     class file_not_found : public ::std::exception
@@ -67,7 +69,6 @@ public:
 
 private:
     model_parser(); // disabled
-    model_parser(const model_parser&); // disabled
 
 private:
     ::std::vector<string_cell> m_cells;

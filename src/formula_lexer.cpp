@@ -153,7 +153,10 @@ void tokenizer::space()
 void tokenizer::name()
 {
     if (m_buffer_type != buf_name)
+    {    
         flush_buffer();
+        m_buffer_type = buf_name;
+    }
 
     m_buffer.push_back(m_char);
 }
@@ -203,19 +206,42 @@ void tokenizer::flush_buffer()
     if (m_buffer.empty())
         return;
 
+    m_buffer.push_back(0);
     switch (m_buffer_type)
     {
         case buf_numeral:
         {
             double val = strtod(&m_buffer[0], NULL);
-            m_buffer.clear();
             m_tokens.push_back(new value_token(val));
         }
         break;
+        case buf_name:
+        {
+            string str = &m_buffer[0];
+            m_tokens.push_back(new string_token(str));
+        }
+        break;
+        default:
+            throw formula_lexer::tokenize_error("unknown buffer type");
     }
+    m_buffer.clear();
 }
 
 // ============================================================================
+
+formula_lexer::tokenize_error::tokenize_error(const string& msg) :
+    m_msg(msg)
+{
+}
+
+formula_lexer::tokenize_error::~tokenize_error() throw()
+{
+}
+
+const char* formula_lexer::tokenize_error::what() const throw()
+{
+    return m_msg.c_str();
+}
 
 formula_lexer::formula_lexer(const string& formula) :
     m_formula(formula)
@@ -228,7 +254,7 @@ formula_lexer::~formula_lexer()
 
 void formula_lexer::tokenize()
 {
-    cout << "formula: " << m_formula << endl;
+    cout << "formula string: '" << m_formula << "'" << endl;
     tokenizer tkr(m_tokens, m_formula);
     tkr.run();
 }

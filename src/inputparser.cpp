@@ -139,7 +139,7 @@ void model_parser::parse()
                     lexer.swap_tokens(tokens);
 
                     // test-print tokens.
-                    cout << "tokens: ";
+                    cout << "tokens from lexer: ";
                     for_each(tokens.begin(), tokens.end(), token_printer());
                     cout << endl;
 

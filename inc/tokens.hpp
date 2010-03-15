@@ -28,6 +28,8 @@
 #ifndef __TOKENS_HPP__
 #define __TOKENS_HPP__
 
+#include <string>
+
 namespace ixion {
 
 // ============================================================================
@@ -51,6 +53,7 @@ public:
     virtual ~token_base();
 
     virtual double get_value() const;
+    virtual ::std::string get_string() const;
     virtual const char* print() const;
 
     opcode_t get_opcode() const;
@@ -77,6 +80,20 @@ private:
 
 // ============================================================================
 
+class string_token : public token_base
+{
+public:
+    string_token(const ::std::string& str);
+    virtual ~string_token();
+
+    virtual ::std::string get_string() const;
+    virtual const char* print() const;
+private:
+    ::std::string m_str;
+};
+
+// ============================================================================
+
 // We need the following inline functions for boost::ptr_container.
 
 inline token_base* new_clone(const token_base& r)
@@ -86,6 +103,8 @@ inline token_base* new_clone(const token_base& r)
     {
         case oc_value:
             return new value_token(r.get_value());
+        case oc_string:
+            return new string_token(r.get_string());
     }
 
     return new token_base(r);
