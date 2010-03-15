@@ -69,6 +69,9 @@ class formula_cell
 {
 public:
     formula_cell(const ::std::string& name, tokens_t& tokens);
+    formula_cell(const formula_cell& r);
+
+    const char* print() const;
 
 private:
     ::std::string m_name;

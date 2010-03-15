@@ -39,15 +39,6 @@ using namespace std;
 
 namespace ixion {
 
-struct token_printer : public unary_function<token_base, void>
-{
-    void operator() (const token_base& r) const
-    {
-        opcode_t oc = r.get_opcode();
-        cout << "(" << get_opcode_name(oc) << ")'" << r.print() << "' ";
-    }
-};
-
 // ============================================================================
 
 model_parser::file_not_found::file_not_found(const string& fpath) : 
@@ -140,9 +131,7 @@ void model_parser::parse()
                     lexer.swap_tokens(tokens);
 
                     // test-print tokens.
-                    cout << "tokens from lexer: ";
-                    for_each(tokens.begin(), tokens.end(), token_printer());
-                    cout << endl;
+                    cout << "tokens from lexer: " << print_tokens(tokens, true) << endl;
 
                     formula_cell fcell(name, tokens);
                     fcells.push_back(fcell);
@@ -154,12 +143,12 @@ void model_parser::parse()
                 buf.push_back(c);
         }
     }
-    m_cells.swap(cells);
+    m_fcells.swap(fcells);
 }
 
-const vector<string_cell>& model_parser::get_cells() const
+const vector<formula_cell>& model_parser::get_cells() const
 {
-    return m_cells;
+    return m_fcells;
 }
 
 }

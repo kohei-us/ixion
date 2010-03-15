@@ -36,6 +36,8 @@ namespace ixion {
 
 typedef ::boost::ptr_vector<token_base> tokens_t;
 
+const char* print_tokens(const tokens_t& tokens, bool verbose);
+
 }
 
 #endif

@@ -77,4 +77,15 @@ formula_cell::formula_cell(const string& name, tokens_t& tokens) :
     m_tokens.swap(tokens);
 }
 
+formula_cell::formula_cell(const formula_cell& r) :
+    m_name(r.m_name),
+    m_tokens(r.m_tokens)
+{
+}
+
+const char* formula_cell::print() const
+{
+    return print_tokens(m_tokens, false);
+}
+
 }

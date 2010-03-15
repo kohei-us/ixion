@@ -65,13 +65,13 @@ public:
     ~model_parser();
 
     void parse();
-    const ::std::vector<string_cell>& get_cells() const;
+    const ::std::vector<formula_cell>& get_cells() const;
 
 private:
     model_parser(); // disabled
 
 private:
-    ::std::vector<string_cell> m_cells;
+    ::std::vector<formula_cell> m_fcells;
     ::std::string m_filepath;
 };
 
