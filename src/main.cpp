@@ -45,7 +45,7 @@ bool parse_model_input(const string& fpath)
         parser.parse();
         const vector<formula_cell>& cells = parser.get_cells();
         for (size_t i = 0; i < cells.size(); ++i)
-            cout << "cell: " << cells[i].print() << endl;
+            cout << "cell (" << cells[i].get_name() << "): " << cells[i].print() << endl;
     }
     catch (const exception& e)
     {
