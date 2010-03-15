@@ -43,6 +43,8 @@ enum opcode_t {
     oc_multiply
 };
 
+const char* get_opcode_name(opcode_t oc);
+
 // ============================================================================
 
 class token_base

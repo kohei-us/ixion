@@ -43,7 +43,8 @@ struct token_printer : public unary_function<token_base, void>
 {
     void operator() (const token_base& r) const
     {
-        cout << r.print();
+        opcode_t oc = r.get_opcode();
+        cout << "(" << get_opcode_name(oc) << ")'" << r.print() << "' ";
     }
 };
 

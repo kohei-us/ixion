@@ -36,6 +36,24 @@ namespace ixion {
 
 // ============================================================================
 
+const char* get_opcode_name(opcode_t oc)
+{
+    switch (oc)
+    {
+        case oc_value:      return "value";
+        case oc_string:     return "string";
+        case oc_divide:     return "divide";
+        case oc_minus:      return "minus";
+        case oc_multiply:   return "multiply";
+        case oc_plus:       return "plus";
+        default:
+            ;
+    }
+    return "";
+}
+
+// ============================================================================
+
 token_base::token_base(opcode_t oc) :
     m_opcode(oc)
 {
