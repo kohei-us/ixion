@@ -89,6 +89,7 @@ public:
     virtual ~formula_cell();
 
     virtual const char* print() const;
+    const tokens_t& get_tokens() const;
 
 private:
     tokens_t m_tokens;

@@ -50,6 +50,27 @@ void flush_buffer(vector<char>& buf, string& str)
 
 }
 
+bool parse_model_input(const string& fpath)
+{
+    model_parser parser(fpath);
+    try
+    {
+        parser.parse();
+        const vector<formula_cell>& cells = parser.get_cells();
+        for (size_t i = 0; i < cells.size(); ++i)
+        {    
+            cout << "cell (" << cells[i].get_name() << "): " << cells[i].print() << endl;
+
+        }
+    }
+    catch (const exception& e)
+    {
+        cout << e.what() << endl;
+        return false;
+    }
+    return true;
+}
+
 // ============================================================================
 
 model_parser::file_not_found::file_not_found(const string& fpath) : 

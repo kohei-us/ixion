@@ -114,4 +114,9 @@ const char* formula_cell::print() const
     return print_tokens(m_tokens, false);
 }
 
+const tokens_t& formula_cell::get_tokens() const
+{
+    return m_tokens;
+}
+
 }

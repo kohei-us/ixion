@@ -30,11 +30,7 @@
 
 #include "tokens.hpp"
 
-#include <boost/ptr_container/ptr_vector.hpp>
-
 namespace ixion {
-
-typedef ::boost::ptr_vector<token_base> tokens_t;
 
 const char* print_tokens(const tokens_t& tokens, bool verbose);
 

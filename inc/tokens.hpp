@@ -30,7 +30,13 @@
 
 #include <string>
 
+#include <boost/ptr_container/ptr_vector.hpp>
+
 namespace ixion {
+
+class token_base;
+
+typedef ::boost::ptr_vector<token_base> tokens_t;
 
 // ============================================================================
 
