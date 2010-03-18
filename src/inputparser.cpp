@@ -39,6 +39,17 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+void flush_buffer(vector<char>& buf, string& str)
+{
+    buf.push_back(0); // null-terminate the buffer.
+    str = &buf[0];
+    buf.clear();
+}
+
+}
+
 // ============================================================================
 
 model_parser::file_not_found::file_not_found(const string& fpath) : 
@@ -104,11 +115,7 @@ void model_parser::parse()
             case '=':
                 if (buf.empty())
                     throw parse_error("left hand side is empty");
-
-                buf.push_back(0);
-                name = &buf[0];
-                buf.clear();
-
+                flush_buffer(buf, name);
                 break;
             case '\n':
                 if (!buf.empty())
@@ -116,10 +123,7 @@ void model_parser::parse()
                     if (name.empty())
                         throw parse_error("'=' is missing");
 
-                    buf.push_back(0);
-                    formula = &buf[0];
-                    buf.clear();
-
+                    flush_buffer(buf, formula);
                     string_cell ce(name, formula);
                     cells.push_back(ce);
 
