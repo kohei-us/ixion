@@ -28,6 +28,7 @@
 #include "inputparser.hpp"
 #include "cell.hpp"
 #include "formula_lexer.hpp"
+#include "formula_parser.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -60,7 +61,8 @@ bool parse_model_input(const string& fpath)
         for (size_t i = 0; i < cells.size(); ++i)
         {    
             cout << "cell (" << cells[i].get_name() << "): " << cells[i].print() << endl;
-
+            formula_parser fparser(cells[i].get_tokens());
+            fparser.parse();
         }
     }
     catch (const exception& e)

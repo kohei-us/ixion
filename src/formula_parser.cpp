@@ -29,11 +29,16 @@
 
 namespace ixion {
 
-formula_parser::formula_parser()
+formula_parser::formula_parser(const tokens_t& tokens) :
+    m_tokens(tokens)
 {
 }
 
 formula_parser::~formula_parser()
+{
+}
+
+void formula_parser::parse()
 {
 }
 

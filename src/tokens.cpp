@@ -40,16 +40,16 @@ const char* get_opcode_name(opcode_t oc)
 {
     switch (oc)
     {
-        case oc_value:      return "value";
-        case oc_string:     return "string";
-        case oc_name:       return "name";
-        case oc_divide:     return "divide";
-        case oc_minus:      return "minus";
-        case oc_multiply:   return "multiply";
-        case oc_plus:       return "plus";
-        case oc_open:       return "open";
-        case oc_close:      return "close";
-        case oc_sep:        return "sep";
+        case op_value:      return "value";
+        case op_string:     return "string";
+        case op_name:       return "name";
+        case op_divide:     return "divide";
+        case op_minus:      return "minus";
+        case op_multiply:   return "multiply";
+        case op_plus:       return "plus";
+        case op_open:       return "open";
+        case op_close:      return "close";
+        case op_sep:        return "sep";
         default:
             ;
     }
@@ -102,17 +102,17 @@ const char* token::print() const
 {
     switch (get_opcode())
     {
-        case oc_plus:
+        case op_plus:
             return "+";
-        case oc_minus:
+        case op_minus:
             return "-";
-        case oc_divide:
+        case op_divide:
             return "/";
-        case oc_multiply:
+        case op_multiply:
             return "*";
-        case oc_open:
+        case op_open:
             return "(";
-        case oc_close:
+        case op_close:
             return ")";
     }
     return "";
@@ -121,7 +121,7 @@ const char* token::print() const
 // ============================================================================
 
 value_token::value_token(double val) :
-    token_base(oc_value),
+    token_base(op_value),
     m_val(val) 
 {
 }
@@ -151,7 +151,7 @@ const char* value_token::print() const
 // ============================================================================
 
 string_token::string_token(const string& str) :
-    token_base(oc_string),
+    token_base(op_string),
     m_str(str)
 {
 }
@@ -173,7 +173,7 @@ const char* string_token::print() const
 // ============================================================================
 
 name_token::name_token(const string& name) :
-    token_base(oc_name),
+    token_base(op_name),
     m_name(name)
 {
 }

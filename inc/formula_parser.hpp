@@ -31,14 +31,22 @@
 #include <boost/noncopyable.hpp>
 
 #include "global.hpp"
+#include "tokens.hpp"
 
 namespace ixion {
 
 class formula_parser : public ::boost::noncopyable
 {
 public:
-    formula_parser();
+    formula_parser(const tokens_t& tokens);
     ~formula_parser();
+
+    void parse();
+
+private:
+    formula_parser(); // disabled
+
+    tokens_t m_tokens;
 };
 
 }

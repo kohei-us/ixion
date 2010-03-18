@@ -42,20 +42,20 @@ typedef ::boost::ptr_vector<token_base> tokens_t;
 
 enum opcode_t {
     // data types
-    oc_value,
-    oc_string,
-    oc_name,
+    op_value,
+    op_string,
+    op_name,
 
     // arithmetic operators
-    oc_plus,
-    oc_minus,
-    oc_divide,
-    oc_multiply,
+    op_plus,
+    op_minus,
+    op_divide,
+    op_multiply,
 
     // parentheses, separators
-    oc_open,
-    oc_close,
-    oc_sep,
+    op_open,
+    op_close,
+    op_sep,
 };
 
 const char* get_opcode_name(opcode_t oc);
@@ -141,11 +141,11 @@ inline token_base* new_clone(const token_base& r)
     opcode_t oc = r.get_opcode();
     switch (oc)
     {
-        case oc_value:
+        case op_value:
             return new value_token(r.get_value());
-        case oc_string:
+        case op_string:
             return new string_token(r.get_string());
-        case oc_name:
+        case op_name:
             return new name_token(r.get_string());
     }
 
