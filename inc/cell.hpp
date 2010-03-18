@@ -71,7 +71,7 @@ public:
     string_cell(const string_cell& r);
     virtual ~string_cell();
 
-    const char* print() const;
+    virtual const char* print() const;
 
 private:
     string_cell();
@@ -88,7 +88,7 @@ public:
     formula_cell(const formula_cell& r);
     virtual ~formula_cell();
 
-    const char* print() const;
+    virtual const char* print() const;
 
 private:
     tokens_t m_tokens;
