@@ -28,6 +28,9 @@
 #ifndef __DEP_TRACKER_HPP__
 #define __DEP_TRACKER_HPP__
 
+#include <string>
+#include <vector>
+
 namespace ixion {
 
 class dep_tracker
@@ -35,6 +38,9 @@ class dep_tracker
 public:
     dep_tracker();
     ~dep_tracker();
+
+    void insert_dep(const ::std::string& name, const ::std::vector< ::std::string>& deps);
+
 private:
 };
 

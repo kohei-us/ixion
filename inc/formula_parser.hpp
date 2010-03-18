@@ -48,7 +48,9 @@ public:
     ~formula_parser();
 
     void parse();
+
     const formula_tokens_t& get_tokens() const;
+    
 
 private:
     formula_parser(); // disabled

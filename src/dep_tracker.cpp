@@ -27,6 +27,8 @@
 
 #include "dep_tracker.hpp"
 
+using namespace std;
+
 namespace ixion {
 
 dep_tracker::dep_tracker()
@@ -34,6 +36,10 @@ dep_tracker::dep_tracker()
 }
 
 dep_tracker::~dep_tracker()
+{
+}
+
+void dep_tracker::insert_dep(const string& name, const vector<string>& deps)
 {
 }
 
