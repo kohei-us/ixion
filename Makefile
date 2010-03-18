@@ -44,7 +44,8 @@ OBJFILES= \
 	$(OBJDIR)/formula_lexer.o \
 	$(OBJDIR)/formula_parser.o \
 	$(OBJDIR)/formula_tokens.o \
-	$(OBJDIR)/inputparser.o
+	$(OBJDIR)/inputparser.o \
+	$(OBJDIR)/dep_tracker.o
 
 all: $(EXEC)
 
@@ -74,6 +75,9 @@ $(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp
 
 $(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp
+
+$(OBJDIR)/dep_tracker.o: $(SRCDIR)/dep_tracker.cpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/dep_tracker.cpp
 
 $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
