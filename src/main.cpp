@@ -37,6 +37,8 @@
 using namespace std;
 using namespace ixion;
 
+namespace {
+
 bool parse_model_input(const string& fpath)
 {
     model_parser parser(fpath);
@@ -53,6 +55,17 @@ bool parse_model_input(const string& fpath)
         return false;
     }
     return true;
+}
+
+void print_help()
+{
+    cout << "usage: inputparser [options] FILE" << endl
+         << endl
+         << "The FILE must contain the definitions of cells according to the cell difinion rule." << endl
+         << "Options:" << endl
+         << "  -h      print this help." << endl;
+}
+
 }
 
 int main (int argc, char** argv)
@@ -78,7 +91,7 @@ int main (int argc, char** argv)
     {
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        int c = getopt_long (argc, argv, "abc:d:f:", long_options, &option_index);
+        int c = getopt_long (argc, argv, "hc:d:f:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -96,13 +109,9 @@ int main (int argc, char** argv)
                 printf ("\n");
                 break;
 
-            case 'a':
-                puts ("option -a\n");
-                break;
-
-            case 'b':
-                puts ("option -b\n");
-                break;
+            case 'h':
+                print_help();
+                exit(EXIT_SUCCESS);
 
             case 'c':
                 printf ("option -c with value `%s'\n", optarg);
@@ -118,6 +127,7 @@ int main (int argc, char** argv)
 
             case '?':
                 /* getopt_long already printed an error message. */
+                exit (EXIT_FAILURE);
                 break;
 
             default:
@@ -128,9 +138,10 @@ int main (int argc, char** argv)
     if (verbose_flag)
         puts ("verbose flag is set");
 
-    if (argc - optind > 1)
+    int num_args = argc - optind;
+    if (num_args != 1)
     {
-        fprintf(stderr, "takes exactly one argument\n");
+        fprintf(stderr, "Too many arguments.  It takes exactly one.\n");
         exit (EXIT_FAILURE);
     }
 
