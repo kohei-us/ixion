@@ -63,17 +63,31 @@ public:
         ::std::string m_msg;
     };
 
+    class cell : public base_cell
+    {
+    public:
+        cell(const ::std::string& name, tokens_t& tokens);
+        cell(const cell& r);
+        virtual ~cell();
+    
+        virtual const char* print() const;
+        const tokens_t& get_tokens() const;
+    
+    private:
+        tokens_t m_tokens;
+    };
+
     model_parser(const ::std::string& filepath);
     ~model_parser();
 
     void parse();
-    const ::std::vector<formula_cell>& get_cells() const;
+    const ::std::vector<cell>& get_cells() const;
 
 private:
     model_parser(); // disabled
 
 private:
-    ::std::vector<formula_cell> m_fcells;
+    ::std::vector<cell> m_fcells;
     ::std::string m_filepath;
 };
 

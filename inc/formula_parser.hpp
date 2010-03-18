@@ -35,6 +35,11 @@
 
 namespace ixion {
 
+/** 
+ * Class formula_parser parses a series of primitive tokens passed on from 
+ * the lexer, and turn them into a series of formula tokens.   It also picks 
+ * up a list of names that the cell depends on. 
+ */
 class formula_parser : public ::boost::noncopyable
 {
 public:

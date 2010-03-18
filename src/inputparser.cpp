@@ -57,7 +57,7 @@ bool parse_model_input(const string& fpath)
     try
     {
         parser.parse();
-        const vector<formula_cell>& cells = parser.get_cells();
+        const vector<model_parser::cell>& cells = parser.get_cells();
         for (size_t i = 0; i < cells.size(); ++i)
         {    
             cout << "cell (" << cells[i].get_name() << "): " << cells[i].print() << endl;
@@ -109,6 +109,37 @@ const char* model_parser::parse_error::what() const throw()
     return oss.str().c_str();
 }
 
+// ============================================================================
+
+model_parser::cell::cell(const string& name, tokens_t& tokens) :
+    base_cell(name)
+{
+    // Note that this will empty the passed token container !
+    m_tokens.swap(tokens);
+}
+
+model_parser::cell::cell(const model_parser::cell& r) :
+    base_cell(r),
+    m_tokens(r.m_tokens)
+{
+}
+
+model_parser::cell::~cell()
+{
+}
+
+const char* model_parser::cell::print() const
+{
+    return print_tokens(m_tokens, false);
+}
+
+const tokens_t& model_parser::cell::get_tokens() const
+{
+    return m_tokens;
+}
+
+// ============================================================================
+
 model_parser::model_parser(const string& filepath) :
     m_filepath(filepath)
 {
@@ -129,8 +160,7 @@ void model_parser::parse()
     string name, formula;
     vector<char> buf;
     buf.reserve(255);
-    vector<string_cell> cells;
-    vector<formula_cell> fcells;
+    vector<cell> fcells;
     while (file.get(c))
     {
         switch (c)
@@ -147,8 +177,6 @@ void model_parser::parse()
                         throw parse_error("'=' is missing");
 
                     flush_buffer(buf, formula);
-                    string_cell ce(name, formula);
-                    cells.push_back(ce);
 
                     // tokenize the formula string, and create a formula cell 
                     // with the tokens.
@@ -160,7 +188,7 @@ void model_parser::parse()
                     // test-print tokens.
                     cout << "tokens from lexer: " << print_tokens(tokens, true) << endl;
 
-                    formula_cell fcell(name, tokens);
+                    cell fcell(name, tokens);
                     fcells.push_back(fcell);
                 }
                 name.clear();
@@ -173,7 +201,7 @@ void model_parser::parse()
     m_fcells.swap(fcells);
 }
 
-const vector<formula_cell>& model_parser::get_cells() const
+const vector<model_parser::cell>& model_parser::get_cells() const
 {
     return m_fcells;
 }
