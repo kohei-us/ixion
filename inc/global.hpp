@@ -32,7 +32,7 @@
 
 namespace ixion {
 
-const char* print_tokens(const tokens_t& tokens, bool verbose);
+const char* print_tokens(const lexer_tokens_t& tokens, bool verbose);
 
 }
 

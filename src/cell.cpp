@@ -92,7 +92,7 @@ const char* string_cell::print() const
 
 // ============================================================================
 
-formula_cell::formula_cell(const string& name, tokens_t& tokens) :
+formula_cell::formula_cell(const string& name, formula_tokens_t& tokens) :
     base_cell(name)
 {
     // Note that this will empty the passed token container !
@@ -114,7 +114,7 @@ const char* formula_cell::print() const
     return print_tokens(m_tokens, false);
 }
 
-const tokens_t& formula_cell::get_tokens() const
+const formula_tokens_t& formula_cell::get_tokens() const
 {
     return m_tokens;
 }

@@ -28,9 +28,35 @@
 #ifndef __FORMULA_TOKENS_HPP__
 #define __FORMULA_TOKENS_HPP__
 
+#include <boost/ptr_container/ptr_vector.hpp>
+
 namespace ixion {
 
+class formula_token_base;
 
+typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
+
+const char* print_tokens(const formula_tokens_t& tokens, bool verbose);
+
+class formula_token_base
+{
+};
+
+// ============================================================================
+
+// We need the following inline functions for boost::ptr_container.
+
+inline formula_token_base* new_clone(const formula_token_base& r)
+{
+    return NULL;
+}
+
+inline void delete_clone(const formula_token_base* p)
+{
+    delete p;
+}
+
+// ============================================================================
 
 }
 

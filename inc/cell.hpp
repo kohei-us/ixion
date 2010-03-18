@@ -28,7 +28,7 @@
 #ifndef __CELL_HPP__
 #define __CELL_HPP__
 
-#include "tokens.hpp"
+#include "formula_tokens.hpp"
 #include "global.hpp"
 
 #include <string>
@@ -84,15 +84,15 @@ private:
 class formula_cell : public base_cell
 {
 public:
-    formula_cell(const ::std::string& name, tokens_t& tokens);
+    formula_cell(const ::std::string& name, formula_tokens_t& tokens);
     formula_cell(const formula_cell& r);
     virtual ~formula_cell();
 
     virtual const char* print() const;
-    const tokens_t& get_tokens() const;
+    const formula_tokens_t& get_tokens() const;
 
 private:
-    tokens_t m_tokens;
+    formula_tokens_t m_tokens;
 };
 
 // ============================================================================

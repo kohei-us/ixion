@@ -63,18 +63,20 @@ public:
         ::std::string m_msg;
     };
 
-    class cell : public base_cell
+    class cell
     {
     public:
-        cell(const ::std::string& name, tokens_t& tokens);
+        cell(const ::std::string& name, lexer_tokens_t& tokens);
         cell(const cell& r);
-        virtual ~cell();
+        ~cell();
     
-        virtual const char* print() const;
-        const tokens_t& get_tokens() const;
+        const char* print() const;
+        const ::std::string& get_name() const;
+        const lexer_tokens_t& get_tokens() const;
     
     private:
-        tokens_t m_tokens;
+        ::std::string m_name;
+        lexer_tokens_t m_tokens;
     };
 
     model_parser(const ::std::string& filepath);

@@ -36,7 +36,7 @@ namespace ixion {
 
 class token_base;
 
-typedef ::boost::ptr_vector<token_base> tokens_t;
+typedef ::boost::ptr_vector<token_base> lexer_tokens_t;
 
 // ============================================================================
 

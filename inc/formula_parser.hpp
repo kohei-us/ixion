@@ -43,7 +43,7 @@ namespace ixion {
 class formula_parser : public ::boost::noncopyable
 {
 public:
-    formula_parser(const tokens_t& tokens);
+    formula_parser(const lexer_tokens_t& tokens);
     ~formula_parser();
 
     void parse();
@@ -51,7 +51,8 @@ public:
 private:
     formula_parser(); // disabled
 
-    tokens_t m_tokens;
+    lexer_tokens_t m_tokens;
+
 };
 
 }

@@ -29,6 +29,9 @@
 
 namespace ixion {
 
-
+const char* print_tokens(const formula_tokens_t& tokens, bool verbose)
+{
+    return "";
+}
 
 }

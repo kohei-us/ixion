@@ -111,15 +111,15 @@ const char* model_parser::parse_error::what() const throw()
 
 // ============================================================================
 
-model_parser::cell::cell(const string& name, tokens_t& tokens) :
-    base_cell(name)
+model_parser::cell::cell(const string& name, lexer_tokens_t& tokens) :
+    m_name(name)
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
 }
 
 model_parser::cell::cell(const model_parser::cell& r) :
-    base_cell(r),
+    m_name(r.m_name),
     m_tokens(r.m_tokens)
 {
 }
@@ -133,7 +133,12 @@ const char* model_parser::cell::print() const
     return print_tokens(m_tokens, false);
 }
 
-const tokens_t& model_parser::cell::get_tokens() const
+const string& model_parser::cell::get_name() const
+{
+    return m_name;
+}
+
+const lexer_tokens_t& model_parser::cell::get_tokens() const
 {
     return m_tokens;
 }
@@ -182,7 +187,7 @@ void model_parser::parse()
                     // with the tokens.
                     formula_lexer lexer(formula);
                     lexer.tokenize();
-                    tokens_t tokens;
+                    lexer_tokens_t tokens;
                     lexer.swap_tokens(tokens);
 
                     // test-print tokens.

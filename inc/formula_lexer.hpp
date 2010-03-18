@@ -59,12 +59,12 @@ public:
      *
      * @param tokens token container to move the tokens to.
      */
-    void swap_tokens(tokens_t& tokens);
+    void swap_tokens(lexer_tokens_t& tokens);
 
 private:
     formula_lexer();
 
-    tokens_t m_tokens;
+    lexer_tokens_t m_tokens;
     ::std::string m_formula;
 };
 
