@@ -43,6 +43,7 @@ OBJFILES= \
 	$(OBJDIR)/global.o \
 	$(OBJDIR)/formula_lexer.o \
 	$(OBJDIR)/formula_parser.o \
+	$(OBJDIR)/formula_tokens.o \
 	$(OBJDIR)/inputparser.o
 
 all: $(EXEC)
@@ -67,6 +68,9 @@ $(OBJDIR)/formula_lexer.o: $(SRCDIR)/formula_lexer.cpp
 
 $(OBJDIR)/formula_parser.o: $(SRCDIR)/formula_parser.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_parser.cpp
+
+$(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_tokens.cpp
 
 $(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp
