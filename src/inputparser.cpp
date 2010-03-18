@@ -59,10 +59,12 @@ bool parse_model_input(const string& fpath)
         parser.parse();
         const vector<model_parser::cell>& cells = parser.get_cells();
         for (size_t i = 0; i < cells.size(); ++i)
-        {    
-            cout << "cell (" << cells[i].get_name() << "): " << cells[i].print() << endl;
-            formula_parser fparser(cells[i].get_tokens());
+        {   
+            const model_parser::cell& cell = cells[i]; 
+            cout << "cell (" << cell.get_name() << "): " << cell.print() << endl;
+            formula_parser fparser(cell.get_tokens());
             fparser.parse();
+
         }
     }
     catch (const exception& e)

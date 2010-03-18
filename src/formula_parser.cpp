@@ -42,4 +42,9 @@ void formula_parser::parse()
 {
 }
 
+const formula_tokens_t& formula_parser::get_tokens() const
+{
+    return m_formula_tokens;
+}
+
 }

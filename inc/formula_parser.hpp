@@ -32,13 +32,14 @@
 
 #include "global.hpp"
 #include "tokens.hpp"
+#include "formula_tokens.hpp"
 
 namespace ixion {
 
 /** 
- * Class formula_parser parses a series of primitive tokens passed on from 
- * the lexer, and turn them into a series of formula tokens.   It also picks 
- * up a list of names that the cell depends on. 
+ * Class formula_parser parses a series of primitive (or lexer) tokens 
+ * passed on from the lexer, and turn them into a series of formula tokens. 
+ * It also picks up a list of names that the cell depends on. 
  */
 class formula_parser : public ::boost::noncopyable
 {
@@ -47,12 +48,13 @@ public:
     ~formula_parser();
 
     void parse();
+    const formula_tokens_t& get_tokens() const;
 
 private:
     formula_parser(); // disabled
 
-    lexer_tokens_t m_tokens;
-
+    lexer_tokens_t   m_tokens;
+    formula_tokens_t m_formula_tokens;
 };
 
 }
