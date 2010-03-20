@@ -128,10 +128,11 @@ bool parse_model_input(const string& fpath)
         for (size_t i = 0; i < cells.size(); ++i)
         {   
             const model_parser::cell& cell = cells[i]; 
-            cout << "cell (" << cell.get_name() << "): " << cell.print() << endl;
+            cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
             formula_parser fparser(cell.get_tokens(), &cell_map);
             fparser.parse();
 
+            // TODO: Build dependency graph.
         }
     }
     catch (const exception& e)

@@ -33,13 +33,68 @@
 namespace ixion {
 
 class formula_token_base;
+class base_cell;
 
 typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
 
 const char* print_tokens(const formula_tokens_t& tokens, bool verbose);
 
+// ============================================================================
+
+/** formula opcode type */
+enum fopcode_t {
+    // data types
+    fop_single_ref,
+    fop_string,
+    fop_value,
+
+    // arithmetic operators
+    fop_plus,
+    fop_minus,
+    fop_divide,
+    fop_multiply,
+
+    // parentheses, separators
+    fop_open,
+    fop_close,
+    fop_sep,
+
+    // error conditions
+    fop_err_no_ref,
+};
+
+// ============================================================================
+
 class formula_token_base
 {
+public:
+    formula_token_base(fopcode_t op);
+    formula_token_base(const formula_token_base& r);
+    virtual ~formula_token_base() = 0;
+
+    fopcode_t get_opcode() const;
+
+    virtual const base_cell* get_single_ref() const;
+
+private:
+    formula_token_base(); // disabled
+
+    fopcode_t m_opcode;
+};
+
+// ============================================================================
+
+class single_ref_token : public formula_token_base
+{
+public:
+    single_ref_token(const base_cell* p_cell);
+    single_ref_token(const single_ref_token& r);
+    virtual ~single_ref_token();
+
+    virtual const base_cell* get_single_ref() const;
+
+private:
+    const base_cell* mp_cell; // referenced cell, pointer only.
 };
 
 // ============================================================================
@@ -48,6 +103,32 @@ class formula_token_base
 
 inline formula_token_base* new_clone(const formula_token_base& r)
 {
+
+    switch (r.get_opcode())
+    {
+        case fop_close:
+            break;
+        case fop_divide:
+            break;
+        case fop_minus:
+            break;
+        case fop_multiply:
+            break;
+        case fop_open:
+            break;
+        case fop_plus:
+            break;
+        case fop_sep:
+            break;
+        case fop_single_ref:
+            return new single_ref_token(r.get_single_ref());
+        case fop_string:
+            break;
+        case fop_value:
+            break;
+        default:
+            ;
+    }
     return NULL;
 }
 

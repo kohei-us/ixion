@@ -58,12 +58,13 @@ public:
 
     const formula_tokens_t& get_tokens() const;
     
-
 private:
     formula_parser(); // disabled
 
-    lexer_tokens_t   m_tokens;
-    formula_tokens_t m_formula_tokens;
+    void name(const token_base& t);
+
+    const lexer_tokens_t    m_tokens;
+    formula_tokens_t        m_formula_tokens;
 
     const cell_name_map_t* mp_cell_names;
 };

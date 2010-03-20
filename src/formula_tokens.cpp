@@ -34,4 +34,53 @@ const char* print_tokens(const formula_tokens_t& tokens, bool verbose)
     return "";
 }
 
+// ============================================================================
+
+formula_token_base::formula_token_base(fopcode_t op) :
+    m_opcode(op)
+{
+}
+
+formula_token_base::formula_token_base(const formula_token_base& r) :
+    m_opcode(r.m_opcode)
+{
+}
+
+formula_token_base::~formula_token_base()
+{
+}
+
+fopcode_t formula_token_base::get_opcode() const
+{
+    return m_opcode;
+}
+
+const base_cell* formula_token_base::get_single_ref() const
+{
+    return NULL;
+}
+
+// ============================================================================
+
+single_ref_token::single_ref_token(const base_cell* pcell) :
+    formula_token_base(fop_single_ref),
+    mp_cell(pcell)
+{
+}
+
+single_ref_token::single_ref_token(const single_ref_token& r) :
+    formula_token_base(r),
+    mp_cell(r.mp_cell)
+{
+}
+
+single_ref_token::~single_ref_token()
+{
+}
+
+const base_cell* single_ref_token::get_single_ref() const
+{
+    return mp_cell;
+}
+
 }

@@ -27,7 +27,22 @@
 
 #include "formula_parser.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 namespace ixion {
+
+namespace {
+
+class ref_error : public general_error
+{
+public:
+    ref_error(const string& msg) :
+        general_error(msg) {}
+};
+
+}
 
 formula_parser::formula_parser(const lexer_tokens_t& tokens, const cell_name_map_t* p_cell_names) :
     m_tokens(tokens),
@@ -41,11 +56,63 @@ formula_parser::~formula_parser()
 
 void formula_parser::parse()
 {
+    try
+    {
+        size_t n = m_tokens.size();
+        for (size_t i = 0; i < n; ++i)
+        {
+            const token_base& t = m_tokens[i];
+            switch (t.get_opcode())
+            {
+                case op_close:
+                    break;
+                case op_divide:
+                    break;
+                case op_minus:
+                    break;
+                case op_multiply:
+                    break;
+                case op_name:
+                    name(t);
+                    break;
+                case op_open:
+                    break;
+                case op_plus:
+                    break;
+                case op_sep:
+                    break;
+                case op_string:
+                    break;
+                case op_value:
+                    break;
+                default:
+                    ;
+            }
+        }
+    }
+    catch (const ref_error& e)
+    {
+
+    }
 }
 
 const formula_tokens_t& formula_parser::get_tokens() const
 {
     return m_formula_tokens;
+}
+
+void formula_parser::name(const token_base& t)
+{
+    const string name = t.get_string();
+    cell_name_map_t::const_iterator itr = mp_cell_names->find(name);
+    if (itr == mp_cell_names->end())
+    {
+        // referenced name not found.
+        throw ref_error(name + " not found");
+    }
+
+    cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
+    m_formula_tokens.push_back(new single_ref_token(itr->second));
 }
 
 }
