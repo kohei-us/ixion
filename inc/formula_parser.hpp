@@ -28,13 +28,20 @@
 #ifndef __FORMULA_PARSER_HPP__
 #define __FORMULA_PARSER_HPP__
 
-#include <boost/noncopyable.hpp>
-
 #include "global.hpp"
 #include "tokens.hpp"
 #include "formula_tokens.hpp"
 
+#include <boost/noncopyable.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
+
+#include <string>
+
 namespace ixion {
+
+class base_cell;
+
+typedef ::boost::ptr_map< ::std::string, base_cell> cell_name_map_t;
 
 /** 
  * Class formula_parser parses a series of primitive (or lexer) tokens 
@@ -44,7 +51,7 @@ namespace ixion {
 class formula_parser : public ::boost::noncopyable
 {
 public:
-    formula_parser(const lexer_tokens_t& tokens);
+    formula_parser(const lexer_tokens_t& tokens, const cell_name_map_t* p_cell_names);
     ~formula_parser();
 
     void parse();
@@ -57,6 +64,8 @@ private:
 
     lexer_tokens_t   m_tokens;
     formula_tokens_t m_formula_tokens;
+
+    const cell_name_map_t* mp_cell_names;
 };
 
 }

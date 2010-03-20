@@ -123,7 +123,7 @@ bool parse_model_input(const string& fpath)
         {   
             const model_parser::cell& cell = cells[i]; 
             cout << "cell (" << cell.get_name() << "): " << cell.print() << endl;
-            formula_parser fparser(cell.get_tokens());
+            formula_parser fparser(cell.get_tokens(), &cell_map);
             fparser.parse();
 
         }

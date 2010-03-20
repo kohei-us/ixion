@@ -29,8 +29,9 @@
 
 namespace ixion {
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens) :
-    m_tokens(tokens)
+formula_parser::formula_parser(const lexer_tokens_t& tokens, const cell_name_map_t* p_cell_names) :
+    m_tokens(tokens),
+    mp_cell_names(p_cell_names)
 {
 }
 
