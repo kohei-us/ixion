@@ -30,7 +30,19 @@
 
 #include "tokens.hpp"
 
+#include <string>
+
 namespace ixion {
+
+class general_error : public ::std::exception
+{
+public:
+    explicit general_error(const ::std::string& msg);
+    ~general_error() throw();
+    virtual const char* what() const throw();
+private:
+    ::std::string m_msg;
+};
 
 const char* print_tokens(const lexer_tokens_t& tokens, bool verbose);
 

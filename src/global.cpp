@@ -54,6 +54,20 @@ private:
 
 }
 
+general_error::general_error(const string& msg) :
+    m_msg(msg)
+{
+}
+
+general_error::~general_error() throw()
+{
+}
+
+const char* general_error::what() const throw()
+{
+    return m_msg.c_str();
+}
+
 const char* print_tokens(const lexer_tokens_t& tokens, bool verbose)
 {
     ostringstream os;

@@ -69,17 +69,25 @@ private:
     ptr_map<string, base_cell>& m_cell_map;
 };
 
+void ensure_unique_names(const vector<string>& cell_names)
+{
+    vector<string> names = cell_names;
+    sort(names.begin(), names.end());
+    if (unique(names.begin(), names.end()) != names.end())
+        throw general_error("Duplicate names exist in the list of cell names.");
+}
+
 void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string, base_cell>& cell_map)
 {
-    // TODO: Check to make sure the cell names don't have duplicates.
+    ensure_unique_names(cell_names);
 
     typedef ptr_map<string, base_cell> _cellmap_type;
     for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
     _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
+
+    // debug output.
     for (; itr != itr_end; ++itr)
-    {
         cout << itr->first << " := " << itr->second << endl;
-    }
 }
 
 }
