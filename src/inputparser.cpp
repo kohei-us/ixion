@@ -57,23 +57,23 @@ void flush_buffer(vector<char>& buf, string& str)
 class formula_cell_inserter : public ::std::unary_function<string, void>
 {
 public:
-    formula_cell_inserter(ptr_map<string, formula_cell>& cell_map) :
+    formula_cell_inserter(ptr_map<string, base_cell>& cell_map) :
         m_cell_map(cell_map) {}
 
     void operator() (const string& name)
     {
-        ptr_map_insert(m_cell_map)(name);
+        ptr_map_insert<formula_cell>(m_cell_map)(name);
     }
 
 private:
-    ptr_map<string, formula_cell>& m_cell_map;
+    ptr_map<string, base_cell>& m_cell_map;
 };
 
-void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string, formula_cell>& cell_map)
+void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string, base_cell>& cell_map)
 {
     // TODO: Check to make sure the cell names don't have duplicates.
 
-    typedef ptr_map<string, formula_cell> _cellmap_type;
+    typedef ptr_map<string, base_cell> _cellmap_type;
     for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
     _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
     for (; itr != itr_end; ++itr)
@@ -115,7 +115,7 @@ bool parse_model_input(const string& fpath)
 
         // TODO: Check to make sure the cell names don't have duplicates.
 
-        ptr_map<string, formula_cell> cell_map;
+        ptr_map<string, base_cell> cell_map;
         create_empty_formula_cells(cell_names, cell_map);
 
         const vector<model_parser::cell>& cells = parser.get_cells();
