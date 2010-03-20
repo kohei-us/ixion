@@ -121,8 +121,6 @@ bool parse_model_input(const string& fpath)
         // name-to-pointer associations.
         const vector<string>& cell_names = parser.get_cell_names();
 
-        // TODO: Check to make sure the cell names don't have duplicates.
-
         ptr_map<string, base_cell> cell_map;
         create_empty_formula_cells(cell_names, cell_map);
 
