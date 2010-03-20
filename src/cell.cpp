@@ -30,6 +30,8 @@
 #include <string>
 #include <sstream>
 
+#include <cstdio>
+
 using namespace std;
 
 namespace ixion {
@@ -46,13 +48,13 @@ address::~address()
 
 // ============================================================================
 
-base_cell::base_cell(const string& name) :
-    m_name(name)
+base_cell::base_cell(celltype_t celltype) :
+    m_celltype(celltype)
 {
 }
 
 base_cell::base_cell(const base_cell& r) :
-    m_name(r.m_name)
+    m_celltype(r.m_celltype)
 {
 }
 
@@ -60,15 +62,15 @@ base_cell::~base_cell()
 {
 }
 
-const string& base_cell::get_name() const
+celltype_t base_cell::get_celltype() const
 {
-    return m_name;
+    return m_celltype;
 }
 
 // ============================================================================
 
-string_cell::string_cell(const string& name, const string& formula) :
-    base_cell(name),
+string_cell::string_cell(const string& formula) :
+    base_cell(celltype_string),
     m_formula(formula)
 {
 }
@@ -85,15 +87,18 @@ string_cell::~string_cell()
 
 const char* string_cell::print() const
 {
-    ostringstream os;
-    os << get_name() << " = " << m_formula;
-    return os.str().c_str();
+    return m_formula.c_str();
 }
 
 // ============================================================================
 
-formula_cell::formula_cell(const string& name, formula_tokens_t& tokens) :
-    base_cell(name)
+formula_cell::formula_cell() :
+    base_cell(celltype_formula)
+{
+}
+
+formula_cell::formula_cell(formula_tokens_t& tokens) :
+    base_cell(celltype_formula)
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);

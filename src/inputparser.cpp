@@ -36,7 +36,12 @@
 #include <vector>
 #include <functional>
 
+#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/assign/ptr_map_inserter.hpp>
+
 using namespace std;
+using ::boost::ptr_map;
+using ::boost::assign::ptr_map_insert;
 
 namespace ixion {
 
@@ -49,14 +54,70 @@ void flush_buffer(vector<char>& buf, string& str)
     buf.clear();
 }
 
+class formula_cell_inserter : public ::std::unary_function<string, void>
+{
+public:
+    formula_cell_inserter(ptr_map<string, formula_cell>& cell_map) :
+        m_cell_map(cell_map) {}
+
+    void operator() (const string& name)
+    {
+        ptr_map_insert(m_cell_map)(name);
+    }
+
+private:
+    ptr_map<string, formula_cell>& m_cell_map;
+};
+
+void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string, formula_cell>& cell_map)
+{
+    // TODO: Check to make sure the cell names don't have duplicates.
+
+    typedef ptr_map<string, formula_cell> _cellmap_type;
+    for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
+    _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
+    for (; itr != itr_end; ++itr)
+    {
+        cout << itr->first << " := " << itr->second << endl;
+    }
 }
 
+}
+
+/** 
+ * This method does the following: 
+ *  
+ * <ol> 
+ * <li>Read the input file, and parse the definition of each model 
+ * "cell" and tokenize it into a series of lexer tokens.</li> 
+ * <li>Create instances of formula cells, store them and map them 
+ * with names.  The mapping will be used when resolving model cell's 
+ * names to pointers of their corresponding formula cell instances.</li> 
+ * <li>Parse the lexer tokens for each model cell, and convert them 
+ * into formula tokens.  At this point, referenced cell names stored in 
+ * the lexer tokens get converted into formula cell pointers.</li> 
+ * </ol>
+ *
+ * @param fpath path to the input model file. 
+ * 
+ * @return true if the conversion is successful, false otherwise.
+ */
 bool parse_model_input(const string& fpath)
 {
     model_parser parser(fpath);
     try
     {
         parser.parse();
+
+        // First, create empty formula cell instances so that we can have 
+        // name-to-pointer associations.
+        const vector<string>& cell_names = parser.get_cell_names();
+
+        // TODO: Check to make sure the cell names don't have duplicates.
+
+        ptr_map<string, formula_cell> cell_map;
+        create_empty_formula_cells(cell_names, cell_map);
+
         const vector<model_parser::cell>& cells = parser.get_cells();
         for (size_t i = 0; i < cells.size(); ++i)
         {   
@@ -168,6 +229,7 @@ void model_parser::parse()
     vector<char> buf;
     buf.reserve(255);
     vector<cell> fcells;
+    vector<string> cell_names;
     while (file.get(c))
     {
         switch (c)
@@ -176,6 +238,7 @@ void model_parser::parse()
                 if (buf.empty())
                     throw parse_error("left hand side is empty");
                 flush_buffer(buf, name);
+                cell_names.push_back(name);
                 break;
             case '\n':
                 if (!buf.empty())
@@ -205,12 +268,19 @@ void model_parser::parse()
                 buf.push_back(c);
         }
     }
+
     m_fcells.swap(fcells);
+    m_cell_names.swap(cell_names);
 }
 
 const vector<model_parser::cell>& model_parser::get_cells() const
 {
     return m_fcells;
+}
+
+const vector<string>& model_parser::get_cell_names() const
+{
+    return m_cell_names;
 }
 
 }

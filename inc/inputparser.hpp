@@ -84,12 +84,13 @@ public:
 
     void parse();
     const ::std::vector<cell>& get_cells() const;
-
+    const ::std::vector< ::std::string>& get_cell_names() const;
 private:
     model_parser(); // disabled
 
 private:
-    ::std::vector<cell> m_fcells;
+    ::std::vector<cell>             m_fcells;
+    ::std::vector< ::std::string>   m_cell_names;
     ::std::string m_filepath;
 };
 

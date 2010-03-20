@@ -47,19 +47,29 @@ private:
 
 // ============================================================================
 
+enum celltype_t {
+    celltype_string,
+    celltype_formula,
+    celltype_unknown
+};
+
+// ============================================================================
+
 class base_cell
 {
 public:
-    base_cell(const ::std::string& name);
+    base_cell(celltype_t celltype);
     base_cell(const base_cell& r);
     virtual ~base_cell() = 0;
 
     virtual const char* print() const = 0;
 
-    const ::std::string& get_name() const;
+    celltype_t get_celltype() const;
 
 private:
-    ::std::string m_name;
+    base_cell(); // disabled
+
+    celltype_t m_celltype;
 };
 
 // ============================================================================
@@ -67,7 +77,7 @@ private:
 class string_cell : public base_cell
 {
 public:
-    string_cell(const ::std::string& name, const ::std::string& formula);
+    string_cell(const ::std::string& formula);
     string_cell(const string_cell& r);
     virtual ~string_cell();
 
@@ -84,7 +94,8 @@ private:
 class formula_cell : public base_cell
 {
 public:
-    formula_cell(const ::std::string& name, formula_tokens_t& tokens);
+    formula_cell();
+    formula_cell(formula_tokens_t& tokens);
     formula_cell(const formula_cell& r);
     virtual ~formula_cell();
 
@@ -96,6 +107,11 @@ private:
 };
 
 // ============================================================================
+
+inline bool operator <(const base_cell& l, const base_cell& r)
+{
+    return &l < &r;
+}
 
 }
 
