@@ -101,6 +101,7 @@ public:
 
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
+    void swap_tokens(formula_tokens_t& tokens);
 
 private:
     formula_tokens_t m_tokens;

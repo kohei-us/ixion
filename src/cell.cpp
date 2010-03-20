@@ -124,4 +124,9 @@ const formula_tokens_t& formula_cell::get_tokens() const
     return m_tokens;
 }
 
+void formula_cell::swap_tokens(formula_tokens_t& tokens)
+{
+    m_tokens.swap(tokens);
+}
+
 }
