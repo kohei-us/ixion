@@ -139,6 +139,7 @@ private:
 inline token_base* new_clone(const token_base& r)
 {
     opcode_t oc = r.get_opcode();
+
     switch (oc)
     {
         case op_value:
@@ -147,6 +148,15 @@ inline token_base* new_clone(const token_base& r)
             return new string_token(r.get_string());
         case op_name:
             return new name_token(r.get_string());
+        case op_close:
+        case op_divide:
+        case op_minus:
+        case op_multiply:
+        case op_open:
+        case op_plus:
+        case op_sep:
+        default:
+            ;
     }
 
     return new token(oc);

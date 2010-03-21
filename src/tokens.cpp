@@ -114,6 +114,12 @@ const char* token::print() const
             return "(";
         case op_close:
             return ")";
+        case op_name:
+        case op_sep:
+        case op_string:
+        case op_value:
+        default:
+            ;
     }
     return "";
 }
