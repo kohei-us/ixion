@@ -104,6 +104,9 @@ void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string
  * <li>Parse the lexer tokens for each model cell, and convert them 
  * into formula tokens.  At this point, referenced cell names stored in 
  * the lexer tokens get converted into formula cell pointers.</li> 
+ * <li>Pass the formula tokens into corresponding formula cell instances, 
+ * and pass the cell dependency data to dependency tracker class instance.
+ * </li> 
  * </ol>
  *
  * @param fpath path to the input model file. 
