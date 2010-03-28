@@ -101,6 +101,11 @@ const formula_tokens_t& formula_parser::get_tokens() const
     return m_formula_tokens;
 }
 
+formula_tokens_t& formula_parser::get_tokens()
+{
+    return m_formula_tokens;
+}
+
 void formula_parser::name(const token_base& t)
 {
     const string name = t.get_string();

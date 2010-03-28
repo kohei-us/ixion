@@ -132,6 +132,17 @@ bool parse_model_input(const string& fpath)
             formula_parser fparser(cell.get_tokens(), &cell_map);
             fparser.parse();
 
+            // Put the formula tokens into formula cell instance.
+            ptr_map<string, base_cell>::iterator itr = cell_map.find(cell.get_name());
+            if (itr == cell_map.end())
+                throw general_error("formula cell not found");
+
+            base_cell* pcell = itr->second;
+            if (pcell->get_celltype() != celltype_formula)
+                throw general_error("formula cell is expected but not found");
+
+            static_cast<formula_cell*>(pcell)->swap_tokens(fparser.get_tokens());
+
             // TODO: Build dependency graph.
         }
     }
