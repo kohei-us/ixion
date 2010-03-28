@@ -141,7 +141,10 @@ bool parse_model_input(const string& fpath)
             if (pcell->get_celltype() != celltype_formula)
                 throw general_error("formula cell is expected but not found");
 
-            static_cast<formula_cell*>(pcell)->swap_tokens(fparser.get_tokens());
+            formula_cell* fcell = static_cast<formula_cell*>(pcell);
+            fcell->swap_tokens(fparser.get_tokens());
+
+            assert(fparser.get_tokens().empty());
 
             // TODO: Build dependency graph.
         }
