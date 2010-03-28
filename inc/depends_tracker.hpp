@@ -25,22 +25,25 @@
  *
  ************************************************************************/
 
-#include "dep_tracker.hpp"
+#ifndef __DEP_TRACKER_HPP__
+#define __DEP_TRACKER_HPP__
 
-using namespace std;
+#include <string>
+#include <vector>
 
 namespace ixion {
 
-dep_tracker::dep_tracker()
+class depends_tracker
 {
+public:
+    depends_tracker();
+    ~depends_tracker();
+
+    void insert_dep(const ::std::string& name, const ::std::vector< ::std::string>& deps);
+
+private:
+};
+
 }
 
-dep_tracker::~dep_tracker()
-{
-}
-
-void dep_tracker::insert_dep(const string& name, const vector<string>& deps)
-{
-}
-
-}
+#endif

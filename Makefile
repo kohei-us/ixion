@@ -34,7 +34,14 @@ CPPFLAGS=-I$(INCDIR) -g -Wall
 LDFLAGS=
 
 HEADERS= \
-	$(INCDIR)/inputparser.hpp
+	$(INCDIR)/cell.hpp \
+	$(INCDIR)/depends_tracker.hpp \
+	$(INCDIR)/formula_lexer.hpp \
+	$(INCDIR)/formula_parser.hpp \
+	$(INCDIR)/formula_tokens.hpp \
+	$(INCDIR)/global.hpp \
+	$(INCDIR)/inputparser.hpp \
+	$(INCDIR)/tokens.hpp
 
 OBJFILES= \
 	$(OBJDIR)/main.o \
@@ -45,39 +52,42 @@ OBJFILES= \
 	$(OBJDIR)/formula_parser.o \
 	$(OBJDIR)/formula_tokens.o \
 	$(OBJDIR)/inputparser.o \
-	$(OBJDIR)/dep_tracker.o
+	$(OBJDIR)/depends_tracker.o
+
+DEPENDS= \
+	$(HEADERS)
 
 all: $(EXEC)
 
 pre:
 	mkdir $(OBJDIR) 2>/dev/null || /bin/true
 
-$(OBJDIR)/main.o: $(SRCDIR)/main.cpp
+$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/main.cpp
 
-$(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp
+$(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell.cpp
 
-$(OBJDIR)/tokens.o: $(SRCDIR)/tokens.cpp
+$(OBJDIR)/tokens.o: $(SRCDIR)/tokens.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/tokens.cpp
 
-$(OBJDIR)/global.o: $(SRCDIR)/global.cpp
+$(OBJDIR)/global.o: $(SRCDIR)/global.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/global.cpp
 
-$(OBJDIR)/formula_lexer.o: $(SRCDIR)/formula_lexer.cpp
+$(OBJDIR)/formula_lexer.o: $(SRCDIR)/formula_lexer.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_lexer.cpp
 
-$(OBJDIR)/formula_parser.o: $(SRCDIR)/formula_parser.cpp
+$(OBJDIR)/formula_parser.o: $(SRCDIR)/formula_parser.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_parser.cpp
 
-$(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp
+$(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_tokens.cpp
 
-$(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp
+$(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp
 
-$(OBJDIR)/dep_tracker.o: $(SRCDIR)/dep_tracker.cpp
-	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/dep_tracker.cpp
+$(OBJDIR)/depends_tracker.o: $(SRCDIR)/depends_tracker.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depends_tracker.cpp
 
 $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
