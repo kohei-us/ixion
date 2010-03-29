@@ -36,6 +36,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include <string>
+#include <vector>
 
 namespace ixion {
 
@@ -46,7 +47,7 @@ typedef ::boost::ptr_map< ::std::string, base_cell> cell_name_map_t;
 /** 
  * Class formula_parser parses a series of primitive (or lexer) tokens 
  * passed on from the lexer, and turn them into a series of formula tokens. 
- * It also picks up a list of names that the cell depends on. 
+ * It also picks up a list of dependent cells.
  */
 class formula_parser : public ::boost::noncopyable
 {
@@ -58,8 +59,8 @@ public:
 
     void parse();
 
-    const formula_tokens_t& get_tokens() const;
     formula_tokens_t& get_tokens();
+    const ::std::vector<const base_cell*>& get_depend_cells() const;
     
 private:
     formula_parser(); // disabled
@@ -68,7 +69,7 @@ private:
 
     const lexer_tokens_t    m_tokens;
     formula_tokens_t        m_formula_tokens;
-    depends_cell_array_type m_depend_cells;
+    ::std::vector<const base_cell*> m_depend_cells;
 
     const cell_name_map_t* mp_cell_names;
 };

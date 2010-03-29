@@ -96,14 +96,14 @@ void formula_parser::parse()
     }
 }
 
-const formula_tokens_t& formula_parser::get_tokens() const
+formula_tokens_t& formula_parser::get_tokens()
 {
     return m_formula_tokens;
 }
 
-formula_tokens_t& formula_parser::get_tokens()
+const vector<const base_cell*>& formula_parser::get_depend_cells() const
 {
-    return m_formula_tokens;
+    return m_depend_cells;
 }
 
 void formula_parser::name(const token_base& t)
@@ -118,6 +118,7 @@ void formula_parser::name(const token_base& t)
 
     cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
     m_formula_tokens.push_back(new single_ref_token(itr->second));
+    m_depend_cells.push_back(itr->second);
 }
 
 }
