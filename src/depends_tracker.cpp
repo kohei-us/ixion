@@ -31,10 +31,8 @@
 
 #include <iostream>
 #include <fstream>
-#include <boost/assign/ptr_map_inserter.hpp>
 
 using namespace std;
-using ::boost::assign::ptr_map_insert;
 
 namespace ixion {
 
