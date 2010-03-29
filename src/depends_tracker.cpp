@@ -27,6 +27,7 @@
 
 #include "depends_tracker.hpp"
 #include "global.hpp"
+#include "cell.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -50,18 +51,17 @@ void depends_tracker::insert_depend(formula_cell* origin_cell, base_cell* depend
 {
     cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
     depend_map_type::iterator itr = m_map.find(origin_cell);
-    if (itr != m_map.end())
+    if (itr == m_map.end())
     {
-        // This origin cell already has dependent cells.
-        itr->second->insert(depend_cell);
-        cout << "map count: " << m_map.size() << endl;
-        return;
+        // First dependent cell for this origin cell.
+        pair<depend_map_type::iterator, bool> r = m_map.insert(origin_cell, new depend_cells_type);
+        if (!r.second)
+            throw general_error("failed to insert a new set instance");
+
+        itr = r.first;
     }
 
-    // First dependent cell for this origin cell.
-    depend_cells_type* p = new depend_cells_type;
-    p->insert(depend_cell);
-    m_map.insert(origin_cell, p);
+    itr->second->insert(depend_cell);
     cout << "map count: " << m_map.size() << endl;
 }
 
@@ -73,7 +73,7 @@ void depends_tracker::print_dot_graph(const string& dotpath) const
     for (; itr != itr_end; ++itr)
     {
         const formula_cell* origin_cell = itr->first;
-        string origin = get_cell_name(reinterpret_cast<const base_cell*>(origin_cell));
+        string origin = get_cell_name(static_cast<const base_cell*>(origin_cell));
         print_dot_graph_depend(file, origin, *itr->second);
     }
     file << "}" << endl;
