@@ -59,6 +59,11 @@ public:
      */
     void insert_depend(formula_cell* origin_cell, base_cell* depend_cell);
 
+    /** 
+     * Create a file and write cell dependency graph in dot script.
+     *
+     * @param dotpath output file path.
+     */
     void print_dot_graph(const ::std::string& dotpath) const;
 
 private:
