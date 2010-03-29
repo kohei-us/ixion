@@ -25,21 +25,33 @@
  *
  ************************************************************************/
 
-#ifndef __DEP_TRACKER_HPP__
-#define __DEP_TRACKER_HPP__
+#ifndef __DEPENDS_TRACKER_HPP__
+#define __DEPENDS_TRACKER_HPP__
 
 #include <string>
 #include <vector>
 
 namespace ixion {
 
+class base_cell;
+class formula_cell;
+
+/** 
+ * This class keeps track of inter-cell dependencies.
+ */
 class depends_tracker
 {
 public:
     depends_tracker();
     ~depends_tracker();
 
-    void insert_dep(const ::std::string& name, const ::std::vector< ::std::string>& deps);
+    /** 
+     * Insert a single dependency relationship.
+     *
+     * @param origin_cell* cell that depends on <code>depend_cell</code>.
+     * @param depend_cell* cell that <code>origin_cell</code> depends on.
+     */
+    void insert_depend(formula_cell* origin_cell, base_cell* depend_cell);
 
 private:
 };

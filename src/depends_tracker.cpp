@@ -39,7 +39,7 @@ depends_tracker::~depends_tracker()
 {
 }
 
-void depends_tracker::insert_dep(const string& name, const vector<string>& deps)
+void depends_tracker::insert_depend(formula_cell* origin_cell, base_cell* depend_cell)
 {
 }
 

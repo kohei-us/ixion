@@ -29,6 +29,7 @@
 #include "cell.hpp"
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
+#include "depends_tracker.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -115,10 +116,13 @@ void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string
  */
 bool parse_model_input(const string& fpath)
 {
-    model_parser parser(fpath);
     try
     {
+        // Read the model definition file, and parse the model cells.
+        model_parser parser(fpath);
         parser.parse();
+
+        depends_tracker deptracker;
 
         // First, create empty formula cell instances so that we can have 
         // name-to-pointer associations.

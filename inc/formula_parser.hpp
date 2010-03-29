@@ -50,6 +50,8 @@ typedef ::boost::ptr_map< ::std::string, base_cell> cell_name_map_t;
  */
 class formula_parser : public ::boost::noncopyable
 {
+    typedef ::std::vector<base_cell*> depends_cell_array_type;
+
 public:
     formula_parser(const lexer_tokens_t& tokens, const cell_name_map_t* p_cell_names);
     ~formula_parser();
@@ -66,6 +68,7 @@ private:
 
     const lexer_tokens_t    m_tokens;
     formula_tokens_t        m_formula_tokens;
+    depends_cell_array_type m_depend_cells;
 
     const cell_name_map_t* mp_cell_names;
 };
