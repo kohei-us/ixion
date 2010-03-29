@@ -63,6 +63,7 @@ public:
 
     void operator() (const string& name)
     {
+        // This inserts a new'ed formula_cell instance associated with the name.
         ptr_map_insert<formula_cell>(m_cell_map)(name);
     }
 
@@ -80,7 +81,7 @@ public:
         m_tracker.insert_depend(mp_fcell, p);
     }
 private:
-    depends_tracker m_tracker;
+    depends_tracker& m_tracker;
     formula_cell* mp_fcell;
 };
 
@@ -92,17 +93,22 @@ void ensure_unique_names(const vector<string>& cell_names)
         throw general_error("Duplicate names exist in the list of cell names.");
 }
 
-void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string, base_cell>& cell_map)
+void create_empty_formula_cells(
+    const vector<string>& cell_names, ptr_map<string, base_cell>& cell_map, map<const base_cell*, string>& ptr_name_map)
 {
     ensure_unique_names(cell_names);
 
     typedef ptr_map<string, base_cell> _cellmap_type;
+    typedef map<const base_cell*, string> _ptrname_type;
     for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
     _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
 
     // debug output.
     for (; itr != itr_end; ++itr)
+    {    
         cout << itr->first << " := " << itr->second << endl;
+        ptr_name_map.insert(_ptrname_type::value_type(itr->second, itr->first));
+    }
 }
 
 }
@@ -128,7 +134,7 @@ void create_empty_formula_cells(const vector<string>& cell_names, ptr_map<string
  * 
  * @return true if the conversion is successful, false otherwise.
  */
-bool parse_model_input(const string& fpath)
+bool parse_model_input(const string& fpath, const string& dotpath)
 {
     try
     {
@@ -136,15 +142,15 @@ bool parse_model_input(const string& fpath)
         model_parser parser(fpath);
         parser.parse();
 
-        depends_tracker deptracker;
-
         // First, create empty formula cell instances so that we can have 
         // name-to-pointer associations.
         const vector<string>& cell_names = parser.get_cell_names();
 
         ptr_map<string, base_cell> cell_map;
-        create_empty_formula_cells(cell_names, cell_map);
+        depends_tracker::ptr_name_map_t ptr_name_map;
+        create_empty_formula_cells(cell_names, cell_map, ptr_name_map);
 
+        depends_tracker deptracker(&ptr_name_map);
         const vector<model_parser::cell>& cells = parser.get_cells();
         size_t cell_count = cells.size();
         for (size_t i = 0; i < cell_count; ++i)
@@ -172,6 +178,8 @@ bool parse_model_input(const string& fpath)
             const vector<base_cell*>& deps = fparser.get_depend_cells();
             for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, fcell));
         }
+
+        deptracker.print_dot_graph(dotpath);
     }
     catch (const exception& e)
     {

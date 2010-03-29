@@ -29,7 +29,8 @@
 #define __DEPENDS_TRACKER_HPP__
 
 #include <string>
-#include <vector>
+#include <set>
+#include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
 
@@ -41,8 +42,13 @@ class formula_cell;
  */
 class depends_tracker
 {
+    typedef ::std::set<base_cell*> depend_cells_type;
+    typedef ::boost::ptr_map<formula_cell*, depend_cells_type> depend_map_type;
+
 public:
-    depends_tracker();
+    typedef ::std::map<const base_cell*, ::std::string> ptr_name_map_t;
+
+    depends_tracker(const ptr_name_map_t* names);
     ~depends_tracker();
 
     /** 
@@ -53,7 +59,16 @@ public:
      */
     void insert_depend(formula_cell* origin_cell, base_cell* depend_cell);
 
+    void print_dot_graph(const ::std::string& dotpath) const;
+
 private:
+    void print_dot_graph_depend(::std::ofstream& file, const ::std::string& origin, const depend_cells_type& cells) const;
+
+    ::std::string get_cell_name(const base_cell* pcell) const;
+
+private:
+    depend_map_type         m_map;
+    const ptr_name_map_t*   mp_names;
 };
 
 }

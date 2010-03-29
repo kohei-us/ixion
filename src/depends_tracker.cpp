@@ -26,12 +26,19 @@
  ************************************************************************/
 
 #include "depends_tracker.hpp"
+#include "global.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <boost/assign/ptr_map_inserter.hpp>
 
 using namespace std;
+using ::boost::assign::ptr_map_insert;
 
 namespace ixion {
 
-depends_tracker::depends_tracker()
+depends_tracker::depends_tracker(const ptr_name_map_t* names) :
+    mp_names(names)
 {
 }
 
@@ -41,6 +48,52 @@ depends_tracker::~depends_tracker()
 
 void depends_tracker::insert_depend(formula_cell* origin_cell, base_cell* depend_cell)
 {
+    cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
+    depend_map_type::iterator itr = m_map.find(origin_cell);
+    if (itr != m_map.end())
+    {
+        // This origin cell already has dependent cells.
+        itr->second->insert(depend_cell);
+        cout << "map count: " << m_map.size() << endl;
+        return;
+    }
+
+    // First dependent cell for this origin cell.
+    depend_cells_type* p = new depend_cells_type;
+    p->insert(depend_cell);
+    m_map.insert(origin_cell, p);
+    cout << "map count: " << m_map.size() << endl;
+}
+
+void depends_tracker::print_dot_graph(const string& dotpath) const
+{
+    ofstream file(dotpath.c_str());
+    depend_map_type::const_iterator itr = m_map.begin(), itr_end = m_map.end();
+    file << "digraph G {" << endl;
+    for (; itr != itr_end; ++itr)
+    {
+        const formula_cell* origin_cell = itr->first;
+        string origin = get_cell_name(reinterpret_cast<const base_cell*>(origin_cell));
+        print_dot_graph_depend(file, origin, *itr->second);
+    }
+    file << "}" << endl;
+}
+
+void depends_tracker::print_dot_graph_depend(
+    ofstream& file, const string& origin, const depend_cells_type& cells) const
+{
+    depend_cells_type::const_iterator itr = cells.begin(), itr_end = cells.end();
+    for (; itr != itr_end; ++itr)
+        file << "    " << origin << " -> " << get_cell_name(*itr) << ";" << endl;
+}
+
+string depends_tracker::get_cell_name(const base_cell* pcell) const
+{
+    ptr_name_map_t::const_iterator itr_name = mp_names->find(pcell);
+    if (itr_name == mp_names->end())
+        throw general_error("name not found for the given cell pointer");
+
+    return itr_name->second;
 }
 
 }

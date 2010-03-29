@@ -38,7 +38,7 @@
 
 namespace ixion {
 
-bool parse_model_input(const ::std::string& fpath);
+bool parse_model_input(const ::std::string& fpath, const ::std::string& dotpath);
 
 class model_parser : public ::boost::noncopyable
 {

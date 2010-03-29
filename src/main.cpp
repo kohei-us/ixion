@@ -69,6 +69,8 @@ int main (int argc, char** argv)
         {0, 0, 0, 0}
     };
 
+    string dotgraph_path;
+
     while (true)
     {
         /* getopt_long stores the option index here. */
@@ -100,7 +102,7 @@ int main (int argc, char** argv)
                 break;
 
             case 'd':
-                printf ("option -d with value `%s'\n", optarg);
+                dotgraph_path = optarg;
                 break;
 
             case 'f':
@@ -130,7 +132,7 @@ int main (int argc, char** argv)
     string fpath = argv[optind];
     cout << fpath << endl;
 
-    if (!parse_model_input(fpath))
+    if (!parse_model_input(fpath, dotgraph_path))
         exit (EXIT_FAILURE);
 }
 

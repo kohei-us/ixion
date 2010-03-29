@@ -93,7 +93,7 @@ $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
 
 test: $(EXEC)
-	./$(EXEC) ./test/simple-arithmetic.txt
+	./$(EXEC) -d $(OBJDIR)/simple-arithmetic.dot ./test/simple-arithmetic.txt
 
 clean:
 	rm -rf $(OBJDIR)
