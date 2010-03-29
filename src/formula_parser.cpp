@@ -44,7 +44,7 @@ public:
 
 }
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, const cell_name_map_t* p_cell_names) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_map_t* p_cell_names) :
     m_tokens(tokens),
     mp_cell_names(p_cell_names)
 {
@@ -101,7 +101,7 @@ formula_tokens_t& formula_parser::get_tokens()
     return m_formula_tokens;
 }
 
-const vector<const base_cell*>& formula_parser::get_depend_cells() const
+const vector<base_cell*>& formula_parser::get_depend_cells() const
 {
     return m_depend_cells;
 }
@@ -109,7 +109,7 @@ const vector<const base_cell*>& formula_parser::get_depend_cells() const
 void formula_parser::name(const token_base& t)
 {
     const string name = t.get_string();
-    cell_name_map_t::const_iterator itr = mp_cell_names->find(name);
+    cell_name_map_t::iterator itr = mp_cell_names->find(name);
     if (itr == mp_cell_names->end())
     {
         // referenced name not found.

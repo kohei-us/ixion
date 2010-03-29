@@ -54,13 +54,13 @@ class formula_parser : public ::boost::noncopyable
     typedef ::std::vector<base_cell*> depends_cell_array_type;
 
 public:
-    formula_parser(const lexer_tokens_t& tokens, const cell_name_map_t* p_cell_names);
+    formula_parser(const lexer_tokens_t& tokens, cell_name_map_t* p_cell_names);
     ~formula_parser();
 
     void parse();
 
     formula_tokens_t& get_tokens();
-    const ::std::vector<const base_cell*>& get_depend_cells() const;
+    const ::std::vector<base_cell*>& get_depend_cells() const;
     
 private:
     formula_parser(); // disabled
@@ -69,9 +69,9 @@ private:
 
     const lexer_tokens_t    m_tokens;
     formula_tokens_t        m_formula_tokens;
-    ::std::vector<const base_cell*> m_depend_cells;
+    ::std::vector<base_cell*> m_depend_cells;
 
-    const cell_name_map_t* mp_cell_names;
+    cell_name_map_t* mp_cell_names;
 };
 
 }

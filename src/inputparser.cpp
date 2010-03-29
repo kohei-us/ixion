@@ -55,7 +55,7 @@ void flush_buffer(vector<char>& buf, string& str)
     buf.clear();
 }
 
-class formula_cell_inserter : public ::std::unary_function<string, void>
+class formula_cell_inserter : public unary_function<string, void>
 {
 public:
     formula_cell_inserter(ptr_map<string, base_cell>& cell_map) :
@@ -68,6 +68,20 @@ public:
 
 private:
     ptr_map<string, base_cell>& m_cell_map;
+};
+
+class depcell_inserter : public unary_function<base_cell*, void>
+{
+public:
+    depcell_inserter(depends_tracker& tracker, formula_cell* fcell) : m_tracker(tracker), mp_fcell(fcell) {}
+
+    void operator() (base_cell* p)
+    {
+        m_tracker.insert_depend(mp_fcell, p);
+    }
+private:
+    depends_tracker m_tracker;
+    formula_cell* mp_fcell;
 };
 
 void ensure_unique_names(const vector<string>& cell_names)
@@ -132,7 +146,8 @@ bool parse_model_input(const string& fpath)
         create_empty_formula_cells(cell_names, cell_map);
 
         const vector<model_parser::cell>& cells = parser.get_cells();
-        for (size_t i = 0; i < cells.size(); ++i)
+        size_t cell_count = cells.size();
+        for (size_t i = 0; i < cell_count; ++i)
         {   
             const model_parser::cell& cell = cells[i]; 
             cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
@@ -148,12 +163,14 @@ bool parse_model_input(const string& fpath)
             if (pcell->get_celltype() != celltype_formula)
                 throw general_error("formula cell is expected but not found");
 
+            // Transfer formula tokens from the parser to the cell.
             formula_cell* fcell = static_cast<formula_cell*>(pcell);
             fcell->swap_tokens(fparser.get_tokens());
-
             assert(fparser.get_tokens().empty());
 
-            // TODO: Build dependency graph.
+            // Register cell dependencies.
+            const vector<base_cell*>& deps = fparser.get_depend_cells();
+            for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, fcell));
         }
     }
     catch (const exception& e)
