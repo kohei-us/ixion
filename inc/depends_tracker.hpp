@@ -38,7 +38,9 @@ class base_cell;
 class formula_cell;
 
 /** 
- * This class keeps track of inter-cell dependencies.
+ * This class keeps track of inter-cell dependencies.  Each formula cell 
+ * item stores pointers to other cells that it depends on.  This information 
+ * is used to build a complete dependency tree.
  */
 class depends_tracker
 {
