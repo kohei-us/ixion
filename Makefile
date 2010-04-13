@@ -30,7 +30,7 @@ OBJDIR=./obj
 SRCDIR=./src
 INCDIR=./inc
 
-CPPFLAGS=-I$(INCDIR) -g -Wall
+CPPFLAGS=-I$(INCDIR) -g -Wall -std=c++0x
 LDFLAGS=
 
 HEADERS= \

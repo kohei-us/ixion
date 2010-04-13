@@ -29,6 +29,8 @@
 #include "global.hpp"
 #include "cell.hpp"
 
+#include <vector>
+#include <unordered_map>
 #include <iostream>
 #include <fstream>
 
@@ -36,7 +38,124 @@ using namespace std;
 
 namespace ixion {
 
-depends_tracker::depends_tracker(const ptr_name_map_t* names) :
+namespace {
+
+class depth_first_search
+{
+    typedef unordered_map<const base_cell*, size_t> cell_index_map_type;
+
+    enum vertex_color { white, gray, black };
+
+    class dfs_error : public general_error
+    {
+    public:
+        dfs_error(const string& msg) : general_error(msg) {}
+    };
+public:
+    depth_first_search(depends_tracker::depend_map_type& depend_map, const depends_tracker::ptr_name_map_type* cell_names) :
+        m_depend_map(depend_map),
+        m_cell_names(cell_names),
+        m_cell_count(cell_names->size()),
+        m_time_stamp(0),
+        m_cell_colors(m_cell_count, white),
+        m_parents(m_cell_count, NULL),
+        m_visited(m_cell_count, 0),
+        m_finished(m_cell_count, 0)
+
+    {
+        m_cells.reserve(m_cell_count);
+        depends_tracker::ptr_name_map_type::const_iterator itr = cell_names->begin(), itr_end = cell_names->end();
+        for (size_t index = 0; itr != itr_end; ++itr, ++index)
+        {
+            m_cells.push_back(itr->first);
+            m_cell_indices.insert(
+                cell_index_map_type::value_type(itr->first, index));
+        }
+    }
+
+    void run()
+    {
+        cout << "cell count: " << m_cell_count << endl;
+        try
+        {
+            for (size_t i = 0; i < m_cell_count; ++i)
+                if (m_cell_colors[i] == white)
+                    visit(i);
+        }
+        catch(const dfs_error& e)
+        {
+            cout << "dfs error: " << e.what() << endl;
+        }
+    }
+
+private:
+    void visit(size_t cell_index)
+    {
+        const base_cell* p = m_cells[cell_index];
+        if (p->get_celltype() != celltype_formula)
+            return;
+        const formula_cell* fcell = static_cast<const formula_cell*>(p);
+        cout << "visit cell index: " << cell_index << "  ptr: " << fcell << endl;
+        m_cell_colors[cell_index] = gray;
+        m_visited[cell_index] = ++m_time_stamp;
+
+        const depends_tracker::depend_cells_type* depends = get_depend_cells(fcell);
+        if (!depends)
+            return;
+
+        depends_tracker::depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
+        for (; itr != itr_end; ++itr)
+        {
+            const base_cell* dcell = *itr;
+            cout << "depend cell: " << dcell << endl;
+            size_t dcell_id = get_cell_index(dcell);
+            if (m_cell_colors[dcell_id] == white)
+            {
+                m_parents[dcell_id] = p;
+                visit(dcell_id);
+            }
+        }
+        m_cell_colors[cell_index] = black;
+        m_finished[cell_index] = ++m_time_stamp;
+    }
+
+    size_t get_cell_index(const base_cell* p) const
+    {
+        unordered_map<const base_cell*, size_t>::const_iterator itr = m_cell_indices.find(p);
+        if (itr == m_cell_indices.end())
+            throw dfs_error("cell ptr to index mapping failed.");
+        return itr->second;
+    }
+
+    const depends_tracker::depend_cells_type* get_depend_cells(const formula_cell* cell)
+    {
+        depends_tracker::depend_map_type::const_iterator itr = m_depend_map.find(cell);
+        if (itr == m_depend_map.end())
+            // This cell has no dependent cells.
+            return NULL;
+
+        return itr->second;
+    }
+
+private:
+    depends_tracker::depend_map_type&           m_depend_map;
+    const depends_tracker::ptr_name_map_type*   m_cell_names;
+
+    size_t                      m_cell_count;
+    size_t                      m_time_stamp;
+    vector<vertex_color>        m_cell_colors;
+    vector<const base_cell*>    m_parents;
+    vector<size_t>              m_visited;
+    vector<size_t>              m_finished;
+
+    cell_index_map_type         m_cell_indices;
+    vector<const base_cell*>    m_cells;
+};
+
+
+}
+
+depends_tracker::depends_tracker(const ptr_name_map_type* names) :
     mp_names(names)
 {
 }
@@ -45,7 +164,7 @@ depends_tracker::~depends_tracker()
 {
 }
 
-void depends_tracker::insert_depend(formula_cell* origin_cell, base_cell* depend_cell)
+void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell)
 {
     cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
     depend_map_type::iterator itr = m_map.find(origin_cell);
@@ -61,6 +180,13 @@ void depends_tracker::insert_depend(formula_cell* origin_cell, base_cell* depend
 
     itr->second->insert(depend_cell);
     cout << "map count: " << m_map.size() << endl;
+}
+
+void depends_tracker::topo_sort_cells()
+{
+    cout << "depth first search ---------------------------------------------------" << endl;
+    depth_first_search dfs(m_map, mp_names);
+    dfs.run();
 }
 
 void depends_tracker::print_dot_graph(const string& dotpath) const
@@ -87,7 +213,7 @@ void depends_tracker::print_dot_graph_depend(
 
 string depends_tracker::get_cell_name(const base_cell* pcell) const
 {
-    ptr_name_map_t::const_iterator itr_name = mp_names->find(pcell);
+    ptr_name_map_type::const_iterator itr_name = mp_names->find(pcell);
     if (itr_name == mp_names->end())
         throw general_error("name not found for the given cell pointer");
 

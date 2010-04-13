@@ -147,7 +147,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         const vector<string>& cell_names = parser.get_cell_names();
 
         ptr_map<string, base_cell> cell_map;
-        depends_tracker::ptr_name_map_t ptr_name_map;
+        depends_tracker::ptr_name_map_type ptr_name_map;
         create_empty_formula_cells(cell_names, cell_map, ptr_name_map);
 
         depends_tracker deptracker(&ptr_name_map);
@@ -180,6 +180,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         }
 
         deptracker.print_dot_graph(dotpath);
+        deptracker.topo_sort_cells();
     }
     catch (const exception& e)
     {

@@ -44,13 +44,12 @@ class formula_cell;
  */
 class depends_tracker
 {
-    typedef ::std::set<base_cell*> depend_cells_type;
-    typedef ::boost::ptr_map<formula_cell*, depend_cells_type> depend_map_type;
-
 public:
-    typedef ::std::map<const base_cell*, ::std::string> ptr_name_map_t;
+    typedef ::std::set<const base_cell*>                                depend_cells_type;
+    typedef ::boost::ptr_map<const formula_cell*, depend_cells_type>    depend_map_type;
+    typedef ::std::map<const base_cell*, ::std::string>                 ptr_name_map_type;
 
-    depends_tracker(const ptr_name_map_t* names);
+    depends_tracker(const ptr_name_map_type* names);
     ~depends_tracker();
 
     /** 
@@ -59,7 +58,12 @@ public:
      * @param origin_cell* cell that depends on <code>depend_cell</code>.
      * @param depend_cell* cell that <code>origin_cell</code> depends on.
      */
-    void insert_depend(formula_cell* origin_cell, base_cell* depend_cell);
+    void insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell);
+
+    /** 
+     * Perform topological sort on all cell instances.
+     */
+    void topo_sort_cells();
 
     /** 
      * Create a file and write cell dependency graph in dot script.
@@ -74,8 +78,8 @@ private:
     ::std::string get_cell_name(const base_cell* pcell) const;
 
 private:
-    depend_map_type         m_map;
-    const ptr_name_map_t*   mp_names;
+    depend_map_type             m_map;
+    const ptr_name_map_type*    mp_names;
 };
 
 }
