@@ -52,7 +52,7 @@ class depth_first_search
         dfs_error(const string& msg) : general_error(msg) {}
     };
 public:
-    depth_first_search(depends_tracker::depend_map_type& depend_map, const depends_tracker::ptr_name_map_type* cell_names) :
+    depth_first_search(const depends_tracker::depend_map_type& depend_map, const depends_tracker::ptr_name_map_type* cell_names) :
         m_depend_map(depend_map),
         m_cell_names(cell_names),
         m_cell_count(cell_names->size()),
@@ -150,10 +150,10 @@ private:
     }
 
 private:
-    depends_tracker::depend_map_type&           m_depend_map;
+    const depends_tracker::depend_map_type&     m_depend_map;
     const depends_tracker::ptr_name_map_type*   m_cell_names;
+    size_t                                      m_cell_count;
 
-    size_t                      m_cell_count;
     size_t                      m_time_stamp;
     vector<vertex_color>        m_cell_colors;
     vector<const base_cell*>    m_parents;
