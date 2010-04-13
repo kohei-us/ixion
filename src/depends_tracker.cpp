@@ -88,6 +88,16 @@ public:
         }
     }
 
+    void print_result()
+    {
+        cout << "result -----------------------------------------------------" << endl;
+        for (size_t i = 0; i < m_cell_count; ++i)
+        {
+            const base_cell* p = m_cells[i];
+            cout << get_cell_name(p) << ": finished: " << m_finished[i] << endl;
+        }
+    }
+
 private:
     void visit(size_t cell_index)
     {
@@ -199,6 +209,7 @@ void depends_tracker::topo_sort_cells()
     cout << "depth first search ---------------------------------------------------" << endl;
     depth_first_search dfs(m_map, mp_names);
     dfs.run();
+    dfs.print_result();
 }
 
 void depends_tracker::print_dot_graph(const string& dotpath) const
