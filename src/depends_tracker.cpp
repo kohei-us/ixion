@@ -95,7 +95,7 @@ private:
         if (p->get_celltype() != celltype_formula)
             return;
         const formula_cell* fcell = static_cast<const formula_cell*>(p);
-        cout << "visit cell index: " << cell_index << "  ptr: " << fcell << endl;
+        cout << "visit cell index: " << cell_index << "  name: " << get_cell_name(fcell) << endl;
         m_cell_colors[cell_index] = gray;
         m_visited[cell_index] = ++m_time_stamp;
 
@@ -107,7 +107,7 @@ private:
         for (; itr != itr_end; ++itr)
         {
             const base_cell* dcell = *itr;
-            cout << "depend cell: " << dcell << endl;
+            cout << "depend cell: " << get_cell_name(dcell) << endl;
             size_t dcell_id = get_cell_index(dcell);
             if (m_cell_colors[dcell_id] == white)
             {
@@ -115,10 +115,19 @@ private:
                 visit(dcell_id);
             }
         }
+
         m_cell_colors[cell_index] = black;
         m_finished[cell_index] = ++m_time_stamp;
     }
 
+    string get_cell_name(const base_cell* p) const
+    {
+        depends_tracker::ptr_name_map_type::const_iterator itr = m_cell_names->find(p);
+        if (itr == m_cell_names->end())
+            throw dfs_error("failed to retrieve cell name from the ptr.");
+
+        return itr->second;
+    }
     size_t get_cell_index(const base_cell* p) const
     {
         unordered_map<const base_cell*, size_t>::const_iterator itr = m_cell_indices.find(p);
