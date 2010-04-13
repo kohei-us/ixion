@@ -91,6 +91,7 @@ public:
 private:
     void visit(size_t cell_index)
     {
+        cout << "visit (start) ----------------------------------------------" << endl;
         const base_cell* p = m_cells[cell_index];
         if (p->get_celltype() != celltype_formula)
             return;
@@ -103,11 +104,12 @@ private:
         if (!depends)
             return;
 
+        cout << "depend cell count: " << depends->size() << endl;
         depends_tracker::depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
         for (; itr != itr_end; ++itr)
         {
             const base_cell* dcell = *itr;
-            cout << "depend cell: " << get_cell_name(dcell) << endl;
+            cout << "depend cell: " << get_cell_name(dcell) << " (" << dcell << ")" << endl;
             size_t dcell_id = get_cell_index(dcell);
             if (m_cell_colors[dcell_id] == white)
             {
@@ -118,6 +120,7 @@ private:
 
         m_cell_colors[cell_index] = black;
         m_finished[cell_index] = ++m_time_stamp;
+        cout << "visit (end) ------------------------------------------------" << endl;
     }
 
     string get_cell_name(const base_cell* p) const
@@ -188,7 +191,7 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
     }
 
     itr->second->insert(depend_cell);
-    cout << "map count: " << m_map.size() << endl;
+    cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
 void depends_tracker::topo_sort_cells()
