@@ -88,15 +88,16 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
     cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
-void depends_tracker::topo_sort_cells()
+void depends_tracker::topo_sort_cells(vector<const base_cell*>& sorted_cells) const
 {
-    vector<const base_cell*> sorted_cells;
+    vector<const base_cell*> _sorted_cells;
     depth_first_search dfs(m_map, mp_names);
     dfs.run();
-    dfs.swap_sorted_cells(sorted_cells);
+    dfs.swap_sorted_cells(_sorted_cells);
     dfs.print_result();
     cout << "topologically sorted cells ---------------------------------" << endl;
-    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
+    for_each(_sorted_cells.begin(), _sorted_cells.end(), cell_printer(mp_names));
+    _sorted_cells.swap(sorted_cells);
 }
 
 void depends_tracker::print_dot_graph(const string& dotpath) const

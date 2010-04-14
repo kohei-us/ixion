@@ -30,6 +30,7 @@
 
 #include <string>
 #include <set>
+#include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
@@ -61,9 +62,10 @@ public:
     void insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell);
 
     /** 
-     * Perform topological sort on all cell instances.
+     * Perform topological sort on all cell instances, and returns an array of 
+     * cells that are sorted in order of dependency. 
      */
-    void topo_sort_cells();
+    void topo_sort_cells(::std::vector<const base_cell*>& sorted_cells) const;
 
     /** 
      * Create a file and write cell dependency graph in dot script.

@@ -180,7 +180,8 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         }
 
         deptracker.print_dot_graph(dotpath);
-        deptracker.topo_sort_cells();
+        vector<const base_cell*> sorted_cells;
+        deptracker.topo_sort_cells(sorted_cells);
     }
     catch (const exception& e)
     {
