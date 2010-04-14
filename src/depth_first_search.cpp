@@ -68,7 +68,7 @@ void depth_first_search::init()
 void depth_first_search::run()
 {
     init();
-    cout << "cell count: " << m_cell_count << endl;
+//  cout << "cell count: " << m_cell_count << endl;
     try
     {
         for (size_t i = 0; i < m_cell_count; ++i)
@@ -87,38 +87,50 @@ void depth_first_search::print_result()
     for (size_t i = 0; i < m_cell_count; ++i)
     {
         const base_cell* p = m_cells[i].ptr;
-        cout << get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
+        cout << "  " << get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
     }
+}
+
+void depth_first_search::swap_sorted_cells(vector<const base_cell*>& sorted_cells)
+{
+    m_sorted_cells.swap(sorted_cells);
 }
 
 void depth_first_search::visit(size_t cell_index)
 {
     cout << "visit (start) ----------------------------------------------" << endl;
     const base_cell* p = m_cells[cell_index].ptr;
-    if (p->get_celltype() != celltype_formula)
-        return;
-    const formula_cell* fcell = static_cast<const formula_cell*>(p);
-    cout << "visit cell index: " << cell_index << "  name: " << get_cell_name(fcell) << endl;
+    cout << "  visit cell index: " << cell_index << "  name: " << get_cell_name(p) << endl;
     m_cells[cell_index].color = gray;
     m_cells[cell_index].time_visited = ++m_time_stamp;
 
-    const depends_tracker::depend_cells_type* depends = get_depend_cells(fcell);
-    if (!depends)
-        return;
-
-    cout << "depend cell count: " << depends->size() << endl;
-    depends_tracker::depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
-    for (; itr != itr_end; ++itr)
+    do
     {
-        const base_cell* dcell = *itr;
-        cout << "depend cell: " << get_cell_name(dcell) << " (" << dcell << ")" << endl;
-        size_t dcell_id = get_cell_index(dcell);
-        if (m_cells[dcell_id].color == white)
+        if (p->get_celltype() != celltype_formula)
+            // No formula cell, no dependent cells.
+            break;
+
+        const formula_cell* fcell = static_cast<const formula_cell*>(p);
+        const depends_tracker::depend_cells_type* depends = get_depend_cells(fcell);
+        if (!depends)
+            // No dependent cells.
+            break;
+    
+        cout << "  depend cell count: " << depends->size() << endl;
+        depends_tracker::depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
+        for (; itr != itr_end; ++itr)
         {
-            m_cells[dcell_id].parent = p;
-            visit(dcell_id);
+            const base_cell* dcell = *itr;
+            cout << "  depend cell: " << get_cell_name(dcell) << " (" << dcell << ")" << endl;
+            size_t dcell_id = get_cell_index(dcell);
+            if (m_cells[dcell_id].color == white)
+            {
+                m_cells[dcell_id].parent = p;
+                visit(dcell_id);
+            }
         }
     }
+    while (false);
 
     m_cells[cell_index].color = black;
     m_cells[cell_index].time_finished = ++m_time_stamp;

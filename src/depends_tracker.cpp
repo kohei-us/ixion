@@ -39,6 +39,28 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+class cell_printer : public unary_function<const base_cell*, void>
+{
+public:
+    cell_printer(const depends_tracker::ptr_name_map_type* names) : mp_names(names) {}
+
+    void operator() (const base_cell* p) const
+    {
+        depends_tracker::ptr_name_map_type::const_iterator itr = mp_names->find(p);
+        if (itr == mp_names->end())
+            cout << "unknown cell (" << p << ")" << endl;
+        else
+            cout << itr->second << endl;
+    }
+
+private:
+    const depends_tracker::ptr_name_map_type* mp_names;
+};
+
+}
+
 depends_tracker::depends_tracker(const ptr_name_map_type* names) :
     mp_names(names)
 {
@@ -68,10 +90,12 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::topo_sort_cells()
 {
-    cout << "depth first search ---------------------------------------------------" << endl;
+    vector<const base_cell*> sorted_cells;
     depth_first_search dfs(m_map, mp_names);
     dfs.run();
+    dfs.swap_sorted_cells(sorted_cells);
     dfs.print_result();
+    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
 }
 
 void depends_tracker::print_dot_graph(const string& dotpath) const

@@ -67,6 +67,7 @@ public:
     void init();
     void run();
     void print_result();
+    void swap_sorted_cells(::std::vector<const base_cell*>& sorted_cells);
 
 private:
     void visit(size_t cell_index);
