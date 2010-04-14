@@ -43,13 +43,10 @@ depth_first_search::depth_first_search(
     m_time_stamp(0),
     m_cells(m_cell_count)
 {
-    depends_tracker::ptr_name_map_type::const_iterator itr = cell_names->begin(), itr_end = cell_names->end();
+    depends_tracker::ptr_name_map_type::const_iterator itr = m_cell_names->begin(), itr_end = m_cell_names->end();
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
-    {
-        m_cells[index].ptr = itr->first;
         m_cell_indices.insert(
             cell_index_map_type::value_type(itr->first, index));
-    }
 }
 
 void depth_first_search::init()
