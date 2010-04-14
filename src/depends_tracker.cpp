@@ -55,11 +55,12 @@ class depth_first_search
     struct celldata
     {
         cell_color_type     color;
+        const base_cell*    ptr;
         const base_cell*    parent;
         size_t              time_visited;
         size_t              time_finished;
 
-        celldata() : color(white), parent(NULL), time_visited(0), time_finished(0) {}
+        celldata() : color(white), ptr(NULL), parent(NULL), time_visited(0), time_finished(0) {}
     };
 
 public:
@@ -71,11 +72,10 @@ public:
         m_cells(m_cell_count)
 
     {
-        m_cell_ptrs.reserve(m_cell_count);
         depends_tracker::ptr_name_map_type::const_iterator itr = cell_names->begin(), itr_end = cell_names->end();
         for (size_t index = 0; itr != itr_end; ++itr, ++index)
         {
-            m_cell_ptrs.push_back(itr->first);
+            m_cells[index].ptr = itr->first;
             m_cell_indices.insert(
                 cell_index_map_type::value_type(itr->first, index));
         }
@@ -101,7 +101,7 @@ public:
         cout << "result -----------------------------------------------------" << endl;
         for (size_t i = 0; i < m_cell_count; ++i)
         {
-            const base_cell* p = m_cell_ptrs[i];
+            const base_cell* p = m_cells[i].ptr;
             cout << get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
         }
     }
@@ -110,7 +110,7 @@ private:
     void visit(size_t cell_index)
     {
         cout << "visit (start) ----------------------------------------------" << endl;
-        const base_cell* p = m_cell_ptrs[cell_index];
+        const base_cell* p = m_cells[cell_index].ptr;
         if (p->get_celltype() != celltype_formula)
             return;
         const formula_cell* fcell = static_cast<const formula_cell*>(p);
@@ -176,7 +176,6 @@ private:
     vector<celldata>            m_cells;
 
     cell_index_map_type         m_cell_indices;
-    vector<const base_cell*>    m_cell_ptrs;
 };
 
 
