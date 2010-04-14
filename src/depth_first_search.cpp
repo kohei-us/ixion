@@ -52,9 +52,19 @@ depth_first_search::depth_first_search(
     }
 }
 
+void depth_first_search::init()
+{
+    vector<celldata> cells(m_cell_count);
+    depends_tracker::ptr_name_map_type::const_iterator itr = m_cell_names->begin(), itr_end = m_cell_names->end();
+    for (size_t index = 0; itr != itr_end; ++itr, ++index)
+        cells[index].ptr = itr->first;
+    m_cells.swap(cells);
+    m_time_stamp = 0;
+}
 
 void depth_first_search::run()
 {
+    init();
     cout << "cell count: " << m_cell_count << endl;
     try
     {

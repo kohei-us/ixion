@@ -64,6 +64,7 @@ class depth_first_search
 public:
     depth_first_search(const depends_tracker::depend_map_type& depend_map, 
                        const depends_tracker::ptr_name_map_type* cell_names);
+    void init();
     void run();
     void print_result();
 
@@ -79,7 +80,7 @@ private:
     size_t                                      m_cell_count;
 
     size_t                      m_time_stamp;
-    ::std::vector<celldata>            m_cells;
+    ::std::vector<celldata>     m_cells;
 
     cell_index_map_type         m_cell_indices;
 };
