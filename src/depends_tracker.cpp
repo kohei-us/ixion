@@ -50,9 +50,9 @@ public:
     {
         depends_tracker::ptr_name_map_type::const_iterator itr = mp_names->find(p);
         if (itr == mp_names->end())
-            cout << "unknown cell (" << p << ")" << endl;
+            cout << "  unknown cell (" << p << ")" << endl;
         else
-            cout << itr->second << endl;
+            cout << "  " << itr->second << endl;
     }
 
 private:
@@ -95,6 +95,7 @@ void depends_tracker::topo_sort_cells()
     dfs.run();
     dfs.swap_sorted_cells(sorted_cells);
     dfs.print_result();
+    cout << "topologically sorted cells ---------------------------------" << endl;
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
 }
 
