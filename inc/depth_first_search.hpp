@@ -78,11 +78,12 @@ private:
     const depends_tracker::depend_map_type&     m_depend_map;
     const depends_tracker::ptr_name_map_type*   m_cell_names;
     size_t                                      m_cell_count;
+    cell_index_map_type                         m_cell_indices;
 
-    size_t                      m_time_stamp;
-    ::std::vector<celldata>     m_cells;
+    size_t                          m_time_stamp;
+    ::std::vector<celldata>         m_cells;
+    ::std::vector<const base_cell*> m_sorted_cells;
 
-    cell_index_map_type         m_cell_indices;
 };
 
 }

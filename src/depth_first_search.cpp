@@ -43,7 +43,9 @@ depth_first_search::depth_first_search(
     m_time_stamp(0),
     m_cells(m_cell_count)
 {
-    depends_tracker::ptr_name_map_type::const_iterator itr = m_cell_names->begin(), itr_end = m_cell_names->end();
+    depends_tracker::ptr_name_map_type::const_iterator 
+        itr = m_cell_names->begin(), itr_end = m_cell_names->end();
+
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
         m_cell_indices.insert(
             cell_index_map_type::value_type(itr->first, index));
@@ -52,11 +54,15 @@ depth_first_search::depth_first_search(
 void depth_first_search::init()
 {
     vector<celldata> cells(m_cell_count);
-    depends_tracker::ptr_name_map_type::const_iterator itr = m_cell_names->begin(), itr_end = m_cell_names->end();
+    depends_tracker::ptr_name_map_type::const_iterator 
+        itr = m_cell_names->begin(), itr_end = m_cell_names->end();
+
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
         cells[index].ptr = itr->first;
     m_cells.swap(cells);
     m_time_stamp = 0;
+    m_sorted_cells.clear();
+    m_sorted_cells.reserve(m_cell_count);
 }
 
 void depth_first_search::run()
@@ -116,6 +122,7 @@ void depth_first_search::visit(size_t cell_index)
 
     m_cells[cell_index].color = black;
     m_cells[cell_index].time_finished = ++m_time_stamp;
+    m_sorted_cells.push_back(m_cells[cell_index].ptr);
     cout << "visit (end) ------------------------------------------------" << endl;
 }
 
