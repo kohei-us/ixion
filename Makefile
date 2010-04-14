@@ -36,6 +36,7 @@ LDFLAGS=
 HEADERS= \
 	$(INCDIR)/cell.hpp \
 	$(INCDIR)/depends_tracker.hpp \
+	$(INCDIR)/depth_first_search.hpp \
 	$(INCDIR)/formula_lexer.hpp \
 	$(INCDIR)/formula_parser.hpp \
 	$(INCDIR)/formula_tokens.hpp \
@@ -52,7 +53,8 @@ OBJFILES= \
 	$(OBJDIR)/formula_parser.o \
 	$(OBJDIR)/formula_tokens.o \
 	$(OBJDIR)/inputparser.o \
-	$(OBJDIR)/depends_tracker.o
+	$(OBJDIR)/depends_tracker.o \
+	$(OBJDIR)/depth_first_search.o
 
 DEPENDS= \
 	$(HEADERS)
@@ -88,6 +90,9 @@ $(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp $(DEPENDS)
 
 $(OBJDIR)/depends_tracker.o: $(SRCDIR)/depends_tracker.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depends_tracker.cpp
+
+$(OBJDIR)/depth_first_search.o: $(SRCDIR)/depth_first_search.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depth_first_search.cpp
 
 $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
