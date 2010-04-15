@@ -98,9 +98,9 @@ void depth_first_search::swap_sorted_cells(vector<const base_cell*>& sorted_cell
 
 void depth_first_search::visit(size_t cell_index)
 {
-    cout << "visit (start) ----------------------------------------------" << endl;
+//  cout << "visit (start) ----------------------------------------------" << endl;
     const base_cell* p = m_cells[cell_index].ptr;
-    cout << "  visit cell index: " << cell_index << "  name: " << get_cell_name(p) << endl;
+//  cout << "  visit cell index: " << cell_index << "  name: " << get_cell_name(p) << endl;
     m_cells[cell_index].color = gray;
     m_cells[cell_index].time_visited = ++m_time_stamp;
 
@@ -116,12 +116,12 @@ void depth_first_search::visit(size_t cell_index)
             // No dependent cells.
             break;
     
-        cout << "  depend cell count: " << depends->size() << endl;
+//      cout << "  depend cell count: " << depends->size() << endl;
         depends_tracker::depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
         for (; itr != itr_end; ++itr)
         {
             const base_cell* dcell = *itr;
-            cout << "  depend cell: " << get_cell_name(dcell) << " (" << dcell << ")" << endl;
+//          cout << "  depend cell: " << get_cell_name(dcell) << " (" << dcell << ")" << endl;
             size_t dcell_id = get_cell_index(dcell);
             if (m_cells[dcell_id].color == white)
             {
@@ -135,7 +135,7 @@ void depth_first_search::visit(size_t cell_index)
     m_cells[cell_index].color = black;
     m_cells[cell_index].time_finished = ++m_time_stamp;
     m_sorted_cells.push_back(m_cells[cell_index].ptr);
-    cout << "visit (end) ------------------------------------------------" << endl;
+//  cout << "visit (end) ------------------------------------------------" << endl;
 }
 
 string depth_first_search::get_cell_name(const base_cell* p) const

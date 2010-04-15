@@ -72,7 +72,7 @@ depends_tracker::~depends_tracker()
 
 void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell)
 {
-    cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
+//  cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
     depend_map_type::iterator itr = m_map.find(origin_cell);
     if (itr == m_map.end())
     {
@@ -85,7 +85,7 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
     }
 
     itr->second->insert(depend_cell);
-    cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
+//  cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
 void depends_tracker::topo_sort_cells(vector<const base_cell*>& sorted_cells) const
@@ -94,10 +94,10 @@ void depends_tracker::topo_sort_cells(vector<const base_cell*>& sorted_cells) co
     depth_first_search dfs(m_map, mp_names);
     dfs.run();
     dfs.swap_sorted_cells(_sorted_cells);
-    dfs.print_result();
-    cout << "topologically sorted cells ---------------------------------" << endl;
-    for_each(_sorted_cells.begin(), _sorted_cells.end(), cell_printer(mp_names));
-    _sorted_cells.swap(sorted_cells);
+//  dfs.print_result();
+//  cout << "topologically sorted cells ---------------------------------" << endl;
+//  for_each(_sorted_cells.begin(), _sorted_cells.end(), cell_printer(mp_names));
+//  _sorted_cells.swap(sorted_cells);
 }
 
 void depends_tracker::print_dot_graph(const string& dotpath) const
