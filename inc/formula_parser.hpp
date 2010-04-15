@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __FORMULA_PARSER_HPP__
-#define __FORMULA_PARSER_HPP__
+#ifndef __IXION_FORMULA_PARSER_HPP__
+#define __IXION_FORMULA_PARSER_HPP__
 
 #include "global.hpp"
 #include "tokens.hpp"
@@ -58,6 +58,7 @@ public:
     ~formula_parser();
 
     void parse();
+    void print_tokens() const;
 
     formula_tokens_t& get_tokens();
     const ::std::vector<base_cell*>& get_depend_cells() const;

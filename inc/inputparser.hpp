@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __INPUTPARSER_HPP__
-#define __INPUTPARSER_HPP__
+#ifndef __IXION_INPUTPARSER_HPP__
+#define __IXION_INPUTPARSER_HPP__
 
 #include "cell.hpp"
 
