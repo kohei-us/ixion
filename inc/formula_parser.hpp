@@ -37,12 +37,14 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace ixion {
 
 class base_cell;
 
 typedef ::boost::ptr_map< ::std::string, base_cell> cell_name_map_t;
+typedef ::std::unordered_map<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
 /** 
  * Class formula_parser parses a series of primitive (or lexer) tokens 

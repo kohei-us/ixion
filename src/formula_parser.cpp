@@ -28,6 +28,7 @@
 #include "formula_parser.hpp"
 
 #include <iostream>
+#include <unordered_map>
 
 using namespace std;
 
@@ -40,6 +41,98 @@ class ref_error : public general_error
 public:
     ref_error(const string& msg) :
         general_error(msg) {}
+};
+
+class formula_token_printer : public unary_function<formula_token_base, void>
+{
+public:
+    formula_token_printer(const cell_name_map_t& cell_names)
+    {
+        // Construct a cell pointer to name association.
+        cell_name_map_t::const_iterator itr = cell_names.begin(), itr_end = cell_names.end();
+        for (; itr != itr_end; ++itr)
+        {
+            m_cell_ptr_name_map.insert(
+                cell_ptr_name_map_t::value_type(itr->second, itr->first));
+        }
+    }
+
+    void operator() (const formula_token_base& token) const
+    {
+        fopcode_t oc = token.get_opcode();   
+        cout << "(" << get_token_name(oc) << ")";
+        switch (oc)
+        {
+            case fop_close:
+                break;
+            case fop_divide:
+                break;
+            case fop_err_no_ref:
+                break;
+            case fop_minus:
+                break;
+            case fop_multiply:
+                break;
+            case fop_open:
+                break;
+            case fop_plus:
+                break;
+            case fop_sep:
+                break;
+            case fop_single_ref:
+                cout << "'" << get_cell_name(token.get_single_ref()) << "'";
+                break;
+            case fop_string:
+                break;
+            case fop_value:
+                break;
+            default:
+                ;
+        }
+    }
+
+private:
+    string get_token_name(fopcode_t oc) const
+    {
+        switch (oc)
+        {
+            case fop_close:
+                return "close";
+            case fop_divide:
+                return "divide";
+            case fop_err_no_ref:
+                return "error no ref";
+            case fop_minus:
+                return "minus";
+            case fop_multiply:
+                return "multiply";
+            case fop_open:
+                return "open";
+            case fop_plus:
+                return "plus";
+            case fop_sep:
+                return "separator";
+            case fop_single_ref:
+                return "single ref";
+            case fop_string:
+                return "string";
+            case fop_value:
+                return "value";
+            default:
+                ;
+        }
+        return "unknown";
+    }
+    string get_cell_name(const base_cell* p) const
+    {
+        cell_ptr_name_map_t::const_iterator itr = m_cell_ptr_name_map.find(p);
+        if (itr == m_cell_ptr_name_map.end())
+            return string();
+        return itr->second;
+    }
+
+private:
+    cell_ptr_name_map_t m_cell_ptr_name_map;
 };
 
 }
@@ -98,6 +191,9 @@ void formula_parser::parse()
 
 void formula_parser::print_tokens() const
 {
+    cout << "formula tokens: ";
+    for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer(*mp_cell_names));
+    cout << endl;
 }
 
 formula_tokens_t& formula_parser::get_tokens()
