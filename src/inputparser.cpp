@@ -138,7 +138,8 @@ bool parse_model_input(const string& fpath, const string& dotpath)
 {
     try
     {
-        // Read the model definition file, and parse the model cells.
+        // Read the model definition file, and parse the model cells. The
+        // model parser parses each line and break it into lexer tokens.
         model_parser parser(fpath);
         parser.parse();
 
@@ -152,11 +153,13 @@ bool parse_model_input(const string& fpath, const string& dotpath)
 
         depends_tracker deptracker(&ptr_name_map);
         const vector<model_parser::cell>& cells = parser.get_cells();
-        size_t cell_count = cells.size();
-        for (size_t i = 0; i < cell_count; ++i)
+        vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
+        for (; itr_cell != itr_cell_end; ++itr_cell)
         {   
-            const model_parser::cell& cell = cells[i]; 
+            const model_parser::cell& cell = *itr_cell;
             cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
+
+            // Parse the lexer tokens and turn them into formula tokens.
             formula_parser fparser(cell.get_tokens(), &cell_map);
             fparser.parse();
 
