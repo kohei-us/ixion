@@ -162,6 +162,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
             // Parse the lexer tokens and turn them into formula tokens.
             formula_parser fparser(cell.get_tokens(), &cell_map);
             fparser.parse();
+            fparser.print_tokens();
 
             // Put the formula tokens into formula cell instance.
             ptr_map<string, base_cell>::iterator itr = cell_map.find(cell.get_name());

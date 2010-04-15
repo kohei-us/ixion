@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_TOKENS_HPP__
-#define __IXION_TOKENS_HPP__
+#ifndef __IXION_LEXER_TOKENS_HPP__
+#define __IXION_LEXER_TOKENS_HPP__
 
 #include <string>
 
