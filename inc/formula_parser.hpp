@@ -66,7 +66,7 @@ public:
 private:
     formula_parser(); // disabled
 
-    void name(const token_base& t);
+    void name(const lexer_token_base& t);
 
     const lexer_tokens_t    m_tokens;
     formula_tokens_t        m_formula_tokens;

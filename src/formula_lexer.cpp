@@ -171,25 +171,25 @@ void tokenizer::name()
 void tokenizer::plus()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_plus));
+    m_tokens.push_back(new lexer_token(op_plus));
 }
 
 void tokenizer::minus()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_minus));
+    m_tokens.push_back(new lexer_token(op_minus));
 }
 
 void tokenizer::divide()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_divide));
+    m_tokens.push_back(new lexer_token(op_divide));
 }
 
 void tokenizer::multiply()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_multiply));
+    m_tokens.push_back(new lexer_token(op_multiply));
 }
 
 void tokenizer::dot()
@@ -199,19 +199,19 @@ void tokenizer::dot()
 void tokenizer::sep()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_sep));
+    m_tokens.push_back(new lexer_token(op_sep));
 }
 
 void tokenizer::open_bracket()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_open));
+    m_tokens.push_back(new lexer_token(op_open));
 }
 
 void tokenizer::close_bracket()
 {
     flush_buffer();
-    m_tokens.push_back(new token(op_close));
+    m_tokens.push_back(new lexer_token(op_close));
 }
 
 void tokenizer::flush_buffer()
@@ -225,13 +225,13 @@ void tokenizer::flush_buffer()
         case buf_numeral:
         {
             double val = strtod(&m_buffer[0], NULL);
-            m_tokens.push_back(new value_token(val));
+            m_tokens.push_back(new lexer_value_token(val));
         }
         break;
         case buf_name:
         {
             string str = &m_buffer[0];
-            m_tokens.push_back(new name_token(str));
+            m_tokens.push_back(new lexer_name_token(str));
         }
         break;
         default:

@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __TOKENS_HPP__
-#define __TOKENS_HPP__
+#ifndef __IXION_TOKENS_HPP__
+#define __IXION_TOKENS_HPP__
 
 #include <string>
 
@@ -34,13 +34,14 @@
 
 namespace ixion {
 
-class token_base;
+class lexer_token_base;
 
-typedef ::boost::ptr_vector<token_base> lexer_tokens_t;
+typedef ::boost::ptr_vector<lexer_token_base> lexer_tokens_t;
 
 // ============================================================================
 
-enum opcode_t {
+enum lexer_opcode_t
+{
     // data types
     op_value,
     op_string,
@@ -58,44 +59,44 @@ enum opcode_t {
     op_sep,
 };
 
-const char* get_opcode_name(opcode_t oc);
+const char* get_opcode_name(lexer_opcode_t oc);
 
 // ============================================================================
 
-class token_base
+class lexer_token_base
 {
 public:
-    token_base(opcode_t oc);
-    token_base(const token_base& r);
-    virtual ~token_base();
+    lexer_token_base(lexer_opcode_t oc);
+    lexer_token_base(const lexer_token_base& r);
+    virtual ~lexer_token_base();
 
     virtual double get_value() const;
     virtual ::std::string get_string() const;
     virtual const char* print() const = 0;
 
-    opcode_t get_opcode() const;
+    lexer_opcode_t get_opcode() const;
 private:
-    opcode_t m_opcode;
+    lexer_opcode_t m_opcode;
 };
 
 // ============================================================================
 
-class token : public token_base
+class lexer_token : public lexer_token_base
 {
 public:
-    token(opcode_t oc);
-    virtual ~token();
+    lexer_token(lexer_opcode_t oc);
+    virtual ~lexer_token();
     virtual const char* print() const;
 };
 
 // ============================================================================
 
-class value_token : public token_base
+class lexer_value_token : public lexer_token_base
 {
 public:
-    value_token(double val);
-    value_token(const value_token& r);
-    virtual ~value_token();
+    lexer_value_token(double val);
+    lexer_value_token(const lexer_value_token& r);
+    virtual ~lexer_value_token();
 
     virtual double get_value() const;
     virtual const char* print() const;
@@ -106,11 +107,11 @@ private:
 
 // ============================================================================
 
-class string_token : public token_base
+class lexer_string_token : public lexer_token_base
 {
 public:
-    string_token(const ::std::string& str);
-    virtual ~string_token();
+    lexer_string_token(const ::std::string& str);
+    virtual ~lexer_string_token();
 
     virtual ::std::string get_string() const;
     virtual const char* print() const;
@@ -120,11 +121,11 @@ private:
 
 // ============================================================================
 
-class name_token : public token_base
+class lexer_name_token : public lexer_token_base
 {
 public:
-    name_token(const ::std::string& name);
-    virtual ~name_token();
+    lexer_name_token(const ::std::string& name);
+    virtual ~lexer_name_token();
 
     virtual ::std::string get_string() const;
     virtual const char* print() const;
@@ -136,18 +137,18 @@ private:
 
 // We need the following inline functions for boost::ptr_container.
 
-inline token_base* new_clone(const token_base& r)
+inline lexer_token_base* new_clone(const lexer_token_base& r)
 {
-    opcode_t oc = r.get_opcode();
+    lexer_opcode_t oc = r.get_opcode();
 
     switch (oc)
     {
         case op_value:
-            return new value_token(r.get_value());
+            return new lexer_value_token(r.get_value());
         case op_string:
-            return new string_token(r.get_string());
+            return new lexer_string_token(r.get_string());
         case op_name:
-            return new name_token(r.get_string());
+            return new lexer_name_token(r.get_string());
         case op_close:
         case op_divide:
         case op_minus:
@@ -159,10 +160,10 @@ inline token_base* new_clone(const token_base& r)
             ;
     }
 
-    return new token(oc);
+    return new lexer_token(oc);
 }
 
-inline void delete_clone(const token_base* p)
+inline void delete_clone(const lexer_token_base* p)
 {
     delete p;
 }

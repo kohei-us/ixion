@@ -35,13 +35,13 @@ namespace ixion {
 
 namespace {
 
-class token_printer : public unary_function<token_base, void>
+class token_printer : public unary_function<lexer_token_base, void>
 {
 public:
     token_printer(ostringstream& os, bool verbose) : m_os(os), m_verbose(verbose) {}
-    void operator() (const token_base& r) const
+    void operator() (const lexer_token_base& r) const
     {
-        opcode_t oc = r.get_opcode();
+        lexer_opcode_t oc = r.get_opcode();
         if (m_verbose)
             m_os << "(" << get_opcode_name(oc) << ")'" << r.print() << "' ";
         else

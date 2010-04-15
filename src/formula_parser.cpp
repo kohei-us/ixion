@@ -61,7 +61,7 @@ void formula_parser::parse()
         size_t n = m_tokens.size();
         for (size_t i = 0; i < n; ++i)
         {
-            const token_base& t = m_tokens[i];
+            const lexer_token_base& t = m_tokens[i];
             switch (t.get_opcode())
             {
                 case op_close:
@@ -110,7 +110,7 @@ const vector<base_cell*>& formula_parser::get_depend_cells() const
     return m_depend_cells;
 }
 
-void formula_parser::name(const token_base& t)
+void formula_parser::name(const lexer_token_base& t)
 {
     const string name = t.get_string();
     cell_name_map_t::iterator itr = mp_cell_names->find(name);

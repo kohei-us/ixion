@@ -36,7 +36,7 @@ namespace ixion {
 
 // ============================================================================
 
-const char* get_opcode_name(opcode_t oc)
+const char* get_opcode_name(lexer_opcode_t oc)
 {
     switch (oc)
     {
@@ -58,47 +58,47 @@ const char* get_opcode_name(opcode_t oc)
 
 // ============================================================================
 
-token_base::token_base(opcode_t oc) :
+lexer_token_base::lexer_token_base(lexer_opcode_t oc) :
     m_opcode(oc)
 {
 }
 
-token_base::token_base(const token_base& r) :
+lexer_token_base::lexer_token_base(const lexer_token_base& r) :
     m_opcode(r.m_opcode)
 {
 }
 
-token_base::~token_base()
+lexer_token_base::~lexer_token_base()
 {
 }
 
-opcode_t token_base::get_opcode() const
+lexer_opcode_t lexer_token_base::get_opcode() const
 {
     return m_opcode;
 }
 
-double token_base::get_value() const
+double lexer_token_base::get_value() const
 {
     return 0.0;
 }
 
-string token_base::get_string() const
+string lexer_token_base::get_string() const
 {
     return string();
 }
 
 // ============================================================================
 
-token::token(opcode_t oc) :
-    token_base(oc)
+lexer_token::lexer_token(lexer_opcode_t oc) :
+    lexer_token_base(oc)
 {
 }
 
-token::~token()
+lexer_token::~lexer_token()
 {
 }
 
-const char* token::print() const
+const char* lexer_token::print() const
 {
     switch (get_opcode())
     {
@@ -126,28 +126,28 @@ const char* token::print() const
 
 // ============================================================================
 
-value_token::value_token(double val) :
-    token_base(op_value),
+lexer_value_token::lexer_value_token(double val) :
+    lexer_token_base(op_value),
     m_val(val) 
 {
 }
 
-value_token::value_token(const value_token& r) :
-    token_base(r),
+lexer_value_token::lexer_value_token(const lexer_value_token& r) :
+    lexer_token_base(r),
     m_val(r.m_val) 
 {
 }
 
-value_token::~value_token()
+lexer_value_token::~lexer_value_token()
 {
 }
 
-double value_token::get_value() const
+double lexer_value_token::get_value() const
 {
     return m_val;
 }
 
-const char* value_token::print() const
+const char* lexer_value_token::print() const
 {
     ostringstream os;
     os << m_val;
@@ -156,44 +156,44 @@ const char* value_token::print() const
 
 // ============================================================================
 
-string_token::string_token(const string& str) :
-    token_base(op_string),
+lexer_string_token::lexer_string_token(const string& str) :
+    lexer_token_base(op_string),
     m_str(str)
 {
 }
 
-string_token::~string_token()
+lexer_string_token::~lexer_string_token()
 {
 }
 
-string string_token::get_string() const
+string lexer_string_token::get_string() const
 {
     return m_str;
 }
 
-const char* string_token::print() const
+const char* lexer_string_token::print() const
 {
     return m_str.c_str();
 }
 
 // ============================================================================
 
-name_token::name_token(const string& name) :
-    token_base(op_name),
+lexer_name_token::lexer_name_token(const string& name) :
+    lexer_token_base(op_name),
     m_name(name)
 {
 }
 
-name_token::~name_token()
+lexer_name_token::~lexer_name_token()
 {
 }
 
-string name_token::get_string() const
+string lexer_name_token::get_string() const
 {
     return m_name;
 }
 
-const char* name_token::print() const
+const char* lexer_name_token::print() const
 {
     return m_name.c_str();
 }
