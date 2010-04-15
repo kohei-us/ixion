@@ -29,7 +29,7 @@
 #define __IXION_FORMULA_PARSER_HPP__
 
 #include "global.hpp"
-#include "tokens.hpp"
+#include "lexer_tokens.hpp"
 #include "formula_tokens.hpp"
 
 #include <boost/noncopyable.hpp>

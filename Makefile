@@ -42,12 +42,12 @@ HEADERS= \
 	$(INCDIR)/formula_tokens.hpp \
 	$(INCDIR)/global.hpp \
 	$(INCDIR)/inputparser.hpp \
-	$(INCDIR)/tokens.hpp
+	$(INCDIR)/lexer_tokens.hpp
 
 OBJFILES= \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/cell.o \
-	$(OBJDIR)/tokens.o \
+	$(OBJDIR)/lexer_tokens.o \
 	$(OBJDIR)/global.o \
 	$(OBJDIR)/formula_lexer.o \
 	$(OBJDIR)/formula_parser.o \
@@ -70,8 +70,8 @@ $(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(DEPENDS)
 $(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell.cpp
 
-$(OBJDIR)/tokens.o: $(SRCDIR)/tokens.cpp $(DEPENDS)
-	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/tokens.cpp
+$(OBJDIR)/lexer_tokens.o: $(SRCDIR)/lexer_tokens.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/lexer_tokens.cpp
 
 $(OBJDIR)/global.o: $(SRCDIR)/global.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/global.cpp

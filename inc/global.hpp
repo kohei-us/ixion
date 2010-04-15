@@ -28,7 +28,7 @@
 #ifndef __GLOBAL_HPP__
 #define __GLOBAL_HPP__
 
-#include "tokens.hpp"
+#include "lexer_tokens.hpp"
 
 #include <string>
 
