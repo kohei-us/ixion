@@ -188,6 +188,8 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         // Sort the cells in order of dependency.
         vector<const base_cell*> sorted_cells;
         deptracker.topo_sort_cells(sorted_cells);
+
+        // Interpret cells in order of dependency.
     }
     catch (const exception& e)
     {
