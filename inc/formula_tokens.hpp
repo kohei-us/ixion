@@ -84,6 +84,21 @@ private:
 
 // ============================================================================
 
+/**
+ * Very simple token that stores opcode only.
+ */
+class opcode_token : public formula_token_base
+{
+public:
+    explicit opcode_token(fopcode_t oc);
+    virtual ~opcode_token();
+};
+
+// ============================================================================
+
+/**
+ * Token that stores a cell reference.
+ */
 class single_ref_token : public formula_token_base
 {
 public:
@@ -107,19 +122,13 @@ inline formula_token_base* new_clone(const formula_token_base& r)
     switch (r.get_opcode())
     {
         case fop_close:
-            break;
         case fop_divide:
-            break;
         case fop_minus:
-            break;
         case fop_multiply:
-            break;
         case fop_open:
-            break;
         case fop_plus:
-            break;
         case fop_sep:
-            break;
+            return new opcode_token(r.get_opcode())
         case fop_single_ref:
             return new single_ref_token(r.get_single_ref());
         case fop_string:

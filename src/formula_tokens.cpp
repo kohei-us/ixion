@@ -62,6 +62,17 @@ const base_cell* formula_token_base::get_single_ref() const
 
 // ============================================================================
 
+opcode_token::opcode_token(fopcode_t oc) :
+    formula_token_base(oc)
+{
+}
+
+opcode_token::~opcode_token()
+{
+}
+
+// ============================================================================
+
 single_ref_token::single_ref_token(const base_cell* pcell) :
     formula_token_base(fop_single_ref),
     mp_cell(pcell)
