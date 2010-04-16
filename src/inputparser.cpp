@@ -58,8 +58,8 @@ void flush_buffer(vector<char>& buf, string& str)
 class formula_cell_inserter : public unary_function<string, void>
 {
 public:
-    formula_cell_inserter(ptr_map<string, base_cell>& cell_map) :
-        m_cell_map(cell_map) {}
+    formula_cell_inserter(ptr_map<string, base_cell>& cell_name_ptr_map) :
+        m_cell_map(cell_name_ptr_map) {}
 
     void operator() (const string& name)
     {
@@ -147,11 +147,11 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         // name-to-pointer associations.
         const vector<string>& cell_names = parser.get_cell_names();
 
-        ptr_map<string, base_cell> cell_map;
-        depends_tracker::ptr_name_map_type ptr_name_map;
-        create_empty_formula_cells(cell_names, cell_map, ptr_name_map);
+        ptr_map<string, base_cell>          cell_name_ptr_map;
+        depends_tracker::ptr_name_map_type  cell_ptr_name_map;
+        create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
 
-        depends_tracker deptracker(&ptr_name_map);
+        depends_tracker deptracker(&cell_ptr_name_map);
         const vector<model_parser::cell>& cells = parser.get_cells();
         vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
         for (; itr_cell != itr_cell_end; ++itr_cell)
@@ -160,13 +160,13 @@ bool parse_model_input(const string& fpath, const string& dotpath)
             cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
 
             // Parse the lexer tokens and turn them into formula tokens.
-            formula_parser fparser(cell.get_tokens(), &cell_map);
+            formula_parser fparser(cell.get_tokens(), &cell_name_ptr_map);
             fparser.parse();
             fparser.print_tokens();
 
             // Put the formula tokens into formula cell instance.
-            ptr_map<string, base_cell>::iterator itr = cell_map.find(cell.get_name());
-            if (itr == cell_map.end())
+            ptr_map<string, base_cell>::iterator itr = cell_name_ptr_map.find(cell.get_name());
+            if (itr == cell_name_ptr_map.end())
                 throw general_error("formula cell not found");
 
             base_cell* pcell = itr->second;
