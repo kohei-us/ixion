@@ -133,6 +133,7 @@ private:
         }
         return "unknown";
     }
+
     string get_cell_name(const base_cell* p) const
     {
         cell_ptr_name_map_t::const_iterator itr = m_cell_ptr_name_map.find(p);
