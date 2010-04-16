@@ -60,35 +60,45 @@ public:
     void operator() (const formula_token_base& token) const
     {
         fopcode_t oc = token.get_opcode();   
-        cout << "(" << get_token_name(oc) << ")";
+        cout << " ";
+        cout << "<" << get_token_name(oc) << ">'";
         switch (oc)
         {
             case fop_close:
+                cout << ")";
                 break;
             case fop_divide:
+                cout << "/";
                 break;
             case fop_err_no_ref:
                 break;
             case fop_minus:
+                cout << "-";
                 break;
             case fop_multiply:
+                cout << "*";
                 break;
             case fop_open:
+                cout << "(";
                 break;
             case fop_plus:
+                cout << "+";
                 break;
             case fop_sep:
+                cout << ",";
                 break;
             case fop_single_ref:
-                cout << "'" << get_cell_name(token.get_single_ref()) << "'";
+                cout << get_cell_name(token.get_single_ref());
                 break;
             case fop_string:
                 break;
             case fop_value:
+                cout << token.get_value();
                 break;
             default:
                 ;
         }
+        cout << "'";
     }
 
 private:
@@ -137,6 +147,13 @@ private:
 
 }
 
+// ----------------------------------------------------------------------------
+
+formula_parser::parse_error::parse_error(const string& msg) :
+    general_error(msg) {}
+
+// ----------------------------------------------------------------------------
+
 formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_map_t* p_cell_names) :
     m_tokens(tokens),
     mp_cell_names(p_cell_names)
@@ -155,28 +172,25 @@ void formula_parser::parse()
         for (size_t i = 0; i < n; ++i)
         {
             const lexer_token_base& t = m_tokens[i];
-            switch (t.get_opcode())
+            lexer_opcode_t oc = t.get_opcode();
+            switch (oc)
             {
+                case op_open:
                 case op_close:
-                    break;
-                case op_divide:
-                    break;
+                case op_plus:
                 case op_minus:
-                    break;
                 case op_multiply:
+                case op_divide:
+                case op_sep:
+                    primitive(oc);
                     break;
                 case op_name:
                     name(t);
                     break;
-                case op_open:
-                    break;
-                case op_plus:
-                    break;
-                case op_sep:
-                    break;
                 case op_string:
                     break;
                 case op_value:
+                    value(t);
                     break;
                 default:
                     ;
@@ -191,7 +205,7 @@ void formula_parser::parse()
 
 void formula_parser::print_tokens() const
 {
-    cout << "formula tokens: ";
+    cout << "formula tokens:";
     for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer(*mp_cell_names));
     cout << endl;
 }
@@ -204,6 +218,38 @@ formula_tokens_t& formula_parser::get_tokens()
 const vector<base_cell*>& formula_parser::get_depend_cells() const
 {
     return m_depend_cells;
+}
+
+void formula_parser::primitive(lexer_opcode_t oc)
+{
+    fopcode_t foc = fop_unknown;
+    switch (oc)
+    {
+        case op_close:
+            foc = fop_close;
+            break;
+        case op_divide:
+            foc = fop_divide;
+            break;
+        case op_minus:
+            foc = fop_minus;
+            break;
+        case op_multiply:
+            foc = fop_multiply;
+            break;
+        case op_open:
+            foc = fop_open;
+            break;
+        case op_plus:
+            foc = fop_plus;
+            break;
+        case op_sep:
+            foc = fop_sep;
+            break;
+        default:
+            throw parse_error("unknown primitive token received");
+    }
+    m_formula_tokens.push_back(new opcode_token(foc));
 }
 
 void formula_parser::name(const lexer_token_base& t)
@@ -219,6 +265,12 @@ void formula_parser::name(const lexer_token_base& t)
     cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
     m_formula_tokens.push_back(new single_ref_token(itr->second));
     m_depend_cells.push_back(itr->second);
+}
+
+void formula_parser::value(const lexer_token_base& t)
+{
+    double val = t.get_value();
+    m_formula_tokens.push_back(new value_token(val));
 }
 
 }

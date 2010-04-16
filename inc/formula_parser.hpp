@@ -56,6 +56,12 @@ class formula_parser : public ::boost::noncopyable
     typedef ::std::vector<base_cell*> depends_cell_array_type;
 
 public:
+    class parse_error : public general_error
+    {
+    public:
+        parse_error(const ::std::string& msg);
+    };
+
     formula_parser(const lexer_tokens_t& tokens, cell_name_map_t* p_cell_names);
     ~formula_parser();
 
@@ -68,7 +74,9 @@ public:
 private:
     formula_parser(); // disabled
 
+    void primitive(lexer_opcode_t oc);
     void name(const lexer_token_base& t);
+    void value(const lexer_token_base& t);
 
     const lexer_tokens_t    m_tokens;
     formula_tokens_t        m_formula_tokens;

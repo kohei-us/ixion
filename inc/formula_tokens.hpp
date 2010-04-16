@@ -61,6 +61,8 @@ enum fopcode_t {
 
     // error conditions
     fop_err_no_ref,
+
+    fop_unknown
 };
 
 // ============================================================================
@@ -75,6 +77,7 @@ public:
     fopcode_t get_opcode() const;
 
     virtual const base_cell* get_single_ref() const;
+    virtual double get_value() const;
 
 private:
     formula_token_base(); // disabled
@@ -92,6 +95,19 @@ class opcode_token : public formula_token_base
 public:
     explicit opcode_token(fopcode_t oc);
     virtual ~opcode_token();
+};
+
+// ============================================================================
+
+class value_token : public formula_token_base
+{
+public:
+    explicit value_token(double value);
+    virtual ~value_token();
+
+    virtual double get_value() const;
+private:
+    double m_value;
 };
 
 // ============================================================================
@@ -128,7 +144,7 @@ inline formula_token_base* new_clone(const formula_token_base& r)
         case fop_open:
         case fop_plus:
         case fop_sep:
-            return new opcode_token(r.get_opcode())
+            return new opcode_token(r.get_opcode());
         case fop_single_ref:
             return new single_ref_token(r.get_single_ref());
         case fop_string:

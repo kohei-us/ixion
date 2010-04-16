@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __GLOBAL_HPP__
-#define __GLOBAL_HPP__
+#ifndef __IXION_GLOBAL_HPP__
+#define __IXION_GLOBAL_HPP__
 
 #include "lexer_tokens.hpp"
 

@@ -60,6 +60,11 @@ const base_cell* formula_token_base::get_single_ref() const
     return NULL;
 }
 
+double formula_token_base::get_value() const
+{
+    return 0.0;
+}
+
 // ============================================================================
 
 opcode_token::opcode_token(fopcode_t oc) :
@@ -69,6 +74,23 @@ opcode_token::opcode_token(fopcode_t oc) :
 
 opcode_token::~opcode_token()
 {
+}
+
+// ============================================================================
+
+value_token::value_token(double value) :
+    formula_token_base(fop_value),
+    m_value(value)
+{
+}
+
+value_token::~value_token()
+{
+}
+
+double value_token::get_value() const
+{
+    return m_value;
 }
 
 // ============================================================================
