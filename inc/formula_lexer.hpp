@@ -32,7 +32,7 @@
 #include <exception>
 #include <boost/noncopyable.hpp>
 
-#include "global.hpp"
+#include "lexer_tokens.hpp"
 
 namespace ixion {
 

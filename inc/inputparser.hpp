@@ -29,6 +29,7 @@
 #define __IXION_INPUTPARSER_HPP__
 
 #include "cell.hpp"
+#include "lexer_tokens.hpp"
 
 #include <string>
 #include <exception>

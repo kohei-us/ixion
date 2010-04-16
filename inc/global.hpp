@@ -28,8 +28,6 @@
 #ifndef __IXION_GLOBAL_HPP__
 #define __IXION_GLOBAL_HPP__
 
-#include "lexer_tokens.hpp"
-
 #include <string>
 
 namespace ixion {
@@ -43,8 +41,6 @@ public:
 private:
     ::std::string m_msg;
 };
-
-const char* print_tokens(const lexer_tokens_t& tokens, bool verbose);
 
 }
 

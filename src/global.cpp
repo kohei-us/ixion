@@ -33,27 +33,6 @@ using namespace std;
 
 namespace ixion {
 
-namespace {
-
-class token_printer : public unary_function<lexer_token_base, void>
-{
-public:
-    token_printer(ostringstream& os, bool verbose) : m_os(os), m_verbose(verbose) {}
-    void operator() (const lexer_token_base& r) const
-    {
-        lexer_opcode_t oc = r.get_opcode();
-        if (m_verbose)
-            m_os << "(" << get_opcode_name(oc) << ")'" << r.print() << "' ";
-        else
-            m_os << r.print();
-    }
-private:
-    ostringstream& m_os;
-    bool m_verbose;
-};
-
-}
-
 general_error::general_error(const string& msg) :
     m_msg(msg)
 {
@@ -66,13 +45,6 @@ general_error::~general_error() throw()
 const char* general_error::what() const throw()
 {
     return m_msg.c_str();
-}
-
-const char* print_tokens(const lexer_tokens_t& tokens, bool verbose)
-{
-    ostringstream os;
-    for_each(tokens.begin(), tokens.end(), token_printer(os, verbose));
-    return os.str().c_str();
 }
 
 }
