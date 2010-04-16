@@ -29,11 +29,17 @@
 
 namespace ixion {
 
-formula_interpreter::formula_interpreter()
+formula_interpreter::formula_interpreter(const cell_name_ptr_map_t& cell_map, const formula_tokens_t& tokens) :
+    m_cell_name_ptr_map(cell_map),
+    m_tokens(tokens)
 {
 }
 
 formula_interpreter::~formula_interpreter()
+{
+}
+
+void formula_interpreter::interpret()
 {
 }
 

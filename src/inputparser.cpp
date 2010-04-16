@@ -30,6 +30,7 @@
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
 #include "depends_tracker.hpp"
+#include "formula_interpreter.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -114,17 +115,24 @@ void create_empty_formula_cells(
 class cell_interpreter : public unary_function<base_cell*, void>
 {
 public:
-    cell_interpreter(const ptr_map<string, base_cell>& cell_name_ptr_map) :
+    cell_interpreter(const cell_name_ptr_map_t& cell_name_ptr_map) :
         m_cell_name_ptr_map(cell_name_ptr_map)
     {
     }
 
     void operator() (base_cell* cell) const
     {
+        if (cell->get_celltype() != celltype_formula)
+            // We can't interpret unless the cell contains formula tokens.
+            return;
+
+        formula_cell* fcell = static_cast<formula_cell*>(cell);
+        formula_interpreter fin(m_cell_name_ptr_map, fcell->get_tokens());
+        fin.interpret();
     }
 
 private:
-    const ptr_map<string, base_cell>& m_cell_name_ptr_map;
+    const cell_name_ptr_map_t& m_cell_name_ptr_map;
 };
 
 }
@@ -163,7 +171,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         // name-to-pointer associations.
         const vector<string>& cell_names = parser.get_cell_names();
 
-        ptr_map<string, base_cell>          cell_name_ptr_map;
+        cell_name_ptr_map_t                 cell_name_ptr_map;
         depends_tracker::ptr_name_map_type  cell_ptr_name_map;
         create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
 

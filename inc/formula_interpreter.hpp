@@ -28,13 +28,24 @@
 #ifndef __IXION_FORMULA_INTERPRETER_HPP__
 #define __IXION_FORMULA_INTERPRETER_HPP__
 
+#include "global.hpp"
+#include "formula_tokens.hpp"
+
+#include <boost/noncopyable.hpp>
+
 namespace ixion {
 
-class formula_interpreter
+class formula_interpreter : public ::boost::noncopyable
 {
 public:
-    formula_interpreter();
+    formula_interpreter(const cell_name_ptr_map_t& cell_map, const formula_tokens_t& tokens);
     ~formula_interpreter();
+
+    void interpret();
+
+private:
+    const cell_name_ptr_map_t&  m_cell_name_ptr_map;
+    const formula_tokens_t&     m_tokens;
 };
 
 }
