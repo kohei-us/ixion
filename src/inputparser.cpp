@@ -111,6 +111,22 @@ void create_empty_formula_cells(
     }
 }
 
+class cell_interpreter : public unary_function<base_cell*, void>
+{
+public:
+    cell_interpreter(const ptr_map<string, base_cell>& cell_name_ptr_map) :
+        m_cell_name_ptr_map(cell_name_ptr_map)
+    {
+    }
+
+    void operator() (base_cell* cell) const
+    {
+    }
+
+private:
+    const ptr_map<string, base_cell>& m_cell_name_ptr_map;
+};
+
 }
 
 /** 
@@ -186,10 +202,11 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         deptracker.print_dot_graph(dotpath);
 
         // Sort the cells in order of dependency.
-        vector<const base_cell*> sorted_cells;
+        vector<base_cell*> sorted_cells;
         deptracker.topo_sort_cells(sorted_cells);
 
         // Interpret cells in order of dependency.
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpreter(cell_name_ptr_map));
     }
     catch (const exception& e)
     {

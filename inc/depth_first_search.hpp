@@ -67,7 +67,7 @@ public:
     void init();
     void run();
     void print_result();
-    void swap_sorted_cells(::std::vector<const base_cell*>& sorted_cells);
+    void swap_sorted_cells(::std::vector<base_cell*>& sorted_cells);
 
 private:
     void visit(size_t cell_index);
@@ -83,7 +83,7 @@ private:
 
     size_t                          m_time_stamp;
     ::std::vector<celldata>         m_cells;
-    ::std::vector<const base_cell*> m_sorted_cells;
+    ::std::vector<base_cell*> m_sorted_cells;
 
 };
 

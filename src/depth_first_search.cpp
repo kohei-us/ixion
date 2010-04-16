@@ -91,7 +91,7 @@ void depth_first_search::print_result()
     }
 }
 
-void depth_first_search::swap_sorted_cells(vector<const base_cell*>& sorted_cells)
+void depth_first_search::swap_sorted_cells(vector<base_cell*>& sorted_cells)
 {
     m_sorted_cells.swap(sorted_cells);
 }
@@ -134,7 +134,7 @@ void depth_first_search::visit(size_t cell_index)
 
     m_cells[cell_index].color = black;
     m_cells[cell_index].time_finished = ++m_time_stamp;
-    m_sorted_cells.push_back(m_cells[cell_index].ptr);
+    m_sorted_cells.push_back(const_cast<base_cell*>(m_cells[cell_index].ptr));
 //  cout << "visit (end) ------------------------------------------------" << endl;
 }
 

@@ -65,7 +65,7 @@ public:
      * Perform topological sort on all cell instances, and returns an array of 
      * cells that are sorted in order of dependency. 
      */
-    void topo_sort_cells(::std::vector<const base_cell*>& sorted_cells) const;
+    void topo_sort_cells(::std::vector<base_cell*>& sorted_cells) const;
 
     /** 
      * Create a file and write cell dependency graph in dot script.
