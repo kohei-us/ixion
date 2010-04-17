@@ -120,34 +120,50 @@ void formula_interpreter::factor()
 {
     // <constant> || <variable> || '(' <expression> ')'
 
-    const formula_token_base& t1 = token();
-    fopcode_t oc1 = t1.get_opcode();
-    if (oc1 == fop_open)
+    fopcode_t oc = token().get_opcode();
+    if (oc == fop_open)
     {
-        cout << "(" << endl;
-        next();
-        expression();
-        const formula_token_base& t2 = token();
-        if (t2.get_opcode() != fop_close)
-            throw invalid_expression("factor: expected close paren");
-
-        cout << ")" << endl;
+        paren();
     }
-    else if (oc1 == fop_value)
+    else if (oc == fop_value)
     {
-        cout << t1.get_value() << endl;
+        constant();
     }
-    else if (oc1 == fop_single_ref)
+    else if (oc == fop_single_ref)
     {
-        cout << t1.get_single_ref() << endl;
+        variable();
     }
     else
     {
         ostringstream os;
         os << "factor: unexpected token type ";
-        os << oc1;
+        os << oc;
         throw invalid_expression(os.str());
     }
+}
+
+void formula_interpreter::paren()
+{
+    cout << "(" << endl;
+    next();
+    expression();
+    const formula_token_base& t2 = token();
+    if (t2.get_opcode() != fop_close)
+        throw invalid_expression("paren: expected close paren");
+
+    cout << ")" << endl;
+    next();
+}
+
+void formula_interpreter::variable()
+{
+    cout << token().get_single_ref() << endl;
+    next();
+}
+
+void formula_interpreter::constant()
+{
+    cout << token().get_value() << endl;
     next();
 }
 

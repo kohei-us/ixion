@@ -56,6 +56,9 @@ private:
     void expression();
     void term();
     void factor();
+    void paren();
+    void variable();
+    void constant();
     void plus_op();
     void multiply_op();
 
