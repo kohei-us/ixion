@@ -121,6 +121,13 @@ void formula_interpreter::factor()
     // <constant> || <variable> || '(' <expression> ')'
 
     fopcode_t oc = token().get_opcode();
+    if (oc == fop_plus || oc == fop_minus)
+    {
+        // Factor can begin with a '+' or '-'.
+        plus_op();
+        oc = token().get_opcode();
+    }
+
     switch (oc)
     {
         case fop_open:
