@@ -121,24 +121,24 @@ void formula_interpreter::factor()
     // <constant> || <variable> || '(' <expression> ')'
 
     fopcode_t oc = token().get_opcode();
-    if (oc == fop_open)
+    switch (oc)
     {
-        paren();
-    }
-    else if (oc == fop_value)
-    {
-        constant();
-    }
-    else if (oc == fop_single_ref)
-    {
-        variable();
-    }
-    else
-    {
-        ostringstream os;
-        os << "factor: unexpected token type ";
-        os << oc;
-        throw invalid_expression(os.str());
+        case fop_open:
+            paren();
+        break;
+        case fop_value:
+            constant();
+        break;
+        case fop_single_ref:
+            variable();
+        break;
+        default:
+        {
+            ostringstream os;
+            os << "factor: unexpected token type ";
+            os << oc;
+            throw invalid_expression(os.str());
+        }
     }
 }
 
