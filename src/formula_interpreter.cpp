@@ -124,6 +124,7 @@ void formula_interpreter::factor()
     if (oc1 == fop_open)
     {
         cout << "(" << endl;
+        next();
         expression();
         const formula_token_base& t2 = token();
         if (t2.get_opcode() != fop_close)
