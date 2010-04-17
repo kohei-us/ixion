@@ -123,7 +123,7 @@ void formula_interpreter::factor()
     }
     else if (oc1 == fop_value)
     {
-        cout << t1.get_opcode() << endl;
+        cout << t1.get_value() << endl;
     }
     else if (oc1 == fop_single_ref)
     {
@@ -158,8 +158,11 @@ void formula_interpreter::plus_op()
             cout << "-" << endl;
         break;
         default:
-            throw invalid_expression("plus_op: unexpected token type");
+            ;
     }
+    ostringstream os;
+    os << "plus_op: unexpected token type " << t.get_opcode();
+    throw invalid_expression(os.str());
 }
 
 void formula_interpreter::multiply_op()
@@ -174,8 +177,11 @@ void formula_interpreter::multiply_op()
             cout << "/" << endl;
         break;
         default:
-            throw invalid_expression("plus_op: unexpected token type");
+            ;
     }
+    ostringstream os;
+    os << "multiply_op: unexpected token type " << t.get_opcode();
+    throw invalid_expression(os.str());
 }
 
 }

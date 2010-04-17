@@ -127,9 +127,18 @@ public:
             // We can't interpret unless the cell contains formula tokens.
             return;
 
+        cout << "---------- interpreting " << get_cell_name(cell) << endl;
         formula_cell* fcell = static_cast<formula_cell*>(cell);
         formula_interpreter fin(m_cell_name_ptr_map, fcell->get_tokens());
         fin.interpret();
+    }
+
+    string get_cell_name(const base_cell* p) const
+    {
+        cell_ptr_name_map_t::const_iterator itr = m_cell_ptr_name_map.find(p);
+        if (itr != m_cell_ptr_name_map.end())
+            return itr->second;
+        return string();
     }
 
 private:
