@@ -48,8 +48,10 @@ private:
     void next();
     const formula_token_base& token() const;
 
-    // The following methods are handlers.  Each handler is responsible for 
-    // setting the token position to the next position at the end.
+    // The following methods are handlers.  In each handler, the initial
+    // position is always set to the first unprocessed token.  Each handler is
+    // responsible for setting the token position to the next unprocessed
+    // position when it finishes.
 
     void expression();
     void term();
