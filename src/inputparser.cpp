@@ -182,7 +182,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         // name-to-pointer associations.
         const vector<string>& cell_names = parser.get_cell_names();
 
-        cell_name_ptr_map_t                 cell_name_ptr_map;
+        cell_name_ptr_map_t  cell_name_ptr_map;
         cell_ptr_name_map_t  cell_ptr_name_map;
         create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
 
