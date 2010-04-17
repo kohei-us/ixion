@@ -28,6 +28,8 @@
 #ifndef __DEPENDS_TRACKER_HPP__
 #define __DEPENDS_TRACKER_HPP__
 
+#include "formula_parser.hpp"
+
 #include <string>
 #include <set>
 #include <vector>
@@ -48,9 +50,8 @@ class depends_tracker
 public:
     typedef ::std::set<const base_cell*>                                depend_cells_type;
     typedef ::boost::ptr_map<const formula_cell*, depend_cells_type>    depend_map_type;
-    typedef ::std::map<const base_cell*, ::std::string>                 ptr_name_map_type;
 
-    depends_tracker(const ptr_name_map_type* names);
+    depends_tracker(const cell_ptr_name_map_t* names);
     ~depends_tracker();
 
     /** 
@@ -81,7 +82,7 @@ private:
 
 private:
     depend_map_type             m_map;
-    const ptr_name_map_type*    mp_names;
+    const cell_ptr_name_map_t*  mp_names;
 };
 
 }

@@ -95,7 +95,7 @@ void ensure_unique_names(const vector<string>& cell_names)
 }
 
 void create_empty_formula_cells(
-    const vector<string>& cell_names, ptr_map<string, base_cell>& cell_map, map<const base_cell*, string>& ptr_name_map)
+    const vector<string>& cell_names, cell_name_map_t& cell_map, cell_ptr_name_map_t& ptr_name_map)
 {
     ensure_unique_names(cell_names);
 
@@ -115,8 +115,9 @@ void create_empty_formula_cells(
 class cell_interpreter : public unary_function<base_cell*, void>
 {
 public:
-    cell_interpreter(const cell_name_ptr_map_t& cell_name_ptr_map) :
-        m_cell_name_ptr_map(cell_name_ptr_map)
+    cell_interpreter(const cell_name_ptr_map_t& cell_name_ptr_map, const cell_ptr_name_map_t& cell_ptr_name_map) :
+        m_cell_name_ptr_map(cell_name_ptr_map),
+        m_cell_ptr_name_map(cell_ptr_name_map)
     {
     }
 
@@ -133,6 +134,7 @@ public:
 
 private:
     const cell_name_ptr_map_t& m_cell_name_ptr_map;
+    const cell_ptr_name_map_t& m_cell_ptr_name_map;
 };
 
 }
@@ -172,7 +174,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         const vector<string>& cell_names = parser.get_cell_names();
 
         cell_name_ptr_map_t                 cell_name_ptr_map;
-        depends_tracker::ptr_name_map_type  cell_ptr_name_map;
+        cell_ptr_name_map_t  cell_ptr_name_map;
         create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
 
         depends_tracker deptracker(&cell_ptr_name_map);
@@ -214,7 +216,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         deptracker.topo_sort_cells(sorted_cells);
 
         // Interpret cells in order of dependency.
-        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpreter(cell_name_ptr_map));
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpreter(cell_name_ptr_map, cell_ptr_name_map));
     }
     catch (const exception& e)
     {

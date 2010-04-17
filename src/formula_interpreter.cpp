@@ -30,6 +30,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -112,19 +113,29 @@ void formula_interpreter::factor()
     fopcode_t oc1 = t1.get_opcode();
     if (oc1 == fop_open)
     {
+        cout << "(" << endl;
         expression();
         const formula_token_base& t2 = next_token();
         if (t2.get_opcode() != fop_close)
             throw invalid_expression("factor: expected close paren");
+
+        cout << ")" << endl;
     }
     else if (oc1 == fop_value)
     {
+        cout << t1.get_opcode() << endl;
     }
     else if (oc1 == fop_single_ref)
     {
+        cout << t1.get_single_ref() << endl;
     }
     else
-        throw invalid_expression("factor: unexpected token type");
+    {
+        ostringstream os;
+        os << "factor: unexpected token type ";
+        os << oc1;
+        throw invalid_expression(os.str());
+    }
 }
 
 void formula_interpreter::variable()
@@ -138,11 +149,33 @@ void formula_interpreter::constant()
 void formula_interpreter::plus_op()
 {
     const formula_token_base& t = next_token();
+    switch (t.get_opcode())
+    {
+        case fop_plus:
+            cout << "+" << endl;
+        break;
+        case fop_minus:
+            cout << "-" << endl;
+        break;
+        default:
+            throw invalid_expression("plus_op: unexpected token type");
+    }
 }
 
 void formula_interpreter::multiply_op()
 {
     const formula_token_base& t = next_token();
+    switch (t.get_opcode())
+    {
+        case fop_multiply:
+            cout << "*" << endl;
+        break;
+        case fop_divide:
+            cout << "/" << endl;
+        break;
+        default:
+            throw invalid_expression("plus_op: unexpected token type");
+    }
 }
 
 }

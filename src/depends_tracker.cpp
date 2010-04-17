@@ -44,11 +44,11 @@ namespace {
 class cell_printer : public unary_function<const base_cell*, void>
 {
 public:
-    cell_printer(const depends_tracker::ptr_name_map_type* names) : mp_names(names) {}
+    cell_printer(const cell_ptr_name_map_t* names) : mp_names(names) {}
 
     void operator() (const base_cell* p) const
     {
-        depends_tracker::ptr_name_map_type::const_iterator itr = mp_names->find(p);
+        cell_ptr_name_map_t::const_iterator itr = mp_names->find(p);
         if (itr == mp_names->end())
             cout << "  unknown cell (" << p << ")" << endl;
         else
@@ -56,12 +56,12 @@ public:
     }
 
 private:
-    const depends_tracker::ptr_name_map_type* mp_names;
+    const cell_ptr_name_map_t* mp_names;
 };
 
 }
 
-depends_tracker::depends_tracker(const ptr_name_map_type* names) :
+depends_tracker::depends_tracker(const cell_ptr_name_map_t* names) :
     mp_names(names)
 {
 }
@@ -122,7 +122,7 @@ void depends_tracker::print_dot_graph_depend(
 
 string depends_tracker::get_cell_name(const base_cell* pcell) const
 {
-    ptr_name_map_type::const_iterator itr_name = mp_names->find(pcell);
+    cell_ptr_name_map_t::const_iterator itr_name = mp_names->find(pcell);
     if (itr_name == mp_names->end())
         throw general_error("name not found for the given cell pointer");
 

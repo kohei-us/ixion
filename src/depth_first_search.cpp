@@ -36,14 +36,14 @@ namespace ixion {
 
 depth_first_search::depth_first_search(
     const depends_tracker::depend_map_type& depend_map, 
-    const depends_tracker::ptr_name_map_type* cell_names) :
+    const cell_ptr_name_map_t* cell_names) :
     m_depend_map(depend_map),
     m_cell_names(cell_names),
     m_cell_count(cell_names->size()),
     m_time_stamp(0),
     m_cells(m_cell_count)
 {
-    depends_tracker::ptr_name_map_type::const_iterator 
+    cell_ptr_name_map_t::const_iterator 
         itr = m_cell_names->begin(), itr_end = m_cell_names->end();
 
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
@@ -54,7 +54,7 @@ depth_first_search::depth_first_search(
 void depth_first_search::init()
 {
     vector<celldata> cells(m_cell_count);
-    depends_tracker::ptr_name_map_type::const_iterator 
+    cell_ptr_name_map_t::const_iterator 
         itr = m_cell_names->begin(), itr_end = m_cell_names->end();
 
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
@@ -140,7 +140,7 @@ void depth_first_search::visit(size_t cell_index)
 
 string depth_first_search::get_cell_name(const base_cell* p) const
 {
-    depends_tracker::ptr_name_map_type::const_iterator itr = m_cell_names->find(p);
+    cell_ptr_name_map_t::const_iterator itr = m_cell_names->find(p);
     if (itr == m_cell_names->end())
         throw dfs_error("failed to retrieve cell name from the ptr.");
 
