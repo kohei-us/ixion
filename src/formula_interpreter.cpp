@@ -26,8 +26,24 @@
  ************************************************************************/
 
 #include "formula_interpreter.hpp"
+#include "global.hpp"
+
+#include <string>
+#include <iostream>
+
+using namespace std;
 
 namespace ixion {
+
+namespace {
+
+class invalid_expression : public general_error
+{
+public:
+    invalid_expression(const string& msg) : general_error(msg) {}
+};
+
+}
 
 formula_interpreter::formula_interpreter(const cell_name_ptr_map_t& cell_map, const formula_tokens_t& tokens) :
     m_cell_name_ptr_map(cell_map),
@@ -41,6 +57,92 @@ formula_interpreter::~formula_interpreter()
 
 void formula_interpreter::interpret()
 {
+    m_cur_token_itr = m_tokens.begin();
+    try
+    {
+        expression();
+    }
+    catch (const invalid_expression& e)
+    {
+        cout << "invalid expression: " << e.what() << endl;
+    }
+}
+
+bool formula_interpreter::has_next() const
+{
+    return m_cur_token_itr != m_tokens.end();
+}
+
+const formula_token_base& formula_interpreter::next_token()
+{
+    if (!has_next())
+        throw invalid_expression("no more token present, but expected one");
+
+    const formula_token_base& t = *m_cur_token_itr;
+    ++m_cur_token_itr;
+    return t;
+}
+
+void formula_interpreter::expression()
+{
+    // <term> || <term> + <expression>
+    term();
+    if (has_next())
+    {
+        plus_op();
+        expression();
+    }
+}
+
+void formula_interpreter::term()
+{
+    // <factor> || <factor> * <term>
+    factor();
+    if (has_next())
+    {
+        multiply_op();
+        term();
+    }
+}
+
+void formula_interpreter::factor()
+{
+    // <constant> || <variable> || '(' <expression> ')'
+    const formula_token_base& t1 = next_token();
+    fopcode_t oc1 = t1.get_opcode();
+    if (oc1 == fop_open)
+    {
+        expression();
+        const formula_token_base& t2 = next_token();
+        if (t2.get_opcode() != fop_close)
+            throw invalid_expression("factor: expected close paren");
+    }
+    else if (oc1 == fop_value)
+    {
+    }
+    else if (oc1 == fop_single_ref)
+    {
+    }
+    else
+        throw invalid_expression("factor: unexpected token type");
+}
+
+void formula_interpreter::variable()
+{
+}
+
+void formula_interpreter::constant()
+{
+}
+
+void formula_interpreter::plus_op()
+{
+    const formula_token_base& t = next_token();
+}
+
+void formula_interpreter::multiply_op()
+{
+    const formula_token_base& t = next_token();
 }
 
 }

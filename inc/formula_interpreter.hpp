@@ -44,8 +44,21 @@ public:
     void interpret();
 
 private:
+    bool has_next() const;
+    const formula_token_base& next_token();
+
+    void expression();
+    void term();
+    void factor();
+    void variable();
+    void constant();
+    void plus_op();
+    void multiply_op();
+
+private:
     const cell_name_ptr_map_t&  m_cell_name_ptr_map;
     const formula_tokens_t&     m_tokens;
+    formula_tokens_t::const_iterator m_cur_token_itr;
 };
 
 }
