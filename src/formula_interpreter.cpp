@@ -119,6 +119,7 @@ void formula_interpreter::term()
 void formula_interpreter::factor()
 {
     // <constant> || <variable> || '(' <expression> ')'
+
     const formula_token_base& t1 = token();
     fopcode_t oc1 = t1.get_opcode();
     if (oc1 == fop_open)
@@ -148,14 +149,6 @@ void formula_interpreter::factor()
         throw invalid_expression(os.str());
     }
     next();
-}
-
-void formula_interpreter::variable()
-{
-}
-
-void formula_interpreter::constant()
-{
 }
 
 void formula_interpreter::plus_op()
