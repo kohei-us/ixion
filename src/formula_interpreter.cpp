@@ -48,7 +48,8 @@ public:
 
 formula_interpreter::formula_interpreter(const cell_name_ptr_map_t& cell_map, const formula_tokens_t& tokens) :
     m_cell_name_ptr_map(cell_map),
-    m_tokens(tokens)
+    m_tokens(tokens),
+    m_end_token_pos(m_tokens.end())
 {
 }
 
@@ -69,18 +70,19 @@ void formula_interpreter::interpret()
     }
 }
 
-bool formula_interpreter::has_next() const
+bool formula_interpreter::has_token() const
 {
-    return m_cur_token_itr != m_tokens.end();
+    return m_cur_token_itr != m_end_token_pos;
 }
 
-const formula_token_base& formula_interpreter::next_token()
+void formula_interpreter::next()
 {
-    if (!has_next())
-        throw invalid_expression("no more token present, but expected one");
-
-    const formula_token_base& t = *m_cur_token_itr;
     ++m_cur_token_itr;
+}
+
+const formula_token_base& formula_interpreter::token() const
+{
+    const formula_token_base& t = *m_cur_token_itr;
     return t;
 }
 
@@ -88,7 +90,11 @@ void formula_interpreter::expression()
 {
     // <term> || <term> + <expression>
     term();
-    if (has_next())
+    if (!has_token())
+        return;
+
+    fopcode_t oc = token().get_opcode();
+    if (oc == fop_plus || oc == fop_minus)
     {
         plus_op();
         expression();
@@ -99,7 +105,11 @@ void formula_interpreter::term()
 {
     // <factor> || <factor> * <term>
     factor();
-    if (has_next())
+    if (!has_token())
+        return;
+
+    fopcode_t oc = token().get_opcode();
+    if (oc == fop_multiply || oc == fop_divide)
     {
         multiply_op();
         term();
@@ -109,13 +119,13 @@ void formula_interpreter::term()
 void formula_interpreter::factor()
 {
     // <constant> || <variable> || '(' <expression> ')'
-    const formula_token_base& t1 = next_token();
+    const formula_token_base& t1 = token();
     fopcode_t oc1 = t1.get_opcode();
     if (oc1 == fop_open)
     {
         cout << "(" << endl;
         expression();
-        const formula_token_base& t2 = next_token();
+        const formula_token_base& t2 = token();
         if (t2.get_opcode() != fop_close)
             throw invalid_expression("factor: expected close paren");
 
@@ -136,6 +146,7 @@ void formula_interpreter::factor()
         os << oc1;
         throw invalid_expression(os.str());
     }
+    next();
 }
 
 void formula_interpreter::variable()
@@ -148,7 +159,7 @@ void formula_interpreter::constant()
 
 void formula_interpreter::plus_op()
 {
-    const formula_token_base& t = next_token();
+    const formula_token_base& t = token();
     switch (t.get_opcode())
     {
         case fop_plus:
@@ -158,16 +169,18 @@ void formula_interpreter::plus_op()
             cout << "-" << endl;
         break;
         default:
-            ;
+        {
+            ostringstream os;
+            os << "plus_op: unexpected token type " << t.get_opcode();
+            throw invalid_expression(os.str());
+        }
     }
-    ostringstream os;
-    os << "plus_op: unexpected token type " << t.get_opcode();
-    throw invalid_expression(os.str());
+    next();
 }
 
 void formula_interpreter::multiply_op()
 {
-    const formula_token_base& t = next_token();
+    const formula_token_base& t = token();
     switch (t.get_opcode())
     {
         case fop_multiply:
@@ -177,11 +190,13 @@ void formula_interpreter::multiply_op()
             cout << "/" << endl;
         break;
         default:
-            ;
+        {
+            ostringstream os;
+            os << "multiply_op: unexpected token type " << t.get_opcode();
+            throw invalid_expression(os.str());
+        }
     }
-    ostringstream os;
-    os << "multiply_op: unexpected token type " << t.get_opcode();
-    throw invalid_expression(os.str());
+    next();
 }
 
 }

@@ -105,6 +105,9 @@ $(EXEC): pre $(OBJFILES)
 test: $(EXEC)
 	./$(EXEC) -d $(OBJDIR)/simple-arithmetic.dot ./test/simple-arithmetic.txt
 
+test.expr: $(EXEC)
+	./$(EXEC) -d $(OBJDIR)/expression-test.dot ./test/expression-test.txt
+
 clean:
 	rm -rf $(OBJDIR)
 	rm $(EXEC)

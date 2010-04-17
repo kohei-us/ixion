@@ -44,8 +44,12 @@ public:
     void interpret();
 
 private:
-    bool has_next() const;
-    const formula_token_base& next_token();
+    bool has_token() const;
+    void next();
+    const formula_token_base& token() const;
+
+    // The following methods are handlers.  Each handler is responsible for 
+    // setting the token position to the next position at the end.
 
     void expression();
     void term();
@@ -59,6 +63,7 @@ private:
     const cell_name_ptr_map_t&  m_cell_name_ptr_map;
     const formula_tokens_t&     m_tokens;
     formula_tokens_t::const_iterator m_cur_token_itr;
+    formula_tokens_t::const_iterator m_end_token_pos;;
 };
 
 }
