@@ -147,8 +147,7 @@ void formula_interpreter::paren()
     cout << "(" << endl;
     next();
     expression();
-    const formula_token_base& t2 = token();
-    if (t2.get_opcode() != fop_close)
+    if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
     cout << ")" << endl;
