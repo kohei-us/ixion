@@ -85,13 +85,13 @@ void formula_interpreter::next()
 
 const formula_token_base& formula_interpreter::token() const
 {
-    const formula_token_base& t = *m_cur_token_itr;
-    return t;
+    return *m_cur_token_itr;
 }
 
 double formula_interpreter::expression()
 {
     // <term> || <term> + <expression>
+
     double val = term();
     if (!has_token())
         return val;
@@ -112,6 +112,7 @@ double formula_interpreter::expression()
 double formula_interpreter::term()
 {
     // <factor> || <factor> * <term>
+
     double val = factor();
     if (!has_token())
         return val;
