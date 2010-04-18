@@ -62,7 +62,8 @@ void formula_interpreter::interpret()
     m_cur_token_itr = m_tokens.begin();
     try
     {
-        expression();
+        double result = expression();
+        cout << "result = " << result << endl;
     }
     catch (const invalid_expression& e)
     {
@@ -86,59 +87,59 @@ const formula_token_base& formula_interpreter::token() const
     return t;
 }
 
-void formula_interpreter::expression()
+double formula_interpreter::expression()
 {
     // <term> || <term> + <expression>
-    term();
+    double val = term();
     if (!has_token())
-        return;
+        return val;
 
     fopcode_t oc = token().get_opcode();
     if (oc == fop_plus || oc == fop_minus)
     {
         plus_op();
-        expression();
+        double right = expression();
+        if (oc == fop_plus)
+            return val + right;
+        else if (oc == fop_minus)
+            return val - right;
     }
+    return val;
 }
 
-void formula_interpreter::term()
+double formula_interpreter::term()
 {
     // <factor> || <factor> * <term>
-    factor();
+    double val = factor();
     if (!has_token())
-        return;
+        return val;
 
     fopcode_t oc = token().get_opcode();
     if (oc == fop_multiply || oc == fop_divide)
     {
         multiply_op();
-        term();
+        double right = term();
+        if (oc == fop_multiply)
+            return val*right;
+        else if (oc == fop_divide)
+            return val/right;
     }
+    return val;
 }
 
-void formula_interpreter::factor()
+double formula_interpreter::factor()
 {
     // <constant> || <variable> || '(' <expression> ')'
 
     fopcode_t oc = token().get_opcode();
-    if (oc == fop_plus || oc == fop_minus)
-    {
-        // Factor can begin with a '+' or '-'.
-        plus_op();
-        oc = token().get_opcode();
-    }
-
     switch (oc)
     {
         case fop_open:
-            paren();
-        break;
+            return paren();
         case fop_value:
-            constant();
-        break;
+            return constant();
         case fop_single_ref:
-            variable();
-        break;
+            return variable();
         default:
         {
             ostringstream os;
@@ -147,30 +148,36 @@ void formula_interpreter::factor()
             throw invalid_expression(os.str());
         }
     }
+    return 0.0;
 }
 
-void formula_interpreter::paren()
+double formula_interpreter::paren()
 {
     cout << "(" << endl;
     next();
-    expression();
+    double val = expression();
     if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
     cout << ")" << endl;
     next();
+    return val;
 }
 
-void formula_interpreter::variable()
+double formula_interpreter::variable()
 {
+    double val = token().get_value();
     cout << token().get_single_ref() << endl;
     next();
+    return val;
 }
 
-void formula_interpreter::constant()
+double formula_interpreter::constant()
 {
-    cout << token().get_value() << endl;
+    double val = token().get_value();
+    cout << val << endl;
     next();
+    return val;
 }
 
 void formula_interpreter::plus_op()

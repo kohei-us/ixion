@@ -53,12 +53,12 @@ private:
     // responsible for setting the token position to the next unprocessed
     // position when it finishes.
 
-    void expression();
-    void term();
-    void factor();
-    void paren();
-    void variable();
-    void constant();
+    double expression();
+    double term();
+    double factor();
+    double paren();
+    double variable();
+    double constant();
     void plus_op();
     void multiply_op();
 
