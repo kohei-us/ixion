@@ -105,21 +105,25 @@ const formula_token_base& formula_interpreter::token() const
 
 double formula_interpreter::expression()
 {
-    // <term> || <term> + <expression>
+    // <term> + <term> + <term> + ... + <term>
 
     double val = term();
-    if (!has_token())
-        return val;
-
-    fopcode_t oc = token().get_opcode();
-    if (oc == fop_plus || oc == fop_minus)
+    while (has_token())
     {
-        plus_op();
-        double right = expression();
-        if (oc == fop_plus)
-            return val + right;
-        else if (oc == fop_minus)
-            return val - right;
+        fopcode_t oc = token().get_opcode();
+        if (oc == fop_plus || oc == fop_minus)
+        {
+            plus_op();
+            double val2 = term();
+            if (oc == fop_plus)
+                val += val2;
+            else if ((oc == fop_minus))
+                val -= val2;
+            else
+                throw invalid_expression("expected plus or minus operator");
+        }
+        else
+            break;
     }
     return val;
 }
