@@ -92,13 +92,19 @@ const char* string_cell::print() const
 
 // ============================================================================
 
+formula_cell::result_cache::result_cache() : value(0.0) {}
+formula_cell::result_cache::result_cache(const result_cache& r) : 
+    value(r.value), text(r.text) {}
+
 formula_cell::formula_cell() :
-    base_cell(celltype_formula)
+    base_cell(celltype_formula),
+    mp_result(NULL)
 {
 }
 
 formula_cell::formula_cell(formula_tokens_t& tokens) :
-    base_cell(celltype_formula)
+    base_cell(celltype_formula),
+    mp_result(NULL)
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
@@ -106,12 +112,21 @@ formula_cell::formula_cell(formula_tokens_t& tokens) :
 
 formula_cell::formula_cell(const formula_cell& r) :
     base_cell(r),
-    m_tokens(r.m_tokens)
+    m_tokens(r.m_tokens),
+    mp_result(NULL)
 {
+    if (r.mp_result)
+        mp_result = new result_cache(*r.mp_result);
 }
 
 formula_cell::~formula_cell()
 {
+    delete mp_result;
+}
+
+double formula_cell::get_value() const
+{
+    return mp_result ? mp_result->value : 0.0;
 }
 
 const char* formula_cell::print() const
@@ -127,6 +142,15 @@ const formula_tokens_t& formula_cell::get_tokens() const
 void formula_cell::swap_tokens(formula_tokens_t& tokens)
 {
     m_tokens.swap(tokens);
+}
+
+void formula_cell::set_result(double result)
+{
+    if (!mp_result)
+        mp_result = new result_cache;
+
+    mp_result->value = result;
+    mp_result->text.clear();
 }
 
 }

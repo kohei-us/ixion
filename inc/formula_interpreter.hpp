@@ -41,7 +41,8 @@ public:
     formula_interpreter(const formula_tokens_t& tokens);
     ~formula_interpreter();
 
-    void interpret();
+    bool interpret();
+    double get_result() const;
 
 private:
     bool has_token() const;
@@ -66,6 +67,7 @@ private:
     const formula_tokens_t&     m_tokens;
     formula_tokens_t::const_iterator m_cur_token_itr;
     formula_tokens_t::const_iterator m_end_token_pos;;
+    double m_result;
 };
 
 }

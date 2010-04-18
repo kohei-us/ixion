@@ -130,7 +130,8 @@ public:
         cout << "---------- interpreting " << get_cell_name(cell) << endl;
         formula_cell* fcell = static_cast<formula_cell*>(cell);
         formula_interpreter fin(fcell->get_tokens());
-        fin.interpret();
+        if (fin.interpret())
+            fcell->set_result(fin.get_result());
     }
 
     string get_cell_name(const base_cell* p) const

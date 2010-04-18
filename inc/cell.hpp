@@ -62,6 +62,7 @@ public:
     base_cell(const base_cell& r);
     virtual ~base_cell() = 0;
 
+    virtual double get_value() const = 0;
     virtual const char* print() const = 0;
 
     celltype_t get_celltype() const;
@@ -93,18 +94,28 @@ private:
 
 class formula_cell : public base_cell
 {
+    struct result_cache
+    {
+        double          value;
+        ::std::string   text;
+
+        result_cache();
+        result_cache(const result_cache& r);
+    };
 public:
     formula_cell();
     formula_cell(formula_tokens_t& tokens);
     formula_cell(const formula_cell& r);
     virtual ~formula_cell();
 
+    virtual double get_value() const;
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
     void swap_tokens(formula_tokens_t& tokens);
-
+    void set_result(double result);
 private:
     formula_tokens_t m_tokens;
+    result_cache* mp_result;
 };
 
 // ============================================================================

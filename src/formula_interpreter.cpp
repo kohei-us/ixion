@@ -26,6 +26,7 @@
  ************************************************************************/
 
 #include "formula_interpreter.hpp"
+#include "cell.hpp"
 #include "global.hpp"
 
 #include <string>
@@ -48,7 +49,8 @@ public:
 
 formula_interpreter::formula_interpreter(const formula_tokens_t& tokens) :
     m_tokens(tokens),
-    m_end_token_pos(m_tokens.end())
+    m_end_token_pos(m_tokens.end()),
+    m_result(0.0)
 {
 }
 
@@ -56,20 +58,27 @@ formula_interpreter::~formula_interpreter()
 {
 }
 
-void formula_interpreter::interpret()
+bool formula_interpreter::interpret()
 {
     m_cur_token_itr = m_tokens.begin();
     try
     {
-        double result = expression();
+        m_result = expression();
         cout << endl;
-        cout << "result = " << result << endl;
+        cout << "result = " << m_result << endl;
+        return true;
     }
     catch (const invalid_expression& e)
     {
         cout << endl;
         cout << "invalid expression: " << e.what() << endl;
     }
+    return false;
+}
+
+double formula_interpreter::get_result() const
+{
+    return m_result;
 }
 
 bool formula_interpreter::has_token() const
@@ -168,8 +177,9 @@ double formula_interpreter::paren()
 
 double formula_interpreter::variable()
 {
-    double val = token().get_value();
-    cout << token().get_single_ref();
+    const base_cell* pref = token().get_single_ref();
+    double val = pref->get_value();
+    cout << pref;
     next();
     return val;
 }
