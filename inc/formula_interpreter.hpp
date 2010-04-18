@@ -38,7 +38,7 @@ namespace ixion {
 class formula_interpreter : public ::boost::noncopyable
 {
 public:
-    formula_interpreter(const cell_name_ptr_map_t& cell_map, const formula_tokens_t& tokens);
+    formula_interpreter(const formula_tokens_t& tokens);
     ~formula_interpreter();
 
     void interpret();
@@ -63,7 +63,6 @@ private:
     void multiply_op();
 
 private:
-    const cell_name_ptr_map_t&  m_cell_name_ptr_map;
     const formula_tokens_t&     m_tokens;
     formula_tokens_t::const_iterator m_cur_token_itr;
     formula_tokens_t::const_iterator m_end_token_pos;;

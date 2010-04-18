@@ -46,8 +46,7 @@ public:
 
 }
 
-formula_interpreter::formula_interpreter(const cell_name_ptr_map_t& cell_map, const formula_tokens_t& tokens) :
-    m_cell_name_ptr_map(cell_map),
+formula_interpreter::formula_interpreter(const formula_tokens_t& tokens) :
     m_tokens(tokens),
     m_end_token_pos(m_tokens.end())
 {
