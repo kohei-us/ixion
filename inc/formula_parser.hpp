@@ -33,18 +33,12 @@
 #include "formula_tokens.hpp"
 
 #include <boost/noncopyable.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 
 #include <string>
 #include <vector>
 #include <unordered_map>
 
 namespace ixion {
-
-class base_cell;
-
-typedef ::boost::ptr_map< ::std::string, base_cell> cell_name_map_t;
-typedef ::std::unordered_map<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
 /** 
  * Class formula_parser parses a series of primitive (or lexer) tokens 
@@ -62,7 +56,7 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, cell_name_map_t* p_cell_names);
+    formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names);
     ~formula_parser();
 
     void parse();
@@ -82,7 +76,7 @@ private:
     formula_tokens_t        m_formula_tokens;
     ::std::vector<base_cell*> m_depend_cells;
 
-    cell_name_map_t* mp_cell_names;
+    cell_name_ptr_map_t* mp_cell_names;
 };
 
 }

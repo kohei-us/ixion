@@ -29,6 +29,7 @@
 #define __IXION_GLOBAL_HPP__
 
 #include <string>
+#include <unordered_map>
 #include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
@@ -36,6 +37,7 @@ namespace ixion {
 class base_cell;
 
 typedef ::boost::ptr_map< ::std::string, base_cell> cell_name_ptr_map_t;
+typedef ::std::unordered_map<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
 class general_error : public ::std::exception
 {

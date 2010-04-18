@@ -95,7 +95,7 @@ void ensure_unique_names(const vector<string>& cell_names)
 }
 
 void create_empty_formula_cells(
-    const vector<string>& cell_names, cell_name_map_t& cell_map, cell_ptr_name_map_t& ptr_name_map)
+    const vector<string>& cell_names, cell_name_ptr_map_t& cell_map, cell_ptr_name_map_t& ptr_name_map)
 {
     ensure_unique_names(cell_names);
 

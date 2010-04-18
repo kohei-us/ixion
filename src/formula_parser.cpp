@@ -46,10 +46,10 @@ public:
 class formula_token_printer : public unary_function<formula_token_base, void>
 {
 public:
-    formula_token_printer(const cell_name_map_t& cell_names)
+    formula_token_printer(const cell_name_ptr_map_t& cell_names)
     {
         // Construct a cell pointer to name association.
-        cell_name_map_t::const_iterator itr = cell_names.begin(), itr_end = cell_names.end();
+        cell_name_ptr_map_t::const_iterator itr = cell_names.begin(), itr_end = cell_names.end();
         for (; itr != itr_end; ++itr)
         {
             m_cell_ptr_name_map.insert(
@@ -155,7 +155,7 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_map_t* p_cell_names) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names) :
     m_tokens(tokens),
     mp_cell_names(p_cell_names)
 {
@@ -256,7 +256,7 @@ void formula_parser::primitive(lexer_opcode_t oc)
 void formula_parser::name(const lexer_token_base& t)
 {
     const string name = t.get_string();
-    cell_name_map_t::iterator itr = mp_cell_names->find(name);
+    cell_name_ptr_map_t::iterator itr = mp_cell_names->find(name);
     if (itr == mp_cell_names->end())
     {
         // referenced name not found.
