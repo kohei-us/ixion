@@ -63,10 +63,12 @@ void formula_interpreter::interpret()
     try
     {
         double result = expression();
+        cout << endl;
         cout << "result = " << result << endl;
     }
     catch (const invalid_expression& e)
     {
+        cout << endl;
         cout << "invalid expression: " << e.what() << endl;
     }
 }
@@ -153,13 +155,13 @@ double formula_interpreter::factor()
 
 double formula_interpreter::paren()
 {
-    cout << "(" << endl;
+    cout << "(";
     next();
     double val = expression();
     if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
-    cout << ")" << endl;
+    cout << ")";
     next();
     return val;
 }
@@ -167,7 +169,7 @@ double formula_interpreter::paren()
 double formula_interpreter::variable()
 {
     double val = token().get_value();
-    cout << token().get_single_ref() << endl;
+    cout << token().get_single_ref();
     next();
     return val;
 }
@@ -175,7 +177,7 @@ double formula_interpreter::variable()
 double formula_interpreter::constant()
 {
     double val = token().get_value();
-    cout << val << endl;
+    cout << val;
     next();
     return val;
 }
@@ -186,10 +188,10 @@ void formula_interpreter::plus_op()
     switch (t.get_opcode())
     {
         case fop_plus:
-            cout << "+" << endl;
+            cout << "+";
         break;
         case fop_minus:
-            cout << "-" << endl;
+            cout << "-";
         break;
         default:
         {
@@ -207,10 +209,10 @@ void formula_interpreter::multiply_op()
     switch (t.get_opcode())
     {
         case fop_multiply:
-            cout << "*" << endl;
+            cout << "*";
         break;
         case fop_divide:
-            cout << "/" << endl;
+            cout << "/";
         break;
         default:
         {
