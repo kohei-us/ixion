@@ -129,7 +129,7 @@ public:
 
         cout << "---------- interpreting " << get_cell_name(cell) << endl;
         formula_cell* fcell = static_cast<formula_cell*>(cell);
-        formula_interpreter fin(fcell->get_tokens());
+        formula_interpreter fin(fcell->get_tokens(), m_cell_ptr_name_map);
         if (fin.interpret())
             fcell->set_result(fin.get_result());
     }

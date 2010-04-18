@@ -47,8 +47,9 @@ public:
 
 }
 
-formula_interpreter::formula_interpreter(const formula_tokens_t& tokens) :
+formula_interpreter::formula_interpreter(const formula_tokens_t& tokens, const cell_ptr_name_map_t& ptr_name_map) :
     m_tokens(tokens),
+    m_ptr_name_map(ptr_name_map),
     m_end_token_pos(m_tokens.end()),
     m_result(0.0)
 {
@@ -79,6 +80,12 @@ bool formula_interpreter::interpret()
 double formula_interpreter::get_result() const
 {
     return m_result;
+}
+
+string formula_interpreter::get_cell_name(const base_cell* p) const
+{
+    cell_ptr_name_map_t::const_iterator itr = m_ptr_name_map.find(p);
+    return itr == m_ptr_name_map.end() ? string("<unknown cell>") : itr->second;
 }
 
 bool formula_interpreter::has_token() const
@@ -179,7 +186,7 @@ double formula_interpreter::variable()
 {
     const base_cell* pref = token().get_single_ref();
     double val = pref->get_value();
-    cout << pref;
+    cout << get_cell_name(pref);
     next();
     return val;
 }
