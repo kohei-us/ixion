@@ -61,7 +61,6 @@ private:
     double paren();
     double variable();
     double constant();
-    void multiply_op();
 
 private:
     const formula_tokens_t&     m_tokens;

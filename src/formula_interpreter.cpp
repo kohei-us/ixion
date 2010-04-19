@@ -149,14 +149,18 @@ double formula_interpreter::term()
         return val;
 
     fopcode_t oc = token().get_opcode();
-    if (oc == fop_multiply || oc == fop_divide)
+    switch (oc)
     {
-        multiply_op();
-        double right = term();
-        if (oc == fop_multiply)
-            return val*right;
-        else if (oc == fop_divide)
-            return val/right;
+        case fop_multiply:
+            cout << "*";
+            next();
+            return val*term();
+        case fop_divide:
+            cout << "/";
+            next();
+            return val/term();
+        default:
+            ;
     }
     return val;
 }
@@ -213,27 +217,6 @@ double formula_interpreter::constant()
     cout << val;
     next();
     return val;
-}
-
-void formula_interpreter::multiply_op()
-{
-    const formula_token_base& t = token();
-    switch (t.get_opcode())
-    {
-        case fop_multiply:
-            cout << "*";
-        break;
-        case fop_divide:
-            cout << "/";
-        break;
-        default:
-        {
-            ostringstream os;
-            os << "multiply_op: unexpected token type " << t.get_opcode();
-            throw invalid_expression(os.str());
-        }
-    }
-    next();
 }
 
 }
