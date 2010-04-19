@@ -111,7 +111,6 @@ double formula_interpreter::expression()
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
-        bool ended = false;
         switch (oc)
         {
             case fop_plus:
@@ -131,11 +130,8 @@ double formula_interpreter::expression()
             }
             break;
             default:
-                ended = true;
+                return val;
         }
-
-        if (ended)
-            break;
     }
     return val;
 }
