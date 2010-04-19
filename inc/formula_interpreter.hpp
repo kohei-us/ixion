@@ -61,7 +61,6 @@ private:
     double paren();
     double variable();
     double constant();
-    void plus_op();
     void multiply_op();
 
 private:

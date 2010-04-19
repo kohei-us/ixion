@@ -111,18 +111,30 @@ double formula_interpreter::expression()
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
-        if (oc == fop_plus || oc == fop_minus)
+        bool ended = false;
+        switch (oc)
         {
-            plus_op();
-            double val2 = term();
-            if (oc == fop_plus)
+            case fop_plus:
+            {
+                cout << "+";
+                next();
+                double val2 = term();
                 val += val2;
-            else if ((oc == fop_minus))
+            }
+            break;
+            case fop_minus:
+            {
+                cout << "-";
+                next();
+                double val2 = term();
                 val -= val2;
-            else
-                throw invalid_expression("expected plus or minus operator");
+            }
+            break;
+            default:
+                ended = true;
         }
-        else
+
+        if (ended)
             break;
     }
     return val;
@@ -201,27 +213,6 @@ double formula_interpreter::constant()
     cout << val;
     next();
     return val;
-}
-
-void formula_interpreter::plus_op()
-{
-    const formula_token_base& t = token();
-    switch (t.get_opcode())
-    {
-        case fop_plus:
-            cout << "+";
-        break;
-        case fop_minus:
-            cout << "-";
-        break;
-        default:
-        {
-            ostringstream os;
-            os << "plus_op: unexpected token type " << t.get_opcode();
-            throw invalid_expression(os.str());
-        }
-    }
-    next();
 }
 
 void formula_interpreter::multiply_op()
