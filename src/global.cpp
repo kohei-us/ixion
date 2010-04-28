@@ -47,4 +47,27 @@ const char* general_error::what() const throw()
     return m_msg.c_str();
 }
 
+// ============================================================================
+
+formula_error::formula_error(formula_error_t fe) :
+    m_ferror(fe)
+{
+}
+
+formula_error::~formula_error() throw()
+{
+}
+
+const char* formula_error::what() const throw()
+{
+    switch (m_ferror)
+    {
+        case fe_ref_result_not_available:
+            return "#REF!";
+        default:
+            ;
+    }
+    return "#ERR!";
+}
+
 }

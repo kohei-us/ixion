@@ -126,7 +126,9 @@ formula_cell::~formula_cell()
 
 double formula_cell::get_value() const
 {
-    return mp_result ? mp_result->value : 0.0;
+    if (!mp_result)
+        throw formula_error(fe_ref_result_not_available);
+    return mp_result->value;
 }
 
 const char* formula_cell::print() const

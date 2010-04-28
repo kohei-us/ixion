@@ -47,7 +47,8 @@ private:
 
 // ============================================================================
 
-enum celltype_t {
+enum celltype_t
+{
     celltype_string,
     celltype_formula,
     celltype_unknown

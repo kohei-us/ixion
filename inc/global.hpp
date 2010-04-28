@@ -49,6 +49,23 @@ private:
     ::std::string m_msg;
 };
 
+// ============================================================================
+
+enum formula_error_t
+{
+    fe_ref_result_not_available
+};
+
+class formula_error : public ::std::exception
+{
+public:
+    explicit formula_error(formula_error_t fe);
+    ~formula_error() throw();
+    virtual const char* what() const throw();
+private:
+    formula_error_t m_ferror;
+};
+
 }
 
 #endif
