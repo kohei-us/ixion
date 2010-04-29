@@ -63,6 +63,9 @@ formula_interpreter::~formula_interpreter()
 bool formula_interpreter::interpret()
 {
     m_cur_token_itr = m_tokens.begin();
+    m_error = fe_no_error;
+    m_result = 0.0;
+
     try
     {
         m_result = expression();
