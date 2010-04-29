@@ -43,6 +43,7 @@ public:
 
     bool interpret();
     double get_result() const;
+    formula_error_t get_error() const;
 
 private:
     ::std::string get_cell_name(const base_cell* p) const;
@@ -68,6 +69,7 @@ private:
     formula_tokens_t::const_iterator m_cur_token_itr;
     formula_tokens_t::const_iterator m_end_token_pos;;
     double m_result;
+    formula_error_t m_error;
 };
 
 }

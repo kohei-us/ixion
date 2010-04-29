@@ -64,10 +64,17 @@ const char* formula_error::what() const throw()
     {
         case fe_ref_result_not_available:
             return "#REF!";
+        case fe_division_by_zero:
+            return "#DIV/0!";
         default:
             ;
     }
     return "#ERR!";
+}
+
+formula_error_t formula_error::get_error() const
+{
+    return m_ferror;
 }
 
 }

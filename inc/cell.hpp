@@ -114,9 +114,11 @@ public:
     const formula_tokens_t& get_tokens() const;
     void swap_tokens(formula_tokens_t& tokens);
     void set_result(double result);
+    void set_error(formula_error_t error);
 private:
-    formula_tokens_t m_tokens;
-    result_cache* mp_result;
+    formula_tokens_t    m_tokens;
+    formula_error_t     m_error;
+    result_cache*       mp_result;
 };
 
 // ============================================================================

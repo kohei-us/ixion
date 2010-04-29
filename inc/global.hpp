@@ -53,7 +53,9 @@ private:
 
 enum formula_error_t
 {
-    fe_ref_result_not_available
+    fe_ref_result_not_available,
+    fe_division_by_zero,
+    fe_no_error
 };
 
 class formula_error : public ::std::exception
@@ -62,6 +64,8 @@ public:
     explicit formula_error(formula_error_t fe);
     ~formula_error() throw();
     virtual const char* what() const throw();
+
+    formula_error_t get_error() const;
 private:
     formula_error_t m_ferror;
 };

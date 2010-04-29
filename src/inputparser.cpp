@@ -132,6 +132,8 @@ public:
         formula_interpreter fin(fcell->get_tokens(), m_cell_ptr_name_map);
         if (fin.interpret())
             fcell->set_result(fin.get_result());
+        else
+            fcell->set_error(fin.get_error());
     }
 
     string get_cell_name(const base_cell* p) const

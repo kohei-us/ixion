@@ -51,7 +51,8 @@ formula_interpreter::formula_interpreter(const formula_tokens_t& tokens, const c
     m_tokens(tokens),
     m_ptr_name_map(ptr_name_map),
     m_end_token_pos(m_tokens.end()),
-    m_result(0.0)
+    m_result(0.0),
+    m_error(fe_no_error)
 {
 }
 
@@ -78,6 +79,7 @@ bool formula_interpreter::interpret()
     {
         cout << endl;
         cout << "result = " << e.what() << endl;
+        m_error = e.get_error();
     }
     return false;
 }
@@ -85,6 +87,11 @@ bool formula_interpreter::interpret()
 double formula_interpreter::get_result() const
 {
     return m_result;
+}
+
+formula_error_t formula_interpreter::get_error() const
+{
+    return m_error;
 }
 
 string formula_interpreter::get_cell_name(const base_cell* p) const
@@ -157,9 +164,14 @@ double formula_interpreter::term()
             next();
             return val*term();
         case fop_divide:
+        {
             cout << "/";
             next();
-            return val/term();
+            double val2 = term();
+            if (val2 == 0.0)
+                throw formula_error(fe_division_by_zero);
+            return val/val2;
+        }
         default:
             ;
     }

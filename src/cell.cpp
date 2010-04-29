@@ -98,12 +98,14 @@ formula_cell::result_cache::result_cache(const result_cache& r) :
 
 formula_cell::formula_cell() :
     base_cell(celltype_formula),
+    m_error(fe_no_error),
     mp_result(NULL)
 {
 }
 
 formula_cell::formula_cell(formula_tokens_t& tokens) :
     base_cell(celltype_formula),
+    m_error(fe_no_error),
     mp_result(NULL)
 {
     // Note that this will empty the passed token container !
@@ -113,6 +115,7 @@ formula_cell::formula_cell(formula_tokens_t& tokens) :
 formula_cell::formula_cell(const formula_cell& r) :
     base_cell(r),
     m_tokens(r.m_tokens),
+    m_error(r.m_error),
     mp_result(NULL)
 {
     if (r.mp_result)
@@ -126,8 +129,14 @@ formula_cell::~formula_cell()
 
 double formula_cell::get_value() const
 {
+    if (m_error != fe_no_error)
+        // Error condition.
+        throw formula_error(m_error);
+
     if (!mp_result)
+        // Result not cached yet.
         throw formula_error(fe_ref_result_not_available);
+
     return mp_result->value;
 }
 
@@ -153,6 +162,11 @@ void formula_cell::set_result(double result)
 
     mp_result->value = result;
     mp_result->text.clear();
+}
+
+void formula_cell::set_error(formula_error_t error)
+{
+    m_error = error;
 }
 
 }
