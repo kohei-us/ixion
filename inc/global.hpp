@@ -55,6 +55,7 @@ enum formula_error_t
 {
     fe_ref_result_not_available,
     fe_division_by_zero,
+    fe_invalid_expression,
     fe_no_error
 };
 

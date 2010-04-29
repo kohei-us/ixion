@@ -77,6 +77,7 @@ bool formula_interpreter::interpret()
     {
         cout << endl;
         cout << "invalid expression: " << e.what() << endl;
+        m_error = fe_invalid_expression;
     }
     catch (const formula_error& e)
     {
