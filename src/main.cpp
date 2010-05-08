@@ -61,21 +61,22 @@ int main (int argc, char** argv)
         {"brief",   no_argument,       &verbose_flag, 0},
         /* These options don't set a flag.
            We distinguish them by their indices. */
-        {"add",     no_argument,       0, 'a'},
-        {"append",  no_argument,       0, 'b'},
-        {"delete",  required_argument, 0, 'd'},
-        {"create",  required_argument, 0, 'c'},
-        {"file",    required_argument, 0, 'f'},
+//      {"add",     no_argument,       0, 'a'},
+//      {"append",  no_argument,       0, 'b'},
+//      {"delete",  required_argument, 0, 'd'},
+//      {"create",  required_argument, 0, 'c'},
+        {"model-list",    required_argument, 0, 'l'},
         {0, 0, 0, 0}
     };
 
+    string model_list_path;
     string dotgraph_path;
 
     while (true)
     {
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        int c = getopt_long (argc, argv, "hc:d:f:", long_options, &option_index);
+        int c = getopt_long (argc, argv, "hc:d:l:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -105,8 +106,8 @@ int main (int argc, char** argv)
                 dotgraph_path = optarg;
                 break;
 
-            case 'f':
-                printf ("option -f with value `%s'\n", optarg);
+            case 'l':
+                model_list_path = optarg;
                 break;
 
             case '?':
@@ -122,17 +123,17 @@ int main (int argc, char** argv)
     if (verbose_flag)
         puts ("verbose flag is set");
 
-    int num_args = argc - optind;
-    if (num_args != 1)
+    for (int i = optind; i < argc; ++i)
     {
-        fprintf(stderr, "Too many arguments.  It takes exactly one.\n");
-        exit (EXIT_FAILURE);
+        string fpath = argv[i];
+        cout << "----------------------------------------------------------------------" << endl;
+        cout << "parsing " << fpath << endl;
+        cout << "----------------------------------------------------------------------" << endl;
+        if (!parse_model_input(fpath, dotgraph_path))
+        {
+            cerr << "failed to parse " << fpath << endl;
+            exit (EXIT_FAILURE);
+        }
     }
-
-    string fpath = argv[optind];
-    cout << fpath << endl;
-
-    if (!parse_model_input(fpath, dotgraph_path))
-        exit (EXIT_FAILURE);
 }
 
