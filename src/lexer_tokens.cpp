@@ -142,8 +142,9 @@ const char* lexer_token::print() const
             return "(";
         case op_close:
             return ")";
-        case op_name:
         case op_sep:
+            return ",";
+        case op_name:
         case op_string:
         case op_value:
         default:
