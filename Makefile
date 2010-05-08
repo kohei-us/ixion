@@ -25,12 +25,12 @@
 #
 #***********************************************************************
 
-EXEC=inputparser
+EXEC=ixion-parser
 OBJDIR=./obj
 SRCDIR=./src
 INCDIR=./inc
 
-CPPFLAGS=-I$(INCDIR) -g -Wall -std=c++0x
+CPPFLAGS=-I$(INCDIR) -O2 -g -Wall -std=c++0x
 LDFLAGS=
 
 HEADERS= \
