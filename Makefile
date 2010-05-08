@@ -103,7 +103,7 @@ $(EXEC): pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
 
 test: $(EXEC)
-	./$(EXEC) -d $(OBJDIR)/simple-arithmetic.dot ./test/simple-arithmetic.txt
+	./$(EXEC) -d $(OBJDIR)/simple-arithmetic.dot ./test/*.txt
 
 test.expr: $(EXEC)
 	./$(EXEC) -d $(OBJDIR)/expression-test.dot ./test/expression-test.txt
