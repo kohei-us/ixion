@@ -62,6 +62,12 @@ formula_interpreter::~formula_interpreter()
 
 bool formula_interpreter::interpret()
 {
+    if (m_tokens.empty())
+    {
+        cout << "interpreter error: no tokens to interpret" << endl;
+        return false;
+    }
+
     m_cur_token_itr = m_tokens.begin();
     m_error = fe_no_error;
     m_result = 0.0;
