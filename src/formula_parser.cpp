@@ -28,6 +28,7 @@
 #include "formula_parser.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <unordered_map>
 
 using namespace std;
@@ -200,7 +201,7 @@ void formula_parser::parse()
     }
     catch (const ref_error& e)
     {
-
+        cout << "reference error: " << e.what() << endl;
     }
 }
 
@@ -260,7 +261,9 @@ void formula_parser::name(const lexer_token_base& t)
     if (itr == mp_cell_names->end())
     {
         // referenced name not found.
-        throw ref_error(name + " not found");
+        ostringstream os;
+        os << "reference named '" << name << "' not found.";
+        throw ref_error(os.str());
     }
 
     cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
