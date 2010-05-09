@@ -38,7 +38,7 @@ class lexer_token_base;
 
 typedef ::boost::ptr_vector<lexer_token_base> lexer_tokens_t;
 
-const char* print_tokens(const lexer_tokens_t& tokens, bool verbose);
+::std::string print_tokens(const lexer_tokens_t& tokens, bool verbose);
 
 // ============================================================================
 

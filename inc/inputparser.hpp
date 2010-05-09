@@ -71,7 +71,7 @@ public:
         cell(const cell& r);
         ~cell();
     
-        const char* print() const;
+        ::std::string print() const;
         const ::std::string& get_name() const;
         const lexer_tokens_t& get_tokens() const;
     

@@ -293,7 +293,7 @@ model_parser::cell::~cell()
 {
 }
 
-const char* model_parser::cell::print() const
+string model_parser::cell::print() const
 {
     return print_tokens(m_tokens, false);
 }

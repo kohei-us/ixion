@@ -55,11 +55,11 @@ private:
 
 }
 
-const char* print_tokens(const lexer_tokens_t& tokens, bool verbose)
+string print_tokens(const lexer_tokens_t& tokens, bool verbose)
 {
     ostringstream os;
     for_each(tokens.begin(), tokens.end(), token_printer(os, verbose));
-    return os.str().c_str();
+    return os.str();
 }
 
 // ============================================================================
