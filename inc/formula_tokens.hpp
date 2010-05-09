@@ -66,6 +66,8 @@ enum fopcode_t {
     fop_unknown
 };
 
+const char* get_opcode_name(fopcode_t oc);
+
 // ============================================================================
 
 class formula_token_base

@@ -63,7 +63,7 @@ public:
     {
         fopcode_t oc = token.get_opcode();   
         cout << " ";
-        cout << "<" << get_token_name(oc) << ">'";
+        cout << "<" << get_opcode_name(oc) << ">'";
         switch (oc)
         {
             case fop_close:
@@ -99,8 +99,7 @@ public:
                 break;
             case fop_function:
             {
-                formula_function_t func_oc = 
-                    static_cast<formula_function_t>(token.get_index());
+                formula_function_t func_oc = formula_functions::get_function_opcode(token);
                 cout << formula_functions::get_function_name(func_oc);
             }
             break;
@@ -111,40 +110,6 @@ public:
     }
 
 private:
-    string get_token_name(fopcode_t oc) const
-    {
-        switch (oc)
-        {
-            case fop_close:
-                return "close";
-            case fop_divide:
-                return "divide";
-            case fop_err_no_ref:
-                return "error no ref";
-            case fop_minus:
-                return "minus";
-            case fop_multiply:
-                return "multiply";
-            case fop_open:
-                return "open";
-            case fop_plus:
-                return "plus";
-            case fop_sep:
-                return "separator";
-            case fop_single_ref:
-                return "single ref";
-            case fop_string:
-                return "string";
-            case fop_value:
-                return "value";
-            case fop_function:
-                return "function";
-            default:
-                ;
-        }
-        return "unknown";
-    }
-
     string get_cell_name(const base_cell* p) const
     {
         cell_ptr_name_map_t::const_iterator itr = m_cell_ptr_name_map.find(p);

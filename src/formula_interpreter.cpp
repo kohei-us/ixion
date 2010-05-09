@@ -28,6 +28,7 @@
 #include "formula_interpreter.hpp"
 #include "cell.hpp"
 #include "global.hpp"
+#include "formula_functions.hpp"
 
 #include <string>
 #include <iostream>
@@ -125,6 +126,15 @@ const formula_token_base& formula_interpreter::token() const
     return *m_cur_token_itr;
 }
 
+const formula_token_base& formula_interpreter::next_token()
+{
+    next();
+    if (!has_token())
+        throw invalid_expression("expecting a token but no more tokens found.");
+
+    return token();
+}
+
 double formula_interpreter::expression()
 {
     // <term> + <term> + <term> + ... + <term>
@@ -190,7 +200,7 @@ double formula_interpreter::term()
 
 double formula_interpreter::factor()
 {
-    // <constant> || <variable> || '(' <expression> ')'
+    // <constant> || <variable> || '(' <expression> ')' || <function>
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
@@ -201,11 +211,12 @@ double formula_interpreter::factor()
             return constant();
         case fop_single_ref:
             return variable();
+        case fop_function:
+            return function();
         default:
         {
             ostringstream os;
-            os << "factor: unexpected token type ";
-            os << oc;
+            os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
             throw invalid_expression(os.str());
         }
     }
@@ -240,6 +251,58 @@ double formula_interpreter::constant()
     cout << val;
     next();
     return val;
+}
+
+double formula_interpreter::function()
+{
+    // '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
+    assert(token().get_opcode() == fop_function);
+    formula_function_t func_oc = formula_functions::get_function_opcode(token());
+    cout << formula_functions::get_function_name(func_oc);
+
+    if (next_token().get_opcode() != fop_open)
+        throw invalid_expression("expecting a '(' after a function name.");
+
+    cout << "(";
+
+    vector<double> args;
+    fopcode_t oc = next_token().get_opcode();
+    bool expect_sep = false;
+    while (oc != fop_close)
+    {
+        if (expect_sep)
+        {
+            if (oc != fop_sep)
+                throw invalid_expression("argument separator is expected, but not found.");
+            next();
+            expect_sep = false;
+            cout << ",";
+        }
+        else
+        {
+            double arg = expression();
+            args.push_back(arg);
+            expect_sep = true;
+        }
+        oc = token().get_opcode();
+    }
+
+    cout << ")";
+
+    switch (func_oc)
+    {
+        case func_max:
+            return formula_functions::max(args);
+        case func_average:
+            break;
+        case func_min:
+            break;
+        case func_unknown:
+            break;
+        default:
+            ;
+    }
+    return 0.0;
 }
 
 }

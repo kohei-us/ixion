@@ -50,6 +50,7 @@ private:
     bool has_token() const;
     void next();
     const formula_token_base& token() const;
+    const formula_token_base& next_token();
 
     // The following methods are handlers.  In each handler, the initial
     // position is always set to the first unprocessed token.  Each handler is
@@ -62,6 +63,7 @@ private:
     double paren();
     double variable();
     double constant();
+    double function();
 
 private:
     const formula_tokens_t&     m_tokens;

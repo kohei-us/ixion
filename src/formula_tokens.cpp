@@ -34,6 +34,40 @@ const char* print_tokens(const formula_tokens_t& tokens, bool verbose)
     return "";
 }
 
+const char* get_opcode_name(fopcode_t oc)
+{
+    switch (oc)
+    {
+        case fop_close:
+            return "close";
+        case fop_divide:
+            return "divide";
+        case fop_err_no_ref:
+            return "error no ref";
+        case fop_minus:
+            return "minus";
+        case fop_multiply:
+            return "multiply";
+        case fop_open:
+            return "open";
+        case fop_plus:
+            return "plus";
+        case fop_sep:
+            return "separator";
+        case fop_single_ref:
+            return "single ref";
+        case fop_string:
+            return "string";
+        case fop_value:
+            return "value";
+        case fop_function:
+            return "function";
+        default:
+            ;
+    }
+    return "unknown";
+}
+
 // ============================================================================
 
 formula_token_base::formula_token_base(fopcode_t op) :
