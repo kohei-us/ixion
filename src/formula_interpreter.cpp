@@ -288,7 +288,7 @@ double formula_interpreter::function()
     }
 
     cout << ")";
-
+    next();
     return formula_functions::interpret(func_oc, args);
 }
 
