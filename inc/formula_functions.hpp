@@ -58,6 +58,8 @@ public:
     static formula_function_t get_function_opcode(const ::std::string& name);
     static const char* get_function_name(formula_function_t oc);
 
+    static double interpret(formula_function_t oc, const args_type& args);
+
     static double max(const args_type& args);
 private:
     formula_functions();

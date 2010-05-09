@@ -289,20 +289,7 @@ double formula_interpreter::function()
 
     cout << ")";
 
-    switch (func_oc)
-    {
-        case func_max:
-            return formula_functions::max(args);
-        case func_average:
-            break;
-        case func_min:
-            break;
-        case func_unknown:
-            break;
-        default:
-            ;
-    }
-    return 0.0;
+    return formula_functions::interpret(func_oc, args);
 }
 
 }

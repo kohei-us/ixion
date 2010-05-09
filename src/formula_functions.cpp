@@ -85,6 +85,23 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
+double formula_functions::interpret(formula_function_t oc, const args_type& args)
+{
+    switch (oc)
+    {
+        case func_max:
+            return formula_functions::max(args);
+        case func_average:
+            break;
+        case func_min:
+            break;
+        case func_unknown:
+        default:
+            ;
+    }
+    return 0.0;
+}
+
 double formula_functions::max(const args_type& args)
 {
     if (args.empty())
