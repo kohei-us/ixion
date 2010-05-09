@@ -204,6 +204,7 @@
 			<F N="inc/cell.hpp"/>
 			<F N="inc/depends_tracker.hpp"/>
 			<F N="inc/depth_first_search.hpp"/>
+			<F N="inc/formula_functions.hpp"/>
 			<F N="inc/formula_interpreter.hpp"/>
 			<F N="inc/formula_lexer.hpp"/>
 			<F N="inc/formula_parser.hpp"/>
@@ -216,6 +217,7 @@
 			<F N="src/cell.cpp"/>
 			<F N="src/depends_tracker.cpp"/>
 			<F N="src/depth_first_search.cpp"/>
+			<F N="src/formula_functions.cpp"/>
 			<F N="src/formula_interpreter.cpp"/>
 			<F N="src/formula_lexer.cpp"/>
 			<F N="src/formula_parser.cpp"/>

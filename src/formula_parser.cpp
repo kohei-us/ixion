@@ -26,6 +26,7 @@
  ************************************************************************/
 
 #include "formula_parser.hpp"
+#include "formula_functions.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -96,6 +97,13 @@ public:
             case fop_value:
                 cout << token.get_value();
                 break;
+            case fop_function:
+            {
+                formula_function_t func_oc = 
+                    static_cast<formula_function_t>(token.get_index());
+                cout << formula_functions::get_function_name(func_oc);
+            }
+            break;
             default:
                 ;
         }
@@ -129,6 +137,8 @@ private:
                 return "string";
             case fop_value:
                 return "value";
+            case fop_function:
+                return "function";
             default:
                 ;
         }
@@ -203,6 +213,10 @@ void formula_parser::parse()
     {
         cout << "reference error: " << e.what() << endl;
     }
+    catch (const parse_error& e)
+    {
+        cout << "parse error: " << e.what() << endl;
+    }
 }
 
 void formula_parser::print_tokens() const
@@ -258,17 +272,27 @@ void formula_parser::name(const lexer_token_base& t)
 {
     const string name = t.get_string();
     cell_name_ptr_map_t::iterator itr = mp_cell_names->find(name);
-    if (itr == mp_cell_names->end())
+    if (itr != mp_cell_names->end())
     {
-        // referenced name not found.
-        ostringstream os;
-        os << "reference named '" << name << "' not found.";
-        throw ref_error(os.str());
+        // This is a reference, either to a cell or to a name.
+        cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
+        m_formula_tokens.push_back(new single_ref_token(itr->second));
+        m_depend_cells.push_back(itr->second);
+        return;
     }
 
-    cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
-    m_formula_tokens.push_back(new single_ref_token(itr->second));
-    m_depend_cells.push_back(itr->second);
+    // Check if this is a function name.
+    formula_function_t func_oc = formula_functions::get_function_opcode(name);
+    if (func_oc != func_unknown)
+    {
+        cout << "'" << name << "' is a built-in function." << endl;
+        m_formula_tokens.push_back(new function_token(static_cast<size_t>(func_oc)));
+        return;
+    }
+
+    ostringstream os;
+    os << "failed to resolve a name '" << name << "'.";
+    throw parse_error(os.str());
 }
 
 void formula_parser::value(const lexer_token_base& t)

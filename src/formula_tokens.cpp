@@ -65,6 +65,11 @@ double formula_token_base::get_value() const
     return 0.0;
 }
 
+size_t formula_token_base::get_index() const
+{
+    return 0;
+}
+
 // ============================================================================
 
 opcode_token::opcode_token(fopcode_t oc) :
@@ -114,6 +119,29 @@ single_ref_token::~single_ref_token()
 const base_cell* single_ref_token::get_single_ref() const
 {
     return mp_cell;
+}
+
+// ============================================================================
+
+function_token::function_token(size_t func_oc) : 
+    formula_token_base(fop_function),
+    m_func_oc(func_oc)
+{
+}
+
+function_token::function_token(const function_token& r) :
+    formula_token_base(r),
+    m_func_oc(r.m_func_oc)
+{
+}
+
+function_token::~function_token()
+{
+}
+
+size_t function_token::get_index() const
+{
+    return m_func_oc;
 }
 
 }

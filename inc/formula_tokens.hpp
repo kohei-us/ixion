@@ -47,6 +47,7 @@ enum fopcode_t {
     fop_single_ref,
     fop_string,
     fop_value,
+    fop_function,
 
     // arithmetic operators
     fop_plus,
@@ -78,6 +79,7 @@ public:
 
     virtual const base_cell* get_single_ref() const;
     virtual double get_value() const;
+    virtual size_t get_index() const;
 
 private:
     formula_token_base(); // disabled
@@ -130,6 +132,21 @@ private:
 
 // ============================================================================
 
+class function_token : public formula_token_base
+{
+public:
+    function_token(size_t func_oc);
+    function_token(const function_token& r);
+    virtual ~function_token();
+
+    virtual size_t get_index() const;
+
+private:
+    size_t m_func_oc;
+};
+
+// ============================================================================
+
 // We need the following inline functions for boost::ptr_container.
 
 inline formula_token_base* new_clone(const formula_token_base& r)
@@ -150,7 +167,10 @@ inline formula_token_base* new_clone(const formula_token_base& r)
         case fop_string:
             break;
         case fop_value:
+            return new value_token(r.get_value());
             break;
+        case fop_function:
+            return new function_token(r.get_index());
         default:
             ;
     }

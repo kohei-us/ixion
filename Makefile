@@ -37,6 +37,7 @@ HEADERS= \
 	$(INCDIR)/cell.hpp \
 	$(INCDIR)/depends_tracker.hpp \
 	$(INCDIR)/depth_first_search.hpp \
+	$(INCDIR)/formula_functions.hpp \
 	$(INCDIR)/formula_lexer.hpp \
 	$(INCDIR)/formula_parser.hpp \
 	$(INCDIR)/formula_tokens.hpp \
@@ -50,6 +51,7 @@ OBJFILES= \
 	$(OBJDIR)/cell.o \
 	$(OBJDIR)/lexer_tokens.o \
 	$(OBJDIR)/global.o \
+	$(OBJDIR)/formula_functions.o \
 	$(OBJDIR)/formula_lexer.o \
 	$(OBJDIR)/formula_parser.o \
 	$(OBJDIR)/formula_tokens.o \
@@ -77,6 +79,9 @@ $(OBJDIR)/lexer_tokens.o: $(SRCDIR)/lexer_tokens.cpp $(DEPENDS)
 
 $(OBJDIR)/global.o: $(SRCDIR)/global.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/global.cpp
+
+$(OBJDIR)/formula_functions.o: $(SRCDIR)/formula_functions.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_functions.cpp
 
 $(OBJDIR)/formula_lexer.o: $(SRCDIR)/formula_lexer.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_lexer.cpp
