@@ -41,6 +41,8 @@ enum formula_function_t
     func_max,
     func_min,
     func_average
+
+    // TODO: more functions to come...
 };
 
 class formula_functions
