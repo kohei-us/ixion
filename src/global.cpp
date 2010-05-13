@@ -77,4 +77,21 @@ formula_error_t formula_error::get_error() const
     return m_ferror;
 }
 
+// ============================================================================
+
+formula_result::formula_result() :
+    numeric(true), value(0.0) {}
+
+formula_result::formula_result(double v) :
+    numeric(true), value(v) {}
+
+formula_result::formula_result(string* p) :
+    numeric(false), text(p) {}
+
+formula_result::~formula_result()
+{
+    if (!numeric)
+        delete text;
+}
+
 }

@@ -39,6 +39,8 @@ class base_cell;
 typedef ::boost::ptr_map< ::std::string, base_cell>             cell_name_ptr_map_t;
 typedef ::std::unordered_map<const base_cell*, ::std::string>   cell_ptr_name_map_t;
 
+// ============================================================================
+
 class general_error : public ::std::exception
 {
 public:
@@ -53,11 +55,13 @@ private:
 
 enum formula_error_t
 {
+    fe_no_error = 0,
     fe_ref_result_not_available,
     fe_division_by_zero,
-    fe_invalid_expression,
-    fe_no_error
+    fe_invalid_expression
 };
+
+// ============================================================================
 
 class formula_error : public ::std::exception
 {
@@ -69,6 +73,26 @@ public:
     formula_error_t get_error() const;
 private:
     formula_error_t m_ferror;
+};
+
+// ============================================================================
+
+/**
+ * Store formula result which may be either numeric or textural.  In case
+ * the result is textural, it owns the instance of the string.
+ */
+struct formula_result
+{
+    bool numeric;
+    union {
+        ::std::string* text;
+        double value;
+    };
+
+    formula_result();
+    formula_result(double v);
+    formula_result(::std::string* p);
+    ~formula_result();
 };
 
 }
