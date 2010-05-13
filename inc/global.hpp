@@ -81,18 +81,28 @@ private:
  * Store formula result which may be either numeric or textural.  In case
  * the result is textural, it owns the instance of the string.
  */
-struct formula_result
+class formula_result
 {
-    bool numeric;
-    union {
-        ::std::string* text;
-        double value;
-    };
-
+public:
     formula_result();
     formula_result(double v);
     formula_result(::std::string* p);
     ~formula_result();
+
+    void set_value(double v);
+    void set_string(::std::string* p);
+    
+    double get_value() const;
+    const ::std::string& get_string() const;
+
+    bool numeric() const;
+
+private:
+    bool m_numeric;
+    union {
+        ::std::string* m_string;
+        double m_value;
+    };
 };
 
 }

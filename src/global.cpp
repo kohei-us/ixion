@@ -80,18 +80,50 @@ formula_error_t formula_error::get_error() const
 // ============================================================================
 
 formula_result::formula_result() :
-    numeric(true), value(0.0) {}
+    m_numeric(true), m_value(0.0) {}
 
 formula_result::formula_result(double v) :
-    numeric(true), value(v) {}
+    m_numeric(true), m_value(v) {}
 
 formula_result::formula_result(string* p) :
-    numeric(false), text(p) {}
+    m_numeric(false), m_string(p) {}
 
 formula_result::~formula_result()
 {
-    if (!numeric)
-        delete text;
+    if (!m_numeric)
+        delete m_string;
+}
+
+void formula_result::set_value(double v)
+{
+    if (!m_numeric)
+        delete m_string;
+
+    m_numeric = true;
+    m_value = v;
+}
+
+void formula_result::set_string(string* p)
+{
+    if (!m_numeric)
+        delete m_string;
+
+    m_string = p;
+}
+
+double formula_result::get_value() const
+{
+    return m_value;
+}
+
+const string& formula_result::get_string() const
+{
+    return *m_string;
+}
+
+bool formula_result::numeric() const
+{
+    return m_numeric;
 }
 
 }
