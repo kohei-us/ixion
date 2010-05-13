@@ -15,11 +15,12 @@
 				Name="Compile"
 				MenuCaption="&amp;Compile"
 				Dialog="_gnuc_options_form Compile"
-				CaptureOutputWith="ProcessBuffer"
+				CaptureOutputWith="Redirection"
 				Deletable="0"
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				ClearProcessBuffer="1">
 				<Exec CmdLine='g++ -c %xup  %defd -g -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
@@ -36,11 +37,11 @@
 			<Target
 				Name="Build"
 				MenuCaption="&amp;Build"
-				CaptureOutputWith="ProcessBuffer"
+				CaptureOutputWith="Redirection"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine="make"/>
+				<Exec CmdLine="make test"/>
 			</Target>
 			<Target
 				Name="Rebuild"
@@ -103,11 +104,12 @@
 				Name="Compile"
 				MenuCaption="&amp;Compile"
 				Dialog="_gnuc_options_form Compile"
-				CaptureOutputWith="ProcessBuffer"
+				CaptureOutputWith="Redirection"
 				Deletable="0"
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				ClearProcessBuffer="1">
 				<Exec CmdLine='g++ -c %xup %defd -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
@@ -124,11 +126,11 @@
 			<Target
 				Name="Build"
 				MenuCaption="&amp;Build"
-				CaptureOutputWith="ProcessBuffer"
+				CaptureOutputWith="Redirection"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine="make"/>
+				<Exec CmdLine="make test"/>
 			</Target>
 			<Target
 				Name="Rebuild"

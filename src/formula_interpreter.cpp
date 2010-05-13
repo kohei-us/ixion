@@ -255,7 +255,7 @@ double formula_interpreter::constant()
 
 double formula_interpreter::function()
 {
-    // '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
+    // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     assert(token().get_opcode() == fop_function);
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
     cout << formula_functions::get_function_name(func_oc);
