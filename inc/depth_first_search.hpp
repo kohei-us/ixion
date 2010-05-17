@@ -65,7 +65,7 @@ public:
     class cell_handler : public ::std::unary_function<base_cell*, void>
     {
     public:
-        virtual void operator() (base_cell* p) = 0;
+        virtual void operator() (base_cell* cell) = 0;
     };
 
     depth_first_search(const depends_tracker::depend_map_type& depend_map, 

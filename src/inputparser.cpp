@@ -264,7 +264,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
 
         deptracker.print_dot_graph(dotpath);
 
-#if 0
+#if 1
         deptracker.interpret_all_cells();
 #else
         // Sort the cells in order of dependency.

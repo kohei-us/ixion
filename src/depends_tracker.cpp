@@ -29,6 +29,7 @@
 #include "global.hpp"
 #include "cell.hpp"
 #include "depth_first_search.hpp"
+#include "formula_interpreter.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -65,12 +66,44 @@ public:
     cell_back_inserter(vector<base_cell*>& sorted_cells) :
         m_sorted_cells(sorted_cells) {}
 
-    virtual void operator() (base_cell* p)
+    virtual void operator() (base_cell* cell)
     {
-        m_sorted_cells.push_back(p);
+        m_sorted_cells.push_back(cell);
     }
 private:
     vector<base_cell*>& m_sorted_cells;
+};
+
+class cell_interpreter : public depth_first_search::cell_handler
+{
+public:
+    cell_interpreter(const cell_ptr_name_map_t& cell_names) :
+        m_cell_names(cell_names) {}
+
+    void operator() (base_cell* cell)
+    {
+        if (cell->get_celltype() != celltype_formula)
+            // We can't interpret unless the cell contains formula tokens.
+            return;
+
+        cout << "---------- interpreting " << get_cell_name(cell) << endl;
+        formula_cell* fcell = static_cast<formula_cell*>(cell);
+        formula_interpreter fin(fcell->get_tokens(), m_cell_names);
+        if (fin.interpret())
+            fcell->set_result(fin.get_result());
+        else
+            fcell->set_error(fin.get_error());
+    }
+
+    string get_cell_name(const base_cell* p) const
+    {
+        cell_ptr_name_map_t::const_iterator itr = m_cell_names.find(p);
+        if (itr != m_cell_names.end())
+            return itr->second;
+        return string();
+    }
+private:
+    const cell_ptr_name_map_t& m_cell_names;
 };
 
 }
@@ -104,8 +137,7 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::interpret_all_cells()
 {
-    vector<base_cell*> foo;
-    cell_back_inserter handler(foo);
+    cell_interpreter handler(*mp_names);
     depth_first_search dfs(m_map, *mp_names, handler);
     dfs.run();
 }
