@@ -90,12 +90,13 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::interpret_all_cells()
 {
-
+    depth_first_search dfs(m_map, *mp_names);
+    dfs.run();
 }
 
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
-    depth_first_search dfs(m_map, mp_names);
+    depth_first_search dfs(m_map, *mp_names);
     dfs.run();
     dfs.swap_sorted_cells(sorted_cells);
 
