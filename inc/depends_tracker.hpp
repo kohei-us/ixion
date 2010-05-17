@@ -62,6 +62,8 @@ public:
      */
     void insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell);
 
+    void interpret_all_cells();
+
     /** 
      * Perform topological sort on all cell instances, and returns an array of 
      * cells that are sorted in order of dependency. 

@@ -88,6 +88,11 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 //  cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
+void depends_tracker::interpret_all_cells()
+{
+
+}
+
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
     depth_first_search dfs(m_map, mp_names);
