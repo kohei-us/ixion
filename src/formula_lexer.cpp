@@ -29,6 +29,8 @@
 
 #include <iostream>
 
+#define DEBUG_LEXER 0
+
 using namespace std;
 
 namespace ixion {
@@ -91,7 +93,9 @@ void tokenizer::run()
     for (m_pos = 0; m_pos < m_size; ++m_pos)
     {
         m_char = m_formula[m_pos];
+#if DEBUG_LEXER
         cout << "char: '" << m_char << "'" << endl;
+#endif
         if (m_char == m_csep)
         {
             sep();
@@ -267,7 +271,9 @@ formula_lexer::~formula_lexer()
 
 void formula_lexer::tokenize()
 {
+#if DEBUG_LEXER
     cout << "formula string: '" << m_formula << "'" << endl;
+#endif        
     tokenizer tkr(m_tokens, m_formula);
     tkr.run();
 }

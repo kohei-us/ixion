@@ -113,6 +113,9 @@ test: $(EXEC)
 test.expr: $(EXEC)
 	./$(EXEC) -d $(OBJDIR)/expression-test.dot ./test/expression-test.txt
 
+test.parallel: $(EXEC)
+	./$(EXEC) -d $(OBJDIR)/05-function-parallel.dot ./test/05-function-parallel.txt
+
 clean:
 	rm -rf $(OBJDIR)
 	rm $(EXEC)

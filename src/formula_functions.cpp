@@ -28,6 +28,7 @@
 #include "formula_functions.hpp"
 #include "formula_tokens.hpp"
 
+#include <unistd.h>
 #include <iostream>
 
 using namespace std;
@@ -46,6 +47,7 @@ const builtin_func builtin_funcs[] = {
     { "MAX", func_max },
     { "MIN", func_min },
     { "AVERAGE", func_average },
+    { "WAIT", func_wait }
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -95,6 +97,8 @@ double formula_functions::interpret(formula_function_t oc, const args_type& args
             break;
         case func_min:
             break;
+        case func_wait:
+            return wait(args);
         case func_unknown:
         default:
             ;
@@ -115,6 +119,12 @@ double formula_functions::max(const args_type& args)
             ret = *itr;
     }
     return ret;
+}
+
+double formula_functions::wait(const args_type& args)
+{
+    sleep(1);
+    return 1;
 }
 
 }
