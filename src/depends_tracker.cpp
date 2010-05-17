@@ -59,6 +59,20 @@ private:
     const cell_ptr_name_map_t* mp_names;
 };
 
+class cell_back_inserter : public depth_first_search::cell_handler
+{
+public:
+    cell_back_inserter(vector<base_cell*>& sorted_cells) :
+        m_sorted_cells(sorted_cells) {}
+
+    virtual void operator() (base_cell* p)
+    {
+        m_sorted_cells.push_back(p);
+    }
+private:
+    vector<base_cell*>& m_sorted_cells;
+};
+
 }
 
 depends_tracker::depends_tracker(const cell_ptr_name_map_t* names) :
@@ -90,15 +104,18 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::interpret_all_cells()
 {
-    depth_first_search dfs(m_map, *mp_names);
+    vector<base_cell*> foo;
+    cell_back_inserter handler(foo);
+    depth_first_search dfs(m_map, *mp_names, handler);
     dfs.run();
 }
 
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
-    depth_first_search dfs(m_map, *mp_names);
+    cell_back_inserter handler(sorted_cells);
+    depth_first_search dfs(m_map, *mp_names, handler);
     dfs.run();
-    dfs.swap_sorted_cells(sorted_cells);
+//  dfs.swap_sorted_cells(sorted_cells);
 
     cout << "topologically sorted cells ---------------------------------" << endl;
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));

@@ -36,9 +36,11 @@ namespace ixion {
 
 depth_first_search::depth_first_search(
     const depends_tracker::depend_map_type& depend_map, 
-    const cell_ptr_name_map_t& cell_names) :
+    const cell_ptr_name_map_t& cell_names,
+    cell_handler& handler) :
     m_depend_map(depend_map),
     m_cell_names(cell_names),
+    m_handler(handler),
     m_cell_count(cell_names.size()),
     m_time_stamp(0),
     m_cells(m_cell_count)
@@ -61,8 +63,6 @@ void depth_first_search::init()
         cells[index].ptr = itr->first;
     m_cells.swap(cells);
     m_time_stamp = 0;
-    m_sorted_cells.clear();
-    m_sorted_cells.reserve(m_cell_count);
 }
 
 void depth_first_search::run()
@@ -89,11 +89,6 @@ void depth_first_search::print_result()
         const base_cell* p = m_cells[i].ptr;
         cout << "  " << get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
     }
-}
-
-void depth_first_search::swap_sorted_cells(vector<base_cell*>& sorted_cells)
-{
-    m_sorted_cells.swap(sorted_cells);
 }
 
 void depth_first_search::visit(size_t cell_index)
@@ -134,7 +129,7 @@ void depth_first_search::visit(size_t cell_index)
 
     m_cells[cell_index].color = black;
     m_cells[cell_index].time_finished = ++m_time_stamp;
-    m_sorted_cells.push_back(const_cast<base_cell*>(m_cells[cell_index].ptr));
+    m_handler(const_cast<base_cell*>(m_cells[cell_index].ptr));
 //  cout << "visit (end) ------------------------------------------------" << endl;
 }
 

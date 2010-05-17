@@ -64,15 +64,15 @@ class depth_first_search
 public:
     class cell_handler : public ::std::unary_function<base_cell*, void>
     {
+    public:
         virtual void operator() (base_cell* p) = 0;
     };
 
     depth_first_search(const depends_tracker::depend_map_type& depend_map, 
-                       const cell_ptr_name_map_t& cell_names);
+                       const cell_ptr_name_map_t& cell_names, cell_handler& handler);
     void init();
     void run();
     void print_result();
-    void swap_sorted_cells(::std::vector<base_cell*>& sorted_cells);
 
 private:
     void visit(size_t cell_index);
@@ -83,13 +83,12 @@ private:
 private:
     const depends_tracker::depend_map_type&     m_depend_map;
     const cell_ptr_name_map_t&                  m_cell_names;
+    cell_handler&                               m_handler;
     size_t                                      m_cell_count;
     cell_index_map_type                         m_cell_indices;
 
     size_t                          m_time_stamp;
     ::std::vector<celldata>         m_cells;
-    ::std::vector<base_cell*> m_sorted_cells;
-
 };
 
 }
