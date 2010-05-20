@@ -1,8 +1,10 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <pthread.h>
+#include <unistd.h>
 
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/thread.hpp>
 
 #include <stdio.h>
 #include <string>
@@ -48,25 +50,53 @@ private:
 
 using namespace std;
 
-void* thread_routine(void* arg)
+void thread_routine()
 {
-    cout << "thread routine" << endl;
-    return arg;
+    StackPrinter __stack_printer__("::thread_routine");
+    sleep(1);
 }
+
+class formula_cell
+{
+public:
+    formula_cell() : mp_thread(NULL) {}
+
+    void interpret_thread()
+    {
+        mp_thread = new ::boost::thread(::boost::bind(&formula_cell::interpret, this));
+    }
+
+    void interpret()
+    {
+        StackPrinter __stack_printer__("formula_cell::interpret");
+        sleep(1);
+    }
+
+    void interpret_join()
+    {
+        mp_thread->join();
+        delete mp_thread;
+        mp_thread = NULL;
+    }
+private:
+    ::boost::thread* mp_thread;
+};
 
 int main()
 {
     StackPrinter __stack_printer__("::main");
-    pthread_t thread_id;
-    void* thread_result;
+    ::boost::ptr_vector<formula_cell> cells;
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
 
-    int status = pthread_create(&thread_id, NULL, thread_routine, NULL);
-    if (!status)
-        return EXIT_FAILURE;
+    ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
+    for (itr = itr_beg; itr != itr_end; ++itr)
+        itr->interpret_thread();
 
-    status = pthread_join(thread_id, &thread_result);
-    if (!status)
-        return EXIT_FAILURE;
-
-    return thread_result == NULL ? EXIT_SUCCESS : EXIT_FAILURE;
+    for (itr = itr_beg; itr != itr_end; ++itr)
+        itr->interpret_join();
 }
