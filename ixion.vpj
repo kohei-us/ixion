@@ -215,6 +215,12 @@
 			<F N="inc/inputparser.hpp"/>
 			<F N="inc/lexer_tokens.hpp"/>
 		</Folder>
+		<Folder Name="misc">
+			<F
+				N="misc/Makefile"
+				Type="Makefile"/>
+			<F N="misc/thread_test.cpp"/>
+		</Folder>
 		<Folder Name="src">
 			<F N="src/cell.cpp"/>
 			<F N="src/depends_tracker.cpp"/>
