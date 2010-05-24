@@ -27,7 +27,10 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <unistd.h>
+
+#include <queue>
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
@@ -38,7 +41,19 @@
 #include <string>
 #include <sys/time.h>
 
+using namespace std;
+using ::boost::mutex;
+
 namespace {
+
+mutex tprintf_mtx;
+
+void tprintf(const string& s)
+{
+    mutex::scoped_lock(tprintf_mtx);
+    cout << s << endl;
+    cout.flush();
+}
 
 class StackPrinter
 {
@@ -46,20 +61,17 @@ public:
     explicit StackPrinter(const char* msg) :
         msMsg(msg)
     {
-        fprintf(stdout, "%s: --begin\n", msMsg.c_str());
+        string s = msg + string(": --begin");
+        tprintf(s);
         mfStartTime = getTime();
     }
 
     ~StackPrinter()
     {
         double fEndTime = getTime();
-        fprintf(stdout, "%s: --end (duration: %g sec)\n", msMsg.c_str(), (fEndTime-mfStartTime));
-    }
-
-    void printTime(int line) const
-    {
-        double fEndTime = getTime();
-        fprintf(stdout, "%s: --(%d) (duration: %g sec)\n", msMsg.c_str(), line, (fEndTime-mfStartTime));
+        ostringstream os;
+        os << msMsg << ": --end (durtion: " << (fEndTime-mfStartTime) << " sec)";
+        tprintf(os.str());
     }
 
 private:
@@ -75,8 +87,6 @@ private:
 };
 
 }
-
-using namespace std;
 
 class formula_cell
 {
@@ -104,77 +114,76 @@ private:
     ::boost::thread* mp_thread;
 };
 
-class thread_queue_manager
+struct manage_queue_data
 {
-public:
-    thread_queue_manager();
-    ~thread_queue_manager();
+    ::boost::mutex mtx;
+    ::boost::condition_variable cond;
+    queue<formula_cell*> cell_queue;
 
-    void run();
+    bool ready;
+    bool added_to_queue;
+    bool terminate_requested;
 
-    void add_to_queue(formula_cell* p);
-    void terminate();
-
-private:
-    static ::boost::mutex mtx;
-    static ::boost::condition_variable cond;
-    static bool added_to_queue;
-    static bool terminate_requested;
+    manage_queue_data() :
+        ready(false),
+        added_to_queue(false), 
+        terminate_requested(false) {}
 };
 
-::boost::mutex thread_queue_manager::mtx;
-::boost::condition_variable thread_queue_manager::cond;
-bool thread_queue_manager::added_to_queue = false;
-bool thread_queue_manager::terminate_requested = false;
+manage_queue_data queue_data;
 
-thread_queue_manager::thread_queue_manager()
+void manage_queue_main()
 {
-}
-
-thread_queue_manager::~thread_queue_manager()
-{
-}
-
-void thread_queue_manager::run()
-{
-    StackPrinter __stack_printer__("thread_queue_manager::run");
-    ::boost::unique_lock< ::boost::mutex> guard(mtx);
-    while (!terminate_requested)
+    StackPrinter __stack_printer__("::manage_queue_main");
+    ::boost::mutex::scoped_lock lock(queue_data.mtx);
+    while (!queue_data.terminate_requested)
     {
-        cout << "waits..." << endl;
-        cout.flush();
-        cond.wait(guard);
-        if (added_to_queue)
+        tprintf("waiting...");
+        queue_data.ready = true;
+        queue_data.cond.wait(lock);
+        if (queue_data.added_to_queue)
         {
-            cout << "added to queue" << endl;
-            cout.flush();
-            added_to_queue = false;
+            while (!queue_data.cell_queue.empty())
+            {
+                formula_cell* p = queue_data.cell_queue.front();
+                queue_data.cell_queue.pop();
+                p->interpret();
+            }
+            queue_data.added_to_queue = false;
         }
     }
 
+    tprintf("finishing up...");
+    while (!queue_data.cell_queue.empty())
+    {
+        formula_cell* p = queue_data.cell_queue.front();
+        queue_data.cell_queue.pop();
+        p->interpret();
+    }
 }
 
-void thread_queue_manager::add_to_queue(formula_cell* p)
+void add_to_queue(formula_cell* p)
 {
-    {
-        ::boost::unique_lock< ::boost::mutex> guard(mtx);
-        added_to_queue = true;
-    }
-    cond.notify_one();
+    tprintf("adding to queue...");
+    ::boost::mutex::scoped_lock lock(queue_data.mtx);
+    queue_data.cell_queue.push(p);
+    queue_data.added_to_queue = true;
+    queue_data.cond.notify_all();
 }
 
-void thread_queue_manager::terminate()
+void manage_queue_terminate()
 {
-    {
-        ::boost::unique_lock< ::boost::mutex> guard(mtx);
-        terminate_requested = true;
-    }
-    cond.notify_one();
+    ::boost::mutex::scoped_lock lock(queue_data.mtx);
+    queue_data.terminate_requested = true;
+    queue_data.cond.notify_all();
 }
 
 int main()
 {
     StackPrinter __stack_printer__("::main");
+    ::boost::thread thr_queue(manage_queue_main);
+    sleep(1);
+
     ::boost::ptr_vector<formula_cell> cells;
     cells.push_back(new formula_cell);
     cells.push_back(new formula_cell);
@@ -183,28 +192,14 @@ int main()
     cells.push_back(new formula_cell);
     cells.push_back(new formula_cell);
 
-#if 1
-    thread_queue_manager queue_mgr;
-    ::boost::thread thr_queue(::boost::bind(&thread_queue_manager::run, queue_mgr));
-    sleep(1);
-
     ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
     for (itr = itr_beg; itr != itr_end; ++itr)
     {
         formula_cell* p = &(*itr);
-        queue_mgr.add_to_queue(p);
-        sleep(1);
+        add_to_queue(p);
     }
 
-    queue_mgr.terminate();
+    manage_queue_terminate();
     thr_queue.join();
-#else
-
-    ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
-    for (itr = itr_beg; itr != itr_end; ++itr)
-        itr->interpret_thread();
-
-    for (itr = itr_beg; itr != itr_end; ++itr)
-        itr->interpret_join();
-#endif
+    fprintf(stdout, "main:   final queue size = %d\n", queue_data.cell_queue.size());
 }

@@ -1,7 +1,8 @@
 SRCDIR=.
 OBJDIR=.
 
-CPPFLAGS=-Wall -lboost_thread
+CPPFLAGS=-Wall -D_REENTRANT
+LDFLAGS=-lboost_thread
 
 HEADERS=
 
@@ -18,7 +19,7 @@ $(OBJDIR)/thread_test.o: $(SRCDIR)/thread_test.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/thread_test.cpp
 
 thread_test: $(OBJFILES)
-	$(CXX) $(CPPFLAGS) -o $@ $(OBJFILES)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJFILES)
 
 clean:
 	rm -rf $(OBJFILES) thread_test
