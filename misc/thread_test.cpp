@@ -43,6 +43,8 @@
 
 using namespace std;
 using ::boost::mutex;
+using ::boost::thread;
+using ::boost::condition_variable;
 
 namespace {
 
@@ -114,75 +116,93 @@ private:
     ::boost::thread* mp_thread;
 };
 
+namespace manage_queue {
+
 struct manage_queue_data
 {
-    ::boost::mutex mtx;
-    ::boost::condition_variable cond;
-    queue<formula_cell*> cell_queue;
+    mutex mtx_thread_ready;
+    condition_variable cond_thread_ready;
+    bool thread_ready;
 
-    bool ready;
+    mutex mtx_queue;
+    condition_variable cond_queue;
+    queue<formula_cell*> cells;
     bool added_to_queue;
     bool terminate_requested;
 
     manage_queue_data() :
-        ready(false),
+        thread_ready(false),
         added_to_queue(false), 
         terminate_requested(false) {}
 };
 
-manage_queue_data queue_data;
+manage_queue_data data;
 
-void manage_queue_main()
+void main()
 {
     StackPrinter __stack_printer__("::manage_queue_main");
-    ::boost::mutex::scoped_lock lock(queue_data.mtx);
-    while (!queue_data.terminate_requested)
+    {
+        mutex::scoped_lock lock(data.mtx_thread_ready);
+        data.thread_ready = true;
+        data.cond_thread_ready.notify_all();
+    }
+
+    mutex::scoped_lock lock(data.mtx_queue);
+    while (!data.terminate_requested)
     {
         tprintf("waiting...");
-        queue_data.ready = true;
-        queue_data.cond.wait(lock);
-        if (queue_data.added_to_queue)
+        data.cond_queue.wait(lock);
+        if (data.added_to_queue)
         {
-            while (!queue_data.cell_queue.empty())
             {
-                formula_cell* p = queue_data.cell_queue.front();
-                queue_data.cell_queue.pop();
+                formula_cell* p = data.cells.front();
+                data.cells.pop();
                 p->interpret();
             }
-            queue_data.added_to_queue = false;
+            data.added_to_queue = false;
         }
     }
 
-    tprintf("finishing up...");
-    while (!queue_data.cell_queue.empty())
+    tprintf("terminating manage queue thread...");
+    while (!data.cells.empty())
     {
-        formula_cell* p = queue_data.cell_queue.front();
-        queue_data.cell_queue.pop();
+        formula_cell* p = data.cells.front();
+        data.cells.pop();
         p->interpret();
     }
 }
 
-void add_to_queue(formula_cell* p)
+void add_cell(formula_cell* p)
 {
     tprintf("adding to queue...");
-    ::boost::mutex::scoped_lock lock(queue_data.mtx);
-    queue_data.cell_queue.push(p);
-    queue_data.added_to_queue = true;
-    queue_data.cond.notify_all();
+    ::boost::mutex::scoped_lock lock(data.mtx_queue);
+    data.cells.push(p);
+    data.added_to_queue = true;
+    data.cond_queue.notify_all();
 }
 
-void manage_queue_terminate()
+void terminate()
 {
-    ::boost::mutex::scoped_lock lock(queue_data.mtx);
-    queue_data.terminate_requested = true;
-    queue_data.cond.notify_all();
+    ::boost::mutex::scoped_lock lock(data.mtx_queue);
+    data.terminate_requested = true;
+    data.cond_queue.notify_all();
 }
+
+/**
+ * Wait until the manage queue thread becomes ready.
+ */
+void wait_init()
+{
+    mutex::scoped_lock lock(data.mtx_thread_ready);
+    while (!data.thread_ready)
+        data.cond_thread_ready.wait(lock);
+}
+
+} // namespace manage_queue
 
 int main()
 {
     StackPrinter __stack_printer__("::main");
-    ::boost::thread thr_queue(manage_queue_main);
-    sleep(1);
 
     ::boost::ptr_vector<formula_cell> cells;
     cells.push_back(new formula_cell);
@@ -192,14 +212,17 @@ int main()
     cells.push_back(new formula_cell);
     cells.push_back(new formula_cell);
 
+    thread thr_queue(manage_queue::main);
+    manage_queue::wait_init();
+    
     ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
     for (itr = itr_beg; itr != itr_end; ++itr)
     {
         formula_cell* p = &(*itr);
-        add_to_queue(p);
+        manage_queue::add_cell(p);
     }
 
-    manage_queue_terminate();
+    manage_queue::terminate();
     thr_queue.join();
-    fprintf(stdout, "main:   final queue size = %d\n", queue_data.cell_queue.size());
+    fprintf(stdout, "main:   final queue size = %d\n", manage_queue::data.cells.size());
 }
