@@ -45,6 +45,7 @@ using namespace std;
 using ::boost::mutex;
 using ::boost::thread;
 using ::boost::condition_variable;
+using ::boost::ptr_vector;
 
 namespace {
 
@@ -118,11 +119,59 @@ private:
 
 namespace manage_queue {
 
+struct worker_thread
+{
+    thread thr_main;
+
+    mutex mtx_ready;
+    condition_variable cond_ready;
+    bool thread_ready;
+
+    mutex mtx_cell;
+    condition_variable cond_cell;
+    formula_cell* cell;
+    bool terminate_requested;
+
+    worker_thread() :
+        thread_ready(false),
+        cell(NULL),
+        terminate_requested(false) {}
+};
+
+void worker_main(worker_thread* data)
+{
+    StackPrinter __stack_printer__("manage_queue::worker_main");
+    mutex::scoped_lock lock_cell(data->mtx_cell);
+    {
+        mutex::scoped_lock lock_ready(data->mtx_ready);
+        data->thread_ready = true;
+        data->cond_ready.notify_all();
+    }
+
+    cout << "worker ready" << endl;
+
+    while (!data->terminate_requested)
+    {
+        data->cond_cell.wait(lock_cell);
+        if (data->cell)
+        {
+            cout << "interpret cell " << data->cell << endl;
+            data->cell->interpret();
+            data->cell = NULL;
+        }
+    }
+}
+
 struct manage_queue_data
 {
+    // thread ready
+
     mutex mtx_thread_ready;
+    ptr_vector<worker_thread> workers;
     condition_variable cond_thread_ready;
     bool thread_ready;
+
+    // queue status
 
     mutex mtx_queue;
     condition_variable cond_queue;
@@ -138,16 +187,52 @@ struct manage_queue_data
 
 manage_queue_data data;
 
+void init_workers(size_t worker_count)
+{
+    for (size_t i = 0; i < worker_count; ++i)
+    {
+        data.workers.push_back(new worker_thread);
+        worker_thread& wt = data.workers.back();
+        wt.thr_main = thread(::boost::bind(worker_main, &wt));
+    }
+
+    ptr_vector<worker_thread>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+    for (; itr != itr_end; ++itr)
+    {
+        worker_thread& wt = *itr;
+        mutex::scoped_lock lock(wt.mtx_ready);
+        while (!wt.thread_ready)
+            wt.cond_ready.wait(lock);
+    }
+}
+
+void terminate_workers()
+{
+    ptr_vector<worker_thread>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+    for (; itr != itr_end; ++itr)
+    {
+        worker_thread& wt = *itr;
+        mutex::scoped_lock lock(wt.mtx_cell);
+        wt.terminate_requested = true;
+        wt.cond_cell.notify_all();
+    }
+
+    itr = data.workers.begin();
+    for (; itr != itr_end; ++itr)
+        itr->thr_main.join();
+}
+
 void main()
 {
     StackPrinter __stack_printer__("::manage_queue_main");
+    mutex::scoped_lock lock(data.mtx_queue);
     {
         mutex::scoped_lock lock(data.mtx_thread_ready);
+        init_workers(2);
         data.thread_ready = true;
         data.cond_thread_ready.notify_all();
     }
 
-    mutex::scoped_lock lock(data.mtx_queue);
     while (!data.terminate_requested)
     {
         tprintf("waiting...");
@@ -170,6 +255,8 @@ void main()
         data.cells.pop();
         p->interpret();
     }
+
+    terminate_workers();
 }
 
 void add_cell(formula_cell* p)
