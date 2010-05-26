@@ -103,7 +103,7 @@ public:
 
     void interpret()
     {
-        StackPrinter __stack_printer__("formula_cell::interpret");
+//      StackPrinter __stack_printer__("formula_cell::interpret");
         sleep(1);
     }
 
@@ -138,6 +138,16 @@ struct worker_thread_data
         terminate_requested(false) {}
 };
 
+struct worker_thread_signal
+{
+    mutex mtx;
+    condition_variable cond;
+    size_t available;
+    worker_thread_signal() : available(0) {}
+};
+
+worker_thread_signal wk_avail_data;
+
 /**
  * Main worker thread routine.
  */
@@ -151,17 +161,22 @@ void worker_main(worker_thread_data* data)
         data->cond_ready.notify_all();
     }
 
-    cout << "worker ready" << endl;
+    tprintf("worker ready");
 
     while (!data->terminate_requested)
     {
+        tprintf("worker waits...");
+
         data->cond_cell.wait(lock_cell);
-        if (data->cell)
-        {
-            cout << "interpret cell " << data->cell << endl;
-            data->cell->interpret();
-            data->cell = NULL;
-        }
+
+        if (!data->cell)
+            continue;
+
+        ostringstream os;
+        os << "interpret cell " << data->cell;
+        tprintf(os.str());
+        data->cell->interpret();
+        data->cell = NULL;
     }
 }
 
@@ -213,6 +228,7 @@ void init_workers(size_t worker_count)
 
 void terminate_workers()
 {
+    tprintf("terminate all workers.");
     ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
@@ -230,13 +246,13 @@ void terminate_workers()
 /**
  * Main queue manager thread routine.
  */
-void main()
+void main(size_t worker_count)
 {
     StackPrinter __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
     {
         mutex::scoped_lock lock(data.mtx_thread_ready);
-        init_workers(2);
+        init_workers(worker_count);
         data.thread_ready = true;
         data.cond_thread_ready.notify_all();
     }
@@ -247,10 +263,30 @@ void main()
         data.cond_queue.wait(lock);
         if (data.added_to_queue)
         {
+            ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+            for (; itr != itr_end; ++itr)
             {
-                formula_cell* p = data.cells.front();
+                if (data.cells.empty())
+                {
+                    tprintf("no more cells to interpret.");
+                    break;
+                }
+
+                worker_thread_data& wt = *itr;
+                mutex::scoped_try_lock lock(wt.mtx_cell);
+                if (!lock.owns_lock())
+                {
+                    // This worker thread is occupied.
+//                  tprintf("this worker thread is occupied.");
+                    continue;
+                }
+
+                // When we obtain the lock, the cell pointer is expected to be NULL.
+                assert(!wt.cell);
+
+                wt.cell = data.cells.front();
                 data.cells.pop();
-                p->interpret();
+                wt.cond_cell.notify_all();
             }
             data.added_to_queue = false;
         }
@@ -259,9 +295,25 @@ void main()
     tprintf("terminating manage queue thread...");
     while (!data.cells.empty())
     {
-        formula_cell* p = data.cells.front();
-        data.cells.pop();
-        p->interpret();
+        ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+        for (; itr != itr_end; ++itr)
+        {
+            worker_thread_data& wt = *itr;
+            mutex::scoped_try_lock lock(wt.mtx_cell);
+            if (!lock.owns_lock())
+            {
+                // This worker thread is occupied.
+//              tprintf("this worker thread is occupied.");
+                continue;
+            }
+
+            // When we obtain the lock, the cell pointer is expected to be NULL.
+            assert(!wt.cell);
+
+            wt.cell = data.cells.front();
+            data.cells.pop();
+            wt.cond_cell.notify_all();
+        }
     }
 
     terminate_workers();
@@ -306,8 +358,20 @@ int main()
     cells.push_back(new formula_cell);
     cells.push_back(new formula_cell);
     cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
+    cells.push_back(new formula_cell);
 
-    thread thr_queue(manage_queue::main);
+    ostringstream os;
+    os << "number of cells to interpret: " << cells.size();
+    tprintf(os.str());
+
+    thread thr_queue(::boost::bind(manage_queue::main, 3));
     manage_queue::wait_init();
     
     ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
