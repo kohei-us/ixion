@@ -119,7 +119,7 @@ private:
 
 namespace manage_queue {
 
-struct worker_thread
+struct worker_thread_data
 {
     thread thr_main;
 
@@ -132,13 +132,16 @@ struct worker_thread
     formula_cell* cell;
     bool terminate_requested;
 
-    worker_thread() :
+    worker_thread_data() :
         thread_ready(false),
         cell(NULL),
         terminate_requested(false) {}
 };
 
-void worker_main(worker_thread* data)
+/**
+ * Main worker thread routine.
+ */
+void worker_main(worker_thread_data* data)
 {
     StackPrinter __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->mtx_cell);
@@ -167,7 +170,7 @@ struct manage_queue_data
     // thread ready
 
     mutex mtx_thread_ready;
-    ptr_vector<worker_thread> workers;
+    ptr_vector<worker_thread_data> workers;
     condition_variable cond_thread_ready;
     bool thread_ready;
 
@@ -189,17 +192,19 @@ manage_queue_data data;
 
 void init_workers(size_t worker_count)
 {
+    // Create specified number of worker threads.
     for (size_t i = 0; i < worker_count; ++i)
     {
-        data.workers.push_back(new worker_thread);
-        worker_thread& wt = data.workers.back();
+        data.workers.push_back(new worker_thread_data);
+        worker_thread_data& wt = data.workers.back();
         wt.thr_main = thread(::boost::bind(worker_main, &wt));
     }
 
-    ptr_vector<worker_thread>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+    // Wait until the worker threads become ready.
+    ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
-        worker_thread& wt = *itr;
+        worker_thread_data& wt = *itr;
         mutex::scoped_lock lock(wt.mtx_ready);
         while (!wt.thread_ready)
             wt.cond_ready.wait(lock);
@@ -208,10 +213,10 @@ void init_workers(size_t worker_count)
 
 void terminate_workers()
 {
-    ptr_vector<worker_thread>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+    ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
-        worker_thread& wt = *itr;
+        worker_thread_data& wt = *itr;
         mutex::scoped_lock lock(wt.mtx_cell);
         wt.terminate_requested = true;
         wt.cond_cell.notify_all();
@@ -222,6 +227,9 @@ void terminate_workers()
         itr->thr_main.join();
 }
 
+/**
+ * Main queue manager thread routine.
+ */
 void main()
 {
     StackPrinter __stack_printer__("::manage_queue_main");
