@@ -119,6 +119,9 @@ private:
 
 namespace manage_queue {
 
+/**
+ * Data relevant for each worker thread.
+ */
 struct worker_thread_data
 {
     thread thr_main;
@@ -167,8 +170,10 @@ void worker_main(worker_thread_data* data)
     {
         tprintf("worker waits...");
         {
+            // Register itself as an idle thread.
             mutex::scoped_lock lock_wts(wts.mtx);
             wts.idle_wts.push(data);
+            wts.cond.notify_all();
         }
         data->cond_cell.wait(lock_cell);
 
@@ -272,10 +277,8 @@ void main(size_t worker_count)
             while (!wts.idle_wts.empty())
             {
                 if (data.cells.empty())
-                {
-                    tprintf("no more cells to interpret.");
+                    // No more cells to interpret.  Bail out.
                     break;
-                }
 
                 worker_thread_data& wt = *wts.idle_wts.front();
                 wts.idle_wts.pop();
@@ -294,12 +297,23 @@ void main(size_t worker_count)
         }
     }
 
+    // Termination is being requested.  Finish interpreting the rest of the 
+    // cells, as no more new cells will be added.
+
     tprintf("terminating manage queue thread...");
     while (!data.cells.empty())
     {
         mutex::scoped_lock wts_lock(wts.mtx);
+        if (wts.idle_wts.empty())
+            // In case no threads are idle, wait until one becomes idle.
+            wts.cond.wait(wts_lock);
+
         while (!wts.idle_wts.empty())
         {
+            if (data.cells.empty())
+                // No more cells to interpret.  Bail out.
+                break;
+
             worker_thread_data& wt = *wts.idle_wts.front();
             wts.idle_wts.pop();
 
@@ -351,27 +365,16 @@ int main()
 {
     StackPrinter __stack_printer__("::main");
 
+    size_t cell_count = 20;
+    size_t worker_count = 4;
+    cout << "number of cells to interpret: " << cell_count << endl;
+    cout << "number of worker threads: " << worker_count << endl;
+
     ::boost::ptr_vector<formula_cell> cells;
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
-    cells.push_back(new formula_cell);
+    for (size_t i = 0; i < cell_count; ++i)
+        cells.push_back(new formula_cell);
 
-    ostringstream os;
-    os << "number of cells to interpret: " << cells.size();
-    tprintf(os.str());
-
-    thread thr_queue(::boost::bind(manage_queue::main, 2));
+    thread thr_queue(::boost::bind(manage_queue::main, worker_count));
     manage_queue::wait_init();
     
     ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
@@ -383,5 +386,5 @@ int main()
 
     manage_queue::terminate();
     thr_queue.join();
-    fprintf(stdout, "main:   final queue size = %d\n", manage_queue::data.cells.size());
+    assert(manage_queue::data.cells.empty());
 }
