@@ -138,15 +138,15 @@ struct worker_thread_data
         terminate_requested(false) {}
 };
 
-struct worker_thread_signal
+struct worker_thread_status
 {
     mutex mtx;
     condition_variable cond;
-    size_t available;
-    worker_thread_signal() : available(0) {}
+    queue<worker_thread_data*> idle_wts;
+    worker_thread_status() {}
 };
 
-worker_thread_signal wk_avail_data;
+worker_thread_status wts;
 
 /**
  * Main worker thread routine.
@@ -166,7 +166,10 @@ void worker_main(worker_thread_data* data)
     while (!data->terminate_requested)
     {
         tprintf("worker waits...");
-
+        {
+            mutex::scoped_lock lock_wts(wts.mtx);
+            wts.idle_wts.push(data);
+        }
         data->cond_cell.wait(lock_cell);
 
         if (!data->cell)
@@ -263,8 +266,10 @@ void main(size_t worker_count)
         data.cond_queue.wait(lock);
         if (data.added_to_queue)
         {
-            ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
-            for (; itr != itr_end; ++itr)
+            data.added_to_queue = false;
+
+            mutex::scoped_lock wts_lock(wts.mtx);
+            while (!wts.idle_wts.empty())
             {
                 if (data.cells.empty())
                 {
@@ -272,14 +277,34 @@ void main(size_t worker_count)
                     break;
                 }
 
-                worker_thread_data& wt = *itr;
-                mutex::scoped_try_lock lock(wt.mtx_cell);
-                if (!lock.owns_lock())
+                worker_thread_data& wt = *wts.idle_wts.front();
+                wts.idle_wts.pop();
+
                 {
-                    // This worker thread is occupied.
-//                  tprintf("this worker thread is occupied.");
-                    continue;
+                    mutex::scoped_lock lock(wt.mtx_cell);
+    
+                    // When we obtain the lock, the cell pointer is expected to be NULL.
+                    assert(!wt.cell);
+    
+                    wt.cell = data.cells.front();
+                    data.cells.pop();
+                    wt.cond_cell.notify_all();
                 }
+            }
+        }
+    }
+
+    tprintf("terminating manage queue thread...");
+    while (!data.cells.empty())
+    {
+        mutex::scoped_lock wts_lock(wts.mtx);
+        while (!wts.idle_wts.empty())
+        {
+            worker_thread_data& wt = *wts.idle_wts.front();
+            wts.idle_wts.pop();
+
+            {
+                mutex::scoped_lock lock(wt.mtx_cell);
 
                 // When we obtain the lock, the cell pointer is expected to be NULL.
                 assert(!wt.cell);
@@ -288,31 +313,6 @@ void main(size_t worker_count)
                 data.cells.pop();
                 wt.cond_cell.notify_all();
             }
-            data.added_to_queue = false;
-        }
-    }
-
-    tprintf("terminating manage queue thread...");
-    while (!data.cells.empty())
-    {
-        ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
-        for (; itr != itr_end; ++itr)
-        {
-            worker_thread_data& wt = *itr;
-            mutex::scoped_try_lock lock(wt.mtx_cell);
-            if (!lock.owns_lock())
-            {
-                // This worker thread is occupied.
-//              tprintf("this worker thread is occupied.");
-                continue;
-            }
-
-            // When we obtain the lock, the cell pointer is expected to be NULL.
-            assert(!wt.cell);
-
-            wt.cell = data.cells.front();
-            data.cells.pop();
-            wt.cond_cell.notify_all();
         }
     }
 
@@ -371,7 +371,7 @@ int main()
     os << "number of cells to interpret: " << cells.size();
     tprintf(os.str());
 
-    thread thr_queue(::boost::bind(manage_queue::main, 3));
+    thread thr_queue(::boost::bind(manage_queue::main, 2));
     manage_queue::wait_init();
     
     ::boost::ptr_vector<formula_cell>::iterator itr, itr_beg = cells.begin(), itr_end = cells.end();
