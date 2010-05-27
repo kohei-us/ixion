@@ -251,6 +251,18 @@ void terminate_workers()
         itr->thr_main.join();
 }
 
+void interpret_cell(worker_thread_data& wt)
+{
+    mutex::scoped_lock lock(wt.mtx_cell);
+
+    // When we obtain the lock, the cell pointer is expected to be NULL.
+    assert(!wt.cell);
+
+    wt.cell = data.cells.front();
+    data.cells.pop();
+    wt.cond_cell.notify_all();
+}
+
 /**
  * Main queue manager thread routine.
  */
@@ -282,17 +294,7 @@ void main(size_t worker_count)
 
                 worker_thread_data& wt = *wts.idle_wts.front();
                 wts.idle_wts.pop();
-
-                {
-                    mutex::scoped_lock lock(wt.mtx_cell);
-    
-                    // When we obtain the lock, the cell pointer is expected to be NULL.
-                    assert(!wt.cell);
-    
-                    wt.cell = data.cells.front();
-                    data.cells.pop();
-                    wt.cond_cell.notify_all();
-                }
+                interpret_cell(wt);
             }
         }
     }
@@ -316,17 +318,7 @@ void main(size_t worker_count)
 
             worker_thread_data& wt = *wts.idle_wts.front();
             wts.idle_wts.pop();
-
-            {
-                mutex::scoped_lock lock(wt.mtx_cell);
-
-                // When we obtain the lock, the cell pointer is expected to be NULL.
-                assert(!wt.cell);
-
-                wt.cell = data.cells.front();
-                data.cells.pop();
-                wt.cond_cell.notify_all();
-            }
+            interpret_cell(wt);
         }
     }
 
@@ -365,8 +357,8 @@ int main()
 {
     StackPrinter __stack_printer__("::main");
 
-    size_t cell_count = 20;
-    size_t worker_count = 4;
+    size_t cell_count = 25;
+    size_t worker_count = 8;
     cout << "number of cells to interpret: " << cell_count << endl;
     cout << "number of worker threads: " << worker_count << endl;
 
