@@ -120,27 +120,40 @@ private:
 namespace manage_queue {
 
 /**
- * Data relevant for each worker thread.
+ * Data for each worker thread.
  */
 struct worker_thread_data
 {
+    struct init_status_data
+    {
+        mutex mtx;
+        condition_variable cond;
+        bool ready;
+
+        init_status_data() : ready(false) {}
+    };
+
+    struct action_data
+    {
+        mutex mtx;
+        condition_variable cond;
+        formula_cell* cell;
+        bool terminate_requested;
+
+        action_data() : cell(NULL), terminate_requested(false) {}
+    };
+
     thread thr_main;
 
-    mutex mtx_ready;
-    condition_variable cond_ready;
-    bool thread_ready;
+    init_status_data init_status;
+    action_data action;
 
-    mutex mtx_cell;
-    condition_variable cond_cell;
-    formula_cell* cell;
-    bool terminate_requested;
-
-    worker_thread_data() :
-        thread_ready(false),
-        cell(NULL),
-        terminate_requested(false) {}
+    worker_thread_data() {}
 };
 
+/**
+ * This structure keeps track of idle worker threads.
+ */
 struct worker_thread_status
 {
     mutex mtx;
@@ -157,16 +170,16 @@ worker_thread_status wts;
 void worker_main(worker_thread_data* data)
 {
     StackPrinter __stack_printer__("manage_queue::worker_main");
-    mutex::scoped_lock lock_cell(data->mtx_cell);
+    mutex::scoped_lock lock_cell(data->action.mtx);
     {
-        mutex::scoped_lock lock_ready(data->mtx_ready);
-        data->thread_ready = true;
-        data->cond_ready.notify_all();
+        mutex::scoped_lock lock_ready(data->init_status.mtx);
+        data->init_status.ready = true;
+        data->init_status.cond.notify_all();
     }
 
     tprintf("worker ready");
 
-    while (!data->terminate_requested)
+    while (!data->action.terminate_requested)
     {
         tprintf("worker waits...");
         {
@@ -175,16 +188,16 @@ void worker_main(worker_thread_data* data)
             wts.idle_wts.push(data);
             wts.cond.notify_all();
         }
-        data->cond_cell.wait(lock_cell);
+        data->action.cond.wait(lock_cell);
 
-        if (!data->cell)
+        if (!data->action.cell)
             continue;
 
         ostringstream os;
-        os << "interpret cell " << data->cell;
+        os << "interpret cell " << data->action.cell;
         tprintf(os.str());
-        data->cell->interpret();
-        data->cell = NULL;
+        data->action.cell->interpret();
+        data->action.cell = NULL;
     }
 }
 
@@ -233,9 +246,9 @@ void init_workers(size_t worker_count)
     for (; itr != itr_end; ++itr)
     {
         worker_thread_data& wt = *itr;
-        mutex::scoped_lock lock(wt.mtx_ready);
-        while (!wt.thread_ready)
-            wt.cond_ready.wait(lock);
+        mutex::scoped_lock lock(wt.init_status.mtx);
+        while (!wt.init_status.ready)
+            wt.init_status.cond.wait(lock);
     }
 }
 
@@ -246,9 +259,9 @@ void terminate_workers()
     for (; itr != itr_end; ++itr)
     {
         worker_thread_data& wt = *itr;
-        mutex::scoped_lock lock(wt.mtx_cell);
-        wt.terminate_requested = true;
-        wt.cond_cell.notify_all();
+        mutex::scoped_lock lock(wt.action.mtx);
+        wt.action.terminate_requested = true;
+        wt.action.cond.notify_all();
     }
 
     itr = data.workers.begin();
@@ -258,14 +271,14 @@ void terminate_workers()
 
 void interpret_cell(worker_thread_data& wt)
 {
-    mutex::scoped_lock lock(wt.mtx_cell);
+    mutex::scoped_lock lock(wt.action.mtx);
 
     // When we obtain the lock, the cell pointer is expected to be NULL.
-    assert(!wt.cell);
+    assert(!wt.action.cell);
 
-    wt.cell = data.cells.front();
+    wt.action.cell = data.cells.front();
     data.cells.pop();
-    wt.cond_cell.notify_all();
+    wt.action.cond.notify_all();
 }
 
 /**
