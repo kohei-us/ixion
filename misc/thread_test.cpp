@@ -188,6 +188,13 @@ void worker_main(worker_thread_data* data)
     }
 }
 
+enum manage_queue_action_t
+{
+    qm_no_action,
+    qm_cell_added_to_queue,
+    qm_terminate_requested
+};
+
 struct manage_queue_data
 {
     // thread ready
@@ -202,13 +209,11 @@ struct manage_queue_data
     mutex mtx_queue;
     condition_variable cond_queue;
     queue<formula_cell*> cells;
-    bool added_to_queue;
-    bool terminate_requested;
+    manage_queue_action_t action;
 
     manage_queue_data() :
         thread_ready(false),
-        added_to_queue(false), 
-        terminate_requested(false) {}
+        action(qm_no_action) {}
 };
 
 manage_queue_data data;
@@ -277,13 +282,13 @@ void main(size_t worker_count)
         data.cond_thread_ready.notify_all();
     }
 
-    while (!data.terminate_requested)
+    while (data.action != qm_terminate_requested)
     {
         tprintf("waiting...");
         data.cond_queue.wait(lock);
-        if (data.added_to_queue)
+        if (data.action == qm_cell_added_to_queue)
         {
-            data.added_to_queue = false;
+            data.action = qm_no_action;
 
             mutex::scoped_lock wts_lock(wts.mtx);
             while (!wts.idle_wts.empty())
@@ -330,14 +335,14 @@ void add_cell(formula_cell* p)
     tprintf("adding to queue...");
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
     data.cells.push(p);
-    data.added_to_queue = true;
+    data.action = qm_cell_added_to_queue;
     data.cond_queue.notify_all();
 }
 
 void terminate()
 {
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
-    data.terminate_requested = true;
+    data.action = qm_terminate_requested;
     data.cond_queue.notify_all();
 }
 
