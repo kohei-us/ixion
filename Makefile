@@ -35,6 +35,7 @@ LDFLAGS=
 
 HEADERS= \
 	$(INCDIR)/cell.hpp \
+	$(INCDIR)/cell_queue_manager.hpp \
 	$(INCDIR)/depends_tracker.hpp \
 	$(INCDIR)/depth_first_search.hpp \
 	$(INCDIR)/formula_functions.hpp \
@@ -49,6 +50,7 @@ HEADERS= \
 OBJFILES= \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/cell.o \
+	$(OBJDIR)/cell_queue_manager.o \
 	$(OBJDIR)/lexer_tokens.o \
 	$(OBJDIR)/global.o \
 	$(OBJDIR)/formula_functions.o \
@@ -73,6 +75,9 @@ $(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(DEPENDS)
 
 $(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell.cpp
+
+$(OBJDIR)/cell_queue_manager.o: $(SRCDIR)/cell_queue_manager.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell_queue_manager.cpp
 
 $(OBJDIR)/lexer_tokens.o: $(SRCDIR)/lexer_tokens.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/lexer_tokens.cpp
