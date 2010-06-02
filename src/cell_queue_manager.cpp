@@ -90,7 +90,7 @@ private:
 
 namespace ixion {
 
-namespace manage_queue {
+namespace {
 
 /**
  * Data for each worker thread.
@@ -261,7 +261,7 @@ void interpret_cell(worker_thread_data& wt)
 /**
  * Main queue manager thread routine.
  */
-void main(size_t worker_count)
+void manage_queue_main(size_t worker_count)
 {
     StackPrinter __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
@@ -320,7 +320,7 @@ void main(size_t worker_count)
     terminate_workers();
 }
 
-void add_cell(formula_cell* p)
+void add_cell_to_queue(formula_cell* p)
 {
     tprintf("adding to queue...");
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
@@ -329,7 +329,7 @@ void add_cell(formula_cell* p)
     data.cond_queue.notify_all();
 }
 
-void terminate()
+void terminate_queue_thread()
 {
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
     data.action = qm_terminate_requested;
@@ -346,18 +346,26 @@ void wait_init()
         data.cond_thread_ready.wait(lock);
 }
 
-} // namespace manage_queue
+thread thr_queue;
+
+} // anonymous namespace
 
 void cell_queue_manager::init(size_t thread_count)
 {
+    thread thr(::boost::bind(manage_queue_main, thread_count));
+    thr_queue.swap(thr);
+    wait_init();
 }
 
 void cell_queue_manager::add_cell(formula_cell* cell)
 {
+    add_cell_to_queue(cell);
 }
 
 void cell_queue_manager::terminate()
 {
+    terminate_queue_thread();
+    thr_queue.join();
 }
 
 }
