@@ -30,8 +30,8 @@ OBJDIR=./obj
 SRCDIR=./src
 INCDIR=./inc
 
-CPPFLAGS=-I$(INCDIR) -O2 -g -Wall -std=c++0x
-LDFLAGS=
+CPPFLAGS=-I$(INCDIR) -D_REENTRANT -O2 -g -Wall -std=c++0x
+LDFLAGS=-lboost_thread
 
 HEADERS= \
 	$(INCDIR)/cell.hpp \

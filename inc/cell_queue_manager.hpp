@@ -28,16 +28,44 @@
 #ifndef __IXION_CELL_QUEUE_MANAGER_HPP__
 #define __IXION_CELL_QUEUE_MANAGER_HPP__
 
+#include <cstdlib>
+
 namespace ixion {
 
 class formula_cell;
 
 /**
- * This class manages parallel cell interpretation using threads.
+ * This class manages parallel cell interpretation using threads.  This 
+ * class should never be instantiated. 
  */
 class cell_queue_manager
 {
+public:
+    /**
+     * Initialize queue manager thread, with specified number of worker 
+     * threads. 
+     *  
+     * @param thread_count desired number of worker threads.
+     */
+    static void init(size_t thread_count);
+
+    /**
+     * Add new cell to queue to interpret. 
+     * 
+     * @param cell pointer to cell instance to interpret.
+     */
     static void add_cell(formula_cell* cell);
+
+    /**
+     * Terminate the queue manager thread, along with all spawned worker
+     * threads.
+     */
+    static void terminate();
+
+private:
+    cell_queue_manager();
+    cell_queue_manager(const cell_queue_manager& r);
+    ~cell_queue_manager();
 };
 
 }
