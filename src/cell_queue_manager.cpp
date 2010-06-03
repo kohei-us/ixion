@@ -141,14 +141,10 @@ struct worker_thread_status
 
 worker_thread_status wts;
 
-void interpret(formula_cell* cell)
-{
-}
-
 /**
  * Main worker thread routine.
  */
-void worker_main(worker_thread_data* data)
+void worker_main(worker_thread_data* data, const cell_ptr_name_map_t& names)
 {
     StackPrinter __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->action.mtx);
@@ -177,7 +173,7 @@ void worker_main(worker_thread_data* data)
         ostringstream os;
         os << "interpret cell " << data->action.cell;
         tprintf(os.str());
-        interpret(data->action.cell);
+        data->action.cell->interpret(names);
         data->action.cell = NULL;
     }
 }
@@ -212,14 +208,14 @@ struct manage_queue_data
 
 manage_queue_data data;
 
-void init_workers(size_t worker_count)
+void init_workers(size_t worker_count, const cell_ptr_name_map_t& names)
 {
     // Create specified number of worker threads.
     for (size_t i = 0; i < worker_count; ++i)
     {
         data.workers.push_back(new worker_thread_data);
         worker_thread_data& wt = data.workers.back();
-        wt.thr_main = thread(::boost::bind(worker_main, &wt));
+        wt.thr_main = thread(::boost::bind(worker_main, &wt, names));
     }
 
     // Wait until the worker threads become ready.
@@ -265,13 +261,13 @@ void interpret_cell(worker_thread_data& wt)
 /**
  * Main queue manager thread routine.
  */
-void manage_queue_main(size_t worker_count)
+void manage_queue_main(size_t worker_count, const cell_ptr_name_map_t& names)
 {
     StackPrinter __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
     {
         mutex::scoped_lock lock(data.mtx_thread_ready);
-        init_workers(worker_count);
+        init_workers(worker_count, names);
         data.thread_ready = true;
         data.cond_thread_ready.notify_all();
     }
@@ -354,9 +350,9 @@ thread thr_queue;
 
 } // anonymous namespace
 
-void cell_queue_manager::init(size_t thread_count)
+void cell_queue_manager::init(size_t thread_count, const cell_ptr_name_map_t& names)
 {
-    thread thr(::boost::bind(manage_queue_main, thread_count));
+    thread thr(::boost::bind(manage_queue_main, thread_count, names));
     thr_queue.swap(thr);
     wait_init();
 }

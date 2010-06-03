@@ -28,6 +28,8 @@
 #ifndef __IXION_CELL_QUEUE_MANAGER_HPP__
 #define __IXION_CELL_QUEUE_MANAGER_HPP__
 
+#include "global.hpp"
+
 #include <cstdlib>
 
 namespace ixion {
@@ -47,7 +49,7 @@ public:
      *  
      * @param thread_count desired number of worker threads.
      */
-    static void init(size_t thread_count);
+    static void init(size_t thread_count, const cell_ptr_name_map_t& names);
 
     /**
      * Add new cell to queue to interpret. 
