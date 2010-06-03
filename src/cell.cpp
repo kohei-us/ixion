@@ -28,9 +28,10 @@
 #include "cell.hpp"
 #include "formula_interpreter.hpp"
 
+#include <boost/thread.hpp>
+
 #include <string>
 #include <sstream>
-
 #include <cstdio>
 
 using namespace std;
@@ -97,6 +98,26 @@ formula_cell::result_cache::result_cache() : value(0.0) {}
 formula_cell::result_cache::result_cache(const result_cache& r) : 
     value(r.value), text(r.text) {}
 
+formula_cell::interpret_status::interpret_status() : 
+    cell_in_computation(NULL)
+{}
+
+formula_cell::interpret_guard::interpret_guard(interpret_status& status, const formula_cell* cell) :
+    m_status(status)
+{
+    ::boost::mutex::scoped_lock lock(m_status.mtx);
+    m_status.cell_in_computation = cell;
+    cout << "in computation" << endl;
+}
+
+formula_cell::interpret_guard::~interpret_guard()
+{
+    ::boost::mutex::scoped_lock lock(m_status.mtx);
+    m_status.cell_in_computation = NULL;
+    m_status.cond.notify_all();
+    cout << "out of computation" << endl;
+}
+
 formula_cell::formula_cell() :
     base_cell(celltype_formula),
     m_error(fe_no_error),
@@ -130,12 +151,31 @@ formula_cell::~formula_cell()
 
 double formula_cell::get_value() const
 {
+    {
+        // If this cell is still being interpreted, wait until the 
+        // interpretation is done.  Note that topological sort ensure that if
+        // the cell is not in the middle of interpretation it's in the wrong
+        // order, which most likely means circular reference.
+        ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+        while (m_interpret_status.cell_in_computation)
+        {
+            if (m_interpret_status.cell_in_computation == this)
+            {
+                // Referencing to itself is a reference error.
+                throw formula_error(fe_ref_result_not_available);
+            }
+
+            cout << "waiting" << endl;
+            m_interpret_status.cond.wait(lock);
+        }
+    }
+
     if (m_error != fe_no_error)
         // Error condition.
         throw formula_error(m_error);
 
     if (!mp_result)
-        // Result not cached yet.
+        // Result not cached yet.  Reference error.
         throw formula_error(fe_ref_result_not_available);
 
     return mp_result->value;
@@ -153,6 +193,8 @@ const formula_tokens_t& formula_cell::get_tokens() const
 
 void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
+    interpret_guard guard(m_interpret_status, this);
+
     formula_interpreter fin(get_tokens(), cell_ptr_name_map);
     if (fin.interpret())
         set_result(fin.get_result());

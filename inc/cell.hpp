@@ -30,7 +30,9 @@
 
 #include "formula_tokens.hpp"
 #include "global.hpp"
-#include "thread.hpp"
+
+#include <boost/thread/condition_variable.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <string>
 
@@ -104,6 +106,26 @@ class formula_cell : public base_cell
         result_cache();
         result_cache(const result_cache& r);
     };
+
+    struct interpret_status
+    {
+        ::boost::mutex mtx;
+        ::boost::condition_variable cond;
+        const formula_cell* cell_in_computation;
+        interpret_status();
+    };
+
+    class interpret_guard
+    {
+    public:
+        explicit interpret_guard(interpret_status& status, const formula_cell* cell);
+        ~interpret_guard();
+    private:
+        interpret_guard();
+
+        interpret_status& m_status;
+    };
+
 public:
     formula_cell();
     formula_cell(formula_tokens_t& tokens);
@@ -115,6 +137,8 @@ public:
     const formula_tokens_t& get_tokens() const;
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
     void swap_tokens(formula_tokens_t& tokens);
+
+private:
     void set_result(double result);
     void set_error(formula_error_t error);
 
@@ -122,6 +146,8 @@ private:
     formula_tokens_t    m_tokens;
     formula_error_t     m_error;
     result_cache*       mp_result;
+
+    mutable interpret_status    m_interpret_status;
 };
 
 // ============================================================================
