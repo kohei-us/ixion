@@ -215,6 +215,7 @@
 			<F N="inc/global.hpp"/>
 			<F N="inc/inputparser.hpp"/>
 			<F N="inc/lexer_tokens.hpp"/>
+			<F N="inc/thread.hpp"/>
 		</Folder>
 		<Folder Name="misc">
 			<F

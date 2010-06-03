@@ -25,11 +25,12 @@
  *
  ************************************************************************/
 
-#ifndef __CELL_HPP__
-#define __CELL_HPP__
+#ifndef __IXION_CELL_HPP__
+#define __IXION_CELL_HPP__
 
 #include "formula_tokens.hpp"
 #include "global.hpp"
+#include "thread.hpp"
 
 #include <string>
 
@@ -112,9 +113,11 @@ public:
     virtual double get_value() const;
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
+    void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
     void swap_tokens(formula_tokens_t& tokens);
     void set_result(double result);
     void set_error(formula_error_t error);
+
 private:
     formula_tokens_t    m_tokens;
     formula_error_t     m_error;

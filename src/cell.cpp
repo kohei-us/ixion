@@ -26,6 +26,7 @@
  ************************************************************************/
 
 #include "cell.hpp"
+#include "formula_interpreter.hpp"
 
 #include <string>
 #include <sstream>
@@ -148,6 +149,15 @@ const char* formula_cell::print() const
 const formula_tokens_t& formula_cell::get_tokens() const
 {
     return m_tokens;
+}
+
+void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
+{
+    formula_interpreter fin(get_tokens(), cell_ptr_name_map);
+    if (fin.interpret())
+        set_result(fin.get_result());
+    else
+        set_error(fin.get_error());
 }
 
 void formula_cell::swap_tokens(formula_tokens_t& tokens)

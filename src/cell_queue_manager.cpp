@@ -38,7 +38,11 @@
 #include <string>
 #include <sys/time.h>
 
-using namespace std;
+using ::std::string;
+using ::std::cout;
+using ::std::endl;
+using ::std::ostringstream;
+using ::std::queue;
 using ::boost::mutex;
 using ::boost::thread;
 using ::boost::condition_variable;
