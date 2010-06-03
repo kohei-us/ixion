@@ -208,7 +208,7 @@ private:
  * 
  * @return true if the conversion is successful, false otherwise.
  */
-bool parse_model_input(const string& fpath, const string& dotpath)
+bool parse_model_input(const string& fpath, const string& dotpath, bool use_thread)
 {
     StackPrinter __stack_printer__("ixion::parse_model_input");
     try
@@ -261,7 +261,7 @@ bool parse_model_input(const string& fpath, const string& dotpath)
         deptracker.print_dot_graph(dotpath);
 
 #if 1
-        deptracker.interpret_all_cells();
+        deptracker.interpret_all_cells(use_thread);
 #else
         // Sort the cells in order of dependency.
         vector<base_cell*> sorted_cells;

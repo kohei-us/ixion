@@ -140,9 +140,8 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 //  cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
-void depends_tracker::interpret_all_cells()
+void depends_tracker::interpret_all_cells(bool use_thread)
 {
-    bool use_thread = false;
     cell_interpreter handler(*mp_names, use_thread);
     if (use_thread)
         cell_queue_manager::init(4, *mp_names);

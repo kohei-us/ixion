@@ -59,6 +59,7 @@ int main (int argc, char** argv)
         /* These options set a flag. */
         {"verbose", no_argument,       &verbose_flag, 1},
         {"brief",   no_argument,       &verbose_flag, 0},
+        {"use-thread", no_argument, 0, 0},
         /* These options don't set a flag.
            We distinguish them by their indices. */
 //      {"add",     no_argument,       0, 'a'},
@@ -71,6 +72,7 @@ int main (int argc, char** argv)
 
     string model_list_path;
     string dotgraph_path;
+    bool use_thread = false;
 
     while (true)
     {
@@ -85,15 +87,24 @@ int main (int argc, char** argv)
         switch (c)
         {
             case 0:
+            {
                 /* If this option set a flag, do nothing else now. */
                 if (long_options[option_index].flag != 0)
                     break;
-                printf ("option %s", long_options[option_index].name);
-                if (optarg)
-                    printf (" with arg %s", optarg);
-                printf ("\n");
-                break;
 
+                const char* opt_name = long_options[option_index].name;
+
+                if (!strncmp(opt_name, "use-thread", 10))
+                    use_thread = true;
+                else
+                {
+                    printf ("option %s", opt_name);
+                    if (optarg)
+                        printf (" with arg %s", optarg);
+                    printf ("\n");
+                }
+                break;
+            }
             case 'h':
                 print_help();
                 exit(EXIT_SUCCESS);
@@ -129,7 +140,7 @@ int main (int argc, char** argv)
         cout << "----------------------------------------------------------------------" << endl;
         cout << "parsing " << fpath << endl;
         cout << "----------------------------------------------------------------------" << endl;
-        if (!parse_model_input(fpath, dotgraph_path))
+        if (!parse_model_input(fpath, dotgraph_path, use_thread))
         {
             cerr << "failed to parse " << fpath << endl;
             exit (EXIT_FAILURE);
