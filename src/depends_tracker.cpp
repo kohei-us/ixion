@@ -30,6 +30,7 @@
 #include "cell.hpp"
 #include "depth_first_search.hpp"
 #include "formula_interpreter.hpp"
+#include "cell_queue_manager.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -77,8 +78,8 @@ private:
 class cell_interpreter : public depth_first_search::cell_handler
 {
 public:
-    cell_interpreter(const cell_ptr_name_map_t& cell_names) :
-        m_cell_names(cell_names) {}
+    cell_interpreter(const cell_ptr_name_map_t& cell_names, bool use_thread) :
+        m_cell_names(cell_names), m_use_thread(use_thread) {}
 
     void operator() (base_cell* cell)
     {
@@ -86,9 +87,16 @@ public:
             // We can't interpret unless the cell contains formula tokens.
             return;
 
-        cout << "---------- interpreting " << get_cell_name(cell) << endl;
         formula_cell* fcell = static_cast<formula_cell*>(cell);
-        fcell->interpret(m_cell_names);
+        if (m_use_thread)
+        {
+            cell_queue_manager::add_cell(fcell);
+        }
+        else
+        {
+            cout << "---------- interpreting " << get_cell_name(cell) << endl;
+            fcell->interpret(m_cell_names);
+        }
     }
 
     string get_cell_name(const base_cell* p) const
@@ -100,6 +108,7 @@ public:
     }
 private:
     const cell_ptr_name_map_t& m_cell_names;
+    bool m_use_thread;
 };
 
 }
@@ -133,9 +142,16 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::interpret_all_cells()
 {
-    cell_interpreter handler(*mp_names);
+    bool use_thread = false;
+    cell_interpreter handler(*mp_names, use_thread);
+    if (use_thread)
+        cell_queue_manager::init(4, *mp_names);
+
     depth_first_search dfs(m_map, *mp_names, handler);
     dfs.run();
+
+    if (use_thread)
+        cell_queue_manager::terminate();
 }
 
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
