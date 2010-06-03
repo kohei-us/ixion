@@ -32,7 +32,8 @@
 
 #include <string>
 #include <sstream>
-#include <cstdio>
+
+#define DEBUG_FORMULA_CELL 0
 
 using namespace std;
 
@@ -107,7 +108,9 @@ formula_cell::interpret_guard::interpret_guard(interpret_status& status, const f
 {
     ::boost::mutex::scoped_lock lock(m_status.mtx);
     m_status.cell_in_computation = cell;
+#if DEBUG_FORMULA_CELL
     cout << "in computation" << endl;
+#endif
 }
 
 formula_cell::interpret_guard::~interpret_guard()
@@ -115,7 +118,9 @@ formula_cell::interpret_guard::~interpret_guard()
     ::boost::mutex::scoped_lock lock(m_status.mtx);
     m_status.cell_in_computation = NULL;
     m_status.cond.notify_all();
+#if DEBUG_FORMULA_CELL
     cout << "out of computation" << endl;
+#endif
 }
 
 formula_cell::formula_cell() :
@@ -207,7 +212,9 @@ void formula_cell::wait_for_interpreted_result() const
             throw formula_error(fe_ref_result_not_available);
         }
 
+#if DEBUG_FORMULA_CELL
         cout << "waiting" << endl;
+#endif
         m_interpret_status.cond.wait(lock);
     }
 }
