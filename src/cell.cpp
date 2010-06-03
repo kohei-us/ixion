@@ -151,24 +151,7 @@ formula_cell::~formula_cell()
 
 double formula_cell::get_value() const
 {
-    {
-        // If this cell is still being interpreted, wait until the 
-        // interpretation is done.  Note that topological sort ensure that if
-        // the cell is not in the middle of interpretation it's in the wrong
-        // order, which most likely means circular reference.
-        ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-        while (m_interpret_status.cell_in_computation)
-        {
-            if (m_interpret_status.cell_in_computation == this)
-            {
-                // Referencing to itself is a reference error.
-                throw formula_error(fe_ref_result_not_available);
-            }
-
-            cout << "waiting" << endl;
-            m_interpret_status.cond.wait(lock);
-        }
-    }
+    wait_for_interpreted_result();
 
     if (m_error != fe_no_error)
         // Error condition.
@@ -205,6 +188,28 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 void formula_cell::swap_tokens(formula_tokens_t& tokens)
 {
     m_tokens.swap(tokens);
+}
+
+void formula_cell::wait_for_interpreted_result() const
+{
+    // If this cell is still being interpreted, wait until the 
+    // interpretation is done.  Note that topological sort ensures that, if
+    // the cell is not in the middle of interpretation and the result is not
+    // yet available, it's in the wrong calculation order, which is most
+    // likely caused by circular reference.
+
+    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+    while (m_interpret_status.cell_in_computation)
+    {
+        if (m_interpret_status.cell_in_computation == this)
+        {
+            // Referencing to itself is a reference error.
+            throw formula_error(fe_ref_result_not_available);
+        }
+
+        cout << "waiting" << endl;
+        m_interpret_status.cond.wait(lock);
+    }
 }
 
 void formula_cell::set_result(double result)

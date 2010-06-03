@@ -139,6 +139,7 @@ public:
     void swap_tokens(formula_tokens_t& tokens);
 
 private:
+    void wait_for_interpreted_result() const;
     void set_result(double result);
     void set_error(formula_error_t error);
 
