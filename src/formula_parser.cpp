@@ -32,6 +32,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#define DEBUG_PARSER 0
+
 using namespace std;
 
 namespace ixion {
@@ -62,51 +64,56 @@ public:
     void operator() (const formula_token_base& token) const
     {
         fopcode_t oc = token.get_opcode();   
-        cout << " ";
-        cout << "<" << get_opcode_name(oc) << ">'";
+        ostringstream os;
+        os << " ";
+        os << "<" << get_opcode_name(oc) << ">'";
+
         switch (oc)
         {
             case fop_close:
-                cout << ")";
+                os << ")";
                 break;
             case fop_divide:
-                cout << "/";
+                os << "/";
                 break;
             case fop_err_no_ref:
                 break;
             case fop_minus:
-                cout << "-";
+                os << "-";
                 break;
             case fop_multiply:
-                cout << "*";
+                os << "*";
                 break;
             case fop_open:
-                cout << "(";
+                os << "(";
                 break;
             case fop_plus:
-                cout << "+";
+                os << "+";
                 break;
             case fop_sep:
-                cout << ",";
+                os << ",";
                 break;
             case fop_single_ref:
-                cout << get_cell_name(token.get_single_ref());
+                os << get_cell_name(token.get_single_ref());
                 break;
             case fop_string:
                 break;
             case fop_value:
-                cout << token.get_value();
+                os << token.get_value();
                 break;
             case fop_function:
             {
                 formula_function_t func_oc = formula_functions::get_function_opcode(token);
-                cout << formula_functions::get_function_name(func_oc);
+                os << formula_functions::get_function_name(func_oc);
             }
             break;
             default:
                 ;
         }
-        cout << "'";
+        os << "'";
+#if DEBUG_PARSER
+        cout << os.str();
+#endif
     }
 
 private:
@@ -176,19 +183,25 @@ void formula_parser::parse()
     }
     catch (const ref_error& e)
     {
+#if DEBUG_PARSER
         cout << "reference error: " << e.what() << endl;
+#endif
     }
     catch (const parse_error& e)
     {
+#if DEBUG_PARSER
         cout << "parse error: " << e.what() << endl;
+#endif
     }
 }
 
 void formula_parser::print_tokens() const
 {
+#if DEBUG_PARSER
     cout << "formula tokens:";
     for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer(*mp_cell_names));
     cout << endl;
+#endif
 }
 
 formula_tokens_t& formula_parser::get_tokens()
@@ -240,7 +253,9 @@ void formula_parser::name(const lexer_token_base& t)
     if (itr != mp_cell_names->end())
     {
         // This is a reference, either to a cell or to a name.
+#if DEBUG_PARSER
         cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
+#endif
         m_formula_tokens.push_back(new single_ref_token(itr->second));
         m_depend_cells.push_back(itr->second);
         return;
@@ -250,7 +265,9 @@ void formula_parser::name(const lexer_token_base& t)
     formula_function_t func_oc = formula_functions::get_function_opcode(name);
     if (func_oc != func_unknown)
     {
+#if DEBUG_PARSER
         cout << "'" << name << "' is a built-in function." << endl;
+#endif
         m_formula_tokens.push_back(new function_token(static_cast<size_t>(func_oc)));
         return;
     }
