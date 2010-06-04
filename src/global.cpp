@@ -33,6 +33,14 @@ using namespace std;
 
 namespace ixion {
 
+string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell)
+{
+    cell_ptr_name_map_t::const_iterator itr = names.find(cell);
+    return itr == names.end() ? string() : itr->second;
+}
+
+// ============================================================================
+
 general_error::general_error(const string& msg) :
     m_msg(msg)
 {

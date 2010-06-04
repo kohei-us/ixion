@@ -31,14 +31,18 @@
 #include "global.hpp"
 #include "formula_tokens.hpp"
 
+#include <sstream>
+
 #include <boost/noncopyable.hpp>
 
 namespace ixion {
 
+class formula_cell;
+
 class formula_interpreter : public ::boost::noncopyable
 {
 public:
-    formula_interpreter(const formula_tokens_t& tokens, const cell_ptr_name_map_t& ptr_name_map);
+    formula_interpreter(const formula_cell* cell, const cell_ptr_name_map_t& ptr_name_map);
     ~formula_interpreter();
 
     bool interpret();
@@ -66,10 +70,14 @@ private:
     double function();
 
 private:
+    const formula_cell*         m_parent_cell;
     const formula_tokens_t&     m_tokens;
     const cell_ptr_name_map_t&  m_ptr_name_map;
     formula_tokens_t::const_iterator m_cur_token_itr;
-    formula_tokens_t::const_iterator m_end_token_pos;;
+    formula_tokens_t::const_iterator m_end_token_pos;
+
+    ::std::ostringstream        m_outbuf; // output buffer (for debug purposes)
+
     double m_result;
     formula_error_t m_error;
 };

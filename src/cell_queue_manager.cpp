@@ -38,6 +38,8 @@
 #include <string>
 #include <sys/time.h>
 
+#define DEBUG_QUEUE_MANAGER 0
+
 using ::std::string;
 using ::std::cout;
 using ::std::endl;
@@ -54,9 +56,11 @@ mutex tprintf_mtx;
 
 void tprintf(const string& s)
 {
+#if DEBUG_QUEUE_MANAGER
     mutex::scoped_lock(tprintf_mtx);
     cout << s << endl;
     cout.flush();
+#endif
 }
 
 class StackPrinter
@@ -65,17 +69,21 @@ public:
     explicit StackPrinter(const char* msg) :
         msMsg(msg)
     {
+#if DEBUG_QUEUE_MANAGER
         string s = msg + string(": --begin");
         tprintf(s);
         mfStartTime = getTime();
+#endif
     }
 
     ~StackPrinter()
     {
+#if DEBUG_QUEUE_MANAGER
         double fEndTime = getTime();
         ostringstream os;
         os << msMsg << ": --end (durtion: " << (fEndTime-mfStartTime) << " sec)";
         tprintf(os.str());
+#endif
     }
 
 private:
@@ -170,9 +178,7 @@ void worker_main(worker_thread_data* data, const cell_ptr_name_map_t& names)
         if (!data->action.cell)
             continue;
 
-        ostringstream os;
-        os << "interpret cell " << data->action.cell;
-        tprintf(os.str());
+        cout << "interpret cell " << get_cell_name(names, data->action.cell) << " ----------------------" << endl;;
         data->action.cell->interpret(names);
         data->action.cell = NULL;
     }

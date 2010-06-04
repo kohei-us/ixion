@@ -48,8 +48,9 @@ public:
 
 }
 
-formula_interpreter::formula_interpreter(const formula_tokens_t& tokens, const cell_ptr_name_map_t& ptr_name_map) :
-    m_tokens(tokens),
+formula_interpreter::formula_interpreter(const formula_cell* cell, const cell_ptr_name_map_t& ptr_name_map) :
+    m_parent_cell(cell),
+    m_tokens(cell->get_tokens()),
     m_ptr_name_map(ptr_name_map),
     m_end_token_pos(m_tokens.end()),
     m_result(0.0),
@@ -76,19 +77,19 @@ bool formula_interpreter::interpret()
     try
     {
         m_result = expression();
-        cout << endl;
+        cout << m_outbuf.str() << endl;
         cout << "result = " << m_result << endl;
         return true;
     }
     catch (const invalid_expression& e)
     {
-        cout << endl;
+        cout << m_outbuf.str() << endl;
         cout << "invalid expression: " << e.what() << endl;
         m_error = fe_invalid_expression;
     }
     catch (const formula_error& e)
     {
-        cout << endl;
+        cout << m_outbuf.str() << endl;
         cout << "result = " << e.what() << endl;
         m_error = e.get_error();
     }
@@ -147,7 +148,7 @@ double formula_interpreter::expression()
         {
             case fop_plus:
             {
-                cout << "+";
+                m_outbuf << "+";
                 next();
                 double val2 = term();
                 val += val2;
@@ -155,7 +156,7 @@ double formula_interpreter::expression()
             break;
             case fop_minus:
             {
-                cout << "-";
+                m_outbuf << "-";
                 next();
                 double val2 = term();
                 val -= val2;
@@ -180,12 +181,12 @@ double formula_interpreter::term()
     switch (oc)
     {
         case fop_multiply:
-            cout << "*";
+            m_outbuf << "*";
             next();
             return val*term();
         case fop_divide:
         {
-            cout << "/";
+            m_outbuf << "/";
             next();
             double val2 = term();
             if (val2 == 0.0)
@@ -225,13 +226,13 @@ double formula_interpreter::factor()
 
 double formula_interpreter::paren()
 {
-    cout << "(";
+    m_outbuf << "(";
     next();
     double val = expression();
     if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
-    cout << ")";
+    m_outbuf << ")";
     next();
     return val;
 }
@@ -239,8 +240,12 @@ double formula_interpreter::paren()
 double formula_interpreter::variable()
 {
     const base_cell* pref = token().get_single_ref();
+    if (pref == m_parent_cell)
+        // self-referencing is not permitted.
+        throw formula_error(fe_ref_result_not_available);
+
     double val = pref->get_value();
-    cout << get_cell_name(pref);
+    m_outbuf << get_cell_name(pref);
     next();
     return val;
 }
@@ -248,7 +253,7 @@ double formula_interpreter::variable()
 double formula_interpreter::constant()
 {
     double val = token().get_value();
-    cout << val;
+    m_outbuf << val;
     next();
     return val;
 }
@@ -258,12 +263,12 @@ double formula_interpreter::function()
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     assert(token().get_opcode() == fop_function);
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
-    cout << formula_functions::get_function_name(func_oc);
+    m_outbuf << formula_functions::get_function_name(func_oc);
 
     if (next_token().get_opcode() != fop_open)
         throw invalid_expression("expecting a '(' after a function name.");
 
-    cout << "(";
+    m_outbuf << "(";
 
     vector<double> args;
     fopcode_t oc = next_token().get_opcode();
@@ -276,7 +281,7 @@ double formula_interpreter::function()
                 throw invalid_expression("argument separator is expected, but not found.");
             next();
             expect_sep = false;
-            cout << ",";
+            m_outbuf << ",";
         }
         else
         {
@@ -287,7 +292,7 @@ double formula_interpreter::function()
         oc = token().get_opcode();
     }
 
-    cout << ")";
+    m_outbuf << ")";
     next();
     return formula_functions::interpret(func_oc, args);
 }

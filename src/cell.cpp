@@ -183,7 +183,7 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
     interpret_guard guard(m_interpret_status, this);
 
-    formula_interpreter fin(get_tokens(), cell_ptr_name_map);
+    formula_interpreter fin(this, cell_ptr_name_map);
     if (fin.interpret())
         set_result(fin.get_result());
     else
@@ -197,21 +197,9 @@ void formula_cell::swap_tokens(formula_tokens_t& tokens)
 
 void formula_cell::wait_for_interpreted_result() const
 {
-    // If this cell is still being interpreted, wait until the 
-    // interpretation is done.  Note that topological sort ensures that, if
-    // the cell is not in the middle of interpretation and the result is not
-    // yet available, it's in the wrong calculation order, which is most
-    // likely caused by circular reference.
-
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     while (m_interpret_status.cell_in_computation)
     {
-        if (m_interpret_status.cell_in_computation == this)
-        {
-            // Referencing to itself is a reference error.
-            throw formula_error(fe_ref_result_not_available);
-        }
-
 #if DEBUG_FORMULA_CELL
         cout << "waiting" << endl;
 #endif
