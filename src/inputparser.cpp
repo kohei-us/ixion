@@ -49,6 +49,8 @@ using ::boost::assign::ptr_map_insert;
 #include <string>
 #include <sys/time.h>
 
+#define DEBUG_INPUT_PARSER 0
+
 namespace {
 
 class StackPrinter
@@ -149,7 +151,9 @@ void create_empty_formula_cells(
     // debug output.
     for (; itr != itr_end; ++itr)
     {    
+#if DEBUG_INPUT_PARSER
         cout << itr->first << " := " << itr->second << endl;
+#endif
         ptr_name_map.insert(_ptrname_type::value_type(itr->second, itr->first));
     }
 }
@@ -168,7 +172,9 @@ public:
             // We can't interpret unless the cell contains formula tokens.
             return;
 
+#if DEBUG_INPUT_PARSER
         cout << "---------- interpreting " << get_cell_name(cell) << endl;
+#endif
         formula_cell* fcell = static_cast<formula_cell*>(cell);
         fcell->interpret(m_cell_ptr_name_map);
     }
@@ -210,7 +216,9 @@ private:
  */
 bool parse_model_input(const string& fpath, const string& dotpath, bool use_thread)
 {
+#if DEBUG_INPUT_PARSER
     StackPrinter __stack_printer__("ixion::parse_model_input");
+#endif
     try
     {
         // Read the model definition file, and parse the model cells. The
@@ -232,8 +240,9 @@ bool parse_model_input(const string& fpath, const string& dotpath, bool use_thre
         for (; itr_cell != itr_cell_end; ++itr_cell)
         {   
             const model_parser::cell& cell = *itr_cell;
+#if DEBUG_INPUT_PARSER
             cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
-
+#endif
             // Parse the lexer tokens and turn them into formula tokens.
             formula_parser fparser(cell.get_tokens(), &cell_name_ptr_map);
             fparser.parse();
@@ -398,8 +407,10 @@ void model_parser::parse()
                     lexer_tokens_t tokens;
                     lexer.swap_tokens(tokens);
 
+#if DEBUG_INPUT_PARSER
                     // test-print tokens.
                     cout << "tokens from lexer: " << print_tokens(tokens, true) << endl;
+#endif
 
                     cell fcell(name, tokens);
                     fcells.push_back(fcell);
