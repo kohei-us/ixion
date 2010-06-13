@@ -142,15 +142,20 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::interpret_all_cells(bool use_thread)
 {
-    cell_interpreter handler(*mp_names, use_thread);
     if (use_thread)
+    {
+        cell_interpreter handler(*mp_names, true);
         cell_queue_manager::init(4, *mp_names);
-
-    depth_first_search dfs(m_map, *mp_names, handler);
-    dfs.run();
-
-    if (use_thread)
+        depth_first_search dfs(m_map, *mp_names, handler);
+        dfs.run();
         cell_queue_manager::terminate();
+    }
+    else
+    {
+        cell_interpreter handler(*mp_names, false);
+        depth_first_search dfs(m_map, *mp_names, handler);
+        dfs.run();
+    }
 }
 
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const

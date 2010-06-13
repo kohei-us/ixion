@@ -59,7 +59,7 @@ int main (int argc, char** argv)
         /* These options set a flag. */
         {"verbose", no_argument,       &verbose_flag, 1},
         {"brief",   no_argument,       &verbose_flag, 0},
-        {"thread", no_argument, 0, 0},
+        {"thread", no_argument, 0, 't'},
         /* These options don't set a flag.
            We distinguish them by their indices. */
 //      {"add",     no_argument,       0, 'a'},
@@ -78,7 +78,7 @@ int main (int argc, char** argv)
     {
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        int c = getopt_long (argc, argv, "hc:d:l:", long_options, &option_index);
+        int c = getopt_long (argc, argv, "htc:d:l:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -94,15 +94,10 @@ int main (int argc, char** argv)
 
                 const char* opt_name = long_options[option_index].name;
 
-                if (!strncmp(opt_name, "thread", 6))
-                    use_thread = true;
-                else
-                {
-                    printf ("option %s", opt_name);
-                    if (optarg)
-                        printf (" with arg %s", optarg);
-                    printf ("\n");
-                }
+                printf ("option %s", opt_name);
+                if (optarg)
+                    printf (" with arg %s", optarg);
+                printf ("\n");
                 break;
             }
             case 'h':
@@ -111,6 +106,9 @@ int main (int argc, char** argv)
 
             case 'c':
                 printf ("option -c with value `%s'\n", optarg);
+                break;
+            case 't':
+                use_thread = true;
                 break;
 
             case 'd':
