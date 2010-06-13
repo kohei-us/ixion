@@ -94,7 +94,7 @@ public:
         }
         else
         {
-            cout << "---------- interpreting " << get_cell_name(cell) << endl;
+//          cout << "---------- interpreting " << get_cell_name(cell) << endl;
             fcell->interpret(m_cell_names);
         }
     }

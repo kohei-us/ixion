@@ -59,7 +59,7 @@ int main (int argc, char** argv)
         /* These options set a flag. */
         {"verbose", no_argument,       &verbose_flag, 1},
         {"brief",   no_argument,       &verbose_flag, 0},
-        {"use-thread", no_argument, 0, 0},
+        {"thread", no_argument, 0, 0},
         /* These options don't set a flag.
            We distinguish them by their indices. */
 //      {"add",     no_argument,       0, 'a'},
@@ -94,7 +94,7 @@ int main (int argc, char** argv)
 
                 const char* opt_name = long_options[option_index].name;
 
-                if (!strncmp(opt_name, "use-thread", 10))
+                if (!strncmp(opt_name, "thread", 6))
                     use_thread = true;
                 else
                 {

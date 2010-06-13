@@ -179,7 +179,7 @@ void worker_main(worker_thread_data* data, const cell_ptr_name_map_t& names)
         if (!data->action.cell)
             continue;
 
-        cout << "interpret cell " << get_cell_name(names, data->action.cell) << " ----------------------" << endl;;
+//      cout << "interpret cell " << get_cell_name(names, data->action.cell) << " ----------------------" << endl;;
         data->action.cell->interpret(names);
         data->action.cell = NULL;
     }
