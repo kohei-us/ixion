@@ -34,6 +34,7 @@
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <iostream>
 #include <queue>
 #include <string>
 #include <sys/time.h>
