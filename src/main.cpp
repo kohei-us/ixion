@@ -129,8 +129,8 @@ int main (int argc, char** argv)
         }
     }
 
-    if (verbose_flag)
-        puts ("verbose flag is set");
+    if (use_thread)
+        cout << "Using threads" << endl;
 
     for (int i = optind; i < argc; ++i)
     {
