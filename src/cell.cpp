@@ -190,7 +190,14 @@ const formula_tokens_t& formula_cell::get_tokens() const
 
 void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
-    assert(!m_interpret_status.result);
+    if (m_interpret_status.result)
+    {
+        // When the result is already cached before the cell is interpreted, 
+        // it can only mean the cell has circular dependency.
+        assert(m_interpret_status.result->error != fe_no_error);
+        cout << "cell " << get_cell_name(cell_ptr_name_map, this) << " has error: " << get_formula_error_name(m_interpret_status.result->error) << endl;
+        return;
+    }
 
     interpret_guard guard(m_interpret_status);
     m_interpret_status.result = new result_cache;
@@ -204,6 +211,11 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
         m_interpret_status.result->error = fin.get_error();
 }
 
+bool formula_cell::is_circular_safe() const
+{
+    return m_circular_safe;
+}
+
 void formula_cell::check_circular()
 {
     // TODO: Check to make sure this is being run on the main thread only.
@@ -212,12 +224,25 @@ void formula_cell::check_circular()
     for (; itr != itr_end; ++itr)
     {
         fopcode_t op = itr->get_opcode();
-        if (op == fop_single_ref)
+        if (op != fop_single_ref)
+            continue;
+
+        const base_cell* ref = itr->get_single_ref();
+        if (ref->get_celltype() != celltype_formula)
+            continue;
+
+        if (!static_cast<const formula_cell*>(ref)->is_circular_safe())
         {
-            const base_cell* ref = itr->get_single_ref();
-            // TODO: continue from here.
+            // Circular dependency detected !!
+            cout << "circular dependency detected !!" << endl;
+            assert(!m_interpret_status.result);
+            m_interpret_status.result = new result_cache;
+            m_interpret_status.result->error = fe_ref_result_not_available;
+            return;
         }
     }
+
+    // No circular dependencies.  Good.
     m_circular_safe = true;
 }
 

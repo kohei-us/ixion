@@ -141,6 +141,7 @@ public:
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
+    bool is_circular_safe() const;
     void check_circular();
     void reset();
     void swap_tokens(formula_tokens_t& tokens);

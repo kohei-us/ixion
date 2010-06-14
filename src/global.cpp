@@ -47,6 +47,21 @@ double get_current_time()
     return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
+const char* get_formula_error_name(formula_error_t fe)
+{
+    static const char* names[] = {
+        "",        // no error
+        "#REF!",   // result not available
+        "#DIV/0!", // division by zero
+        "#NUM!"    // invalid expression
+    };
+    static const size_t name_size = 4;
+    if (static_cast<size_t>(fe) < name_size)
+        return names[fe];
+
+    return "#ERR!";
+}
+
 // ============================================================================
 
 general_error::general_error(const string& msg) :
@@ -76,16 +91,7 @@ formula_error::~formula_error() throw()
 
 const char* formula_error::what() const throw()
 {
-    switch (m_ferror)
-    {
-        case fe_ref_result_not_available:
-            return "#REF!";
-        case fe_division_by_zero:
-            return "#DIV/0!";
-        default:
-            ;
-    }
-    return "#ERR!";
+    return get_formula_error_name(m_ferror);
 }
 
 formula_error_t formula_error::get_error() const

@@ -69,10 +69,7 @@ struct cell_reset_handler : public unary_function<base_cell*, void>
 {
     void operator() (base_cell* p) const
     {
-        if (p->get_celltype() != celltype_formula)
-            // not a formula cell.
-            return;
-
+        assert(p->get_celltype() == celltype_formula);
         static_cast<formula_cell*>(p)->reset();
     }
 };
@@ -81,11 +78,18 @@ struct circular_check_handler : public unary_function<base_cell*, void>
 {
     void operator() (base_cell* p) const
     {
-        if (p->get_celltype() != celltype_formula)
-            // not a formula cell.
-            return;
-
+        assert(p->get_celltype() == celltype_formula);
         static_cast<formula_cell*>(p)->check_circular();
+    }
+};
+
+struct thread_queue_handler : public unary_function<base_cell*, void>
+{
+    void operator() (base_cell* p) const
+    {
+        assert(p->get_celltype() == celltype_formula);
+        formula_cell* fcell = static_cast<formula_cell*>(p);
+        cell_queue_manager::add_cell(fcell);
     }
 };
 
@@ -187,11 +191,10 @@ void depends_tracker::interpret_all_cells(bool use_thread)
         cout << "Check circular dependencies --------------------------------" << endl;
         for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
 
-//      cell_interpreter handler(*mp_names, true);
-//      cell_queue_manager::init(4, *mp_names);
-//      depth_first_search dfs(m_map, *mp_names, handler);
-//      dfs.run();
-//      cell_queue_manager::terminate();
+        // Finally, interpret cells in topological order using threads.
+        cell_queue_manager::init(4, *mp_names);
+        for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler());
+        cell_queue_manager::terminate();
     }
     else
     {

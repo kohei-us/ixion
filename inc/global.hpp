@@ -65,6 +65,8 @@ enum formula_error_t
     fe_invalid_expression
 };
 
+const char* get_formula_error_name(formula_error_t fe);
+
 // ============================================================================
 
 class formula_error : public ::std::exception
