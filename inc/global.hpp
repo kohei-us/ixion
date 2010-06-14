@@ -41,6 +41,8 @@ typedef ::std::unordered_map<const base_cell*, ::std::string>   cell_ptr_name_ma
 
 ::std::string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell);
 
+double get_current_time();
+
 // ============================================================================
 
 class general_error : public ::std::exception

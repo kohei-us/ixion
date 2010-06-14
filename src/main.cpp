@@ -135,6 +135,7 @@ int main (int argc, char** argv)
     for (int i = optind; i < argc; ++i)
     {
         string fpath = argv[i];
+        double start_time = get_current_time();
         cout << "----------------------------------------------------------------------" << endl;
         cout << "parsing " << fpath << endl;
         cout << "----------------------------------------------------------------------" << endl;
@@ -143,6 +144,8 @@ int main (int argc, char** argv)
             cerr << "failed to parse " << fpath << endl;
             exit (EXIT_FAILURE);
         }
+
+        cout << "(duration: " << get_current_time() - start_time << " sec)" << endl;
     }
 }
 

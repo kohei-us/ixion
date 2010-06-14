@@ -28,6 +28,7 @@
 #include "global.hpp"
 
 #include <sstream>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -37,6 +38,13 @@ string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell)
 {
     cell_ptr_name_map_t::const_iterator itr = names.find(cell);
     return itr == names.end() ? string() : itr->second;
+}
+
+double get_current_time()
+{
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
 // ============================================================================
