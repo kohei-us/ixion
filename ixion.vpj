@@ -41,7 +41,7 @@
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine="make test"/>
+				<Exec CmdLine="make"/>
 			</Target>
 			<Target
 				Name="Rebuild"
@@ -50,7 +50,7 @@
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine=""/>
+				<Exec CmdLine="make"/>
 			</Target>
 			<Target
 				Name="Debug"
@@ -130,7 +130,7 @@
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine="make test"/>
+				<Exec CmdLine="make"/>
 			</Target>
 			<Target
 				Name="Rebuild"
@@ -139,7 +139,7 @@
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine=""/>
+				<Exec CmdLine="make"/>
 			</Target>
 			<Target
 				Name="Debug"

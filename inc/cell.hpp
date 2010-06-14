@@ -102,6 +102,7 @@ class formula_cell : public base_cell
     {
         double          value;
         ::std::string   text;
+        formula_error_t error;
 
         result_cache();
         result_cache(const result_cache& r);
@@ -111,14 +112,18 @@ class formula_cell : public base_cell
     {
         ::boost::mutex mtx;
         ::boost::condition_variable cond;
-        const formula_cell* cell_in_computation;
+
+        result_cache* result;
+
         interpret_status();
+        interpret_status(const interpret_status& r);
+        ~interpret_status();
     };
 
     class interpret_guard
     {
     public:
-        explicit interpret_guard(interpret_status& status, const formula_cell* cell);
+        explicit interpret_guard(interpret_status& status);
         ~interpret_guard();
     private:
         interpret_guard();
@@ -136,19 +141,19 @@ public:
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
+    void check_circular();
+    void reset();
     void swap_tokens(formula_tokens_t& tokens);
 
 private:
     void wait_for_interpreted_result() const;
-    void set_result(double result);
-    void set_error(formula_error_t error);
 
 private:
     formula_tokens_t    m_tokens;
-    formula_error_t     m_error;
-    result_cache*       mp_result;
 
     mutable interpret_status    m_interpret_status;
+
+    bool m_circular_safe;
 };
 
 // ============================================================================

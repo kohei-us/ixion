@@ -61,6 +61,34 @@ private:
     const cell_ptr_name_map_t* mp_names;
 };
 
+/**
+ * Function object to reset the status of formula cell to pre-interpretation
+ * status.
+ */
+struct cell_reset_handler : public unary_function<base_cell*, void>
+{
+    void operator() (base_cell* p) const
+    {
+        if (p->get_celltype() != celltype_formula)
+            // not a formula cell.
+            return;
+
+        static_cast<formula_cell*>(p)->reset();
+    }
+};
+
+struct circular_check_handler : public unary_function<base_cell*, void>
+{
+    void operator() (base_cell* p) const
+    {
+        if (p->get_celltype() != celltype_formula)
+            // not a formula cell.
+            return;
+
+        static_cast<formula_cell*>(p)->check_circular();
+    }
+};
+
 class cell_back_inserter : public depth_first_search::cell_handler
 {
 public:
@@ -144,11 +172,26 @@ void depends_tracker::interpret_all_cells(bool use_thread)
 {
     if (use_thread)
     {
-        cell_interpreter handler(*mp_names, true);
-        cell_queue_manager::init(4, *mp_names);
-        depth_first_search dfs(m_map, *mp_names, handler);
-        dfs.run();
-        cell_queue_manager::terminate();
+        vector<base_cell*> sorted_cells;
+        topo_sort_cells(sorted_cells);
+
+        cout << "Topologically sorted cells ---------------------------------" << endl;
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
+
+        // Reset cell status.
+        cout << "Reset cell status ------------------------------------------" << endl;
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
+
+        // First, detect circular dependencies and mark those circular 
+        // dependent cells with appropriate error flags.
+        cout << "Check circular dependencies --------------------------------" << endl;
+        for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
+
+//      cell_interpreter handler(*mp_names, true);
+//      cell_queue_manager::init(4, *mp_names);
+//      depth_first_search dfs(m_map, *mp_names, handler);
+//      dfs.run();
+//      cell_queue_manager::terminate();
     }
     else
     {
@@ -163,10 +206,6 @@ void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
     cell_back_inserter handler(sorted_cells);
     depth_first_search dfs(m_map, *mp_names, handler);
     dfs.run();
-//  dfs.swap_sorted_cells(sorted_cells);
-
-    cout << "topologically sorted cells ---------------------------------" << endl;
-    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
 }
 
 void depends_tracker::print_dot_graph(const string& dotpath) const

@@ -33,7 +33,7 @@
 #include <string>
 #include <sstream>
 
-#define DEBUG_FORMULA_CELL 0
+#define DEBUG_FORMULA_CELL 1
 
 using namespace std;
 
@@ -95,45 +95,57 @@ const char* string_cell::print() const
 
 // ============================================================================
 
-formula_cell::result_cache::result_cache() : value(0.0) {}
+formula_cell::result_cache::result_cache() : value(0.0), error(fe_no_error) {}
 formula_cell::result_cache::result_cache(const result_cache& r) : 
-    value(r.value), text(r.text) {}
+    value(r.value), text(r.text), error(r.error) {}
 
 formula_cell::interpret_status::interpret_status() : 
-    cell_in_computation(NULL)
+    result(NULL)
 {}
 
-formula_cell::interpret_guard::interpret_guard(interpret_status& status, const formula_cell* cell) :
+formula_cell::interpret_status::interpret_status(const interpret_status& r) :
+    result(NULL)
+{
+    if (r.result)
+        result = new result_cache(*r.result);
+}
+
+formula_cell::interpret_status::~interpret_status()
+{
+    delete result;
+}
+
+// ============================================================================
+
+formula_cell::interpret_guard::interpret_guard(interpret_status& status) :
     m_status(status)
 {
     ::boost::mutex::scoped_lock lock(m_status.mtx);
-    m_status.cell_in_computation = cell;
 #if DEBUG_FORMULA_CELL
-    cout << "in computation" << endl;
+    cout << "locked" << endl;
 #endif
 }
 
 formula_cell::interpret_guard::~interpret_guard()
 {
     ::boost::mutex::scoped_lock lock(m_status.mtx);
-    m_status.cell_in_computation = NULL;
     m_status.cond.notify_all();
 #if DEBUG_FORMULA_CELL
-    cout << "out of computation" << endl;
+    cout << "unlocked" << endl;
 #endif
 }
 
+// ============================================================================
+
 formula_cell::formula_cell() :
     base_cell(celltype_formula),
-    m_error(fe_no_error),
-    mp_result(NULL)
+    m_circular_safe(false)
 {
 }
 
 formula_cell::formula_cell(formula_tokens_t& tokens) :
     base_cell(celltype_formula),
-    m_error(fe_no_error),
-    mp_result(NULL)
+    m_circular_safe(false)
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
@@ -142,31 +154,28 @@ formula_cell::formula_cell(formula_tokens_t& tokens) :
 formula_cell::formula_cell(const formula_cell& r) :
     base_cell(r),
     m_tokens(r.m_tokens),
-    m_error(r.m_error),
-    mp_result(NULL)
+    m_interpret_status(r.m_interpret_status),
+    m_circular_safe(r.m_circular_safe)
 {
-    if (r.mp_result)
-        mp_result = new result_cache(*r.mp_result);
 }
 
 formula_cell::~formula_cell()
 {
-    delete mp_result;
 }
 
 double formula_cell::get_value() const
 {
     wait_for_interpreted_result();
 
-    if (m_error != fe_no_error)
-        // Error condition.
-        throw formula_error(m_error);
-
-    if (!mp_result)
+    if (!m_interpret_status.result)
         // Result not cached yet.  Reference error.
         throw formula_error(fe_ref_result_not_available);
 
-    return mp_result->value;
+    if (m_interpret_status.result->error != fe_no_error)
+        // Error condition.
+        throw formula_error(m_interpret_status.result->error);
+
+    return m_interpret_status.result->value;
 }
 
 const char* formula_cell::print() const
@@ -181,13 +190,43 @@ const formula_tokens_t& formula_cell::get_tokens() const
 
 void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
-    interpret_guard guard(m_interpret_status, this);
+    assert(!m_interpret_status.result);
 
+    interpret_guard guard(m_interpret_status);
+    m_interpret_status.result = new result_cache;
     formula_interpreter fin(this, cell_ptr_name_map);
     if (fin.interpret())
-        set_result(fin.get_result());
+    {
+        m_interpret_status.result->value = fin.get_result();
+        m_interpret_status.result->text.clear();
+    }
     else
-        set_error(fin.get_error());
+        m_interpret_status.result->error = fin.get_error();
+}
+
+void formula_cell::check_circular()
+{
+    // TODO: Check to make sure this is being run on the main thread only.
+
+    formula_tokens_t::iterator itr = m_tokens.begin(), itr_end = m_tokens.end();
+    for (; itr != itr_end; ++itr)
+    {
+        fopcode_t op = itr->get_opcode();
+        if (op == fop_single_ref)
+        {
+            const base_cell* ref = itr->get_single_ref();
+            // TODO: continue from here.
+        }
+    }
+    m_circular_safe = true;
+}
+
+void formula_cell::reset()
+{
+    interpret_guard guard(m_interpret_status);
+    delete m_interpret_status.result;
+    m_interpret_status.result = NULL;
+    m_circular_safe = false;
 }
 
 void formula_cell::swap_tokens(formula_tokens_t& tokens)
@@ -198,27 +237,13 @@ void formula_cell::swap_tokens(formula_tokens_t& tokens)
 void formula_cell::wait_for_interpreted_result() const
 {
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-    while (m_interpret_status.cell_in_computation)
+    while (!m_interpret_status.result)
     {
 #if DEBUG_FORMULA_CELL
         cout << "waiting" << endl;
 #endif
         m_interpret_status.cond.wait(lock);
     }
-}
-
-void formula_cell::set_result(double result)
-{
-    if (!mp_result)
-        mp_result = new result_cache;
-
-    mp_result->value = result;
-    mp_result->text.clear();
-}
-
-void formula_cell::set_error(formula_error_t error)
-{
-    m_error = error;
 }
 
 }
