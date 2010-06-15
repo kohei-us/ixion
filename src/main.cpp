@@ -138,7 +138,7 @@ int main (int argc, char** argv)
 
     if (thread_count > 0)
     {
-        cout << "Using threads" << endl;
+        cout << "Using " << thread_count << " threads" << endl;
         cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
     }
 
