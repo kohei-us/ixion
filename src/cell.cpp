@@ -118,30 +118,6 @@ formula_cell::interpret_status::~interpret_status()
 
 // ============================================================================
 
-formula_cell::interpret_guard::interpret_guard(interpret_status& status, const string& cell_name) :
-    m_status(status),
-    m_cell_name(cell_name)
-{
-    ::boost::mutex::scoped_lock lock(m_status.mtx);
-#if DEBUG_FORMULA_CELL
-    ostringstream os;
-    os << m_cell_name << " locked" << endl;
-    cout << os.str();
-#endif
-}
-
-formula_cell::interpret_guard::~interpret_guard()
-{
-    ::boost::mutex::scoped_lock lock(m_status.mtx);
-#if DEBUG_FORMULA_CELL
-    ostringstream os;
-    os << m_cell_name << " unlocked" << endl;
-    cout << os.str();
-#endif
-}
-
-// ============================================================================
-
 formula_cell::formula_cell() :
     base_cell(celltype_formula),
     m_circular_safe(false)
@@ -171,10 +147,6 @@ formula_cell::~formula_cell()
 double formula_cell::get_value() const
 {
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-#if DEBUG_FORMULA_CELL
-    ostringstream os;
-#endif
-
     wait_for_interpreted_result(lock);
 
     if (!m_interpret_status.result)
@@ -185,10 +157,6 @@ double formula_cell::get_value() const
         // Error condition.
         throw formula_error(m_interpret_status.result->error);
 
-#if DEBUG_FORMULA_CELL
-    os << "returning value of " << m_interpret_status.result->value << endl;
-    cout << os.str();
-#endif
     return m_interpret_status.result->value;
 }
 
@@ -204,52 +172,38 @@ const formula_tokens_t& formula_cell::get_tokens() const
 
 void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
-    string cell_name = get_cell_name(cell_ptr_name_map, this);
-    interpret_guard guard(m_interpret_status, cell_name);
-
-    if (m_interpret_status.result)
     {
-        // When the result is already cached before the cell is interpreted, 
-        // it can only mean the cell has circular dependency.
-        assert(m_interpret_status.result->error != fe_no_error);
-        ostringstream os;
-        os << get_formula_result_output_separator() << endl;
-        os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->error) << endl;
-        cout << os.str();
-        return;
-    }
+        ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
 
-#if DEBUG_FORMULA_CELL
-    ostringstream os;
-    os << cell_name << " is being interpreted" << endl;
-    cout << os.str();
-    os.clear();
-#endif
-
-    formula_interpreter fin(this, cell_ptr_name_map);
-    result_cache result;
-    if (fin.interpret())
-    {
-        // Successful interpretation.
-        result.value = fin.get_result();
-        result.text.clear();
+        string cell_name = get_cell_name(cell_ptr_name_map, this);
+    
+        if (m_interpret_status.result)
+        {
+            // When the result is already cached before the cell is interpreted, 
+            // it can only mean the cell has circular dependency.
+            assert(m_interpret_status.result->error != fe_no_error);
+            ostringstream os;
+            os << get_formula_result_output_separator() << endl;
+            os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->error) << endl;
+            cout << os.str();
+            return;
+        }
+    
+        formula_interpreter fin(this, cell_ptr_name_map);
+        m_interpret_status.result = new result_cache;
+        if (fin.interpret())
+        {
+            // Successful interpretation.
+            m_interpret_status.result->value = fin.get_result();
+            m_interpret_status.result->text.clear();
+        }
+        else
+        {
+            // Interpretation ended with an error condition.
+            m_interpret_status.result->error = fin.get_error();
+        }
     }
-    else
-    {
-        // Interpretation ended with an error condition.
-        result.error = fin.get_error();
-    }
-
-    // The result pointer being non-NULL indicates the availability of the 
-    // interpretation result.  So this must be done atomically.
-    m_interpret_status.result = new result_cache(result);
     m_interpret_status.cond.notify_all();
-
-#if DEBUG_FORMULA_CELL
-    os << cell_name << " interpretation finished" << endl;
-    cout << os.str();
-    os.clear();
-#endif
 }
 
 bool formula_cell::is_circular_safe() const
@@ -276,7 +230,9 @@ void formula_cell::check_circular()
         {
             // Circular dependency detected !!
 #if DEBUG_FORMULA_CELL
-            cout << "circular dependency detected !!" << endl;
+            ostringstream os;
+            os << "circular dependency detected !!" << endl;
+            cout << os.str();
 #endif
             assert(!m_interpret_status.result);
             m_interpret_status.result = new result_cache;
@@ -291,8 +247,8 @@ void formula_cell::check_circular()
 
 void formula_cell::reset(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
+    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     string cell_name = get_cell_name(cell_ptr_name_map, this);
-    interpret_guard guard(m_interpret_status, cell_name);
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
     m_circular_safe = false;

@@ -121,18 +121,6 @@ class formula_cell : public base_cell
         ~interpret_status();
     };
 
-    class interpret_guard : public ::boost::noncopyable
-    {
-    public:
-        explicit interpret_guard(interpret_status& status, const ::std::string& cell_name);
-        ~interpret_guard();
-    private:
-        interpret_guard();
-
-        interpret_status& m_status;
-        const ::std::string& m_cell_name;
-    };
-
 public:
     formula_cell();
     formula_cell(formula_tokens_t& tokens);
