@@ -34,6 +34,8 @@
 #include <string>
 #include <iostream>
 
+#include <boost/thread.hpp>
+
 using namespace std;
 using namespace ixion;
 
@@ -130,7 +132,10 @@ int main (int argc, char** argv)
     }
 
     if (use_thread)
+    {
         cout << "Using threads" << endl;
+        cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
+    }
 
     for (int i = optind; i < argc; ++i)
     {
