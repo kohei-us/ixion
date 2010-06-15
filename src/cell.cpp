@@ -196,7 +196,11 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
         // When the result is already cached before the cell is interpreted, 
         // it can only mean the cell has circular dependency.
         assert(m_interpret_status.result->error != fe_no_error);
-        cout << "cell " << get_cell_name(cell_ptr_name_map, this) << " has error: " << get_formula_error_name(m_interpret_status.result->error) << endl;
+        ostringstream os;
+        string cell_name = get_cell_name(cell_ptr_name_map, this);
+        os << get_formula_result_output_separator() << endl;
+        os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->error) << endl;
+        cout << os.str();
         return;
     }
 

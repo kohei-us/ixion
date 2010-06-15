@@ -74,25 +74,26 @@ bool formula_interpreter::interpret()
     m_error = fe_no_error;
     m_result = 0.0;
     m_outbuf.clear();
-    m_outbuf << "interpreting cell " << get_cell_name(m_parent_cell) << " ---------------------" << endl;
-
+    string cell_name = get_cell_name(m_parent_cell);
+    m_outbuf << get_formula_result_output_separator() << endl;
+    m_outbuf << cell_name << ": ";
     try
     {
         m_result = expression();
-        m_outbuf << endl << "result = " << m_result << endl;
+        m_outbuf << endl << cell_name << ": result = " << m_result << endl;
         cout << m_outbuf.str();
         return true;
     }
     catch (const invalid_expression& e)
     {
-        m_outbuf << endl << "invalid expression: " << e.what() << endl;
+        m_outbuf << endl << cell_name << ": invalid expression: " << e.what() << endl;
         cout << m_outbuf.str();
         m_error = fe_invalid_expression;
     }
     catch (const formula_error& e)
     {
         m_outbuf << endl << "result = " << e.what() << endl;
-        cout << m_outbuf.str();
+        cout <<  m_outbuf.str();
         m_error = e.get_error();
     }
     return false;

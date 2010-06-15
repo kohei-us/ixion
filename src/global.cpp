@@ -34,6 +34,13 @@ using namespace std;
 
 namespace ixion {
 
+const char* get_formula_result_output_separator()
+{
+    static const char* sep = 
+        "---------------------------------------------------------";
+    return sep;
+}
+
 string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell)
 {
     cell_ptr_name_map_t::const_iterator itr = names.find(cell);

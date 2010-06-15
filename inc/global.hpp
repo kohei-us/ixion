@@ -39,6 +39,8 @@ class base_cell;
 typedef ::boost::ptr_map< ::std::string, base_cell>             cell_name_ptr_map_t;
 typedef ::std::unordered_map<const base_cell*, ::std::string>   cell_ptr_name_map_t;
 
+const char* get_formula_result_output_separator();
+
 ::std::string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell);
 
 double get_current_time();

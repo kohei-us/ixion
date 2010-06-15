@@ -37,6 +37,8 @@
 #include <iostream>
 #include <fstream>
 
+#define DEBUG_DEPENDS_TRACKER 0
+
 using namespace std;
 
 namespace ixion {
@@ -191,16 +193,22 @@ void depends_tracker::interpret_all_cells(bool use_thread)
     vector<base_cell*> sorted_cells;
     topo_sort_cells(sorted_cells);
 
+#if DEBUG_DEPENDS_TRACKER
     cout << "Topologically sorted cells ---------------------------------" << endl;
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
+#endif
 
     // Reset cell status.
+#if DEBUG_DEPENDS_TRACKER
     cout << "Reset cell status ------------------------------------------" << endl;
+#endif
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
 
     // First, detect circular dependencies and mark those circular 
     // dependent cells with appropriate error flags.
+#if DEBUG_DEPENDS_TRACKER
     cout << "Check circular dependencies --------------------------------" << endl;
+#endif
     for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
 
     if (use_thread)

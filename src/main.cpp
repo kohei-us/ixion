@@ -141,16 +141,17 @@ int main (int argc, char** argv)
     {
         string fpath = argv[i];
         double start_time = get_current_time();
-        cout << "----------------------------------------------------------------------" << endl;
+        cout << get_formula_result_output_separator() << endl;
         cout << "parsing " << fpath << endl;
-        cout << "----------------------------------------------------------------------" << endl;
         if (!parse_model_input(fpath, dotgraph_path, use_thread))
         {
             cerr << "failed to parse " << fpath << endl;
             exit (EXIT_FAILURE);
         }
 
+        cout << get_formula_result_output_separator() << endl;
         cout << "(duration: " << get_current_time() - start_time << " sec)" << endl;
+        cout << get_formula_result_output_separator() << endl;
     }
 }
 
