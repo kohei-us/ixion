@@ -146,6 +146,11 @@ public:
     void swap_tokens(formula_tokens_t& tokens);
 
 private:
+    /**
+     * Block until the result becomes available.
+     * 
+     * @param lock mutex lock associated with the result cache data.
+     */
     void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const;
 
     /**

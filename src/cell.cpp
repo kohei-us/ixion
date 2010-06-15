@@ -261,25 +261,15 @@ void formula_cell::swap_tokens(formula_tokens_t& tokens)
 
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
 {
-#if DEBUG_FORMULA_CELL
-    ostringstream os;
-    os << "wait for result" << endl;
-    cout << os.str();
-#endif
     while (!m_interpret_status.result)
     {
 #if DEBUG_FORMULA_CELL
-        os.clear();
+        ostringstream os;
         os << "waiting" << endl;
         cout << os.str();
 #endif
         m_interpret_status.cond.wait(lock);
     }
-#if DEBUG_FORMULA_CELL
-    os.clear();
-    os << "done waiting for result" << endl;
-    cout << os.str();
-#endif
 }
 
 }
