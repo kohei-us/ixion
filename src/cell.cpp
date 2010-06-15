@@ -34,7 +34,7 @@
 #include <sstream>
 #include <iostream>
 
-#define DEBUG_FORMULA_CELL 1
+#define DEBUG_FORMULA_CELL 0
 
 using namespace std;
 
@@ -133,7 +133,6 @@ formula_cell::interpret_guard::interpret_guard(interpret_status& status, const s
 formula_cell::interpret_guard::~interpret_guard()
 {
     ::boost::mutex::scoped_lock lock(m_status.mtx);
-    m_status.cond.notify_all();
 #if DEBUG_FORMULA_CELL
     ostringstream os;
     os << m_cell_name << " unlocked" << endl;
@@ -171,7 +170,12 @@ formula_cell::~formula_cell()
 
 double formula_cell::get_value() const
 {
-    wait_for_interpreted_result();
+    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+#if DEBUG_FORMULA_CELL
+    ostringstream os;
+#endif
+
+    wait_for_interpreted_result(lock);
 
     if (!m_interpret_status.result)
         // Result not cached yet.  Reference error.
@@ -182,7 +186,6 @@ double formula_cell::get_value() const
         throw formula_error(m_interpret_status.result->error);
 
 #if DEBUG_FORMULA_CELL
-    ostringstream os;
     os << "returning value of " << m_interpret_status.result->value << endl;
     cout << os.str();
 #endif
@@ -209,12 +212,10 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
         // When the result is already cached before the cell is interpreted, 
         // it can only mean the cell has circular dependency.
         assert(m_interpret_status.result->error != fe_no_error);
-#if DEBUG_FORMULA_CELL
         ostringstream os;
         os << get_formula_result_output_separator() << endl;
         os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->error) << endl;
         cout << os.str();
-#endif
         return;
     }
 
@@ -222,26 +223,32 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
     ostringstream os;
     os << cell_name << " is being interpreted" << endl;
     cout << os.str();
+    os.clear();
 #endif
-    m_interpret_status.result = new result_cache;
+
     formula_interpreter fin(this, cell_ptr_name_map);
+    result_cache result;
     if (fin.interpret())
     {
-        m_interpret_status.result->value = fin.get_result();
-        m_interpret_status.result->text.clear();
-#if DEBUG_FORMULA_CELL
-        os.clear();
-        os << cell_name << " result: " << m_interpret_status.result->value << endl;
-        cout << os.str();
-#endif
+        // Successful interpretation.
+        result.value = fin.get_result();
+        result.text.clear();
     }
     else
-        m_interpret_status.result->error = fin.get_error();
+    {
+        // Interpretation ended with an error condition.
+        result.error = fin.get_error();
+    }
+
+    // The result pointer being non-NULL indicates the availability of the 
+    // interpretation result.  So this must be done atomically.
+    m_interpret_status.result = new result_cache(result);
+    m_interpret_status.cond.notify_all();
 
 #if DEBUG_FORMULA_CELL
-    os.clear();
-    os << cell_name << " is done being interpreted" << endl;
+    os << cell_name << " interpretation finished" << endl;
     cout << os.str();
+    os.clear();
 #endif
 }
 
@@ -296,14 +303,13 @@ void formula_cell::swap_tokens(formula_tokens_t& tokens)
     m_tokens.swap(tokens);
 }
 
-void formula_cell::wait_for_interpreted_result() const
+void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
 {
 #if DEBUG_FORMULA_CELL
     ostringstream os;
     os << "wait for result" << endl;
     cout << os.str();
 #endif
-    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     while (!m_interpret_status.result)
     {
 #if DEBUG_FORMULA_CELL

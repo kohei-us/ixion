@@ -33,6 +33,7 @@
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <string>
 
@@ -108,7 +109,7 @@ class formula_cell : public base_cell
         result_cache(const result_cache& r);
     };
 
-    struct interpret_status
+    struct interpret_status : public ::boost::noncopyable
     {
         ::boost::mutex mtx;
         ::boost::condition_variable cond;
@@ -120,7 +121,7 @@ class formula_cell : public base_cell
         ~interpret_status();
     };
 
-    class interpret_guard
+    class interpret_guard : public ::boost::noncopyable
     {
     public:
         explicit interpret_guard(interpret_status& status, const ::std::string& cell_name);
@@ -148,7 +149,7 @@ public:
     void swap_tokens(formula_tokens_t& tokens);
 
 private:
-    void wait_for_interpreted_result() const;
+    void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const;
 
 private:
     formula_tokens_t    m_tokens;
