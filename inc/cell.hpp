@@ -123,12 +123,13 @@ class formula_cell : public base_cell
     class interpret_guard
     {
     public:
-        explicit interpret_guard(interpret_status& status);
+        explicit interpret_guard(interpret_status& status, const ::std::string& cell_name);
         ~interpret_guard();
     private:
         interpret_guard();
 
         interpret_status& m_status;
+        const ::std::string& m_cell_name;
     };
 
 public:
@@ -143,7 +144,7 @@ public:
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
     bool is_circular_safe() const;
     void check_circular();
-    void reset();
+    void reset(const cell_ptr_name_map_t& cell_ptr_name_map);
     void swap_tokens(formula_tokens_t& tokens);
 
 private:
