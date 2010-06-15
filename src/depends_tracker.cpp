@@ -129,42 +129,6 @@ private:
     vector<base_cell*>& m_sorted_cells;
 };
 
-class cell_interpreter : public depth_first_search::cell_handler
-{
-public:
-    cell_interpreter(const cell_ptr_name_map_t& cell_names, bool use_thread) :
-        m_cell_names(cell_names), m_use_thread(use_thread) {}
-
-    void operator() (base_cell* cell)
-    {
-        if (cell->get_celltype() != celltype_formula)
-            // We can't interpret unless the cell contains formula tokens.
-            return;
-
-        formula_cell* fcell = static_cast<formula_cell*>(cell);
-        if (m_use_thread)
-        {
-            cell_queue_manager::add_cell(fcell);
-        }
-        else
-        {
-//          cout << "---------- interpreting " << get_cell_name(cell) << endl;
-            fcell->interpret(m_cell_names);
-        }
-    }
-
-    string get_cell_name(const base_cell* p) const
-    {
-        cell_ptr_name_map_t::const_iterator itr = m_cell_names.find(p);
-        if (itr != m_cell_names.end())
-            return itr->second;
-        return string();
-    }
-private:
-    const cell_ptr_name_map_t& m_cell_names;
-    bool m_use_thread;
-};
-
 }
 
 depends_tracker::depends_tracker(const cell_ptr_name_map_t* names) :
