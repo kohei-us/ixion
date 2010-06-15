@@ -93,6 +93,20 @@ struct thread_queue_handler : public unary_function<base_cell*, void>
     }
 };
 
+struct cell_interpret_handler : public unary_function<base_cell*, void>
+{
+    cell_interpret_handler(const cell_ptr_name_map_t& cell_names) :
+        m_cell_names(cell_names) {}
+
+    void operator() (base_cell* p) const
+    {
+        assert(p->get_celltype() == celltype_formula);
+        static_cast<formula_cell*>(p)->interpret(m_cell_names);
+    }
+private:
+    const cell_ptr_name_map_t& m_cell_names;
+};
+
 class cell_back_inserter : public depth_first_search::cell_handler
 {
 public:
@@ -174,33 +188,32 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 
 void depends_tracker::interpret_all_cells(bool use_thread)
 {
+    vector<base_cell*> sorted_cells;
+    topo_sort_cells(sorted_cells);
+
+    cout << "Topologically sorted cells ---------------------------------" << endl;
+    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
+
+    // Reset cell status.
+    cout << "Reset cell status ------------------------------------------" << endl;
+    for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
+
+    // First, detect circular dependencies and mark those circular 
+    // dependent cells with appropriate error flags.
+    cout << "Check circular dependencies --------------------------------" << endl;
+    for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
+
     if (use_thread)
     {
-        vector<base_cell*> sorted_cells;
-        topo_sort_cells(sorted_cells);
-
-        cout << "Topologically sorted cells ---------------------------------" << endl;
-        for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
-
-        // Reset cell status.
-        cout << "Reset cell status ------------------------------------------" << endl;
-        for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
-
-        // First, detect circular dependencies and mark those circular 
-        // dependent cells with appropriate error flags.
-        cout << "Check circular dependencies --------------------------------" << endl;
-        for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
-
-        // Finally, interpret cells in topological order using threads.
+        // Interpret cells in topological order using threads.
         cell_queue_manager::init(4, *mp_names);
         for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler());
         cell_queue_manager::terminate();
     }
     else
     {
-        cell_interpreter handler(*mp_names, false);
-        depth_first_search dfs(m_map, *mp_names, handler);
-        dfs.run();
+        // Interpret cells using just a single thread.
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpret_handler(*mp_names));
     }
 }
 
