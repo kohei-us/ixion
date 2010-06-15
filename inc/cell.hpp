@@ -131,8 +131,26 @@ public:
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
+
+    /**
+     * Check if this cell contains a circular reference. 
+     *  
+     * @return true if this cell contains no circular reference, hence 
+     *         considered "safe", false otherwise.
+     */
     bool is_circular_safe() const;
+
+    /**
+     * Determine if this cell contains circular reference by walking through
+     * all its reference tokens.
+     */
     void check_circular();
+
+    /**
+     * Reset cell's internal state. 
+     * 
+     * @param cell_ptr_name_map cell pointer-to-name map
+     */
     void reset(const cell_ptr_name_map_t& cell_ptr_name_map);
     void swap_tokens(formula_tokens_t& tokens);
 
