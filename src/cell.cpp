@@ -32,8 +32,9 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
-#define DEBUG_FORMULA_CELL 1
+#define DEBUG_FORMULA_CELL 0
 
 using namespace std;
 
@@ -234,7 +235,9 @@ void formula_cell::check_circular()
         if (!static_cast<const formula_cell*>(ref)->is_circular_safe())
         {
             // Circular dependency detected !!
+#if DEBUG_FORMULA_CELL
             cout << "circular dependency detected !!" << endl;
+#endif
             assert(!m_interpret_status.result);
             m_interpret_status.result = new result_cache;
             m_interpret_status.result->error = fe_ref_result_not_available;
