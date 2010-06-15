@@ -158,39 +158,6 @@ void create_empty_formula_cells(
     }
 }
 
-class cell_interpreter : public unary_function<base_cell*, void>
-{
-public:
-    cell_interpreter(const cell_ptr_name_map_t& cell_ptr_name_map) :
-        m_cell_ptr_name_map(cell_ptr_name_map)
-    {
-    }
-
-    void operator() (base_cell* cell) const
-    {
-        if (cell->get_celltype() != celltype_formula)
-            // We can't interpret unless the cell contains formula tokens.
-            return;
-
-#if DEBUG_INPUT_PARSER
-        cout << "---------- interpreting " << get_cell_name(cell) << endl;
-#endif
-        formula_cell* fcell = static_cast<formula_cell*>(cell);
-        fcell->interpret(m_cell_ptr_name_map);
-    }
-
-    string get_cell_name(const base_cell* p) const
-    {
-        cell_ptr_name_map_t::const_iterator itr = m_cell_ptr_name_map.find(p);
-        if (itr != m_cell_ptr_name_map.end())
-            return itr->second;
-        return string();
-    }
-
-private:
-    const cell_ptr_name_map_t& m_cell_ptr_name_map;
-};
-
 }
 
 /** 
@@ -268,17 +235,7 @@ bool parse_model_input(const string& fpath, const string& dotpath, bool use_thre
         }
 
         deptracker.print_dot_graph(dotpath);
-
-#if 1
         deptracker.interpret_all_cells(use_thread);
-#else
-        // Sort the cells in order of dependency.
-        vector<base_cell*> sorted_cells;
-        deptracker.topo_sort_cells(sorted_cells);
-
-        // Interpret cells in order of dependency.
-        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpreter(cell_ptr_name_map));
-#endif
     }
     catch (const exception& e)
     {

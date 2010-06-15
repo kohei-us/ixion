@@ -34,7 +34,7 @@
 #include <sstream>
 #include <iostream>
 
-#define DEBUG_FORMULA_CELL 0
+#define DEBUG_FORMULA_CELL 1
 
 using namespace std;
 
