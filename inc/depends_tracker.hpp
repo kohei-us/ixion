@@ -62,7 +62,7 @@ public:
      */
     void insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell);
 
-    void interpret_all_cells(bool use_thread);
+    void interpret_all_cells(size_t thread_count);
 
     /** 
      * Perform topological sort on all cell instances, and returns an array of 

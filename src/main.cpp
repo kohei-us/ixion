@@ -61,7 +61,7 @@ int main (int argc, char** argv)
         /* These options set a flag. */
         {"verbose", no_argument,       &verbose_flag, 1},
         {"brief",   no_argument,       &verbose_flag, 0},
-        {"thread", no_argument, 0, 't'},
+        {"thread", required_argument, 0, 't'},
         /* These options don't set a flag.
            We distinguish them by their indices. */
 //      {"add",     no_argument,       0, 'a'},
@@ -74,13 +74,13 @@ int main (int argc, char** argv)
 
     string model_list_path;
     string dotgraph_path;
-    bool use_thread = false;
+    size_t thread_count = 0;
 
     while (true)
     {
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        int c = getopt_long (argc, argv, "htc:d:l:", long_options, &option_index);
+        int c = getopt_long (argc, argv, "ht:c:d:l:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -110,7 +110,12 @@ int main (int argc, char** argv)
                 printf ("option -c with value `%s'\n", optarg);
                 break;
             case 't':
-                use_thread = true;
+                thread_count = static_cast<size_t>(strtod(optarg, NULL));
+                if (!thread_count)
+                {
+                    cerr << "thread count must be a positive integer." << endl;
+                    abort();
+                }
                 break;
 
             case 'd':
@@ -131,7 +136,7 @@ int main (int argc, char** argv)
         }
     }
 
-    if (use_thread)
+    if (thread_count > 0)
     {
         cout << "Using threads" << endl;
         cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
@@ -143,7 +148,7 @@ int main (int argc, char** argv)
         double start_time = get_current_time();
         cout << get_formula_result_output_separator() << endl;
         cout << "parsing " << fpath << endl;
-        if (!parse_model_input(fpath, dotgraph_path, use_thread))
+        if (!parse_model_input(fpath, dotgraph_path, thread_count))
         {
             cerr << "failed to parse " << fpath << endl;
             exit (EXIT_FAILURE);

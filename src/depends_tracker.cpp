@@ -158,7 +158,7 @@ void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_
 //  cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
-void depends_tracker::interpret_all_cells(bool use_thread)
+void depends_tracker::interpret_all_cells(size_t thread_count)
 {
     vector<base_cell*> sorted_cells;
     topo_sort_cells(sorted_cells);
@@ -181,10 +181,10 @@ void depends_tracker::interpret_all_cells(bool use_thread)
 #endif
     for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
 
-    if (use_thread)
+    if (thread_count > 0)
     {
         // Interpret cells in topological order using threads.
-        cell_queue_manager::init(4, *mp_names);
+        cell_queue_manager::init(thread_count, *mp_names);
         for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler());
         cell_queue_manager::terminate();
     }

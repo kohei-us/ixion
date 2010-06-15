@@ -181,7 +181,7 @@ void create_empty_formula_cells(
  * 
  * @return true if the conversion is successful, false otherwise.
  */
-bool parse_model_input(const string& fpath, const string& dotpath, bool use_thread)
+bool parse_model_input(const string& fpath, const string& dotpath, size_t thread_count)
 {
 #if DEBUG_INPUT_PARSER
     StackPrinter __stack_printer__("ixion::parse_model_input");
@@ -235,7 +235,7 @@ bool parse_model_input(const string& fpath, const string& dotpath, bool use_thre
         }
 
         deptracker.print_dot_graph(dotpath);
-        deptracker.interpret_all_cells(use_thread);
+        deptracker.interpret_all_cells(thread_count);
     }
     catch (const exception& e)
     {
