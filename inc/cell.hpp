@@ -33,7 +33,6 @@
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/noncopyable.hpp>
 
 #include <string>
 
@@ -109,7 +108,7 @@ class formula_cell : public base_cell
         result_cache(const result_cache& r);
     };
 
-    struct interpret_status : public ::boost::noncopyable
+    struct interpret_status
     {
         ::boost::mutex mtx;
         ::boost::condition_variable cond;
@@ -133,14 +132,6 @@ public:
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
 
     /**
-     * Check if this cell contains a circular reference. 
-     *  
-     * @return true if this cell contains no circular reference, hence 
-     *         considered "safe", false otherwise.
-     */
-    bool is_circular_safe() const;
-
-    /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
      */
@@ -156,6 +147,14 @@ public:
 
 private:
     void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const;
+
+    /**
+     * Check if this cell contains a circular reference. 
+     *  
+     * @return true if this cell contains no circular reference, hence 
+     *         considered "safe", false otherwise.
+     */
+    bool is_circular_safe() const;
 
 private:
     formula_tokens_t    m_tokens;
