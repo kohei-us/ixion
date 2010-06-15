@@ -213,8 +213,8 @@
 			<F N="inc/formula_parser.hpp"/>
 			<F N="inc/formula_tokens.hpp"/>
 			<F N="inc/global.hpp"/>
-			<F N="inc/inputparser.hpp"/>
 			<F N="inc/lexer_tokens.hpp"/>
+			<F N="inc/model_parser.hpp"/>
 			<F N="inc/thread.hpp"/>
 		</Folder>
 		<Folder Name="misc">
@@ -234,9 +234,9 @@
 			<F N="src/formula_parser.cpp"/>
 			<F N="src/formula_tokens.cpp"/>
 			<F N="src/global.cpp"/>
-			<F N="src/inputparser.cpp"/>
 			<F N="src/lexer_tokens.cpp"/>
 			<F N="src/main.cpp"/>
+			<F N="src/model_parser.cpp"/>
 		</Folder>
 		<F
 			N="Makefile"

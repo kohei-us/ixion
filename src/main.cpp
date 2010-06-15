@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "inputparser.hpp"
+#include "model_parser.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

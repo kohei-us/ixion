@@ -44,7 +44,7 @@ HEADERS= \
 	$(INCDIR)/formula_tokens.hpp \
 	$(INCDIR)/formula_interpreter.hpp \
 	$(INCDIR)/global.hpp \
-	$(INCDIR)/inputparser.hpp \
+	$(INCDIR)/model_parser.hpp \
 	$(INCDIR)/lexer_tokens.hpp
 
 OBJFILES= \
@@ -58,7 +58,7 @@ OBJFILES= \
 	$(OBJDIR)/formula_parser.o \
 	$(OBJDIR)/formula_tokens.o \
 	$(OBJDIR)/formula_interpreter.o \
-	$(OBJDIR)/inputparser.o \
+	$(OBJDIR)/model_parser.o \
 	$(OBJDIR)/depends_tracker.o \
 	$(OBJDIR)/depth_first_search.o
 
@@ -100,8 +100,8 @@ $(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp $(DEPENDS)
 $(OBJDIR)/formula_interpreter.o: $(SRCDIR)/formula_interpreter.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_interpreter.cpp
 
-$(OBJDIR)/inputparser.o: $(SRCDIR)/inputparser.cpp $(DEPENDS)
-	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/inputparser.cpp
+$(OBJDIR)/model_parser.o: $(SRCDIR)/model_parser.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/model_parser.cpp
 
 $(OBJDIR)/depends_tracker.o: $(SRCDIR)/depends_tracker.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depends_tracker.cpp

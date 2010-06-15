@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "inputparser.hpp"
+#include "model_parser.hpp"
 #include "cell.hpp"
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"

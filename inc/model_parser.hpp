@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_INPUTPARSER_HPP__
-#define __IXION_INPUTPARSER_HPP__
+#ifndef __IXION_MODEL_PARSER_HPP__
+#define __IXION_MODEL_PARSER_HPP__
 
 #include "cell.hpp"
 #include "lexer_tokens.hpp"
