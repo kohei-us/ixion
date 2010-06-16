@@ -44,6 +44,7 @@ HEADERS= \
 	$(INCDIR)/formula_tokens.hpp \
 	$(INCDIR)/formula_interpreter.hpp \
 	$(INCDIR)/global.hpp \
+	$(INCDIR)/mem_str_buf.hpp \
 	$(INCDIR)/model_parser.hpp \
 	$(INCDIR)/lexer_tokens.hpp
 
@@ -58,6 +59,7 @@ OBJFILES= \
 	$(OBJDIR)/formula_parser.o \
 	$(OBJDIR)/formula_tokens.o \
 	$(OBJDIR)/formula_interpreter.o \
+	$(OBJDIR)/mem_str_buf.o \
 	$(OBJDIR)/model_parser.o \
 	$(OBJDIR)/depends_tracker.o \
 	$(OBJDIR)/depth_first_search.o
@@ -99,6 +101,9 @@ $(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp $(DEPENDS)
 
 $(OBJDIR)/formula_interpreter.o: $(SRCDIR)/formula_interpreter.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_interpreter.cpp
+
+$(OBJDIR)/mem_str_buf.o: $(SRCDIR)/mem_str_buf.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/mem_str_buf.cpp
 
 $(OBJDIR)/model_parser.o: $(SRCDIR)/model_parser.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/model_parser.cpp

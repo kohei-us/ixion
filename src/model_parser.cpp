@@ -31,6 +31,7 @@
 #include "formula_parser.hpp"
 #include "depends_tracker.hpp"
 #include "formula_interpreter.hpp"
+#include "mem_str_buf.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -95,65 +96,6 @@ namespace ixion {
 namespace {
 
 typedef ::std::unordered_map<string, formula_result> formula_results_t;
-
-/**
- * String buffer that only stores the first char position in memory and the
- * size of the string.
- */
-class mem_str_buf
-{
-public:
-    mem_str_buf() : mp_buf(NULL), m_size(0) {}
-
-    void set_start(const char* p)
-    {
-        mp_buf = p;
-        m_size = 1;
-    }
-
-    void inc()
-    { 
-        assert(mp_buf);
-        ++m_size; 
-    }
-
-    bool empty() const { return m_size == 0; }
-    size_t size() const { return m_size; }
-    const char* get() const { return mp_buf; }
-
-    void clear()
-    {
-        mp_buf = NULL;
-        m_size = 0;
-    }
-
-    void swap(mem_str_buf& r)
-    {
-        ::std::swap(mp_buf, r.mp_buf);
-        ::std::swap(m_size, r.m_size);
-    }
-
-    bool equals(const char* s) const
-    {
-        return ::std::strncmp(mp_buf, s, m_size) == 0;
-    }
-
-    string str() const
-    {
-        return string(mp_buf, m_size);
-    }
-
-    mem_str_buf& operator= (const mem_str_buf& r)
-    {
-        mp_buf = r.mp_buf;
-        m_size = r.m_size;
-        return *this;
-    }
-
-private:
-    const char* mp_buf;
-    size_t m_size;
-};
 
 void load_file_content(const string& filepath, string& content)
 {
