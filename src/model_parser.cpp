@@ -227,6 +227,13 @@ void parse_formula(const char*& p, parse_formula_data& data)
     }
 }
 
+void parse_result(const char*& p)
+{
+    for (; *p != '\n'; ++p)
+    {
+    }
+}
+
 void parse_command(const char*& p, mem_str_buf& com)
 {
     mem_str_buf _com;
@@ -469,6 +476,9 @@ void model_parser::parse()
         {
             case parse_mode_formula:
                 parse_formula(p, formula_data);
+            break;
+            case parse_mode_result:
+                parse_result(p);
             break;
             default:
                 throw parse_error("unknown parse mode");
