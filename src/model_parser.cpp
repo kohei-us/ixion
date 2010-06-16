@@ -141,16 +141,17 @@ public:
         return string(mp_buf, m_size);
     }
 
+    mem_str_buf& operator= (const mem_str_buf& r)
+    {
+        mp_buf = r.mp_buf;
+        m_size = r.m_size;
+        return *this;
+    }
+
 private:
     const char* mp_buf;
     size_t m_size;
 };
-
-void flush_buffer(mem_str_buf& buf, string& str)
-{
-    str = string(buf.get(), buf.size());
-    buf.clear();
-}
 
 void load_file_content(const string& filepath, string& content)
 {
@@ -164,6 +165,72 @@ void load_file_content(const string& filepath, string& content)
     file.close();
 
     os.str().swap(content);
+}
+
+enum parse_mode_t
+{
+    parse_mode_unknown = 0,
+    parse_mode_formula,
+    parse_mode_result
+};
+
+struct parse_formula_data
+{
+    vector<model_parser::cell>  cells;
+    vector<string>              cell_names;
+
+    void swap(parse_formula_data& r)
+    {
+        cells.swap(r.cells);
+        cell_names.swap(r.cell_names);
+    }
+};
+
+void parse_formula(const char*& p, parse_formula_data& data)
+{
+    mem_str_buf buf, name, formula;
+    for (; *p != '\n'; ++p)
+    {
+        if (*p == '=')
+        {
+            if (buf.empty())
+                throw model_parser::parse_error("left hand side is empty");
+
+            name = buf;
+            buf.clear();
+            data.cell_names.push_back(name.str());
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(p);
+            else
+                buf.inc();
+        }
+    }
+
+    if (!buf.empty())
+    {
+        if (name.empty())
+            throw model_parser::parse_error("'=' is missing");
+
+        formula = buf;
+
+        // tokenize the formula string, and create a formula cell 
+        // with the tokens.
+        formula_lexer lexer(formula.str());
+        lexer.tokenize();
+        lexer_tokens_t tokens;
+        lexer.swap_tokens(tokens);
+
+#if DEBUG_INPUT_PARSER
+        // test-print tokens.
+        cout << "tokens from lexer: " << print_tokens(tokens, true) << endl;
+#endif
+
+        model_parser::cell fcell(name.str(), tokens);
+        data.cells.push_back(fcell);
+    }
 }
 
 void parse_command(const char*& p, mem_str_buf& com)
@@ -364,89 +431,53 @@ void model_parser::parse()
     string strm;
     load_file_content(m_filepath, strm);
 
+    parse_mode_t parse_mode = parse_mode_unknown;
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];
-    mem_str_buf buf;
-    string name, formula;
-    vector<cell> cells;
-    vector<string> cell_names;
-    const char* p_col0 = NULL;
+    parse_formula_data formula_data;
+
     for (; p != p_last; ++p)
     {
-        if (!p_col0)
+        if (*p == '%')
         {
-            // This is the first char of a line.
-
-            p_col0 = p; // record column 0 of each line.
-            if (*p_col0 == '%')
+            // This line contains a command.
+            mem_str_buf buf_com;
+            parse_command(p, buf_com);
+            if (buf_com.equals("check"))
+                cout << "check command" << endl;
+            else if (buf_com.equals("calc"))
             {
-                // This line contains a command.
-                mem_str_buf buf_com;
-                parse_command(p, buf_com);
-                if (buf_com.equals("check"))
-                    cout << "check command" << endl;
-                else if (buf_com.equals("calc"))
-                {
-                    // Perform full calculation on currently stored cells.
+                // Perform full calculation on currently stored cells.
 
-                    // First, create empty formula cell instances so that we can have 
-                    // name-to-pointer associations.
-                    create_empty_formula_cells(cell_names, m_cells, m_cell_names);
+                // First, create empty formula cell instances so that we can have 
+                // name-to-pointer associations.
+                create_empty_formula_cells(formula_data.cell_names, m_cells, m_cell_names);
 
-                    calc(cells);
-                }
-                else
-                {
-                    ostringstream os;
-                    os << "unknown command: " << buf_com.str() << endl;
-                    throw parse_error(os.str());
-                }
-
-                break;
+                calc(formula_data.cells);
             }
+            else if (buf_com.equals("mode-formula"))
+            {
+                parse_mode = parse_mode_formula;
+            }
+            else if (buf_com.equals("mode-result"))
+            {
+                parse_mode = parse_mode_result;
+            }
+            else
+            {
+                ostringstream os;
+                os << "unknown command: " << buf_com.str() << endl;
+                throw parse_error(os.str());
+            }
+            continue;
         }
 
-        switch (*p)
+        switch (parse_mode)
         {
-            case '=':
-                if (buf.empty())
-                    throw parse_error("left hand side is empty");
-                flush_buffer(buf, name);
-                cell_names.push_back(name);
-                break;
-            break;
-            case '\n':
-                if (!buf.empty())
-                {
-                    if (name.empty())
-                        throw parse_error("'=' is missing");
-
-                    flush_buffer(buf, formula);
-
-                    // tokenize the formula string, and create a formula cell 
-                    // with the tokens.
-                    formula_lexer lexer(formula);
-                    lexer.tokenize();
-                    lexer_tokens_t tokens;
-                    lexer.swap_tokens(tokens);
-
-#if DEBUG_INPUT_PARSER
-                    // test-print tokens.
-                    cout << "tokens from lexer: " << print_tokens(tokens, true) << endl;
-#endif
-
-                    cell fcell(name, tokens);
-                    cells.push_back(fcell);
-                }
-                name.clear();
-                formula.clear();
-                p_col0 = NULL;
-                break;
+            case parse_mode_formula:
+                parse_formula(p, formula_data);
             break;
             default:
-                if (buf.empty())
-                    buf.set_start(p);
-                else
-                    buf.inc();
+                throw parse_error("unknown parse mode");
         }
     }
 }
