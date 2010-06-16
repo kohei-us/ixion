@@ -366,13 +366,15 @@ void model_parser::parse()
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];
     mem_str_buf buf;
     string name, formula;
-    vector<cell> fcells;
+    vector<cell> cells;
     vector<string> cell_names;
     const char* p_col0 = NULL;
     for (; p != p_last; ++p)
     {
         if (!p_col0)
         {
+            // This is the first char of a line.
+
             p_col0 = p; // record column 0 of each line.
             if (*p_col0 == '%')
             {
@@ -384,9 +386,7 @@ void model_parser::parse()
                 else if (buf_com.equals("calc"))
                 {
                     // Perform full calculation on currently stored cells.
-                    m_fcells.swap(fcells);
-                    m_cell_names.swap(cell_names);
-                    calc();
+                    calc(cell_names, cells);
                 }
                 else
                 {
@@ -429,7 +429,7 @@ void model_parser::parse()
 #endif
 
                     cell fcell(name, tokens);
-                    fcells.push_back(fcell);
+                    cells.push_back(fcell);
                 }
                 name.clear();
                 formula.clear();
@@ -445,18 +445,16 @@ void model_parser::parse()
     }
 }
 
-void model_parser::calc()
+void model_parser::calc(const vector<string>& cell_names, const vector<cell>& cells)
 {
     // First, create empty formula cell instances so that we can have 
     // name-to-pointer associations.
-    const vector<string>& cell_names = get_cell_names();
 
     cell_name_ptr_map_t  cell_name_ptr_map;
     cell_ptr_name_map_t  cell_ptr_name_map;
     create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
 
     depends_tracker deptracker(&cell_ptr_name_map);
-    const vector<model_parser::cell>& cells = get_cells();
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
