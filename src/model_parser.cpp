@@ -93,7 +93,7 @@ namespace ixion {
 
 namespace {
 
-void flush_buffer(vector<char>& buf, string& str)
+void flush_buffer(string& buf, string& str)
 {
     buf.push_back(0); // null-terminate the buffer.
     str = &buf[0];
@@ -335,7 +335,7 @@ void model_parser::parse()
 
     char c;
     string name, formula;
-    vector<char> buf;
+    string buf;
     buf.reserve(255);
     vector<cell> fcells;
     vector<string> cell_names;
