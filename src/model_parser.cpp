@@ -93,10 +93,45 @@ namespace ixion {
 
 namespace {
 
-void flush_buffer(string& buf, string& str)
+/**
+ * String buffer that only stores the first char position in memory and the
+ * size of the string.
+ */
+class mem_str_buf
 {
-    buf.push_back(0); // null-terminate the buffer.
-    str = &buf[0];
+public:
+    mem_str_buf() : mp_buf(NULL), m_size(0) {}
+
+    void set_start(const char* p)
+    {
+        mp_buf = p;
+        m_size = 1;
+    }
+
+    void inc()
+    { 
+        assert(mp_buf);
+        ++m_size; 
+    }
+
+    bool empty() const { return m_size == 0; }
+    size_t size() const { return m_size; }
+    const char* get() const { return mp_buf; }
+
+    void clear()
+    {
+        mp_buf = NULL;
+        m_size = 0;
+    }
+
+private:
+    const char* mp_buf;
+    size_t m_size;
+};
+
+void flush_buffer(mem_str_buf& buf, string& str)
+{
+    str = string(buf.get(), buf.size());
     buf.clear();
 }
 
@@ -333,15 +368,19 @@ void model_parser::parse()
         // failed to open the specified file.
         throw file_not_found(m_filepath);
 
-    char c;
+    ostringstream os;
+    os << file.rdbuf() << ' '; // extra char to use as the end position.
+    string strm = os.str();
+    size_t size = strm.size();
+
+    const char *p = &strm[0], *p_last = &strm[size-1];
+    mem_str_buf buf;
     string name, formula;
-    string buf;
-    buf.reserve(255);
     vector<cell> fcells;
     vector<string> cell_names;
-    while (file.get(c))
+    for (; p != p_last; ++p)
     {
-        switch (c)
+        switch (*p)
         {
             case '=':
                 if (buf.empty())
@@ -349,6 +388,7 @@ void model_parser::parse()
                 flush_buffer(buf, name);
                 cell_names.push_back(name);
                 break;
+            break;
             case '\n':
                 if (!buf.empty())
                 {
@@ -375,8 +415,12 @@ void model_parser::parse()
                 name.clear();
                 formula.clear();
                 break;
+            break;
             default:
-                buf.push_back(c);
+                if (buf.empty())
+                    buf.set_start(p);
+                else
+                    buf.inc();
         }
     }
 
