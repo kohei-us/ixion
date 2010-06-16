@@ -37,6 +37,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <cstring>
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
@@ -124,6 +125,17 @@ public:
         m_size = 0;
     }
 
+    void swap(mem_str_buf& r)
+    {
+        ::std::swap(mp_buf, r.mp_buf);
+        ::std::swap(m_size, r.m_size);
+    }
+
+    bool equals(const char* s)
+    {
+        return ::std::strncmp(mp_buf, s, m_size) == 0;
+    }
+
 private:
     const char* mp_buf;
     size_t m_size;
@@ -133,6 +145,30 @@ void flush_buffer(mem_str_buf& buf, string& str)
 {
     str = string(buf.get(), buf.size());
     buf.clear();
+}
+
+void load_file_content(const string& filepath, string& content)
+{
+    ifstream file(filepath.c_str());
+    if (!file)
+        // failed to open the specified file.
+        throw model_parser::file_not_found(filepath);
+
+    ostringstream os;
+    os << file.rdbuf() << ' '; // extra char as the end position.
+    file.close();
+
+    os.str().swap(content);
+}
+
+void parse_command(const char*& p, mem_str_buf& com)
+{
+    mem_str_buf _com;
+    ++p;
+    _com.set_start(p);
+    for (++p; *p != '\n'; ++p)
+        _com.inc();
+    _com.swap(com);
 }
 
 class formula_cell_inserter : public unary_function<string, void>
@@ -363,23 +399,32 @@ model_parser::~model_parser()
 
 void model_parser::parse()
 {
-    ifstream file(m_filepath.c_str());
-    if (!file)
-        // failed to open the specified file.
-        throw file_not_found(m_filepath);
+    string strm;
+    load_file_content(m_filepath, strm);
 
-    ostringstream os;
-    os << file.rdbuf() << ' '; // extra char to use as the end position.
-    string strm = os.str();
-    size_t size = strm.size();
-
-    const char *p = &strm[0], *p_last = &strm[size-1];
+    const char *p = &strm[0], *p_last = &strm[strm.size()-1];
     mem_str_buf buf;
     string name, formula;
     vector<cell> fcells;
     vector<string> cell_names;
+    const char* p_col0 = NULL;
     for (; p != p_last; ++p)
     {
+        if (!p_col0)
+        {
+            p_col0 = p; // record column 0 of each line.
+            if (*p_col0 == '%')
+            {
+                // This line contains a command.
+                mem_str_buf buf_com;
+                parse_command(p, buf_com);
+                if (buf_com.equals("check"))
+                    cout << "check command" << endl;
+
+                throw parse_error("TODO: handle command.");
+            }
+        }
+
         switch (*p)
         {
             case '=':
@@ -414,6 +459,7 @@ void model_parser::parse()
                 }
                 name.clear();
                 formula.clear();
+                p_col0 = NULL;
                 break;
             break;
             default:
