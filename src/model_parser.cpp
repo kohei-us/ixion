@@ -218,13 +218,14 @@ void create_empty_formula_cells(
     const vector<string>& cell_names, cell_name_ptr_map_t& cell_map, cell_ptr_name_map_t& ptr_name_map)
 {
     ensure_unique_names(cell_names);
+    cell_map.clear();
+    ptr_name_map.clear();
 
     typedef ptr_map<string, base_cell> _cellmap_type;
     typedef map<const base_cell*, string> _ptrname_type;
     for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
     _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
 
-    // debug output.
     for (; itr != itr_end; ++itr)
     {    
 #if DEBUG_INPUT_PARSER
@@ -386,7 +387,12 @@ void model_parser::parse()
                 else if (buf_com.equals("calc"))
                 {
                     // Perform full calculation on currently stored cells.
-                    calc(cell_names, cells);
+
+                    // First, create empty formula cell instances so that we can have 
+                    // name-to-pointer associations.
+                    create_empty_formula_cells(cell_names, m_cells, m_cell_names);
+
+                    calc(cells);
                 }
                 else
                 {
@@ -445,16 +451,9 @@ void model_parser::parse()
     }
 }
 
-void model_parser::calc(const vector<string>& cell_names, const vector<cell>& cells)
+void model_parser::calc(const vector<cell>& cells)
 {
-    // First, create empty formula cell instances so that we can have 
-    // name-to-pointer associations.
-
-    cell_name_ptr_map_t  cell_name_ptr_map;
-    cell_ptr_name_map_t  cell_ptr_name_map;
-    create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
-
-    depends_tracker deptracker(&cell_ptr_name_map);
+    depends_tracker deptracker(&m_cell_names);
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
@@ -463,13 +462,13 @@ void model_parser::calc(const vector<string>& cell_names, const vector<cell>& ce
         cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
 #endif
         // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(cell.get_tokens(), &cell_name_ptr_map);
+        formula_parser fparser(cell.get_tokens(), &m_cells);
         fparser.parse();
         fparser.print_tokens();
 
         // Put the formula tokens into formula cell instance.
-        ptr_map<string, base_cell>::iterator itr = cell_name_ptr_map.find(cell.get_name());
-        if (itr == cell_name_ptr_map.end())
+        ptr_map<string, base_cell>::iterator itr = m_cells.find(cell.get_name());
+        if (itr == m_cells.end())
             throw general_error("formula cell not found");
 
         base_cell* pcell = itr->second;

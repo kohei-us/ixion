@@ -88,12 +88,15 @@ public:
 private:
     model_parser(); // disabled
 
-    void calc(const ::std::vector< ::std::string>& cell_names, const ::std::vector<cell>& cells);
+    void calc(const::std::vector<cell>& cells);
 
 private:
 
     ::std::string m_filepath;
     size_t m_thread_count;
+
+    cell_name_ptr_map_t     m_cells;
+    cell_ptr_name_map_t     m_cell_names;
 };
 
 }
