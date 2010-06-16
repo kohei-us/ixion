@@ -27,6 +27,7 @@
 
 #include "global.hpp"
 
+#include <cstdlib>
 #include <sstream>
 #include <sys/time.h>
 
@@ -111,6 +112,25 @@ formula_error_t formula_error::get_error() const
 formula_result::formula_result() :
     m_type(rt_value), m_value(0.0) {}
 
+formula_result::formula_result(const formula_result& r) :
+    m_type(r.m_type)
+{
+    switch (m_type)
+    {
+        case rt_value:
+            m_value = r.m_value;
+        break;
+        case rt_string:
+            m_string = new string(*r.m_string);
+        break;
+        case rt_error:
+            m_error = r.m_error;
+        break;
+        default:
+            assert(!"unknown formula result type specified during copy construction.");
+    }
+}
+
 formula_result::formula_result(double v) :
     m_type(rt_value), m_value(v) {}
 
@@ -174,6 +194,74 @@ formula_error_t formula_result::get_error() const
 formula_result::result_type formula_result::get_type() const
 {
     return m_type;
+}
+
+string formula_result::str() const
+{    
+    switch (m_type)
+    {
+        case rt_error:
+            return string(get_formula_error_name(m_error));
+        case rt_string:
+            return *m_string;
+        case rt_value:
+        {
+            ostringstream os;
+            os << m_value;
+            return os.str();
+        }
+        default:
+            assert(!"unknown formula result type!");
+    }
+    return string();
+}
+
+void formula_result::parse(const string& r)
+{
+    if (r.empty())
+        return;
+
+    const char* p = r.c_str();
+    if (*p == '#')
+        parse_error(p);
+    else if (*p == '"')
+        parse_string(p);
+    else
+    {
+        // parse this as a number.
+        m_value = strtod(p, NULL);
+        m_type = rt_value;
+    }
+
+}
+
+formula_result& formula_result::operator= (const formula_result& r)
+{
+    m_type = r.m_type;
+    switch (m_type)
+    {
+        case rt_value:
+            m_value = r.m_value;
+        break;
+        case rt_string:
+            m_string = new string(*r.m_string);
+        break;
+        case rt_error:
+            m_error = r.m_error;
+        break;
+        default:
+            assert(!"unknown formula result type specified during copy construction.");
+    }
+    return *this;
+}
+
+void formula_result::parse_error(const char* p)
+{
+}
+
+void formula_result::parse_string(const char* p)
+{
+    throw general_error("formula_result::parse_string() not implemented yet");
 }
 
 }

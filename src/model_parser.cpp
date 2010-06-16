@@ -94,6 +94,8 @@ namespace ixion {
 
 namespace {
 
+typedef ::std::unordered_map<string, formula_result> formula_results_t;
+
 /**
  * String buffer that only stores the first char position in memory and the
  * size of the string.
@@ -227,11 +229,52 @@ void parse_formula(const char*& p, parse_formula_data& data)
     }
 }
 
-void parse_result(const char*& p)
+void parse_result(const char*& p, formula_results_t& results)
 {
+    mem_str_buf buf, name, result;
     for (; *p != '\n'; ++p)
     {
+        if (*p == '=')
+        {
+            if (buf.empty())
+                throw model_parser::parse_error("left hand side is empty");
+
+            name = buf;
+            buf.clear();
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(p);
+            else
+                buf.inc();
+        }
     }
+
+    if (!buf.empty())
+    {
+        if (name.empty())
+            throw model_parser::parse_error("'=' is missing");
+
+        result = buf;
+    }
+
+    string name_s = name.str();
+    formula_result res;
+    res.parse(result.str());
+    formula_results_t::iterator itr = results.find(name_s);
+    if (itr == results.end())
+    {
+        // This cell doesn't exist yet.
+        pair<formula_results_t::iterator, bool> r = 
+            results.insert(formula_results_t::value_type(name_s, res));
+        if (!r.second)
+            throw model_parser::parse_error("failed to insert a new result.");
+    }
+    else
+        itr->second = res;
+
+    cout << name_s << "=" << result.str() << endl;
 }
 
 void parse_command(const char*& p, mem_str_buf& com)
@@ -435,6 +478,7 @@ void model_parser::parse()
     parse_mode_t parse_mode = parse_mode_unknown;
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];
     parse_formula_data formula_data;
+    formula_results_t formula_results;
 
     for (; p != p_last; ++p)
     {
@@ -443,9 +487,7 @@ void model_parser::parse()
             // This line contains a command.
             mem_str_buf buf_com;
             parse_command(p, buf_com);
-            if (buf_com.equals("check"))
-                cout << "check command" << endl;
-            else if (buf_com.equals("calc"))
+            if (buf_com.equals("calc"))
             {
                 // Perform full calculation on currently stored cells.
 
@@ -454,6 +496,16 @@ void model_parser::parse()
                 create_empty_formula_cells(formula_data.cell_names, m_cells, m_cell_names);
 
                 calc(formula_data.cells);
+            }
+            else if (buf_com.equals("check"))
+            {
+                // Check cell results.
+                cout << "check cell results" << endl;
+                formula_results_t::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
+                for (; itr != itr_end; ++itr)
+                {
+                    cout << itr->first << " : " << itr->second.str() << endl;
+                }
             }
             else if (buf_com.equals("mode-formula"))
             {
@@ -478,7 +530,7 @@ void model_parser::parse()
                 parse_formula(p, formula_data);
             break;
             case parse_mode_result:
-                parse_result(p);
+                parse_result(p, formula_results);
             break;
             default:
                 throw parse_error("unknown parse mode");

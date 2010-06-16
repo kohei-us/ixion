@@ -95,6 +95,7 @@ public:
     enum result_type { rt_value, rt_string, rt_error };
 
     formula_result();
+    formula_result(const formula_result& r);
     formula_result(double v);
     formula_result(::std::string* p);
     formula_result(formula_error_t e);
@@ -109,6 +110,22 @@ public:
     formula_error_t get_error() const;
 
     result_type get_type() const;
+
+    ::std::string str() const;
+
+    /**
+     * Parse a textural representation of a formula result, and set result 
+     * value of appropriate type.
+     * 
+     * @param str textural representation of a formula result.
+     */
+    void parse(const ::std::string& str);
+
+    formula_result& operator= (const formula_result& r);
+
+private:
+    void parse_error(const char* p);
+    void parse_string(const char* p);
 
 private:
     result_type m_type;
