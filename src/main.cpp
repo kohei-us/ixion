@@ -43,11 +43,15 @@ namespace {
 
 void print_help()
 {
-    cout << "usage: inputparser [options] FILE" << endl
+    cout << "usage: ixion-parser [options] FILE1 FILE2 ..." << endl
          << endl
-         << "The FILE must contain the definitions of cells according to the cell difinion rule." << endl
+         << "The FILE must contain the definitions of cells according to the cell difinion rule." << endl << endl
          << "Options:" << endl
-         << "  -h      print this help." << endl;
+         << "  -h                print this help." << endl
+         << "  -t n,--thread=n   specify the number of threads to use during calculation.  Note that the number" << endl
+         << "                    specified by this option corresponds with the number of calculation threads i.e." << endl
+         << "                    those threads that perform cell interpretations.  The total number of threads " << endl
+         << "                    used by this program will be n + 2." << endl;
 }
 
 }
