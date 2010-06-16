@@ -178,12 +178,6 @@ struct parse_formula_data
 {
     vector<model_parser::cell>  cells;
     vector<string>              cell_names;
-
-    void swap(parse_formula_data& r)
-    {
-        cells.swap(r.cells);
-        cell_names.swap(r.cell_names);
-    }
 };
 
 void parse_formula(const char*& p, parse_formula_data& data)
@@ -236,7 +230,7 @@ void parse_formula(const char*& p, parse_formula_data& data)
 void parse_command(const char*& p, mem_str_buf& com)
 {
     mem_str_buf _com;
-    ++p;
+    ++p; // skip '%'.
     _com.set_start(p);
     for (++p; *p != '\n'; ++p)
         _com.inc();

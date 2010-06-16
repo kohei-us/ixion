@@ -92,24 +92,30 @@ private:
 class formula_result
 {
 public:
+    enum result_type { rt_value, rt_string, rt_error };
+
     formula_result();
     formula_result(double v);
     formula_result(::std::string* p);
+    formula_result(formula_error_t e);
     ~formula_result();
 
     void set_value(double v);
     void set_string(::std::string* p);
+    void set_error(formula_error_t e);
     
     double get_value() const;
     const ::std::string& get_string() const;
+    formula_error_t get_error() const;
 
-    bool numeric() const;
+    result_type get_type() const;
 
 private:
-    bool m_numeric;
+    result_type m_type;
     union {
         ::std::string* m_string;
         double m_value;
+        formula_error_t m_error;
     };
 };
 

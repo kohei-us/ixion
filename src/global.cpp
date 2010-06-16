@@ -109,50 +109,71 @@ formula_error_t formula_error::get_error() const
 // ============================================================================
 
 formula_result::formula_result() :
-    m_numeric(true), m_value(0.0) {}
+    m_type(rt_value), m_value(0.0) {}
 
 formula_result::formula_result(double v) :
-    m_numeric(true), m_value(v) {}
+    m_type(rt_value), m_value(v) {}
 
 formula_result::formula_result(string* p) :
-    m_numeric(false), m_string(p) {}
+    m_type(rt_string), m_string(p) {}
+
+formula_result::formula_result(formula_error_t e) :
+    m_type(rt_error), m_error(e) {}
 
 formula_result::~formula_result()
 {
-    if (!m_numeric)
+    if (m_type == rt_string)
         delete m_string;
 }
 
 void formula_result::set_value(double v)
 {
-    if (!m_numeric)
+    if (m_type == rt_string)
         delete m_string;
 
-    m_numeric = true;
+    m_type = rt_value;
     m_value = v;
 }
 
 void formula_result::set_string(string* p)
 {
-    if (!m_numeric)
+    if (m_type == rt_string)
         delete m_string;
 
+    m_type = rt_string;
     m_string = p;
+}
+
+void formula_result::set_error(formula_error_t e)
+{
+    if (m_type == rt_string)
+        delete m_string;
+
+    m_type = rt_error;
+    m_error = e;
 }
 
 double formula_result::get_value() const
 {
+    assert(m_type == rt_value);
     return m_value;
 }
 
 const string& formula_result::get_string() const
 {
+    assert(m_type == rt_string);
     return *m_string;
 }
 
-bool formula_result::numeric() const
+formula_error_t formula_result::get_error() const
 {
-    return m_numeric;
+    assert(m_type == rt_error);
+    return m_error;
+}
+
+formula_result::result_type formula_result::get_type() const
+{
+    return m_type;
 }
 
 }
