@@ -80,10 +80,14 @@ public:
         lexer_tokens_t m_tokens;
     };
 
-    model_parser(const ::std::string& filepath);
+    model_parser(const ::std::string& filepath, size_t thread_count);
     ~model_parser();
 
     void parse();
+
+    void calc();
+
+
     const ::std::vector<cell>& get_cells() const;
     const ::std::vector< ::std::string>& get_cell_names() const;
 private:
@@ -92,7 +96,9 @@ private:
 private:
     ::std::vector<cell>             m_fcells;
     ::std::vector< ::std::string>   m_cell_names;
+
     ::std::string m_filepath;
+    size_t m_thread_count;
 };
 
 }

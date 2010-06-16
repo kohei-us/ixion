@@ -131,9 +131,14 @@ public:
         ::std::swap(m_size, r.m_size);
     }
 
-    bool equals(const char* s)
+    bool equals(const char* s) const
     {
         return ::std::strncmp(mp_buf, s, m_size) == 0;
+    }
+
+    string str() const
+    {
+        return string(mp_buf, m_size);
     }
 
 private:
@@ -261,56 +266,12 @@ bool parse_model_input(const string& fpath, const string& dotpath, size_t thread
     {
         // Read the model definition file, and parse the model cells. The
         // model parser parses each line and break it into lexer tokens.
-        model_parser parser(fpath);
+        model_parser parser(fpath, thread_count);
         parser.parse();
-
-        // First, create empty formula cell instances so that we can have 
-        // name-to-pointer associations.
-        const vector<string>& cell_names = parser.get_cell_names();
-
-        cell_name_ptr_map_t  cell_name_ptr_map;
-        cell_ptr_name_map_t  cell_ptr_name_map;
-        create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
-
-        depends_tracker deptracker(&cell_ptr_name_map);
-        const vector<model_parser::cell>& cells = parser.get_cells();
-        vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
-        for (; itr_cell != itr_cell_end; ++itr_cell)
-        {   
-            const model_parser::cell& cell = *itr_cell;
-#if DEBUG_INPUT_PARSER
-            cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
-#endif
-            // Parse the lexer tokens and turn them into formula tokens.
-            formula_parser fparser(cell.get_tokens(), &cell_name_ptr_map);
-            fparser.parse();
-            fparser.print_tokens();
-
-            // Put the formula tokens into formula cell instance.
-            ptr_map<string, base_cell>::iterator itr = cell_name_ptr_map.find(cell.get_name());
-            if (itr == cell_name_ptr_map.end())
-                throw general_error("formula cell not found");
-
-            base_cell* pcell = itr->second;
-            if (pcell->get_celltype() != celltype_formula)
-                throw general_error("formula cell is expected but not found");
-
-            // Transfer formula tokens from the parser to the cell.
-            formula_cell* fcell = static_cast<formula_cell*>(pcell);
-            fcell->swap_tokens(fparser.get_tokens());
-            assert(fparser.get_tokens().empty());
-
-            // Register cell dependencies.
-            const vector<base_cell*>& deps = fparser.get_depend_cells();
-            for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, fcell));
-        }
-
-        deptracker.print_dot_graph(dotpath);
-        deptracker.interpret_all_cells(thread_count);
     }
     catch (const exception& e)
     {
-        cout << e.what() << endl;
+        cerr << e.what() << endl;
         return false;
     }
     return true;
@@ -388,8 +349,8 @@ const lexer_tokens_t& model_parser::cell::get_tokens() const
 
 // ============================================================================
 
-model_parser::model_parser(const string& filepath) :
-    m_filepath(filepath)
+model_parser::model_parser(const string& filepath, size_t thread_count) :
+    m_filepath(filepath), m_thread_count(thread_count)
 {
 }
 
@@ -420,8 +381,21 @@ void model_parser::parse()
                 parse_command(p, buf_com);
                 if (buf_com.equals("check"))
                     cout << "check command" << endl;
+                else if (buf_com.equals("calc"))
+                {
+                    // Perform full calculation on currently stored cells.
+                    m_fcells.swap(fcells);
+                    m_cell_names.swap(cell_names);
+                    calc();
+                }
+                else
+                {
+                    ostringstream os;
+                    os << "unknown command: " << buf_com.str() << endl;
+                    throw parse_error(os.str());
+                }
 
-                throw parse_error("TODO: handle command.");
+                break;
             }
         }
 
@@ -469,9 +443,53 @@ void model_parser::parse()
                     buf.inc();
         }
     }
+}
 
-    m_fcells.swap(fcells);
-    m_cell_names.swap(cell_names);
+void model_parser::calc()
+{
+    // First, create empty formula cell instances so that we can have 
+    // name-to-pointer associations.
+    const vector<string>& cell_names = get_cell_names();
+
+    cell_name_ptr_map_t  cell_name_ptr_map;
+    cell_ptr_name_map_t  cell_ptr_name_map;
+    create_empty_formula_cells(cell_names, cell_name_ptr_map, cell_ptr_name_map);
+
+    depends_tracker deptracker(&cell_ptr_name_map);
+    const vector<model_parser::cell>& cells = get_cells();
+    vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
+    for (; itr_cell != itr_cell_end; ++itr_cell)
+    {   
+        const model_parser::cell& cell = *itr_cell;
+#if DEBUG_INPUT_PARSER
+        cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
+#endif
+        // Parse the lexer tokens and turn them into formula tokens.
+        formula_parser fparser(cell.get_tokens(), &cell_name_ptr_map);
+        fparser.parse();
+        fparser.print_tokens();
+
+        // Put the formula tokens into formula cell instance.
+        ptr_map<string, base_cell>::iterator itr = cell_name_ptr_map.find(cell.get_name());
+        if (itr == cell_name_ptr_map.end())
+            throw general_error("formula cell not found");
+
+        base_cell* pcell = itr->second;
+        if (pcell->get_celltype() != celltype_formula)
+            throw general_error("formula cell is expected but not found");
+
+        // Transfer formula tokens from the parser to the cell.
+        formula_cell* fcell = static_cast<formula_cell*>(pcell);
+        fcell->swap_tokens(fparser.get_tokens());
+        assert(fparser.get_tokens().empty());
+
+        // Register cell dependencies.
+        const vector<base_cell*>& deps = fparser.get_depend_cells();
+        for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, fcell));
+    }
+
+//  deptracker.print_dot_graph(dotpath);
+    deptracker.interpret_all_cells(m_thread_count);
 }
 
 const vector<model_parser::cell>& model_parser::get_cells() const
