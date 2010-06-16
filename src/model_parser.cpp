@@ -490,15 +490,5 @@ void model_parser::calc(const vector<string>& cell_names, const vector<cell>& ce
     deptracker.interpret_all_cells(m_thread_count);
 }
 
-const vector<model_parser::cell>& model_parser::get_cells() const
-{
-    return m_fcells;
-}
-
-const vector<string>& model_parser::get_cell_names() const
-{
-    return m_cell_names;
-}
-
 }
 
