@@ -41,6 +41,7 @@ HEADERS= \
 	$(INCDIR)/formula_functions.hpp \
 	$(INCDIR)/formula_lexer.hpp \
 	$(INCDIR)/formula_parser.hpp \
+	$(INCDIR)/formula_result.hpp \
 	$(INCDIR)/formula_tokens.hpp \
 	$(INCDIR)/formula_interpreter.hpp \
 	$(INCDIR)/global.hpp \
@@ -57,6 +58,7 @@ OBJFILES= \
 	$(OBJDIR)/formula_functions.o \
 	$(OBJDIR)/formula_lexer.o \
 	$(OBJDIR)/formula_parser.o \
+	$(OBJDIR)/formula_result.o \
 	$(OBJDIR)/formula_tokens.o \
 	$(OBJDIR)/formula_interpreter.o \
 	$(OBJDIR)/mem_str_buf.o \
@@ -95,6 +97,9 @@ $(OBJDIR)/formula_lexer.o: $(SRCDIR)/formula_lexer.cpp $(DEPENDS)
 
 $(OBJDIR)/formula_parser.o: $(SRCDIR)/formula_parser.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_parser.cpp
+
+$(OBJDIR)/formula_result.o: $(SRCDIR)/formula_result.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_result.cpp
 
 $(OBJDIR)/formula_tokens.o: $(SRCDIR)/formula_tokens.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/formula_tokens.cpp

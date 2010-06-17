@@ -31,6 +31,7 @@
 #include "formula_parser.hpp"
 #include "depends_tracker.hpp"
 #include "formula_interpreter.hpp"
+#include "formula_result.hpp"
 #include "mem_str_buf.hpp"
 
 #include <sstream>

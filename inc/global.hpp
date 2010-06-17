@@ -83,61 +83,6 @@ private:
     formula_error_t m_ferror;
 };
 
-// ============================================================================
-
-/**
- * Store formula result which may be either numeric, textural, or error.  In
- * case the result is textural, it owns the instance of the string. 
- */
-class formula_result
-{
-public:
-    enum result_type { rt_value, rt_string, rt_error };
-
-    formula_result();
-    formula_result(const formula_result& r);
-    formula_result(double v);
-    formula_result(::std::string* p);
-    formula_result(formula_error_t e);
-    ~formula_result();
-
-    void set_value(double v);
-    void set_string(::std::string* p);
-    void set_error(formula_error_t e);
-    
-    double get_value() const;
-    const ::std::string& get_string() const;
-    formula_error_t get_error() const;
-
-    result_type get_type() const;
-
-    ::std::string str() const;
-
-    /**
-     * Parse a textural representation of a formula result, and set result 
-     * value of appropriate type.
-     * 
-     * @param str textural representation of a formula result.
-     */
-    void parse(const ::std::string& str);
-
-    formula_result& operator= (const formula_result& r);
-    bool operator== (const formula_result& r) const;
-    bool operator!= (const formula_result& r) const;
-
-private:
-    void parse_error(const ::std::string& str);
-    void parse_string(const ::std::string& str);
-
-private:
-    result_type m_type;
-    union {
-        ::std::string* m_string;
-        double m_value;
-        formula_error_t m_error;
-    };
-};
-
 }
 
 #endif

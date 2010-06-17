@@ -27,6 +27,7 @@
 
 #include "cell.hpp"
 #include "formula_interpreter.hpp"
+#include "formula_result.hpp"
 
 #include <boost/thread.hpp>
 

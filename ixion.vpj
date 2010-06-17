@@ -211,6 +211,7 @@
 			<F N="inc/formula_interpreter.hpp"/>
 			<F N="inc/formula_lexer.hpp"/>
 			<F N="inc/formula_parser.hpp"/>
+			<F N="inc/formula_result.hpp"/>
 			<F N="inc/formula_tokens.hpp"/>
 			<F N="inc/global.hpp"/>
 			<F N="inc/lexer_tokens.hpp"/>
@@ -233,6 +234,7 @@
 			<F N="src/formula_interpreter.cpp"/>
 			<F N="src/formula_lexer.cpp"/>
 			<F N="src/formula_parser.cpp"/>
+			<F N="src/formula_result.cpp"/>
 			<F N="src/formula_tokens.cpp"/>
 			<F N="src/global.cpp"/>
 			<F N="src/lexer_tokens.cpp"/>

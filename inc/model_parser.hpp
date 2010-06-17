@@ -39,6 +39,8 @@
 
 namespace ixion {
 
+class formula_result;
+
 bool parse_model_input(const ::std::string& fpath, const ::std::string& dotpath, size_t thread_count);
 
 class model_parser : public ::boost::noncopyable

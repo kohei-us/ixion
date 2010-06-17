@@ -38,6 +38,8 @@
 
 namespace ixion {
 
+class formula_result;
+
 // ============================================================================
 
 class address
