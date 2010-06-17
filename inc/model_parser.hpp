@@ -44,6 +44,8 @@ bool parse_model_input(const ::std::string& fpath, const ::std::string& dotpath,
 class model_parser : public ::boost::noncopyable
 {
 public:
+    typedef ::std::unordered_map< ::std::string, formula_result> formula_results_t;
+
     class file_not_found : public ::std::exception
     {
     public:
@@ -89,6 +91,7 @@ private:
     model_parser(); // disabled
 
     void calc(const::std::vector<cell>& cells);
+    void check(const formula_results_t& formula_results);
 
 private:
 

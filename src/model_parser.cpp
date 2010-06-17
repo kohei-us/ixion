@@ -95,8 +95,6 @@ namespace ixion {
 
 namespace {
 
-typedef ::std::unordered_map<string, formula_result> formula_results_t;
-
 void load_file_content(const string& filepath, string& content)
 {
     ifstream file(filepath.c_str());
@@ -171,7 +169,7 @@ void parse_formula(const char*& p, parse_formula_data& data)
     }
 }
 
-void parse_result(const char*& p, formula_results_t& results)
+void parse_result(const char*& p, model_parser::formula_results_t& results)
 {
     mem_str_buf buf, name, result;
     for (; *p != '\n'; ++p)
@@ -204,12 +202,12 @@ void parse_result(const char*& p, formula_results_t& results)
     string name_s = name.str();
     formula_result res;
     res.parse(result.str());
-    formula_results_t::iterator itr = results.find(name_s);
+    model_parser::formula_results_t::iterator itr = results.find(name_s);
     if (itr == results.end())
     {
         // This cell doesn't exist yet.
-        pair<formula_results_t::iterator, bool> r = 
-            results.insert(formula_results_t::value_type(name_s, res));
+        pair<model_parser::formula_results_t::iterator, bool> r = 
+            results.insert(model_parser::formula_results_t::value_type(name_s, res));
         if (!r.second)
             throw model_parser::parse_error("failed to insert a new result.");
     }
@@ -440,12 +438,7 @@ void model_parser::parse()
             else if (buf_com.equals("check"))
             {
                 // Check cell results.
-                cout << "check cell results" << endl;
-                formula_results_t::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
-                for (; itr != itr_end; ++itr)
-                {
-                    cout << itr->first << " : " << itr->second.str() << endl;
-                }
+                check(formula_results);
             }
             else if (buf_com.equals("mode-formula"))
             {
@@ -514,6 +507,19 @@ void model_parser::calc(const vector<cell>& cells)
 
 //  deptracker.print_dot_graph(dotpath);
     deptracker.interpret_all_cells(m_thread_count);
+}
+
+void model_parser::check(const formula_results_t& formula_results)
+{
+    cout << get_formula_result_output_separator() << endl
+         << "check results" << endl
+         << get_formula_result_output_separator() << endl;
+
+    formula_results_t::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
+    for (; itr != itr_end; ++itr)
+    {
+        cout << itr->first << " : " << itr->second.str() << endl;
+    }
 }
 
 }
