@@ -47,7 +47,8 @@ public:
         m_pos(0), 
         m_size(formula.size()), 
         m_char(0),
-        m_csep(',')
+        m_csep(','),
+        m_sep_decimal('.')
     {
     }
 
@@ -86,6 +87,7 @@ private:
     
     // data that influence tokenization behavior.
     char m_csep; // function argument separator
+    char m_sep_decimal; // decimal separator.
 };
 
 void tokenizer::run()
@@ -99,6 +101,11 @@ void tokenizer::run()
         if (m_char == m_csep)
         {
             sep();
+            continue;
+        }
+        else if (m_char == m_sep_decimal)
+        {
+            dot();
             continue;
         }
 
@@ -118,9 +125,6 @@ void tokenizer::run()
                 break;
             case ' ':
                 space();
-                break;
-            case '.':
-                dot();
                 break;
             case '+':
                 plus();

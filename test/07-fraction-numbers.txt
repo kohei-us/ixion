@@ -1,0 +1,3 @@
+%mode init
+A1=2.5
+%calc
