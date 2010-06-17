@@ -66,6 +66,12 @@ public:
         ::std::string m_msg;
     };
 
+    class check_error : public general_error
+    {
+    public:
+        check_error(const ::std::string& msg);
+    };
+
     class cell
     {
     public:
@@ -93,12 +99,19 @@ private:
     void calc(const::std::vector<cell>& cells);
     void check(const formula_results_t& formula_results);
 
+    const base_cell* get_cell(const ::std::string& name) const;
+
 private:
 
     ::std::string m_filepath;
     size_t m_thread_count;
 
+    /** 
+     * Cell name to pointer mapping.  This container owns the cell instances.
+     */
     cell_name_ptr_map_t     m_cells;
+
+    /** Cell pointer to name mapping, for quick name lookup. */
     cell_ptr_name_map_t     m_cell_names;
 };
 

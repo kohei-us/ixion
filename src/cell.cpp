@@ -254,6 +254,12 @@ void formula_cell::swap_tokens(formula_tokens_t& tokens)
     m_tokens.swap(tokens);
 }
 
+const formula_result* formula_cell::get_result_cache() const
+{
+    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+    return m_interpret_status.result;
+}
+
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
 {
     while (!m_interpret_status.result)

@@ -86,8 +86,8 @@ private:
 // ============================================================================
 
 /**
- * Store formula result which may be either numeric or textural.  In case
- * the result is textural, it owns the instance of the string.
+ * Store formula result which may be either numeric, textural, or error.  In
+ * case the result is textural, it owns the instance of the string. 
  */
 class formula_result
 {
@@ -122,6 +122,8 @@ public:
     void parse(const ::std::string& str);
 
     formula_result& operator= (const formula_result& r);
+    bool operator== (const formula_result& r) const;
+    bool operator!= (const formula_result& r) const;
 
 private:
     void parse_error(const ::std::string& str);

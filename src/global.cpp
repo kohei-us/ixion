@@ -257,6 +257,35 @@ formula_result& formula_result::operator= (const formula_result& r)
     return *this;
 }
 
+bool formula_result::operator== (const formula_result& r) const
+{
+    if (m_type != r.m_type)
+        return false;
+
+    switch (m_type)
+    {
+        case rt_value:
+            return m_value == r.m_value;
+        break;
+        case rt_string:
+            return *m_string == *r.m_string;
+        break;
+        case rt_error:
+            return m_error == r.m_error;
+        break;
+        default:
+            assert(!"unknown formula result type specified during copy construction.");
+    }
+
+    assert(!"this should never be reached!");
+    return false;
+}
+
+bool formula_result::operator!= (const formula_result& r) const
+{
+    return !operator== (r);
+}
+
 void formula_result::parse_error(const string& str)
 {
     const char* p = &str[0];

@@ -365,6 +365,11 @@ const char* model_parser::parse_error::what() const throw()
 
 // ============================================================================
 
+model_parser::check_error::check_error(const string& msg) :
+    general_error(msg) {}
+
+// ============================================================================
+
 model_parser::cell::cell(const string& name, lexer_tokens_t& tokens) :
     m_name(name)
 {
@@ -512,14 +517,43 @@ void model_parser::calc(const vector<cell>& cells)
 void model_parser::check(const formula_results_t& formula_results)
 {
     cout << get_formula_result_output_separator() << endl
-         << "check results" << endl
+         << "checking results" << endl
          << get_formula_result_output_separator() << endl;
 
     formula_results_t::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
     for (; itr != itr_end; ++itr)
     {
-        cout << itr->first << " : " << itr->second.str() << endl;
+        const string& name = itr->first;
+        const formula_result& res = itr->second;
+        cout << name << " : " << res.str() << endl;
+        const base_cell* pcell = get_cell(name);
+        if (!pcell)
+        {
+            ostringstream os;
+            os << "specified cell instance not found: " << name;
+            throw check_error(os.str());
+        }
+
+        if (pcell->get_celltype() != celltype_formula)
+            throw check_error("expected formula cell");
+
+        const formula_result* res_cell = static_cast<const formula_cell*>(pcell)->get_result_cache();
+        if (!res_cell)
+            throw check_error("result is not cached");
+
+        if (*res_cell != res)
+        {
+            ostringstream os;
+            os << "unexpected result: (expected: " << res.str() << "; actual: " << res_cell->str() << ")";
+            throw check_error(os.str());
+        }
     }
+}
+
+const base_cell* model_parser::get_cell(const string& name) const
+{
+    cell_name_ptr_map_t::const_iterator itr = m_cells.find(name);
+    return itr == m_cells.end() ? NULL : itr->second;
 }
 
 }

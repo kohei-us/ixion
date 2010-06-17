@@ -135,6 +135,8 @@ public:
     void reset(const cell_ptr_name_map_t& cell_ptr_name_map);
     void swap_tokens(formula_tokens_t& tokens);
 
+    const formula_result* get_result_cache() const;
+
 private:
     /**
      * Block until the result becomes available.
