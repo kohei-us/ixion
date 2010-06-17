@@ -44,6 +44,15 @@ const char* get_formula_result_output_separator()
     return sep;
 }
 
+void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& cell_names)
+{
+    cell_ptr_name_map_t _cell_names;
+    cell_name_ptr_map_t::const_iterator itr = cells.begin(), itr_end = cells.end();
+    for (; itr != itr_end; ++itr)
+        _cell_names.insert(cell_ptr_name_map_t::value_type(itr->second, itr->first));
+    cell_names.swap(_cell_names);
+}
+
 string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell)
 {
     cell_ptr_name_map_t::const_iterator itr = names.find(cell);

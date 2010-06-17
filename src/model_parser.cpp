@@ -291,24 +291,20 @@ void ensure_unique_names(const vector<string>& cell_names)
 }
 
 void create_empty_formula_cells(
-    const vector<string>& cell_names, cell_name_ptr_map_t& cell_map, cell_ptr_name_map_t& ptr_name_map)
+    const vector<string>& cell_names, cell_name_ptr_map_t& cell_map)
 {
     ensure_unique_names(cell_names);
     cell_map.clear();
-    ptr_name_map.clear();
 
     typedef ptr_map<string, base_cell> _cellmap_type;
     typedef map<const base_cell*, string> _ptrname_type;
     for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
     _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
 
-    for (; itr != itr_end; ++itr)
-    {    
 #if DEBUG_INPUT_PARSER
+    for (; itr != itr_end; ++itr)
         cout << itr->first << " := " << itr->second << endl;
 #endif
-        ptr_name_map.insert(_ptrname_type::value_type(itr->second, itr->first));
-    }
 }
 
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr_map_t& formula_cells)
@@ -485,13 +481,19 @@ void model_parser::parse()
             parse_command(p, buf_com);
             if (buf_com.equals("calc"))
             {
+                if (parse_mode != parse_mode_init)
+                    throw parse_error("'calc' command must be used in the init mode.");
+
                 // Perform full calculation on currently stored cells.
-                assert(parse_mode == parse_mode_init);
+
                 // First, create empty formula cell instances so that we can have 
                 // name-to-pointer associations.
-                create_empty_formula_cells(formula_data.cell_names, m_cells, m_cell_names);
+                create_empty_formula_cells(formula_data.cell_names, m_cells);
                 convert_lexer_tokens(formula_data.cells, m_cells);
                 calc();
+            }
+            else if (buf_com.equals("recalc"))
+            {
             }
             else if (buf_com.equals("check"))
             {
@@ -539,7 +541,10 @@ void model_parser::parse()
 
 void model_parser::calc()
 {
-    depends_tracker deptracker(&m_cell_names);
+    cell_ptr_name_map_t cell_names;
+    build_ptr_name_map(m_cells, cell_names);
+
+    depends_tracker deptracker(&cell_names);
     cell_name_ptr_map_t::iterator itr = m_cells.begin(), itr_end = m_cells.end();
     for (; itr != itr_end; ++itr)
     {

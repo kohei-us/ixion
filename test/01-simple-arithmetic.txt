@@ -22,4 +22,4 @@ A9=#DIV/0!
 %check
 %mode-edit
 A8=A6*2
-%calc
+%recalc
