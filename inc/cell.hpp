@@ -98,22 +98,12 @@ private:
 
 class formula_cell : public base_cell
 {
-    struct result_cache
-    {
-        double          value;
-        ::std::string   text;
-        formula_error_t error;
-
-        result_cache();
-        result_cache(const result_cache& r);
-    };
-
     struct interpret_status
     {
         ::boost::mutex mtx;
         ::boost::condition_variable cond;
 
-        result_cache* result;
+        formula_result* result;
 
         interpret_status();
         interpret_status(const interpret_status& r);

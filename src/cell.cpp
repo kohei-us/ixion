@@ -96,10 +96,6 @@ const char* string_cell::print() const
 
 // ============================================================================
 
-formula_cell::result_cache::result_cache() : value(0.0), error(fe_no_error) {}
-formula_cell::result_cache::result_cache(const result_cache& r) : 
-    value(r.value), text(r.text), error(r.error) {}
-
 formula_cell::interpret_status::interpret_status() : 
     result(NULL)
 {}
@@ -108,7 +104,7 @@ formula_cell::interpret_status::interpret_status(const interpret_status& r) :
     result(NULL)
 {
     if (r.result)
-        result = new result_cache(*r.result);
+        result = new formula_result(*r.result);
 }
 
 formula_cell::interpret_status::~interpret_status()
@@ -153,11 +149,12 @@ double formula_cell::get_value() const
         // Result not cached yet.  Reference error.
         throw formula_error(fe_ref_result_not_available);
 
-    if (m_interpret_status.result->error != fe_no_error)
+    if (m_interpret_status.result->get_type() == formula_result::rt_error)
         // Error condition.
-        throw formula_error(m_interpret_status.result->error);
+        throw formula_error(m_interpret_status.result->get_error());
 
-    return m_interpret_status.result->value;
+    assert(m_interpret_status.result->get_type() == formula_result::rt_value);
+    return m_interpret_status.result->get_value();
 }
 
 const char* formula_cell::print() const
@@ -181,26 +178,25 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
         {
             // When the result is already cached before the cell is interpreted, 
             // it can only mean the cell has circular dependency.
-            assert(m_interpret_status.result->error != fe_no_error);
+            assert(m_interpret_status.result->get_type() == formula_result::rt_error);
             ostringstream os;
             os << get_formula_result_output_separator() << endl;
-            os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->error) << endl;
+            os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->get_error()) << endl;
             cout << os.str();
             return;
         }
     
         formula_interpreter fin(this, cell_ptr_name_map);
-        m_interpret_status.result = new result_cache;
+        m_interpret_status.result = new formula_result;
         if (fin.interpret())
         {
             // Successful interpretation.
-            m_interpret_status.result->value = fin.get_result();
-            m_interpret_status.result->text.clear();
+            m_interpret_status.result->set_value(fin.get_result());
         }
         else
         {
             // Interpretation ended with an error condition.
-            m_interpret_status.result->error = fin.get_error();
+            m_interpret_status.result->set_error(fin.get_error());
         }
     }
     m_interpret_status.cond.notify_all();
@@ -235,8 +231,7 @@ void formula_cell::check_circular()
             cout << os.str();
 #endif
             assert(!m_interpret_status.result);
-            m_interpret_status.result = new result_cache;
-            m_interpret_status.result->error = fe_ref_result_not_available;
+            m_interpret_status.result = new formula_result(fe_ref_result_not_available);
             return;
         }
     }
