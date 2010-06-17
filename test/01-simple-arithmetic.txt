@@ -1,4 +1,4 @@
-%mode-formula
+%mode-init
 A1=1
 A2=A1+10
 A3=A2+A1*30
@@ -20,3 +20,6 @@ A7=#REF!
 A8=#DIV/0!
 A9=#DIV/0!
 %check
+%mode-edit
+A8=A6*2
+%calc

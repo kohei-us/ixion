@@ -139,6 +139,8 @@ public:
 
     const formula_result* get_result_cache() const;
 
+    void get_ref_tokens(::std::vector<formula_token_base*>& tokens);
+
 private:
     /**
      * Block until the result becomes available.

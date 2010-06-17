@@ -113,17 +113,24 @@ void load_file_content(const string& filepath, string& content)
 enum parse_mode_t
 {
     parse_mode_unknown = 0,
-    parse_mode_formula,
-    parse_mode_result
+    parse_mode_init,
+    parse_mode_result,
+    parse_mode_edit
 };
 
-struct parse_formula_data
+struct parse_init_data
 {
     vector<model_parser::cell>  cells;
     vector<string>              cell_names;
+
+    void clear()
+    {
+        cells.clear();
+        cell_names.clear();
+    }
 };
 
-void parse_formula(const char*& p, parse_formula_data& data)
+void parse_init(const char*& p, parse_init_data& data)
 {
     mem_str_buf buf, name, formula;
     for (; *p != '\n'; ++p)
@@ -242,6 +249,25 @@ private:
     ptr_map<string, base_cell>& m_cell_map;
 };
 
+class ref_cell_picker : public unary_function<formula_token_base*, void>
+{
+public:
+    ref_cell_picker(vector<base_cell*>& deps) :
+        m_deps(deps) {}
+
+    void operator() (formula_token_base* p)
+    {
+        if (p->get_opcode() != fop_single_ref)
+            return;
+
+        const base_cell* refcell = static_cast<single_ref_token*>(p)->get_single_ref();
+        m_deps.push_back(const_cast<base_cell*>(refcell));
+    }
+
+private:
+    vector<base_cell*>& m_deps;
+};
+
 class depcell_inserter : public unary_function<base_cell*, void>
 {
 public:
@@ -282,6 +308,32 @@ void create_empty_formula_cells(
         cout << itr->first << " := " << itr->second << endl;
 #endif
         ptr_name_map.insert(_ptrname_type::value_type(itr->second, itr->first));
+    }
+}
+
+void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr_map_t& formula_cells)
+{
+    vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
+    for (; itr_cell != itr_cell_end; ++itr_cell)
+    {   
+        const model_parser::cell& cell = *itr_cell;
+#if DEBUG_INPUT_PARSER
+        cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
+#endif
+        // Parse the lexer tokens and turn them into formula tokens.
+        formula_parser fparser(cell.get_tokens(), &formula_cells);
+        fparser.parse();
+        fparser.print_tokens();
+
+        // Put the formula tokens into formula cell instance.
+        ptr_map<string, base_cell>::iterator itr = formula_cells.find(cell.get_name());
+        if (itr == formula_cells.end())
+            throw general_error("formula cell not found");
+
+        // Transfer formula tokens from the parser to the cell.
+        formula_cell* fcell = static_cast<formula_cell*>(itr->second);
+        fcell->swap_tokens(fparser.get_tokens());
+        assert(fparser.get_tokens().empty());
     }
 }
 
@@ -421,7 +473,7 @@ void model_parser::parse()
 
     parse_mode_t parse_mode = parse_mode_unknown;
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];
-    parse_formula_data formula_data;
+    parse_init_data formula_data;
     formula_results_t formula_results;
 
     for (; p != p_last; ++p)
@@ -434,25 +486,29 @@ void model_parser::parse()
             if (buf_com.equals("calc"))
             {
                 // Perform full calculation on currently stored cells.
-
+                assert(parse_mode == parse_mode_init);
                 // First, create empty formula cell instances so that we can have 
                 // name-to-pointer associations.
                 create_empty_formula_cells(formula_data.cell_names, m_cells, m_cell_names);
-
-                calc(formula_data.cells);
+                convert_lexer_tokens(formula_data.cells, m_cells);
+                calc();
             }
             else if (buf_com.equals("check"))
             {
                 // Check cell results.
                 check(formula_results);
             }
-            else if (buf_com.equals("mode-formula"))
+            else if (buf_com.equals("mode-init"))
             {
-                parse_mode = parse_mode_formula;
+                parse_mode = parse_mode_init;
             }
             else if (buf_com.equals("mode-result"))
             {
                 parse_mode = parse_mode_result;
+            }
+            else if (buf_com.equals("mode-edit"))
+            {
+                parse_mode = parse_mode_edit;
             }
             else
             {
@@ -465,8 +521,12 @@ void model_parser::parse()
 
         switch (parse_mode)
         {
-            case parse_mode_formula:
-                parse_formula(p, formula_data);
+            case parse_mode_init:
+                parse_init(p, formula_data);
+            break;
+            case parse_mode_edit:
+                formula_data.clear();
+                parse_init(p, formula_data);
             break;
             case parse_mode_result:
                 parse_result(p, formula_results);
@@ -477,41 +537,28 @@ void model_parser::parse()
     }
 }
 
-void model_parser::calc(const vector<cell>& cells)
+void model_parser::calc()
 {
     depends_tracker deptracker(&m_cell_names);
-    vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
-    for (; itr_cell != itr_cell_end; ++itr_cell)
-    {   
-        const model_parser::cell& cell = *itr_cell;
-#if DEBUG_INPUT_PARSER
-        cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
-#endif
-        // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(cell.get_tokens(), &m_cells);
-        fparser.parse();
-        fparser.print_tokens();
-
-        // Put the formula tokens into formula cell instance.
-        ptr_map<string, base_cell>::iterator itr = m_cells.find(cell.get_name());
-        if (itr == m_cells.end())
-            throw general_error("formula cell not found");
-
+    cell_name_ptr_map_t::iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    for (; itr != itr_end; ++itr)
+    {
         base_cell* pcell = itr->second;
         if (pcell->get_celltype() != celltype_formula)
             throw general_error("formula cell is expected but not found");
 
-        // Transfer formula tokens from the parser to the cell.
-        formula_cell* fcell = static_cast<formula_cell*>(pcell);
-        fcell->swap_tokens(fparser.get_tokens());
-        assert(fparser.get_tokens().empty());
-
         // Register cell dependencies.
-        const vector<base_cell*>& deps = fparser.get_depend_cells();
+        formula_cell* fcell = static_cast<formula_cell*>(pcell);
+        vector<formula_token_base*> ref_tokens;
+        fcell->get_ref_tokens(ref_tokens);
+
+        // Pick up referenced cells from ref tokens.  Combine this with the 
+        // above get_ref_tokens() call above for efficiency.
+        vector<base_cell*> deps;
+        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(deps));
+
         for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, fcell));
     }
-
-//  deptracker.print_dot_graph(dotpath);
     deptracker.interpret_all_cells(m_thread_count);
 }
 

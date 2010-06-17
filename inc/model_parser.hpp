@@ -98,7 +98,7 @@ public:
 private:
     model_parser(); // disabled
 
-    void calc(const::std::vector<cell>& cells);
+    void calc();
     void check(const formula_results_t& formula_results);
 
     const base_cell* get_cell(const ::std::string& name) const;

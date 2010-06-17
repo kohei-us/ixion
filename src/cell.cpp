@@ -29,6 +29,7 @@
 #include "formula_interpreter.hpp"
 #include "formula_result.hpp"
 
+#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
 #include <string>
@@ -40,6 +41,34 @@
 using namespace std;
 
 namespace ixion {
+
+namespace {
+
+class ref_token_picker : public unary_function<formula_token_base, void>
+{
+public:
+    ref_token_picker() :
+        mp_tokens(new vector<formula_token_base*>()) {}
+
+    ref_token_picker(const ref_token_picker& r) :
+        mp_tokens(r.mp_tokens) {}
+
+    void operator() (formula_token_base& t)
+    {
+        if (t.get_opcode() == fop_single_ref)
+            mp_tokens->push_back(&t);
+    }
+
+    void swap_tokens(vector<formula_token_base*>& dest)
+    {
+        mp_tokens->swap(dest);
+    }
+
+private:
+    ::boost::shared_ptr<vector<formula_token_base*> > mp_tokens;
+};
+
+}
 
 // ============================================================================
 
@@ -259,6 +288,12 @@ const formula_result* formula_cell::get_result_cache() const
 {
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     return m_interpret_status.result;
+}
+
+void formula_cell::get_ref_tokens(vector<formula_token_base*>& tokens)
+{
+    ref_token_picker func;
+    for_each(m_tokens.begin(), m_tokens.end(), func).swap_tokens(tokens);
 }
 
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
