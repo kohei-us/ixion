@@ -259,11 +259,12 @@ formula_result& formula_result::operator= (const formula_result& r)
 
 void formula_result::parse_error(const string& str)
 {
-    assert(!str.empty());
     const char* p = &str[0];
     size_t n = str.size();
 
+    assert(n);
     assert(*p == '#');
+
     ++p; // skip '#'.
     mem_str_buf buf;
     for (size_t i = 0; i < n; ++p, ++i)
