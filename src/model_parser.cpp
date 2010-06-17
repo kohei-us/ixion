@@ -494,21 +494,23 @@ void model_parser::parse()
             }
             else if (buf_com.equals("recalc"))
             {
+                if (parse_mode != parse_mode_edit)
+                    throw parse_error("'recalc' command must be used in the edit mode.");
             }
             else if (buf_com.equals("check"))
             {
                 // Check cell results.
                 check(formula_results);
             }
-            else if (buf_com.equals("mode-init"))
+            else if (buf_com.equals("mode init"))
             {
                 parse_mode = parse_mode_init;
             }
-            else if (buf_com.equals("mode-result"))
+            else if (buf_com.equals("mode result"))
             {
                 parse_mode = parse_mode_result;
             }
-            else if (buf_com.equals("mode-edit"))
+            else if (buf_com.equals("mode edit"))
             {
                 parse_mode = parse_mode_edit;
             }

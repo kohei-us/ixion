@@ -111,7 +111,7 @@ private:
     /** 
      * Cell name to pointer mapping.  This container owns the cell instances.
      */
-    cell_name_ptr_map_t     m_cells;
+    cell_name_ptr_map_t m_cells;
 };
 
 }
