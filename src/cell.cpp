@@ -36,7 +36,7 @@
 #include <sstream>
 #include <iostream>
 
-#define DEBUG_FORMULA_CELL 1
+#define DEBUG_FORMULA_CELL 0
 
 using namespace std;
 
@@ -199,6 +199,12 @@ const formula_tokens_t& formula_cell::get_tokens() const
 
 void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
 {
+#if DEBUG_FORMULA_CELL
+    ostringstream os;
+    os << get_formula_result_output_separator() << endl;
+    os << global::get_cell_name(this) << ": interpreting" << endl;
+    cout << os.str();
+#endif
     {
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
 
@@ -275,6 +281,11 @@ void formula_cell::check_circular()
 
 void formula_cell::reset()
 {
+#if DEBUG_FORMULA_CELL
+    ostringstream os;
+    os << global::get_cell_name(this) << ": reset" << endl;
+    cout << os.str();
+#endif
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;

@@ -523,7 +523,10 @@ void model_parser::parse()
                 if (parse_mode != parse_mode_edit)
                     throw parse_error("'recalc' command must be used in the edit mode.");
 
-                cout << "recalc" << endl;
+                ostringstream os;
+                os << get_formula_result_output_separator() << endl
+                    << "recalculating" << endl;
+                cout << os.str();
                 update_formula_cells(data.cells, m_cells);
                 calc();
             }

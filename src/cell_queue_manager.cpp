@@ -146,6 +146,12 @@ struct worker_thread_status
     condition_variable cond;
     queue<worker_thread_data*> idle_wts;
     worker_thread_status() {}
+
+    void reset()
+    {
+        while (!idle_wts.empty())
+            idle_wts.pop();
+    }
 };
 
 worker_thread_status wts;
@@ -179,7 +185,6 @@ void worker_main(worker_thread_data* data, const cell_ptr_name_map_t& names)
         if (!data->action.cell)
             continue;
 
-//      cout << "interpret cell " << get_cell_name(names, data->action.cell) << " ----------------------" << endl;;
         data->action.cell->interpret(names);
         data->action.cell = NULL;
     }
@@ -211,6 +216,14 @@ struct manage_queue_data
     manage_queue_data() :
         thread_ready(false),
         action(qm_no_action) {}
+
+    void reset()
+    {
+        thread_ready = false;
+        action = qm_no_action;
+        while (!cells.empty())
+            cells.pop();
+    }
 };
 
 manage_queue_data data;
@@ -238,7 +251,11 @@ void init_workers(size_t worker_count, const cell_ptr_name_map_t& names)
 
 void terminate_workers()
 {
-    tprintf("terminate all workers.");
+#if DEBUG_QUEUE_MANAGER
+    ostringstream os;
+    os << "terminating all workers..." << endl;
+    cout << os.str();
+#endif
     ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
@@ -329,7 +346,12 @@ void manage_queue_main(size_t worker_count, const cell_ptr_name_map_t& names)
 
 void add_cell_to_queue(formula_cell* p)
 {
-    tprintf("adding to queue...");
+#if DEBUG_QUEUE_MANAGER
+    ostringstream os;
+    os << "adding cell " << global::get_cell_name(p) << " to queue..." << endl;
+    cout << os.str();
+#endif
+
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
     data.cells.push(p);
     data.action = qm_cell_added_to_queue;
@@ -359,6 +381,10 @@ thread thr_queue;
 
 void cell_queue_manager::init(size_t thread_count, const cell_ptr_name_map_t& names)
 {
+    // Don't forget to reset the global data.
+    data.reset();
+    wts.reset();
+
     thread thr(::boost::bind(manage_queue_main, thread_count, names));
     thr_queue.swap(thr);
     wait_init();
