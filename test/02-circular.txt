@@ -1,3 +1,4 @@
+%mode init
 A1=20
 A2=A1+A3
 A3=A2-10
@@ -8,3 +9,5 @@ A7=A8
 A8=A9
 A9=A10
 A10=A6
+%calc
+

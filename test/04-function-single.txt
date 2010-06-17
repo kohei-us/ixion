@@ -1,1 +1,4 @@
+%mode init
 A1=MAX(10,20,5,36)+100
+%calc
+

@@ -1,3 +1,4 @@
+%mode init
 A1=WAIT()+1
 A2=WAIT()+20
 A3=WAIT()+15
@@ -5,3 +6,5 @@ A4=WAIT()+5
 A5=A1+A2+A3+A4+WAIT()
 A6=(A2+A3)*2+WAIT()
 A7=A5+A6+WAIT()
+%calc
+
