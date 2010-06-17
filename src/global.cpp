@@ -26,7 +26,9 @@
  ************************************************************************/
 
 #include "global.hpp"
+#include "mem_str_buf.hpp"
 
+#include <iostream>
 #include <cstdlib>
 #include <sstream>
 #include <sys/time.h>
@@ -223,9 +225,9 @@ void formula_result::parse(const string& r)
 
     const char* p = r.c_str();
     if (*p == '#')
-        parse_error(p);
+        parse_error(r);
     else if (*p == '"')
-        parse_string(p);
+        parse_string(r);
     else
     {
         // parse this as a number.
@@ -255,13 +257,51 @@ formula_result& formula_result::operator= (const formula_result& r)
     return *this;
 }
 
-void formula_result::parse_error(const char* p)
+void formula_result::parse_error(const string& str)
 {
+    assert(!str.empty());
+    const char* p = &str[0];
+    size_t n = str.size();
+
+    assert(*p == '#');
+    ++p; // skip '#'.
+    mem_str_buf buf;
+    for (size_t i = 0; i < n; ++p, ++i)
+    {
+        if (*p == '!')
+        {
+            if (buf.empty())
+                throw general_error("failed to parse error string: buffer is empty.");
+
+            if (buf.equals("REF"))
+            {
+                m_error = fe_ref_result_not_available;
+            }
+            else if (buf.equals("DIV/0"))
+            {
+                m_error = fe_division_by_zero;
+            }
+            else
+                throw general_error("failed to parse error string in formula_result::parse_error().");
+
+            m_type = rt_error;
+            return;
+        }
+
+        if (buf.empty())
+            buf.set_start(p);
+        else
+            buf.inc();
+    }
+
+    ostringstream os;
+    os << "malformed error string: " << str;
+    throw general_error(os.str());
 }
 
-void formula_result::parse_string(const char* p)
+void formula_result::parse_string(const string& str)
 {
-    throw general_error("formula_result::parse_string() not implemented yet");
+    throw general_error("formula_result::parse_string() is not implemented yet.");
 }
 
 }

@@ -124,8 +124,8 @@ public:
     formula_result& operator= (const formula_result& r);
 
 private:
-    void parse_error(const char* p);
-    void parse_string(const char* p);
+    void parse_error(const ::std::string& str);
+    void parse_string(const ::std::string& str);
 
 private:
     result_type m_type;

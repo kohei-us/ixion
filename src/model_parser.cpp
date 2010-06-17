@@ -215,8 +215,6 @@ void parse_result(const char*& p, formula_results_t& results)
     }
     else
         itr->second = res;
-
-    cout << name_s << "=" << result.str() << endl;
 }
 
 void parse_command(const char*& p, mem_str_buf& com)
