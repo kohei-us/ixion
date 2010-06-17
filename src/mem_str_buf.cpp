@@ -92,4 +92,9 @@ mem_str_buf& mem_str_buf::operator= (const mem_str_buf& r)
     return *this;
 }
 
+char mem_str_buf::operator[] (size_t pos) const
+{
+    return mp_buf[pos];
+}
+
 }

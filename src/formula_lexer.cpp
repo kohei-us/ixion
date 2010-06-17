@@ -40,7 +40,7 @@ namespace ixion {
 class tokenizer : public ::boost::noncopyable
 {
 public:
-    tokenizer(lexer_tokens_t& tokens, string& formula) :
+    tokenizer(lexer_tokens_t& tokens, const mem_str_buf& formula) :
         m_tokens(tokens), 
         m_formula(formula), 
         m_buffer_type(buf_name), 
@@ -76,7 +76,7 @@ private:
     };
 
     lexer_tokens_t& m_tokens;
-    string& m_formula;
+    const mem_str_buf& m_formula;
 
     vector<char> m_buffer;
     buffer_t m_buffer_type;
@@ -264,7 +264,7 @@ const char* formula_lexer::tokenize_error::what() const throw()
     return m_msg.c_str();
 }
 
-formula_lexer::formula_lexer(const string& formula) :
+formula_lexer::formula_lexer(const mem_str_buf& formula) :
     m_formula(formula)
 {
 }
@@ -276,7 +276,7 @@ formula_lexer::~formula_lexer()
 void formula_lexer::tokenize()
 {
 #if DEBUG_LEXER
-    cout << "formula string: '" << m_formula << "'" << endl;
+    cout << "formula string: '" << m_formula.str() << "'" << endl;
 #endif        
     tokenizer tkr(m_tokens, m_formula);
     tkr.run();

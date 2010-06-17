@@ -157,7 +157,7 @@ void parse_init(const char*& p, parse_data& data)
 
         // tokenize the formula string, and create a formula cell 
         // with the tokens.
-        formula_lexer lexer(formula.str());
+        formula_lexer lexer(formula);
         lexer.tokenize();
         lexer_tokens_t tokens;
         lexer.swap_tokens(tokens);

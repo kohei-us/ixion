@@ -51,6 +51,7 @@ public:
     bool equals(const char* s) const;
     ::std::string str() const;
     mem_str_buf& operator= (const mem_str_buf& r);
+    char operator[] (size_t pos) const;
 
 private:
     const char* mp_buf;

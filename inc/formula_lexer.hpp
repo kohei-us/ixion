@@ -25,14 +25,15 @@
  *
  ************************************************************************/
 
-#ifndef __FORMULA_LEXER_HPP__
-#define __FORMULA_LEXER_HPP__
+#ifndef __IXION_FORMULA_LEXER_HPP__
+#define __IXION_FORMULA_LEXER_HPP__
 
 #include <string>
 #include <exception>
 #include <boost/noncopyable.hpp>
 
 #include "lexer_tokens.hpp"
+#include "mem_str_buf.hpp"
 
 namespace ixion {
 
@@ -49,7 +50,7 @@ public:
         ::std::string m_msg;
     };
 
-    formula_lexer(const ::std::string& formula);
+    formula_lexer(const mem_str_buf& formula);
     ~formula_lexer();
 
     void tokenize();
@@ -65,7 +66,7 @@ private:
     formula_lexer();
 
     lexer_tokens_t m_tokens;
-    ::std::string m_formula;
+    mem_str_buf m_formula;
 };
 
 }
