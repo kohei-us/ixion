@@ -546,6 +546,8 @@ void model_parser::parse()
             else if (buf_com.equals("mode edit"))
             {
                 parse_mode = parse_mode_edit;
+                data.cells.clear();
+                data.cell_names.clear();
             }
             else
             {
@@ -562,8 +564,6 @@ void model_parser::parse()
                 parse_init(p, data);
             break;
             case parse_mode_edit:
-                data.cells.clear();
-                data.cell_names.clear();
                 parse_init(p, data);
             break;
             case parse_mode_result:

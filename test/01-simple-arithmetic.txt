@@ -22,4 +22,6 @@ A9=#DIV/0!
 %check
 %mode edit
 A8=A6*2
+A1=10
+A10=A8/2.5
 %recalc
