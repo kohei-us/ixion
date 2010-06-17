@@ -36,7 +36,7 @@
 #include <sstream>
 #include <iostream>
 
-#define DEBUG_FORMULA_CELL 0
+#define DEBUG_FORMULA_CELL 1
 
 using namespace std;
 
@@ -202,17 +202,19 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
     {
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
 
-        string cell_name = get_cell_name(cell_ptr_name_map, this);
+        string cell_name = global::get_cell_name(this);
     
         if (m_interpret_status.result)
         {
             // When the result is already cached before the cell is interpreted, 
-            // it can only mean the cell has circular dependency.
-            assert(m_interpret_status.result->get_type() == formula_result::rt_error);
-            ostringstream os;
-            os << get_formula_result_output_separator() << endl;
-            os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->get_error()) << endl;
-            cout << os.str();
+            // it can mean the cell has circular dependency.
+            if (m_interpret_status.result->get_type() == formula_result::rt_error)
+            {
+                ostringstream os;
+                os << get_formula_result_output_separator() << endl;
+                os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->get_error()) << endl;
+                cout << os.str();
+            }
             return;
         }
     
@@ -257,6 +259,7 @@ void formula_cell::check_circular()
             // Circular dependency detected !!
 #if DEBUG_FORMULA_CELL
             ostringstream os;
+            os << global::get_cell_name(this) << ": ";
             os << "circular dependency detected !!" << endl;
             cout << os.str();
 #endif
@@ -270,10 +273,9 @@ void formula_cell::check_circular()
     m_circular_safe = true;
 }
 
-void formula_cell::reset(const cell_ptr_name_map_t& cell_ptr_name_map)
+void formula_cell::reset()
 {
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-    string cell_name = get_cell_name(cell_ptr_name_map, this);
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
     m_circular_safe = false;
@@ -302,6 +304,7 @@ void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock
     {
 #if DEBUG_FORMULA_CELL
         ostringstream os;
+        os << global::get_cell_name(this) << ": ";
         os << "waiting" << endl;
         cout << os.str();
 #endif

@@ -69,17 +69,11 @@ private:
  */
 struct cell_reset_handler : public unary_function<base_cell*, void>
 {
-    cell_reset_handler(const cell_ptr_name_map_t& cell_names) :
-        m_cell_names(cell_names) {}
-
     void operator() (base_cell* p) const
     {
         assert(p->get_celltype() == celltype_formula);
-        static_cast<formula_cell*>(p)->reset(m_cell_names);
+        static_cast<formula_cell*>(p)->reset();
     }
-
-private:
-    const cell_ptr_name_map_t& m_cell_names;
 };
 
 struct circular_check_handler : public unary_function<base_cell*, void>
@@ -172,7 +166,7 @@ void depends_tracker::interpret_all_cells(size_t thread_count)
 #if DEBUG_DEPENDS_TRACKER
     cout << "Reset cell status ------------------------------------------" << endl;
 #endif
-    for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler(*mp_names));
+    for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
 
     // First, detect circular dependencies and mark those circular 
     // dependent cells with appropriate error flags.

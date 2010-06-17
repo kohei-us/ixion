@@ -134,7 +134,7 @@ public:
      * 
      * @param cell_ptr_name_map cell pointer-to-name map
      */
-    void reset(const cell_ptr_name_map_t& cell_ptr_name_map);
+    void reset();
     void swap_tokens(formula_tokens_t& tokens);
 
     const formula_result* get_result_cache() const;

@@ -33,9 +33,20 @@
 #include <sstream>
 #include <sys/time.h>
 
+#include <boost/thread/mutex.hpp>
+
 using namespace std;
 
 namespace ixion {
+
+namespace {
+
+struct _cell_name_data {
+    const cell_ptr_name_map_t* store;
+    ::boost::mutex mtx;
+} cell_name_data;
+
+}
 
 const char* get_formula_result_output_separator()
 {
@@ -53,17 +64,29 @@ void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& c
     cell_names.swap(_cell_names);
 }
 
-string get_cell_name(const cell_ptr_name_map_t& names, const base_cell* cell)
-{
-    cell_ptr_name_map_t::const_iterator itr = names.find(cell);
-    return itr == names.end() ? string() : itr->second;
-}
-
 double get_current_time()
 {
     timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec + tv.tv_usec / 1000000.0;
+}
+
+void global::set_cell_name_map(const cell_ptr_name_map_t* p)
+{
+    ::boost::mutex::scoped_lock lock(cell_name_data.mtx);
+    cell_name_data.store = p;
+}
+
+string global::get_cell_name(const base_cell* cell)
+{
+    ::boost::mutex::scoped_lock lock(cell_name_data.mtx);
+    if (cell_name_data.store)
+    {
+        cell_ptr_name_map_t::const_iterator itr = cell_name_data.store->find(cell);
+        if (itr != cell_name_data.store->end())
+            return itr->second;
+    }
+    return string("<unknown cell>");
 }
 
 const char* get_formula_error_name(formula_error_t fe)
