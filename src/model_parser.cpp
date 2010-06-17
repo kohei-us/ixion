@@ -317,7 +317,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
         fparser.print_tokens();
 
         // Put the formula tokens into formula cell instance.
-        ptr_map<string, base_cell>::iterator itr = formula_cells.find(cell.get_name());
+        cell_name_ptr_map_t::iterator itr = formula_cells.find(cell.get_name());
         if (itr == formula_cells.end())
             throw general_error("formula cell not found");
 
