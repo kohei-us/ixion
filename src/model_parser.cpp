@@ -118,19 +118,14 @@ enum parse_mode_t
     parse_mode_edit
 };
 
-struct parse_init_data
+struct parse_data
 {
     vector<model_parser::cell>  cells;
     vector<string>              cell_names;
-
-    void clear()
-    {
-        cells.clear();
-        cell_names.clear();
-    }
+    model_parser::results_type  formula_results;
 };
 
-void parse_init(const char*& p, parse_init_data& data)
+void parse_init(const char*& p, parse_data& data)
 {
     mem_str_buf buf, name, formula;
     for (; *p != '\n'; ++p)
@@ -177,7 +172,7 @@ void parse_init(const char*& p, parse_init_data& data)
     }
 }
 
-void parse_result(const char*& p, model_parser::formula_results_t& results)
+void parse_result(const char*& p, model_parser::results_type& results)
 {
     mem_str_buf buf, name, result;
     for (; *p != '\n'; ++p)
@@ -210,12 +205,12 @@ void parse_result(const char*& p, model_parser::formula_results_t& results)
     string name_s = name.str();
     formula_result res;
     res.parse(result.str());
-    model_parser::formula_results_t::iterator itr = results.find(name_s);
+    model_parser::results_type::iterator itr = results.find(name_s);
     if (itr == results.end())
     {
         // This cell doesn't exist yet.
-        pair<model_parser::formula_results_t::iterator, bool> r = 
-            results.insert(model_parser::formula_results_t::value_type(name_s, res));
+        pair<model_parser::results_type::iterator, bool> r = 
+            results.insert(model_parser::results_type::value_type(name_s, res));
         if (!r.second)
             throw model_parser::parse_error("failed to insert a new result.");
     }
@@ -469,8 +464,7 @@ void model_parser::parse()
 
     parse_mode_t parse_mode = parse_mode_unknown;
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];
-    parse_init_data formula_data;
-    formula_results_t formula_results;
+    parse_data data;
 
     for (; p != p_last; ++p)
     {
@@ -488,19 +482,21 @@ void model_parser::parse()
 
                 // First, create empty formula cell instances so that we can have 
                 // name-to-pointer associations.
-                create_empty_formula_cells(formula_data.cell_names, m_cells);
-                convert_lexer_tokens(formula_data.cells, m_cells);
+                create_empty_formula_cells(data.cell_names, m_cells);
+                convert_lexer_tokens(data.cells, m_cells);
                 calc();
             }
             else if (buf_com.equals("recalc"))
             {
                 if (parse_mode != parse_mode_edit)
                     throw parse_error("'recalc' command must be used in the edit mode.");
+
+                
             }
             else if (buf_com.equals("check"))
             {
                 // Check cell results.
-                check(formula_results);
+                check(data.formula_results);
             }
             else if (buf_com.equals("mode init"))
             {
@@ -526,14 +522,15 @@ void model_parser::parse()
         switch (parse_mode)
         {
             case parse_mode_init:
-                parse_init(p, formula_data);
+                parse_init(p, data);
             break;
             case parse_mode_edit:
-                formula_data.clear();
-                parse_init(p, formula_data);
+                data.cells.clear();
+                data.cell_names.clear();
+                parse_init(p, data);
             break;
             case parse_mode_result:
-                parse_result(p, formula_results);
+                parse_result(p, data.formula_results);
             break;
             default:
                 throw parse_error("unknown parse mode");
@@ -569,13 +566,13 @@ void model_parser::calc()
     deptracker.interpret_all_cells(m_thread_count);
 }
 
-void model_parser::check(const formula_results_t& formula_results)
+void model_parser::check(const results_type& formula_results)
 {
     cout << get_formula_result_output_separator() << endl
          << "checking results" << endl
          << get_formula_result_output_separator() << endl;
 
-    formula_results_t::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
+    results_type::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
     for (; itr != itr_end; ++itr)
     {
         const string& name = itr->first;
