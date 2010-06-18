@@ -101,6 +101,21 @@ void base_cell::add_listener(formula_cell* p)
     m_listeners.insert(p);
 }
 
+void base_cell::remove_listener(formula_cell* p)
+{
+    m_listeners.erase(p);
+}
+
+void base_cell::print_listeners() const
+{
+    cout << "The following cells listen to cell " << global::get_cell_name(this) << endl;
+    unordered_set<formula_cell*>::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
+    for (; itr != itr_end; ++itr)
+    {
+        cout << "  cell " << global::get_cell_name(*itr) << endl;
+    }
+}
+
 celltype_t base_cell::get_celltype() const
 {
     return m_celltype;

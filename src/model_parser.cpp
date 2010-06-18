@@ -48,7 +48,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_INPUT_PARSER 0
+#define DEBUG_INPUT_PARSER 1
 
 namespace ixion {
 
@@ -66,6 +66,12 @@ void load_file_content(const string& filepath, string& content)
     file.close();
 
     os.str().swap(content);
+}
+
+base_cell* find_cell(cell_name_ptr_map_t& store, const string& name)
+{
+    cell_name_ptr_map_t::iterator itr = store.find(name);
+    return itr == store.end() ? NULL : itr->second;
 }
 
 enum parse_mode_t
@@ -235,6 +241,37 @@ private:
     formula_cell* mp_fcell;
 };
 
+class formula_cell_listener_handler : public unary_function<formula_token_base*, void>
+{
+public:
+    enum mode_t { mode_add, mode_remove };
+
+    explicit formula_cell_listener_handler(formula_cell* p, mode_t mode) : 
+        mp_cell(p), m_mode(mode) {}
+
+    void operator() (formula_token_base* p) const
+    {
+        if (p->get_opcode() == fop_single_ref)
+        {
+            base_cell* cell = p->get_single_ref();
+            if (!cell)
+                return;
+
+            if (m_mode == mode_add)
+                cell->add_listener(mp_cell);
+            else
+            {
+                assert(m_mode == mode_remove);
+                cell->remove_listener(mp_cell);
+            }
+        }
+    }
+
+private:
+    formula_cell* mp_cell;
+    mode_t m_mode;
+};
+
 void ensure_unique_names(const vector<string>& cell_names)
 {
     vector<string> names = cell_names;
@@ -265,17 +302,31 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
-        const model_parser::cell& cell = *itr_cell;
+        const model_parser::cell& model_cell = *itr_cell;
+        const string & name = model_cell.get_name();
+
 #if DEBUG_INPUT_PARSER
-        cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
+        cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(cell.get_tokens(), &formula_cells);
+        formula_parser fparser(model_cell.get_tokens(), &formula_cells);
         fparser.parse();
         fparser.print_tokens();
+        base_cell* pcell = find_cell(formula_cells, name);
+
+        if (pcell && pcell->get_celltype() == celltype_formula)
+        {
+            // Go through all its references, and remove itself as a listener
+            // from them.
+            formula_cell* fcell = static_cast<formula_cell*>(pcell);
+            vector<formula_token_base*> ref_tokens;
+            fcell->get_ref_tokens(ref_tokens);
+            for_each(ref_tokens.begin(), ref_tokens.end(), 
+                     formula_cell_listener_handler(
+                         fcell, formula_cell_listener_handler::mode_remove));
+        }
 
         // Put the formula tokens into formula cell instance.
-        const string & name = cell.get_name();
         cell_name_ptr_map_t::iterator itr = formula_cells.find(name);
         if (itr == formula_cells.end())
         {
@@ -289,7 +340,26 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
         // Transfer formula tokens from the parser to the cell.
         formula_cell* fcell = static_cast<formula_cell*>(itr->second);
         fcell->swap_tokens(fparser.get_tokens());
+
+        // Now, register the formula cell as a listener to all its references.
+        vector<formula_token_base*> ref_tokens;
+        fcell->get_ref_tokens(ref_tokens);
+        for_each(ref_tokens.begin(), ref_tokens.end(), 
+                 formula_cell_listener_handler(
+                     fcell, formula_cell_listener_handler::mode_add));
     }
+
+#if DEBUG_INPUT_PARSER
+    cell_ptr_name_map_t cell_names;
+    build_ptr_name_map(formula_cells, cell_names);
+    global::set_cell_name_map(&cell_names);
+    cell_name_ptr_map_t::const_iterator itr = formula_cells.begin(), itr_end = formula_cells.end();
+    for (; itr != itr_end; ++itr)
+    {
+        const base_cell* p = itr->second;
+        p->print_listeners();
+    }
+#endif
 }
 
 }

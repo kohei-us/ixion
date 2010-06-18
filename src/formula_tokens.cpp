@@ -89,7 +89,7 @@ fopcode_t formula_token_base::get_opcode() const
     return m_opcode;
 }
 
-const base_cell* formula_token_base::get_single_ref() const
+base_cell* formula_token_base::get_single_ref() const
 {
     return NULL;
 }
@@ -134,7 +134,7 @@ double value_token::get_value() const
 
 // ============================================================================
 
-single_ref_token::single_ref_token(const base_cell* pcell) :
+single_ref_token::single_ref_token(base_cell* pcell) :
     formula_token_base(fop_single_ref),
     mp_cell(pcell)
 {
@@ -150,7 +150,7 @@ single_ref_token::~single_ref_token()
 {
 }
 
-const base_cell* single_ref_token::get_single_ref() const
+base_cell* single_ref_token::get_single_ref() const
 {
     return mp_cell;
 }

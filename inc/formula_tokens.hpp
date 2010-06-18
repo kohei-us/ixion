@@ -79,7 +79,7 @@ public:
 
     fopcode_t get_opcode() const;
 
-    virtual const base_cell* get_single_ref() const;
+    virtual base_cell* get_single_ref() const;
     virtual double get_value() const;
     virtual size_t get_index() const;
 
@@ -122,14 +122,14 @@ private:
 class single_ref_token : public formula_token_base
 {
 public:
-    single_ref_token(const base_cell* p_cell);
+    single_ref_token(base_cell* p_cell);
     single_ref_token(const single_ref_token& r);
     virtual ~single_ref_token();
 
-    virtual const base_cell* get_single_ref() const;
+    virtual base_cell* get_single_ref() const;
 
 private:
-    const base_cell* mp_cell; // referenced cell, pointer only.
+    base_cell* mp_cell; // referenced cell, pointer only.
 };
 
 // ============================================================================

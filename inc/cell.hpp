@@ -74,6 +74,8 @@ public:
     virtual const char* print() const = 0;
 
     void add_listener(formula_cell* p);
+    void remove_listener(formula_cell* p);
+    void print_listeners() const;
 
     celltype_t get_celltype() const;
 
