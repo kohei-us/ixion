@@ -152,8 +152,15 @@ int main (int argc, char** argv)
         double start_time = get_current_time();
         cout << get_formula_result_output_separator() << endl;
         cout << "parsing " << fpath << endl;
-        if (!parse_model_input(fpath, dotgraph_path, thread_count))
+
+        try
         {
+            model_parser parser(fpath, thread_count);
+            parser.parse();
+        }
+        catch (const exception& e)
+        {
+            cerr << e.what() << endl;
             cerr << "failed to parse " << fpath << endl;
             exit (EXIT_FAILURE);
         }

@@ -336,47 +336,6 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
 
 }
 
-/** 
- * This method does the following: 
- *  
- * <ol> 
- * <li>Read the input file, and parse the definition of each model 
- * "cell" and tokenize it into a series of lexer tokens.</li> 
- * <li>Create instances of formula cells, store them and map them 
- * with names.  The mapping will be used when resolving model cell's 
- * names to pointers of their corresponding formula cell instances.</li> 
- * <li>Parse the lexer tokens for each model cell, and convert them 
- * into formula tokens.  At this point, referenced cell names stored in 
- * the lexer tokens get converted into formula cell pointers.</li> 
- * <li>Pass the formula tokens into corresponding formula cell instances, 
- * and pass the cell dependency data to dependency tracker class instance.
- * </li> 
- * </ol>
- *
- * @param fpath path to the input model file. 
- * 
- * @return true if the conversion is successful, false otherwise.
- */
-bool parse_model_input(const string& fpath, const string& dotpath, size_t thread_count)
-{
-#if DEBUG_INPUT_PARSER
-    StackPrinter __stack_printer__("ixion::parse_model_input");
-#endif
-    try
-    {
-        // Read the model definition file, and parse the model cells. The
-        // model parser parses each line and break it into lexer tokens.
-        model_parser parser(fpath, thread_count);
-        parser.parse();
-    }
-    catch (const exception& e)
-    {
-        cerr << e.what() << endl;
-        return false;
-    }
-    return true;
-}
-
 // ============================================================================
 
 model_parser::file_not_found::file_not_found(const string& fpath) : 
