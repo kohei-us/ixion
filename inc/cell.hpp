@@ -35,6 +35,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include <string>
+#include <unordered_set>
 
 namespace ixion {
 
@@ -123,6 +124,8 @@ public:
     const formula_tokens_t& get_tokens() const;
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
 
+    void register_listener(formula_cell* p);
+
     /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
@@ -131,15 +134,14 @@ public:
 
     /**
      * Reset cell's internal state. 
-     * 
-     * @param cell_ptr_name_map cell pointer-to-name map
      */
     void reset();
+
     void swap_tokens(formula_tokens_t& tokens);
 
-    const formula_result* get_result_cache() const;
-
     void get_ref_tokens(::std::vector<formula_token_base*>& tokens);
+
+    const formula_result* get_result_cache() const;
 
 private:
     /**
@@ -159,6 +161,11 @@ private:
 
 private:
     formula_tokens_t    m_tokens;
+
+    /**
+     * List of cells that reference this cell.
+     */
+    ::std::unordered_set<formula_cell*> m_listeners;
 
     mutable interpret_status    m_interpret_status;
 

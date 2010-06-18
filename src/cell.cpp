@@ -245,6 +245,11 @@ bool formula_cell::is_circular_safe() const
     return m_circular_safe;
 }
 
+void formula_cell::register_listener(formula_cell* p)
+{
+    m_listeners.insert(p);
+}
+
 void formula_cell::check_circular()
 {
     // TODO: Check to make sure this is being run on the main thread only.
@@ -290,6 +295,7 @@ void formula_cell::reset()
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
     m_circular_safe = false;
+    m_listeners.clear();
 }
 
 void formula_cell::swap_tokens(formula_tokens_t& tokens)
@@ -297,16 +303,16 @@ void formula_cell::swap_tokens(formula_tokens_t& tokens)
     m_tokens.swap(tokens);
 }
 
-const formula_result* formula_cell::get_result_cache() const
-{
-    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-    return m_interpret_status.result;
-}
-
 void formula_cell::get_ref_tokens(vector<formula_token_base*>& tokens)
 {
     ref_token_picker func;
     for_each(m_tokens.begin(), m_tokens.end(), func).swap_tokens(tokens);
+}
+
+const formula_result* formula_cell::get_result_cache() const
+{
+    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+    return m_interpret_status.result;
 }
 
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
