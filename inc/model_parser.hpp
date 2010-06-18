@@ -96,7 +96,7 @@ public:
 private:
     model_parser(); // disabled
 
-    void calc();
+    void calc(cell_name_ptr_map_t& cells);
     void check(const results_type& formula_results);
 
     const base_cell* get_cell(const ::std::string& name) const;

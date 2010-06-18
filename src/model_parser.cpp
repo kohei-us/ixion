@@ -477,7 +477,7 @@ void model_parser::parse()
                 // name-to-pointer associations.
                 create_empty_formula_cells(data.cell_names, m_cells);
                 convert_lexer_tokens(data.cells, m_cells);
-                calc();
+                calc(m_cells);
             }
             else if (buf_com.equals("recalc"))
             {
@@ -489,7 +489,7 @@ void model_parser::parse()
                     << "recalculating" << endl;
                 cout << os.str();
                 convert_lexer_tokens(data.cells, m_cells);
-                calc();
+                calc(m_cells);
             }
             else if (buf_com.equals("check"))
             {
@@ -536,14 +536,14 @@ void model_parser::parse()
     }
 }
 
-void model_parser::calc()
+void model_parser::calc(cell_name_ptr_map_t& cells)
 {
     cell_ptr_name_map_t cell_names;
-    build_ptr_name_map(m_cells, cell_names);
+    build_ptr_name_map(cells, cell_names);
     global::set_cell_name_map(&cell_names);
 
     depends_tracker deptracker(&cell_names);
-    cell_name_ptr_map_t::iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    cell_name_ptr_map_t::iterator itr = cells.begin(), itr_end = cells.end();
     for (; itr != itr_end; ++itr)
     {
         base_cell* pcell = itr->second;
