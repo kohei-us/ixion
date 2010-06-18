@@ -272,6 +272,14 @@ private:
     mode_t m_mode;
 };
 
+struct formula_cell_printer : public unary_function<const formula_cell*, void>
+{
+    void operator() (const formula_cell* p) const
+    {
+        cout << "  cell " << global::get_cell_name(p) << endl;
+    }
+};
+
 void ensure_unique_names(const vector<string>& cell_names)
 {
     vector<string> names = cell_names;
@@ -297,8 +305,9 @@ void create_empty_formula_cells(
 #endif
 }
 
-void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr_map_t& formula_cells)
+void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr_map_t& formula_cells, dirty_cells_t& dirty_cells)
 {
+    dirty_cells_t _dirty_cells;
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
@@ -347,9 +356,14 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
         for_each(ref_tokens.begin(), ref_tokens.end(), 
                  formula_cell_listener_handler(
                      fcell, formula_cell_listener_handler::mode_add));
+        
+        // Add this cell and all its listeners to the dirty cell list.
+        _dirty_cells.insert(fcell);
+        fcell->get_all_listeners(_dirty_cells);
     }
 
 #if DEBUG_INPUT_PARSER
+    cout << get_formula_result_output_separator() << endl;
     cell_ptr_name_map_t cell_names;
     build_ptr_name_map(formula_cells, cell_names);
     global::set_cell_name_map(&cell_names);
@@ -359,7 +373,12 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
         const base_cell* p = itr->second;
         p->print_listeners();
     }
+
+    cout << get_formula_result_output_separator() << endl;
+    cout << "All dirty cells: " << endl;
+    for_each(_dirty_cells.begin(), _dirty_cells.end(), formula_cell_printer());
 #endif
+    dirty_cells.swap(_dirty_cells);
 }
 
 }
@@ -476,8 +495,9 @@ void model_parser::parse()
                 // First, create empty formula cell instances so that we can have 
                 // name-to-pointer associations.
                 create_empty_formula_cells(data.cell_names, m_cells);
-                convert_lexer_tokens(data.cells, m_cells);
-                calc(m_cells);
+                dirty_cells_t dirty_cells;
+                convert_lexer_tokens(data.cells, m_cells, dirty_cells);
+                calc(dirty_cells);
             }
             else if (buf_com.equals("recalc"))
             {
@@ -488,8 +508,9 @@ void model_parser::parse()
                 os << get_formula_result_output_separator() << endl
                     << "recalculating" << endl;
                 cout << os.str();
-                convert_lexer_tokens(data.cells, m_cells);
-                calc(m_cells);
+                dirty_cells_t dirty_cells;
+                convert_lexer_tokens(data.cells, m_cells, dirty_cells);
+                calc(dirty_cells);
             }
             else if (buf_com.equals("check"))
             {
@@ -536,22 +557,19 @@ void model_parser::parse()
     }
 }
 
-void model_parser::calc(cell_name_ptr_map_t& cells)
+void model_parser::calc(dirty_cells_t& cells)
 {
     cell_ptr_name_map_t cell_names;
-    build_ptr_name_map(cells, cell_names);
+    build_ptr_name_map(m_cells, cell_names);
     global::set_cell_name_map(&cell_names);
 
     depends_tracker deptracker(&cell_names);
-    cell_name_ptr_map_t::iterator itr = cells.begin(), itr_end = cells.end();
+    dirty_cells_t::iterator itr = cells.begin(), itr_end = cells.end();
     for (; itr != itr_end; ++itr)
     {
-        base_cell* pcell = itr->second;
-        if (pcell->get_celltype() != celltype_formula)
-            throw general_error("formula cell is expected but not found");
+        formula_cell* fcell = *itr;
 
         // Register cell dependencies.
-        formula_cell* fcell = static_cast<formula_cell*>(pcell);
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
 

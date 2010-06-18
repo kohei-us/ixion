@@ -65,6 +65,7 @@ enum celltype_t
 
 class base_cell
 {
+    typedef ::std::unordered_set<formula_cell*> listeners_type;
 public:
     base_cell(celltype_t celltype);
     base_cell(const base_cell& r);
@@ -76,6 +77,7 @@ public:
     void add_listener(formula_cell* p);
     void remove_listener(formula_cell* p);
     void print_listeners() const;
+    void get_all_listeners(dirty_cells_t& cell) const;
 
     celltype_t get_celltype() const;
 
@@ -86,7 +88,7 @@ private:
     /**
      * List of formula cells that reference this cell.
      */
-    ::std::unordered_set<formula_cell*> m_listeners;
+    listeners_type m_listeners;
 
     celltype_t m_celltype;
 };

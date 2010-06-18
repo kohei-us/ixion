@@ -116,6 +116,21 @@ void base_cell::print_listeners() const
     }
 }
 
+void base_cell::get_all_listeners(dirty_cells_t& cells) const
+{
+    listeners_type::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
+    for (; itr != itr_end; ++itr)
+    {
+        formula_cell* p = *itr;
+        if (cells.count(p) == 0)
+        {
+            // This cell is not yet on the dirty cell list.  Run recursively.
+            cells.insert(p);
+            p->get_all_listeners(cells);
+        }
+    }
+}
+
 celltype_t base_cell::get_celltype() const
 {
     return m_celltype;
