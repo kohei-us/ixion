@@ -96,6 +96,11 @@ base_cell::~base_cell()
 {
 }
 
+void base_cell::register_listener(formula_cell* p)
+{
+    m_listeners.insert(p);
+}
+
 celltype_t base_cell::get_celltype() const
 {
     return m_celltype;
@@ -245,11 +250,6 @@ bool formula_cell::is_circular_safe() const
     return m_circular_safe;
 }
 
-void formula_cell::register_listener(formula_cell* p)
-{
-    m_listeners.insert(p);
-}
-
 void formula_cell::check_circular()
 {
     // TODO: Check to make sure this is being run on the main thread only.
@@ -295,7 +295,6 @@ void formula_cell::reset()
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
     m_circular_safe = false;
-    m_listeners.clear();
 }
 
 void formula_cell::swap_tokens(formula_tokens_t& tokens)

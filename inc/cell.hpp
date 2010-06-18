@@ -40,6 +40,7 @@
 namespace ixion {
 
 class formula_result;
+class formula_cell;
 
 // ============================================================================
 
@@ -72,10 +73,18 @@ public:
     virtual double get_value() const = 0;
     virtual const char* print() const = 0;
 
+    void register_listener(formula_cell* p);
+
     celltype_t get_celltype() const;
 
 private:
     base_cell(); // disabled
+
+private:
+    /**
+     * List of formula cells that reference this cell.
+     */
+    ::std::unordered_set<formula_cell*> m_listeners;
 
     celltype_t m_celltype;
 };
@@ -124,8 +133,6 @@ public:
     const formula_tokens_t& get_tokens() const;
     void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
 
-    void register_listener(formula_cell* p);
-
     /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
@@ -161,11 +168,6 @@ private:
 
 private:
     formula_tokens_t    m_tokens;
-
-    /**
-     * List of cells that reference this cell.
-     */
-    ::std::unordered_set<formula_cell*> m_listeners;
 
     mutable interpret_status    m_interpret_status;
 
