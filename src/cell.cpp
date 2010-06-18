@@ -96,7 +96,7 @@ base_cell::~base_cell()
 {
 }
 
-void base_cell::register_listener(formula_cell* p)
+void base_cell::add_listener(formula_cell* p)
 {
     m_listeners.insert(p);
 }

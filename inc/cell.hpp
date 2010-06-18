@@ -73,7 +73,7 @@ public:
     virtual double get_value() const = 0;
     virtual const char* print() const = 0;
 
-    void register_listener(formula_cell* p);
+    void add_listener(formula_cell* p);
 
     celltype_t get_celltype() const;
 
