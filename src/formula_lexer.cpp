@@ -28,6 +28,7 @@
 #include "formula_lexer.hpp"
 
 #include <iostream>
+#include <sstream>
 
 #define DEBUG_LEXER 0
 
@@ -160,8 +161,8 @@ bool tokenizer::is_digit(char c)
 
 void tokenizer::numeral()
 {
-    flush_buffer();
-    m_buf_type = buf_numeral;
+    if (m_buf.empty())
+        m_buf_type = buf_numeral;
 
     size_t sep_count = 0;
     while (true)
@@ -175,8 +176,13 @@ void tokenizer::numeral()
             continue;
         break;
     }
-    if (sep_count > 1)
-        throw formula_lexer::tokenize_error("second decimal separator encountered.");
+
+    if (sep_count > 1 && m_buf_type == buf_numeral)
+    {
+        ostringstream os;
+        os << "error parsing numeral: " << m_buf.str();
+        throw formula_lexer::tokenize_error(os.str());
+    }
 }
 
 void tokenizer::space()
@@ -273,7 +279,6 @@ void tokenizer::flush_buffer()
         {
             string s = m_buf.str();
             double val = strtod(s.c_str(), NULL);
-            cout << "value = " << val << endl;
             m_tokens.push_back(new lexer_value_token(val));
         }
         break;
