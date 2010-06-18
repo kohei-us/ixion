@@ -126,7 +126,7 @@ lexer_token::~lexer_token()
 {
 }
 
-const char* lexer_token::print() const
+string lexer_token::print() const
 {
     switch (get_opcode())
     {
@@ -176,11 +176,11 @@ double lexer_value_token::get_value() const
     return m_val;
 }
 
-const char* lexer_value_token::print() const
+string lexer_value_token::print() const
 {
     ostringstream os;
     os << m_val;
-    return os.str().c_str();
+    return os.str();
 }
 
 // ============================================================================
@@ -200,9 +200,9 @@ string lexer_string_token::get_string() const
     return m_str;
 }
 
-const char* lexer_string_token::print() const
+string lexer_string_token::print() const
 {
-    return m_str.c_str();
+    return m_str;
 }
 
 // ============================================================================
@@ -222,7 +222,7 @@ string lexer_name_token::get_string() const
     return m_name;
 }
 
-const char* lexer_name_token::print() const
+string lexer_name_token::print() const
 {
     return m_name.c_str();
 }

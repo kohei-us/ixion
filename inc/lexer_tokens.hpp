@@ -74,7 +74,7 @@ public:
 
     virtual double get_value() const;
     virtual ::std::string get_string() const;
-    virtual const char* print() const = 0;
+    virtual ::std::string print() const = 0;
 
     lexer_opcode_t get_opcode() const;
 private:
@@ -88,7 +88,7 @@ class lexer_token : public lexer_token_base
 public:
     lexer_token(lexer_opcode_t oc);
     virtual ~lexer_token();
-    virtual const char* print() const;
+    virtual ::std::string print() const;
 };
 
 // ============================================================================
@@ -101,7 +101,7 @@ public:
     virtual ~lexer_value_token();
 
     virtual double get_value() const;
-    virtual const char* print() const;
+    virtual ::std::string print() const;
 
 private:
     double m_val;
@@ -116,7 +116,7 @@ public:
     virtual ~lexer_string_token();
 
     virtual ::std::string get_string() const;
-    virtual const char* print() const;
+    virtual ::std::string print() const;
 private:
     ::std::string m_str;
 };
@@ -130,7 +130,7 @@ public:
     virtual ~lexer_name_token();
 
     virtual ::std::string get_string() const;
-    virtual const char* print() const;
+    virtual ::std::string print() const;
 private:
     ::std::string m_name;
 };
