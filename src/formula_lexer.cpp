@@ -39,16 +39,20 @@ namespace ixion {
 
 class tokenizer : public ::boost::noncopyable
 {
+    enum buffer_type {
+        buf_numeral,
+        buf_name
+    };
+
 public:
-    tokenizer(lexer_tokens_t& tokens, const mem_str_buf& formula) :
-        m_tokens(tokens), 
-        m_formula(formula), 
-        m_buffer_type(buf_name), 
-        m_pos(0), 
-        m_size(formula.size()), 
-        m_char(0),
-        m_csep(','),
-        m_sep_decimal('.')
+    explicit tokenizer(lexer_tokens_t& tokens, const mem_str_buf& formula) :
+        m_tokens(tokens),
+        m_formula(formula),
+        m_sep_arg(','),
+        m_sep_decimal('.'),
+        mp(NULL),
+        m_pos(0),
+        m_buf_type(buf_name)
     {
     }
 
@@ -62,54 +66,51 @@ private:
     void minus();
     void divide();
     void multiply();
-    void dot();
-    void sep();
+    void sep_arg();
     void open_bracket();
     void close_bracket();
 
+    void next();
+    void push_back();
     void flush_buffer();
 
 private:
-    enum buffer_t {
-        buf_numeral,
-        buf_name
-    };
+    lexer_tokens_t&     m_tokens;
+    const mem_str_buf&  m_formula;
 
-    lexer_tokens_t& m_tokens;
-    const mem_str_buf& m_formula;
+    char m_sep_arg;
+    char m_sep_decimal;
 
-    vector<char> m_buffer;
-    buffer_t m_buffer_type;
-    
+    const char* mp;
     size_t m_pos;
-    size_t m_size;
-    char   m_char;
-    
-    // data that influence tokenization behavior.
-    char m_csep; // function argument separator
-    char m_sep_decimal; // decimal separator.
+
+    mem_str_buf m_buf;
+    buffer_type m_buf_type;
 };
 
 void tokenizer::run()
 {
-    for (m_pos = 0; m_pos < m_size; ++m_pos)
+    m_tokens.clear();
+
+    if (m_formula.empty())
+        // Nothing to do.
+        return;
+
+    mp = m_formula.get();
+    m_pos = 0;
+
+    size_t n = m_formula.size();
+    while (m_pos < n)
     {
-        m_char = m_formula[m_pos];
-#if DEBUG_LEXER
-        cout << "char: '" << m_char << "'" << endl;
-#endif
-        if (m_char == m_csep)
+        cout << *mp << endl;
+
+        if (*mp == m_sep_arg)
         {
-            sep();
-            continue;
-        }
-        else if (m_char == m_sep_decimal)
-        {
-            dot();
+            sep_arg();
             continue;
         }
 
-        switch (m_char)
+        switch (*mp)
         {
             case '0':
             case '1':
@@ -154,98 +155,118 @@ void tokenizer::run()
 
 void tokenizer::numeral()
 {
-    if (m_buffer.empty())
-        m_buffer_type = buf_numeral;
+    if (m_buf.empty())
+        m_buf_type = buf_numeral;
 
-    m_buffer.push_back(m_char);
+    push_back();
+    next();
 }
 
 void tokenizer::space()
 {
     // space is ignored for now.
+    next();
 }
 
 void tokenizer::name()
 {
-    if (m_buffer_type != buf_name)
+    if (m_buf_type != buf_name)
     {    
         flush_buffer();
-        m_buffer_type = buf_name;
+        m_buf_type = buf_name;
     }
 
-    m_buffer.push_back(m_char);
+    push_back();
+    next();
 }
 
 void tokenizer::plus()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_plus));
+    next();
 }
 
 void tokenizer::minus()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_minus));
+    next();
 }
 
 void tokenizer::divide()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_divide));
+    next();
 }
 
 void tokenizer::multiply()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_multiply));
+    next();
 }
 
-void tokenizer::dot()
-{
-}
-
-void tokenizer::sep()
+void tokenizer::sep_arg()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_sep));
+    next();
 }
 
 void tokenizer::open_bracket()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_open));
+    next();
 }
 
 void tokenizer::close_bracket()
 {
     flush_buffer();
     m_tokens.push_back(new lexer_token(op_close));
+    next();
+}
+
+void tokenizer::next()
+{
+    ++mp;
+    ++m_pos;
+}
+
+void tokenizer::push_back()
+{
+    if (m_buf.empty())
+        m_buf.set_start(mp);
+    else
+        m_buf.inc();
 }
 
 void tokenizer::flush_buffer()
 {
-    if (m_buffer.empty())
+    if (m_buf.empty())
         return;
 
-    m_buffer.push_back(0);
-    switch (m_buffer_type)
+    switch (m_buf_type)
     {
         case buf_numeral:
         {
-            double val = strtod(&m_buffer[0], NULL);
+            string s = m_buf.str();
+            double val = strtod(s.c_str(), NULL);
+            cout << "value = " << val << endl;
             m_tokens.push_back(new lexer_value_token(val));
         }
         break;
         case buf_name:
         {
-            string str = &m_buffer[0];
-            m_tokens.push_back(new lexer_name_token(str));
+            m_tokens.push_back(new lexer_name_token(m_buf.str()));
         }
         break;
         default:
             throw formula_lexer::tokenize_error("unknown buffer type");
     }
-    m_buffer.clear();
+    m_buf.clear();
 }
 
 // ============================================================================
