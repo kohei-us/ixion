@@ -317,32 +317,6 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
         fparser.print_tokens();
 
         // Put the formula tokens into formula cell instance.
-        cell_name_ptr_map_t::iterator itr = formula_cells.find(cell.get_name());
-        if (itr == formula_cells.end())
-            throw general_error("formula cell not found");
-
-        // Transfer formula tokens from the parser to the cell.
-        formula_cell* fcell = static_cast<formula_cell*>(itr->second);
-        fcell->swap_tokens(fparser.get_tokens());
-        assert(fparser.get_tokens().empty());
-    }
-}
-
-void update_formula_cells(const vector<model_parser::cell>& cells, cell_name_ptr_map_t& formula_cells)
-{
-    vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
-    for (; itr_cell != itr_cell_end; ++itr_cell)
-    {   
-        const model_parser::cell& cell = *itr_cell;
-#if DEBUG_INPUT_PARSER
-        cout << "parsing cell " << cell.get_name() << " (initial content:" << cell.print() << ")" << endl;
-#endif
-        // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(cell.get_tokens(), &formula_cells);
-        fparser.parse();
-        fparser.print_tokens();
-
-        // Put the formula tokens into formula cell instance.
         const string & name = cell.get_name();
         cell_name_ptr_map_t::iterator itr = formula_cells.find(name);
         if (itr == formula_cells.end())
@@ -527,7 +501,7 @@ void model_parser::parse()
                 os << get_formula_result_output_separator() << endl
                     << "recalculating" << endl;
                 cout << os.str();
-                update_formula_cells(data.cells, m_cells);
+                convert_lexer_tokens(data.cells, m_cells);
                 calc();
             }
             else if (buf_com.equals("check"))
