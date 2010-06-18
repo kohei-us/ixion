@@ -59,6 +59,8 @@ public:
     void run();
 
 private:
+    static bool is_digit(char c);
+
     void numeral();
     void space();
     void name();
@@ -102,8 +104,6 @@ void tokenizer::run()
     size_t n = m_formula.size();
     while (m_pos < n)
     {
-        cout << *mp << endl;
-
         if (*mp == m_sep_arg)
         {
             sep_arg();
@@ -153,17 +153,36 @@ void tokenizer::run()
     flush_buffer();
 }
 
+bool tokenizer::is_digit(char c)
+{
+    return ('0' <= c && c <= '9');
+}
+
 void tokenizer::numeral()
 {
-    if (m_buf.empty())
-        m_buf_type = buf_numeral;
+    flush_buffer();
+    m_buf_type = buf_numeral;
 
-    push_back();
-    next();
+    size_t sep_count = 0;
+    while (true)
+    {
+        push_back();
+        next();
+
+        if (is_digit(*mp))
+            continue;
+        if (*mp == m_sep_decimal && ++sep_count <= 1)
+            continue;
+        break;
+    }
+    if (sep_count > 1)
+        throw formula_lexer::tokenize_error("second decimal separator encountered.");
 }
 
 void tokenizer::space()
 {
+    flush_buffer();
+
     // space is ignored for now.
     next();
 }
