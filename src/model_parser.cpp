@@ -54,44 +54,6 @@ using ::boost::assign::ptr_map_insert;
 
 #define DEBUG_INPUT_PARSER 0
 
-namespace {
-
-class StackPrinter
-{
-public:
-    explicit StackPrinter(const char* msg) :
-        msMsg(msg)
-    {
-        fprintf(stdout, "%s: --begin\n", msMsg.c_str());
-        mfStartTime = getTime();
-    }
-
-    ~StackPrinter()
-    {
-        double fEndTime = getTime();
-        fprintf(stdout, "%s: --end (duration: %g sec)\n", msMsg.c_str(), (fEndTime-mfStartTime));
-    }
-
-    void printTime(int line) const
-    {
-        double fEndTime = getTime();
-        fprintf(stdout, "%s: --(%d) (duration: %g sec)\n", msMsg.c_str(), line, (fEndTime-mfStartTime));
-    }
-
-private:
-    double getTime() const
-    {
-        timeval tv;
-        gettimeofday(&tv, NULL);
-        return tv.tv_sec + tv.tv_usec / 1000000.0;
-    }
-
-    ::std::string msMsg;
-    double mfStartTime;
-};
-
-}
-
 namespace ixion {
 
 namespace {
