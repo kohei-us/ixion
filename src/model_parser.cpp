@@ -48,10 +48,6 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#include <stdio.h>
-#include <string>
-#include <sys/time.h>
-
 #define DEBUG_INPUT_PARSER 0
 
 namespace ixion {
