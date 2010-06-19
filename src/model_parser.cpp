@@ -54,6 +54,151 @@ namespace ixion {
 
 namespace {
 
+// ============================================================================
+// Function objects
+
+class formula_cell_inserter : public unary_function<string, void>
+{
+public:
+    formula_cell_inserter(ptr_map<string, base_cell>& cell_name_ptr_map) :
+        m_cell_map(cell_name_ptr_map) {}
+
+    void operator() (const string& name)
+    {
+        // This inserts a new'ed formula_cell instance associated with the name.
+        ptr_map_insert<formula_cell>(m_cell_map)(name);
+    }
+
+private:
+    ptr_map<string, base_cell>& m_cell_map;
+};
+
+class ref_cell_picker : public unary_function<formula_token_base*, void>
+{
+public:
+    ref_cell_picker(vector<base_cell*>& deps) :
+        m_deps(deps) {}
+
+    void operator() (formula_token_base* p)
+    {
+        if (p->get_opcode() != fop_single_ref)
+            return;
+
+        const base_cell* refcell = static_cast<single_ref_token*>(p)->get_single_ref();
+        m_deps.push_back(const_cast<base_cell*>(refcell));
+    }
+
+private:
+    vector<base_cell*>& m_deps;
+};
+
+class depcell_inserter : public unary_function<base_cell*, void>
+{
+public:
+    depcell_inserter(depends_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) : 
+        m_tracker(tracker), 
+        m_dirty_cells(dirty_cells),
+        mp_fcell(fcell) {}
+
+    void operator() (base_cell* p)
+    {
+        if (m_dirty_cells.count(p) > 0)
+            m_tracker.insert_depend(mp_fcell, p);
+    }
+private:
+    depends_tracker& m_tracker;
+    const dirty_cells_t& m_dirty_cells;
+    formula_cell* mp_fcell;
+};
+
+class formula_cell_listener_handler : public unary_function<formula_token_base*, void>
+{
+public:
+    enum mode_t { mode_add, mode_remove };
+
+    explicit formula_cell_listener_handler(formula_cell* p, mode_t mode) : 
+        mp_cell(p), m_mode(mode) {}
+
+    void operator() (formula_token_base* p) const
+    {
+        if (p->get_opcode() == fop_single_ref)
+        {
+            base_cell* cell = p->get_single_ref();
+            if (!cell)
+                return;
+
+            if (m_mode == mode_add)
+                cell->add_listener(mp_cell);
+            else
+            {
+                assert(m_mode == mode_remove);
+                cell->remove_listener(mp_cell);
+            }
+        }
+    }
+
+private:
+    formula_cell* mp_cell;
+    mode_t m_mode;
+};
+
+struct formula_cell_printer : public unary_function<const base_cell*, void>
+{
+    void operator() (const base_cell* p) const
+    {
+        cout << "  cell " << global::get_cell_name(p) << endl;
+    }
+};
+
+class ptr_name_map_builder : public unary_function<const base_cell*, void>
+{
+public:
+    ptr_name_map_builder(cell_ptr_name_map_t& map) : 
+        m_map(map) {}
+
+    void operator() (const base_cell* p) const
+    {
+        m_map.insert(cell_ptr_name_map_t::value_type(p, global::get_cell_name(p)));
+    }
+private:
+    cell_ptr_name_map_t& m_map;
+};
+
+class cell_dependency_handler : public unary_function<base_cell*, void>
+{
+public:
+    explicit cell_dependency_handler(depends_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
+        m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
+
+    void operator() (base_cell* pcell)
+    {
+        if (pcell->get_celltype() != celltype_formula)
+            return;
+
+        // Register cell dependencies.
+        formula_cell* fcell = static_cast<formula_cell*>(pcell);
+        vector<formula_token_base*> ref_tokens;
+        fcell->get_ref_tokens(ref_tokens);
+
+        // Pick up the referenced cells from the ref tokens.  I should
+        // probably combine this with the above get_ref_tokens() call above
+        // for efficiency.
+        vector<base_cell*> deps;
+        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(deps));
+
+        // Register dependency information.  Only dirty cells should be
+        // registered as precedent cells since non-dirty cells are equivalent
+        // to constants.
+        for_each(deps.begin(), deps.end(), depcell_inserter(m_dep_tracker, m_dirty_cells, fcell));
+    }
+
+private:
+    depends_tracker& m_dep_tracker;
+    dirty_cells_t& m_dirty_cells;
+};
+
+// ============================================================================
+
 void load_file_content(const string& filepath, string& content)
 {
     ifstream file(filepath.c_str());
@@ -191,113 +336,6 @@ void parse_command(const char*& p, mem_str_buf& com)
         _com.inc();
     _com.swap(com);
 }
-
-class formula_cell_inserter : public unary_function<string, void>
-{
-public:
-    formula_cell_inserter(ptr_map<string, base_cell>& cell_name_ptr_map) :
-        m_cell_map(cell_name_ptr_map) {}
-
-    void operator() (const string& name)
-    {
-        // This inserts a new'ed formula_cell instance associated with the name.
-        ptr_map_insert<formula_cell>(m_cell_map)(name);
-    }
-
-private:
-    ptr_map<string, base_cell>& m_cell_map;
-};
-
-class ref_cell_picker : public unary_function<formula_token_base*, void>
-{
-public:
-    ref_cell_picker(vector<base_cell*>& deps) :
-        m_deps(deps) {}
-
-    void operator() (formula_token_base* p)
-    {
-        if (p->get_opcode() != fop_single_ref)
-            return;
-
-        const base_cell* refcell = static_cast<single_ref_token*>(p)->get_single_ref();
-        m_deps.push_back(const_cast<base_cell*>(refcell));
-    }
-
-private:
-    vector<base_cell*>& m_deps;
-};
-
-class depcell_inserter : public unary_function<base_cell*, void>
-{
-public:
-    depcell_inserter(depends_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) : 
-        m_tracker(tracker), 
-        m_dirty_cells(dirty_cells),
-        mp_fcell(fcell) {}
-
-    void operator() (base_cell* p)
-    {
-        if (m_dirty_cells.count(p) > 0)
-            m_tracker.insert_depend(mp_fcell, p);
-    }
-private:
-    depends_tracker& m_tracker;
-    const dirty_cells_t& m_dirty_cells;
-    formula_cell* mp_fcell;
-};
-
-class formula_cell_listener_handler : public unary_function<formula_token_base*, void>
-{
-public:
-    enum mode_t { mode_add, mode_remove };
-
-    explicit formula_cell_listener_handler(formula_cell* p, mode_t mode) : 
-        mp_cell(p), m_mode(mode) {}
-
-    void operator() (formula_token_base* p) const
-    {
-        if (p->get_opcode() == fop_single_ref)
-        {
-            base_cell* cell = p->get_single_ref();
-            if (!cell)
-                return;
-
-            if (m_mode == mode_add)
-                cell->add_listener(mp_cell);
-            else
-            {
-                assert(m_mode == mode_remove);
-                cell->remove_listener(mp_cell);
-            }
-        }
-    }
-
-private:
-    formula_cell* mp_cell;
-    mode_t m_mode;
-};
-
-struct formula_cell_printer : public unary_function<const base_cell*, void>
-{
-    void operator() (const base_cell* p) const
-    {
-        cout << "  cell " << global::get_cell_name(p) << endl;
-    }
-};
-
-class ptr_name_map_builder : public unary_function<const base_cell*, void>
-{
-public:
-    ptr_name_map_builder(cell_ptr_name_map_t& map) : 
-        m_map(map) {}
-
-    void operator() (const base_cell* p) const
-    {
-        m_map.insert(cell_ptr_name_map_t::value_type(p, global::get_cell_name(p)));
-    }
-private:
-    cell_ptr_name_map_t& m_map;
-};
 
 void ensure_unique_names(const vector<string>& cell_names)
 {
@@ -578,36 +616,21 @@ void model_parser::parse()
 
 void model_parser::calc(dirty_cells_t& cells)
 {
+    // First, create cell pointer to name map and set it to the global 
+    // instance.  This is used throughout the calculation routine.
     cell_ptr_name_map_t all_cell_names;
     build_ptr_name_map(m_cells, all_cell_names);
     global::set_cell_name_map(&all_cell_names);
 
+    // Create cell pointer to name map only for the dirty cells.  The 
+    // depends_tracker instance needs this.
     cell_ptr_name_map_t dirty_cell_names;
     for_each(cells.begin(), cells.end(), ptr_name_map_builder(dirty_cell_names));
+
+    // Now, register the dependency info on each dirty cell, and interpret all
+    // dirty cells.
     depends_tracker deptracker(&dirty_cell_names);
-    dirty_cells_t::iterator itr = cells.begin(), itr_end = cells.end();
-    for (; itr != itr_end; ++itr)
-    {
-        base_cell* pcell = *itr;
-        if (pcell->get_celltype() != celltype_formula)
-            continue;
-
-        // Register cell dependencies.
-        formula_cell* fcell = static_cast<formula_cell*>(pcell);
-        vector<formula_token_base*> ref_tokens;
-        fcell->get_ref_tokens(ref_tokens);
-
-        // Pick up the referenced cells from the ref tokens.  I should
-        // probably combine this with the above get_ref_tokens() call above
-        // for efficiency.
-        vector<base_cell*> deps;
-        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(deps));
-
-        // Register dependency information.  Only dirty cells should be
-        // registered as precedent cells since non-dirty cells are equivalent
-        // to constants.
-        for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, cells, fcell));
-    }
+    for_each(cells.begin(), cells.end(), cell_dependency_handler(deptracker, cells));
     deptracker.interpret_all_cells(m_thread_count);
 }
 
