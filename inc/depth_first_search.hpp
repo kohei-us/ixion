@@ -76,7 +76,6 @@ public:
 
 private:
     void visit(size_t cell_index);
-    ::std::string get_cell_name(const base_cell* p) const;
     size_t get_cell_index(const base_cell* p) const;
     const depends_tracker::depend_cells_type* get_depend_cells(const formula_cell* cell);
 

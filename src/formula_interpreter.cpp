@@ -74,7 +74,7 @@ bool formula_interpreter::interpret()
     m_error = fe_no_error;
     m_result = 0.0;
     m_outbuf.clear();
-    string cell_name = get_cell_name(m_parent_cell);
+    string cell_name = global::get_cell_name(m_parent_cell);
     m_outbuf << get_formula_result_output_separator() << endl;
     m_outbuf << cell_name << ": ";
     try
@@ -107,12 +107,6 @@ double formula_interpreter::get_result() const
 formula_error_t formula_interpreter::get_error() const
 {
     return m_error;
-}
-
-string formula_interpreter::get_cell_name(const base_cell* p) const
-{
-    cell_ptr_name_map_t::const_iterator itr = m_ptr_name_map.find(p);
-    return itr == m_ptr_name_map.end() ? string("<unknown cell>") : itr->second;
 }
 
 bool formula_interpreter::has_token() const
@@ -244,11 +238,13 @@ double formula_interpreter::variable()
 {
     const base_cell* pref = token().get_single_ref();
     if (pref == m_parent_cell)
+    {
         // self-referencing is not permitted.
         throw formula_error(fe_ref_result_not_available);
+    }
 
     double val = pref->get_value();
-    m_outbuf << get_cell_name(pref);
+    m_outbuf << global::get_cell_name(pref);
     next();
     return val;
 }

@@ -204,7 +204,7 @@ void depends_tracker::print_dot_graph(const string& dotpath) const
     for (; itr != itr_end; ++itr)
     {
         const formula_cell* origin_cell = itr->first;
-        string origin = get_cell_name(static_cast<const base_cell*>(origin_cell));
+        string origin = global::get_cell_name(static_cast<const base_cell*>(origin_cell));
         print_dot_graph_depend(file, origin, *itr->second);
     }
     file << "}" << endl;
@@ -215,16 +215,7 @@ void depends_tracker::print_dot_graph_depend(
 {
     depend_cells_type::const_iterator itr = cells.begin(), itr_end = cells.end();
     for (; itr != itr_end; ++itr)
-        file << "    " << origin << " -> " << get_cell_name(*itr) << ";" << endl;
-}
-
-string depends_tracker::get_cell_name(const base_cell* pcell) const
-{
-    cell_ptr_name_map_t::const_iterator itr_name = mp_names->find(pcell);
-    if (itr_name == mp_names->end())
-        throw general_error("name not found for the given cell pointer");
-
-    return itr_name->second;
+        file << "    " << origin << " -> " << global::get_cell_name(*itr) << ";" << endl;
 }
 
 }

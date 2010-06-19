@@ -80,8 +80,6 @@ public:
 private:
     void print_dot_graph_depend(::std::ofstream& file, const ::std::string& origin, const depend_cells_type& cells) const;
 
-    ::std::string get_cell_name(const base_cell* pcell) const;
-
 private:
     depend_map_type             m_map;
     const cell_ptr_name_map_t*  mp_names;

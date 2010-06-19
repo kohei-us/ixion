@@ -87,7 +87,7 @@ void depth_first_search::print_result()
     for (size_t i = 0; i < m_cell_count; ++i)
     {
         const base_cell* p = m_cells[i].ptr;
-        cout << "  " << get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
+        cout << "  " << global::get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
     }
 }
 
@@ -131,15 +131,6 @@ void depth_first_search::visit(size_t cell_index)
     m_cells[cell_index].time_finished = ++m_time_stamp;
     m_handler(const_cast<base_cell*>(m_cells[cell_index].ptr));
 //  cout << "visit (end) ------------------------------------------------" << endl;
-}
-
-string depth_first_search::get_cell_name(const base_cell* p) const
-{
-    cell_ptr_name_map_t::const_iterator itr = m_cell_names.find(p);
-    if (itr == m_cell_names.end())
-        throw dfs_error("failed to retrieve cell name from the ptr.");
-
-    return itr->second;
 }
 
 size_t depth_first_search::get_cell_index(const base_cell* p) const

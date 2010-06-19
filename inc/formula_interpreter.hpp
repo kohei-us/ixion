@@ -50,7 +50,6 @@ public:
     formula_error_t get_error() const;
 
 private:
-    ::std::string get_cell_name(const base_cell* p) const;
     bool has_token() const;
     void next();
     const formula_token_base& token() const;

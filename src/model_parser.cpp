@@ -48,7 +48,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_INPUT_PARSER 1
+#define DEBUG_INPUT_PARSER 0
 
 namespace ixion {
 
@@ -230,14 +230,19 @@ private:
 class depcell_inserter : public unary_function<base_cell*, void>
 {
 public:
-    depcell_inserter(depends_tracker& tracker, formula_cell* fcell) : m_tracker(tracker), mp_fcell(fcell) {}
+    depcell_inserter(depends_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) : 
+        m_tracker(tracker), 
+        m_dirty_cells(dirty_cells),
+        mp_fcell(fcell) {}
 
     void operator() (base_cell* p)
     {
-        m_tracker.insert_depend(mp_fcell, p);
+        if (m_dirty_cells.count(p) > 0)
+            m_tracker.insert_depend(mp_fcell, p);
     }
 private:
     depends_tracker& m_tracker;
+    const dirty_cells_t& m_dirty_cells;
     formula_cell* mp_fcell;
 };
 
@@ -272,12 +277,26 @@ private:
     mode_t m_mode;
 };
 
-struct formula_cell_printer : public unary_function<const formula_cell*, void>
+struct formula_cell_printer : public unary_function<const base_cell*, void>
 {
-    void operator() (const formula_cell* p) const
+    void operator() (const base_cell* p) const
     {
         cout << "  cell " << global::get_cell_name(p) << endl;
     }
+};
+
+class ptr_name_map_builder : public unary_function<const base_cell*, void>
+{
+public:
+    ptr_name_map_builder(cell_ptr_name_map_t& map) : 
+        m_map(map) {}
+
+    void operator() (const base_cell* p) const
+    {
+        m_map.insert(cell_ptr_name_map_t::value_type(p, global::get_cell_name(p)));
+    }
+private:
+    cell_ptr_name_map_t& m_map;
 };
 
 void ensure_unique_names(const vector<string>& cell_names)
@@ -559,26 +578,35 @@ void model_parser::parse()
 
 void model_parser::calc(dirty_cells_t& cells)
 {
-    cell_ptr_name_map_t cell_names;
-    build_ptr_name_map(m_cells, cell_names);
-    global::set_cell_name_map(&cell_names);
+    cell_ptr_name_map_t all_cell_names;
+    build_ptr_name_map(m_cells, all_cell_names);
+    global::set_cell_name_map(&all_cell_names);
 
-    depends_tracker deptracker(&cell_names);
+    cell_ptr_name_map_t dirty_cell_names;
+    for_each(cells.begin(), cells.end(), ptr_name_map_builder(dirty_cell_names));
+    depends_tracker deptracker(&dirty_cell_names);
     dirty_cells_t::iterator itr = cells.begin(), itr_end = cells.end();
     for (; itr != itr_end; ++itr)
     {
-        formula_cell* fcell = *itr;
+        base_cell* pcell = *itr;
+        if (pcell->get_celltype() != celltype_formula)
+            continue;
 
         // Register cell dependencies.
+        formula_cell* fcell = static_cast<formula_cell*>(pcell);
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
 
-        // Pick up referenced cells from ref tokens.  Combine this with the 
-        // above get_ref_tokens() call above for efficiency.
+        // Pick up the referenced cells from the ref tokens.  I should
+        // probably combine this with the above get_ref_tokens() call above
+        // for efficiency.
         vector<base_cell*> deps;
         for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(deps));
 
-        for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, fcell));
+        // Register dependency information.  Only dirty cells should be
+        // registered as precedent cells since non-dirty cells are equivalent
+        // to constants.
+        for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, cells, fcell));
     }
     deptracker.interpret_all_cells(m_thread_count);
 }

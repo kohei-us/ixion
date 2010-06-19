@@ -40,7 +40,13 @@ class formula_cell;
 
 typedef ::boost::ptr_map< ::std::string, base_cell>             cell_name_ptr_map_t;
 typedef ::std::unordered_map<const base_cell*, ::std::string>   cell_ptr_name_map_t;
-typedef ::std::unordered_set<formula_cell*>                     dirty_cells_t;
+
+/**
+ * Dirty cells are those cells that have been modified or that reference
+ * other cells that have been modified.  Note that dirty cells can be of any 
+ * cell types.
+ */
+typedef ::std::unordered_set<base_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
 
