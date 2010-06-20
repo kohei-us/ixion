@@ -57,7 +57,7 @@ void print_help()
 {
     cout << "usage: ixion-parser [options] FILE1 FILE2 ..." << endl
          << endl
-         << "The FILE must contain the definitions of cells according to the cell difinion rule." << endl << endl
+         << "The FILE must contain the definitions of cells according to the cell difintion rule." << endl << endl
          << "Options:" << endl
          << "  -h                print this help." << endl
          << "  -t n,--thread=n   specify the number of threads to use during calculation.  Note that the number" << endl
@@ -77,8 +77,9 @@ int main (int argc, char** argv)
     namespace po = ::boost::program_options;
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help,h", "print this help")
-        ("thread,t", po::value<size_t>(), "specify the number of threads to use for calculation");
+        ("help,h", "print this help.")
+        ("thread,t", po::value<size_t>(), 
+         "specify the number of threads to use for calculation.  Note that the number specified by this option corresponds with the number of calculation threads i.e. those threads that perform cell interpretations.  The total number of threads used by this program will be n + 2.");
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
@@ -101,13 +102,16 @@ int main (int argc, char** argv)
     {
         // Unknown options.
         cout << e.what() << endl;
-        cout << desc << endl;
+        cout << desc;
         return EXIT_FAILURE;
     }
 
     if (vm.count("help"))
     {
-        cout << desc << endl;
+        cout << "Usage: ixion-parser [options] FILE1 FILE2 ..." << endl
+            << endl
+            << "The FILE must contain the definitions of cells according to the cell difintion rule." << endl << endl
+            << desc;
         return (EXIT_SUCCESS);
     }
 
