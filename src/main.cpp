@@ -29,13 +29,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <boost/program_options.hpp>
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 #include <boost/thread.hpp>
+#include <boost/program_options.hpp>
 
 using namespace std;
 using namespace ixion;
