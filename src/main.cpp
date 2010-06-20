@@ -52,7 +52,7 @@ using namespace ixion;
 
 namespace {
 
-#ifndef USE_BOOST_PROGRAM_OPTIONS
+#if !USE_BOOST_PROGRAM_OPTIONS
 void print_help()
 {
     cout << "usage: ixion-parser [options] FILE1 FILE2 ..." << endl
@@ -72,7 +72,7 @@ void print_help()
 int main (int argc, char** argv)
 {
     size_t thread_count = 0;
-#ifdef USE_BOOST_PROGRAM_OPTIONS
+#if USE_BOOST_PROGRAM_OPTIONS
     int optind = 1;
     namespace po = ::boost::program_options;
     po::options_description desc("Allowed options");
@@ -173,7 +173,6 @@ int main (int argc, char** argv)
 
     string model_list_path;
     string dotgraph_path;
-    size_t thread_count = 0;
 
     while (true)
     {
