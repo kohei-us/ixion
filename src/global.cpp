@@ -31,7 +31,11 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#ifdef WIN32
+#include <Windows.h>
+#else
 #include <sys/time.h>
+#endif
 
 #include <boost/thread/mutex.hpp>
 
@@ -66,9 +70,16 @@ void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& c
 
 double get_current_time()
 {
+#ifdef WIN32
+    FILETIME ft;
+    __int64 *time64 = (__int64 *) &ft;
+    GetSystemTimeAsFileTime (&ft);
+    return *time64 / 10000000.0;
+#else
     timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec + tv.tv_usec / 1000000.0;
+#endif
 }
 
 void global::set_cell_name_map(const cell_ptr_name_map_t* p)

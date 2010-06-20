@@ -29,7 +29,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <getopt.h>
+#endif
 
 #include <string>
 #include <iostream>
@@ -58,6 +60,10 @@ void print_help()
 
 int main (int argc, char** argv)
 {
+#ifdef WIN32
+    int optind = 1;
+    size_t thread_count = 0;
+#else
     /* Flag set by '--verbose'. */
     static int verbose_flag;
     static struct option long_options[] =
@@ -139,7 +145,7 @@ int main (int argc, char** argv)
                 abort ();
         }
     }
-
+#endif
     if (thread_count > 0)
     {
         cout << "Using " << thread_count << " threads" << endl;

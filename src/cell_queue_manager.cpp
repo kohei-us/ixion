@@ -37,7 +37,6 @@
 #include <iostream>
 #include <queue>
 #include <string>
-#include <sys/time.h>
 
 #define DEBUG_QUEUE_MANAGER 0
 
@@ -80,7 +79,7 @@ public:
     ~StackPrinter()
     {
 #if DEBUG_QUEUE_MANAGER
-        double fEndTime = getTime();
+        double fEndTime = get_current_time();
         ostringstream os;
         os << msMsg << ": --end (durtion: " << (fEndTime-mfStartTime) << " sec)";
         tprintf(os.str());
@@ -88,13 +87,6 @@ public:
     }
 
 private:
-    double getTime() const
-    {
-        timeval tv;
-        gettimeofday(&tv, NULL);
-        return tv.tv_sec + tv.tv_usec / 1000000.0;
-    }
-
     ::std::string msMsg;
     double mfStartTime;
 };
