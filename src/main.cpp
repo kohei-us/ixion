@@ -27,13 +27,22 @@
 
 #include "model_parser.hpp"
 
+#ifdef WIN32
+#define USE_BOOST_PROGRAM_OPTIONS 1
+#else
+#define USE_BOOST_PROGRAM_OPTIONS 0
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef WIN32
+#if USE_BOOST_PROGRAM_OPTIONS
+#include <boost/program_options.hpp>
+#else
 #include <getopt.h>
 #endif
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 #include <boost/thread.hpp>
@@ -43,6 +52,7 @@ using namespace ixion;
 
 namespace {
 
+#ifndef USE_BOOST_PROGRAM_OPTIONS
 void print_help()
 {
     cout << "usage: ixion-parser [options] FILE1 FILE2 ..." << endl
@@ -55,14 +65,89 @@ void print_help()
          << "                    those threads that perform cell interpretations.  The total number of threads " << endl
          << "                    used by this program will be n + 2." << endl;
 }
+#endif
 
 }
 
 int main (int argc, char** argv)
 {
-#ifdef WIN32
-    int optind = 1;
     size_t thread_count = 0;
+#ifdef USE_BOOST_PROGRAM_OPTIONS
+    int optind = 1;
+    namespace po = ::boost::program_options;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "print this help")
+        ("thread,t", po::value<size_t>(), "specify the number of threads to use for calculation");
+
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("input-file", po::value< vector<string> >(), "input file");
+
+    po::options_description cmd_opt;
+    cmd_opt.add(desc).add(hidden);
+
+    po::positional_options_description po_desc;
+    po_desc.add("input-file", -1);
+
+    po::variables_map vm;
+    try
+    {
+        po::store(
+            po::command_line_parser(argc, argv).options(cmd_opt).positional(po_desc).run(), vm);
+        po::notify(vm);
+    }
+    catch (const exception& e)
+    {
+        // Unknown options.
+        cout << e.what() << endl;
+        cout << desc << endl;
+        return EXIT_FAILURE;
+    }
+
+    if (vm.count("help"))
+    {
+        cout << desc << endl;
+        return (EXIT_SUCCESS);
+    }
+
+    if (vm.count("thread"))
+        thread_count = vm["thread"].as<size_t>();
+
+    vector<string> files;
+    if (vm.count("input-file"))
+        files = vm["input-file"].as< vector<string> >();
+
+    if (thread_count > 0)
+    {
+        cout << "Using " << thread_count << " threads" << endl;
+        cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
+    }
+    vector<string>::const_iterator itr = files.begin(), itr_end = files.end();
+    for (; itr != itr_end; ++itr)
+    {
+        const string& fpath = *itr;
+        double start_time = get_current_time();
+        cout << get_formula_result_output_separator() << endl;
+        cout << "parsing " << fpath << endl;
+
+        try
+        {
+            model_parser parser(fpath, thread_count);
+            parser.parse();
+        }
+        catch (const exception& e)
+        {
+            cerr << e.what() << endl;
+            cerr << "failed to parse " << fpath << endl;
+            exit (EXIT_FAILURE);
+        }
+
+        cout << get_formula_result_output_separator() << endl;
+        cout << "(duration: " << get_current_time() - start_time << " sec)" << endl;
+        cout << get_formula_result_output_separator() << endl;
+    }
+
 #else
     /* Flag set by '--verbose'. */
     static int verbose_flag;
@@ -145,7 +230,6 @@ int main (int argc, char** argv)
                 abort ();
         }
     }
-#endif
     if (thread_count > 0)
     {
         cout << "Using " << thread_count << " threads" << endl;
@@ -175,5 +259,7 @@ int main (int argc, char** argv)
         cout << "(duration: " << get_current_time() - start_time << " sec)" << endl;
         cout << get_formula_result_output_separator() << endl;
     }
+#endif
+    return (EXIT_SUCCESS);
 }
 
