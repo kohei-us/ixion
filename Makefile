@@ -31,7 +31,7 @@ SRCDIR=./src
 INCDIR=./inc
 
 CPPFLAGS=-I$(INCDIR) -D_REENTRANT -O2 -g -Wall -std=c++0x
-LDFLAGS=-lboost_thread
+LDFLAGS=-lboost_thread -lboost_program_options
 
 HEADERS= \
 	$(INCDIR)/cell.hpp \
