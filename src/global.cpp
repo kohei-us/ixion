@@ -34,6 +34,7 @@
 #ifdef WIN32
 #include <Windows.h>
 #else
+#include <unistd.h>
 #include <sys/time.h>
 #endif
 
@@ -97,6 +98,15 @@ double global::get_current_time()
     timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec + tv.tv_usec / 1000000.0;
+#endif
+}
+
+void global::sleep(unsigned int seconds)
+{
+#ifdef WIN32
+    ::Sleep(1000*seconds);
+#else
+    ::sleep(seconds);
 #endif
 }
 

@@ -28,12 +28,10 @@
 #include "formula_functions.hpp"
 #include "formula_tokens.hpp"
 
-#ifdef WIN32
-#include <Windows.h>
+#ifdef max
 #undef max
-#else
-#include <unistd.h>
 #endif
+
 #include <iostream>
 
 using namespace std;
@@ -128,11 +126,7 @@ double formula_functions::max(const args_type& args)
 
 double formula_functions::wait(const args_type& args)
 {
-#ifdef WIN32
-    Sleep(1000);
-#else
-    sleep(1);
-#endif
+    global::sleep(1);
     return 1;
 }
 

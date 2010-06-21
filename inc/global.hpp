@@ -60,7 +60,21 @@ public:
     static void set_cell_name_map(const cell_ptr_name_map_t* p);
     static ::std::string get_cell_name(const base_cell* cell);
 
+    /**
+     * Get current time in seconds since epoch.  Note that the value 
+     * representing a time may differ from platform to platform.  Use this 
+     * value only to measure relative time. 
+     * 
+     * @return current time in seconds since epoch.
+     */
     static double get_current_time();
+
+    /**
+     * Suspend execution of the calling thread for specified seconds.
+     * 
+     * @param seconds duration of sleep.
+     */
+    static void sleep(unsigned int seconds);
 
 private:
     global();
