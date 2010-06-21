@@ -101,7 +101,7 @@ int main (int argc, char** argv)
     for (; itr != itr_end; ++itr)
     {
         const string& fpath = *itr;
-        double start_time = get_current_time();
+        double start_time = global::get_current_time();
         cout << get_formula_result_output_separator() << endl;
         cout << "parsing " << fpath << endl;
 
@@ -118,7 +118,7 @@ int main (int argc, char** argv)
         }
 
         cout << get_formula_result_output_separator() << endl;
-        cout << "(duration: " << get_current_time() - start_time << " sec)" << endl;
+        cout << "(duration: " << global::get_current_time() - start_time << " sec)" << endl;
         cout << get_formula_result_output_separator() << endl;
     }
 

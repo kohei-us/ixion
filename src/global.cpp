@@ -68,20 +68,6 @@ void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& c
     cell_names.swap(_cell_names);
 }
 
-double get_current_time()
-{
-#ifdef WIN32
-    FILETIME ft;
-    __int64 *time64 = (__int64 *) &ft;
-    GetSystemTimeAsFileTime (&ft);
-    return *time64 / 10000000.0;
-#else
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + tv.tv_usec / 1000000.0;
-#endif
-}
-
 void global::set_cell_name_map(const cell_ptr_name_map_t* p)
 {
     ::boost::mutex::scoped_lock lock(cell_name_data.mtx);
@@ -98,6 +84,20 @@ string global::get_cell_name(const base_cell* cell)
             return itr->second;
     }
     return string("<unknown cell>");
+}
+
+double global::get_current_time()
+{
+#ifdef WIN32
+    FILETIME ft;
+    __int64 *time64 = (__int64 *) &ft;
+    GetSystemTimeAsFileTime (&ft);
+    return *time64 / 10000000.0;
+#else
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec + tv.tv_usec / 1000000.0;
+#endif
 }
 
 const char* get_formula_error_name(formula_error_t fe)

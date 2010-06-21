@@ -79,7 +79,7 @@ public:
     ~StackPrinter()
     {
 #if DEBUG_QUEUE_MANAGER
-        double fEndTime = get_current_time();
+        double fEndTime = global::get_current_time();
         ostringstream os;
         os << msMsg << ": --end (durtion: " << (fEndTime-mfStartTime) << " sec)";
         tprintf(os.str());
