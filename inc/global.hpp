@@ -42,9 +42,9 @@ typedef ::boost::ptr_map< ::std::string, base_cell>             cell_name_ptr_ma
 typedef ::std::unordered_map<const base_cell*, ::std::string>   cell_ptr_name_map_t;
 
 /**
- * Dirty cells are those cells that have been modified or that reference
- * other cells that have been modified.  Note that dirty cells can be of any 
- * cell types.
+ * Dirty cells are those cells that have been modified or cells that 
+ * reference modified cells.  Note that dirty cells can be of any cell 
+ * types. 
  */
 typedef ::std::unordered_set<base_cell*> dirty_cells_t;
 
