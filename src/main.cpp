@@ -80,7 +80,7 @@ int main (int argc, char** argv)
     {
         cout << "Usage: ixion-parser [options] FILE1 FILE2 ..." << endl
             << endl
-            << "The FILE must contain the definitions of cells according to the cell difinition rule." << endl << endl
+            << "The FILE must contain the definitions of cells according to the cell definition rule." << endl << endl
             << desc;
         return (EXIT_SUCCESS);
     }
