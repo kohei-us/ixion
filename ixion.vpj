@@ -223,7 +223,6 @@
 			<F
 				N="misc/Makefile"
 				Type="Makefile"/>
-			<F N="misc/thread_test.cpp"/>
 		</Folder>
 		<Folder Name="src">
 			<F N="src/cell.cpp"/>
