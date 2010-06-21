@@ -422,7 +422,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
 #if DEBUG_INPUT_PARSER
     cout << get_formula_result_output_separator() << endl;
     cell_ptr_name_map_t cell_names;
-    build_ptr_name_map(formula_cells, cell_names);
+    global::build_ptr_name_map(formula_cells, cell_names);
     global::set_cell_name_map(&cell_names);
     cell_name_ptr_map_t::const_iterator itr = formula_cells.begin(), itr_end = formula_cells.end();
     for (; itr != itr_end; ++itr)
@@ -619,7 +619,7 @@ void model_parser::calc(dirty_cells_t& cells)
     // First, create cell pointer to name map and set it to the global 
     // instance.  This is used throughout the calculation routine.
     cell_ptr_name_map_t all_cell_names;
-    build_ptr_name_map(m_cells, all_cell_names);
+    global::build_ptr_name_map(m_cells, all_cell_names);
     global::set_cell_name_map(&all_cell_names);
 
     // Create cell pointer to name map only for the dirty cells.  The 

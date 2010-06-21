@@ -60,7 +60,7 @@ const char* get_formula_result_output_separator()
     return sep;
 }
 
-void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& cell_names)
+void global::build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& cell_names)
 {
     cell_ptr_name_map_t _cell_names;
     cell_name_ptr_map_t::const_iterator itr = cells.begin(), itr_end = cells.end();

@@ -50,13 +50,13 @@ typedef ::std::unordered_set<base_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
 
-void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& cell_names);
 
 // ============================================================================
 
 class global
 {
 public:
+    static void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& cell_names);
     static void set_cell_name_map(const cell_ptr_name_map_t* p);
     static ::std::string get_cell_name(const base_cell* cell);
 
