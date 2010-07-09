@@ -25,7 +25,7 @@
 #
 #***********************************************************************
 
-EXEC=ixion-parser
+EXEC=ixion-parser ixion-sorter
 OBJDIR=./obj
 SRCDIR=./src
 INCDIR=./inc
@@ -66,6 +66,9 @@ OBJFILES= \
 	$(OBJDIR)/depends_tracker.o \
 	$(OBJDIR)/depth_first_search.o
 
+OBJ_SORTER= \
+	$(OBJDIR)/ixion_sorter.o
+
 DEPENDS= \
 	$(HEADERS)
 
@@ -76,6 +79,9 @@ pre:
 
 $(OBJDIR)/ixion_parser.o: $(SRCDIR)/ixion_parser.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/ixion_parser.cpp
+
+$(OBJDIR)/ixion_sorter.o: $(SRCDIR)/ixion_sorter.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/ixion_sorter.cpp
 
 $(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell.cpp
@@ -119,8 +125,11 @@ $(OBJDIR)/depends_tracker.o: $(SRCDIR)/depends_tracker.cpp $(DEPENDS)
 $(OBJDIR)/depth_first_search.o: $(SRCDIR)/depth_first_search.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depth_first_search.cpp
 
-$(EXEC): pre $(OBJFILES)
-	$(CXX) $(LDFLAGS) $(OBJFILES) -o $(EXEC)
+ixion-parser: pre $(OBJFILES)
+	$(CXX) $(LDFLAGS) $(OBJFILES) -o $@
+
+ixion-sorter: pre $(OBJ_SORTER)
+	$(CXX) $(LDFLAGS) $(OBJFILES) -o $@
 
 test: $(EXEC)
 	./$(EXEC) -d $(OBJDIR)/simple-arithmetic.dot ./test/*.txt
