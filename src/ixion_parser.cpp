@@ -82,7 +82,7 @@ int main (int argc, char** argv)
             << endl
             << "The FILE must contain the definitions of cells according to the cell definition rule." << endl << endl
             << desc;
-        return (EXIT_SUCCESS);
+        return EXIT_SUCCESS;
     }
 
     if (vm.count("thread"))
@@ -114,7 +114,7 @@ int main (int argc, char** argv)
         {
             cerr << e.what() << endl;
             cerr << "failed to parse " << fpath << endl;
-            exit (EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
 
         cout << get_formula_result_output_separator() << endl;
@@ -122,6 +122,6 @@ int main (int argc, char** argv)
         cout << get_formula_result_output_separator() << endl;
     }
 
-    return (EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 

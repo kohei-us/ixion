@@ -236,9 +236,9 @@
 			<F N="src/formula_result.cpp"/>
 			<F N="src/formula_tokens.cpp"/>
 			<F N="src/global.cpp"/>
+			<F N="src/ixion_parser.cpp"/>
 			<F N="src/ixion_sorter.cpp"/>
 			<F N="src/lexer_tokens.cpp"/>
-			<F N="src/main.cpp"/>
 			<F N="src/mem_str_buf.cpp"/>
 			<F N="src/model_parser.cpp"/>
 		</Folder>
