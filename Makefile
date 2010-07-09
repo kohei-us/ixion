@@ -50,7 +50,7 @@ HEADERS= \
 	$(INCDIR)/lexer_tokens.hpp
 
 OBJFILES= \
-	$(OBJDIR)/main.o \
+	$(OBJDIR)/ixion_parser.o \
 	$(OBJDIR)/cell.o \
 	$(OBJDIR)/cell_queue_manager.o \
 	$(OBJDIR)/lexer_tokens.o \
@@ -74,8 +74,8 @@ all: $(EXEC)
 pre:
 	mkdir $(OBJDIR) 2>/dev/null || /bin/true
 
-$(OBJDIR)/main.o: $(SRCDIR)/main.cpp $(DEPENDS)
-	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/main.cpp
+$(OBJDIR)/ixion_parser.o: $(SRCDIR)/ixion_parser.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/ixion_parser.cpp
 
 $(OBJDIR)/cell.o: $(SRCDIR)/cell.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/cell.cpp
@@ -132,6 +132,6 @@ test.parallel: $(EXEC)
 	./$(EXEC) -d $(OBJDIR)/05-function-parallel.dot ./test/05-function-parallel.txt
 
 clean:
-	rm -rf $(OBJDIR)
-	rm $(EXEC)
+	rm -rf $(OBJDIR) || /bin/true
+	rm -f $(EXEC) pre || /bin/true
 
