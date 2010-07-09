@@ -129,7 +129,7 @@ ixion-parser: pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $@
 
 ixion-sorter: pre $(OBJ_SORTER)
-	$(CXX) $(LDFLAGS) $(OBJFILES) -o $@
+	$(CXX) $(LDFLAGS) $(OBJ_SORTER) -o $@
 
 test: $(EXEC)
 	./$(EXEC) -d $(OBJDIR)/simple-arithmetic.dot ./test/*.txt
