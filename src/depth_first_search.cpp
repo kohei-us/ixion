@@ -35,7 +35,7 @@ using namespace std;
 namespace ixion {
 
 depth_first_search::depth_first_search(
-    const vector<base_cell*>& cells,
+    const vector<value_type>& cells,
     const depend_map_type& depend_map, cell_handler& handler) :
     m_depend_map(depend_map),
     m_handler(handler),
@@ -43,7 +43,7 @@ depth_first_search::depth_first_search(
     m_time_stamp(0),
     m_cells(m_cell_count)
 {
-    vector<base_cell*>::const_iterator 
+    vector<value_type>::const_iterator 
         itr = cells.begin(), itr_end = cells.end();
 
     // Construct cell pointer to index mapping.
@@ -54,12 +54,12 @@ depth_first_search::depth_first_search(
 
 void depth_first_search::init()
 {
-    vector<celldata> cells(m_cell_count);
+    vector<node_data> cells(m_cell_count);
     cell_index_map_type::const_iterator 
         itr = m_cell_indices.begin(), itr_end = m_cell_indices.end();
 
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
-        cells[index].ptr = itr->first;
+        cells[index].node = itr->first;
     m_cells.swap(cells);
     m_time_stamp = 0;
 }
@@ -67,7 +67,6 @@ void depth_first_search::init()
 void depth_first_search::run()
 {
     init();
-//  cout << "cell count: " << m_cell_count << endl;
     try
     {
         for (size_t i = 0; i < m_cell_count; ++i)
@@ -82,9 +81,7 @@ void depth_first_search::run()
 
 void depth_first_search::visit(size_t cell_index)
 {
-//  cout << "visit (start) ----------------------------------------------" << endl;
-    base_cell* p = m_cells[cell_index].ptr;
-//  cout << "  visit cell index: " << cell_index << "  name: " << get_cell_name(p) << endl;
+    value_type p = m_cells[cell_index].node;
     m_cells[cell_index].color = gray;
     m_cells[cell_index].time_visited = ++m_time_stamp;
 
@@ -99,12 +96,10 @@ void depth_first_search::visit(size_t cell_index)
             // No dependent cells.
             break;
     
-//      cout << "  depend cell count: " << depends->size() << endl;
         depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
         for (; itr != itr_end; ++itr)
         {
-            base_cell* dcell = *itr;
-//          cout << "  depend cell: " << get_cell_name(dcell) << " (" << dcell << ")" << endl;
+            value_type dcell = *itr;
             size_t dcell_id = get_cell_index(dcell);
             if (m_cells[dcell_id].color == white)
             {
@@ -117,20 +112,19 @@ void depth_first_search::visit(size_t cell_index)
 
     m_cells[cell_index].color = black;
     m_cells[cell_index].time_finished = ++m_time_stamp;
-    m_handler(m_cells[cell_index].ptr);
-//  cout << "visit (end) ------------------------------------------------" << endl;
+    m_handler(m_cells[cell_index].node);
 }
 
-size_t depth_first_search::get_cell_index(base_cell* p) const
+size_t depth_first_search::get_cell_index(value_type p) const
 {
-    unordered_map<base_cell*, size_t>::const_iterator itr = m_cell_indices.find(p);
+    unordered_map<value_type, size_t>::const_iterator itr = m_cell_indices.find(p);
     if (itr == m_cell_indices.end())
         throw dfs_error("cell ptr to index mapping failed.");
     return itr->second;
 }
 
 const depth_first_search::depend_cells_type* depth_first_search::get_depend_cells(
-    base_cell* cell)
+    value_type cell)
 {
     depend_map_type::const_iterator itr = m_depend_map.find(cell);
     if (itr == m_depend_map.end())

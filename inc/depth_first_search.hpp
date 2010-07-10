@@ -41,7 +41,10 @@ class base_cell;
 
 class depth_first_search
 {
-    typedef ::std::unordered_map<base_cell*, size_t> cell_index_map_type;
+public:
+    typedef base_cell* value_type;
+private:
+    typedef ::std::unordered_map<value_type, size_t> cell_index_map_type;
 
     enum cell_color_type { white, gray, black };
 
@@ -59,29 +62,29 @@ class depth_first_search
         ::std::string m_msg;
     };
 
-    struct celldata
+    struct node_data
     {
         cell_color_type color;
-        base_cell*      ptr;
-        base_cell*      parent;
+        value_type      node;
+        value_type      parent;
         size_t          time_visited;
         size_t          time_finished;
 
-        celldata() : color(white), ptr(NULL), parent(NULL), time_visited(0), time_finished(0) {}
+        node_data() : color(white), node(0), parent(0), time_visited(0), time_finished(0) {}
     };
 
 public:
-    typedef ::std::set<base_cell*>                             depend_cells_type;
-    typedef ::boost::ptr_map<base_cell*, depend_cells_type>    depend_map_type;
+    typedef ::std::set<value_type>                             depend_cells_type;
+    typedef ::boost::ptr_map<value_type, depend_cells_type>    depend_map_type;
 
-    class cell_handler : public ::std::unary_function<base_cell*, void>
+    class cell_handler : public ::std::unary_function<value_type, void>
     {
     public:
-        virtual void operator() (base_cell* cell) = 0;
+        virtual void operator() (value_type cell) = 0;
     };
 
     depth_first_search(
-        const ::std::vector<base_cell*>& cells, 
+        const ::std::vector<value_type>& cells, 
         const depend_map_type& depend_map, cell_handler& handler);
 
     void init();
@@ -89,8 +92,8 @@ public:
 
 private:
     void visit(size_t cell_index);
-    size_t get_cell_index(base_cell* p) const;
-    const depend_cells_type* get_depend_cells(base_cell* cell);
+    size_t get_cell_index(value_type p) const;
+    const depend_cells_type* get_depend_cells(value_type cell);
 
 private:
     const depend_map_type&  m_depend_map;
@@ -99,7 +102,7 @@ private:
     cell_index_map_type     m_cell_indices;
 
     size_t                  m_time_stamp;
-    ::std::vector<celldata> m_cells;
+    ::std::vector<node_data> m_cells;
 };
 
 }

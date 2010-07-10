@@ -92,7 +92,7 @@ int main (int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    const string& filepath = files[0];
+//  const string& filepath = files[0];
     
 
     return EXIT_SUCCESS;
