@@ -61,11 +61,11 @@ class depth_first_search
 
     struct celldata
     {
-        cell_color_type     color;
-        base_cell*    ptr;
-        base_cell*    parent;
-        size_t              time_visited;
-        size_t              time_finished;
+        cell_color_type color;
+        base_cell*      ptr;
+        base_cell*      parent;
+        size_t          time_visited;
+        size_t          time_finished;
 
         celldata() : color(white), ptr(NULL), parent(NULL), time_visited(0), time_finished(0) {}
     };
