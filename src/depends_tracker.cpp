@@ -148,7 +148,8 @@ void depends_tracker::insert_depend(const base_cell* origin_cell, const base_cel
         itr = r.first;
     }
 
-    itr->second->insert(depend_cell);
+    if (depend_cell)
+        itr->second->insert(depend_cell);
 //  cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
 }
 
@@ -192,7 +193,13 @@ void depends_tracker::interpret_all_cells(size_t thread_count)
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
-    depth_first_search dfs(m_map, *mp_names, handler);
+    vector<const base_cell*> all_cells;
+    all_cells.reserve(mp_names->size());
+    cell_ptr_name_map_t::const_iterator itr = mp_names->begin(), itr_end = mp_names->end();
+    for (; itr != itr_end; ++itr)
+        all_cells.push_back(itr->first);
+
+    depth_first_search dfs(all_cells, m_map, handler);
     dfs.run();
 }
 

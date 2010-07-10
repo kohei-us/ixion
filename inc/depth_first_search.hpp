@@ -29,10 +29,12 @@
 #define __IXION_DEPTH_FIRST_SEARCH_HPP__
 
 #include "global.hpp"
-#include "depends_tracker.hpp"
 
 #include <unordered_map>
 #include <vector>
+#include <set>
+
+#include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
 
@@ -62,31 +64,35 @@ class depth_first_search
     };
 
 public:
+    typedef ::std::set<const base_cell*>                             depend_cells_type;
+    typedef ::boost::ptr_map<const base_cell*, depend_cells_type>    depend_map_type;
+
     class cell_handler : public ::std::unary_function<base_cell*, void>
     {
     public:
         virtual void operator() (base_cell* cell) = 0;
     };
 
-    depth_first_search(const depends_tracker::depend_map_type& depend_map, 
-                       const cell_ptr_name_map_t& cell_names, cell_handler& handler);
+    depth_first_search(
+        const ::std::vector<const base_cell*>& cells, 
+        const depend_map_type& depend_map, cell_handler& handler);
+
     void init();
     void run();
 
 private:
     void visit(size_t cell_index);
     size_t get_cell_index(const base_cell* p) const;
-    const depends_tracker::depend_cells_type* get_depend_cells(const formula_cell* cell);
+    const depend_cells_type* get_depend_cells(const base_cell* cell);
 
 private:
-    const depends_tracker::depend_map_type&     m_depend_map;
-    const cell_ptr_name_map_t&                  m_cell_names;
-    cell_handler&                               m_handler;
-    size_t                                      m_cell_count;
-    cell_index_map_type                         m_cell_indices;
+    const depend_map_type&  m_depend_map;
+    cell_handler&           m_handler;
+    size_t                  m_cell_count;
+    cell_index_map_type     m_cell_indices;
 
-    size_t                          m_time_stamp;
-    ::std::vector<celldata>         m_cells;
+    size_t                  m_time_stamp;
+    ::std::vector<celldata> m_cells;
 };
 
 }

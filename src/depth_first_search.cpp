@@ -35,29 +35,28 @@ using namespace std;
 namespace ixion {
 
 depth_first_search::depth_first_search(
-    const depends_tracker::depend_map_type& depend_map, 
-    const cell_ptr_name_map_t& cell_names,
-    cell_handler& handler) :
+    const vector<const base_cell*>& cells,
+    const depend_map_type& depend_map, cell_handler& handler) :
     m_depend_map(depend_map),
-    m_cell_names(cell_names),
     m_handler(handler),
-    m_cell_count(cell_names.size()),
+    m_cell_count(cells.size()),
     m_time_stamp(0),
     m_cells(m_cell_count)
 {
-    cell_ptr_name_map_t::const_iterator 
-        itr = m_cell_names.begin(), itr_end = m_cell_names.end();
+    vector<const base_cell*>::const_iterator 
+        itr = cells.begin(), itr_end = cells.end();
 
+    // Construct cell pointer to index mapping.
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
         m_cell_indices.insert(
-            cell_index_map_type::value_type(itr->first, index));
+            cell_index_map_type::value_type(*itr, index));
 }
 
 void depth_first_search::init()
 {
     vector<celldata> cells(m_cell_count);
-    cell_ptr_name_map_t::const_iterator 
-        itr = m_cell_names.begin(), itr_end = m_cell_names.end();
+    cell_index_map_type::const_iterator 
+        itr = m_cell_indices.begin(), itr_end = m_cell_indices.end();
 
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
         cells[index].ptr = itr->first;
@@ -96,13 +95,13 @@ void depth_first_search::visit(size_t cell_index)
             break;
 
         const formula_cell* fcell = static_cast<const formula_cell*>(p);
-        const depends_tracker::depend_cells_type* depends = get_depend_cells(fcell);
+        const depend_cells_type* depends = get_depend_cells(fcell);
         if (!depends)
             // No dependent cells.
             break;
     
 //      cout << "  depend cell count: " << depends->size() << endl;
-        depends_tracker::depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
+        depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
         for (; itr != itr_end; ++itr)
         {
             const base_cell* dcell = *itr;
@@ -131,10 +130,10 @@ size_t depth_first_search::get_cell_index(const base_cell* p) const
     return itr->second;
 }
 
-const depends_tracker::depend_cells_type* depth_first_search::get_depend_cells(
-    const formula_cell* cell)
+const depth_first_search::depend_cells_type* depth_first_search::get_depend_cells(
+    const base_cell* cell)
 {
-    depends_tracker::depend_map_type::const_iterator itr = m_depend_map.find(cell);
+    depend_map_type::const_iterator itr = m_depend_map.find(cell);
     if (itr == m_depend_map.end())
         // This cell has no dependent cells.
         return NULL;

@@ -29,9 +29,9 @@
 #define __DEPENDS_TRACKER_HPP__
 
 #include "formula_parser.hpp"
+#include "depth_first_search.hpp"
 
 #include <string>
-#include <set>
 #include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
 
@@ -47,8 +47,8 @@ class base_cell;
 class depends_tracker
 {
 public:
-    typedef ::std::set<const base_cell*>                             depend_cells_type;
-    typedef ::boost::ptr_map<const base_cell*, depend_cells_type>    depend_map_type;
+    typedef depth_first_search::depend_cells_type   depend_cells_type;
+    typedef depth_first_search::depend_map_type     depend_map_type;
 
     depends_tracker(const cell_ptr_name_map_t* names);
     ~depends_tracker();
