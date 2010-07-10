@@ -26,8 +26,74 @@
  ************************************************************************/
 
 #include <cstdlib>
+#include <string>
+#include <vector>
+#include <iostream>
+
+#include <boost/program_options.hpp>
+
+using namespace std;
+
+namespace po = ::boost::program_options;
+
+void print_help(const po::options_description& desc)
+{
+    cout << "Usage: ixion-parser [options] FILE" << endl
+        << endl
+        << "FILE must contain a list of dependencies." << endl << endl
+        << desc;
+}
 
 int main (int argc, char** argv)
 {
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "print this help.");
+
+    po::options_description hidden("Hidden options");
+    hidden.add_options()
+        ("input-file", po::value< vector<string> >(), "input file");
+
+    po::options_description cmd_opt;
+    cmd_opt.add(desc).add(hidden);
+
+    po::positional_options_description po_desc;
+    po_desc.add("input-file", -1);
+
+    po::variables_map vm;
+    try
+    {
+        po::store(
+            po::command_line_parser(argc, argv).options(cmd_opt).positional(po_desc).run(), vm);
+        po::notify(vm);
+    }
+    catch (const exception& e)
+    {
+        // Unknown options.
+        cerr << e.what() << endl;
+        print_help(desc);
+        return EXIT_FAILURE;
+    }
+
+    if (vm.count("help"))
+    {
+        print_help(desc);
+        return EXIT_SUCCESS;
+    }
+
+    vector<string> files;
+    if (vm.count("input-file"))
+        files = vm["input-file"].as< vector<string> >();
+
+    if (files.size() != 1)
+    {
+        cerr << "Takes exactly one input file." << endl;
+        print_help(desc);
+        return EXIT_FAILURE;
+    }
+
+    const string& filepath = files[0];
+    
+
     return EXIT_SUCCESS;
 }
