@@ -134,7 +134,7 @@ depends_tracker::~depends_tracker()
 {
 }
 
-void depends_tracker::insert_depend(const base_cell* origin_cell, const base_cell* depend_cell)
+void depends_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
 {
 //  cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
     depend_map_type::iterator itr = m_map.find(origin_cell);
@@ -193,11 +193,11 @@ void depends_tracker::interpret_all_cells(size_t thread_count)
 void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
-    vector<const base_cell*> all_cells;
+    vector<base_cell*> all_cells;
     all_cells.reserve(mp_names->size());
     cell_ptr_name_map_t::const_iterator itr = mp_names->begin(), itr_end = mp_names->end();
     for (; itr != itr_end; ++itr)
-        all_cells.push_back(itr->first);
+        all_cells.push_back(const_cast<base_cell*>(itr->first));
 
     depth_first_search dfs(all_cells, m_map, handler);
     dfs.run();

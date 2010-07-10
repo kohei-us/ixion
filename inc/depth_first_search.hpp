@@ -28,11 +28,10 @@
 #ifndef __IXION_DEPTH_FIRST_SEARCH_HPP__
 #define __IXION_DEPTH_FIRST_SEARCH_HPP__
 
-#include "global.hpp"
-
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <exception>
 
 #include <boost/ptr_container/ptr_map.hpp>
 
@@ -42,21 +41,29 @@ class base_cell;
 
 class depth_first_search
 {
-    typedef ::std::unordered_map<const base_cell*, size_t> cell_index_map_type;
+    typedef ::std::unordered_map<base_cell*, size_t> cell_index_map_type;
 
     enum cell_color_type { white, gray, black };
 
-    class dfs_error : public general_error
+    class dfs_error : public ::std::exception
     {
     public:
-        dfs_error(const ::std::string& msg) : general_error(msg) {}
+        dfs_error(const ::std::string& msg) : m_msg(msg) {}
+        virtual ~dfs_error() throw() {}
+
+        virtual const char* what() const throw()
+        {
+            return m_msg.c_str();
+        }
+    private:
+        ::std::string m_msg;
     };
 
     struct celldata
     {
         cell_color_type     color;
-        const base_cell*    ptr;
-        const base_cell*    parent;
+        base_cell*    ptr;
+        base_cell*    parent;
         size_t              time_visited;
         size_t              time_finished;
 
@@ -64,8 +71,8 @@ class depth_first_search
     };
 
 public:
-    typedef ::std::set<const base_cell*>                             depend_cells_type;
-    typedef ::boost::ptr_map<const base_cell*, depend_cells_type>    depend_map_type;
+    typedef ::std::set<base_cell*>                             depend_cells_type;
+    typedef ::boost::ptr_map<base_cell*, depend_cells_type>    depend_map_type;
 
     class cell_handler : public ::std::unary_function<base_cell*, void>
     {
@@ -74,7 +81,7 @@ public:
     };
 
     depth_first_search(
-        const ::std::vector<const base_cell*>& cells, 
+        const ::std::vector<base_cell*>& cells, 
         const depend_map_type& depend_map, cell_handler& handler);
 
     void init();
@@ -82,8 +89,8 @@ public:
 
 private:
     void visit(size_t cell_index);
-    size_t get_cell_index(const base_cell* p) const;
-    const depend_cells_type* get_depend_cells(const base_cell* cell);
+    size_t get_cell_index(base_cell* p) const;
+    const depend_cells_type* get_depend_cells(base_cell* cell);
 
 private:
     const depend_map_type&  m_depend_map;

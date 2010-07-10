@@ -59,7 +59,7 @@ public:
      * @param origin_cell* cell that depends on <code>depend_cell</code>.
      * @param depend_cell* cell that <code>origin_cell</code> depends on.
      */
-    void insert_depend(const base_cell* origin_cell, const base_cell* depend_cell);
+    void insert_depend(base_cell* origin_cell, base_cell* depend_cell);
 
     void interpret_all_cells(size_t thread_count);
 
