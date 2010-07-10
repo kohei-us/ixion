@@ -72,7 +72,6 @@ public:
                        const cell_ptr_name_map_t& cell_names, cell_handler& handler);
     void init();
     void run();
-    void print_result();
 
 private:
     void visit(size_t cell_index);

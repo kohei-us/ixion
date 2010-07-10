@@ -81,16 +81,6 @@ void depth_first_search::run()
     }
 }
 
-void depth_first_search::print_result()
-{
-    cout << "result -----------------------------------------------------" << endl;
-    for (size_t i = 0; i < m_cell_count; ++i)
-    {
-        const base_cell* p = m_cells[i].ptr;
-        cout << "  " << global::get_cell_name(p) << ": finished: " << m_cells[i].time_finished << endl;
-    }
-}
-
 void depth_first_search::visit(size_t cell_index)
 {
 //  cout << "visit (start) ----------------------------------------------" << endl;

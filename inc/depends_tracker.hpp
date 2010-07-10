@@ -38,7 +38,6 @@
 namespace ixion {
 
 class base_cell;
-class formula_cell;
 
 /** 
  * This class keeps track of inter-cell dependencies.  Each formula cell 
@@ -48,8 +47,8 @@ class formula_cell;
 class depends_tracker
 {
 public:
-    typedef ::std::set<const base_cell*>                                depend_cells_type;
-    typedef ::boost::ptr_map<const formula_cell*, depend_cells_type>    depend_map_type;
+    typedef ::std::set<const base_cell*>                             depend_cells_type;
+    typedef ::boost::ptr_map<const base_cell*, depend_cells_type>    depend_map_type;
 
     depends_tracker(const cell_ptr_name_map_t* names);
     ~depends_tracker();
@@ -60,7 +59,7 @@ public:
      * @param origin_cell* cell that depends on <code>depend_cell</code>.
      * @param depend_cell* cell that <code>origin_cell</code> depends on.
      */
-    void insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell);
+    void insert_depend(const base_cell* origin_cell, const base_cell* depend_cell);
 
     void interpret_all_cells(size_t thread_count);
 

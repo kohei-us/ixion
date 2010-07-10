@@ -134,7 +134,7 @@ depends_tracker::~depends_tracker()
 {
 }
 
-void depends_tracker::insert_depend(const formula_cell* origin_cell, const base_cell* depend_cell)
+void depends_tracker::insert_depend(const base_cell* origin_cell, const base_cell* depend_cell)
 {
 //  cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
     depend_map_type::iterator itr = m_map.find(origin_cell);
@@ -203,8 +203,8 @@ void depends_tracker::print_dot_graph(const string& dotpath) const
     file << "digraph G {" << endl;
     for (; itr != itr_end; ++itr)
     {
-        const formula_cell* origin_cell = itr->first;
-        string origin = global::get_cell_name(static_cast<const base_cell*>(origin_cell));
+        const base_cell* origin_cell = itr->first;
+        string origin = global::get_cell_name(origin_cell);
         print_dot_graph_depend(file, origin, *itr->second);
     }
     file << "}" << endl;
