@@ -38,11 +38,12 @@
 
 namespace ixion {
 
-template<typename _ValueType>
+template<typename _ValueType, typename _CellHandlerType>
 class depth_first_search
 {
 public:
-    typedef _ValueType value_type;
+    typedef _ValueType          value_type;
+    typedef _CellHandlerType    cell_handler_type;
 
 private:
     typedef ::std::unordered_map<value_type, size_t> cell_index_map_type;
@@ -78,15 +79,9 @@ public:
     typedef ::std::set<value_type>                             depend_cells_type;
     typedef ::boost::ptr_map<value_type, depend_cells_type>    depend_map_type;
 
-    class cell_handler : public ::std::unary_function<value_type, void>
-    {
-    public:
-        virtual void operator() (value_type cell) = 0;
-    };
-
     depth_first_search(
         const ::std::vector<value_type>& cells, 
-        const depend_map_type& depend_map, cell_handler& handler);
+        const depend_map_type& depend_map, cell_handler_type& handler);
 
     void init();
     void run();
@@ -98,7 +93,7 @@ private:
 
 private:
     const depend_map_type&  m_depend_map;
-    cell_handler&           m_handler;
+    cell_handler_type&      m_handler;
     size_t                  m_cell_count;
     cell_index_map_type     m_cell_indices;
 
@@ -106,10 +101,10 @@ private:
     ::std::vector<node_data> m_cells;
 };
 
-template<typename _ValueType>
-depth_first_search<_ValueType>::depth_first_search(
+template<typename _ValueType, typename _CellHandlerType>
+depth_first_search<_ValueType,_CellHandlerType>::depth_first_search(
     const ::std::vector<value_type>& cells,
-    const depend_map_type& depend_map, cell_handler& handler) :
+    const depend_map_type& depend_map, cell_handler_type& handler) :
     m_depend_map(depend_map),
     m_handler(handler),
     m_cell_count(cells.size()),
@@ -125,8 +120,8 @@ depth_first_search<_ValueType>::depth_first_search(
             typename cell_index_map_type::value_type(*itr, index));
 }
 
-template<typename _ValueType>
-void depth_first_search<_ValueType>::init()
+template<typename _ValueType, typename _CellHandlerType>
+void depth_first_search<_ValueType,_CellHandlerType>::init()
 {
     ::std::vector<node_data> cells(m_cell_count);
     typename cell_index_map_type::const_iterator 
@@ -138,8 +133,8 @@ void depth_first_search<_ValueType>::init()
     m_time_stamp = 0;
 }
 
-template<typename _ValueType>
-void depth_first_search<_ValueType>::run()
+template<typename _ValueType, typename _CellHandlerType>
+void depth_first_search<_ValueType,_CellHandlerType>::run()
 {
     init();
     try
@@ -155,8 +150,8 @@ void depth_first_search<_ValueType>::run()
     }
 }
 
-template<typename _ValueType>
-void depth_first_search<_ValueType>::visit(size_t cell_index)
+template<typename _ValueType, typename _CellHandlerType>
+void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
 {
     value_type p = m_cells[cell_index].node;
     m_cells[cell_index].color = gray;
@@ -188,8 +183,8 @@ void depth_first_search<_ValueType>::visit(size_t cell_index)
     m_handler(m_cells[cell_index].node);
 }
 
-template<typename _ValueType>
-size_t depth_first_search<_ValueType>::get_cell_index(value_type p) const
+template<typename _ValueType, typename _CellHandlerType>
+size_t depth_first_search<_ValueType,_CellHandlerType>::get_cell_index(value_type p) const
 {
     typename ::std::unordered_map<value_type, size_t>::const_iterator itr = m_cell_indices.find(p);
     if (itr == m_cell_indices.end())
@@ -197,9 +192,9 @@ size_t depth_first_search<_ValueType>::get_cell_index(value_type p) const
     return itr->second;
 }
 
-template<typename _ValueType>
-const typename depth_first_search<_ValueType>::depend_cells_type*
-depth_first_search<_ValueType>::get_depend_cells(value_type cell)
+template<typename _ValueType, typename _CellHandlerType>
+const typename depth_first_search<_ValueType,_CellHandlerType>::depend_cells_type*
+depth_first_search<_ValueType,_CellHandlerType>::get_depend_cells(value_type cell)
 {
     typename depend_map_type::const_iterator itr = m_depend_map.find(cell);
     if (itr == m_depend_map.end())

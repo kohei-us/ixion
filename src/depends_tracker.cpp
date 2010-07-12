@@ -109,7 +109,7 @@ private:
     const cell_ptr_name_map_t& m_cell_names;
 };
 
-class cell_back_inserter : public depth_first_search<base_cell*>::cell_handler
+class cell_back_inserter : public unary_function<base_cell*, void>
 {
 public:
     cell_back_inserter(vector<base_cell*>& sorted_cells) :
@@ -141,8 +141,7 @@ void depends_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_ce
     if (itr == m_map.end())
     {
         // First dependent cell for this origin cell.
-        pair<depend_map_type::iterator, bool> r = m_map.insert(
-            origin_cell, new depth_first_search<base_cell*>::depend_cells_type);
+        pair<depend_map_type::iterator, bool> r = m_map.insert(origin_cell, new depend_cells_type);
         if (!r.second)
             throw general_error("failed to insert a new set instance");
 
@@ -200,7 +199,7 @@ void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
     for (; itr != itr_end; ++itr)
         all_cells.push_back(const_cast<base_cell*>(itr->first));
 
-    depth_first_search<base_cell*> dfs(all_cells, m_map, handler);
+    depth_first_search<base_cell*, cell_back_inserter> dfs(all_cells, m_map, handler);
     dfs.run();
 }
 

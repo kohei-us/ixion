@@ -219,11 +219,6 @@
 			<F N="inc/model_parser.hpp"/>
 			<F N="inc/thread.hpp"/>
 		</Folder>
-		<Folder Name="misc">
-			<F
-				N="misc/Makefile"
-				Type="Makefile"/>
-		</Folder>
 		<Folder Name="src">
 			<F N="src/cell.cpp"/>
 			<F N="src/cell_queue_manager.cpp"/>

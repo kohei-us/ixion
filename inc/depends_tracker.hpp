@@ -29,9 +29,9 @@
 #define __DEPENDS_TRACKER_HPP__
 
 #include "formula_parser.hpp"
-#include "depth_first_search.hpp"
 
 #include <string>
+#include <set>
 #include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
 
@@ -67,7 +67,8 @@ public:
     void topo_sort_cells(::std::vector<base_cell*>& sorted_cells) const;
 
 private:
-    typedef depth_first_search<base_cell*>::depend_map_type depend_map_type;
+    typedef ::std::set<base_cell*>                             depend_cells_type;
+    typedef ::boost::ptr_map<base_cell*, depend_cells_type>    depend_map_type;
 
     depend_map_type m_map;
     const cell_ptr_name_map_t* mp_names;
