@@ -109,7 +109,7 @@ private:
     const cell_ptr_name_map_t& m_cell_names;
 };
 
-class cell_back_inserter : public depth_first_search::cell_handler
+class cell_back_inserter : public depth_first_search<base_cell*>::cell_handler
 {
 public:
     cell_back_inserter(vector<base_cell*>& sorted_cells) :
@@ -199,7 +199,7 @@ void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
     for (; itr != itr_end; ++itr)
         all_cells.push_back(const_cast<base_cell*>(itr->first));
 
-    depth_first_search dfs(all_cells, m_map, handler);
+    depth_first_search<base_cell*> dfs(all_cells, m_map, handler);
     dfs.run();
 }
 

@@ -63,8 +63,7 @@ OBJFILES= \
 	$(OBJDIR)/formula_interpreter.o \
 	$(OBJDIR)/mem_str_buf.o \
 	$(OBJDIR)/model_parser.o \
-	$(OBJDIR)/depends_tracker.o \
-	$(OBJDIR)/depth_first_search.o
+	$(OBJDIR)/depends_tracker.o
 
 OBJ_SORTER= \
 	$(OBJDIR)/ixion_sorter.o
@@ -121,9 +120,6 @@ $(OBJDIR)/model_parser.o: $(SRCDIR)/model_parser.cpp $(DEPENDS)
 
 $(OBJDIR)/depends_tracker.o: $(SRCDIR)/depends_tracker.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depends_tracker.cpp
-
-$(OBJDIR)/depth_first_search.o: $(SRCDIR)/depth_first_search.cpp $(DEPENDS)
-	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depth_first_search.cpp
 
 ixion-parser: pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $@

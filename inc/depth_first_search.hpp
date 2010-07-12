@@ -32,17 +32,18 @@
 #include <vector>
 #include <set>
 #include <exception>
+#include <iostream>
 
 #include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
 
-class base_cell;
-
+template<typename _ValueType>
 class depth_first_search
 {
 public:
-    typedef base_cell* value_type;
+    typedef _ValueType value_type;
+
 private:
     typedef ::std::unordered_map<value_type, size_t> cell_index_map_type;
 
@@ -104,6 +105,109 @@ private:
     size_t                  m_time_stamp;
     ::std::vector<node_data> m_cells;
 };
+
+template<typename _ValueType>
+depth_first_search<_ValueType>::depth_first_search(
+    const ::std::vector<value_type>& cells,
+    const depend_map_type& depend_map, cell_handler& handler) :
+    m_depend_map(depend_map),
+    m_handler(handler),
+    m_cell_count(cells.size()),
+    m_time_stamp(0),
+    m_cells(m_cell_count)
+{
+    typename ::std::vector<value_type>::const_iterator 
+        itr = cells.begin(), itr_end = cells.end();
+
+    // Construct cell pointer to index mapping.
+    for (size_t index = 0; itr != itr_end; ++itr, ++index)
+        m_cell_indices.insert(
+            typename cell_index_map_type::value_type(*itr, index));
+}
+
+template<typename _ValueType>
+void depth_first_search<_ValueType>::init()
+{
+    ::std::vector<node_data> cells(m_cell_count);
+    typename cell_index_map_type::const_iterator 
+        itr = m_cell_indices.begin(), itr_end = m_cell_indices.end();
+
+    for (size_t index = 0; itr != itr_end; ++itr, ++index)
+        cells[index].node = itr->first;
+    m_cells.swap(cells);
+    m_time_stamp = 0;
+}
+
+template<typename _ValueType>
+void depth_first_search<_ValueType>::run()
+{
+    init();
+    try
+    {
+        for (size_t i = 0; i < m_cell_count; ++i)
+            if (m_cells[i].color == white)
+                visit(i);
+    }
+    catch(const dfs_error& e)
+    {
+        using namespace std;
+        cout << "dfs error: " << e.what() << endl;
+    }
+}
+
+template<typename _ValueType>
+void depth_first_search<_ValueType>::visit(size_t cell_index)
+{
+    value_type p = m_cells[cell_index].node;
+    m_cells[cell_index].color = gray;
+    m_cells[cell_index].time_visited = ++m_time_stamp;
+
+    do
+    {
+        const depend_cells_type* depends = get_depend_cells(p);
+        if (!depends)
+            // No dependent cells.
+            break;
+    
+        typename depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
+        for (; itr != itr_end; ++itr)
+        {
+            value_type dcell = *itr;
+            size_t dcell_id = get_cell_index(dcell);
+            if (m_cells[dcell_id].color == white)
+            {
+                m_cells[dcell_id].parent = p;
+                visit(dcell_id);
+            }
+        }
+    }
+    while (false);
+
+    m_cells[cell_index].color = black;
+    m_cells[cell_index].time_finished = ++m_time_stamp;
+    m_handler(m_cells[cell_index].node);
+}
+
+template<typename _ValueType>
+size_t depth_first_search<_ValueType>::get_cell_index(value_type p) const
+{
+    typename ::std::unordered_map<value_type, size_t>::const_iterator itr = m_cell_indices.find(p);
+    if (itr == m_cell_indices.end())
+        throw dfs_error("cell ptr to index mapping failed.");
+    return itr->second;
+}
+
+template<typename _ValueType>
+const typename depth_first_search<_ValueType>::depend_cells_type*
+depth_first_search<_ValueType>::get_depend_cells(value_type cell)
+{
+    typename depend_map_type::const_iterator itr = m_depend_map.find(cell);
+    if (itr == m_depend_map.end())
+        // This cell has no dependent cells.
+        return NULL;
+
+    return itr->second;
+}
 
 }
 

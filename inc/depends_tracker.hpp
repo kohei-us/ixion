@@ -47,8 +47,8 @@ class base_cell;
 class depends_tracker
 {
 public:
-    typedef depth_first_search::depend_cells_type   depend_cells_type;
-    typedef depth_first_search::depend_map_type     depend_map_type;
+    typedef depth_first_search<base_cell*>::depend_cells_type   depend_cells_type;
+    typedef depth_first_search<base_cell*>::depend_map_type     depend_map_type;
 
     depends_tracker(const cell_ptr_name_map_t* names);
     ~depends_tracker();
