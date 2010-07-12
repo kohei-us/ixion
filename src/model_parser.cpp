@@ -35,7 +35,6 @@
 #include "mem_str_buf.hpp"
 
 #include <sstream>
-#include <fstream>
 #include <iostream>
 #include <vector>
 #include <functional>
@@ -198,20 +197,6 @@ private:
 };
 
 // ============================================================================
-
-void load_file_content(const string& filepath, string& content)
-{
-    ifstream file(filepath.c_str());
-    if (!file)
-        // failed to open the specified file.
-        throw model_parser::file_not_found(filepath);
-
-    ostringstream os;
-    os << file.rdbuf() << ' '; // extra char as the end position.
-    file.close();
-
-    os.str().swap(content);
-}
 
 base_cell* find_cell(cell_name_ptr_map_t& store, const string& name)
 {
@@ -442,24 +427,6 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
 
 // ============================================================================
 
-model_parser::file_not_found::file_not_found(const string& fpath) : 
-    m_fpath(fpath)
-{
-}
-
-model_parser::file_not_found::~file_not_found() throw()
-{
-}
-
-const char* model_parser::file_not_found::what() const throw()
-{
-    ostringstream oss;
-    oss << "specified file not found: " << m_fpath;
-    return oss.str().c_str();
-}
-
-// ============================================================================
-
 model_parser::parse_error::parse_error(const string& msg) :
     m_msg(msg)
 {
@@ -529,7 +496,7 @@ model_parser::~model_parser()
 void model_parser::parse()
 {
     string strm;
-    load_file_content(m_filepath, strm);
+    global::load_file_content(m_filepath, strm);
 
     parse_mode_t parse_mode = parse_mode_unknown;
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];

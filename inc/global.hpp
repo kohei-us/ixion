@@ -76,6 +76,8 @@ public:
      */
     static void sleep(unsigned int seconds);
 
+    static void load_file_content(const ::std::string& filepath, ::std::string& content);
+
 private:
     global();
     global(const global& r);
@@ -92,6 +94,18 @@ public:
     virtual const char* what() const throw();
 private:
     ::std::string m_msg;
+};
+
+// ============================================================================
+
+class file_not_found : public ::std::exception
+{
+public:
+    explicit file_not_found(const ::std::string& fpath);
+    ~file_not_found() throw();
+    virtual const char* what() const throw();
+private:
+    ::std::string m_fpath;
 };
 
 // ============================================================================

@@ -46,16 +46,6 @@ class model_parser : public ::boost::noncopyable
 public:
     typedef ::std::unordered_map< ::std::string, formula_result> results_type;
 
-    class file_not_found : public ::std::exception
-    {
-    public:
-        explicit file_not_found(const ::std::string& fpath);
-        ~file_not_found() throw();
-        virtual const char* what() const throw();
-    private:
-        ::std::string m_fpath;
-    };
-
     class parse_error : public ::std::exception
     {
     public:

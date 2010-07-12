@@ -31,6 +31,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <fstream>
 #ifdef WIN32
 #include <Windows.h>
 #else
@@ -110,6 +111,20 @@ void global::sleep(unsigned int seconds)
 #endif
 }
 
+void global::load_file_content(const string& filepath, string& content)
+{
+    ifstream file(filepath.c_str());
+    if (!file)
+        // failed to open the specified file.
+        throw file_not_found(filepath);
+
+    ostringstream os;
+    os << file.rdbuf() << ' '; // extra char as the end position.
+    file.close();
+
+    os.str().swap(content);
+}
+
 const char* get_formula_error_name(formula_error_t fe)
 {
     static const char* names[] = {
@@ -139,6 +154,24 @@ general_error::~general_error() throw()
 const char* general_error::what() const throw()
 {
     return m_msg.c_str();
+}
+
+// ============================================================================
+
+file_not_found::file_not_found(const string& fpath) : 
+    m_fpath(fpath)
+{
+}
+
+file_not_found::~file_not_found() throw()
+{
+}
+
+const char* file_not_found::what() const throw()
+{
+    ostringstream oss;
+    oss << "specified file not found: " << m_fpath;
+    return oss.str().c_str();
 }
 
 // ============================================================================

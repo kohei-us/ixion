@@ -55,6 +55,7 @@ private:
 
 private:
     dfs_type::depend_set m_set;
+    ::std::string m_content;
 };
 
 }

@@ -28,6 +28,9 @@
 #include "sort_input_parser.hpp"
 #include "global.hpp"
 
+#include <fstream>
+#include <iostream>
+
 using namespace std;
 
 namespace ixion {
@@ -40,6 +43,8 @@ void sort_input_parser::cell_handler::operator() (const mem_str_buf& s)
 
 sort_input_parser::sort_input_parser(const string& filepath)
 {
+    global::load_file_content(filepath, m_content);
+    cout << m_content << endl;
 }
 
 sort_input_parser::~sort_input_parser()
