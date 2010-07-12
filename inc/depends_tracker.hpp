@@ -47,9 +47,6 @@ class base_cell;
 class depends_tracker
 {
 public:
-    typedef depth_first_search<base_cell*>::depend_cells_type   depend_cells_type;
-    typedef depth_first_search<base_cell*>::depend_map_type     depend_map_type;
-
     depends_tracker(const cell_ptr_name_map_t* names);
     ~depends_tracker();
 
@@ -69,19 +66,11 @@ public:
      */
     void topo_sort_cells(::std::vector<base_cell*>& sorted_cells) const;
 
-    /** 
-     * Create a file and write cell dependency graph in dot script.
-     *
-     * @param dotpath output file path.
-     */
-    void print_dot_graph(const ::std::string& dotpath) const;
-
 private:
-    void print_dot_graph_depend(::std::ofstream& file, const ::std::string& origin, const depend_cells_type& cells) const;
+    typedef depth_first_search<base_cell*>::depend_map_type depend_map_type;
 
-private:
-    depend_map_type             m_map;
-    const cell_ptr_name_map_t*  mp_names;
+    depend_map_type m_map;
+    const cell_ptr_name_map_t* mp_names;
 };
 
 }

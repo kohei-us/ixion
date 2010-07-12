@@ -228,7 +228,6 @@
 			<F N="src/cell.cpp"/>
 			<F N="src/cell_queue_manager.cpp"/>
 			<F N="src/depends_tracker.cpp"/>
-			<F N="src/depth_first_search.cpp"/>
 			<F N="src/formula_functions.cpp"/>
 			<F N="src/formula_interpreter.cpp"/>
 			<F N="src/formula_lexer.cpp"/>

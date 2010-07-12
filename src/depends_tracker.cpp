@@ -141,7 +141,8 @@ void depends_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_ce
     if (itr == m_map.end())
     {
         // First dependent cell for this origin cell.
-        pair<depend_map_type::iterator, bool> r = m_map.insert(origin_cell, new depend_cells_type);
+        pair<depend_map_type::iterator, bool> r = m_map.insert(
+            origin_cell, new depth_first_search<base_cell*>::depend_cells_type);
         if (!r.second)
             throw general_error("failed to insert a new set instance");
 
@@ -201,28 +202,6 @@ void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 
     depth_first_search<base_cell*> dfs(all_cells, m_map, handler);
     dfs.run();
-}
-
-void depends_tracker::print_dot_graph(const string& dotpath) const
-{
-    ofstream file(dotpath.c_str());
-    depend_map_type::const_iterator itr = m_map.begin(), itr_end = m_map.end();
-    file << "digraph G {" << endl;
-    for (; itr != itr_end; ++itr)
-    {
-        const base_cell* origin_cell = itr->first;
-        string origin = global::get_cell_name(origin_cell);
-        print_dot_graph_depend(file, origin, *itr->second);
-    }
-    file << "}" << endl;
-}
-
-void depends_tracker::print_dot_graph_depend(
-    ofstream& file, const string& origin, const depend_cells_type& cells) const
-{
-    depend_cells_type::const_iterator itr = cells.begin(), itr_end = cells.end();
-    for (; itr != itr_end; ++itr)
-        file << "    " << origin << " -> " << global::get_cell_name(*itr) << ";" << endl;
 }
 
 }
