@@ -79,6 +79,31 @@ public:
     typedef ::std::set<value_type>                             depend_cells_type;
     typedef ::boost::ptr_map<value_type, depend_cells_type>    depend_map_type;
 
+    class depend_set
+    {
+    public:
+        void insert(value_type cell, value_type dep)
+        {
+            typename depend_map_type::iterator itr = m_map.find(cell);
+            if (itr == m_map.end())
+            {
+                // First dependent for this cell.
+                ::std::pair<typename depend_map_type::iterator, bool> r = m_map.insert(cell, new depend_cells_type);
+                if (!r.second)
+                    throw general_error("failed to insert a new set instance");
+
+                itr = r.first;
+            }
+
+            itr->second->insert(dep);
+        }
+
+        const depend_map_type& get() const { return m_map; }
+
+    private:
+        depend_map_type m_map;
+    };
+
     depth_first_search(
         const ::std::vector<value_type>& cells, 
         const depend_map_type& depend_map, cell_handler_type& handler);

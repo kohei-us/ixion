@@ -29,6 +29,7 @@
 #define __DEPENDS_TRACKER_HPP__
 
 #include "formula_parser.hpp"
+#include "depth_first_search.hpp"
 
 #include <string>
 #include <set>
@@ -46,6 +47,17 @@ class base_cell;
  */
 class depends_tracker
 {
+    class cell_back_inserter : public ::std::unary_function<base_cell*, void>
+    {
+    public:
+        cell_back_inserter(::std::vector<base_cell*>& sorted_cells);
+        void operator() (base_cell* cell);
+    private:
+        ::std::vector<base_cell*>& m_sorted_cells;
+    };
+
+    typedef depth_first_search<base_cell*, cell_back_inserter> dfs_type;
+
 public:
     depends_tracker(const cell_ptr_name_map_t* names);
     ~depends_tracker();
@@ -67,10 +79,7 @@ public:
     void topo_sort_cells(::std::vector<base_cell*>& sorted_cells) const;
 
 private:
-    typedef ::std::set<base_cell*>                             depend_cells_type;
-    typedef ::boost::ptr_map<base_cell*, depend_cells_type>    depend_map_type;
-
-    depend_map_type m_map;
+    dfs_type::depend_set m_deps;
     const cell_ptr_name_map_t* mp_names;
 };
 

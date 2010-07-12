@@ -28,7 +28,6 @@
 #include "depends_tracker.hpp"
 #include "global.hpp"
 #include "cell.hpp"
-#include "depth_first_search.hpp"
 #include "formula_interpreter.hpp"
 #include "cell_queue_manager.hpp"
 
@@ -109,21 +108,17 @@ private:
     const cell_ptr_name_map_t& m_cell_names;
 };
 
-class cell_back_inserter : public unary_function<base_cell*, void>
-{
-public:
-    cell_back_inserter(vector<base_cell*>& sorted_cells) :
-        m_sorted_cells(sorted_cells) {}
-
-    virtual void operator() (base_cell* cell)
-    {
-        m_sorted_cells.push_back(cell);
-    }
-private:
-    vector<base_cell*>& m_sorted_cells;
-};
-
 }
+
+depends_tracker::cell_back_inserter::cell_back_inserter(vector<base_cell*> & sorted_cells) :
+    m_sorted_cells(sorted_cells) {}
+
+void depends_tracker::cell_back_inserter::operator() (base_cell* cell)
+{
+    m_sorted_cells.push_back(cell);
+}
+
+// ============================================================================
 
 depends_tracker::depends_tracker(const cell_ptr_name_map_t* names) :
     mp_names(names)
@@ -136,21 +131,7 @@ depends_tracker::~depends_tracker()
 
 void depends_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
 {
-//  cout << "origin cell: " << origin_cell << "  depend cell: " << depend_cell << endl;
-    depend_map_type::iterator itr = m_map.find(origin_cell);
-    if (itr == m_map.end())
-    {
-        // First dependent cell for this origin cell.
-        pair<depend_map_type::iterator, bool> r = m_map.insert(origin_cell, new depend_cells_type);
-        if (!r.second)
-            throw general_error("failed to insert a new set instance");
-
-        itr = r.first;
-    }
-
-    if (depend_cell)
-        itr->second->insert(depend_cell);
-//  cout << "map count: " << m_map.size() << "  depend count: " << itr->second->size() << endl;
+    m_deps.insert(origin_cell, depend_cell);
 }
 
 void depends_tracker::interpret_all_cells(size_t thread_count)
@@ -199,7 +180,7 @@ void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
     for (; itr != itr_end; ++itr)
         all_cells.push_back(const_cast<base_cell*>(itr->first));
 
-    depth_first_search<base_cell*, cell_back_inserter> dfs(all_cells, m_map, handler);
+    dfs_type dfs(all_cells, m_deps.get(), handler);
     dfs.run();
 }
 
