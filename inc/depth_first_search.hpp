@@ -90,7 +90,7 @@ public:
                 // First dependent for this cell.
                 ::std::pair<typename depend_map_type::iterator, bool> r = m_map.insert(cell, new depend_cells_type);
                 if (!r.second)
-                    throw general_error("failed to insert a new set instance");
+                    throw dfs_error("failed to insert a new set instance");
 
                 itr = r.first;
             }

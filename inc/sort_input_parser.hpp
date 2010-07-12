@@ -25,82 +25,38 @@
  *
  ************************************************************************/
 
+#ifndef __IXION_SORT_INPUT_PARSER_HXX__
+#define __IXION_SORT_INPUT_PARSER_HXX__
+
+#include "depth_first_search.hpp"
 #include "mem_str_buf.hpp"
-
-#include <cstring>
-#include <cassert>
-
-using namespace std;
 
 namespace ixion {
 
-mem_str_buf::mem_str_buf() : mp_buf(NULL), m_size(0) {}
-
-void mem_str_buf::set_start(const char* p)
+class sort_input_parser
 {
-    mp_buf = p;
-    m_size = 1;
-}
+    class cell_handler : public ::std::unary_function<mem_str_buf, void>
+    {
+    public:
+        void operator() (const mem_str_buf& s);
+    };
 
-void mem_str_buf::inc()
-{ 
-    assert(mp_buf);
-    ++m_size; 
-}
+    typedef depth_first_search<mem_str_buf, cell_handler> dfs_type;
 
-bool mem_str_buf::empty() const 
-{ 
-    return m_size == 0; 
-}
+public:
+    sort_input_parser(const ::std::string& filepath);
+    ~sort_input_parser();
 
-size_t mem_str_buf::size() const 
-{ 
-    return m_size; 
-}
+    void parse();
+    void print();
 
-const char* mem_str_buf::get() const 
-{ 
-    return mp_buf; 
-}
+private:
+    void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
 
-void mem_str_buf::clear()
-{
-    mp_buf = NULL;
-    m_size = 0;
-}
-
-void mem_str_buf::swap(mem_str_buf& r)
-{
-    ::std::swap(mp_buf, r.mp_buf);
-    ::std::swap(m_size, r.m_size);
-}
-
-bool mem_str_buf::equals(const char* s) const
-{
-    return ::std::strncmp(mp_buf, s, m_size) == 0;
-}
-
-string mem_str_buf::str() const
-{
-    return string(mp_buf, m_size);
-}
-
-mem_str_buf& mem_str_buf::operator= (const mem_str_buf& r)
-{
-    mp_buf = r.mp_buf;
-    m_size = r.m_size;
-    return *this;
-}
-
-char mem_str_buf::operator[] (size_t pos) const
-{
-    return mp_buf[pos];
-}
-
-bool operator< (const mem_str_buf& left, const mem_str_buf& right)
-{
-    // TODO: optimize this.
-    return left.str() < right.str();
-}
+private:
+    dfs_type::depend_set m_set;
+};
 
 }
+
+#endif

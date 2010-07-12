@@ -66,6 +66,9 @@ OBJFILES= \
 	$(OBJDIR)/depends_tracker.o
 
 OBJ_SORTER= \
+	$(OBJDIR)/global.o \
+	$(OBJDIR)/mem_str_buf.o \
+	$(OBJDIR)/sort_input_parser.o \
 	$(OBJDIR)/ixion_sorter.o
 
 DEPENDS= \
@@ -120,6 +123,9 @@ $(OBJDIR)/model_parser.o: $(SRCDIR)/model_parser.cpp $(DEPENDS)
 
 $(OBJDIR)/depends_tracker.o: $(SRCDIR)/depends_tracker.cpp $(DEPENDS)
 	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/depends_tracker.cpp
+
+$(OBJDIR)/sort_input_parser.o: $(SRCDIR)/sort_input_parser.cpp $(DEPENDS)
+	$(CXX) $(CPPFLAGS) -c -o $@ $(SRCDIR)/sort_input_parser.cpp
 
 ixion-parser: pre $(OBJFILES)
 	$(CXX) $(LDFLAGS) $(OBJFILES) -o $@

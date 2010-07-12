@@ -25,82 +25,39 @@
  *
  ************************************************************************/
 
-#include "mem_str_buf.hpp"
-
-#include <cstring>
-#include <cassert>
+#include "sort_input_parser.hpp"
+#include "global.hpp"
 
 using namespace std;
 
 namespace ixion {
 
-mem_str_buf::mem_str_buf() : mp_buf(NULL), m_size(0) {}
-
-void mem_str_buf::set_start(const char* p)
+void sort_input_parser::cell_handler::operator() (const mem_str_buf& s)
 {
-    mp_buf = p;
-    m_size = 1;
 }
 
-void mem_str_buf::inc()
-{ 
-    assert(mp_buf);
-    ++m_size; 
-}
+// ============================================================================
 
-bool mem_str_buf::empty() const 
-{ 
-    return m_size == 0; 
-}
-
-size_t mem_str_buf::size() const 
-{ 
-    return m_size; 
-}
-
-const char* mem_str_buf::get() const 
-{ 
-    return mp_buf; 
-}
-
-void mem_str_buf::clear()
+sort_input_parser::sort_input_parser(const string& filepath)
 {
-    mp_buf = NULL;
-    m_size = 0;
 }
 
-void mem_str_buf::swap(mem_str_buf& r)
+sort_input_parser::~sort_input_parser()
 {
-    ::std::swap(mp_buf, r.mp_buf);
-    ::std::swap(m_size, r.m_size);
 }
 
-bool mem_str_buf::equals(const char* s) const
+void sort_input_parser::parse()
 {
-    return ::std::strncmp(mp_buf, s, m_size) == 0;
 }
 
-string mem_str_buf::str() const
+void sort_input_parser::print()
 {
-    return string(mp_buf, m_size);
 }
 
-mem_str_buf& mem_str_buf::operator= (const mem_str_buf& r)
+void sort_input_parser::insert_depend(const mem_str_buf& cell, const mem_str_buf& dep)
 {
-    mp_buf = r.mp_buf;
-    m_size = r.m_size;
-    return *this;
+    m_set.insert(cell, dep);
 }
 
-char mem_str_buf::operator[] (size_t pos) const
-{
-    return mp_buf[pos];
-}
-
-bool operator< (const mem_str_buf& left, const mem_str_buf& right)
-{
-    // TODO: optimize this.
-    return left.str() < right.str();
-}
 
 }

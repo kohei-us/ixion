@@ -217,6 +217,7 @@
 			<F N="inc/lexer_tokens.hpp"/>
 			<F N="inc/mem_str_buf.hpp"/>
 			<F N="inc/model_parser.hpp"/>
+			<F N="inc/sort_input_parser.hpp"/>
 			<F N="inc/thread.hpp"/>
 		</Folder>
 		<Folder Name="src">
@@ -235,6 +236,7 @@
 			<F N="src/lexer_tokens.cpp"/>
 			<F N="src/mem_str_buf.cpp"/>
 			<F N="src/model_parser.cpp"/>
+			<F N="src/sort_input_parser.cpp"/>
 		</Folder>
 		<F
 			N="Makefile"

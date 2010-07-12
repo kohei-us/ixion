@@ -25,6 +25,8 @@
  *
  ************************************************************************/
 
+#include "sort_input_parser.hpp"
+
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -92,8 +94,11 @@ int main (int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-//  const string& filepath = files[0];
-    
+    const string& filepath = files[0];
+    cout << "Reading " << filepath << endl;
+    ::ixion::sort_input_parser parser(filepath);
+    parser.parse();
+    parser.print();
 
     return EXIT_SUCCESS;
 }
