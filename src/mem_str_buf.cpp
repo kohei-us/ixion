@@ -97,6 +97,12 @@ char mem_str_buf::operator[] (size_t pos) const
     return mp_buf[pos];
 }
 
+bool operator== (const mem_str_buf& left, const mem_str_buf& right)
+{
+    // TODO: optimize this.
+    return left.str() == right.str();
+}
+
 bool operator< (const mem_str_buf& left, const mem_str_buf& right)
 {
     // TODO: optimize this.

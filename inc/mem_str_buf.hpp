@@ -58,7 +58,8 @@ private:
     size_t m_size;
 };
 
-bool operator< (const mem_str_buf& left, const mem_str_buf& right);
+bool operator== (const mem_str_buf& left, const mem_str_buf& right);
+bool operator<  (const mem_str_buf& left, const mem_str_buf& right);
 
 }
 

@@ -31,6 +31,8 @@
 #include "depth_first_search.hpp"
 #include "mem_str_buf.hpp"
 
+#include <vector>
+
 namespace ixion {
 
 class sort_input_parser
@@ -38,7 +40,10 @@ class sort_input_parser
     class cell_handler : public ::std::unary_function<mem_str_buf, void>
     {
     public:
+        cell_handler(::std::vector<mem_str_buf>& sorted);
         void operator() (const mem_str_buf& s);
+    private:
+        ::std::vector<mem_str_buf>& m_sorted;
     };
 
     typedef depth_first_search<mem_str_buf, cell_handler> dfs_type;
@@ -54,8 +59,8 @@ private:
     void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
 
 private:
-    dfs_type::depend_set m_set;
-    ::std::string m_content;
+    dfs_type::depend_set    m_set;
+    ::std::string           m_content;
 };
 
 }

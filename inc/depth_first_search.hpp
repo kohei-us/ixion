@@ -68,11 +68,10 @@ private:
     {
         cell_color_type color;
         value_type      node;
-        value_type      parent;
         size_t          time_visited;
         size_t          time_finished;
 
-        node_data() : color(white), node(0), parent(0), time_visited(0), time_finished(0) {}
+        node_data() : color(white), time_visited(0), time_finished(0) {}
     };
 
 public:
@@ -196,7 +195,6 @@ void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
             size_t dcell_id = get_cell_index(dcell);
             if (m_cells[dcell_id].color == white)
             {
-                m_cells[dcell_id].parent = p;
                 visit(dcell_id);
             }
         }
