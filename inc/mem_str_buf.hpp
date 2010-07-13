@@ -41,6 +41,7 @@ class mem_str_buf
 public:
     mem_str_buf();
 
+    void append(const char* p);
     void set_start(const char* p);
     void inc();
     bool empty() const;
@@ -52,14 +53,16 @@ public:
     ::std::string str() const;
     mem_str_buf& operator= (const mem_str_buf& r);
     char operator[] (size_t pos) const;
+    bool operator== (const mem_str_buf& r) const;
+    bool operator!= (const mem_str_buf& r) const { return !operator==(r); }
 
 private:
     const char* mp_buf;
     size_t m_size;
 };
 
-bool operator== (const mem_str_buf& left, const mem_str_buf& right);
 bool operator<  (const mem_str_buf& left, const mem_str_buf& right);
+bool operator>  (const mem_str_buf& left, const mem_str_buf& right);
 
 }
 

@@ -76,6 +76,15 @@ public:
      */
     static void sleep(unsigned int seconds);
 
+    /**
+     * Load the entire content of a file on disk.  When loading, this function 
+     * appends an extra character to the end, the pointer to which can be used 
+     * as the position past the last character.
+     * 
+     * @param filepath path of the file to load. 
+     *  
+     * @param content string instance to pass the file content to.
+     */
     static void load_file_content(const ::std::string& filepath, ::std::string& content);
 
 private:

@@ -30,6 +30,7 @@
 
 #include "depth_first_search.hpp"
 #include "mem_str_buf.hpp"
+#include "global.hpp"
 
 #include <vector>
 
@@ -37,6 +38,13 @@ namespace ixion {
 
 class sort_input_parser
 {
+    class parse_error : public general_error
+    {
+    public:
+        parse_error(const ::std::string& msg);
+        virtual ~parse_error() throw();
+    };
+
     class cell_handler : public ::std::unary_function<mem_str_buf, void>
     {
     public:
@@ -61,6 +69,10 @@ private:
 private:
     dfs_type::depend_set    m_set;
     ::std::string           m_content;
+    ::std::vector<mem_str_buf>   m_all_cells;
+
+    const char* mp;
+    const char* mp_last;
 };
 
 }

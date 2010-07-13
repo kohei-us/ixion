@@ -50,6 +50,18 @@ size_t hash<ixion::mem_str_buf>::operator () (ixion::mem_str_buf s) const
 
 namespace ixion {
 
+namespace {
+
+struct mem_str_buf_printer : unary_function<mem_str_buf, void>
+{
+    void operator() (const mem_str_buf& r) const
+    {
+        cout << r.str() << endl;
+    }
+};
+
+}
+
 sort_input_parser::cell_handler::cell_handler(vector<mem_str_buf>& sorted) :
     m_sorted(sorted) {}
 
@@ -59,6 +71,13 @@ void sort_input_parser::cell_handler::operator() (const mem_str_buf& s)
 }
 
 // ============================================================================
+
+sort_input_parser::parse_error::parse_error(const string& msg) : 
+    general_error(msg) {}
+
+sort_input_parser::parse_error::~parse_error() throw() {}
+
+// ----------------------------------------------------------------------------
 
 sort_input_parser::sort_input_parser(const string& filepath)
 {
@@ -71,19 +90,72 @@ sort_input_parser::~sort_input_parser()
 
 void sort_input_parser::parse()
 {
-    cout << m_content << endl;
+    if (m_content.empty())
+        return;
+
+    mp = &m_content[0];
+    mp_last = &m_content[m_content.size()-1];
+    mem_str_buf cell, dep;
+    bool in_name = true;
+    for (;mp != mp_last; ++mp)
+    {
+        switch (*mp)
+        {
+            case '\n':
+                if (cell.empty())
+                {
+                    if (!dep.empty())
+                        throw parse_error("cell name is emtpy but dependency name isn't.");
+                }
+                else
+                {
+                    if (dep.empty())
+                        throw parse_error("dependency name is empty.");
+                    else
+                        insert_depend(cell, dep);
+                }
+
+                cell.clear();
+                dep.clear();
+                in_name = true;
+            break;
+            case ':':
+                if (cell.empty())
+                    throw parse_error("cell name is empty");
+                in_name = false;
+            break;
+            default:
+                if (in_name)
+                    cell.append(mp);
+                else
+                    dep.append(mp);
+        }
+    }
 }
 
 void sort_input_parser::print()
 {
-    vector<mem_str_buf> cells;
-    cell_handler handler(cells);
-    dfs_type dfs(cells, m_set.get(), handler);
+    sort(m_all_cells.begin(), m_all_cells.end());
+    vector<mem_str_buf>::iterator itr = unique(m_all_cells.begin(), m_all_cells.end());
+    m_all_cells.erase(itr, m_all_cells.end());
+
+    vector<mem_str_buf> sorted;
+    cell_handler handler(sorted);
+    dfs_type dfs(m_all_cells, m_set.get(), handler);
+    dfs.run();
+
+    for_each(m_all_cells.begin(), m_all_cells.end(), mem_str_buf_printer());
+    cout << "---" << endl;
+    for_each(sorted.begin(), sorted.end(), mem_str_buf_printer());
+
 }
 
 void sort_input_parser::insert_depend(const mem_str_buf& cell, const mem_str_buf& dep)
 {
+    cout << "cell: " << cell.str() << "  dep: " << dep.str() << endl;
     m_set.insert(cell, dep);
+    m_all_cells.push_back(cell);
+    m_all_cells.push_back(dep);
 }
 
 

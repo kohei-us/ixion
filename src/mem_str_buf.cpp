@@ -36,6 +36,14 @@ namespace ixion {
 
 mem_str_buf::mem_str_buf() : mp_buf(NULL), m_size(0) {}
 
+void mem_str_buf::append(const char* p)
+{
+    if (m_size)
+        inc();
+    else
+        set_start(p);
+}
+
 void mem_str_buf::set_start(const char* p)
 {
     mp_buf = p;
@@ -97,16 +105,28 @@ char mem_str_buf::operator[] (size_t pos) const
     return mp_buf[pos];
 }
 
-bool operator== (const mem_str_buf& left, const mem_str_buf& right)
+bool mem_str_buf::operator== (const mem_str_buf& r) const
 {
-    // TODO: optimize this.
-    return left.str() == right.str();
+    if (m_size != r.m_size)
+        return false;
+
+    for (size_t i = 0; i < m_size; ++i)
+        if (mp_buf[i] != r.mp_buf[i])
+            return false;
+
+    return true;
 }
 
 bool operator< (const mem_str_buf& left, const mem_str_buf& right)
 {
     // TODO: optimize this.
     return left.str() < right.str();
+}
+
+bool operator> (const mem_str_buf& left, const mem_str_buf& right)
+{
+    // TODO: optimize this.
+    return left.str() > right.str();
 }
 
 }
