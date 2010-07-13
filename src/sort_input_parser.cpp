@@ -101,7 +101,11 @@ void sort_input_parser::parse()
     {
         switch (*mp)
         {
+            case ' ':
+                // Let's skip blanks for now.
+                break;
             case '\n':
+                // end of line.
                 if (cell.empty())
                 {
                     if (!dep.empty())
@@ -120,6 +124,8 @@ void sort_input_parser::parse()
                 in_name = true;
             break;
             case ':':
+                if (!dep.empty())
+                    throw parse_error("more than one separator in a single line!");
                 if (cell.empty())
                     throw parse_error("cell name is empty");
                 in_name = false;
@@ -135,28 +141,31 @@ void sort_input_parser::parse()
 
 void sort_input_parser::print()
 {
-    sort(m_all_cells.begin(), m_all_cells.end());
-    vector<mem_str_buf>::iterator itr = unique(m_all_cells.begin(), m_all_cells.end());
-    m_all_cells.erase(itr, m_all_cells.end());
+    remove_duplicate_cells();
 
+    // Run the depth first search.
     vector<mem_str_buf> sorted;
+    sorted.reserve(m_all_cells.size());
     cell_handler handler(sorted);
     dfs_type dfs(m_all_cells, m_set.get(), handler);
     dfs.run();
 
-    for_each(m_all_cells.begin(), m_all_cells.end(), mem_str_buf_printer());
-    cout << "---" << endl;
+    // Print the result.
     for_each(sorted.begin(), sorted.end(), mem_str_buf_printer());
+}
 
+void sort_input_parser::remove_duplicate_cells()
+{
+    sort(m_all_cells.begin(), m_all_cells.end());
+    vector<mem_str_buf>::iterator itr = unique(m_all_cells.begin(), m_all_cells.end());
+    m_all_cells.erase(itr, m_all_cells.end());
 }
 
 void sort_input_parser::insert_depend(const mem_str_buf& cell, const mem_str_buf& dep)
 {
-    cout << "cell: " << cell.str() << "  dep: " << dep.str() << endl;
     m_set.insert(cell, dep);
     m_all_cells.push_back(cell);
     m_all_cells.push_back(dep);
 }
-
 
 }

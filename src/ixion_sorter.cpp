@@ -95,7 +95,6 @@ int main (int argc, char** argv)
     }
 
     const string& filepath = files[0];
-    cout << "Reading " << filepath << endl;
     ::ixion::sort_input_parser parser(filepath);
     parser.parse();
     parser.print();

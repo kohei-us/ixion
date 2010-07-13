@@ -64,6 +64,7 @@ public:
     void print();
 
 private:
+    void remove_duplicate_cells();
     void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
 
 private:
