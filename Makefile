@@ -47,7 +47,8 @@ HEADERS= \
 	$(INCDIR)/global.hpp \
 	$(INCDIR)/mem_str_buf.hpp \
 	$(INCDIR)/model_parser.hpp \
-	$(INCDIR)/lexer_tokens.hpp
+	$(INCDIR)/lexer_tokens.hpp \
+	$(INCDIR)/sort_input_parser.hpp
 
 OBJFILES= \
 	$(OBJDIR)/ixion_parser.o \

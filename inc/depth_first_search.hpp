@@ -138,7 +138,7 @@ depth_first_search<_ValueType,_CellHandlerType>::depth_first_search(
     typename ::std::vector<value_type>::const_iterator 
         itr = cells.begin(), itr_end = cells.end();
 
-    // Construct cell pointer to index mapping.
+    // Construct cell node to index mapping.
     for (size_t index = 0; itr != itr_end; ++itr, ++index)
         m_cell_indices.insert(
             typename cell_index_map_type::value_type(*itr, index));
@@ -151,8 +151,9 @@ void depth_first_search<_ValueType,_CellHandlerType>::init()
     typename cell_index_map_type::const_iterator 
         itr = m_cell_indices.begin(), itr_end = m_cell_indices.end();
 
-    for (size_t index = 0; itr != itr_end; ++itr, ++index)
-        cells[index].node = itr->first;
+    // Now, construct index to cell node mapping.
+    for (; itr != itr_end; ++itr)
+        cells[itr->second].node = itr->first;
     m_cells.swap(cells);
     m_time_stamp = 0;
 }
