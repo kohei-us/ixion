@@ -19,5 +19,5 @@ missing
 .libs
 tags
 ChangeLog
-src/ixion_parser
-src/ixion_sorter
+src/ixion-parser
+src/ixion-sorter
