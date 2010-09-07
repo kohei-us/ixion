@@ -18,7 +18,11 @@ AM_INIT_AUTOMAKE
 IXION_API_VERSION=ixion_api_version
 AC_SUBST(IXION_API_VERSION)
 
+BOOST_VERSION=1.34
+
 AC_CONFIG_MACRO_DIR([m4])
+
+m4_pattern_allow([^BOOST_])
 
 for top_builddir in . .. ../.. $ac_auxdir $ac_auxdir/..; do
     test -f $top_builddir/configure && break
@@ -43,6 +47,10 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
+
+BOOST_REQUIRE([$BOOST_VERSION])
+BOOST_THREADS
+BOOST_PROGRAM_OPTIONS
 
 CXXFLAGS="-D_REENTRANT -std=c++0x"
 AC_DEFINE(CXXFLAGS)

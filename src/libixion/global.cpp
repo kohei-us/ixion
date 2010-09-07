@@ -32,8 +32,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <fstream>
-#ifdef WIN32
-#include <Windows.h>
+#ifdef _WIN32
+#include <windows.h>
 #else
 #include <unistd.h>
 #include <sys/time.h>
@@ -90,7 +90,7 @@ string global::get_cell_name(const base_cell* cell)
 
 double global::get_current_time()
 {
-#ifdef WIN32
+#ifdef _WIN32
     FILETIME ft;
     __int64 *time64 = (__int64 *) &ft;
     GetSystemTimeAsFileTime (&ft);
@@ -104,7 +104,7 @@ double global::get_current_time()
 
 void global::sleep(unsigned int seconds)
 {
-#ifdef WIN32
+#ifdef _WIN32
     ::Sleep(1000*seconds);
 #else
     ::sleep(seconds);
