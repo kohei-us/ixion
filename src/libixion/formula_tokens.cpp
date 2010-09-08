@@ -56,6 +56,8 @@ const char* get_opcode_name(fopcode_t oc)
             return "separator";
         case fop_single_ref:
             return "single ref";
+        case fop_unresolved_ref:
+            return "unresolved ref";
         case fop_string:
             return "string";
         case fop_value:
@@ -102,6 +104,11 @@ double formula_token_base::get_value() const
 size_t formula_token_base::get_index() const
 {
     return 0;
+}
+
+std::string formula_token_base::get_name() const
+{
+    return std::string();
 }
 
 // ============================================================================
@@ -153,6 +160,23 @@ single_ref_token::~single_ref_token()
 base_cell* single_ref_token::get_single_ref() const
 {
     return mp_cell;
+}
+
+// ============================================================================
+
+unresolved_ref_token::unresolved_ref_token(std::string name) :
+    formula_token_base(fop_unresolved_ref),
+    m_name(name)
+{
+}
+
+unresolved_ref_token::~unresolved_ref_token()
+{
+}
+
+std::string unresolved_ref_token::get_name() const
+{
+    return m_name;
 }
 
 // ============================================================================

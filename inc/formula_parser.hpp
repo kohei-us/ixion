@@ -56,7 +56,8 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names);
+    formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names, 
+                   bool ignore_unresolved = false);
     ~formula_parser();
 
     void parse();
@@ -77,6 +78,7 @@ private:
     ::std::vector<base_cell*> m_depend_cells;
 
     cell_name_ptr_map_t* mp_cell_names;
+    bool m_ignore_unresolved;
 };
 
 }

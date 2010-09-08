@@ -28,6 +28,7 @@
 #ifndef __FORMULA_TOKENS_HPP__
 #define __FORMULA_TOKENS_HPP__
 
+#include <string>
 #include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {
@@ -45,6 +46,7 @@ const char* print_tokens(const formula_tokens_t& tokens, bool verbose);
 enum fopcode_t {
     // data types
     fop_single_ref,
+    fop_unresolved_ref,
     fop_string,
     fop_value,
     fop_function,
@@ -82,6 +84,7 @@ public:
     virtual base_cell* get_single_ref() const;
     virtual double get_value() const;
     virtual size_t get_index() const;
+    virtual std::string get_name() const;
 
 private:
     formula_token_base(); // disabled
@@ -112,6 +115,23 @@ public:
     virtual double get_value() const;
 private:
     double m_value;
+};
+
+// ============================================================================
+
+/**
+ * Token that stores an unresolved name.
+ */
+class unresolved_ref_token : public formula_token_base
+{
+public:
+    unresolved_ref_token(std::string name);
+    virtual ~unresolved_ref_token();
+
+    virtual std::string get_name() const;
+
+private:
+    std::string m_name; // unresolved reference name
 };
 
 // ============================================================================
@@ -166,6 +186,8 @@ inline formula_token_base* new_clone(const formula_token_base& r)
             return new opcode_token(r.get_opcode());
         case fop_single_ref:
             return new single_ref_token(r.get_single_ref());
+        case fop_unresolved_ref:
+            return new unresolved_ref_token(r.get_name());
         case fop_string:
             break;
         case fop_value:

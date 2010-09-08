@@ -32,8 +32,6 @@
 #include <sstream>
 #include <unordered_map>
 
-#define DEBUG_PARSER 0
-
 using namespace std;
 
 namespace ixion {
@@ -96,6 +94,9 @@ public:
             case fop_single_ref:
                 os << get_cell_name(token.get_single_ref());
                 break;
+            case fop_unresolved_ref:
+                os << token.get_name();
+                break;
             case fop_string:
                 break;
             case fop_value:
@@ -138,9 +139,11 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names,
+                               bool ignore_unresolved) :
     m_tokens(tokens),
-    mp_cell_names(p_cell_names)
+    mp_cell_names(p_cell_names),
+    m_ignore_unresolved(ignore_unresolved)
 {
 }
 
@@ -269,6 +272,13 @@ void formula_parser::name(const lexer_token_base& t)
         cout << "'" << name << "' is a built-in function." << endl;
 #endif
         m_formula_tokens.push_back(new function_token(static_cast<size_t>(func_oc)));
+        return;
+    }
+
+    if ( m_ignore_unresolved )
+    {
+        m_formula_tokens.push_back(new unresolved_ref_token(name));
+        // Not added to the dependent cells as it's unresolved
         return;
     }
 
