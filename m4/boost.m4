@@ -761,6 +761,13 @@ AC_DEFUN([BOOST_TUPLE],
 AC_DEFUN([BOOST_TYPETRAITS],
 [BOOST_FIND_HEADER([boost/type_traits.hpp])])
 
+# BOOST_UNORDERED()
+# ---------------
+# Look for Boost.Unordered (unordered_map, unordered_set
+# etc.)
+AC_DEFUN([BOOST_UNORDERED],
+[BOOST_FIND_HEADER([boost/unordered_map.hpp])
+BOOST_FIND_HEADER([boost/unordered_set.hpp])])
 
 # BOOST_UTILITY()
 # ---------------

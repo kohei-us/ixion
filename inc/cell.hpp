@@ -35,7 +35,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include <string>
-#include <unordered_set>
+#include <boost/unordered_set.hpp>
 
 namespace ixion {
 
@@ -65,7 +65,7 @@ enum celltype_t
 
 class base_cell
 {
-    typedef ::std::unordered_set<formula_cell*> listeners_type;
+    typedef ::boost::unordered_set<formula_cell*> listeners_type;
 public:
     base_cell(celltype_t celltype);
     base_cell(const base_cell& r);

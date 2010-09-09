@@ -33,10 +33,10 @@
 #include "formula_tokens.hpp"
 
 #include <boost/noncopyable.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 
 namespace ixion {
 

@@ -109,7 +109,7 @@ void base_cell::remove_listener(formula_cell* p)
 void base_cell::print_listeners() const
 {
     cout << "The following cells listen to cell " << global::get_cell_name(this) << endl;
-    unordered_set<formula_cell*>::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
+    boost::unordered_set<formula_cell*>::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
     for (; itr != itr_end; ++itr)
     {
         cout << "  cell " << global::get_cell_name(*itr) << endl;

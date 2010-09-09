@@ -31,8 +31,8 @@
 #include "formula_parser.hpp"
 #include "depth_first_search.hpp"
 
-#include <string>
 #include <set>
+#include <string>
 #include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
 

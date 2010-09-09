@@ -33,11 +33,9 @@
 
 using namespace std;
 
-namespace std {
+namespace ixion {
 
-// Template specialization for mem_str_buf.
-template<>
-size_t hash<ixion::mem_str_buf>::operator () (ixion::mem_str_buf s) const
+size_t hash_value(ixion::mem_str_buf const& s)
 {
     size_t n = s.size();
     size_t hash_val = 0;
@@ -46,9 +44,6 @@ size_t hash<ixion::mem_str_buf>::operator () (ixion::mem_str_buf s) const
     return hash_val;
 }
 
-}
-
-namespace ixion {
 
 namespace {
 

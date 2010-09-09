@@ -44,7 +44,7 @@ class formula_result;
 class model_parser : public ::boost::noncopyable
 {
 public:
-    typedef ::std::unordered_map< ::std::string, formula_result> results_type;
+    typedef ::boost::unordered_map< ::std::string, formula_result> results_type;
 
     class parse_error : public ::std::exception
     {

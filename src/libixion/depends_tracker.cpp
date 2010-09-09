@@ -32,9 +32,10 @@
 #include "cell_queue_manager.hpp"
 
 #include <vector>
-#include <unordered_map>
 #include <iostream>
 #include <fstream>
+
+#include <boost/unordered_map.hpp>
 
 #define DEBUG_DEPENDS_TRACKER 0
 

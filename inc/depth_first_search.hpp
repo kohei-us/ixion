@@ -28,12 +28,12 @@
 #ifndef __IXION_DEPTH_FIRST_SEARCH_HPP__
 #define __IXION_DEPTH_FIRST_SEARCH_HPP__
 
-#include <unordered_map>
 #include <vector>
 #include <set>
 #include <exception>
 #include <iostream>
 
+#include <boost/unordered_map.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
@@ -46,7 +46,7 @@ public:
     typedef _CellHandlerType    cell_handler_type;
 
 private:
-    typedef ::std::unordered_map<value_type, size_t> cell_index_map_type;
+    typedef ::boost::unordered_map<value_type, size_t> cell_index_map_type;
 
     enum cell_color_type { white, gray, black };
 
@@ -210,7 +210,7 @@ void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
 template<typename _ValueType, typename _CellHandlerType>
 size_t depth_first_search<_ValueType,_CellHandlerType>::get_cell_index(value_type p) const
 {
-    typename ::std::unordered_map<value_type, size_t>::const_iterator itr = m_cell_indices.find(p);
+    typename ::boost::unordered_map<value_type, size_t>::const_iterator itr = m_cell_indices.find(p);
     if (itr == m_cell_indices.end())
         throw dfs_error("cell ptr to index mapping failed.");
     return itr->second;
