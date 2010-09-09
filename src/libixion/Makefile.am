@@ -19,3 +19,5 @@ libixion_@IXION_API_VERSION@_la_SOURCES = cell.cpp \
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 
 libixion_@IXION_API_VERSION@_la_LIBADD = $(BOOST_THREAD_LIBS)
+
+EXTRA_DIST = makefile.mk
