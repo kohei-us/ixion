@@ -41,6 +41,7 @@ enum formula_function_t
     func_max,
     func_min,
     func_average,
+    func_sum,
 
     func_wait // dummy function used only for testing.
 
@@ -65,6 +66,9 @@ public:
     static double interpret(formula_function_t oc, const args_type& args);
 
     static double max(const args_type& args);
+    static double min(const args_type& args);
+    static double sum(const args_type& args);
+    static double average(const args_type& args);
     static double wait(const args_type& args);
 private:
     formula_functions();

@@ -50,7 +50,8 @@ const builtin_func builtin_funcs[] = {
     { "MAX", func_max },
     { "MIN", func_min },
     { "AVERAGE", func_average },
-    { "WAIT", func_wait }
+    { "WAIT", func_wait },
+    { "SUM", func_sum }
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -97,11 +98,13 @@ double formula_functions::interpret(formula_function_t oc, const args_type& args
         case func_max:
             return formula_functions::max(args);
         case func_average:
-            break;
+            return formula_functions::average(args);
         case func_min:
-            break;
+            return formula_functions::min(args);
         case func_wait:
             return wait(args);
+        case func_sum:
+            return formula_functions::sum(args);
         case func_unknown:
         default:
             ;
@@ -122,6 +125,51 @@ double formula_functions::max(const args_type& args)
             ret = *itr;
     }
     return ret;
+}
+
+double formula_functions::min(const args_type& args)
+{
+    if (args.empty())
+        throw formula_functions::invalid_arg("MIN requires one or more arguments.");
+
+    args_type::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = *itr;
+    for (++itr; itr != itr_end; ++itr)
+    {
+        if (*itr < ret)
+            ret = *itr;
+    }
+    return ret;
+}
+
+double formula_functions::sum(const args_type& args)
+{
+    if (args.empty())
+        throw formula_functions::invalid_arg("SUM requires one or more arguments.");
+
+    args_type::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = *itr;
+    for (++itr; itr != itr_end; ++itr)
+    {
+            ret += *itr;
+    }
+    return ret;
+}
+
+double formula_functions::average(const args_type& args)
+{
+    if (args.empty())
+        throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
+
+    args_type::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = *itr;
+    long count = 1;
+    for (++itr; itr != itr_end; ++itr)
+    {
+            ret += *itr;
+            count++;
+    }
+    return ret / count;
 }
 
 double formula_functions::wait(const args_type& args)
