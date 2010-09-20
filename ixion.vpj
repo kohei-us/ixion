@@ -221,25 +221,24 @@
 			<F N="inc/thread.hpp"/>
 		</Folder>
 		<Folder Name="src">
-			<F N="src/cell.cpp"/>
-			<F N="src/cell_queue_manager.cpp"/>
-			<F N="src/depends_tracker.cpp"/>
-			<F N="src/formula_functions.cpp"/>
-			<F N="src/formula_interpreter.cpp"/>
-			<F N="src/formula_lexer.cpp"/>
-			<F N="src/formula_parser.cpp"/>
-			<F N="src/formula_result.cpp"/>
-			<F N="src/formula_tokens.cpp"/>
-			<F N="src/global.cpp"/>
+			<Folder Name="libixion">
+				<F N="src/libixion/cell.cpp"/>
+				<F N="src/libixion/cell_queue_manager.cpp"/>
+				<F N="src/libixion/depends_tracker.cpp"/>
+				<F N="src/libixion/formula_functions.cpp"/>
+				<F N="src/libixion/formula_interpreter.cpp"/>
+				<F N="src/libixion/formula_lexer.cpp"/>
+				<F N="src/libixion/formula_parser.cpp"/>
+				<F N="src/libixion/formula_result.cpp"/>
+				<F N="src/libixion/formula_tokens.cpp"/>
+				<F N="src/libixion/global.cpp"/>
+				<F N="src/libixion/lexer_tokens.cpp"/>
+				<F N="src/libixion/mem_str_buf.cpp"/>
+				<F N="src/libixion/model_parser.cpp"/>
+				<F N="src/libixion/sort_input_parser.cpp"/>
+			</Folder>
 			<F N="src/ixion_parser.cpp"/>
 			<F N="src/ixion_sorter.cpp"/>
-			<F N="src/lexer_tokens.cpp"/>
-			<F N="src/mem_str_buf.cpp"/>
-			<F N="src/model_parser.cpp"/>
-			<F N="src/sort_input_parser.cpp"/>
 		</Folder>
-		<F
-			N="Makefile"
-			Type="Makefile"/>
 	</Files>
 </Project>
