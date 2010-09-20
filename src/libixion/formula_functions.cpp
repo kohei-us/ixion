@@ -151,7 +151,7 @@ double formula_functions::sum(const args_type& args)
     double ret = *itr;
     for (++itr; itr != itr_end; ++itr)
     {
-            ret += *itr;
+        ret += *itr;
     }
     return ret;
 }
@@ -166,8 +166,8 @@ double formula_functions::average(const args_type& args)
     long count = 1;
     for (++itr; itr != itr_end; ++itr)
     {
-            ret += *itr;
-            count++;
+        ret += *itr;
+        ++count;
     }
     return ret / count;
 }
