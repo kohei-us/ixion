@@ -125,7 +125,7 @@ private:
 class unresolved_ref_token : public formula_token_base
 {
 public:
-    unresolved_ref_token(std::string name);
+    unresolved_ref_token(const std::string& name);
     virtual ~unresolved_ref_token();
 
     virtual std::string get_name() const;

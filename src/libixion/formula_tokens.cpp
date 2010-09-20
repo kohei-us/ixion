@@ -164,7 +164,7 @@ base_cell* single_ref_token::get_single_ref() const
 
 // ============================================================================
 
-unresolved_ref_token::unresolved_ref_token(std::string name) :
+unresolved_ref_token::unresolved_ref_token(const std::string& name) :
     formula_token_base(fop_unresolved_ref),
     m_name(name)
 {

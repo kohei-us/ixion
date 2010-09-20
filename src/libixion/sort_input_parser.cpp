@@ -35,7 +35,7 @@ using namespace std;
 
 namespace ixion {
 
-size_t hash_value(ixion::mem_str_buf const& s)
+size_t hash_value(const ixion::mem_str_buf& s)
 {
     size_t n = s.size();
     size_t hash_val = 0;
