@@ -32,7 +32,6 @@
 #include "hash_container/set.hpp"
 
 #include <string>
-#include <boost/unordered_set.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
