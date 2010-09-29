@@ -30,6 +30,7 @@
 
 #include "cell.hpp"
 #include "lexer_tokens.hpp"
+#include "hash_container/map.hpp"
 
 #include <string>
 #include <exception>
@@ -44,7 +45,7 @@ class formula_result;
 class model_parser : public ::boost::noncopyable
 {
 public:
-    typedef ::boost::unordered_map< ::std::string, formula_result> results_type;
+    typedef _ixion_unordered_map_type< ::std::string, formula_result> results_type;
 
     class parse_error : public ::std::exception
     {

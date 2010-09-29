@@ -203,6 +203,10 @@
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
 		<Folder Name="inc">
+			<Folder Name="hash_container">
+				<F N="inc/hash_container/map.hpp"/>
+				<F N="inc/hash_container/set.hpp"/>
+			</Folder>
 			<F N="inc/cell.hpp"/>
 			<F N="inc/cell_queue_manager.hpp"/>
 			<F N="inc/depends_tracker.hpp"/>

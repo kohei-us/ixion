@@ -28,9 +28,11 @@
 #ifndef __IXION_GLOBAL_HPP__
 #define __IXION_GLOBAL_HPP__
 
+#include "hash_container/map.hpp"
+#include "hash_container/set.hpp"
+
 #include <string>
 #include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
@@ -39,14 +41,14 @@ class base_cell;
 class formula_cell;
 
 typedef ::boost::ptr_map< ::std::string, base_cell>             cell_name_ptr_map_t;
-typedef ::boost::unordered_map<const base_cell*, ::std::string>   cell_ptr_name_map_t;
+typedef _ixion_unordered_map_type<const base_cell*, ::std::string>   cell_ptr_name_map_t;
 
 /**
  * Dirty cells are those cells that have been modified or cells that 
  * reference modified cells.  Note that dirty cells can be of any cell 
  * types. 
  */
-typedef ::boost::unordered_set<base_cell*> dirty_cells_t;
+typedef _ixion_unordered_set_type<base_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
 

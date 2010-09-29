@@ -31,9 +31,9 @@
 #include "global.hpp"
 #include "lexer_tokens.hpp"
 #include "formula_tokens.hpp"
+#include "hash_container/map.hpp"
 
 #include <boost/noncopyable.hpp>
-#include <boost/unordered_map.hpp>
 
 #include <string>
 #include <vector>

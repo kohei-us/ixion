@@ -27,11 +27,10 @@
 
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
+#include "hash_container/map.hpp"
 
 #include <iostream>
 #include <sstream>
-
-#include <boost/unordered_map.hpp>
 
 using namespace std;
 

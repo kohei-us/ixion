@@ -30,6 +30,7 @@
 
 #include "formula_tokens.hpp"
 #include "global.hpp"
+#include "hash_container/set.hpp"
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -65,7 +66,7 @@ enum celltype_t
 
 class base_cell
 {
-    typedef ::boost::unordered_set<formula_cell*> listeners_type;
+    typedef _ixion_unordered_set_type<formula_cell*> listeners_type;
 public:
     base_cell(celltype_t celltype);
     base_cell(const base_cell& r);
