@@ -15,6 +15,12 @@ AC_PREREQ([2.63])
 AC_INIT([ixion], [ixion_version])
 AM_INIT_AUTOMAKE
 
+AC_ARG_WITH(hash-container-compat,
+[
+  --with-hash-container-compat use std::hash_foo instead of boost::unordered_foo
+  ],
+,with_hash_container_compat=no)
+
 IXION_API_VERSION=ixion_api_version
 AC_SUBST(IXION_API_VERSION)
 
@@ -54,6 +60,10 @@ BOOST_PROGRAM_OPTIONS
 BOOST_UNORDERED
 
 CXXFLAGS="-D_REENTRANT"
+
+if test "z$with_hash_container_compat" != "zno"; then
+    CXXFLAGS="$CXXFLAGS -D_IXION_HASH_CONTAINER_COMPAT"
+fi
 AC_DEFINE(CXXFLAGS)
 
 AC_CONFIG_FILES([Makefile
