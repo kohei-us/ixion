@@ -24,8 +24,6 @@ AC_ARG_WITH(hash-container-compat,
 IXION_API_VERSION=ixion_api_version
 AC_SUBST(IXION_API_VERSION)
 
-BOOST_VERSION=1.36
-
 AC_CONFIG_MACRO_DIR([m4])
 
 m4_pattern_allow([^BOOST_])
@@ -54,17 +52,22 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-BOOST_REQUIRE([$BOOST_VERSION])
-BOOST_THREADS
-BOOST_PROGRAM_OPTIONS
-BOOST_UNORDERED
 
 CXXFLAGS="-D_REENTRANT"
 
-if test "z$with_hash_container_compat" != "zno"; then
+AC_MSG_CHECKING([whether to turn on hash container compatibility])
+if test "z$with_hash_container_compat" = "zno"; then
+    AC_MSG_RESULT([no])
+    BOOST_REQUIRE([1.36])
+    BOOST_UNORDERED
+else
+    AC_MSG_RESULT([yes])
     CXXFLAGS="$CXXFLAGS -D_IXION_HASH_CONTAINER_COMPAT"
 fi
 AC_DEFINE(CXXFLAGS)
+
+BOOST_THREADS
+BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile
                  ixion.pc
