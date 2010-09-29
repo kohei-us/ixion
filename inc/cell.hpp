@@ -36,7 +36,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include <string>
-#include <boost/unordered_set.hpp>
 
 namespace ixion {
 
