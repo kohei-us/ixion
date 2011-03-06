@@ -25,6 +25,9 @@
  *
  ************************************************************************/
 
+#ifndef __IXION_FORMULA_FUNCTIONS_HPP__
+#define __IXION_FORMULA_FUNCTIONS_HPP__
+
 #include "global.hpp"
 
 #include <string>
@@ -76,3 +79,5 @@ private:
 };
 
 }
+
+#endif
