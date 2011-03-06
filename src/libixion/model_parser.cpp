@@ -212,6 +212,9 @@ enum parse_mode_t
     parse_mode_edit
 };
 
+/**
+ * A bucket of data used during model definition parsing.
+ */
 struct parse_data
 {
     vector<model_parser::cell>  cells;

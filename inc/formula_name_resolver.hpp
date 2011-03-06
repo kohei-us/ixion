@@ -48,6 +48,9 @@ public:
     virtual formula_name_type resolve(const ::std::string& name) const = 0;
 };
 
+/**
+ * Resolve formula expression names by name only.
+ */
 class formula_name_resolver_simple : public formula_name_resolver_base
 {
 public:

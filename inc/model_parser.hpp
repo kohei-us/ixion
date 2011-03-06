@@ -30,6 +30,7 @@
 
 #include "cell.hpp"
 #include "lexer_tokens.hpp"
+#include "model_context.hpp"
 #include "hash_container/map.hpp"
 
 #include <string>
@@ -63,6 +64,10 @@ public:
         check_error(const ::std::string& msg);
     };
 
+    /**
+     * 'cell' in this context is just a named storage containing lexer tokens. 
+     * A 'cell' may be either a formula cell, or a named expression. 
+     */
     class cell
     {
     public:
@@ -97,6 +102,7 @@ private:
     ::std::string m_filepath;
     size_t m_thread_count;
 
+    model_context m_context;
     /** 
      * Cell name to pointer mapping.  This container owns the cell instances.
      */

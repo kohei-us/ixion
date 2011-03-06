@@ -28,6 +28,11 @@
 #ifndef __IXION_MODEL_CONTEXT_HPP__
 #define __IXION_MODEL_CONTEXT_HPP__
 
+#include <string>
+#include <boost/ptr_container/ptr_map.hpp>
+
+#include "cell.hpp"
+
 namespace ixion {
 
 /**
@@ -36,12 +41,13 @@ namespace ixion {
  */
 class model_context
 {
+    typedef ::boost::ptr_map< ::std::string, base_cell> named_expressions_t;
 public:
     model_context();
     ~model_context();
 
 private:
-
+    named_expressions_t m_named_expressions;
 };
 
 }
