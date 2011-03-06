@@ -21,4 +21,4 @@ TESTS = $(top_srcdir)/test/01-simple-arithmetic.txt \
 		$(top_srcdir)/test/05-function-parallel.txt \
 		$(top_srcdir)/test/06-function-wait-simple.txt \
 		$(top_srcdir)/test/07-fraction-numbers.txt \
-		$(top_srcdir)/test/08-function-test.txt
+		$(top_srcdir)/test/08-functions-test.txt
