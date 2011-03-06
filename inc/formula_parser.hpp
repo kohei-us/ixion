@@ -43,7 +43,7 @@ namespace ixion {
 /** 
  * Class formula_parser parses a series of primitive (or lexer) tokens 
  * passed on from the lexer, and turn them into a series of formula tokens. 
- * It also picks up a list of dependent cells.
+ * It also picks up a list of cells that it depends on.
  */
 class formula_parser : public ::boost::noncopyable
 {
@@ -56,7 +56,7 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names, 
+    formula_parser(const ::std::string& name, const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names, 
                    bool ignore_unresolved = false);
     ~formula_parser();
 
@@ -73,7 +73,8 @@ private:
     void name(const lexer_token_base& t);
     void value(const lexer_token_base& t);
 
-    const lexer_tokens_t    m_tokens;
+    ::std::string           m_name;   // name of this expression.
+    const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
     formula_tokens_t        m_formula_tokens;
     ::std::vector<base_cell*> m_depend_cells;
 

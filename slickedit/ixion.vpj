@@ -238,6 +238,7 @@
 				N="../inc/Makefile.am"
 				Type="Makefile"/>
 			<F N="../inc/mem_str_buf.hpp"/>
+			<F N="../inc/model_context.hpp"/>
 			<F N="../inc/model_parser.hpp"/>
 			<F N="../inc/sort_input_parser.hpp"/>
 			<F N="../inc/thread.hpp"/>
@@ -260,6 +261,7 @@
 					N="../src/libixion/Makefile.am"
 					Type="Makefile"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
+				<F N="../src/libixion/model_context.cpp"/>
 				<F N="../src/libixion/model_parser.cpp"/>
 				<F N="../src/libixion/sort_input_parser.cpp"/>
 			</Folder>

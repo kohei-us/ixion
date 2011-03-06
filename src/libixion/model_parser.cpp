@@ -337,11 +337,10 @@ void create_empty_formula_cells(
     cell_map.clear();
 
     typedef ptr_map<string, base_cell> _cellmap_type;
-    typedef map<const base_cell*, string> _ptrname_type;
     for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
-    _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
 
 #if DEBUG_INPUT_PARSER
+    _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
     for (; itr != itr_end; ++itr)
         cout << itr->first << " := " << itr->second << endl;
 #endif
@@ -354,13 +353,13 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
         const model_parser::cell& model_cell = *itr_cell;
-        const string & name = model_cell.get_name();
+        const string& name = model_cell.get_name();
 
 #if DEBUG_INPUT_PARSER
         cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(model_cell.get_tokens(), &formula_cells);
+        formula_parser fparser(model_cell.get_name(), model_cell.get_tokens(), &formula_cells);
         fparser.parse();
         fparser.print_tokens();
         base_cell* pcell = find_cell(formula_cells, name);
@@ -519,6 +518,9 @@ void model_parser::parse()
                 // First, create empty formula cell instances so that we can have 
                 // name-to-pointer associations.
                 create_empty_formula_cells(data.cell_names, m_cells);
+
+                // Now, convert lexer tokens into formula tokens and put them
+                // into formula cells.
                 dirty_cells_t dirty_cells;
                 convert_lexer_tokens(data.cells, m_cells, dirty_cells);
                 calc(dirty_cells);

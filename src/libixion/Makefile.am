@@ -14,6 +14,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = cell.cpp \
 	global.cpp \
 	lexer_tokens.cpp \
 	mem_str_buf.cpp \
+	model_context.cpp \
 	model_parser.cpp \
 	sort_input_parser.cpp
 

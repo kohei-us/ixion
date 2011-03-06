@@ -13,6 +13,7 @@ libixion_HEADERS = cell.hpp \
 	global.hpp \
 	lexer_tokens.hpp \
 	mem_str_buf.hpp \
+	model_context.hpp \
 	model_parser.hpp \
 	sort_input_parser.hpp \
 	thread.hpp

@@ -141,8 +141,9 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names,
+formula_parser::formula_parser(const string& name, const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names,
                                bool ignore_unresolved) :
+    m_name(name),
     m_tokens(tokens),
     mp_cell_names(p_cell_names),
     m_ignore_unresolved(ignore_unresolved)
