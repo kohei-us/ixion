@@ -33,12 +33,12 @@
 #include "formula_tokens.hpp"
 #include "hash_container/map.hpp"
 
+#include <string>
 #include <boost/noncopyable.hpp>
 
-#include <string>
-#include <vector>
-
 namespace ixion {
+
+class model_context;
 
 /** 
  * Class formula_parser parses a series of primitive (or lexer) tokens 
@@ -47,8 +47,6 @@ namespace ixion {
  */
 class formula_parser : public ::boost::noncopyable
 {
-    typedef ::std::vector<base_cell*> depends_cell_array_type;
-
 public:
     class parse_error : public general_error
     {
@@ -56,8 +54,7 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const ::std::string& name, const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names, 
-                   bool ignore_unresolved = false);
+    formula_parser(const ::std::string& name, const lexer_tokens_t& tokens, const model_context& cxt);
     ~formula_parser();
 
     void parse();
@@ -75,10 +72,7 @@ private:
     ::std::string           m_name;   // name of this expression.
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
     formula_tokens_t        m_formula_tokens;
-    ::std::vector<base_cell*> m_precedent_cells;
-
-    cell_name_ptr_map_t* mp_cell_names;
-    bool m_ignore_unresolved;
+    const model_context&    m_context;
 };
 
 }

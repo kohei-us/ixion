@@ -96,16 +96,17 @@ struct thread_queue_handler : public unary_function<base_cell*, void>
 
 struct cell_interpret_handler : public unary_function<base_cell*, void>
 {
-    cell_interpret_handler(const cell_ptr_name_map_t& cell_names) :
-        m_cell_names(cell_names) {}
+    cell_interpret_handler(const cell_ptr_name_map_t& cell_names, const model_context& cxt) :
+        m_cell_names(cell_names), m_context(cxt) {}
 
     void operator() (base_cell* p) const
     {
         assert(p->get_celltype() == celltype_formula);
-        static_cast<formula_cell*>(p)->interpret(m_cell_names);
+        static_cast<formula_cell*>(p)->interpret(m_context);
     }
 private:
     const cell_ptr_name_map_t& m_cell_names;
+    const model_context& m_context;
 };
 
 }
@@ -120,8 +121,8 @@ void dependency_tracker::cell_back_inserter::operator() (base_cell* cell)
 
 // ============================================================================
 
-dependency_tracker::dependency_tracker(const cell_ptr_name_map_t* names) :
-    mp_names(names)
+dependency_tracker::dependency_tracker(const cell_ptr_name_map_t* names, const model_context& cxt) :
+    mp_names(names), m_context(cxt)
 {
 }
 
@@ -160,14 +161,14 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     if (thread_count > 0)
     {
         // Interpret cells in topological order using threads.
-        cell_queue_manager::init(thread_count, *mp_names);
+        cell_queue_manager::init(thread_count, *mp_names, m_context);
         for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler());
         cell_queue_manager::terminate();
     }
     else
     {
         // Interpret cells using just a single thread.
-        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpret_handler(*mp_names));
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpret_handler(*mp_names, m_context));
     }
 }
 

@@ -30,14 +30,26 @@
 
 #include <string>
 
+#include "formula_functions.hpp"
+
 namespace ixion {
 
-enum formula_name_type {
-    cell_reference,
-    range_reference,
-    named_expression,
-    function,
-    invalid
+struct formula_name_type
+{
+    enum name_type {
+        cell_reference,
+        range_reference,
+        named_expression,
+        function,
+        invalid
+    };
+
+    name_type type;
+    union {
+        formula_function_t func_oc; // function opcode
+    };
+
+    formula_name_type();
 };
 
 class formula_name_resolver_base
@@ -49,7 +61,9 @@ public:
 };
 
 /**
- * Resolve formula expression names by name only.
+ * Resolve formula expression names by name only.  In other words, all 
+ * expressions are named expressions, i.e. no expressions are addressable by
+ * cell address syntax. 
  */
 class formula_name_resolver_simple : public formula_name_resolver_base
 {

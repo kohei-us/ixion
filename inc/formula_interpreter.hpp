@@ -38,11 +38,12 @@
 namespace ixion {
 
 class formula_cell;
+class model_context;
 
 class formula_interpreter : public ::boost::noncopyable
 {
 public:
-    formula_interpreter(const formula_cell* cell, const cell_ptr_name_map_t& ptr_name_map);
+    formula_interpreter(const formula_cell* cell, const model_context& cxt);
     ~formula_interpreter();
 
     bool interpret();
@@ -61,6 +62,7 @@ private:
     // position when it finishes.
 
     double expression();
+    double named_expression();
     double term();
     double factor();
     double paren();
@@ -71,7 +73,7 @@ private:
 private:
     const formula_cell*         m_parent_cell;
     const formula_tokens_t&     m_tokens;
-    const cell_ptr_name_map_t&  m_ptr_name_map;
+    const model_context&        m_context;
     formula_tokens_t::const_iterator m_cur_token_itr;
     formula_tokens_t::const_iterator m_end_token_pos;
 

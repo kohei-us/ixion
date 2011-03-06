@@ -27,6 +27,9 @@
 
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
+#include "formula_name_resolver.hpp"
+#include "model_context.hpp"
+
 #include "hash_container/map.hpp"
 
 #include <iostream>
@@ -50,15 +53,8 @@ public:
 class formula_token_printer : public unary_function<formula_token_base, void>
 {
 public:
-    formula_token_printer(const cell_name_ptr_map_t& cell_names)
+    formula_token_printer()
     {
-        // Construct a cell pointer to name association.
-        cell_name_ptr_map_t::const_iterator itr = cell_names.begin(), itr_end = cell_names.end();
-        for (; itr != itr_end; ++itr)
-        {
-            m_cell_ptr_name_map.insert(
-                cell_ptr_name_map_t::value_type(itr->second, itr->first));
-        }
     }
 
     void operator() (const formula_token_base& token) const
@@ -94,7 +90,10 @@ public:
                 os << ",";
                 break;
             case fop_single_ref:
-                os << get_cell_name(token.get_single_ref());
+                os << "---";
+                break;
+            case fop_named_expression:
+                os << token.get_name();
                 break;
             case fop_unresolved_ref:
                 os << token.get_name();
@@ -118,18 +117,6 @@ public:
         cout << os.str();
 #endif
     }
-
-private:
-    string get_cell_name(const base_cell* p) const
-    {
-        cell_ptr_name_map_t::const_iterator itr = m_cell_ptr_name_map.find(p);
-        if (itr == m_cell_ptr_name_map.end())
-            return string();
-        return itr->second;
-    }
-
-private:
-    cell_ptr_name_map_t m_cell_ptr_name_map;
 };
 
 }
@@ -141,12 +128,11 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const string& name, const lexer_tokens_t& tokens, cell_name_ptr_map_t* p_cell_names,
-                               bool ignore_unresolved) :
+formula_parser::formula_parser(
+    const string& name, const lexer_tokens_t& tokens, const model_context& cxt) :
     m_name(name),
     m_tokens(tokens),
-    mp_cell_names(p_cell_names),
-    m_ignore_unresolved(ignore_unresolved)
+    m_context(cxt)
 {
 }
 
@@ -205,7 +191,7 @@ void formula_parser::print_tokens() const
 {
 #if DEBUG_PARSER
     cout << "formula tokens:";
-    for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer(*mp_cell_names));
+    for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer());
     cout << endl;
 #endif
 }
@@ -250,39 +236,28 @@ void formula_parser::primitive(lexer_opcode_t oc)
 void formula_parser::name(const lexer_token_base& t)
 {
     const string name = t.get_string();
-    cell_name_ptr_map_t::iterator itr = mp_cell_names->find(name);
-    if (itr != mp_cell_names->end())
+    formula_name_type fn = m_context.get_name_resolver().resolve(name);
+    switch (fn.type)
     {
-        // This is a reference, either to a cell or to a name.
+        case formula_name_type::function:
 #if DEBUG_PARSER
-        cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
+            cout << "'" << name << "' is a built-in function." << endl;
 #endif
-        m_formula_tokens.push_back(new single_ref_token(itr->second));
-        m_precedent_cells.push_back(itr->second);
-        return;
-    }
-
-    // Check if this is a function name.
-    formula_function_t func_oc = formula_functions::get_function_opcode(name);
-    if (func_oc != func_unknown)
-    {
+            m_formula_tokens.push_back(new function_token(static_cast<size_t>(fn.func_oc)));
+        break;
+        case formula_name_type::named_expression:
 #if DEBUG_PARSER
-        cout << "'" << name << "' is a built-in function." << endl;
+            cout << "'" << name << "' is a named expression." << endl;
 #endif
-        m_formula_tokens.push_back(new function_token(static_cast<size_t>(func_oc)));
-        return;
+            m_formula_tokens.push_back(new named_exp_token(name));
+        break;
+        default:
+        {
+            ostringstream os;
+            os << "failed to resolve a name '" << name << "'.";
+            throw parse_error(os.str());      
+        }
     }
-
-    if ( m_ignore_unresolved )
-    {
-        m_formula_tokens.push_back(new unresolved_ref_token(name));
-        // Not added to the dependent cells as it's unresolved
-        return;
-    }
-
-    ostringstream os;
-    os << "failed to resolve a name '" << name << "'.";
-    throw parse_error(os.str());
 }
 
 void formula_parser::value(const lexer_token_base& t)

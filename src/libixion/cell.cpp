@@ -232,7 +232,7 @@ const formula_tokens_t& formula_cell::get_tokens() const
     return m_tokens;
 }
 
-void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
+void formula_cell::interpret(const model_context& context)
 {
 #if DEBUG_FORMULA_CELL
     ostringstream os;
@@ -259,7 +259,7 @@ void formula_cell::interpret(const cell_ptr_name_map_t& cell_ptr_name_map)
             return;
         }
     
-        formula_interpreter fin(this, cell_ptr_name_map);
+        formula_interpreter fin(this, context);
         m_interpret_status.result = new formula_result;
         if (fin.interpret())
         {

@@ -26,10 +26,13 @@
  ************************************************************************/
 
 #include "formula_name_resolver.hpp"
+#include "formula_functions.hpp"
 
 using namespace std;
 
 namespace ixion {
+
+formula_name_type::formula_name_type() : type(invalid) {}
 
 formula_name_resolver_base::formula_name_resolver_base() {}
 formula_name_resolver_base::~formula_name_resolver_base() {}
@@ -41,14 +44,27 @@ formula_name_resolver_simple::~formula_name_resolver_simple() {}
 
 formula_name_type formula_name_resolver_simple::resolve(const string& name) const
 {
-    return invalid;
+    formula_name_type ret;
+
+    formula_function_t func_oc = formula_functions::get_function_opcode(name);
+    if (func_oc != func_unknown)
+    {
+        // This is a built-in function.
+        ret.type = formula_name_type::function;
+        ret.func_oc = func_oc;
+        return ret;
+    }
+
+    // Everything else is assumed to be a named expression.
+    ret.type = formula_name_type::named_expression;
+    return ret;
 }
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
 formula_name_type formula_name_resolver_a1::resolve(const string& name) const
 {
-    return invalid;
+    return formula_name_type();
 }
 
 }

@@ -349,7 +349,7 @@ void create_empty_formula_cells(
 #endif
 }
 
-void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr_map_t& formula_cells, dirty_cells_t& dirty_cells)
+void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, cell_name_ptr_map_t& formula_cells, dirty_cells_t& dirty_cells)
 {
     dirty_cells_t _dirty_cells;
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
@@ -362,7 +362,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
         cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(model_cell.get_name(), model_cell.get_tokens(), &formula_cells);
+        formula_parser fparser(model_cell.get_name(), model_cell.get_tokens(), context);
         fparser.parse();
         fparser.print_tokens();
         base_cell* pcell = find_cell(formula_cells, name);
@@ -520,12 +520,12 @@ void model_parser::parse()
 
                 // First, create empty formula cell instances so that we can have 
                 // name-to-pointer associations.
-                create_empty_formula_cells(data.cell_names, m_cells);
+//              create_empty_formula_cells(data.cell_names, m_cells);
 
                 // Now, convert lexer tokens into formula tokens and put them
                 // into formula cells.
                 dirty_cells_t dirty_cells;
-                convert_lexer_tokens(data.cells, m_cells, dirty_cells);
+                convert_lexer_tokens(data.cells, m_context, m_cells, dirty_cells);
                 calc(dirty_cells);
             }
             else if (buf_com.equals("recalc"))
@@ -538,7 +538,7 @@ void model_parser::parse()
                     << "recalculating" << endl;
                 cout << os.str();
                 dirty_cells_t dirty_cells;
-                convert_lexer_tokens(data.cells, m_cells, dirty_cells);
+                convert_lexer_tokens(data.cells, m_context, m_cells, dirty_cells);
                 calc(dirty_cells);
             }
             else if (buf_com.equals("check"))
@@ -601,7 +601,7 @@ void model_parser::calc(dirty_cells_t& cells)
 
     // Now, register the dependency info on each dirty cell, and interpret all
     // dirty cells.
-    dependency_tracker deptracker(&dirty_cell_names);
+    dependency_tracker deptracker(&dirty_cell_names, m_context);
     for_each(cells.begin(), cells.end(), cell_dependency_handler(deptracker, cells));
     deptracker.interpret_all_cells(m_thread_count);
 }

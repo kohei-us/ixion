@@ -41,6 +41,7 @@ namespace ixion {
 
 class formula_result;
 class formula_cell;
+class model_context;
 
 // ============================================================================
 
@@ -135,7 +136,7 @@ public:
     virtual double get_value() const;
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
-    void interpret(const cell_ptr_name_map_t& cell_ptr_name_map);
+    void interpret(const model_context& context);
 
     /**
      * Determine if this cell contains circular reference by walking through
@@ -179,6 +180,20 @@ private:
 };
 
 // ============================================================================
+
+inline base_cell* new_clone(const base_cell& r)
+{    
+    switch (r.get_celltype())
+    {
+        case celltype_formula:
+            return new formula_cell(static_cast<const formula_cell&>(r));
+        case celltype_string:
+        case celltype_unknown:
+        default:
+            ;
+    }
+    return NULL;
+}
 
 inline bool operator <(const base_cell& l, const base_cell& r)
 {

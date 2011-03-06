@@ -27,6 +27,8 @@
 
 #include "formula_tokens.hpp"
 
+using ::std::string;
+
 namespace ixion {
 
 const char* print_tokens(const formula_tokens_t& tokens, bool verbose)
@@ -56,6 +58,8 @@ const char* get_opcode_name(fopcode_t oc)
             return "separator";
         case fop_single_ref:
             return "single ref";
+        case fop_named_expression:
+            return "named expression";
         case fop_unresolved_ref:
             return "unresolved ref";
         case fop_string:
@@ -160,6 +164,23 @@ single_ref_token::~single_ref_token()
 base_cell* single_ref_token::get_single_ref() const
 {
     return mp_cell;
+}
+
+// ============================================================================
+
+named_exp_token::named_exp_token(const std::string& name) :
+    formula_token_base(fop_named_expression),
+    m_name(name) {}
+
+named_exp_token::named_exp_token(const named_exp_token& r) :
+    formula_token_base(r),
+    m_name(r.m_name) {}
+
+named_exp_token::~named_exp_token() {}
+
+string named_exp_token::get_name() const
+{
+    return m_name;
 }
 
 // ============================================================================

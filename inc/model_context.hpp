@@ -35,6 +35,8 @@
 
 namespace ixion {
 
+class formula_name_resolver_base;
+
 /**
  * This class stores all data relevant to current session.  You can think of 
  * this like a document model for each formula calculation run.
@@ -45,8 +47,10 @@ class model_context
 public:
     model_context();
     ~model_context();
-
+    
+    const formula_name_resolver_base& get_name_resolver() const;
 private:
+    formula_name_resolver_base* mp_name_resolver;
     named_expressions_t m_named_expressions;
 };
 

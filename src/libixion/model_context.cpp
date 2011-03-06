@@ -26,10 +26,22 @@
  ************************************************************************/
 
 #include "model_context.hpp"
+#include "formula_name_resolver.hpp"
 
 namespace ixion {
 
-model_context::model_context() {}
-model_context::~model_context() {}
+model_context::model_context() :
+    mp_name_resolver(new formula_name_resolver_simple)
+{}
+
+const formula_name_resolver_base& model_context::get_name_resolver() const
+{
+    return *mp_name_resolver;
+}
+
+model_context::~model_context()
+{
+    delete mp_name_resolver;
+}
 
 }

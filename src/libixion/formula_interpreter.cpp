@@ -48,10 +48,10 @@ public:
 
 }
 
-formula_interpreter::formula_interpreter(const formula_cell* cell, const cell_ptr_name_map_t& ptr_name_map) :
+formula_interpreter::formula_interpreter(const formula_cell* cell, const model_context& cxt) :
     m_parent_cell(cell),
     m_tokens(cell->get_tokens()),
-    m_ptr_name_map(ptr_name_map),
+    m_context(cxt),
     m_end_token_pos(m_tokens.end()),
     m_result(0.0),
     m_error(fe_no_error)
@@ -166,6 +166,13 @@ double formula_interpreter::expression()
     return val;
 }
 
+double formula_interpreter::named_expression()
+{
+    m_outbuf << token().get_name();
+    next();
+    return 1;
+}
+
 double formula_interpreter::term()
 {
     // <factor> || <factor> * <term>
@@ -198,13 +205,15 @@ double formula_interpreter::term()
 
 double formula_interpreter::factor()
 {
-    // <constant> || <variable> || '(' <expression> ')' || <function>
+    // <constant> || <variable> || <named expression> || '(' <expression> ')' || <function>
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
     {
         case fop_open:
             return paren();
+        case fop_named_expression:
+            return named_expression();
         case fop_value:
             return constant();
         case fop_single_ref:
