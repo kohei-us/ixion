@@ -215,11 +215,6 @@ formula_tokens_t& formula_parser::get_tokens()
     return m_formula_tokens;
 }
 
-const vector<base_cell*>& formula_parser::get_precedent_cells() const
-{
-    return m_precedent_cells;
-}
-
 void formula_parser::primitive(lexer_opcode_t oc)
 {
     fopcode_t foc = fop_unknown;

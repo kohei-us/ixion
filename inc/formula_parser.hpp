@@ -64,7 +64,6 @@ public:
     void print_tokens() const;
 
     formula_tokens_t& get_tokens();
-    const ::std::vector<base_cell*>& get_precedent_cells() const;
     
 private:
     formula_parser(); // disabled
