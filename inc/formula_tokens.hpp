@@ -68,6 +68,13 @@ enum fopcode_t {
     fop_unknown
 };
 
+/**
+ * Get a printable name for a formula opcode.
+ * 
+ * @param oc formula opcode
+ * 
+ * @return printable name for a formula opcode.
+ */
 const char* get_opcode_name(fopcode_t oc);
 
 // ============================================================================
