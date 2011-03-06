@@ -31,7 +31,18 @@ using namespace std;
 
 namespace ixion {
 
+formula_name_resolver_base::formula_name_resolver_base() {}
 formula_name_resolver_base::~formula_name_resolver_base() {}
+
+formula_name_resolver_simple::formula_name_resolver_simple() :
+    formula_name_resolver_base() {}
+
+formula_name_resolver_simple::~formula_name_resolver_simple() {}
+
+formula_name_type formula_name_resolver_simple::resolve(const string& name) const
+{
+    return invalid;
+}
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 

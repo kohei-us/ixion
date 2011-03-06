@@ -43,8 +43,17 @@ enum formula_name_type {
 class formula_name_resolver_base
 {
 public:
+    formula_name_resolver_base();
     virtual ~formula_name_resolver_base() = 0;
     virtual formula_name_type resolve(const ::std::string& name) const = 0;
+};
+
+class formula_name_resolver_simple : public formula_name_resolver_base
+{
+public:
+    formula_name_resolver_simple();
+    virtual ~formula_name_resolver_simple();
+    virtual formula_name_type resolve(const::std::string &name) const;
 };
 
 class formula_name_resolver_a1 : public formula_name_resolver_base

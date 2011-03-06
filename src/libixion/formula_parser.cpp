@@ -32,6 +32,8 @@
 #include <iostream>
 #include <sstream>
 
+#define DEBUG_PARSER 1
+
 using namespace std;
 
 namespace ixion {
