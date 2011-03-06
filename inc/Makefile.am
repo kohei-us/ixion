@@ -6,6 +6,7 @@ libixion_HEADERS = cell.hpp \
 	formula_functions.hpp \
 	formula_interpreter.hpp \
 	formula_lexer.hpp \
+	formula_name_resolver.hpp \
 	formula_parser.hpp \
 	formula_result.hpp \
 	formula_tokens.hpp \
