@@ -94,6 +94,8 @@ int main (int argc, char** argv)
         cout << "Using " << thread_count << " threads" << endl;
         cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
     }
+
+    // Parse all files one at a time.
     vector<string>::const_iterator itr = files.begin(), itr_end = files.end();
     for (; itr != itr_end; ++itr)
     {
