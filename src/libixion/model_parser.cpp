@@ -427,9 +427,11 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, cell_name_ptr
 
 // ============================================================================
 
-model_parser::parse_error::parse_error(const string& msg) :
-    m_msg(msg)
+model_parser::parse_error::parse_error(const string& msg)
 {
+    ostringstream os;
+    os << "parse error: " << msg;
+    m_msg = os.str();
 }
 
 model_parser::parse_error::~parse_error() throw()
@@ -438,9 +440,7 @@ model_parser::parse_error::~parse_error() throw()
 
 const char* model_parser::parse_error::what() const throw()
 {
-    ostringstream oss;
-    oss << "parse error: " << m_msg;
-    return oss.str().c_str();
+    return m_msg.c_str();
 }
 
 // ============================================================================
