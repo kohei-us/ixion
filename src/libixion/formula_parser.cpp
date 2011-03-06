@@ -215,9 +215,9 @@ formula_tokens_t& formula_parser::get_tokens()
     return m_formula_tokens;
 }
 
-const vector<base_cell*>& formula_parser::get_depend_cells() const
+const vector<base_cell*>& formula_parser::get_precedent_cells() const
 {
-    return m_depend_cells;
+    return m_precedent_cells;
 }
 
 void formula_parser::primitive(lexer_opcode_t oc)
@@ -263,7 +263,7 @@ void formula_parser::name(const lexer_token_base& t)
         cout << "  name = " << name << "  pointer to the cell instance = " << itr->second << endl;
 #endif
         m_formula_tokens.push_back(new single_ref_token(itr->second));
-        m_depend_cells.push_back(itr->second);
+        m_precedent_cells.push_back(itr->second);
         return;
     }
 

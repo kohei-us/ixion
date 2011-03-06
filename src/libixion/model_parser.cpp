@@ -94,7 +94,7 @@ private:
 class depcell_inserter : public unary_function<base_cell*, void>
 {
 public:
-    depcell_inserter(depends_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) : 
+    depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) : 
         m_tracker(tracker), 
         m_dirty_cells(dirty_cells),
         mp_fcell(fcell) {}
@@ -105,7 +105,7 @@ public:
             m_tracker.insert_depend(mp_fcell, p);
     }
 private:
-    depends_tracker& m_tracker;
+    dependency_tracker& m_tracker;
     const dirty_cells_t& m_dirty_cells;
     formula_cell* mp_fcell;
 };
@@ -166,7 +166,7 @@ private:
 class cell_dependency_handler : public unary_function<base_cell*, void>
 {
 public:
-    explicit cell_dependency_handler(depends_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
+    explicit cell_dependency_handler(dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
         m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
 
     void operator() (base_cell* pcell)
@@ -192,7 +192,7 @@ public:
     }
 
 private:
-    depends_tracker& m_dep_tracker;
+    dependency_tracker& m_dep_tracker;
     dirty_cells_t& m_dirty_cells;
 };
 
@@ -601,7 +601,7 @@ void model_parser::calc(dirty_cells_t& cells)
 
     // Now, register the dependency info on each dirty cell, and interpret all
     // dirty cells.
-    depends_tracker deptracker(&dirty_cell_names);
+    dependency_tracker deptracker(&dirty_cell_names);
     for_each(cells.begin(), cells.end(), cell_dependency_handler(deptracker, cells));
     deptracker.interpret_all_cells(m_thread_count);
 }

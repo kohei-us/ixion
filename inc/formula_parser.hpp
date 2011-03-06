@@ -64,7 +64,7 @@ public:
     void print_tokens() const;
 
     formula_tokens_t& get_tokens();
-    const ::std::vector<base_cell*>& get_depend_cells() const;
+    const ::std::vector<base_cell*>& get_precedent_cells() const;
     
 private:
     formula_parser(); // disabled
@@ -76,7 +76,7 @@ private:
     ::std::string           m_name;   // name of this expression.
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
     formula_tokens_t        m_formula_tokens;
-    ::std::vector<base_cell*> m_depend_cells;
+    ::std::vector<base_cell*> m_precedent_cells;
 
     cell_name_ptr_map_t* mp_cell_names;
     bool m_ignore_unresolved;

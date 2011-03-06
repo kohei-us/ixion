@@ -76,19 +76,19 @@ private:
     };
 
 public:
-    typedef ::std::set<value_type>                             depend_cells_type;
-    typedef ::boost::ptr_map<value_type, depend_cells_type>    depend_map_type;
+    typedef ::std::set<value_type>                             precedent_cells_type;
+    typedef ::boost::ptr_map<value_type, precedent_cells_type>    precedent_map_type;
 
-    class depend_set
+    class precedent_set
     {
     public:
         void insert(value_type cell, value_type dep)
         {
-            typename depend_map_type::iterator itr = m_map.find(cell);
+            typename precedent_map_type::iterator itr = m_map.find(cell);
             if (itr == m_map.end())
             {
                 // First dependent for this cell.
-                ::std::pair<typename depend_map_type::iterator, bool> r = m_map.insert(cell, new depend_cells_type);
+                ::std::pair<typename precedent_map_type::iterator, bool> r = m_map.insert(cell, new precedent_cells_type);
                 if (!r.second)
                     throw dfs_error("failed to insert a new set instance");
 
@@ -98,15 +98,15 @@ public:
             itr->second->insert(dep);
         }
 
-        const depend_map_type& get() const { return m_map; }
+        const precedent_map_type& get() const { return m_map; }
 
     private:
-        depend_map_type m_map;
+        precedent_map_type m_map;
     };
 
     depth_first_search(
         const ::std::vector<value_type>& cells, 
-        const depend_map_type& depend_map, cell_handler_type& handler);
+        const precedent_map_type& precedent_map, cell_handler_type& handler);
 
     void init();
     void run();
@@ -114,10 +114,10 @@ public:
 private:
     void visit(size_t cell_index);
     size_t get_cell_index(value_type p) const;
-    const depend_cells_type* get_depend_cells(value_type cell);
+    const precedent_cells_type* get_precedent_cells(value_type cell);
 
 private:
-    const depend_map_type&  m_depend_map;
+    const precedent_map_type&  m_precedent_map;
     cell_handler_type&      m_handler;
     size_t                  m_cell_count;
     cell_index_map_type     m_cell_indices;
@@ -129,8 +129,8 @@ private:
 template<typename _ValueType, typename _CellHandlerType>
 depth_first_search<_ValueType,_CellHandlerType>::depth_first_search(
     const ::std::vector<value_type>& cells,
-    const depend_map_type& depend_map, cell_handler_type& handler) :
-    m_depend_map(depend_map),
+    const precedent_map_type& precedent_map, cell_handler_type& handler) :
+    m_precedent_map(precedent_map),
     m_handler(handler),
     m_cell_count(cells.size()),
     m_time_stamp(0),
@@ -185,12 +185,12 @@ void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
 
     do
     {
-        const depend_cells_type* depends = get_depend_cells(p);
+        const precedent_cells_type* depends = get_precedent_cells(p);
         if (!depends)
             // No dependent cells.
             break;
     
-        typename depend_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
+        typename precedent_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
         for (; itr != itr_end; ++itr)
         {
             value_type dcell = *itr;
@@ -218,11 +218,11 @@ size_t depth_first_search<_ValueType,_CellHandlerType>::get_cell_index(value_typ
 }
 
 template<typename _ValueType, typename _CellHandlerType>
-const typename depth_first_search<_ValueType,_CellHandlerType>::depend_cells_type*
-depth_first_search<_ValueType,_CellHandlerType>::get_depend_cells(value_type cell)
+const typename depth_first_search<_ValueType,_CellHandlerType>::precedent_cells_type*
+depth_first_search<_ValueType,_CellHandlerType>::get_precedent_cells(value_type cell)
 {
-    typename depend_map_type::const_iterator itr = m_depend_map.find(cell);
-    if (itr == m_depend_map.end())
+    typename precedent_map_type::const_iterator itr = m_precedent_map.find(cell);
+    if (itr == m_precedent_map.end())
         // This cell has no dependent cells.
         return NULL;
 

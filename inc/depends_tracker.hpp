@@ -42,10 +42,10 @@ class base_cell;
 
 /** 
  * This class keeps track of inter-cell dependencies.  Each formula cell 
- * item stores pointers to other cells that it depends on.  This information 
- * is used to build a complete dependency tree.
+ * item stores pointers to other cells that it depends on (precedent cells).
+ * This information is used to build a complete dependency tree. 
  */
-class depends_tracker
+class dependency_tracker
 {
     class cell_back_inserter : public ::std::unary_function<base_cell*, void>
     {
@@ -59,8 +59,8 @@ class depends_tracker
     typedef depth_first_search<base_cell*, cell_back_inserter> dfs_type;
 
 public:
-    depends_tracker(const cell_ptr_name_map_t* names);
-    ~depends_tracker();
+    dependency_tracker(const cell_ptr_name_map_t* names);
+    ~dependency_tracker();
 
     /** 
      * Insert a single dependency relationship.
@@ -79,7 +79,7 @@ public:
     void topo_sort_cells(::std::vector<base_cell*>& sorted_cells) const;
 
 private:
-    dfs_type::depend_set m_deps;
+    dfs_type::precedent_set m_deps;
     const cell_ptr_name_map_t* mp_names;
 };
 

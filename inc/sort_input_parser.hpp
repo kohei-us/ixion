@@ -68,7 +68,7 @@ private:
     void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
 
 private:
-    dfs_type::depend_set    m_set;
+    dfs_type::precedent_set    m_set;
     ::std::string           m_content;
     ::std::vector<mem_str_buf>   m_all_cells;
 

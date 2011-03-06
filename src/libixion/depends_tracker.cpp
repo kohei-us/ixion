@@ -110,31 +110,31 @@ private:
 
 }
 
-depends_tracker::cell_back_inserter::cell_back_inserter(vector<base_cell*> & sorted_cells) :
+dependency_tracker::cell_back_inserter::cell_back_inserter(vector<base_cell*> & sorted_cells) :
     m_sorted_cells(sorted_cells) {}
 
-void depends_tracker::cell_back_inserter::operator() (base_cell* cell)
+void dependency_tracker::cell_back_inserter::operator() (base_cell* cell)
 {
     m_sorted_cells.push_back(cell);
 }
 
 // ============================================================================
 
-depends_tracker::depends_tracker(const cell_ptr_name_map_t* names) :
+dependency_tracker::dependency_tracker(const cell_ptr_name_map_t* names) :
     mp_names(names)
 {
 }
 
-depends_tracker::~depends_tracker()
+dependency_tracker::~dependency_tracker()
 {
 }
 
-void depends_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
+void dependency_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
 {
     m_deps.insert(origin_cell, depend_cell);
 }
 
-void depends_tracker::interpret_all_cells(size_t thread_count)
+void dependency_tracker::interpret_all_cells(size_t thread_count)
 {
     vector<base_cell*> sorted_cells;
     topo_sort_cells(sorted_cells);
@@ -171,7 +171,7 @@ void depends_tracker::interpret_all_cells(size_t thread_count)
     }
 }
 
-void depends_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
+void dependency_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
     vector<base_cell*> all_cells;
