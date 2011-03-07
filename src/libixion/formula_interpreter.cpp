@@ -178,6 +178,10 @@ double formula_interpreter::named_expression()
         os << "unable to find named expression '" << expr_name << "'";
         throw invalid_expression(os.str());
     }
+
+    // NOTE: We may want to look into expanding named expressions prior to
+    // interpreting formula tokens to avoid potential "recursion too deep"
+    // problem.
     formula_interpreter fi(expr, m_context);
     if (!fi.interpret())
     {
