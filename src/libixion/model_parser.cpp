@@ -346,22 +346,6 @@ void ensure_unique_names(const vector<string>& cell_names)
         throw general_error("Duplicate names exist in the list of cell names.");
 }
 
-void create_empty_formula_cells(
-    const vector<string>& cell_names, cell_name_ptr_map_t& cell_map)
-{
-    ensure_unique_names(cell_names);
-    cell_map.clear();
-
-    typedef ptr_map<string, base_cell> _cellmap_type;
-    for_each(cell_names.begin(), cell_names.end(), formula_cell_inserter(cell_map));
-
-#if DEBUG_INPUT_PARSER
-    _cellmap_type::const_iterator itr = cell_map.begin(), itr_end = cell_map.end();
-    for (; itr != itr_end; ++itr)
-        cout << itr->first << " := " << itr->second << endl;
-#endif
-}
-
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, cell_name_ptr_map_t& formula_cells, dirty_cells_t& dirty_cells)
 {
     dirty_cells_t _dirty_cells;
@@ -542,14 +526,12 @@ void model_parser::parse()
                 if (parse_mode != parse_mode_init)
                     throw parse_error("'calc' command must be used in the init mode.");
 
+                ensure_unique_names(data.cell_names);
+
                 // Perform full calculation on currently stored cells.
 
-                // First, create empty formula cell instances so that we can have 
-                // name-to-pointer associations.
-//              create_empty_formula_cells(data.cell_names, m_cells);
-
-                // Now, convert lexer tokens into formula tokens and put them
-                // into formula cells.
+                // Convert lexer tokens into formula tokens and put them into
+                // formula cells.
                 dirty_cells_t dirty_cells;
                 convert_lexer_tokens(data.cells, m_context, m_cells, dirty_cells);
                 calc(dirty_cells);
