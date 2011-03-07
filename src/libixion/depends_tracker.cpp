@@ -161,7 +161,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     if (thread_count > 0)
     {
         // Interpret cells in topological order using threads.
-        cell_queue_manager::init(thread_count, *mp_names, m_context);
+        cell_queue_manager::init(thread_count, m_context);
         for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler());
         cell_queue_manager::terminate();
     }

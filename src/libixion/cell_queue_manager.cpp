@@ -152,7 +152,7 @@ worker_thread_status wts;
 /**
  * Main worker thread routine.
  */
-void worker_main(worker_thread_data* data, const cell_ptr_name_map_t& names, const model_context* context)
+void worker_main(worker_thread_data* data, const model_context* context)
 {
     StackPrinter __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->action.mtx);
@@ -221,14 +221,14 @@ struct manage_queue_data
 
 manage_queue_data data;
 
-void init_workers(size_t worker_count, const cell_ptr_name_map_t& names, const model_context* context)
+void init_workers(size_t worker_count, const model_context* context)
 {
     // Create specified number of worker threads.
     for (size_t i = 0; i < worker_count; ++i)
     {
         data.workers.push_back(new worker_thread_data);
         worker_thread_data& wt = data.workers.back();
-        wt.thr_main = thread(::boost::bind(worker_main, &wt, names, context));
+        wt.thr_main = thread(::boost::bind(worker_main, &wt, context));
     }
 
     // Wait until the worker threads become ready.
@@ -278,13 +278,13 @@ void interpret_cell(worker_thread_data& wt)
 /**
  * Main queue manager thread routine.
  */
-void manage_queue_main(size_t worker_count, const cell_ptr_name_map_t& names, const model_context* context)
+void manage_queue_main(size_t worker_count, const model_context* context)
 {
     StackPrinter __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
     {
         mutex::scoped_lock lock(data.mtx_thread_ready);
-        init_workers(worker_count, names, context);
+        init_workers(worker_count, context);
         data.thread_ready = true;
         data.cond_thread_ready.notify_all();
     }
@@ -372,13 +372,13 @@ thread thr_queue;
 
 } // anonymous namespace
 
-void cell_queue_manager::init(size_t thread_count, const cell_ptr_name_map_t& names, const model_context& context)
+void cell_queue_manager::init(size_t thread_count, const model_context& context)
 {
     // Don't forget to reset the global data.
     data.reset();
     wts.reset();
 
-    thread thr(::boost::bind(manage_queue_main, thread_count, names, &context));
+    thread thr(::boost::bind(manage_queue_main, thread_count, &context));
     thr_queue.swap(thr);
     wait_init();
 }

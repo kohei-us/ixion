@@ -50,7 +50,7 @@ public:
      *  
      * @param thread_count desired number of worker threads.
      */
-    static void init(size_t thread_count, const cell_ptr_name_map_t& names, const model_context& context);
+    static void init(size_t thread_count, const model_context& context);
 
     /**
      * Add new cell to queue to interpret. 
