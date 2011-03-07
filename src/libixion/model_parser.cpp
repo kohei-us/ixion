@@ -142,11 +142,23 @@ private:
     mode_t m_mode;
 };
 
-struct formula_cell_printer : public unary_function<const base_cell*, void>
+class formula_cell_printer : public unary_function<const base_cell*, void>
 {
+    const model_context& m_context;
+public:
+    formula_cell_printer(const model_context& cxt) : m_context(cxt) {}
+
     void operator() (const base_cell* p) const
     {
-        cout << "  cell " << global::get_cell_name(p) << endl;
+        string name = "<unknown>";
+        if (p->get_celltype() == celltype_formula)
+        {
+            const string* expr_name = m_context.get_named_expression_name(
+                static_cast<const formula_cell*>(p));
+            if (expr_name)
+                name = *expr_name;
+        }
+        cout << "  cell " << name << endl;
     }
 };
 
@@ -434,7 +446,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
     cout << get_formula_result_output_separator() << endl;
     cout << "All dirty cells: " << endl;
-    for_each(_dirty_cells.begin(), _dirty_cells.end(), formula_cell_printer());
+    for_each(_dirty_cells.begin(), _dirty_cells.end(), formula_cell_printer(context));
 #endif
     dirty_cells.swap(_dirty_cells);
 }
