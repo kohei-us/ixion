@@ -179,9 +179,10 @@ double formula_interpreter::named_expression()
         throw invalid_expression(os.str());
     }
 
-    // NOTE: We may want to look into expanding named expressions prior to
+    // NOTE: We need look into expanding named expressions prior to
     // interpreting formula tokens to avoid potential "recursion too deep"
-    // problem.
+    // problem.  Plus, this nested interpretation does not resolve circular
+    // name dependency issue.
     formula_interpreter fi(expr, m_context);
     if (!fi.interpret())
     {
