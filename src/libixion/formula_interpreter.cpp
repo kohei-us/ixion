@@ -47,6 +47,9 @@ public:
     invalid_expression(const string& msg) : general_error(msg) {}
 };
 
+opcode_token paren_open = opcode_token(fop_open);
+opcode_token paren_close = opcode_token(fop_close);
+
 }
 
 formula_interpreter::formula_interpreter(const formula_cell* cell, const model_context& cxt) :
@@ -113,13 +116,48 @@ formula_error_t formula_interpreter::get_error() const
 
 void formula_interpreter::init_tokens()
 {
+    m_tokens.clear();
     formula_tokens_t::const_iterator itr = m_original_tokens.begin(), itr_end = m_original_tokens.end();
     for (; itr != itr_end; ++itr)
     {
         const formula_token_base* p = &(*itr);
-        m_tokens.push_back(p);
+        assert(p);
+        if (p->get_opcode() == fop_named_expression)
+        {
+            // Named expression.  Expand it.
+            const formula_cell* expr = m_context.get_named_expression(p->get_name());
+            expand_named_expression(p->get_name(), expr);
+        }
+        else
+            // Normal token.
+            m_tokens.push_back(p);
     }
     m_end_token_pos = m_tokens.end();
+}
+
+void formula_interpreter::expand_named_expression(
+    const string& expr_name, const formula_cell* expr)
+{
+    if (!expr)
+    {
+        ostringstream os;
+        os << "unable to find named expression '" << expr_name << "'";
+        throw invalid_expression(os.str());
+    }
+    const formula_tokens_t& expr_tokens = expr->get_tokens();
+    m_tokens.push_back(&paren_open);
+    formula_tokens_t::const_iterator itr = expr_tokens.begin(), itr_end = expr_tokens.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->get_opcode() == fop_named_expression)
+        {
+            const formula_cell* expr = m_context.get_named_expression(itr->get_name());
+            expand_named_expression(itr->get_name(), expr);
+        }
+        else
+            m_tokens.push_back(&(*itr));
+    }
+    m_tokens.push_back(&paren_close);
 }
 
 bool formula_interpreter::has_token() const

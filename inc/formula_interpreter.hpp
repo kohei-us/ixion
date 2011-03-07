@@ -43,6 +43,8 @@ class model_context;
 class formula_interpreter : public ::boost::noncopyable
 {
 public:
+    typedef ::std::vector<const formula_token_base*> local_tokens_type;
+
     formula_interpreter(const formula_cell* cell, const model_context& cxt);
     ~formula_interpreter();
 
@@ -56,6 +58,8 @@ private:
      * where we detect circular referencing of named expressions. 
      */
     void init_tokens();
+
+    void expand_named_expression(const ::std::string& expr_name, const formula_cell* expr);
 
     bool has_token() const;
     void next();
@@ -81,7 +85,6 @@ private:
     const formula_tokens_t&     m_original_tokens;
     const model_context&        m_context;
 
-    typedef ::std::vector<const formula_token_base*> local_tokens_type;
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;
