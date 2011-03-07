@@ -33,6 +33,7 @@
 #include <string>
 #include <memory>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
@@ -42,7 +43,7 @@ class formula_name_resolver_base;
  * This class stores all data relevant to current session.  You can think of 
  * this like a document model for each formula calculation run.
  */
-class model_context
+class model_context : public ::boost::noncopyable
 {
     typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_t;
 public:
