@@ -122,6 +122,11 @@ opcode_token::opcode_token(fopcode_t oc) :
 {
 }
 
+opcode_token::opcode_token(const opcode_token& r) :
+    formula_token_base(r)
+{
+}
+
 opcode_token::~opcode_token()
 {
 }

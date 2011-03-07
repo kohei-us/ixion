@@ -51,6 +51,12 @@ public:
     formula_error_t get_error() const;
 
 private:
+    /**
+     * Expand all named expressions into a flat set of tokens.  This is also 
+     * where we detect circular referencing of named expressions. 
+     */
+    void init_tokens();
+
     bool has_token() const;
     void next();
     const formula_token_base& token() const;
@@ -72,10 +78,13 @@ private:
 
 private:
     const formula_cell*         m_parent_cell;
-    const formula_tokens_t&     m_tokens;
+    const formula_tokens_t&     m_original_tokens;
     const model_context&        m_context;
-    formula_tokens_t::const_iterator m_cur_token_itr;
-    formula_tokens_t::const_iterator m_end_token_pos;
+
+    typedef ::std::vector<const formula_token_base*> local_tokens_type;
+    local_tokens_type m_tokens;
+    local_tokens_type::const_iterator m_cur_token_itr;
+    local_tokens_type::const_iterator m_end_token_pos;
 
     ::std::ostringstream        m_outbuf; // output buffer (for debug purposes)
 

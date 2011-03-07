@@ -51,9 +51,8 @@ public:
 
 formula_interpreter::formula_interpreter(const formula_cell* cell, const model_context& cxt) :
     m_parent_cell(cell),
-    m_tokens(cell->get_tokens()),
+    m_original_tokens(cell->get_tokens()),
     m_context(cxt),
-    m_end_token_pos(m_tokens.end()),
     m_result(0.0),
     m_error(fe_no_error)
 {
@@ -65,6 +64,8 @@ formula_interpreter::~formula_interpreter()
 
 bool formula_interpreter::interpret()
 {
+    init_tokens();
+
     if (m_tokens.empty())
     {
         cout << "interpreter error: no tokens to interpret" << endl;
@@ -110,6 +111,17 @@ formula_error_t formula_interpreter::get_error() const
     return m_error;
 }
 
+void formula_interpreter::init_tokens()
+{
+    formula_tokens_t::const_iterator itr = m_original_tokens.begin(), itr_end = m_original_tokens.end();
+    for (; itr != itr_end; ++itr)
+    {
+        const formula_token_base* p = &(*itr);
+        m_tokens.push_back(p);
+    }
+    m_end_token_pos = m_tokens.end();
+}
+
 bool formula_interpreter::has_token() const
 {
     return m_cur_token_itr != m_end_token_pos;
@@ -122,7 +134,7 @@ void formula_interpreter::next()
 
 const formula_token_base& formula_interpreter::token() const
 {
-    return *m_cur_token_itr;
+    return *(*m_cur_token_itr);
 }
 
 const formula_token_base& formula_interpreter::next_token()

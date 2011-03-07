@@ -109,6 +109,7 @@ class opcode_token : public formula_token_base
 {
 public:
     explicit opcode_token(fopcode_t oc);
+    opcode_token(const opcode_token& r);
     virtual ~opcode_token();
 };
 
