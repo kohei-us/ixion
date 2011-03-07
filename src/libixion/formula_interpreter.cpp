@@ -67,23 +67,24 @@ formula_interpreter::~formula_interpreter()
 
 bool formula_interpreter::interpret()
 {
-    init_tokens();
-
-    if (m_tokens.empty())
-    {
-        cout << "interpreter error: no tokens to interpret" << endl;
-        return false;
-    }
-
-    m_cur_token_itr = m_tokens.begin();
-    m_error = fe_no_error;
-    m_result = 0.0;
-    m_outbuf.clear();
     string cell_name = global::get_cell_name(m_parent_cell);
-    m_outbuf << get_formula_result_output_separator() << endl;
-    m_outbuf << cell_name << ": ";
     try
     {
+        init_tokens();
+
+        if (m_tokens.empty())
+        {
+            cout << "interpreter error: no tokens to interpret" << endl;
+            return false;
+        }
+
+        m_cur_token_itr = m_tokens.begin();
+        m_error = fe_no_error;
+        m_result = 0.0;
+        m_outbuf.clear();
+        m_outbuf << get_formula_result_output_separator() << endl;
+        m_outbuf << cell_name << ": ";
+
         m_result = expression();
         m_outbuf << endl << cell_name << ": result = " << m_result << endl;
         cout << m_outbuf.str();
@@ -116,6 +117,7 @@ formula_error_t formula_interpreter::get_error() const
 
 void formula_interpreter::init_tokens()
 {
+    name_set used_names;
     m_tokens.clear();
     formula_tokens_t::const_iterator itr = m_original_tokens.begin(), itr_end = m_original_tokens.end();
     for (; itr != itr_end; ++itr)
@@ -126,7 +128,8 @@ void formula_interpreter::init_tokens()
         {
             // Named expression.  Expand it.
             const formula_cell* expr = m_context.get_named_expression(p->get_name());
-            expand_named_expression(p->get_name(), expr);
+            used_names.insert(p->get_name());
+            expand_named_expression(p->get_name(), expr, used_names);
         }
         else
             // Normal token.
@@ -136,7 +139,7 @@ void formula_interpreter::init_tokens()
 }
 
 void formula_interpreter::expand_named_expression(
-    const string& expr_name, const formula_cell* expr)
+    const string& expr_name, const formula_cell* expr, name_set& used_names)
 {
     if (!expr)
     {
@@ -144,6 +147,7 @@ void formula_interpreter::expand_named_expression(
         os << "unable to find named expression '" << expr_name << "'";
         throw invalid_expression(os.str());
     }
+
     const formula_tokens_t& expr_tokens = expr->get_tokens();
     m_tokens.push_back(&paren_open);
     formula_tokens_t::const_iterator itr = expr_tokens.begin(), itr_end = expr_tokens.end();
@@ -151,8 +155,15 @@ void formula_interpreter::expand_named_expression(
     {
         if (itr->get_opcode() == fop_named_expression)
         {
-            const formula_cell* expr = m_context.get_named_expression(itr->get_name());
-            expand_named_expression(itr->get_name(), expr);
+            string expr_name = itr->get_name();
+            if (used_names.count(expr_name) > 0)
+            {
+                // Circular reference detected.
+                throw invalid_expression("circular referencing of named expressions");
+            }
+            const formula_cell* expr = m_context.get_named_expression(expr_name);
+            used_names.insert(expr_name);
+            expand_named_expression(expr_name, expr, used_names);
         }
         else
             m_tokens.push_back(&(*itr));

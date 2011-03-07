@@ -30,6 +30,7 @@
 
 #include "global.hpp"
 #include "formula_tokens.hpp"
+#include "hash_container/set.hpp"
 
 #include <sstream>
 
@@ -42,6 +43,7 @@ class model_context;
 
 class formula_interpreter : public ::boost::noncopyable
 {
+    typedef _ixion_unordered_set_type< ::std::string> name_set;
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
@@ -59,7 +61,8 @@ private:
      */
     void init_tokens();
 
-    void expand_named_expression(const ::std::string& expr_name, const formula_cell* expr);
+    void expand_named_expression(
+        const ::std::string& expr_name, const formula_cell* expr, name_set& used_names);
 
     bool has_token() const;
     void next();
