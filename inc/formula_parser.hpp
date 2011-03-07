@@ -54,7 +54,7 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const ::std::string& name, const lexer_tokens_t& tokens, const model_context& cxt);
+    formula_parser(const lexer_tokens_t& tokens, const model_context& cxt);
     ~formula_parser();
 
     void parse();
@@ -69,7 +69,6 @@ private:
     void name(const lexer_token_base& t);
     void value(const lexer_token_base& t);
 
-    ::std::string           m_name;   // name of this expression.
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
     formula_tokens_t        m_formula_tokens;
     const model_context&    m_context;

@@ -28,6 +28,8 @@
 #include "model_context.hpp"
 #include "formula_name_resolver.hpp"
 
+using namespace std;
+
 namespace ixion {
 
 model_context::model_context() :
@@ -37,6 +39,23 @@ model_context::model_context() :
 const formula_name_resolver_base& model_context::get_name_resolver() const
 {
     return *mp_name_resolver;
+}
+
+void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)
+{
+    m_named_expressions.insert(name, cell);
+}
+
+formula_cell* model_context::get_named_expression(const string& name)
+{
+    named_expressions_t::iterator itr = m_named_expressions.find(name);
+    return itr == m_named_expressions.end() ? NULL : itr->second;
+}
+
+const formula_cell* model_context::get_named_expression(const string& name) const
+{
+    named_expressions_t::const_iterator itr = m_named_expressions.find(name);
+    return itr == m_named_expressions.end() ? NULL : itr->second;
 }
 
 model_context::~model_context()

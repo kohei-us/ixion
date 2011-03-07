@@ -28,10 +28,11 @@
 #ifndef __IXION_MODEL_CONTEXT_HPP__
 #define __IXION_MODEL_CONTEXT_HPP__
 
-#include <string>
-#include <boost/ptr_container/ptr_map.hpp>
-
 #include "cell.hpp"
+
+#include <string>
+#include <memory>
+#include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
 
@@ -43,12 +44,17 @@ class formula_name_resolver_base;
  */
 class model_context
 {
-    typedef ::boost::ptr_map< ::std::string, base_cell> named_expressions_t;
+    typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_t;
 public:
     model_context();
     ~model_context();
     
     const formula_name_resolver_base& get_name_resolver() const;
+
+    void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
+    formula_cell* get_named_expression(const ::std::string& name);
+    const formula_cell* get_named_expression(const ::std::string& name) const;
+
 private:
     formula_name_resolver_base* mp_name_resolver;
     named_expressions_t m_named_expressions;

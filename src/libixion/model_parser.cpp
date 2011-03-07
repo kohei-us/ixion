@@ -39,6 +39,7 @@
 #include <vector>
 #include <functional>
 #include <cstring>
+#include <memory>
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
@@ -47,7 +48,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_INPUT_PARSER 0
+#define DEBUG_INPUT_PARSER 1
 
 namespace ixion {
 
@@ -362,11 +363,12 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(model_cell.get_name(), model_cell.get_tokens(), context);
+        formula_parser fparser(model_cell.get_tokens(), context);
         fparser.parse();
         fparser.print_tokens();
-        base_cell* pcell = find_cell(formula_cells, name);
 
+#if 0 // Do I need this?
+        base_cell* pcell = find_cell(formula_cells, name);
         if (pcell && pcell->get_celltype() == celltype_formula)
         {
             // Go through all its references, and remove itself as a listener
@@ -378,7 +380,18 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
                      formula_cell_listener_handler(
                          fcell, formula_cell_listener_handler::mode_remove));
         }
+#endif
 
+#if 1
+        // Put the formula tokens into formula cell instance, and put the 
+        // formula cell into context.
+        auto_ptr<formula_cell> pcell(new formula_cell);
+        pcell->swap_tokens(fparser.get_tokens());
+        context.set_named_expression(name, pcell);
+        formula_cell* fcell = context.get_named_expression(name);
+        if (!fcell)
+            throw general_error("failed to insert a named expression");
+#else
         // Put the formula tokens into formula cell instance.
         cell_name_ptr_map_t::iterator itr = formula_cells.find(name);
         if (itr == formula_cells.end())
@@ -393,6 +406,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         // Transfer formula tokens from the parser to the cell.
         formula_cell* fcell = static_cast<formula_cell*>(itr->second);
         fcell->swap_tokens(fparser.get_tokens());
+#endif
 
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;

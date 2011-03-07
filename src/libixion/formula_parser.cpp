@@ -128,9 +128,7 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(
-    const string& name, const lexer_tokens_t& tokens, const model_context& cxt) :
-    m_name(name),
+formula_parser::formula_parser(const lexer_tokens_t& tokens, const model_context& cxt) :
     m_tokens(tokens),
     m_context(cxt)
 {

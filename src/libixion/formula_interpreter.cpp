@@ -29,6 +29,7 @@
 #include "cell.hpp"
 #include "global.hpp"
 #include "formula_functions.hpp"
+#include "model_context.hpp"
 
 #include <string>
 #include <iostream>
@@ -168,9 +169,25 @@ double formula_interpreter::expression()
 
 double formula_interpreter::named_expression()
 {
-    m_outbuf << token().get_name();
+    const string& expr_name = token().get_name();
+    m_outbuf << expr_name;
+    const formula_cell* expr = m_context.get_named_expression(expr_name);
+    if (!expr)
+    {
+        ostringstream os;
+        os << "unable to find named expression '" << expr_name << "'";
+        throw invalid_expression(os.str());
+    }
+    formula_interpreter fi(expr, m_context);
+    if (!fi.interpret())
+    {
+        ostringstream os;
+        os << "failed to interpret named expression '" << expr_name << "'";
+        throw invalid_expression(os.str());
+    }
+    double res = fi.get_result();
     next();
-    return 1;
+    return res;
 }
 
 double formula_interpreter::term()
