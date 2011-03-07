@@ -58,6 +58,17 @@ const formula_cell* model_context::get_named_expression(const string& name) cons
     return itr == m_named_expressions.end() ? NULL : itr->second;
 }
 
+const string* model_context::get_named_expression_name(const formula_cell* expr) const
+{
+    named_expressions_t::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->second == expr)
+            return &itr->first;
+    }
+    return NULL;
+}
+
 model_context::~model_context()
 {
     delete mp_name_resolver;

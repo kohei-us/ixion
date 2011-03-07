@@ -54,6 +54,7 @@ public:
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
     formula_cell* get_named_expression(const ::std::string& name);
     const formula_cell* get_named_expression(const ::std::string& name) const;
+    const ::std::string* get_named_expression_name(const formula_cell* expr) const;
 
 private:
     formula_name_resolver_base* mp_name_resolver;

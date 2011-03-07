@@ -67,7 +67,11 @@ formula_interpreter::~formula_interpreter()
 
 bool formula_interpreter::interpret()
 {
-    string cell_name = global::get_cell_name(m_parent_cell);
+    string cell_name("<unknown cell");
+    const string* p = m_context.get_named_expression_name(m_parent_cell);
+    if (p)
+        cell_name = *p;
+
     try
     {
         init_tokens();
