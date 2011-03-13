@@ -90,8 +90,11 @@ public:
                 os << ",";
                 break;
             case fop_single_ref:
-                os << "---";
-                break;
+            {
+                address_t addr = token.get_single_ref();
+                os << "(s=" << addr.sheet << ",r=" << addr.row << ",c=" << addr.column << ")";
+            }
+            break;
             case fop_named_expression:
                 os << token.get_name();
                 break;
