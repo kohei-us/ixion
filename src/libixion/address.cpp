@@ -27,6 +27,10 @@
 
 #include "address.hpp"
 
+#include <sstream>
+
+using namespace std;
+
 namespace ixion {
 
 address_t::address_t() : 
@@ -34,6 +38,23 @@ address_t::address_t() :
 
 address_t::address_t(const address_t& r) : 
     sheet(r.sheet), row(r.row), column(r.column) {}
+
+string address_t::get_name() const
+{
+    ostringstream os;
+    os << "(row=" << row << ",column=" << column << ")" << endl;
+    return os.str();
+}
+
+size_t address_t::hash::operator()(const address_t& addr) const
+{
+    return 0;
+}
+
+bool operator== (const address_t& left, const address_t& right)
+{
+    return left.sheet == right.sheet && left.row == right.row && left.column == right.column;
+}
 
 bool operator< (const address_t& left, const address_t& right)
 {

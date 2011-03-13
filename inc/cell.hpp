@@ -30,6 +30,7 @@
 
 #include "formula_tokens.hpp"
 #include "global.hpp"
+#include "address.hpp"
 #include "hash_container/set.hpp"
 
 #include <boost/thread/condition_variable.hpp>
@@ -54,7 +55,7 @@ enum celltype_t
 
 class base_cell
 {
-    typedef _ixion_unordered_set_type<formula_cell*> listeners_type;
+    typedef _ixion_unordered_set_type<address_t, address_t::hash> listeners_type;
 public:
     base_cell(celltype_t celltype);
     base_cell(const base_cell& r);
@@ -63,10 +64,10 @@ public:
     virtual double get_value() const = 0;
     virtual const char* print() const = 0;
 
-    void add_listener(formula_cell* p);
-    void remove_listener(formula_cell* p);
+    void add_listener(const address_t& addr);
+    void remove_listener(const address_t& addr);
     void print_listeners(const model_context& cxt) const;
-    void get_all_listeners(dirty_cells_t& cell) const;
+    void get_all_listeners(model_context& cxt, dirty_cells_t& cell) const;
 
     celltype_t get_celltype() const;
 

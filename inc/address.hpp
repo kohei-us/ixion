@@ -30,6 +30,8 @@
 
 #include "global.hpp"
 
+#include <string>
+
 namespace ixion {
 
 struct address_t
@@ -40,8 +42,16 @@ struct address_t
 
     address_t();
     address_t(const address_t& addr);
+
+    ::std::string get_name() const;
+
+    struct hash
+    {
+        size_t operator() (const address_t& addr) const;
+    };
 };
 
+bool operator==(const address_t& left, const address_t& right);
 bool operator<(const address_t& left, const address_t& right);
 
 }

@@ -134,11 +134,11 @@ public:
                 return;
 
             if (m_mode == mode_add)
-                cell->add_listener(mp_cell);
+                cell->add_listener(addr);
             else
             {
                 assert(m_mode == mode_remove);
-                cell->remove_listener(mp_cell);
+                cell->remove_listener(addr);
             }
         }
     }
@@ -448,7 +448,10 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         
         // Add this cell and all its listeners to the dirty cell list.
         _dirty_cells.insert(fcell);
-        fcell->get_all_listeners(_dirty_cells);
+
+        // TODO: We have to do this after all the formula cells have been 
+        // constructed.
+//      fcell->get_all_listeners(_dirty_cells);
     }
 
 #if DEBUG_INPUT_PARSER

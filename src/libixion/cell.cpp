@@ -85,37 +85,43 @@ base_cell::~base_cell()
 {
 }
 
-void base_cell::add_listener(formula_cell* p)
+void base_cell::add_listener(const address_t& addr)
 {
-    m_listeners.insert(p);
+    m_listeners.insert(addr);
 }
 
-void base_cell::remove_listener(formula_cell* p)
+void base_cell::remove_listener(const address_t& addr)
 {
-    m_listeners.erase(p);
+    m_listeners.erase(addr);
 }
 
 void base_cell::print_listeners(const model_context& cxt) const
 {
-    cout << "The following cells listen to cell " << global::get_cell_name(this) << endl;
-    _ixion_unordered_set_type<formula_cell*>::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
-    for (; itr != itr_end; ++itr)
-    {
-        cout << "  cell " << global::get_cell_name(*itr) << endl;
-    }
-}
-
-void base_cell::get_all_listeners(dirty_cells_t& cells) const
-{
+    cout << "The following cells listen to cell " << cxt.get_cell_name(this) << endl;
     listeners_type::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
     for (; itr != itr_end; ++itr)
     {
-        formula_cell* p = *itr;
-        if (cells.count(p) == 0)
+        cout << "  cell " << itr->get_name() << endl;
+    }
+}
+
+void base_cell::get_all_listeners(model_context& cxt, dirty_cells_t& cells) const
+{
+    listeners_type::iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
+    for (; itr != itr_end; ++itr)
+    {
+        base_cell* p = cxt.get_cell(*itr);
+        if (!p || p->get_celltype() != celltype_formula)
+            // Referenced cell is empty or not a formula cell.  Ignore this.
+            continue;
+
+        formula_cell* fcell = static_cast<formula_cell*>(p);
+
+        if (cells.count(fcell) == 0)
         {
             // This cell is not yet on the dirty cell list.  Run recursively.
-            cells.insert(p);
-            p->get_all_listeners(cells);
+            cells.insert(fcell);
+            p->get_all_listeners(cxt, cells);
         }
     }
 }
