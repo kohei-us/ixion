@@ -95,9 +95,9 @@ fopcode_t formula_token_base::get_opcode() const
     return m_opcode;
 }
 
-base_cell* formula_token_base::get_single_ref() const
+address_t formula_token_base::get_single_ref() const
 {
-    return NULL;
+    return address_t();
 }
 
 double formula_token_base::get_value() const
@@ -150,15 +150,15 @@ double value_token::get_value() const
 
 // ============================================================================
 
-single_ref_token::single_ref_token(base_cell* pcell) :
+single_ref_token::single_ref_token(const address_t& addr) :
     formula_token_base(fop_single_ref),
-    mp_cell(pcell)
+    m_address(addr)
 {
 }
 
 single_ref_token::single_ref_token(const single_ref_token& r) :
     formula_token_base(r),
-    mp_cell(r.mp_cell)
+    m_address(r.m_address)
 {
 }
 
@@ -166,9 +166,9 @@ single_ref_token::~single_ref_token()
 {
 }
 
-base_cell* single_ref_token::get_single_ref() const
+address_t single_ref_token::get_single_ref() const
 {
-    return mp_cell;
+    return m_address;
 }
 
 // ============================================================================

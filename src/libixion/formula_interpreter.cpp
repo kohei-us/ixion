@@ -332,14 +332,18 @@ double formula_interpreter::paren()
 
 double formula_interpreter::variable()
 {
-    const base_cell* pref = token().get_single_ref();
+    address_t addr = token().get_single_ref();
+    const base_cell* pref = m_context.get_cell(addr);
+
     if (pref == m_parent_cell)
     {
         // self-referencing is not permitted.
         throw formula_error(fe_ref_result_not_available);
     }
 
-    double val = pref->get_value();
+    double val = 0.0;
+    if (pref)
+        val = pref->get_value();
     m_outbuf << global::get_cell_name(pref);
     next();
     return val;

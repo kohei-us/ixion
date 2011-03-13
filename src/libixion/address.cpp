@@ -25,47 +25,14 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_MODEL_CONTEXT_HPP__
-#define __IXION_MODEL_CONTEXT_HPP__
-
-#include "cell.hpp"
-
-#include <string>
-#include <memory>
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/noncopyable.hpp>
+#include "address.hpp"
 
 namespace ixion {
 
-class formula_name_resolver_base;
+address_t::address_t() : 
+    sheet(0), row(0), column(0) {}
 
-/**
- * This class stores all data relevant to current session.  You can think of 
- * this like a document model for each formula calculation run.
- */
-class model_context : public ::boost::noncopyable
-{
-    typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_t;
-public:
-    model_context();
-    ~model_context();
-    
-    const formula_name_resolver_base& get_name_resolver() const;
-
-    void set_cell(const address_t& addr, ::std::auto_ptr<base_cell>& cell);
-    const base_cell* get_cell(const address_t& addr) const;
-    base_cell* get_cell(const address_t& addr);
-
-    void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
-    formula_cell* get_named_expression(const ::std::string& name);
-    const formula_cell* get_named_expression(const ::std::string& name) const;
-    const ::std::string* get_named_expression_name(const formula_cell* expr) const;
-
-private:
-    formula_name_resolver_base* mp_name_resolver;
-    named_expressions_t m_named_expressions;
-};
+address_t::address_t(const address_t& r) : 
+    sheet(r.sheet), row(r.row), column(r.column) {}
 
 }
-
-#endif

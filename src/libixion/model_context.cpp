@@ -33,12 +33,26 @@ using namespace std;
 namespace ixion {
 
 model_context::model_context() :
-    mp_name_resolver(new formula_name_resolver_simple)
+    mp_name_resolver(new formula_name_resolver_a1)
 {}
 
 const formula_name_resolver_base& model_context::get_name_resolver() const
 {
     return *mp_name_resolver;
+}
+
+void model_context::set_cell(const address_t& addr, auto_ptr<base_cell>& cell)
+{
+}
+
+const base_cell* model_context::get_cell(const address_t& addr) const
+{
+    return NULL;
+}
+
+base_cell* model_context::get_cell(const address_t& addr)
+{
+    return NULL;
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)

@@ -75,12 +75,16 @@ struct cell_reset_handler : public unary_function<base_cell*, void>
     }
 };
 
-struct circular_check_handler : public unary_function<base_cell*, void>
+class circular_check_handler : public unary_function<base_cell*, void>
 {
+    const model_context& m_context;
+public:
+    circular_check_handler(const model_context& cxt) : m_context(cxt) {}
+
     void operator() (base_cell* p) const
     {
         assert(p->get_celltype() == celltype_formula);
-        static_cast<formula_cell*>(p)->check_circular();
+        static_cast<formula_cell*>(p)->check_circular(m_context);
     }
 };
 
@@ -156,7 +160,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
 #if DEBUG_DEPENDS_TRACKER
     cout << "Check circular dependencies --------------------------------" << endl;
 #endif
-    for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler());
+    for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler(m_context));
 
     if (thread_count > 0)
     {

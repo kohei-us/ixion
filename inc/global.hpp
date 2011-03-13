@@ -36,6 +36,10 @@
 
 namespace ixion {
 
+typedef int col_t;
+typedef int row_t;
+typedef int sheet_t;
+
 class base_cell;
 class formula_cell;
 

@@ -28,6 +28,7 @@
 #include "cell.hpp"
 #include "formula_interpreter.hpp"
 #include "formula_result.hpp"
+#include "model_context.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -69,18 +70,6 @@ private:
 };
 
 }
-
-// ============================================================================
-
-address::address()
-{
-}
-
-address::~address()
-{
-}
-
-// ============================================================================
 
 base_cell::base_cell(celltype_t celltype) :
     m_celltype(celltype)
@@ -280,7 +269,7 @@ bool formula_cell::is_circular_safe() const
     return m_circular_safe;
 }
 
-void formula_cell::check_circular()
+void formula_cell::check_circular(const model_context& cxt)
 {
     // TODO: Check to make sure this is being run on the main thread only.
 
@@ -291,7 +280,12 @@ void formula_cell::check_circular()
         if (op != fop_single_ref)
             continue;
 
-        const base_cell* ref = itr->get_single_ref();
+        address_t addr = itr->get_single_ref();
+        const base_cell* ref = cxt.get_cell(addr);
+
+        if (!ref)
+            continue;
+
         if (ref->get_celltype() != celltype_formula)
             continue;
 

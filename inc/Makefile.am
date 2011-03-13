@@ -1,5 +1,7 @@
 libixiondir = $(includedir)/libixion-@IXION_API_VERSION@/ixion
-libixion_HEADERS = cell.hpp \
+libixion_HEADERS = \
+	address.hpp \
+	cell.hpp \
 	cell_queue_manager.hpp \
 	depends_tracker.hpp \
 	depth_first_search.hpp \

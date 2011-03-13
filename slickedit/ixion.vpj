@@ -221,6 +221,7 @@
 				<F N="../inc/hash_container/map.hpp"/>
 				<F N="../inc/hash_container/set.hpp"/>
 			</Folder>
+			<F N="../inc/address.hpp"/>
 			<F N="../inc/cell.hpp"/>
 			<F N="../inc/cell_queue_manager.hpp"/>
 			<F N="../inc/depends_tracker.hpp"/>
@@ -245,6 +246,7 @@
 		</Folder>
 		<Folder Name="../src">
 			<Folder Name="libixion">
+				<F N="../src/libixion/address.cpp"/>
 				<F N="../src/libixion/cell.cpp"/>
 				<F N="../src/libixion/cell_queue_manager.cpp"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>

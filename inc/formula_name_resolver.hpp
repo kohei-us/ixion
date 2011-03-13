@@ -31,6 +31,7 @@
 #include <string>
 
 #include "formula_functions.hpp"
+#include "address.hpp"
 
 namespace ixion {
 
@@ -44,8 +45,15 @@ struct formula_name_type
         invalid
     };
 
+    struct address_type {
+        sheet_t sheet;
+        row_t row;
+        col_t col;
+    };
+
     name_type type;
     union {
+        address_type address;
         formula_function_t func_oc; // function opcode
     };
 

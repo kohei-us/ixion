@@ -1,7 +1,9 @@
 INCLUDES = -I$(top_srcdir)/inc
 
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
-libixion_@IXION_API_VERSION@_la_SOURCES = cell.cpp \
+libixion_@IXION_API_VERSION@_la_SOURCES = \
+	address.cpp \
+	cell.cpp \
 	cell_queue_manager.cpp \
 	depends_tracker.cpp \
 	formula_functions.cpp \

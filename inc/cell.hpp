@@ -43,18 +43,6 @@ class formula_result;
 class formula_cell;
 class model_context;
 
-// ============================================================================
-
-class address
-{
-public:
-    address();
-    ~address();
-private:
-};
-
-// ============================================================================
-
 enum celltype_t
 {
     celltype_string,
@@ -142,7 +130,7 @@ public:
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
      */
-    void check_circular();
+    void check_circular(const model_context& cxt);
 
     /**
      * Reset cell's internal state. 

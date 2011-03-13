@@ -237,6 +237,13 @@ void formula_parser::name(const lexer_token_base& t)
     formula_name_type fn = m_context.get_name_resolver().resolve(name);
     switch (fn.type)
     {
+        case formula_name_type::cell_reference:
+#if DEBUG_PARSER
+            cout << "'" << name << "' is a cell reference (sheet=" << 
+                fn.address.sheet << ",row=" << fn.address.row << ",col=" << fn.address.col << ")" << endl;
+#endif
+            
+        break;
         case formula_name_type::function:
 #if DEBUG_PARSER
             cout << "'" << name << "' is a built-in function." << endl;

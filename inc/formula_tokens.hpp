@@ -31,10 +31,11 @@
 #include <string>
 #include <boost/ptr_container/ptr_vector.hpp>
 
+#include "address.hpp"
+
 namespace ixion {
 
 class formula_token_base;
-class base_cell;
 
 typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
 
@@ -89,7 +90,7 @@ public:
 
     fopcode_t get_opcode() const;
 
-    virtual base_cell* get_single_ref() const;
+    virtual address_t get_single_ref() const;
     virtual double get_value() const;
     virtual size_t get_index() const;
     virtual std::string get_name() const;
@@ -151,14 +152,14 @@ private:
 class single_ref_token : public formula_token_base
 {
 public:
-    single_ref_token(base_cell* p_cell);
+    single_ref_token(const address_t& addr);
     single_ref_token(const single_ref_token& r);
     virtual ~single_ref_token();
 
-    virtual base_cell* get_single_ref() const;
+    virtual address_t get_single_ref() const;
 
 private:
-    base_cell* mp_cell; // referenced cell, pointer only.
+    address_t m_address;
 };
 
 // ============================================================================

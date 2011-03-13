@@ -76,19 +76,22 @@ private:
 class ref_cell_picker : public unary_function<formula_token_base*, void>
 {
 public:
-    ref_cell_picker(vector<base_cell*>& deps) :
-        m_deps(deps) {}
+    ref_cell_picker(const model_context& cxt, vector<base_cell*>& deps) :
+        m_context(cxt), m_deps(deps) {}
 
     void operator() (formula_token_base* p)
     {
         if (p->get_opcode() != fop_single_ref)
             return;
 
-        const base_cell* refcell = static_cast<single_ref_token*>(p)->get_single_ref();
-        m_deps.push_back(const_cast<base_cell*>(refcell));
+        const base_cell* refcell = NULL;
+        address_t addr = static_cast<single_ref_token*>(p)->get_single_ref();
+        if (refcell)
+            m_deps.push_back(const_cast<base_cell*>(refcell));
     }
 
 private:
+    const model_context& m_context;
     vector<base_cell*>& m_deps;
 };
 
@@ -116,14 +119,15 @@ class formula_cell_listener_handler : public unary_function<formula_token_base*,
 public:
     enum mode_t { mode_add, mode_remove };
 
-    explicit formula_cell_listener_handler(formula_cell* p, mode_t mode) : 
-        mp_cell(p), m_mode(mode) {}
+    explicit formula_cell_listener_handler(model_context& cxt, formula_cell* p, mode_t mode) : 
+        m_context(cxt), mp_cell(p), m_mode(mode) {}
 
     void operator() (formula_token_base* p) const
     {
         if (p->get_opcode() == fop_single_ref)
         {
-            base_cell* cell = p->get_single_ref();
+            address_t addr = p->get_single_ref();
+            base_cell* cell = m_context.get_cell(addr);
             if (!cell)
                 return;
 
@@ -138,6 +142,7 @@ public:
     }
 
 private:
+    model_context& m_context;
     formula_cell* mp_cell;
     mode_t m_mode;
 };
@@ -179,8 +184,8 @@ private:
 class cell_dependency_handler : public unary_function<base_cell*, void>
 {
 public:
-    explicit cell_dependency_handler(dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
-        m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
+    explicit cell_dependency_handler(const model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
+        m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
 
     void operator() (base_cell* pcell)
     {
@@ -196,7 +201,7 @@ public:
         // probably combine this with the above get_ref_tokens() call above
         // for efficiency.
         vector<base_cell*> deps;
-        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(deps));
+        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, deps));
 
         // Register dependency information.  Only dirty cells should be
         // registered as precedent cells since non-dirty cells are equivalent
@@ -205,6 +210,7 @@ public:
     }
 
 private:
+    const model_context& m_context;
     dependency_tracker& m_dep_tracker;
     dirty_cells_t& m_dirty_cells;
 };
@@ -373,7 +379,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
             vector<formula_token_base*> ref_tokens;
             fcell->get_ref_tokens(ref_tokens);
             for_each(ref_tokens.begin(), ref_tokens.end(), 
-                     formula_cell_listener_handler(
+                     formula_cell_listener_handler(context,
                          fcell, formula_cell_listener_handler::mode_remove));
         }
 #endif
@@ -408,7 +414,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
         for_each(ref_tokens.begin(), ref_tokens.end(), 
-                 formula_cell_listener_handler(
+                 formula_cell_listener_handler(context,
                      fcell, formula_cell_listener_handler::mode_add));
         
         // Add this cell and all its listeners to the dirty cell list.
@@ -417,6 +423,8 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     }
 
 #if DEBUG_INPUT_PARSER
+
+#if 0 // TODO: Replace this with one that uses the context object.
     cout << get_formula_result_output_separator() << endl;
     cell_ptr_name_map_t cell_names;
     global::build_ptr_name_map(formula_cells, cell_names);
@@ -427,6 +435,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         const base_cell* p = itr->second;
         p->print_listeners();
     }
+#endif
 
     cout << get_formula_result_output_separator() << endl;
     cout << "All dirty cells: " << endl;
@@ -610,7 +619,7 @@ void model_parser::calc(dirty_cells_t& cells)
     // Now, register the dependency info on each dirty cell, and interpret all
     // dirty cells.
     dependency_tracker deptracker(&dirty_cell_names, m_context);
-    for_each(cells.begin(), cells.end(), cell_dependency_handler(deptracker, cells));
+    for_each(cells.begin(), cells.end(), cell_dependency_handler(m_context, deptracker, cells));
     deptracker.interpret_all_cells(m_thread_count);
 }
 
