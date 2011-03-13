@@ -53,6 +53,7 @@ public:
     const formula_name_resolver_base& get_name_resolver() const;
 
     void set_cell(const address_t& addr, ::std::auto_ptr<base_cell>& cell);
+    void set_cell(const address_t& addr, base_cell* cell);
     const base_cell* get_cell(const address_t& addr) const;
     base_cell* get_cell(const address_t& addr);
 

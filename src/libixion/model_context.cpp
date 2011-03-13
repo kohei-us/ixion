@@ -45,6 +45,11 @@ void model_context::set_cell(const address_t& addr, auto_ptr<base_cell>& cell)
 {
 }
 
+void model_context::set_cell(const address_t& addr, base_cell* cell)
+{
+    delete cell;
+}
+
 const base_cell* model_context::get_cell(const address_t& addr) const
 {
     return NULL;

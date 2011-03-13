@@ -31,6 +31,7 @@
 #include "formula_parser.hpp"
 #include "depends_tracker.hpp"
 #include "formula_interpreter.hpp"
+#include "formula_name_resolver.hpp"
 #include "formula_result.hpp"
 #include "mem_str_buf.hpp"
 
@@ -39,6 +40,7 @@
 #include <vector>
 #include <functional>
 #include <cstring>
+#include <cassert>
 #include <memory>
 
 #include <boost/ptr_container/ptr_map.hpp>
@@ -389,10 +391,37 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         // formula cell into context.
         auto_ptr<formula_cell> pcell(new formula_cell);
         pcell->swap_tokens(fparser.get_tokens());
-        context.set_named_expression(name, pcell);
-        formula_cell* fcell = context.get_named_expression(name);
-        if (!fcell)
-            throw general_error("failed to insert a named expression");
+        formula_cell* fcell = NULL;
+        formula_name_type name_type = context.get_name_resolver().resolve(name);
+        switch (name_type.type)
+        {
+            case formula_name_type::named_expression:
+                context.set_named_expression(name, pcell);
+                fcell = context.get_named_expression(name);
+                if (!fcell)
+                    throw general_error("failed to insert a named expression");
+            break;
+            case formula_name_type::cell_reference:
+            {
+                address_t addr;
+                addr.sheet = name_type.address.sheet;
+                addr.row = name_type.address.row;
+                addr.column = name_type.address.col;
+                context.set_cell(addr, pcell.release());
+
+                base_cell* p = context.get_cell(addr);
+                if (!p || p->get_celltype() != celltype_formula)
+                    throw general_error("failed to retrieve the cell instance just inserted.");
+
+                fcell = static_cast<formula_cell*>(p);
+            }
+            break;
+            default:
+                throw general_error("unknown name type.");
+        }
+
+        assert(fcell);
+
 #else
         // Put the formula tokens into formula cell instance.
         cell_name_ptr_map_t::iterator itr = formula_cells.find(name);
