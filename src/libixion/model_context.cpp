@@ -43,21 +43,25 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
 
 void model_context::set_cell(const address_t& addr, auto_ptr<base_cell>& cell)
 {
+    m_cells.insert(addr, cell);
 }
 
 void model_context::set_cell(const address_t& addr, base_cell* cell)
 {
-    delete cell;
+    auto_ptr<base_cell> p(cell);
+    set_cell(addr, p);
 }
 
 const base_cell* model_context::get_cell(const address_t& addr) const
 {
-    return NULL;
+    cell_store_type::const_iterator itr = m_cells.find(addr);
+    return itr == m_cells.end() ? NULL : itr->second;
 }
 
 base_cell* model_context::get_cell(const address_t& addr)
 {
-    return NULL;
+    cell_store_type::iterator itr = m_cells.find(addr);
+    return itr == m_cells.end() ? NULL : itr->second;
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)

@@ -38,6 +38,7 @@
 namespace ixion {
 
 class formula_name_resolver_base;
+struct address_t;
 
 /**
  * This class stores all data relevant to current session.  You can think of 
@@ -46,6 +47,7 @@ class formula_name_resolver_base;
 class model_context : public ::boost::noncopyable
 {
     typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_type;
+    typedef ::boost::ptr_map<address_t, base_cell> cell_store_type;
 public:
     model_context();
     ~model_context();
@@ -65,6 +67,7 @@ public:
 private:
     formula_name_resolver_base* mp_name_resolver;
     named_expressions_type m_named_expressions;
+    cell_store_type m_cells;
 };
 
 }

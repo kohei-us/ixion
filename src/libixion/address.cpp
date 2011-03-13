@@ -35,4 +35,16 @@ address_t::address_t() :
 address_t::address_t(const address_t& r) : 
     sheet(r.sheet), row(r.row), column(r.column) {}
 
+bool operator< (const address_t& left, const address_t& right)
+{
+    if (left.sheet != right.sheet)
+        return left.sheet < right.sheet;
+
+    if (left.row != right.row)
+        return left.row < right.row;
+
+    return left.column < right.column;
+}
+
+
 }

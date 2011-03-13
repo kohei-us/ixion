@@ -42,6 +42,8 @@ struct address_t
     address_t(const address_t& addr);
 };
 
+bool operator<(const address_t& left, const address_t& right);
+
 }
 
 #endif
