@@ -357,6 +357,7 @@ void ensure_unique_names(const vector<string>& cell_names)
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, cell_name_ptr_map_t& formula_cells, dirty_cells_t& dirty_cells)
 {
     dirty_cells_t _dirty_cells;
+    vector<formula_cell*> fcells;
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
@@ -386,7 +387,6 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         }
 #endif
 
-#if 1
         // Put the formula tokens into formula cell instance, and put the 
         // formula cell into context.
         auto_ptr<formula_cell> pcell(new formula_cell);
@@ -414,30 +414,18 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
                     throw general_error("failed to retrieve the cell instance just inserted.");
 
                 fcell = static_cast<formula_cell*>(p);
+                fcells.push_back(fcell);
             }
             break;
             default:
                 throw general_error("unknown name type.");
         }
+    }
 
-        assert(fcell);
-
-#else
-        // Put the formula tokens into formula cell instance.
-        cell_name_ptr_map_t::iterator itr = formula_cells.find(name);
-        if (itr == formula_cells.end())
-        {
-            // Insert a new formula cell instance.
-            ptr_map_insert<formula_cell>(formula_cells)(name);
-            itr = formula_cells.find(name);
-            if (itr == formula_cells.end())
-                throw general_error("inserted formula cell instance not found");
-        }
-
-        // Transfer formula tokens from the parser to the cell.
-        formula_cell* fcell = static_cast<formula_cell*>(itr->second);
-        fcell->swap_tokens(fparser.get_tokens());
-#endif
+    vector<formula_cell*>::iterator itr_fcell = fcells.begin(), itr_fcell_end = fcells.end();
+    for (; itr_fcell != itr_fcell_end; ++itr_fcell)
+    {
+        formula_cell* fcell = *itr_fcell;
 
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;
@@ -449,10 +437,9 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         // Add this cell and all its listeners to the dirty cell list.
         _dirty_cells.insert(fcell);
 
-        // TODO: We have to do this after all the formula cells have been 
-        // constructed.
-//      fcell->get_all_listeners(_dirty_cells);
+        fcell->get_all_listeners(context, _dirty_cells);
     }
+
 
 #if DEBUG_INPUT_PARSER
 
