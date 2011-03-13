@@ -190,6 +190,7 @@ void formula_parser::print_tokens() const
 #if DEBUG_PARSER
     cout << "formula tokens:";
     for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer());
+    cout << " (" << m_formula_tokens.size() << ")";
     cout << endl;
 #endif
 }
@@ -242,7 +243,8 @@ void formula_parser::name(const lexer_token_base& t)
             cout << "'" << name << "' is a cell reference (sheet=" << 
                 fn.address.sheet << ",row=" << fn.address.row << ",col=" << fn.address.col << ")" << endl;
 #endif
-            
+            m_formula_tokens.push_back(
+                new single_ref_token(address_t(fn.address.sheet, fn.address.row, fn.address.col)));
         break;
         case formula_name_type::function:
 #if DEBUG_PARSER

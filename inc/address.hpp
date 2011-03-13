@@ -41,6 +41,7 @@ struct address_t
     col_t column;
 
     address_t();
+    address_t(sheet_t _sheet, row_t _row, col_t _column);
     address_t(const address_t& addr);
 
     ::std::string get_name() const;

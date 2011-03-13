@@ -36,6 +36,9 @@ namespace ixion {
 address_t::address_t() : 
     sheet(0), row(0), column(0) {}
 
+address_t::address_t(sheet_t _sheet, row_t _row, col_t _column) : 
+    sheet(_sheet), row(_row), column(_column) {}
+
 address_t::address_t(const address_t& r) : 
     sheet(r.sheet), row(r.row), column(r.column) {}
 
