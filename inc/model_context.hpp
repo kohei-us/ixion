@@ -45,7 +45,7 @@ class formula_name_resolver_base;
  */
 class model_context : public ::boost::noncopyable
 {
-    typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_t;
+    typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_type;
 public:
     model_context();
     ~model_context();
@@ -64,7 +64,7 @@ public:
 
 private:
     formula_name_resolver_base* mp_name_resolver;
-    named_expressions_t m_named_expressions;
+    named_expressions_type m_named_expressions;
 };
 
 }

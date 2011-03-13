@@ -67,19 +67,19 @@ void model_context::set_named_expression(const string& name, auto_ptr<formula_ce
 
 formula_cell* model_context::get_named_expression(const string& name)
 {
-    named_expressions_t::iterator itr = m_named_expressions.find(name);
+    named_expressions_type::iterator itr = m_named_expressions.find(name);
     return itr == m_named_expressions.end() ? NULL : itr->second;
 }
 
 const formula_cell* model_context::get_named_expression(const string& name) const
 {
-    named_expressions_t::const_iterator itr = m_named_expressions.find(name);
+    named_expressions_type::const_iterator itr = m_named_expressions.find(name);
     return itr == m_named_expressions.end() ? NULL : itr->second;
 }
 
 const string* model_context::get_named_expression_name(const formula_cell* expr) const
 {
-    named_expressions_t::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
+    named_expressions_type::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
     for (; itr != itr_end; ++itr)
     {
         if (itr->second == expr)
