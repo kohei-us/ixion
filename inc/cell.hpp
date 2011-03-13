@@ -65,7 +65,7 @@ public:
 
     void add_listener(formula_cell* p);
     void remove_listener(formula_cell* p);
-    void print_listeners() const;
+    void print_listeners(const model_context& cxt) const;
     void get_all_listeners(dirty_cells_t& cell) const;
 
     celltype_t get_celltype() const;

@@ -64,6 +64,11 @@ base_cell* model_context::get_cell(const address_t& addr)
     return itr == m_cells.end() ? NULL : itr->second;
 }
 
+string model_context::get_cell_name(const base_cell* p) const
+{
+    return string("<unknown cell>");
+}
+
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)
 {
     m_named_expressions.insert(name, cell);

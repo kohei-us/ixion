@@ -453,18 +453,13 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
 #if DEBUG_INPUT_PARSER
 
-#if 0 // TODO: Replace this with one that uses the context object.
     cout << get_formula_result_output_separator() << endl;
-    cell_ptr_name_map_t cell_names;
-    global::build_ptr_name_map(formula_cells, cell_names);
-    global::set_cell_name_map(&cell_names);
     cell_name_ptr_map_t::const_iterator itr = formula_cells.begin(), itr_end = formula_cells.end();
     for (; itr != itr_end; ++itr)
     {
         const base_cell* p = itr->second;
-        p->print_listeners();
+        p->print_listeners(context);
     }
-#endif
 
     cout << get_formula_result_output_separator() << endl;
     cout << "All dirty cells: " << endl;

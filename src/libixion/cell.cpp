@@ -95,7 +95,7 @@ void base_cell::remove_listener(formula_cell* p)
     m_listeners.erase(p);
 }
 
-void base_cell::print_listeners() const
+void base_cell::print_listeners(const model_context& cxt) const
 {
     cout << "The following cells listen to cell " << global::get_cell_name(this) << endl;
     _ixion_unordered_set_type<formula_cell*>::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
