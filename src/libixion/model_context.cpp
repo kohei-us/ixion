@@ -66,7 +66,19 @@ base_cell* model_context::get_cell(const address_t& addr)
 
 string model_context::get_cell_name(const base_cell* p) const
 {
-    return string("<unknown cell>");
+    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->second == p)
+        {
+            // TODO: Replace this with proper name according to current naming
+            // convention (such as A1, R1C1 etc).
+            return itr->first.get_name();
+        }
+    }
+
+    // Cell not found.  Return an empty string.
+    return string();
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)

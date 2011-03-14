@@ -134,7 +134,9 @@ public:
                 return;
 
             if (m_mode == mode_add)
+            {
                 cell->add_listener(addr);
+            }
             else
             {
                 assert(m_mode == mode_remove);
@@ -160,10 +162,9 @@ public:
         string name = "<unknown>";
         if (p->get_celltype() == celltype_formula)
         {
-            const string* expr_name = m_context.get_named_expression_name(
-                static_cast<const formula_cell*>(p));
-            if (expr_name)
-                name = *expr_name;
+            string expr_name = m_context.get_cell_name(p);
+            if (!expr_name.empty())
+                name = expr_name;
         }
         cout << "  cell " << name << endl;
     }
@@ -426,7 +427,9 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     for (; itr_fcell != itr_fcell_end; ++itr_fcell)
     {
         formula_cell* fcell = *itr_fcell;
-
+#if DEBUG_INPUT_PARSER
+        cout << "processing formula cell at " << context.get_cell_name(fcell) << endl;
+#endif
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
@@ -440,9 +443,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         fcell->get_all_listeners(context, _dirty_cells);
     }
 
-
 #if DEBUG_INPUT_PARSER
-
     cout << get_formula_result_output_separator() << endl;
     cell_name_ptr_map_t::const_iterator itr = formula_cells.begin(), itr_end = formula_cells.end();
     for (; itr != itr_end; ++itr)

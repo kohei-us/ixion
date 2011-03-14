@@ -45,7 +45,7 @@ address_t::address_t(const address_t& r) :
 string address_t::get_name() const
 {
     ostringstream os;
-    os << "(row=" << row << ",column=" << column << ")" << endl;
+    os << "(row=" << row << ",column=" << column << ")";
     return os.str();
 }
 
