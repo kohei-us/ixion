@@ -69,20 +69,22 @@ enum resolver_parse_mode {
 void append_column_name_a1(ostringstream& os, col_t col)
 {
     const col_t div = 26;
+    string col_name;
     while (true)
     {
-        if (col < div)
-        {
-            char c = 'A' + col;
-            os << c;
-            break;
-        }
-
         col_t rem = col % div;
         char c = 'A' + rem;
-        os << c;
+        col_name.push_back(c);
+        if (col < div)
+            break;
+
+        col -= rem;
         col /= div;
+        col -= 1;
     }
+
+    reverse(col_name.begin(), col_name.end());
+    os << col_name;
 }
 
 }

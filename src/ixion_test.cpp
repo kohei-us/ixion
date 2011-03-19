@@ -38,19 +38,29 @@ using namespace ixion;
 void test_name_resolver()
 {
     cout << "test name resolver" << endl;
+
     formula_name_resolver_a1 resolver;
-    string name_a1("AA23");
-    cout << name_a1 << endl;
-    formula_name_type res = resolver.resolve(name_a1);
-    assert(res.type == formula_name_type::cell_reference);
-    address_t addr;
-    addr.sheet = res.address.sheet;
-    addr.row = res.address.row;
-    addr.column = res.address.col;
-    cout << addr.get_name() << endl;
-    string test_name = resolver.get_name(addr);
-    cout << test_name << endl;
-    assert(name_a1 == test_name);
+
+    const char* names[] = {
+        "AA23", "AB23", "BA1", "AAA2", "BAA1", 0
+    };
+
+    for (size_t i = 0; names[i]; ++i)
+    {
+        const char* p = names[i];
+        string name_a1(p);
+        cout << name_a1 << endl;
+        formula_name_type res = resolver.resolve(name_a1);
+        assert(res.type == formula_name_type::cell_reference);
+        address_t addr;
+        addr.sheet = res.address.sheet;
+        addr.row = res.address.row;
+        addr.column = res.address.col;
+        cout << addr.get_name() << endl;
+        string test_name = resolver.get_name(addr);
+        cout << test_name << endl;
+        assert(name_a1 == test_name);
+    }
 }
 
 int main()
