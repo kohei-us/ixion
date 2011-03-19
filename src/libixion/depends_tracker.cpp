@@ -48,19 +48,15 @@ namespace {
 class cell_printer : public unary_function<const base_cell*, void>
 {
 public:
-    cell_printer(const cell_ptr_name_map_t* names) : mp_names(names) {}
+    cell_printer(const model_context& cxt) : m_cxt(cxt) {}
 
     void operator() (const base_cell* p) const
     {
-        cell_ptr_name_map_t::const_iterator itr = mp_names->find(p);
-        if (itr == mp_names->end())
-            cout << "  unknown cell (" << p << ")" << endl;
-        else
-            cout << "  " << itr->second << endl;
+        cout << "  " << m_cxt.get_cell_name(p) << endl;
     }
 
 private:
-    const cell_ptr_name_map_t* mp_names;
+    const model_context& m_cxt;
 };
 
 /**
@@ -150,7 +146,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
 
 #if DEBUG_DEPENDS_TRACKER
     cout << "Topologically sorted cells ---------------------------------" << endl;
-    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(mp_names));
+    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(m_context));
 #endif
 
     // Reset cell status.
