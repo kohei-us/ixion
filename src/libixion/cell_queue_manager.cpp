@@ -340,9 +340,9 @@ void manage_queue_main(size_t worker_count, const model_context* context)
 void add_cell_to_queue(formula_cell* p)
 {
 #if DEBUG_QUEUE_MANAGER
-    ostringstream os;
-    os << "adding cell " << global::get_cell_name(p) << " to queue..." << endl;
-    cout << os.str();
+//  ostringstream os;
+//  os << "adding cell " << global::get_cell_name(p) << " to queue..." << endl;
+//  cout << os.str();
 #endif
 
     ::boost::mutex::scoped_lock lock(data.mtx_queue);

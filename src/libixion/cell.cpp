@@ -232,13 +232,13 @@ void formula_cell::interpret(const model_context& context)
 #if DEBUG_FORMULA_CELL
     ostringstream os;
     os << get_formula_result_output_separator() << endl;
-    os << global::get_cell_name(this) << ": interpreting" << endl;
+    os << context.get_cell_name(this) << ": interpreting" << endl;
     cout << os.str();
 #endif
     {
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
 
-        string cell_name = global::get_cell_name(this);
+        string cell_name = context.get_cell_name(this);
     
         if (m_interpret_status.result)
         {
@@ -300,7 +300,7 @@ void formula_cell::check_circular(const model_context& cxt)
             // Circular dependency detected !!
 #if DEBUG_FORMULA_CELL
             ostringstream os;
-            os << global::get_cell_name(this) << ": ";
+            os << cxt.get_cell_name(this) << ": ";
             os << "circular dependency detected !!" << endl;
             cout << os.str();
 #endif
@@ -316,11 +316,6 @@ void formula_cell::check_circular(const model_context& cxt)
 
 void formula_cell::reset()
 {
-#if DEBUG_FORMULA_CELL
-    ostringstream os;
-    os << global::get_cell_name(this) << ": reset" << endl;
-    cout << os.str();
-#endif
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
@@ -349,10 +344,10 @@ void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock
     while (!m_interpret_status.result)
     {
 #if DEBUG_FORMULA_CELL
-        ostringstream os;
-        os << global::get_cell_name(this) << ": ";
-        os << "waiting" << endl;
-        cout << os.str();
+//      ostringstream os;
+//      os << global::get_cell_name(this) << ": ";
+//      os << "waiting" << endl;
+//      cout << os.str();
 #endif
         m_interpret_status.cond.wait(lock);
     }

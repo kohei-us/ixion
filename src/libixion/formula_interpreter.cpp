@@ -344,7 +344,7 @@ double formula_interpreter::variable()
     double val = 0.0;
     if (pref)
         val = pref->get_value();
-    m_outbuf << global::get_cell_name(pref);
+    m_outbuf << m_context.get_cell_name(pref);
     next();
     return val;
 }
