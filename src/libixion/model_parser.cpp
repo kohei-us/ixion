@@ -121,8 +121,8 @@ class formula_cell_listener_handler : public unary_function<formula_token_base*,
 public:
     enum mode_t { mode_add, mode_remove };
 
-    explicit formula_cell_listener_handler(model_context& cxt, formula_cell* p, mode_t mode) : 
-        m_context(cxt), mp_cell(p), m_mode(mode) {}
+    explicit formula_cell_listener_handler(model_context& cxt, const address_t& addr, mode_t mode) : 
+        m_context(cxt), m_addr(addr), m_mode(mode) {}
 
     void operator() (formula_token_base* p) const
     {
@@ -135,18 +135,19 @@ public:
 
             if (m_mode == mode_add)
             {
-                cell->add_listener(addr);
+                cell->add_listener(m_addr);
             }
             else
             {
                 assert(m_mode == mode_remove);
-                cell->remove_listener(addr);
+                cell->remove_listener(m_addr);
             }
         }
     }
 
 private:
     model_context& m_context;
+    const address_t& m_addr;
     formula_cell* mp_cell;
     mode_t m_mode;
 };
@@ -365,10 +366,12 @@ void ensure_unique_names(const vector<string>& cell_names)
         throw general_error("Duplicate names exist in the list of cell names.");
 }
 
-void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, cell_name_ptr_map_t& formula_cells, dirty_cells_t& dirty_cells)
+void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
 {
+    typedef ::std::pair<address_t, formula_cell*> address_cell_pair_type;
+
     dirty_cells_t _dirty_cells;
-    vector<formula_cell*> fcells;
+    vector<address_cell_pair_type> fcells;
     vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
     for (; itr_cell != itr_cell_end; ++itr_cell)
     {   
@@ -382,21 +385,6 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         formula_parser fparser(model_cell.get_tokens(), context);
         fparser.parse();
         fparser.print_tokens();
-
-#if 0 // Do I need this?
-        base_cell* pcell = find_cell(formula_cells, name);
-        if (pcell && pcell->get_celltype() == celltype_formula)
-        {
-            // Go through all its references, and remove itself as a listener
-            // from them.
-            formula_cell* fcell = static_cast<formula_cell*>(pcell);
-            vector<formula_token_base*> ref_tokens;
-            fcell->get_ref_tokens(ref_tokens);
-            for_each(ref_tokens.begin(), ref_tokens.end(), 
-                     formula_cell_listener_handler(context,
-                         fcell, formula_cell_listener_handler::mode_remove));
-        }
-#endif
 
         // Put the formula tokens into formula cell instance, and put the 
         // formula cell into context.
@@ -425,7 +413,8 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
                     throw general_error("failed to retrieve the cell instance just inserted.");
 
                 fcell = static_cast<formula_cell*>(p);
-                fcells.push_back(fcell);
+                fcells.push_back(
+                    address_cell_pair_type(addr, fcell));
             }
             break;
             default:
@@ -433,19 +422,22 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         }
     }
 
-    vector<formula_cell*>::iterator itr_fcell = fcells.begin(), itr_fcell_end = fcells.end();
+    vector<address_cell_pair_type>::iterator itr_fcell = fcells.begin(), itr_fcell_end = fcells.end();
     for (; itr_fcell != itr_fcell_end; ++itr_fcell)
     {
-        formula_cell* fcell = *itr_fcell;
+        formula_cell* fcell = itr_fcell->second;
 #if DEBUG_INPUT_PARSER
         cout << "processing formula cell at " << context.get_cell_name(fcell) << endl;
 #endif
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
+#if DEBUG_INPUT_PARSER
+        cout << "  number of reference tokens: " << ref_tokens.size() << endl;
+#endif
         for_each(ref_tokens.begin(), ref_tokens.end(), 
                  formula_cell_listener_handler(context,
-                     fcell, formula_cell_listener_handler::mode_add));
+                     itr_fcell->first, formula_cell_listener_handler::mode_add));
         
         // Add this cell and all its listeners to the dirty cell list.
         _dirty_cells.insert(fcell);
@@ -455,10 +447,10 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
 #if DEBUG_INPUT_PARSER
     cout << get_formula_result_output_separator() << endl;
-    cell_name_ptr_map_t::const_iterator itr = formula_cells.begin(), itr_end = formula_cells.end();
+    vector<address_cell_pair_type>::const_iterator itr = fcells.begin(), itr_end = fcells.end();
     for (; itr != itr_end; ++itr)
     {
-        const base_cell* p = itr->second;
+        const formula_cell* p = itr->second;
         p->print_listeners(context);
     }
 
@@ -567,7 +559,7 @@ void model_parser::parse()
                 // Convert lexer tokens into formula tokens and put them into
                 // formula cells.
                 dirty_cells_t dirty_cells;
-                convert_lexer_tokens(data.cells, m_context, m_cells, dirty_cells);
+                convert_lexer_tokens(data.cells, m_context, dirty_cells);
                 calc(dirty_cells);
             }
             else if (buf_com.equals("recalc"))
@@ -580,7 +572,7 @@ void model_parser::parse()
                     << "recalculating" << endl;
                 cout << os.str();
                 dirty_cells_t dirty_cells;
-                convert_lexer_tokens(data.cells, m_context, m_cells, dirty_cells);
+                convert_lexer_tokens(data.cells, m_context, dirty_cells);
                 calc(dirty_cells);
             }
             else if (buf_com.equals("check"))
@@ -630,12 +622,6 @@ void model_parser::parse()
 
 void model_parser::calc(dirty_cells_t& cells)
 {
-    // First, create cell pointer to name map and set it to the global 
-    // instance.  This is used throughout the calculation routine.
-    cell_ptr_name_map_t all_cell_names;
-    global::build_ptr_name_map(m_cells, all_cell_names);
-    global::set_cell_name_map(&all_cell_names);
-
     // Create cell pointer to name map only for the dirty cells.  The 
     // depends_tracker instance needs this.
     cell_ptr_name_map_t dirty_cell_names;
@@ -660,7 +646,7 @@ void model_parser::check(const results_type& formula_results)
         const string& name = itr->first;
         const formula_result& res = itr->second;
         cout << name << " : " << res.str() << endl;
-        const base_cell* pcell = get_cell(name);
+        const base_cell* pcell = NULL;
         if (!pcell)
         {
             ostringstream os;
@@ -682,12 +668,6 @@ void model_parser::check(const results_type& formula_results)
             throw check_error(os.str());
         }
     }
-}
-
-const base_cell* model_parser::get_cell(const string& name) const
-{
-    cell_name_ptr_map_t::const_iterator itr = m_cells.find(name);
-    return itr == m_cells.end() ? NULL : itr->second;
 }
 
 }

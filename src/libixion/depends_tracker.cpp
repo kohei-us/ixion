@@ -37,7 +37,7 @@
 #include <iostream>
 #include <fstream>
 
-#define DEBUG_DEPENDS_TRACKER 1
+#define DEBUG_DEPENDS_TRACKER 0
 
 using namespace std;
 

@@ -95,18 +95,11 @@ private:
     void calc(dirty_cells_t& cells);
     void check(const results_type& formula_results);
 
-    const base_cell* get_cell(const ::std::string& name) const;
-
 private:
 
     ::std::string m_filepath;
     size_t m_thread_count;
-
     model_context m_context;
-    /** 
-     * Cell name to pointer mapping.  This container owns the cell instances.
-     */
-    cell_name_ptr_map_t m_cells;
 };
 
 }
