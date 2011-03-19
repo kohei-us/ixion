@@ -269,6 +269,7 @@
 			</Folder>
 			<F N="../src/ixion_parser.cpp"/>
 			<F N="../src/ixion_sorter.cpp"/>
+			<F N="../src/ixion_test.cpp"/>
 			<F
 				N="../src/Makefile.am"
 				Type="Makefile"/>

@@ -66,6 +66,7 @@ public:
     formula_name_resolver_base();
     virtual ~formula_name_resolver_base() = 0;
     virtual formula_name_type resolve(const ::std::string& name) const = 0;
+    virtual ::std::string get_name(const address_t& addr) const = 0;
 };
 
 /**
@@ -79,6 +80,7 @@ public:
     formula_name_resolver_simple();
     virtual ~formula_name_resolver_simple();
     virtual formula_name_type resolve(const::std::string &name) const;
+    virtual ::std::string get_name(const address_t& addr) const;
 };
 
 class formula_name_resolver_a1 : public formula_name_resolver_base
@@ -86,6 +88,7 @@ class formula_name_resolver_a1 : public formula_name_resolver_base
 public:
     virtual ~formula_name_resolver_a1();
     virtual formula_name_type resolve(const::std::string &name) const;
+    virtual ::std::string get_name(const address_t& addr) const;
 };
 
 }

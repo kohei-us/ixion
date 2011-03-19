@@ -70,11 +70,7 @@ string model_context::get_cell_name(const base_cell* p) const
     for (; itr != itr_end; ++itr)
     {
         if (itr->second == p)
-        {
-            // TODO: Replace this with proper name according to current naming
-            // convention (such as A1, R1C1 etc).
-            return itr->first.get_name();
-        }
+            return get_name_resolver().get_name(itr->first);
     }
 
     // Cell not found.  Return an empty string.

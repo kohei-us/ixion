@@ -29,6 +29,9 @@
 #include "formula_functions.hpp"
 
 #include <iostream>
+#include <sstream>
+
+#define DEBUG_NAME_RESOLVER 0
 
 using namespace std;
 
@@ -63,6 +66,25 @@ enum resolver_parse_mode {
     resolver_parse_row
 };
 
+void append_column_name_a1(ostringstream& os, col_t col)
+{
+    const col_t div = 26;
+    while (true)
+    {
+        if (col < div)
+        {
+            char c = 'A' + col;
+            os << c;
+            break;
+        }
+
+        col_t rem = col % div;
+        char c = 'A' + rem;
+        os << c;
+        col /= div;
+    }
+}
+
 }
 
 formula_name_type::formula_name_type() : type(invalid) {}
@@ -80,6 +102,11 @@ formula_name_type formula_name_resolver_simple::resolve(const string& name) cons
     formula_name_type ret;
     resolve_function_or_name(name, ret);
     return ret;
+}
+
+string formula_name_resolver_simple::get_name(const address_t& addr) const
+{
+    return addr.get_name();
 }
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
@@ -151,7 +178,9 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name) const
         // This is a valid A1 reference.
         col -= 1;
         row -= 1;
+#if DEBUG_NAME_RESOLVER
         cout << name << ": (col=" << col << ",row=" << row << ")" << endl;
+#endif
         ret.type = formula_name_type::cell_reference;
         ret.address.col = col;
         ret.address.row = row;
@@ -161,6 +190,15 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name) const
 
     resolve_function_or_name(name, ret);
     return ret;
+}
+
+string formula_name_resolver_a1::get_name(const address_t& addr) const
+{
+    // For now, sheet index is ignored.
+    ostringstream os;
+    append_column_name_a1(os, addr.column);
+    os << (addr.row + 1);
+    return os.str();
 }
 
 }
