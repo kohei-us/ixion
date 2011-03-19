@@ -60,7 +60,7 @@ class dependency_tracker
     typedef depth_first_search<base_cell*, cell_back_inserter> dfs_type;
 
 public:
-    dependency_tracker(const cell_ptr_name_map_t* names, const model_context& cxt);
+    dependency_tracker(const dirty_cells_t& dirty_cells, const model_context& cxt);
     ~dependency_tracker();
 
     /** 
@@ -81,7 +81,7 @@ public:
 
 private:
     dfs_type::precedent_set m_deps;
-    const cell_ptr_name_map_t* mp_names;
+    const dirty_cells_t& m_dirty_cells;
     const model_context& m_context;
 };
 

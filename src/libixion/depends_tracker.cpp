@@ -121,8 +121,8 @@ void dependency_tracker::cell_back_inserter::operator() (base_cell* cell)
 
 // ============================================================================
 
-dependency_tracker::dependency_tracker(const cell_ptr_name_map_t* names, const model_context& cxt) :
-    mp_names(names), m_context(cxt)
+dependency_tracker::dependency_tracker(const dirty_cells_t& dirty_cells, const model_context& cxt) :
+    m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }
 
@@ -179,10 +179,10 @@ void dependency_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
     vector<base_cell*> all_cells;
-    all_cells.reserve(mp_names->size());
-    cell_ptr_name_map_t::const_iterator itr = mp_names->begin(), itr_end = mp_names->end();
+    all_cells.reserve(m_dirty_cells.size());
+    dirty_cells_t::const_iterator itr = m_dirty_cells.begin(), itr_end = m_dirty_cells.end();
     for (; itr != itr_end; ++itr)
-        all_cells.push_back(const_cast<base_cell*>(itr->first));
+        all_cells.push_back(const_cast<base_cell*>(*itr));
 
     dfs_type dfs(all_cells, m_deps.get(), handler);
     dfs.run();

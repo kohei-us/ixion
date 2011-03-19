@@ -50,7 +50,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_INPUT_PARSER 1
+#define DEBUG_INPUT_PARSER 0
 
 namespace ixion {
 
@@ -622,14 +622,9 @@ void model_parser::parse()
 
 void model_parser::calc(dirty_cells_t& cells)
 {
-    // Create cell pointer to name map only for the dirty cells.  The 
-    // depends_tracker instance needs this.
-    cell_ptr_name_map_t dirty_cell_names;
-    for_each(cells.begin(), cells.end(), ptr_name_map_builder(dirty_cell_names));
-
     // Now, register the dependency info on each dirty cell, and interpret all
     // dirty cells.
-    dependency_tracker deptracker(&dirty_cell_names, m_context);
+    dependency_tracker deptracker(cells, m_context);
     for_each(cells.begin(), cells.end(), cell_dependency_handler(m_context, deptracker, cells));
     deptracker.interpret_all_cells(m_thread_count);
 }

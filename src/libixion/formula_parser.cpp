@@ -35,7 +35,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_PARSER 1
+#define DEBUG_PARSER 0
 
 using namespace std;
 
