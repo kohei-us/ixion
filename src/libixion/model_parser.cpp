@@ -231,12 +231,6 @@ private:
 
 // ============================================================================
 
-base_cell* find_cell(cell_name_ptr_map_t& store, const string& name)
-{
-    cell_name_ptr_map_t::iterator itr = store.find(name);
-    return itr == store.end() ? NULL : itr->second;
-}
-
 enum parse_mode_t
 {
     parse_mode_unknown = 0,

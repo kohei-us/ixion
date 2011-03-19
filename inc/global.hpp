@@ -43,8 +43,7 @@ typedef int sheet_t;
 class base_cell;
 class formula_cell;
 
-typedef ::boost::ptr_map< ::std::string, base_cell>             cell_name_ptr_map_t;
-typedef _ixion_unordered_map_type<const base_cell*, ::std::string>   cell_ptr_name_map_t;
+typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
 /**
  * Dirty cells are those cells that have been modified or cells that 
@@ -61,8 +60,6 @@ const char* get_formula_result_output_separator();
 class global
 {
 public:
-    static void build_ptr_name_map(const cell_name_ptr_map_t& cells, cell_ptr_name_map_t& cell_names);
-    static void set_cell_name_map(const cell_ptr_name_map_t* p);
     static ::std::string get_cell_name(const base_cell* cell);
 
     /**
