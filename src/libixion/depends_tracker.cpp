@@ -30,13 +30,14 @@
 #include "cell.hpp"
 #include "formula_interpreter.hpp"
 #include "cell_queue_manager.hpp"
+#include "model_context.hpp"
 #include "hash_container/map.hpp"
 
 #include <vector>
 #include <iostream>
 #include <fstream>
 
-#define DEBUG_DEPENDS_TRACKER 0
+#define DEBUG_DEPENDS_TRACKER 1
 
 using namespace std;
 
@@ -136,6 +137,9 @@ dependency_tracker::~dependency_tracker()
 
 void dependency_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
 {
+#if DEBUG_DEPENDS_TRACKER
+    cout << m_context.get_cell_name(origin_cell) << "->" << m_context.get_cell_name(depend_cell) << endl;
+#endif
     m_deps.insert(origin_cell, depend_cell);
 }
 

@@ -86,8 +86,8 @@ public:
         if (p->get_opcode() != fop_single_ref)
             return;
 
-        const base_cell* refcell = NULL;
         address_t addr = static_cast<single_ref_token*>(p)->get_single_ref();
+        const base_cell* refcell = m_context.get_cell(addr);
         if (refcell)
             m_deps.push_back(const_cast<base_cell*>(refcell));
     }
@@ -195,17 +195,27 @@ public:
         if (pcell->get_celltype() != celltype_formula)
             return;
 
+#if DEBUG_INPUT_PARSER
+        cout << get_formula_result_output_separator() << endl;
+        cout << "processing dependency of " << m_context.get_cell_name(pcell) << endl;
+#endif
         // Register cell dependencies.
         formula_cell* fcell = static_cast<formula_cell*>(pcell);
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
 
+#if DEBUG_INPUT_PARSER
+        cout << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;
+#endif
         // Pick up the referenced cells from the ref tokens.  I should
         // probably combine this with the above get_ref_tokens() call above
         // for efficiency.
         vector<base_cell*> deps;
         for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, deps));
 
+#if DEBUG_INPUT_PARSER
+        cout << "number of precedent cells picked up: " << deps.size() << endl;
+#endif
         // Register dependency information.  Only dirty cells should be
         // registered as precedent cells since non-dirty cells are equivalent
         // to constants.
