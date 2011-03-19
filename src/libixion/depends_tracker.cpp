@@ -97,8 +97,8 @@ struct thread_queue_handler : public unary_function<base_cell*, void>
 
 struct cell_interpret_handler : public unary_function<base_cell*, void>
 {
-    cell_interpret_handler(const cell_ptr_name_map_t& cell_names, const model_context& cxt) :
-        m_cell_names(cell_names), m_context(cxt) {}
+    cell_interpret_handler(const model_context& cxt) :
+        m_context(cxt) {}
 
     void operator() (base_cell* p) const
     {
@@ -106,7 +106,6 @@ struct cell_interpret_handler : public unary_function<base_cell*, void>
         static_cast<formula_cell*>(p)->interpret(m_context);
     }
 private:
-    const cell_ptr_name_map_t& m_cell_names;
     const model_context& m_context;
 };
 
@@ -172,7 +171,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     else
     {
         // Interpret cells using just a single thread.
-        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpret_handler(*mp_names, m_context));
+        for_each(sorted_cells.begin(), sorted_cells.end(), cell_interpret_handler(m_context));
     }
 }
 
