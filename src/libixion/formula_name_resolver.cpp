@@ -39,6 +39,19 @@ namespace ixion {
 
 namespace {
 
+bool resolve_function(const string& name, formula_name_type& ret)
+{
+    formula_function_t func_oc = formula_functions::get_function_opcode(name);
+    if (func_oc != func_unknown)
+    {
+        // This is a built-in function.
+        ret.type = formula_name_type::function;
+        ret.func_oc = func_oc;
+        return true;
+    }
+    return false;
+}
+
 /**
  * Check if the name is a built-in function, or else it's considered a named 
  * expression. 
@@ -48,14 +61,8 @@ namespace {
  */
 void resolve_function_or_name(const string& name, formula_name_type& ret)
 {
-    formula_function_t func_oc = formula_functions::get_function_opcode(name);
-    if (func_oc != func_unknown)
-    {
-        // This is a built-in function.
-        ret.type = formula_name_type::function;
-        ret.func_oc = func_oc;
+    if (resolve_function(name, ret))
         return;
-    }
 
     // Everything else is assumed to be a named expression.
     ret.type = formula_name_type::named_expression;
@@ -116,6 +123,9 @@ formula_name_resolver_a1::~formula_name_resolver_a1() {}
 formula_name_type formula_name_resolver_a1::resolve(const string& name) const
 {
     formula_name_type ret;
+    if (resolve_function(name, ret))
+        return ret;
+
     resolver_parse_mode mode = resolver_parse_column;
 
     size_t n = name.size();
