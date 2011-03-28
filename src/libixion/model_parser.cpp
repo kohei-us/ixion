@@ -635,7 +635,9 @@ void model_parser::check(const results_type& formula_results)
         const string& name = itr->first;
         const formula_result& res = itr->second;
         cout << name << " : " << res.str() << endl;
-        const base_cell* pcell = NULL;
+        // resolve name and get cell instance from the context.  The cell may
+        // be either a real cell, or a named expression.
+        const base_cell* pcell = get_cell_from_name(name);
         if (!pcell)
         {
             ostringstream os;
@@ -657,6 +659,25 @@ void model_parser::check(const results_type& formula_results)
             throw check_error(os.str());
         }
     }
+}
+
+const base_cell* model_parser::get_cell_from_name(const string& name)
+{
+    const formula_name_resolver_base& resolver = m_context.get_name_resolver();
+    formula_name_type name_type = resolver.resolve(name);
+    switch (name_type.type)
+    {
+        case formula_name_type::cell_reference:
+        {
+            const formula_name_type::address_type& addr = name_type.address;
+            return m_context.get_cell(address_t(addr.sheet, addr.row, addr.col));
+        }
+        case formula_name_type::named_expression:
+            return m_context.get_named_expression(name);
+        default:
+            ;
+    }
+    return NULL;
 }
 
 }

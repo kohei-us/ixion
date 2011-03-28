@@ -94,6 +94,7 @@ private:
 
     void calc(dirty_cells_t& cells);
     void check(const results_type& formula_results);
+    const base_cell* get_cell_from_name(const ::std::string& name);
 
 private:
 
