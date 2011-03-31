@@ -43,6 +43,7 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
 
 void model_context::set_cell(const address_t& addr, auto_ptr<base_cell>& cell)
 {
+    m_cells.erase(addr);
     m_cells.insert(addr, cell);
 }
 
