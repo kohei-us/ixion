@@ -216,6 +216,9 @@
 				N="../Makefile.am"
 				Type="Makefile"/>
 		</Folder>
+		<Folder Name="../bin">
+			<F N="../bin/ixion-parser.sh"/>
+		</Folder>
 		<Folder Name="../inc">
 			<Folder Name="hash_container">
 				<F N="../inc/hash_container/map.hpp"/>
