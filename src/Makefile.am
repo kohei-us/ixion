@@ -17,4 +17,4 @@ ixion_test_SOURCES = ixion_test.cpp
 ixion_test_LDADD = libixion/libixion-@IXION_API_VERSION@.la
 ixion_test_CPPFLAGS = -I$(top_builddir)/lib/libixion/libixion.la
 
-TESTS = ixion-test
+TESTS = ixion-test $(top_srcdir)/test/ixion-parser-test.sh
