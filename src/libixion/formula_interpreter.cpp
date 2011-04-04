@@ -29,6 +29,7 @@
 #include "cell.hpp"
 #include "global.hpp"
 #include "formula_functions.hpp"
+#include "formula_name_resolver.hpp"
 #include "model_context.hpp"
 
 #include <string>
@@ -346,7 +347,7 @@ double formula_interpreter::variable()
     double val = 0.0;
     if (pref)
         val = pref->get_value();
-    m_outbuf << m_context.get_cell_name(pref);
+    m_outbuf << m_context.get_name_resolver().get_name(addr);
     next();
     return val;
 }
