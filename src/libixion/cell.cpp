@@ -95,6 +95,11 @@ void base_cell::remove_listener(const address_t& addr)
     m_listeners.erase(addr);
 }
 
+void base_cell::swap_listeners(base_cell& other)
+{
+    m_listeners.swap(other.m_listeners);
+}
+
 void base_cell::print_listeners(const model_context& cxt) const
 {
     cout << "The following cells listen to cell " << cxt.get_cell_name(this) << endl;

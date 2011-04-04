@@ -380,17 +380,19 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         fparser.parse();
         fparser.print_tokens();
 
-        // Put the formula tokens into formula cell instance, and put the 
-        // formula cell into context.
-        auto_ptr<formula_cell> pcell(new formula_cell);
-        pcell->swap_tokens(fparser.get_tokens());
         formula_cell* fcell = NULL;
         formula_name_type name_type = context.get_name_resolver().resolve(name);
         switch (name_type.type)
         {
             case formula_name_type::named_expression:
-                context.set_named_expression(name, pcell);
                 fcell = context.get_named_expression(name);
+                if (!fcell)
+                {
+                    // No prior named expression with the same name.
+                    auto_ptr<formula_cell> pcell(new formula_cell);
+                    context.set_named_expression(name, pcell);
+                    fcell = context.get_named_expression(name);
+                }
                 if (!fcell)
                     throw general_error("failed to insert a named expression");
             break;
@@ -400,13 +402,33 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
                 addr.sheet = name_type.address.sheet;
                 addr.row = name_type.address.row;
                 addr.column = name_type.address.col;
-                context.set_cell(addr, pcell.release());
-
                 base_cell* p = context.get_cell(addr);
-                if (!p || p->get_celltype() != celltype_formula)
-                    throw general_error("failed to retrieve the cell instance just inserted.");
+                if (!p)
+                {
+                    // No prior cell at this address. Create a new one.
+                    auto_ptr<base_cell> pcell(new formula_cell);
+                    context.set_cell(addr, pcell);
+                    fcell = static_cast<formula_cell*>(context.get_cell(addr));
+                }
+                else if (p->get_celltype() != celltype_formula)
+                {
+                    // Prior cell exists, but it's not a formula cell.
+                    // Transfer the listener cells over to the new cell
+                    // instance.
+                    auto_ptr<base_cell> pcell(new formula_cell);
+                    pcell->swap_listeners(*p);
+                    context.set_cell(addr, pcell);
+                    fcell = static_cast<formula_cell*>(context.get_cell(addr));
+                }
+                else
+                {
+                    // Pre-existing formula cell.
+                    fcell = static_cast<formula_cell*>(p);
+                }
 
-                fcell = static_cast<formula_cell*>(p);
+                if (!fcell)
+                    throw general_error("failed to insert a new formula cell");
+
                 fcells.push_back(
                     address_cell_pair_type(addr, fcell));
             }
@@ -414,6 +436,12 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
             default:
                 throw general_error("unknown name type.");
         }
+
+        assert(fcell);
+
+        // Put the formula tokens into formula cell instance, and put the 
+        // formula cell into context.
+        fcell->swap_tokens(fparser.get_tokens());
     }
 
     vector<address_cell_pair_type>::iterator itr_fcell = fcells.begin(), itr_fcell_end = fcells.end();

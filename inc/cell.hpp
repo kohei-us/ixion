@@ -66,6 +66,7 @@ public:
 
     void add_listener(const address_t& addr);
     void remove_listener(const address_t& addr);
+    void swap_listeners(base_cell& other);
     void print_listeners(const model_context& cxt) const;
     void get_all_listeners(model_context& cxt, dirty_cells_t& cell) const;
 

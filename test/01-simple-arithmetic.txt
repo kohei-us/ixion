@@ -37,4 +37,14 @@ A9=#DIV/0!
 %mode edit
 A1=10
 %recalc
-
+%mode result
+A1=10
+A2=20
+A3=320
+A4=600
+A5=191990
+A6=30
+A7=#REF!
+A8=#DIV/0!
+A9=#DIV/0!
+%check
