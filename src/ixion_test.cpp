@@ -49,7 +49,7 @@ void test_name_resolver()
     {
         const char* p = names[i];
         string name_a1(p);
-        formula_name_type res = resolver.resolve(name_a1);
+        formula_name_type res = resolver.resolve(name_a1, address_t());
         assert(res.type == formula_name_type::cell_reference);
         address_t addr;
         addr.sheet = res.address.sheet;

@@ -34,13 +34,15 @@ using namespace std;
 namespace ixion {
 
 address_t::address_t() : 
-    sheet(0), row(0), column(0) {}
+    sheet(0), row(0), column(0), abs_sheet(true), abs_row(true), abs_column(true) {}
 
-address_t::address_t(sheet_t _sheet, row_t _row, col_t _column) : 
-    sheet(_sheet), row(_row), column(_column) {}
+address_t::address_t(sheet_t _sheet, row_t _row, col_t _column, bool _abs_sheet, bool _abs_row, bool _abs_column) : 
+    sheet(_sheet), row(_row), column(_column), 
+    abs_sheet(_abs_sheet), abs_row(_abs_row), abs_column(_abs_column) {}
 
 address_t::address_t(const address_t& r) : 
-    sheet(r.sheet), row(r.row), column(r.column) {}
+    sheet(r.sheet), row(r.row), column(r.column),
+    abs_sheet(r.abs_sheet), abs_row(r.abs_row), abs_column(r.abs_column) {}
 
 string address_t::get_name() const
 {
@@ -56,11 +58,29 @@ size_t address_t::hash::operator()(const address_t& addr) const
 
 bool operator== (const address_t& left, const address_t& right)
 {
-    return left.sheet == right.sheet && left.row == right.row && left.column == right.column;
+    return left.sheet == right.sheet && 
+        left.row == right.row && 
+        left.column == right.column &&
+        left.abs_sheet == right.abs_sheet && 
+        left.abs_row == right.abs_row && 
+        left.abs_column == right.abs_column;
 }
 
 bool operator< (const address_t& left, const address_t& right)
 {
+    // Not sure how to compare absolute and relative addresses, but let's make
+    // absolute address always greater than relative one until we find a
+    // better way.
+
+    if (left.abs_sheet != right.abs_sheet)
+        return left.abs_sheet < right.abs_sheet;
+
+    if (left.abs_row != right.abs_row)
+        return left.abs_row < right.abs_row;
+
+    if (left.abs_column != right.abs_column)
+        return left.abs_column < right.abs_column;
+
     if (left.sheet != right.sheet)
         return left.sheet < right.sheet;
 

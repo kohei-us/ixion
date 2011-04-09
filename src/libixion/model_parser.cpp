@@ -371,17 +371,18 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     {   
         const model_parser::cell& model_cell = *itr_cell;
         const string& name = model_cell.get_name();
+        address_t pos(0, 0, 0, true, true, true);
 
 #if DEBUG_INPUT_PARSER
         cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(model_cell.get_tokens(), context);
+        formula_parser fparser(model_cell.get_tokens(), context, pos);
         fparser.parse();
         fparser.print_tokens();
 
         formula_cell* fcell = NULL;
-        formula_name_type name_type = context.get_name_resolver().resolve(name);
+        formula_name_type name_type = context.get_name_resolver().resolve(name, address_t());
         switch (name_type.type)
         {
             case formula_name_type::named_expression:
@@ -692,7 +693,7 @@ void model_parser::check(const results_type& formula_results)
 const base_cell* model_parser::get_cell_from_name(const string& name)
 {
     const formula_name_resolver_base& resolver = m_context.get_name_resolver();
-    formula_name_type name_type = resolver.resolve(name);
+    formula_name_type name_type = resolver.resolve(name, address_t());
     switch (name_type.type)
     {
         case formula_name_type::cell_reference:

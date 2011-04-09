@@ -106,7 +106,7 @@ formula_name_resolver_simple::formula_name_resolver_simple() :
 
 formula_name_resolver_simple::~formula_name_resolver_simple() {}
 
-formula_name_type formula_name_resolver_simple::resolve(const string& name) const
+formula_name_type formula_name_resolver_simple::resolve(const string& name, const address_t& pos) const
 {
     formula_name_type ret;
     resolve_function_or_name(name, ret);
@@ -120,7 +120,7 @@ string formula_name_resolver_simple::get_name(const address_t& addr) const
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
-formula_name_type formula_name_resolver_a1::resolve(const string& name) const
+formula_name_type formula_name_resolver_a1::resolve(const string& name, const address_t& pos) const
 {
     formula_name_type ret;
     if (resolve_function(name, ret))

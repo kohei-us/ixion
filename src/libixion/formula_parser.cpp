@@ -131,9 +131,10 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, const model_context& cxt) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, const model_context& cxt, const address_t& pos) :
     m_tokens(tokens),
-    m_context(cxt)
+    m_context(cxt),
+    m_pos(pos)
 {
 }
 
@@ -238,7 +239,7 @@ void formula_parser::primitive(lexer_opcode_t oc)
 void formula_parser::name(const lexer_token_base& t)
 {
     const string name = t.get_string();
-    formula_name_type fn = m_context.get_name_resolver().resolve(name);
+    formula_name_type fn = m_context.get_name_resolver().resolve(name, m_pos);
     switch (fn.type)
     {
         case formula_name_type::cell_reference:

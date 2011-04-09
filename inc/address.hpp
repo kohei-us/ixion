@@ -37,11 +37,15 @@ namespace ixion {
 struct address_t
 {
     sheet_t sheet;
-    row_t row;
-    col_t column;
+    row_t   row;
+    col_t   column;
+    bool    abs_sheet:1;
+    bool    abs_row:1;
+    bool    abs_column:1;
 
     address_t();
-    address_t(sheet_t _sheet, row_t _row, col_t _column);
+    address_t(sheet_t _sheet, row_t _row, col_t _column, 
+              bool _abs_sheet=true, bool _abs_row=true, bool _abs_column=true);
     address_t(const address_t& addr);
 
     ::std::string get_name() const;
