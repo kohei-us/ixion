@@ -54,9 +54,10 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, const model_context& cxt, const address_t& pos);
+    formula_parser(const lexer_tokens_t& tokens, const model_context& cxt);
     ~formula_parser();
 
+    void set_origin(const address_t& pos);
     void parse();
     void print_tokens() const;
 
@@ -72,7 +73,7 @@ private:
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
     const model_context&    m_context;
     formula_tokens_t        m_formula_tokens;
-    const address_t         m_pos;    // reference position (usually current cell). always absolute.
+    address_t               m_pos;    // reference position (usually current cell). always absolute.
 };
 
 }

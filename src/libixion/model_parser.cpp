@@ -371,15 +371,11 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     {   
         const model_parser::cell& model_cell = *itr_cell;
         const string& name = model_cell.get_name();
-        address_t pos(0, 0, 0, true, true, true);
 
 #if DEBUG_INPUT_PARSER
         cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
-        // Parse the lexer tokens and turn them into formula tokens.
-        formula_parser fparser(model_cell.get_tokens(), context, pos);
-        fparser.parse();
-        fparser.print_tokens();
+        formula_parser fparser(model_cell.get_tokens(), context);
 
         formula_cell* fcell = NULL;
         formula_name_type name_type = context.get_name_resolver().resolve(name, address_t());
@@ -432,6 +428,8 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
                 fcells.push_back(
                     address_cell_pair_type(addr, fcell));
+
+                fparser.set_origin(addr);
             }
             break;
             default:
@@ -439,6 +437,10 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         }
 
         assert(fcell);
+
+        // Parse the lexer tokens and turn them into formula tokens.
+        fparser.parse();
+        fparser.print_tokens();
 
         // Put the formula tokens into formula cell instance, and put the 
         // formula cell into context.

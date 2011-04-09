@@ -131,15 +131,19 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, const model_context& cxt, const address_t& pos) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, const model_context& cxt) :
     m_tokens(tokens),
-    m_context(cxt),
-    m_pos(pos)
+    m_context(cxt)
 {
 }
 
 formula_parser::~formula_parser()
 {
+}
+
+void formula_parser::set_origin(const address_t& pos)
+{
+    m_pos = pos;
 }
 
 void formula_parser::parse()
