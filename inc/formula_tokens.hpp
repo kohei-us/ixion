@@ -147,9 +147,8 @@ private:
 // ============================================================================
 
 /**
- * Token that stores a cell reference.  Note that the address it stores must 
- * be relative to the origin cell.  Origin cell is the cell that stores the 
- * instance of this class in its formula token array.
+ * Token that stores a cell reference.  Note that the address it stores may 
+ * be either relative to the origin cell or absolute.
  */
 class single_ref_token : public formula_token_base
 {
