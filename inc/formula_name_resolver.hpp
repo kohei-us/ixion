@@ -49,6 +49,9 @@ struct formula_name_type
         sheet_t sheet;
         row_t row;
         col_t col;
+        bool abs_sheet:1;
+        bool abs_row:1;
+        bool abs_col:1;
     };
 
     name_type type;

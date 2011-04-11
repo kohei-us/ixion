@@ -122,6 +122,9 @@ formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
 formula_name_type formula_name_resolver_a1::resolve(const string& name, const address_t& pos) const
 {
+#if DEBUG_NAME_RESOLVER
+    cout << "resolve: name=" << name << "; origin=" << pos.get_name() << endl;
+#endif
     formula_name_type ret;
     if (resolve_function(name, ret))
         return ret;
@@ -136,6 +139,10 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
     col_t col = 0;
     row_t row = 0;
     sheet_t sheet = 0;
+    bool abs_col = false;
+    bool abs_row = false;
+    bool abs_sheet = false;
+
     bool valid_ref = true;
     for (size_t i = 0; i < n; ++i, ++p)
     {
@@ -187,16 +194,29 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
 
     if (valid_ref)
     {
-        // This is a valid A1 reference.
+        // Convert column and row from 1-based to 0-based.
         col -= 1;
         row -= 1;
+
+        if (!abs_sheet)
+            sheet -= pos.sheet;
+        if (!abs_row)
+            row -= pos.row;
+        if (!abs_col)
+            col -= pos.column;
+
 #if DEBUG_NAME_RESOLVER
-        cout << name << ": (col=" << col << ",row=" << row << ")" << endl;
+        string abs_row_s = abs_row ? "abs" : "rel";
+        string abs_col_s = abs_col ? "abs" : "rel";
+        cout << "resolve: " << name << "=(row=" << row << " [" << abs_row_s << "]; column=" << col << " [" << abs_col_s << "])" << endl;
 #endif
         ret.type = formula_name_type::cell_reference;
-        ret.address.col = col;
-        ret.address.row = row;
         ret.address.sheet = sheet;
+        ret.address.row = row;
+        ret.address.col = col;
+        ret.address.abs_sheet = abs_sheet;
+        ret.address.abs_row = abs_row;
+        ret.address.abs_col = abs_col;
         return ret;
     }
 

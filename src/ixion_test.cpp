@@ -60,8 +60,19 @@ void test_name_resolver()
     }
 }
 
+void test_address()
+{
+    cout << "test address" << endl;
+    address_t addr(-1, 0, 0, false, false, false);
+    address_t pos(1, 0, 0, true, true, true);
+    address_t abs_addr(addr);
+    abs_addr = abs_addr.to_abs(pos);
+    assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
+}
+
 int main()
 {
     test_name_resolver();
+    test_address();
     return EXIT_SUCCESS;
 }

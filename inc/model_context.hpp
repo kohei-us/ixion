@@ -59,6 +59,7 @@ public:
     const base_cell* get_cell(const address_t& addr) const;
     base_cell* get_cell(const address_t& addr);
     ::std::string get_cell_name(const base_cell* p) const;
+    address_t get_cell_position(const base_cell* p) const;
 
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
     formula_cell* get_named_expression(const ::std::string& name);

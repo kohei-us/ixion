@@ -44,10 +44,43 @@ address_t::address_t(const address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column),
     abs_sheet(r.abs_sheet), abs_row(r.abs_row), abs_column(r.abs_column) {}
 
+address_t address_t::to_abs(const address_t& origin) const
+{
+    address_t abs_addr(*this);
+    if (!abs_addr.abs_sheet)
+    {
+        abs_addr.sheet += origin.sheet;
+        abs_addr.abs_sheet = true;
+    }
+
+    if (!abs_addr.abs_row)
+    {
+        abs_addr.row += origin.row;
+        abs_addr.abs_row = true;
+    }
+
+    if (!abs_addr.abs_column)
+    {
+        abs_addr.column += origin.column;
+        abs_addr.abs_column = true;
+    }
+    return abs_addr;
+}
+
 string address_t::get_name() const
 {
     ostringstream os;
-    os << "(row=" << row << ",column=" << column << ")";
+    os << "(row=" << row << " [";
+    if (abs_row)
+        os << "abs";
+    else
+        os << "rel";
+    os << "]; column=" << column << " [";
+    if (abs_column)
+        os << "abs";
+    else
+        os << "rel";
+    os << "])";
     return os.str();
 }
 

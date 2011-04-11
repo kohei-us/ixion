@@ -50,6 +50,7 @@ public:
     formula_interpreter(const formula_cell* cell, const model_context& cxt);
     ~formula_interpreter();
 
+    void set_origin(const address_t& pos);
     bool interpret();
     double get_result() const;
     formula_error_t get_error() const;
@@ -87,6 +88,7 @@ private:
     const formula_cell*         m_parent_cell;
     const formula_tokens_t&     m_original_tokens;
     const model_context&        m_context;
+    address_t                   m_pos;
 
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;

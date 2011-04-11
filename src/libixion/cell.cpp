@@ -260,6 +260,7 @@ void formula_cell::interpret(const model_context& context)
         }
     
         formula_interpreter fin(this, context);
+        fin.set_origin(context.get_cell_position(this));
         m_interpret_status.result = new formula_result;
         if (fin.interpret())
         {

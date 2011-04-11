@@ -50,7 +50,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_INPUT_PARSER 0
+#define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
 
@@ -78,15 +78,15 @@ private:
 class ref_cell_picker : public unary_function<formula_token_base*, void>
 {
 public:
-    ref_cell_picker(const model_context& cxt, vector<base_cell*>& deps) :
-        m_context(cxt), m_deps(deps) {}
+    ref_cell_picker(const model_context& cxt, const address_t& origin, vector<base_cell*>& deps) :
+        m_context(cxt), m_origin(origin), m_deps(deps) {}
 
     void operator() (formula_token_base* p)
     {
         if (p->get_opcode() != fop_single_ref)
             return;
 
-        address_t addr = static_cast<single_ref_token*>(p)->get_single_ref();
+        address_t addr = static_cast<single_ref_token*>(p)->get_single_ref().to_abs(m_origin);
         const base_cell* refcell = m_context.get_cell(addr);
         if (refcell)
             m_deps.push_back(const_cast<base_cell*>(refcell));
@@ -94,7 +94,8 @@ public:
 
 private:
     const model_context& m_context;
-    vector<base_cell*>& m_deps;
+    const address_t&     m_origin;
+    vector<base_cell*>&  m_deps;
 };
 
 class depcell_inserter : public unary_function<base_cell*, void>
@@ -122,16 +123,30 @@ public:
     enum mode_t { mode_add, mode_remove };
 
     explicit formula_cell_listener_handler(model_context& cxt, const address_t& addr, mode_t mode) : 
-        m_context(cxt), m_addr(addr), m_mode(mode) {}
+        m_context(cxt), m_addr(addr), m_mode(mode)
+    {
+#if DEBUG_MODEL_PARSER
+        cout << "formula_cell_listener_handler: cell position=" << m_addr.get_name() << endl;
+#endif
+    }
 
     void operator() (formula_token_base* p) const
     {
         if (p->get_opcode() == fop_single_ref)
         {
             address_t addr = p->get_single_ref();
+            addr = addr.to_abs(m_addr);
+#if DEBUG_MODEL_PARSER
+            cout << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
+#endif
             base_cell* cell = m_context.get_cell(addr);
             if (!cell)
+            {
+#if DEBUG_MODEL_PARSER
+                cout << "formula_cell_listener_handler: cell not found!" << endl;
+#endif
                 return;
+            }
 
             if (m_mode == mode_add)
             {
@@ -196,7 +211,7 @@ public:
         if (pcell->get_celltype() != celltype_formula)
             return;
 
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         cout << get_formula_result_output_separator() << endl;
         cout << "processing dependency of " << m_context.get_cell_name(pcell) << endl;
 #endif
@@ -205,16 +220,17 @@ public:
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
 
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         cout << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;
 #endif
         // Pick up the referenced cells from the ref tokens.  I should
         // probably combine this with the above get_ref_tokens() call above
         // for efficiency.
         vector<base_cell*> deps;
-        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, deps));
+        address_t cell_pos = m_context.get_cell_position(pcell);
+        for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, cell_pos, deps));
 
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         cout << "number of precedent cells picked up: " << deps.size() << endl;
 #endif
         // Register dependency information.  Only dirty cells should be
@@ -286,7 +302,7 @@ void parse_init(const char*& p, parse_data& data)
         lexer_tokens_t tokens;
         lexer.swap_tokens(tokens);
 
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         // test-print tokens.
         cout << "tokens from lexer: " << print_tokens(tokens, true) << endl;
 #endif
@@ -372,7 +388,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         const model_parser::cell& model_cell = *itr_cell;
         const string& name = model_cell.get_name();
 
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         formula_parser fparser(model_cell.get_tokens(), context);
@@ -451,13 +467,13 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     for (; itr_fcell != itr_fcell_end; ++itr_fcell)
     {
         formula_cell* fcell = itr_fcell->second;
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         cout << "processing formula cell at " << context.get_cell_name(fcell) << endl;
 #endif
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(ref_tokens);
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
         cout << "  number of reference tokens: " << ref_tokens.size() << endl;
 #endif
         for_each(ref_tokens.begin(), ref_tokens.end(), 
@@ -470,7 +486,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         fcell->get_all_listeners(context, _dirty_cells);
     }
 
-#if DEBUG_INPUT_PARSER
+#if DEBUG_MODEL_PARSER
     cout << get_formula_result_output_separator() << endl;
     vector<address_cell_pair_type>::const_iterator itr = fcells.begin(), itr_end = fcells.end();
     for (; itr != itr_end; ++itr)

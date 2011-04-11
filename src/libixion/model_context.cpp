@@ -78,6 +78,18 @@ string model_context::get_cell_name(const base_cell* p) const
     return string();
 }
 
+address_t model_context::get_cell_position(const base_cell* p) const
+{
+    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->second == p)
+            return itr->first;
+    }
+
+    throw general_error("cell instance not found");
+}
+
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)
 {
     m_named_expressions.insert(name, cell);

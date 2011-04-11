@@ -36,6 +36,8 @@
 #include <iostream>
 #include <sstream>
 
+#define DEBUG_FORMULA_INTERPRETER 0
+
 using namespace std;
 
 namespace ixion {
@@ -64,6 +66,11 @@ formula_interpreter::formula_interpreter(const formula_cell* cell, const model_c
 
 formula_interpreter::~formula_interpreter()
 {
+}
+
+void formula_interpreter::set_origin(const address_t& pos)
+{
+    m_pos = pos;
 }
 
 bool formula_interpreter::interpret()
@@ -336,6 +343,14 @@ double formula_interpreter::paren()
 double formula_interpreter::variable()
 {
     address_t addr = token().get_single_ref();
+#if DEBUG_FORMULA_INTERPRETER
+    cout << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
+    cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
+#endif
+    addr = addr.to_abs(m_pos);
+#if DEBUG_FORMULA_INTERPRETER
+    cout << "formula_interpreter::variable: ref=" << addr.get_name() << " (converted to absolute)" << endl;
+#endif
     const base_cell* pref = m_context.get_cell(addr);
 
     if (pref == m_parent_cell)

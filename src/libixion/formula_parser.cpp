@@ -249,10 +249,12 @@ void formula_parser::name(const lexer_token_base& t)
         case formula_name_type::cell_reference:
 #if DEBUG_PARSER
             cout << "'" << name << "' is a cell reference (sheet=" << 
-                fn.address.sheet << ",row=" << fn.address.row << ",col=" << fn.address.col << ")" << endl;
+                fn.address.sheet << "; row=" << fn.address.row << "; col=" << fn.address.col << ")" << endl;
 #endif
             m_formula_tokens.push_back(
-                new single_ref_token(address_t(fn.address.sheet, fn.address.row, fn.address.col)));
+                new single_ref_token(
+                    address_t(fn.address.sheet, fn.address.row, fn.address.col,
+                              fn.address.abs_sheet, fn.address.abs_row, fn.address.abs_col)));
         break;
         case formula_name_type::function:
 #if DEBUG_PARSER

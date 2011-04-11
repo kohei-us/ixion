@@ -48,6 +48,7 @@ struct address_t
               bool _abs_sheet=true, bool _abs_row=true, bool _abs_column=true);
     address_t(const address_t& addr);
 
+    address_t to_abs(const address_t& origin) const;
     ::std::string get_name() const;
 
     struct hash
