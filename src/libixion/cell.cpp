@@ -293,6 +293,8 @@ void formula_cell::check_circular(const model_context& cxt)
             continue;
 
         address_t addr = itr->get_single_ref();
+        address_t origin = cxt.get_cell_position(this);
+        addr = addr.to_abs(origin);
         const base_cell* ref = cxt.get_cell(addr);
 
         if (!ref)
