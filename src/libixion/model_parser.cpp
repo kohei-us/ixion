@@ -589,6 +589,8 @@ void model_parser::parse()
 
     for (; p != p_last; ++p)
     {
+        // In each iteration, the p always points to the 1st character of a
+        // line.
         if (*p == '%')
         {
             // This line contains a command.
