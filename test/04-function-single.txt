@@ -1,3 +1,4 @@
+%% Test built-in functions.
 %mode init
 A1=MAX(10,20,5,36)
 A2=MIN(10,20,5,36)

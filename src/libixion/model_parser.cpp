@@ -362,6 +362,13 @@ void parse_command(const char*& p, mem_str_buf& com)
     mem_str_buf _com;
     ++p; // skip '%'.
     _com.set_start(p);
+    if (*p == '%')
+    {
+        // This line is a comment.  Skip the rest of the line.
+        _com.swap(com);
+        while (*p != '\n') ++p;
+        return;
+    }
     for (++p; *p != '\n'; ++p)
         _com.inc();
     _com.swap(com);
@@ -587,7 +594,11 @@ void model_parser::parse()
             // This line contains a command.
             mem_str_buf buf_com;
             parse_command(p, buf_com);
-            if (buf_com.equals("calc"))
+            if (buf_com.equals("%"))
+            {
+                // This is a comment line.  Just ignore it.
+            }
+            else if (buf_com.equals("calc"))
             {
                 if (parse_mode != parse_mode_init)
                     throw parse_error("'calc' command must be used in the init mode.");

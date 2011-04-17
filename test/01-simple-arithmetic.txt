@@ -1,3 +1,4 @@
+%% Test calculation involving dependency resolution.
 %mode init
 A1=1
 A2=A1+10
