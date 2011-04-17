@@ -45,8 +45,21 @@ struct abs_address_t
     abs_address_t();
     abs_address_t(sheet_t _sheet, row_t _row, col_t _column);
     abs_address_t(const abs_address_t& r);
+
+    ::std::string get_name() const;
+
+    struct hash
+    {
+        size_t operator() (const abs_address_t& addr) const;
+    };
 };
 
+bool operator==(const abs_address_t& left, const abs_address_t& right);
+bool operator<(const abs_address_t& left, const abs_address_t& right);
+
+/**
+ * Stores either absolute or relative address.
+ */
 struct address_t
 {
     sheet_t sheet;
@@ -59,9 +72,10 @@ struct address_t
     address_t();
     address_t(sheet_t _sheet, row_t _row, col_t _column, 
               bool _abs_sheet=true, bool _abs_row=true, bool _abs_column=true);
-    address_t(const address_t& addr);
+    address_t(const address_t& r);
+    address_t(const abs_address_t& r);
 
-    address_t to_abs(const address_t& origin) const;
+    abs_address_t to_abs(const abs_address_t& origin) const;
     ::std::string get_name() const;
 
     struct hash

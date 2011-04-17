@@ -78,7 +78,7 @@ private:
 class ref_cell_picker : public unary_function<formula_token_base*, void>
 {
 public:
-    ref_cell_picker(const model_context& cxt, const address_t& origin, vector<base_cell*>& deps) :
+    ref_cell_picker(const model_context& cxt, const abs_address_t& origin, vector<base_cell*>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
     void operator() (formula_token_base* p)
@@ -86,7 +86,7 @@ public:
         if (p->get_opcode() != fop_single_ref)
             return;
 
-        address_t addr = static_cast<single_ref_token*>(p)->get_single_ref().to_abs(m_origin);
+        abs_address_t addr = static_cast<single_ref_token*>(p)->get_single_ref().to_abs(m_origin);
         const base_cell* refcell = m_context.get_cell(addr);
         if (refcell)
             m_deps.push_back(const_cast<base_cell*>(refcell));
@@ -94,7 +94,7 @@ public:
 
 private:
     const model_context& m_context;
-    const address_t&     m_origin;
+    const abs_address_t& m_origin;
     vector<base_cell*>&  m_deps;
 };
 
@@ -122,7 +122,7 @@ class formula_cell_listener_handler : public unary_function<formula_token_base*,
 public:
     enum mode_t { mode_add, mode_remove };
 
-    explicit formula_cell_listener_handler(model_context& cxt, const address_t& addr, mode_t mode) : 
+    explicit formula_cell_listener_handler(model_context& cxt, const abs_address_t& addr, mode_t mode) : 
         m_context(cxt), m_addr(addr), m_mode(mode)
     {
 #if DEBUG_MODEL_PARSER
@@ -134,8 +134,7 @@ public:
     {
         if (p->get_opcode() == fop_single_ref)
         {
-            address_t addr = p->get_single_ref();
-            addr = addr.to_abs(m_addr);
+            abs_address_t addr = p->get_single_ref().to_abs(m_addr);
 #if DEBUG_MODEL_PARSER
             cout << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
 #endif
@@ -162,7 +161,7 @@ public:
 
 private:
     model_context& m_context;
-    const address_t& m_addr;
+    const abs_address_t& m_addr;
     formula_cell* mp_cell;
     mode_t m_mode;
 };
@@ -227,7 +226,7 @@ public:
         // probably combine this with the above get_ref_tokens() call above
         // for efficiency.
         vector<base_cell*> deps;
-        address_t cell_pos = m_context.get_cell_position(pcell);
+        abs_address_t cell_pos = m_context.get_cell_position(pcell);
         for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, cell_pos, deps));
 
 #if DEBUG_MODEL_PARSER
@@ -378,7 +377,7 @@ void ensure_unique_names(const vector<string>& cell_names)
 
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
 {
-    typedef ::std::pair<address_t, formula_cell*> address_cell_pair_type;
+    typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
 
     dirty_cells_t _dirty_cells;
     vector<address_cell_pair_type> fcells;
@@ -411,7 +410,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
             break;
             case formula_name_type::cell_reference:
             {
-                address_t addr;
+                abs_address_t addr;
                 addr.sheet = name_type.address.sheet;
                 addr.row = name_type.address.row;
                 addr.column = name_type.address.col;
@@ -717,7 +716,7 @@ const base_cell* model_parser::get_cell_from_name(const string& name)
         case formula_name_type::cell_reference:
         {
             const formula_name_type::address_type& addr = name_type.address;
-            return m_context.get_cell(address_t(addr.sheet, addr.row, addr.col));
+            return m_context.get_cell(abs_address_t(addr.sheet, addr.row, addr.col));
         }
         case formula_name_type::named_expression:
             return m_context.get_named_expression(name);

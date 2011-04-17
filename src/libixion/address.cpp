@@ -42,6 +42,36 @@ abs_address_t::abs_address_t(sheet_t _sheet, row_t _row, col_t _column) :
 abs_address_t::abs_address_t(const abs_address_t& r) : 
     sheet(r.sheet), row(r.row), column(r.column) {}
 
+string abs_address_t::get_name() const
+{
+    ostringstream os;
+    os << "(sheet=" << sheet << "; row=" << row << "; column=" << column << ")";
+    return os.str();
+}
+
+size_t abs_address_t::hash::operator()(const abs_address_t& addr) const
+{
+    return addr.sheet + addr.row + addr.column;
+}
+
+bool operator== (const abs_address_t& left, const abs_address_t& right)
+{
+    return left.sheet == right.sheet && 
+        left.row == right.row && 
+        left.column == right.column;
+}
+
+bool operator< (const abs_address_t& left, const abs_address_t& right)
+{
+    if (left.sheet != right.sheet)
+        return left.sheet < right.sheet;
+
+    if (left.row != right.row)
+        return left.row < right.row;
+
+    return left.column < right.column;
+}
+
 address_t::address_t() : 
     sheet(0), row(0), column(0), abs_sheet(true), abs_row(true), abs_column(true) {}
 
@@ -53,26 +83,26 @@ address_t::address_t(const address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column),
     abs_sheet(r.abs_sheet), abs_row(r.abs_row), abs_column(r.abs_column) {}
 
-address_t address_t::to_abs(const address_t& origin) const
+address_t::address_t(const abs_address_t& r) : 
+    sheet(r.sheet), row(r.row), column(r.column),
+    abs_sheet(true), abs_row(true), abs_column(true) {}
+
+abs_address_t address_t::to_abs(const abs_address_t& origin) const
 {
-    address_t abs_addr(*this);
-    if (!abs_addr.abs_sheet)
-    {
+    abs_address_t abs_addr;
+    abs_addr.sheet = sheet;
+    abs_addr.row = row;
+    abs_addr.column = column;
+
+    if (!abs_sheet)
         abs_addr.sheet += origin.sheet;
-        abs_addr.abs_sheet = true;
-    }
 
-    if (!abs_addr.abs_row)
-    {
+    if (!abs_row)
         abs_addr.row += origin.row;
-        abs_addr.abs_row = true;
-    }
 
-    if (!abs_addr.abs_column)
-    {
+    if (!abs_column)
         abs_addr.column += origin.column;
-        abs_addr.abs_column = true;
-    }
+
     return abs_addr;
 }
 

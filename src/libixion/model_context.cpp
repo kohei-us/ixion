@@ -41,25 +41,25 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
     return *mp_name_resolver;
 }
 
-void model_context::set_cell(const address_t& addr, auto_ptr<base_cell>& cell)
+void model_context::set_cell(const abs_address_t& addr, auto_ptr<base_cell>& cell)
 {
     m_cells.erase(addr);
     m_cells.insert(addr, cell);
 }
 
-void model_context::set_cell(const address_t& addr, base_cell* cell)
+void model_context::set_cell(const abs_address_t& addr, base_cell* cell)
 {
     auto_ptr<base_cell> p(cell);
     set_cell(addr, p);
 }
 
-const base_cell* model_context::get_cell(const address_t& addr) const
+const base_cell* model_context::get_cell(const abs_address_t& addr) const
 {
     cell_store_type::const_iterator itr = m_cells.find(addr);
     return itr == m_cells.end() ? NULL : itr->second;
 }
 
-base_cell* model_context::get_cell(const address_t& addr)
+base_cell* model_context::get_cell(const abs_address_t& addr)
 {
     cell_store_type::iterator itr = m_cells.find(addr);
     return itr == m_cells.end() ? NULL : itr->second;
@@ -78,7 +78,7 @@ string model_context::get_cell_name(const base_cell* p) const
     return string();
 }
 
-address_t model_context::get_cell_position(const base_cell* p) const
+abs_address_t model_context::get_cell_position(const base_cell* p) const
 {
     cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
     for (; itr != itr_end; ++itr)

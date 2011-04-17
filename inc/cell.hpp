@@ -55,7 +55,7 @@ enum celltype_t
 
 class base_cell
 {
-    typedef _ixion_unordered_set_type<address_t, address_t::hash> listeners_type;
+    typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> listeners_type;
 public:
     base_cell(celltype_t celltype);
     base_cell(const base_cell& r);
@@ -64,8 +64,8 @@ public:
     virtual double get_value() const = 0;
     virtual const char* print() const = 0;
 
-    void add_listener(const address_t& addr);
-    void remove_listener(const address_t& addr);
+    void add_listener(const abs_address_t& addr);
+    void remove_listener(const abs_address_t& addr);
     void swap_listeners(base_cell& other);
     void print_listeners(const model_context& cxt) const;
     void get_all_listeners(model_context& cxt, dirty_cells_t& cell) const;

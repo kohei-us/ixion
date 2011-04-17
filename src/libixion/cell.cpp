@@ -85,12 +85,12 @@ base_cell::~base_cell()
 {
 }
 
-void base_cell::add_listener(const address_t& addr)
+void base_cell::add_listener(const abs_address_t& addr)
 {
     m_listeners.insert(addr);
 }
 
-void base_cell::remove_listener(const address_t& addr)
+void base_cell::remove_listener(const abs_address_t& addr)
 {
     m_listeners.erase(addr);
 }
@@ -292,9 +292,8 @@ void formula_cell::check_circular(const model_context& cxt)
         if (op != fop_single_ref)
             continue;
 
-        address_t addr = itr->get_single_ref();
-        address_t origin = cxt.get_cell_position(this);
-        addr = addr.to_abs(origin);
+        abs_address_t origin = cxt.get_cell_position(this);
+        abs_address_t addr = itr->get_single_ref().to_abs(origin);
         const base_cell* ref = cxt.get_cell(addr);
 
         if (!ref)

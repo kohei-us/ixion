@@ -38,7 +38,7 @@
 namespace ixion {
 
 class formula_name_resolver_base;
-struct address_t;
+struct abs_address_t;
 
 /**
  * This class stores all data relevant to current session.  You can think of 
@@ -47,19 +47,19 @@ struct address_t;
 class model_context : public ::boost::noncopyable
 {
     typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_type;
-    typedef ::boost::ptr_map<address_t, base_cell> cell_store_type;
+    typedef ::boost::ptr_map<abs_address_t, base_cell> cell_store_type;
 public:
     model_context();
     ~model_context();
     
     const formula_name_resolver_base& get_name_resolver() const;
 
-    void set_cell(const address_t& addr, ::std::auto_ptr<base_cell>& cell);
-    void set_cell(const address_t& addr, base_cell* cell);
-    const base_cell* get_cell(const address_t& addr) const;
-    base_cell* get_cell(const address_t& addr);
+    void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
+    void set_cell(const abs_address_t& addr, base_cell* cell);
+    const base_cell* get_cell(const abs_address_t& addr) const;
+    base_cell* get_cell(const abs_address_t& addr);
     ::std::string get_cell_name(const base_cell* p) const;
-    address_t get_cell_position(const base_cell* p) const;
+    abs_address_t get_cell_position(const base_cell* p) const;
 
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
     formula_cell* get_named_expression(const ::std::string& name);

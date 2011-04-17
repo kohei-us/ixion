@@ -68,7 +68,7 @@ formula_interpreter::~formula_interpreter()
 {
 }
 
-void formula_interpreter::set_origin(const address_t& pos)
+void formula_interpreter::set_origin(const abs_address_t& pos)
 {
     m_pos = pos;
 }
@@ -347,11 +347,11 @@ double formula_interpreter::variable()
     cout << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
     cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
 #endif
-    addr = addr.to_abs(m_pos);
+    abs_address_t abs_addr = addr.to_abs(m_pos);
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::variable: ref=" << addr.get_name() << " (converted to absolute)" << endl;
+    cout << "formula_interpreter::variable: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
 #endif
-    const base_cell* pref = m_context.get_cell(addr);
+    const base_cell* pref = m_context.get_cell(abs_addr);
 
     if (pref == m_parent_cell)
     {
