@@ -33,6 +33,15 @@ using namespace std;
 
 namespace ixion {
 
+abs_address_t::abs_address_t() : 
+    sheet(0), row(0), column(0) {}
+
+abs_address_t::abs_address_t(sheet_t _sheet, row_t _row, col_t _column) : 
+    sheet(_sheet), row(_row), column(_column) {}
+
+abs_address_t::abs_address_t(const abs_address_t& r) : 
+    sheet(r.sheet), row(r.row), column(r.column) {}
+
 address_t::address_t() : 
     sheet(0), row(0), column(0), abs_sheet(true), abs_row(true), abs_column(true) {}
 

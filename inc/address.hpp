@@ -34,6 +34,19 @@
 
 namespace ixion {
 
+/**
+ * Stores absolute address, and absolute address only.
+ */
+struct abs_address_t
+{
+    sheet_t sheet;
+    row_t   row;
+    col_t   column;
+    abs_address_t();
+    abs_address_t(sheet_t _sheet, row_t _row, col_t _column);
+    abs_address_t(const abs_address_t& r);
+};
+
 struct address_t
 {
     sheet_t sheet;
