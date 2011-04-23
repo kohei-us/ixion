@@ -239,9 +239,6 @@
 				<F N="../include/ixion/formula_tokens.hpp"/>
 				<F N="../include/ixion/global.hpp"/>
 				<F N="../include/ixion/lexer_tokens.hpp"/>
-				<F
-					N="../include/ixion/Makefile.am"
-					Type="Makefile"/>
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
 				<F N="../include/ixion/model_parser.hpp"/>
