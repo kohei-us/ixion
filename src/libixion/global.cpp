@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#include "global.hpp"
-#include "mem_str_buf.hpp"
+#include "ixion/global.hpp"
+#include "ixion/mem_str_buf.hpp"
 
 #include <iostream>
 #include <cstdlib>

@@ -25,15 +25,15 @@
  *
  ************************************************************************/
 
-#include "model_parser.hpp"
-#include "cell.hpp"
-#include "formula_lexer.hpp"
-#include "formula_parser.hpp"
-#include "depends_tracker.hpp"
-#include "formula_interpreter.hpp"
-#include "formula_name_resolver.hpp"
-#include "formula_result.hpp"
-#include "mem_str_buf.hpp"
+#include "ixion/model_parser.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/formula_lexer.hpp"
+#include "ixion/formula_parser.hpp"
+#include "ixion/depends_tracker.hpp"
+#include "ixion/formula_interpreter.hpp"
+#include "ixion/formula_name_resolver.hpp"
+#include "ixion/formula_result.hpp"
+#include "ixion/mem_str_buf.hpp"
 
 #include <sstream>
 #include <iostream>

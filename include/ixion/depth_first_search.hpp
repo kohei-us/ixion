@@ -28,7 +28,7 @@
 #ifndef __IXION_DEPTH_FIRST_SEARCH_HPP__
 #define __IXION_DEPTH_FIRST_SEARCH_HPP__
 
-#include "hash_container/map.hpp"
+#include "ixion/hash_container/map.hpp"
 
 #include <vector>
 #include <set>

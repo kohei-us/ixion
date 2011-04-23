@@ -25,48 +25,57 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_FORMULA_LEXER_HPP__
-#define __IXION_FORMULA_LEXER_HPP__
+#ifndef __IXION_FORMULA_FUNCTIONS_HPP__
+#define __IXION_FORMULA_FUNCTIONS_HPP__
+
+#include "ixion/global.hpp"
 
 #include <string>
-#include <exception>
-#include <boost/noncopyable.hpp>
-
-#include "lexer_tokens.hpp"
-#include "mem_str_buf.hpp"
+#include <vector>
 
 namespace ixion {
 
-class formula_lexer : public ::boost::noncopyable
+class formula_token_base;
+
+enum formula_function_t
+{
+    func_unknown = 0,
+
+    func_max,
+    func_min,
+    func_average,
+    func_sum,
+
+    func_wait // dummy function used only for testing.
+
+    // TODO: more functions to come...
+};
+
+class formula_functions
 {
 public:
-    class tokenize_error : public ::std::exception
+    typedef ::std::vector<double> args_type;
+
+    class invalid_arg : public general_error
     {
     public:
-        tokenize_error(const ::std::string& msg);
-        virtual ~tokenize_error() throw();
-        virtual const char* what() const throw();
-    private:
-        ::std::string m_msg;
+        invalid_arg(const ::std::string& msg);
     };
 
-    formula_lexer(const mem_str_buf& formula);
-    ~formula_lexer();
+    static formula_function_t get_function_opcode(const formula_token_base& token);
+    static formula_function_t get_function_opcode(const ::std::string& name);
+    static const char* get_function_name(formula_function_t oc);
 
-    void tokenize();
+    static double interpret(formula_function_t oc, const args_type& args);
 
-    /** 
-     * Note that this will empty the tokens stored inside the lexer instance.
-     *
-     * @param tokens token container to move the tokens to.
-     */
-    void swap_tokens(lexer_tokens_t& tokens);
-
+    static double max(const args_type& args);
+    static double min(const args_type& args);
+    static double sum(const args_type& args);
+    static double average(const args_type& args);
+    static double wait(const args_type& args);
 private:
-    formula_lexer();
-
-    lexer_tokens_t m_tokens;
-    mem_str_buf m_formula;
+    formula_functions();
+    ~formula_functions();
 };
 
 }

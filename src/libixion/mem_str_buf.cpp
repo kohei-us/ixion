@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "mem_str_buf.hpp"
+#include "ixion/mem_str_buf.hpp"
 
 #include <cstring>
 #include <cassert>

@@ -25,57 +25,55 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_FORMULA_FUNCTIONS_HPP__
-#define __IXION_FORMULA_FUNCTIONS_HPP__
+#ifndef __IXION_FORMULA_PARSER_HPP__
+#define __IXION_FORMULA_PARSER_HPP__
 
-#include "global.hpp"
+#include "ixion/global.hpp"
+#include "ixion/lexer_tokens.hpp"
+#include "ixion/formula_tokens.hpp"
+#include "ixion/hash_container/map.hpp"
 
 #include <string>
-#include <vector>
+#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
-class formula_token_base;
+class model_context;
 
-enum formula_function_t
-{
-    func_unknown = 0,
-
-    func_max,
-    func_min,
-    func_average,
-    func_sum,
-
-    func_wait // dummy function used only for testing.
-
-    // TODO: more functions to come...
-};
-
-class formula_functions
+/** 
+ * Class formula_parser parses a series of primitive (or lexer) tokens 
+ * passed on from the lexer, and turn them into a series of formula tokens. 
+ * It also picks up a list of cells that it depends on.
+ */
+class formula_parser : public ::boost::noncopyable
 {
 public:
-    typedef ::std::vector<double> args_type;
-
-    class invalid_arg : public general_error
+    class parse_error : public general_error
     {
     public:
-        invalid_arg(const ::std::string& msg);
+        parse_error(const ::std::string& msg);
     };
 
-    static formula_function_t get_function_opcode(const formula_token_base& token);
-    static formula_function_t get_function_opcode(const ::std::string& name);
-    static const char* get_function_name(formula_function_t oc);
+    formula_parser(const lexer_tokens_t& tokens, const model_context& cxt);
+    ~formula_parser();
 
-    static double interpret(formula_function_t oc, const args_type& args);
+    void set_origin(const address_t& pos);
+    void parse();
+    void print_tokens() const;
 
-    static double max(const args_type& args);
-    static double min(const args_type& args);
-    static double sum(const args_type& args);
-    static double average(const args_type& args);
-    static double wait(const args_type& args);
+    formula_tokens_t& get_tokens();
+    
 private:
-    formula_functions();
-    ~formula_functions();
+    formula_parser(); // disabled
+
+    void primitive(lexer_opcode_t oc);
+    void name(const lexer_token_base& t);
+    void value(const lexer_token_base& t);
+
+    const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
+    const model_context&    m_context;
+    formula_tokens_t        m_formula_tokens;
+    address_t               m_pos;    // reference position (usually current cell). always absolute.
 };
 
 }

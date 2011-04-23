@@ -28,7 +28,7 @@
 #ifndef __IXION_FORMULA_RESULT_HPP__
 #define __IXION_FORMULA_RESULT_HPP__
 
-#include "global.hpp"
+#include "ixion/global.hpp"
 
 #include <string>
 

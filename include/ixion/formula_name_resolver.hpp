@@ -30,8 +30,8 @@
 
 #include <string>
 
-#include "formula_functions.hpp"
-#include "address.hpp"
+#include "ixion/formula_functions.hpp"
+#include "ixion/address.hpp"
 
 namespace ixion {
 

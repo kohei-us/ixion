@@ -28,7 +28,7 @@
 #ifndef __IXION_MODEL_CONTEXT_HPP__
 #define __IXION_MODEL_CONTEXT_HPP__
 
-#include "cell.hpp"
+#include "ixion/cell.hpp"
 
 #include <string>
 #include <memory>

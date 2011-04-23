@@ -25,55 +25,50 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_FORMULA_PARSER_HPP__
-#define __IXION_FORMULA_PARSER_HPP__
+#ifndef __IXION_CELL_QUEUE_MANAGER_HPP__
+#define __IXION_CELL_QUEUE_MANAGER_HPP__
 
-#include "global.hpp"
-#include "lexer_tokens.hpp"
-#include "formula_tokens.hpp"
-#include "hash_container/map.hpp"
+#include "ixion/global.hpp"
 
-#include <string>
-#include <boost/noncopyable.hpp>
+#include <cstdlib>
 
 namespace ixion {
 
+class formula_cell;
 class model_context;
 
-/** 
- * Class formula_parser parses a series of primitive (or lexer) tokens 
- * passed on from the lexer, and turn them into a series of formula tokens. 
- * It also picks up a list of cells that it depends on.
+/**
+ * This class manages parallel cell interpretation using threads.  This 
+ * class should never be instantiated. 
  */
-class formula_parser : public ::boost::noncopyable
+class cell_queue_manager
 {
 public:
-    class parse_error : public general_error
-    {
-    public:
-        parse_error(const ::std::string& msg);
-    };
+    /**
+     * Initialize queue manager thread, with specified number of worker 
+     * threads. 
+     *  
+     * @param thread_count desired number of worker threads.
+     */
+    static void init(size_t thread_count, const model_context& context);
 
-    formula_parser(const lexer_tokens_t& tokens, const model_context& cxt);
-    ~formula_parser();
+    /**
+     * Add new cell to queue to interpret. 
+     * 
+     * @param cell pointer to cell instance to interpret.
+     */
+    static void add_cell(formula_cell* cell);
 
-    void set_origin(const address_t& pos);
-    void parse();
-    void print_tokens() const;
+    /**
+     * Terminate the queue manager thread, along with all spawned worker
+     * threads.
+     */
+    static void terminate();
 
-    formula_tokens_t& get_tokens();
-    
 private:
-    formula_parser(); // disabled
-
-    void primitive(lexer_opcode_t oc);
-    void name(const lexer_token_base& t);
-    void value(const lexer_token_base& t);
-
-    const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
-    const model_context&    m_context;
-    formula_tokens_t        m_formula_tokens;
-    address_t               m_pos;    // reference position (usually current cell). always absolute.
+    cell_queue_manager();
+    cell_queue_manager(const cell_queue_manager& r);
+    ~cell_queue_manager();
 };
 
 }

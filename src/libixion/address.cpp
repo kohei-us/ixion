@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "address.hpp"
+#include "ixion/address.hpp"
 
 #include <sstream>
 

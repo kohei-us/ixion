@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#include "sort_input_parser.hpp"
-#include "global.hpp"
+#include "ixion/sort_input_parser.hpp"
+#include "ixion/global.hpp"
 
 #include <fstream>
 #include <iostream>

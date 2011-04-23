@@ -219,33 +219,35 @@
 		<Folder Name="../bin">
 			<F N="../bin/ixion-parser.sh"/>
 		</Folder>
-		<Folder Name="../inc">
-			<Folder Name="hash_container">
-				<F N="../include/hash_container/map.hpp"/>
-				<F N="../include/hash_container/set.hpp"/>
+		<Folder Name="../include">
+			<Folder Name="ixion">
+				<Folder Name="hash_container">
+					<F N="../include/ixion/hash_container/map.hpp"/>
+					<F N="../include/ixion/hash_container/set.hpp"/>
+				</Folder>
+				<F N="../include/ixion/address.hpp"/>
+				<F N="../include/ixion/cell.hpp"/>
+				<F N="../include/ixion/cell_queue_manager.hpp"/>
+				<F N="../include/ixion/depends_tracker.hpp"/>
+				<F N="../include/ixion/depth_first_search.hpp"/>
+				<F N="../include/ixion/formula_functions.hpp"/>
+				<F N="../include/ixion/formula_interpreter.hpp"/>
+				<F N="../include/ixion/formula_lexer.hpp"/>
+				<F N="../include/ixion/formula_name_resolver.hpp"/>
+				<F N="../include/ixion/formula_parser.hpp"/>
+				<F N="../include/ixion/formula_result.hpp"/>
+				<F N="../include/ixion/formula_tokens.hpp"/>
+				<F N="../include/ixion/global.hpp"/>
+				<F N="../include/ixion/lexer_tokens.hpp"/>
+				<F
+					N="../include/ixion/Makefile.am"
+					Type="Makefile"/>
+				<F N="../include/ixion/mem_str_buf.hpp"/>
+				<F N="../include/ixion/model_context.hpp"/>
+				<F N="../include/ixion/model_parser.hpp"/>
+				<F N="../include/ixion/sort_input_parser.hpp"/>
+				<F N="../include/ixion/thread.hpp"/>
 			</Folder>
-			<F N="../include/address.hpp"/>
-			<F N="../include/cell.hpp"/>
-			<F N="../include/cell_queue_manager.hpp"/>
-			<F N="../include/depends_tracker.hpp"/>
-			<F N="../include/depth_first_search.hpp"/>
-			<F N="../include/formula_functions.hpp"/>
-			<F N="../include/formula_interpreter.hpp"/>
-			<F N="../include/formula_lexer.hpp"/>
-			<F N="../include/formula_name_resolver.hpp"/>
-			<F N="../include/formula_parser.hpp"/>
-			<F N="../include/formula_result.hpp"/>
-			<F N="../include/formula_tokens.hpp"/>
-			<F N="../include/global.hpp"/>
-			<F N="../include/lexer_tokens.hpp"/>
-			<F
-				N="../include/Makefile.am"
-				Type="Makefile"/>
-			<F N="../include/mem_str_buf.hpp"/>
-			<F N="../include/model_context.hpp"/>
-			<F N="../include/model_parser.hpp"/>
-			<F N="../include/sort_input_parser.hpp"/>
-			<F N="../include/thread.hpp"/>
 		</Folder>
 		<Folder Name="../src">
 			<Folder Name="libixion">

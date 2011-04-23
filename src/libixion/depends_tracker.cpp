@@ -25,13 +25,13 @@
  *
  ************************************************************************/
 
-#include "depends_tracker.hpp"
-#include "global.hpp"
-#include "cell.hpp"
-#include "formula_interpreter.hpp"
-#include "cell_queue_manager.hpp"
-#include "model_context.hpp"
-#include "hash_container/map.hpp"
+#include "ixion/depends_tracker.hpp"
+#include "ixion/global.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/formula_interpreter.hpp"
+#include "ixion/cell_queue_manager.hpp"
+#include "ixion/model_context.hpp"
+#include "ixion/hash_container/map.hpp"
 
 #include <vector>
 #include <iostream>

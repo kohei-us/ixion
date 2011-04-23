@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "formula_lexer.hpp"
+#include "ixion/formula_lexer.hpp"
 
 #include <iostream>
 #include <sstream>

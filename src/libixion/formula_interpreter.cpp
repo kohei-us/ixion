@@ -25,12 +25,12 @@
  *
  ************************************************************************/
 
-#include "formula_interpreter.hpp"
-#include "cell.hpp"
-#include "global.hpp"
-#include "formula_functions.hpp"
-#include "formula_name_resolver.hpp"
-#include "model_context.hpp"
+#include "ixion/formula_interpreter.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/global.hpp"
+#include "ixion/formula_functions.hpp"
+#include "ixion/formula_name_resolver.hpp"
+#include "ixion/model_context.hpp"
 
 #include <string>
 #include <iostream>

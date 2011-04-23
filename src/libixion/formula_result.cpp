@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#include "formula_result.hpp"
-#include "mem_str_buf.hpp"
+#include "ixion/formula_result.hpp"
+#include "ixion/mem_str_buf.hpp"
 
 #include <sstream>
 

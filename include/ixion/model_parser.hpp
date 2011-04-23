@@ -28,10 +28,10 @@
 #ifndef __IXION_MODEL_PARSER_HPP__
 #define __IXION_MODEL_PARSER_HPP__
 
-#include "cell.hpp"
-#include "lexer_tokens.hpp"
-#include "model_context.hpp"
-#include "hash_container/map.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/lexer_tokens.hpp"
+#include "ixion/model_context.hpp"
+#include "ixion/hash_container/map.hpp"
 
 #include <string>
 #include <exception>

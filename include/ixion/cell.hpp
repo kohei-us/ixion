@@ -28,10 +28,10 @@
 #ifndef __IXION_CELL_HPP__
 #define __IXION_CELL_HPP__
 
-#include "formula_tokens.hpp"
-#include "global.hpp"
-#include "address.hpp"
-#include "hash_container/set.hpp"
+#include "ixion/formula_tokens.hpp"
+#include "ixion/global.hpp"
+#include "ixion/address.hpp"
+#include "ixion/hash_container/set.hpp"
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>

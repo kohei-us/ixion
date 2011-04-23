@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "lexer_tokens.hpp"
+#include "ixion/lexer_tokens.hpp"
 
 #include <iostream>
 #include <sstream>

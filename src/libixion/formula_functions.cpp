@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#include "formula_functions.hpp"
-#include "formula_tokens.hpp"
+#include "ixion/formula_functions.hpp"
+#include "ixion/formula_tokens.hpp"
 
 #ifdef max
 #undef max

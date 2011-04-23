@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "model_parser.hpp"
+#include "ixion/model_parser.hpp"
 
 #include <string>
 #include <vector>

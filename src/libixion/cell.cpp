@@ -25,10 +25,10 @@
  *
  ************************************************************************/
 
-#include "cell.hpp"
-#include "formula_interpreter.hpp"
-#include "formula_result.hpp"
-#include "model_context.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/formula_interpreter.hpp"
+#include "ixion/formula_result.hpp"
+#include "ixion/model_context.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>

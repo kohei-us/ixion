@@ -28,8 +28,8 @@
 #ifndef __IXION_GLOBAL_HPP__
 #define __IXION_GLOBAL_HPP__
 
-#include "hash_container/map.hpp"
-#include "hash_container/set.hpp"
+#include "ixion/hash_container/map.hpp"
+#include "ixion/hash_container/set.hpp"
 
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>

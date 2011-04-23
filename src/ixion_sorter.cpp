@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "sort_input_parser.hpp"
+#include "ixion/sort_input_parser.hpp"
 
 #include <cstdlib>
 #include <string>

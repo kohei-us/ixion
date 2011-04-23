@@ -25,7 +25,7 @@
  *
  ************************************************************************/
 
-#include "formula_tokens.hpp"
+#include "ixion/formula_tokens.hpp"
 
 using ::std::string;
 

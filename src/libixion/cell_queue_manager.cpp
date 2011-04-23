@@ -25,10 +25,10 @@
  *
  ************************************************************************/
 
-#include "cell_queue_manager.hpp"
+#include "ixion/cell_queue_manager.hpp"
 
-#include "cell.hpp"
-#include "model_context.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/model_context.hpp"
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>

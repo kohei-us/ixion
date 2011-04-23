@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#include "formula_name_resolver.hpp"
-#include "address.hpp"
+#include "ixion/formula_name_resolver.hpp"
+#include "ixion/address.hpp"
 
 #include <iostream>
 #include <cassert>

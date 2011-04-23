@@ -31,7 +31,7 @@
 #include <string>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-#include "address.hpp"
+#include "ixion/address.hpp"
 
 namespace ixion {
 

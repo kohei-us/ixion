@@ -25,50 +25,48 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_CELL_QUEUE_MANAGER_HPP__
-#define __IXION_CELL_QUEUE_MANAGER_HPP__
+#ifndef __IXION_FORMULA_LEXER_HPP__
+#define __IXION_FORMULA_LEXER_HPP__
 
-#include "global.hpp"
+#include <string>
+#include <exception>
+#include <boost/noncopyable.hpp>
 
-#include <cstdlib>
+#include "ixion/lexer_tokens.hpp"
+#include "ixion/mem_str_buf.hpp"
 
 namespace ixion {
 
-class formula_cell;
-class model_context;
-
-/**
- * This class manages parallel cell interpretation using threads.  This 
- * class should never be instantiated. 
- */
-class cell_queue_manager
+class formula_lexer : public ::boost::noncopyable
 {
 public:
-    /**
-     * Initialize queue manager thread, with specified number of worker 
-     * threads. 
-     *  
-     * @param thread_count desired number of worker threads.
-     */
-    static void init(size_t thread_count, const model_context& context);
+    class tokenize_error : public ::std::exception
+    {
+    public:
+        tokenize_error(const ::std::string& msg);
+        virtual ~tokenize_error() throw();
+        virtual const char* what() const throw();
+    private:
+        ::std::string m_msg;
+    };
 
-    /**
-     * Add new cell to queue to interpret. 
-     * 
-     * @param cell pointer to cell instance to interpret.
-     */
-    static void add_cell(formula_cell* cell);
+    formula_lexer(const mem_str_buf& formula);
+    ~formula_lexer();
 
-    /**
-     * Terminate the queue manager thread, along with all spawned worker
-     * threads.
+    void tokenize();
+
+    /** 
+     * Note that this will empty the tokens stored inside the lexer instance.
+     *
+     * @param tokens token container to move the tokens to.
      */
-    static void terminate();
+    void swap_tokens(lexer_tokens_t& tokens);
 
 private:
-    cell_queue_manager();
-    cell_queue_manager(const cell_queue_manager& r);
-    ~cell_queue_manager();
+    formula_lexer();
+
+    lexer_tokens_t m_tokens;
+    mem_str_buf m_formula;
 };
 
 }

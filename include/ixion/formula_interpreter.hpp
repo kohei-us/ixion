@@ -28,9 +28,9 @@
 #ifndef __IXION_FORMULA_INTERPRETER_HPP__
 #define __IXION_FORMULA_INTERPRETER_HPP__
 
-#include "global.hpp"
-#include "formula_tokens.hpp"
-#include "hash_container/set.hpp"
+#include "ixion/global.hpp"
+#include "ixion/formula_tokens.hpp"
+#include "ixion/hash_container/set.hpp"
 
 #include <sstream>
 

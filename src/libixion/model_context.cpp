@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#include "model_context.hpp"
-#include "formula_name_resolver.hpp"
+#include "ixion/model_context.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 using namespace std;
 

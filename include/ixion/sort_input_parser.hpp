@@ -28,9 +28,9 @@
 #ifndef __IXION_SORT_INPUT_PARSER_HXX__
 #define __IXION_SORT_INPUT_PARSER_HXX__
 
-#include "depth_first_search.hpp"
-#include "mem_str_buf.hpp"
-#include "global.hpp"
+#include "ixion/depth_first_search.hpp"
+#include "ixion/mem_str_buf.hpp"
+#include "ixion/global.hpp"
 
 #include <vector>
 

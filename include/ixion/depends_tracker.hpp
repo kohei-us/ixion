@@ -28,8 +28,8 @@
 #ifndef __DEPENDS_TRACKER_HPP__
 #define __DEPENDS_TRACKER_HPP__
 
-#include "formula_parser.hpp"
-#include "depth_first_search.hpp"
+#include "ixion/formula_parser.hpp"
+#include "ixion/depth_first_search.hpp"
 
 #include <set>
 #include <string>
