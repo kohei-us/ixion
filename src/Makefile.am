@@ -1,6 +1,6 @@
 SUBDIRS = libixion .
 
-INCLUDES = -I$(top_srcdir)/inc
+INCLUDES = -I$(top_srcdir)/include
 
 bin_PROGRAMS = ixion-parser ixion-sorter ixion-test
 ixion_parser_SOURCES = ixion_parser.cpp

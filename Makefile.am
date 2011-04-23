@@ -1,4 +1,4 @@
-SUBDIRS = src inc
+SUBDIRS = src include
 
 pcfiles = ixion-@IXION_API_VERSION@.pc
 ixion-@IXION_API_VERSION@.pc: ixion.pc

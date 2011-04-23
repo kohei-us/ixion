@@ -71,7 +71,7 @@ BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile
                  ixion.pc
-                 inc/Makefile
+                 include/Makefile
                  src/Makefile
                  src/libixion/Makefile])
 AC_OUTPUT

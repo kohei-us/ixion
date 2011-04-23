@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/inc
+INCLUDES = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \

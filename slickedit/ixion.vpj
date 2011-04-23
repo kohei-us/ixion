@@ -221,31 +221,31 @@
 		</Folder>
 		<Folder Name="../inc">
 			<Folder Name="hash_container">
-				<F N="../inc/hash_container/map.hpp"/>
-				<F N="../inc/hash_container/set.hpp"/>
+				<F N="../include/hash_container/map.hpp"/>
+				<F N="../include/hash_container/set.hpp"/>
 			</Folder>
-			<F N="../inc/address.hpp"/>
-			<F N="../inc/cell.hpp"/>
-			<F N="../inc/cell_queue_manager.hpp"/>
-			<F N="../inc/depends_tracker.hpp"/>
-			<F N="../inc/depth_first_search.hpp"/>
-			<F N="../inc/formula_functions.hpp"/>
-			<F N="../inc/formula_interpreter.hpp"/>
-			<F N="../inc/formula_lexer.hpp"/>
-			<F N="../inc/formula_name_resolver.hpp"/>
-			<F N="../inc/formula_parser.hpp"/>
-			<F N="../inc/formula_result.hpp"/>
-			<F N="../inc/formula_tokens.hpp"/>
-			<F N="../inc/global.hpp"/>
-			<F N="../inc/lexer_tokens.hpp"/>
+			<F N="../include/address.hpp"/>
+			<F N="../include/cell.hpp"/>
+			<F N="../include/cell_queue_manager.hpp"/>
+			<F N="../include/depends_tracker.hpp"/>
+			<F N="../include/depth_first_search.hpp"/>
+			<F N="../include/formula_functions.hpp"/>
+			<F N="../include/formula_interpreter.hpp"/>
+			<F N="../include/formula_lexer.hpp"/>
+			<F N="../include/formula_name_resolver.hpp"/>
+			<F N="../include/formula_parser.hpp"/>
+			<F N="../include/formula_result.hpp"/>
+			<F N="../include/formula_tokens.hpp"/>
+			<F N="../include/global.hpp"/>
+			<F N="../include/lexer_tokens.hpp"/>
 			<F
-				N="../inc/Makefile.am"
+				N="../include/Makefile.am"
 				Type="Makefile"/>
-			<F N="../inc/mem_str_buf.hpp"/>
-			<F N="../inc/model_context.hpp"/>
-			<F N="../inc/model_parser.hpp"/>
-			<F N="../inc/sort_input_parser.hpp"/>
-			<F N="../inc/thread.hpp"/>
+			<F N="../include/mem_str_buf.hpp"/>
+			<F N="../include/model_context.hpp"/>
+			<F N="../include/model_parser.hpp"/>
+			<F N="../include/sort_input_parser.hpp"/>
+			<F N="../include/thread.hpp"/>
 		</Folder>
 		<Folder Name="../src">
 			<Folder Name="libixion">
