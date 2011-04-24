@@ -244,6 +244,99 @@ private:
     dirty_cells_t& m_dirty_cells;
 };
 
+typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
+
+/**
+ * Function object to convert each lexer token cell into formula token cell. 
+ * Converted cells are put into the context object during this process. 
+ */
+class lexer_formula_cell_converter : public unary_function<model_parser::cell, void>
+{
+    model_context& m_context;
+    vector<address_cell_pair_type>& m_fcells;
+public:
+    lexer_formula_cell_converter(model_context& cxt, vector<address_cell_pair_type>& fcells) : 
+        m_context(cxt), m_fcells(fcells) {}
+
+    void operator() (const model_parser::cell& model_cell)
+    {
+        const string& name = model_cell.get_name();
+
+#if DEBUG_MODEL_PARSER
+        cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
+#endif
+        formula_parser fparser(model_cell.get_tokens(), m_context);
+
+        formula_cell* fcell = NULL;
+        formula_name_type name_type = m_context.get_name_resolver().resolve(name, address_t());
+        switch (name_type.type)
+        {
+            case formula_name_type::named_expression:
+                fcell = m_context.get_named_expression(name);
+                if (!fcell)
+                {
+                    // No prior named expression with the same name.
+                    auto_ptr<formula_cell> pcell(new formula_cell);
+                    m_context.set_named_expression(name, pcell);
+                    fcell = m_context.get_named_expression(name);
+                }
+                if (!fcell)
+                    throw general_error("failed to insert a named expression");
+            break;
+            case formula_name_type::cell_reference:
+            {
+                abs_address_t addr;
+                addr.sheet = name_type.address.sheet;
+                addr.row = name_type.address.row;
+                addr.column = name_type.address.col;
+                base_cell* p = m_context.get_cell(addr);
+                if (!p)
+                {
+                    // No prior cell at this address. Create a new one.
+                    auto_ptr<base_cell> pcell(new formula_cell);
+                    m_context.set_cell(addr, pcell);
+                    fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
+                }
+                else if (p->get_celltype() != celltype_formula)
+                {
+                    // Prior cell exists, but it's not a formula cell.
+                    // Transfer the listener cells over to the new cell
+                    // instance.
+                    auto_ptr<base_cell> pcell(new formula_cell);
+                    pcell->swap_listeners(*p);
+                    m_context.set_cell(addr, pcell);
+                    fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
+                }
+                else
+                {
+                    // Pre-existing formula cell.
+                    fcell = static_cast<formula_cell*>(p);
+                }
+
+                if (!fcell)
+                    throw general_error("failed to insert a new formula cell");
+
+                m_fcells.push_back(
+                    address_cell_pair_type(addr, fcell));
+
+                fparser.set_origin(addr);
+            }
+            break;
+            default:
+                throw general_error("unknown name type.");
+        }
+
+        assert(fcell);
+
+        // Parse the lexer tokens and turn them into formula tokens.
+        fparser.parse();
+        fparser.print_tokens();
+
+        // Put the formula tokens into formula cell instance.
+        fcell->swap_tokens(fparser.get_tokens());
+    }
+};
+
 // ============================================================================
 
 enum parse_mode_t
@@ -393,90 +486,9 @@ void ensure_unique_names(const vector<string>& cell_names)
  */
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
 {
-    typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
-
     dirty_cells_t _dirty_cells;
     vector<address_cell_pair_type> fcells;
-    vector<model_parser::cell>::const_iterator itr_cell = cells.begin(), itr_cell_end = cells.end();
-    for (; itr_cell != itr_cell_end; ++itr_cell)
-    {   
-        const model_parser::cell& model_cell = *itr_cell;
-        const string& name = model_cell.get_name();
-
-#if DEBUG_MODEL_PARSER
-        cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
-#endif
-        formula_parser fparser(model_cell.get_tokens(), context);
-
-        formula_cell* fcell = NULL;
-        formula_name_type name_type = context.get_name_resolver().resolve(name, address_t());
-        switch (name_type.type)
-        {
-            case formula_name_type::named_expression:
-                fcell = context.get_named_expression(name);
-                if (!fcell)
-                {
-                    // No prior named expression with the same name.
-                    auto_ptr<formula_cell> pcell(new formula_cell);
-                    context.set_named_expression(name, pcell);
-                    fcell = context.get_named_expression(name);
-                }
-                if (!fcell)
-                    throw general_error("failed to insert a named expression");
-            break;
-            case formula_name_type::cell_reference:
-            {
-                abs_address_t addr;
-                addr.sheet = name_type.address.sheet;
-                addr.row = name_type.address.row;
-                addr.column = name_type.address.col;
-                base_cell* p = context.get_cell(addr);
-                if (!p)
-                {
-                    // No prior cell at this address. Create a new one.
-                    auto_ptr<base_cell> pcell(new formula_cell);
-                    context.set_cell(addr, pcell);
-                    fcell = static_cast<formula_cell*>(context.get_cell(addr));
-                }
-                else if (p->get_celltype() != celltype_formula)
-                {
-                    // Prior cell exists, but it's not a formula cell.
-                    // Transfer the listener cells over to the new cell
-                    // instance.
-                    auto_ptr<base_cell> pcell(new formula_cell);
-                    pcell->swap_listeners(*p);
-                    context.set_cell(addr, pcell);
-                    fcell = static_cast<formula_cell*>(context.get_cell(addr));
-                }
-                else
-                {
-                    // Pre-existing formula cell.
-                    fcell = static_cast<formula_cell*>(p);
-                }
-
-                if (!fcell)
-                    throw general_error("failed to insert a new formula cell");
-
-                fcells.push_back(
-                    address_cell_pair_type(addr, fcell));
-
-                fparser.set_origin(addr);
-            }
-            break;
-            default:
-                throw general_error("unknown name type.");
-        }
-
-        assert(fcell);
-
-        // Parse the lexer tokens and turn them into formula tokens.
-        fparser.parse();
-        fparser.print_tokens();
-
-        // Put the formula tokens into formula cell instance, and put the 
-        // formula cell into context.
-        fcell->swap_tokens(fparser.get_tokens());
-    }
+    for_each(cells.begin(), cells.end(), lexer_formula_cell_converter(context, fcells));
 
     vector<address_cell_pair_type>::iterator itr_fcell = fcells.begin(), itr_fcell_end = fcells.end();
     for (; itr_fcell != itr_fcell_end; ++itr_fcell)

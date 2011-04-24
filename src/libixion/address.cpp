@@ -188,7 +188,7 @@ bool operator<(const abs_range_t& left, const abs_range_t& right)
 {
     if (left.first != right.first)
         return left.first < right.first;
-    return return left.last < right.last;
+    return left.last < right.last;
 }
 
 range_t::range_t() {}
