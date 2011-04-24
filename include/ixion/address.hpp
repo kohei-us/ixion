@@ -89,6 +89,9 @@ bool operator==(const address_t& left, const address_t& right);
 bool operator!=(const address_t& left, const address_t& right);
 bool operator<(const address_t& left, const address_t& right);
 
+/**
+ * Stores absolute range address.
+ */
 struct abs_range_t
 {
     abs_address_t first;
@@ -99,7 +102,11 @@ struct abs_range_t
 
 bool operator==(const abs_range_t& left, const abs_range_t& right);
 bool operator!=(const abs_range_t& left, const abs_range_t& right);
+bool operator<(const abs_range_t& left, const abs_range_t& right);
 
+/**
+ * Stores range whose component may be relative or absolute.
+ */
 struct range_t
 {
     address_t first;

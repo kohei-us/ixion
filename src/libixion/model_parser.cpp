@@ -382,6 +382,15 @@ void ensure_unique_names(const vector<string>& cell_names)
         throw general_error("Duplicate names exist in the list of cell names.");
 }
 
+/**
+ * This is where primitive lexer tokens get converted to formula tokens, and 
+ * any dependency tracking information gets built. 
+ * 
+ * @param cells array of cells containing lexer tokens.  <i>This array only
+ *              contains either new cells or edited cells.</i>
+ * @param context context representing current session.
+ * @param dirty_cells cells that need to be re-calculated.
+ */
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
 {
     typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
