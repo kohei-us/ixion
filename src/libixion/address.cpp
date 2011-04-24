@@ -61,6 +61,11 @@ bool operator== (const abs_address_t& left, const abs_address_t& right)
         left.column == right.column;
 }
 
+bool operator!= (const abs_address_t& left, const abs_address_t& right)
+{
+    return !operator==(left, right);
+}
+
 bool operator< (const abs_address_t& left, const abs_address_t& right)
 {
     if (left.sheet != right.sheet)
@@ -138,6 +143,11 @@ bool operator== (const address_t& left, const address_t& right)
         left.abs_column == right.abs_column;
 }
 
+bool operator!=(const address_t& left, const address_t& right)
+{
+    return !operator==(left, right);
+}
+
 bool operator< (const address_t& left, const address_t& right)
 {
     // Not sure how to compare absolute and relative addresses, but let's make
@@ -162,5 +172,28 @@ bool operator< (const address_t& left, const address_t& right)
     return left.column < right.column;
 }
 
+abs_range_t::abs_range_t() {}
+
+bool operator==(const abs_range_t& left, const abs_range_t& right)
+{
+    return left.first == right.first && left.last == right.last;
+}
+
+bool operator!=(const abs_range_t& left, const abs_range_t& right)
+{
+    return !operator==(left, right);
+}
+
+range_t::range_t() {}
+
+bool operator==(const range_t& left, const range_t& right)
+{
+    return left.first == right.first && left.last == right.last;
+}
+
+bool operator!=(const range_t& left, const range_t& right)
+{
+    return !operator==(left, right);
+}
 
 }

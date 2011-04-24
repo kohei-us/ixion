@@ -55,6 +55,7 @@ struct abs_address_t
 };
 
 bool operator==(const abs_address_t& left, const abs_address_t& right);
+bool operator!=(const abs_address_t& left, const abs_address_t& right);
 bool operator<(const abs_address_t& left, const abs_address_t& right);
 
 /**
@@ -85,7 +86,30 @@ struct address_t
 };
 
 bool operator==(const address_t& left, const address_t& right);
+bool operator!=(const address_t& left, const address_t& right);
 bool operator<(const address_t& left, const address_t& right);
+
+struct abs_range_t
+{
+    abs_address_t first;
+    abs_address_t last;
+
+    abs_range_t();
+};
+
+bool operator==(const abs_range_t& left, const abs_range_t& right);
+bool operator!=(const abs_range_t& left, const abs_range_t& right);
+
+struct range_t
+{
+    address_t first;
+    address_t last;
+
+    range_t();
+};
+
+bool operator==(const range_t& left, const range_t& right);
+bool operator!=(const range_t& left, const range_t& right);
 
 }
 
