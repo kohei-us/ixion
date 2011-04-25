@@ -337,6 +337,37 @@ public:
     }
 };
 
+class formula_cell_register_listener_handler : public unary_function<address_cell_pair_type, void>
+{
+    model_context& m_context;
+    dirty_cells_t& m_dirty_cells;
+public:
+    formula_cell_register_listener_handler(model_context& cxt, dirty_cells_t& dirty_cells) :
+        m_context(cxt), m_dirty_cells(dirty_cells) {}
+
+    void operator() (const address_cell_pair_type& v)
+    {
+        formula_cell* fcell = v.second;
+#if DEBUG_MODEL_PARSER
+        cout << "processing formula cell at " << context.get_cell_name(fcell) << endl;
+#endif
+        // Now, register the formula cell as a listener to all its references.
+        vector<formula_token_base*> ref_tokens;
+        fcell->get_ref_tokens(ref_tokens);
+#if DEBUG_MODEL_PARSER
+        cout << "  number of reference tokens: " << ref_tokens.size() << endl;
+#endif
+        for_each(ref_tokens.begin(), ref_tokens.end(), 
+                 formula_cell_listener_handler(m_context,
+                     v.first, formula_cell_listener_handler::mode_add));
+        
+        // Add this cell and all its listeners to the dirty cell list.
+        m_dirty_cells.insert(fcell);
+
+        fcell->get_all_listeners(m_context, m_dirty_cells);
+    }
+};
+
 // ============================================================================
 
 enum parse_mode_t
@@ -486,32 +517,18 @@ void ensure_unique_names(const vector<string>& cell_names)
  */
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
 {
-    dirty_cells_t _dirty_cells;
     vector<address_cell_pair_type> fcells;
-    for_each(cells.begin(), cells.end(), lexer_formula_cell_converter(context, fcells));
 
-    vector<address_cell_pair_type>::iterator itr_fcell = fcells.begin(), itr_fcell_end = fcells.end();
-    for (; itr_fcell != itr_fcell_end; ++itr_fcell)
-    {
-        formula_cell* fcell = itr_fcell->second;
-#if DEBUG_MODEL_PARSER
-        cout << "processing formula cell at " << context.get_cell_name(fcell) << endl;
-#endif
-        // Now, register the formula cell as a listener to all its references.
-        vector<formula_token_base*> ref_tokens;
-        fcell->get_ref_tokens(ref_tokens);
-#if DEBUG_MODEL_PARSER
-        cout << "  number of reference tokens: " << ref_tokens.size() << endl;
-#endif
-        for_each(ref_tokens.begin(), ref_tokens.end(), 
-                 formula_cell_listener_handler(context,
-                     itr_fcell->first, formula_cell_listener_handler::mode_add));
-        
-        // Add this cell and all its listeners to the dirty cell list.
-        _dirty_cells.insert(fcell);
+    // First, convert each lexer token cell into formula token cell, and put
+    // the formula cells into the context object.
+    for_each(cells.begin(), cells.end(), 
+             lexer_formula_cell_converter(context, fcells));
 
-        fcell->get_all_listeners(context, _dirty_cells);
-    }
+    // Next, go through the formula cells and their references, and register
+    // the formula cells as listeners to their respective references.
+    dirty_cells_t _dirty_cells;
+    for_each(fcells.begin(), fcells.end(), 
+             formula_cell_register_listener_handler(context, _dirty_cells));
 
 #if DEBUG_MODEL_PARSER
     cout << get_formula_result_output_separator() << endl;
