@@ -337,6 +337,12 @@ public:
     }
 };
 
+/**
+ * Function object that goes through the references of each formula cell and
+ * registers the formula cell as a listener to all its referenced cells. 
+ * This function object also accumulates all "dirty" cells (those cells that 
+ * need re-calculation) during the process. 
+ */
 class formula_cell_register_listener_handler : public unary_function<address_cell_pair_type, void>
 {
     model_context& m_context;
@@ -363,7 +369,6 @@ public:
         
         // Add this cell and all its listeners to the dirty cell list.
         m_dirty_cells.insert(fcell);
-
         fcell->get_all_listeners(m_context, m_dirty_cells);
     }
 };
