@@ -249,6 +249,8 @@ typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
 /**
  * Function object to convert each lexer token cell into formula token cell. 
  * Converted cells are put into the context object during this process. 
+ * Note that each cell passed on to this function represents either a 
+ * brand-new cell, or an edited cell. 
  */
 class lexer_formula_cell_converter : public unary_function<model_parser::cell, void>
 {
@@ -311,6 +313,14 @@ public:
                 {
                     // Pre-existing formula cell.
                     fcell = static_cast<formula_cell*>(p);
+
+                    // Go through all its existing references, and remove
+                    // itself as their listener.
+                    vector<formula_token_base*> ref_tokens;
+                    fcell->get_ref_tokens(ref_tokens);
+                    for_each(ref_tokens.begin(), ref_tokens.end(), 
+                             formula_cell_listener_handler(m_context,
+                                 addr, formula_cell_listener_handler::mode_remove));
                 }
 
                 if (!fcell)
