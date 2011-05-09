@@ -94,6 +94,60 @@ void append_column_name_a1(ostringstream& os, col_t col)
     os << col_name;
 }
 
+enum parse_address_result
+{
+    invalid,
+    valid_address,
+    range_expected
+};
+
+parse_address_result parse_address(
+    const char*& p, size_t n, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
+{
+    resolver_parse_mode mode = resolver_parse_column;
+
+    for (size_t i = 0; i < n; ++i, ++p)
+    {
+        char c = *p;
+        if ('a' <= c && c <= 'z')
+        {
+            // Convert to upper case.
+            c -= 'a' - 'A';
+        }
+
+        if ('A' <= c && c <= 'Z')
+        {
+            // Column digit
+            if (mode != resolver_parse_column)
+                return invalid;
+
+            if (col)
+                col *= 26;
+            col += static_cast<col_t>(c - 'A' + 1);
+        }
+        else if ('0' <= c && c <= '9')
+        {
+            if (mode == resolver_parse_column)
+            {
+                // First digit of a row.
+                if (c == '0')
+                    // Leading zeros not allowed.
+                    return invalid;
+
+                mode = resolver_parse_row;
+            }
+
+            if (row)
+                row *= 10;
+
+            row += static_cast<row_t>(c - '0');
+        }
+        else
+            return invalid;
+    }
+    return valid_address;
+}
+
 }
 
 formula_name_type::formula_name_type() : type(invalid) {}
@@ -129,8 +183,6 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
     if (resolve_function(name, ret))
         return ret;
 
-    resolver_parse_mode mode = resolver_parse_column;
-
     size_t n = name.size();
     if (!n)
         return ret;
@@ -143,56 +195,10 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
     bool abs_row = false;
     bool abs_sheet = false;
 
-    bool valid_ref = true;
-    for (size_t i = 0; i < n; ++i, ++p)
-    {
-        char c = *p;
-        if ('a' <= c && c <= 'z')
-        {
-            // Convert to upper case.
-            c -= 'a' - 'A';
-        }
+    parse_address_result parse_res = 
+        parse_address(p, n, sheet, row, col, abs_sheet, abs_row, abs_col);
 
-        if ('A' <= c && c <= 'Z')
-        {
-            // Column digit
-            if (mode != resolver_parse_column)
-            {
-                valid_ref = false;
-                break;
-            }
-
-            if (col)
-                col *= 26;
-            col += static_cast<col_t>(c - 'A' + 1);
-        }
-        else if ('0' <= c && c <= '9')
-        {
-            if (mode == resolver_parse_column)
-            {
-                // First digit of a row.
-                if (c == '0')
-                {
-                    // Leading zeros not allowed.
-                    valid_ref = false;
-                    break;
-                }
-                mode = resolver_parse_row;
-            }
-
-            if (row)
-                row *= 10;
-
-            row += static_cast<row_t>(c - '0');
-        }
-        else
-        {
-            valid_ref = false;
-            break;
-        }
-    }
-
-    if (valid_ref)
+    if (parse_res == valid_address)
     {
         // Convert column and row from 1-based to 0-based.
         col -= 1;
