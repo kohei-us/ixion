@@ -54,9 +54,15 @@ struct formula_name_type
         bool abs_col:1;
     };
 
+    struct range_type {
+        address_type first;
+        address_type last;
+    };
+
     name_type type;
     union {
         address_type address;
+        range_type range;
         formula_function_t func_oc; // function opcode
     };
 

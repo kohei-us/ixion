@@ -102,11 +102,18 @@ enum parse_address_result
 };
 
 parse_address_result parse_address(
-    const char*& p, size_t n, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
+    const char*& p, const char* p_last, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
 {
+    sheet = 0;
+    row = 0;
+    col = 0;
+    abs_sheet = false;
+    abs_row = false;
+    abs_col = false;
+
     resolver_parse_mode mode = resolver_parse_column;
 
-    for (size_t i = 0; i < n; ++i, ++p)
+    while (true)
     {
         char c = *p;
         if ('a' <= c && c <= 'z')
@@ -142,9 +149,28 @@ parse_address_result parse_address(
 
             row += static_cast<row_t>(c - '0');
         }
+        else if (c == ':')
+        {
+            if (mode == resolver_parse_row)
+            {
+                --row;
+                --col;
+                return range_expected;
+            }
+            else
+                return invalid;
+        }
         else
             return invalid;
+
+        if (p == p_last)
+            // last character reached.
+            break;
+        ++p;
     }
+
+    --row;
+    --col;
     return valid_address;
 }
 
@@ -188,6 +214,7 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
         return ret;
 
     const char* p = &name[0];
+    const char* p_last = &name[n-1];
     col_t col = 0;
     row_t row = 0;
     sheet_t sheet = 0;
@@ -196,14 +223,11 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
     bool abs_sheet = false;
 
     parse_address_result parse_res = 
-        parse_address(p, n, sheet, row, col, abs_sheet, abs_row, abs_col);
+        parse_address(p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
 
     if (parse_res == valid_address)
     {
-        // Convert column and row from 1-based to 0-based.
-        col -= 1;
-        row -= 1;
-
+        // This is a single cell address.
         if (!abs_sheet)
             sheet -= pos.sheet;
         if (!abs_row)
@@ -223,6 +247,35 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
         ret.address.abs_sheet = abs_sheet;
         ret.address.abs_row = abs_row;
         ret.address.abs_col = abs_col;
+        return ret;
+    }
+    
+    if (parse_res == range_expected)
+    {
+        if (p == p_last)
+            // ':' occurs as the last character.  This is not allowed.
+            return ret;
+
+        ++p; // skip ':'
+
+        ret.range.first.sheet = sheet;
+        ret.range.first.row = row;
+        ret.range.first.col = col;
+        ret.range.first.abs_sheet = abs_sheet;
+        ret.range.first.abs_row = abs_row;
+        ret.range.first.abs_col = abs_col;
+        parse_res = parse_address(p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
+        if (parse_res != valid_address)
+            // The 2nd part after the ':' is not valid.
+            return ret;
+
+        ret.range.last.sheet = sheet;
+        ret.range.last.row = row;
+        ret.range.last.col = col;
+        ret.range.last.abs_sheet = abs_sheet;
+        ret.range.last.abs_row = abs_row;
+        ret.range.last.abs_col = abs_col;
+        ret.type = formula_name_type::range_reference;
         return ret;
     }
 

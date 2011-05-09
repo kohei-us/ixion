@@ -41,6 +41,7 @@ void test_name_resolver()
 
     formula_name_resolver_a1 resolver;
 
+    // Parse single cell addresses.
     const char* names[] = {
         "A1", "Z1", "AA23", "AB23", "BA1", "AAA2", "ABA1", "BAA1", 0
     };
@@ -57,6 +58,28 @@ void test_name_resolver()
         addr.column = res.address.col;
         string test_name = resolver.get_name(addr);
         assert(name_a1 == test_name);
+    }
+
+    // Parse range addresses.
+    struct {
+        const char* name; sheet_t sheet1; row_t row1; col_t col1; sheet_t sheet2; row_t row2; col_t col2;
+    } range_tests[] {
+        { "A1:B2", 0, 0, 0, 0, 1, 1 },
+        { "D10:G24", 0, 9, 3, 0, 23, 6 },
+        { 0, 0, 0, 0, 0, 0, 0 }
+    };
+
+    for (size_t i = 0; range_tests[i].name; ++i)
+    {
+        string name_a1(range_tests[i].name);
+        formula_name_type res = resolver.resolve(name_a1, address_t());
+        assert(res.type == formula_name_type::range_reference);
+        assert(res.range.first.sheet == range_tests[i].sheet1);
+        assert(res.range.first.row == range_tests[i].row1);
+        assert(res.range.first.col == range_tests[i].col1);
+        assert(res.range.last.sheet == range_tests[i].sheet2);
+        assert(res.range.last.row == range_tests[i].row2);
+        assert(res.range.last.col == range_tests[i].col2);
     }
 }
 
