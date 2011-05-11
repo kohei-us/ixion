@@ -50,7 +50,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 0
+#define DEBUG_MODEL_PARSER 1
 
 namespace ixion {
 
@@ -287,6 +287,7 @@ public:
             break;
             case formula_name_type::cell_reference:
             {
+                cout << "cell reference" << endl;
                 abs_address_t addr;
                 addr.sheet = name_type.address.sheet;
                 addr.row = name_type.address.row;
@@ -365,7 +366,7 @@ public:
     {
         formula_cell* fcell = v.second;
 #if DEBUG_MODEL_PARSER
-        cout << "processing formula cell at " << context.get_cell_name(fcell) << endl;
+        cout << "processing formula cell at " << m_context.get_cell_name(fcell) << endl;
 #endif
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;

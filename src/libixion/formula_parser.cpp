@@ -35,7 +35,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_PARSER 0
+#define DEBUG_FORMULA_PARSER 1
 
 using namespace std;
 
@@ -95,6 +95,14 @@ public:
                 os << "(s=" << addr.sheet << ",r=" << addr.row << ",c=" << addr.column << ")";
             }
             break;
+            case fop_range_ref:
+            {
+                range_t range = token.get_range_ref();
+                os << "(s=" << range.first.sheet << ":" << range.last.sheet 
+                    << ",r=" << range.first.row << ":" << range.last.row
+                    << ",c=" << range.first.column << ":" << range.last.column << ")";
+            }
+            break;
             case fop_named_expression:
                 os << token.get_name();
                 break;
@@ -116,7 +124,7 @@ public:
                 ;
         }
         os << "'";
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
         cout << os.str();
 #endif
     }
@@ -170,6 +178,7 @@ void formula_parser::parse()
                     name(t);
                     break;
                 case op_string:
+                    // TODO: not implemented yet.
                     break;
                 case op_value:
                     value(t);
@@ -181,13 +190,13 @@ void formula_parser::parse()
     }
     catch (const ref_error& e)
     {
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
         cout << "reference error: " << e.what() << endl;
 #endif
     }
     catch (const parse_error& e)
     {
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
         cout << "parse error: " << e.what() << endl;
 #endif
     }
@@ -195,10 +204,10 @@ void formula_parser::parse()
 
 void formula_parser::print_tokens() const
 {
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
     cout << "formula tokens:";
     for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer());
-    cout << " (" << m_formula_tokens.size() << ")";
+    cout << " (size=" << m_formula_tokens.size() << ")";
     cout << endl;
 #endif
 }
@@ -247,7 +256,7 @@ void formula_parser::name(const lexer_token_base& t)
     switch (fn.type)
     {
         case formula_name_type::cell_reference:
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
             cout << "'" << name << "' is a cell reference (sheet=" << 
                 fn.address.sheet << "; row=" << fn.address.row << "; col=" << fn.address.col << ")" << endl;
 #endif
@@ -256,14 +265,27 @@ void formula_parser::name(const lexer_token_base& t)
                     address_t(fn.address.sheet, fn.address.row, fn.address.col,
                               fn.address.abs_sheet, fn.address.abs_row, fn.address.abs_col)));
         break;
+        case formula_name_type::range_reference:
+        {
+#if DEBUG_FORMULA_PARSER
+            cout << "'" << name << "' is a range reference." << endl;
+#endif
+            address_t first(fn.range.first.sheet, fn.range.first.row, fn.range.first.col,
+                            fn.range.first.abs_sheet, fn.range.first.abs_row, fn.range.first.abs_col);
+            address_t last(fn.range.last.sheet, fn.range.last.row, fn.range.last.col,
+                           fn.range.last.abs_sheet, fn.range.last.abs_row, fn.range.last.abs_col);
+            m_formula_tokens.push_back(
+                new range_ref_token(range_t(first, last)));
+        }
+        break;
         case formula_name_type::function:
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
             cout << "'" << name << "' is a built-in function." << endl;
 #endif
             m_formula_tokens.push_back(new function_token(static_cast<size_t>(fn.func_oc)));
         break;
         case formula_name_type::named_expression:
-#if DEBUG_PARSER
+#if DEBUG_FORMULA_PARSER
             cout << "'" << name << "' is a named expression." << endl;
 #endif
             m_formula_tokens.push_back(new named_exp_token(name));

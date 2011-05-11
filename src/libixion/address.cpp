@@ -192,6 +192,8 @@ bool operator<(const abs_range_t& left, const abs_range_t& right)
 }
 
 range_t::range_t() {}
+range_t::range_t(const address_t& _first, const address_t& _last) :
+    first(_first), last(_last) {}
 
 bool operator==(const range_t& left, const range_t& right)
 {
