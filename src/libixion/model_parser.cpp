@@ -50,7 +50,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 1
+#define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
 
