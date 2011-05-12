@@ -260,26 +260,26 @@ void formula_interpreter::term()
     // <factor> || <factor> * <term>
 
     factor();
-    double val = pop_value();
     if (!has_token())
-    {
-        push_value(val);
         return;
-    }
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
     {
         case fop_multiply:
+        {
             m_outbuf << "*";
             next();
+            double val = pop_value();
             term();
             push_value(val*pop_value());
             return;
+        }
         case fop_divide:
         {
             m_outbuf << "/";
             next();
+            double val = pop_value();
             term();
             double val2 = pop_value();
             if (val2 == 0.0)
@@ -290,7 +290,6 @@ void formula_interpreter::term()
         default:
             ;
     }
-    push_value(val);
 }
 
 void formula_interpreter::factor()
