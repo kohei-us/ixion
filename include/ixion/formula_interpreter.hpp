@@ -35,6 +35,7 @@
 #include <sstream>
 
 #include <boost/noncopyable.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {
 
@@ -44,6 +45,20 @@ class model_context;
 class formula_interpreter : public ::boost::noncopyable
 {
     typedef _ixion_unordered_set_type< ::std::string> name_set;
+    enum stack_type { st_value, st_string };
+    struct stack_value
+    {
+        stack_type type;
+        union {
+            double value;
+            ::std::string* str;
+        };
+
+        explicit stack_value(double val);
+        ~stack_value();
+    };
+    typedef ::boost::ptr_vector<stack_value> stack_store_type;
+
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
@@ -75,14 +90,16 @@ private:
     // responsible for setting the token position to the next unprocessed
     // position when it finishes.
 
-    double expression();
-    double named_expression();
-    double term();
-    double factor();
-    double paren();
-    double variable();
-    double constant();
-    double function();
+    void expression();
+    void term();
+    void factor();
+    void paren();
+    void variable();
+    void constant();
+    void function();
+
+    void push_value(double val);
+    double pop_value();
 
 private:
     const formula_cell*         m_parent_cell;
@@ -90,6 +107,7 @@ private:
     const model_context&        m_context;
     abs_address_t               m_pos;
 
+    stack_store_type m_stack;
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;

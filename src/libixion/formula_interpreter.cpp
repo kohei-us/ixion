@@ -55,6 +55,15 @@ opcode_token paren_close = opcode_token(fop_close);
 
 }
 
+formula_interpreter::stack_value::stack_value(double val) :
+    type(st_value), value(val) {}
+
+formula_interpreter::stack_value::~stack_value()
+{
+    if (type == st_string)
+        delete str;
+}
+
 formula_interpreter::formula_interpreter(const formula_cell* cell, const model_context& cxt) :
     m_parent_cell(cell),
     m_original_tokens(cell->get_tokens()),
@@ -99,7 +108,8 @@ bool formula_interpreter::interpret()
         m_outbuf << get_formula_result_output_separator() << endl;
         m_outbuf << cell_name << ": ";
 
-        m_result = expression();
+        expression();
+        m_result = pop_value();
         m_outbuf << endl << cell_name << ": result = " << m_result << endl;
         cout << m_outbuf.str();
         return true;
@@ -133,6 +143,7 @@ void formula_interpreter::init_tokens()
 {
     name_set used_names;
     m_tokens.clear();
+    m_stack.clear();
     formula_tokens_t::const_iterator itr = m_original_tokens.begin(), itr_end = m_original_tokens.end();
     for (; itr != itr_end; ++itr)
     {
@@ -209,11 +220,12 @@ const formula_token_base& formula_interpreter::next_token()
     return token();
 }
 
-double formula_interpreter::expression()
+void formula_interpreter::expression()
 {
     // <term> + <term> + <term> + ... + <term>
 
-    double val = term();
+    term();
+    double val = pop_value();
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
@@ -223,60 +235,37 @@ double formula_interpreter::expression()
             {
                 m_outbuf << "+";
                 next();
-                double val2 = term();
-                val += val2;
+                term();
+                val += pop_value();
             }
             break;
             case fop_minus:
             {
                 m_outbuf << "-";
                 next();
-                double val2 = term();
-                val -= val2;
+                term();
+                val -= pop_value();
             }
             break;
             default:
-                return val;
+                push_value(val);
+                return;
         }
     }
-    return val;
+    push_value(val);
 }
 
-double formula_interpreter::named_expression()
-{
-    const string& expr_name = token().get_name();
-    m_outbuf << expr_name;
-    const formula_cell* expr = m_context.get_named_expression(expr_name);
-    if (!expr)
-    {
-        ostringstream os;
-        os << "unable to find named expression '" << expr_name << "'";
-        throw invalid_expression(os.str());
-    }
-
-    // NOTE: We need look into expanding named expressions prior to
-    // interpreting formula tokens to avoid potential "recursion too deep"
-    // problem.  Plus, this nested interpretation does not resolve circular
-    // name dependency issue.
-    formula_interpreter fi(expr, m_context);
-    if (!fi.interpret())
-    {
-        ostringstream os;
-        os << "failed to interpret named expression '" << expr_name << "'";
-        throw invalid_expression(os.str());
-    }
-    double res = fi.get_result();
-    next();
-    return res;
-}
-
-double formula_interpreter::term()
+void formula_interpreter::term()
 {
     // <factor> || <factor> * <term>
 
-    double val = factor();
+    factor();
+    double val = pop_value();
     if (!has_token())
-        return val;
+    {
+        push_value(val);
+        return;
+    }
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
@@ -284,23 +273,27 @@ double formula_interpreter::term()
         case fop_multiply:
             m_outbuf << "*";
             next();
-            return val*term();
+            term();
+            push_value(val*pop_value());
+            return;
         case fop_divide:
         {
             m_outbuf << "/";
             next();
-            double val2 = term();
+            term();
+            double val2 = pop_value();
             if (val2 == 0.0)
                 throw formula_error(fe_division_by_zero);
-            return val/val2;
+            push_value(val/val2);
+            return;
         }
         default:
             ;
     }
-    return val;
+    push_value(val);
 }
 
-double formula_interpreter::factor()
+void formula_interpreter::factor()
 {
     // <constant> || <variable> || <named expression> || '(' <expression> ')' || <function>
 
@@ -308,15 +301,20 @@ double formula_interpreter::factor()
     switch (oc)
     {
         case fop_open:
-            return paren();
+            paren();
+            return;
         case fop_named_expression:
-            return named_expression();
+            // All named expressions are supposed to be expanded prior to interpretation.
+            throw formula_error(fe_general_error);
         case fop_value:
-            return constant();
+            constant();
+            return;
         case fop_single_ref:
-            return variable();
+            variable();
+            return;
         case fop_function:
-            return function();
+            function();
+            return;
         default:
         {
             ostringstream os;
@@ -324,23 +322,22 @@ double formula_interpreter::factor()
             throw invalid_expression(os.str());
         }
     }
-    return 0.0;
+    push_value(0.0);
 }
 
-double formula_interpreter::paren()
+void formula_interpreter::paren()
 {
     m_outbuf << "(";
     next();
-    double val = expression();
+    expression();
     if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
     m_outbuf << ")";
     next();
-    return val;
 }
 
-double formula_interpreter::variable()
+void formula_interpreter::variable()
 {
     address_t addr = token().get_single_ref();
 #if DEBUG_FORMULA_INTERPRETER
@@ -364,18 +361,20 @@ double formula_interpreter::variable()
         val = pref->get_value();
     m_outbuf << m_context.get_name_resolver().get_name(addr);
     next();
-    return val;
+
+    push_value(val);
 }
 
-double formula_interpreter::constant()
+void formula_interpreter::constant()
 {
     double val = token().get_value();
     m_outbuf << val;
     next();
-    return val;
+
+    push_value(val);
 }
 
-double formula_interpreter::function()
+void formula_interpreter::function()
 {
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     assert(token().get_opcode() == fop_function);
@@ -402,7 +401,8 @@ double formula_interpreter::function()
         }
         else
         {
-            double arg = expression();
+            expression();
+            double arg = pop_value();
             args.push_back(arg);
             expect_sep = true;
         }
@@ -411,7 +411,27 @@ double formula_interpreter::function()
 
     m_outbuf << ")";
     next();
-    return formula_functions::interpret(func_oc, args);
+    double val = formula_functions::interpret(func_oc, args);
+    push_value(val);
+}
+
+void formula_interpreter::push_value(double val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+double formula_interpreter::pop_value()
+{
+    double ret = 0.0;
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.type == st_value)
+        ret = v.value;
+
+    m_stack.pop_back();
+    return ret;
 }
 
 }

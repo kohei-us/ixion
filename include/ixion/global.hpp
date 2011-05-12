@@ -126,7 +126,9 @@ enum formula_error_t
     fe_no_error = 0,
     fe_ref_result_not_available,
     fe_division_by_zero,
-    fe_invalid_expression
+    fe_invalid_expression,
+    fe_stack_error,
+    fe_general_error,
 };
 
 const char* get_formula_error_name(formula_error_t fe);
