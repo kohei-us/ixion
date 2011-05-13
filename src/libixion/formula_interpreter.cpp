@@ -109,6 +109,8 @@ bool formula_interpreter::interpret()
         m_outbuf << cell_name << ": ";
 
         expression();
+        // there should only be one stack value left for the result value.
+        assert(m_stack.size() == 1);
         m_result = pop_value();
         m_outbuf << endl << cell_name << ": result = " << m_result << endl;
         cout << m_outbuf.str();
