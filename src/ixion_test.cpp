@@ -63,7 +63,7 @@ void test_name_resolver()
     // Parse range addresses.
     struct {
         const char* name; sheet_t sheet1; row_t row1; col_t col1; sheet_t sheet2; row_t row2; col_t col2;
-    } range_tests[] {
+    } range_tests[] = {
         { "A1:B2", 0, 0, 0, 0, 1, 1 },
         { "D10:G24", 0, 9, 3, 0, 23, 6 },
         { 0, 0, 0, 0, 0, 0, 0 }
