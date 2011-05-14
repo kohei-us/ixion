@@ -180,4 +180,13 @@ formula_error_t formula_error::get_error() const
     return m_ferror;
 }
 
+stack_value::stack_value(double val) :
+    type(sv_value), value(val) {}
+
+stack_value::~stack_value()
+{
+    if (type == sv_string)
+        delete str;
+}
+
 }

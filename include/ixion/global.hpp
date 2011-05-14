@@ -33,6 +33,7 @@
 
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {
 
@@ -53,7 +54,6 @@ typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name
 typedef _ixion_unordered_set_type<base_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
-
 
 // ============================================================================
 
@@ -146,6 +146,26 @@ public:
 private:
     formula_error_t m_ferror;
 };
+
+enum stack_value_t {
+    sv_value,
+    sv_string,
+    sv_range_ref,
+};
+
+struct stack_value
+{
+    stack_value_t type;
+    union {
+        double value;
+        ::std::string* str;
+    };
+
+    explicit stack_value(double val);
+    ~stack_value();
+};
+
+typedef ::boost::ptr_vector<stack_value> value_stack_t;
 
 }
 

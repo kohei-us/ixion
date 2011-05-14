@@ -55,15 +55,6 @@ opcode_token paren_close = opcode_token(fop_close);
 
 }
 
-formula_interpreter::stack_value::stack_value(double val) :
-    type(st_value), value(val) {}
-
-formula_interpreter::stack_value::~stack_value()
-{
-    if (type == st_string)
-        delete str;
-}
-
 formula_interpreter::formula_interpreter(const formula_cell* cell, const model_context& cxt) :
     m_parent_cell(cell),
     m_original_tokens(cell->get_tokens()),
@@ -431,7 +422,7 @@ double formula_interpreter::pop_value()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.type == st_value)
+    if (v.type == sv_value)
         ret = v.value;
 
     m_stack.pop_back();

@@ -58,19 +58,6 @@ class model_context;
 class formula_interpreter : public ::boost::noncopyable
 {
     typedef _ixion_unordered_set_type< ::std::string> name_set;
-    enum stack_type { st_value, st_string };
-    struct stack_value
-    {
-        stack_type type;
-        union {
-            double value;
-            ::std::string* str;
-        };
-
-        explicit stack_value(double val);
-        ~stack_value();
-    };
-    typedef ::boost::ptr_vector<stack_value> stack_store_type;
 
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
@@ -120,7 +107,7 @@ private:
     const model_context&        m_context;
     abs_address_t               m_pos;
 
-    stack_store_type m_stack;
+    value_stack_t m_stack;
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;
