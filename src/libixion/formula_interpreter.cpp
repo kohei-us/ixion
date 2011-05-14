@@ -387,7 +387,6 @@ void formula_interpreter::function()
 
     m_outbuf << "(";
 
-    vector<double> args;
     fopcode_t oc = next_token().get_opcode();
     bool expect_sep = false;
     while (oc != fop_close)
@@ -403,8 +402,6 @@ void formula_interpreter::function()
         else
         {
             expression();
-            double arg = pop_value();
-            args.push_back(arg);
             expect_sep = true;
         }
         oc = token().get_opcode();
@@ -412,6 +409,12 @@ void formula_interpreter::function()
 
     m_outbuf << ")";
     next();
+
+    // Pop all values from the stack into an array of arguments.
+    vector<double> args;
+    while (!m_stack.empty())
+        args.push_back(pop_value());
+
     double val = formula_functions::interpret(func_oc, args);
     push_value(val);
 }
