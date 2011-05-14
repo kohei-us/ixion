@@ -42,6 +42,19 @@ namespace ixion {
 class formula_cell;
 class model_context;
 
+/**
+ * The formula interpreter parses a series of formula tokens representing a
+ * formula expression, and calculates the result of that expression.
+ *  
+ * <p>Intermediate result of each handler is pushed onto the stack and 
+ * popped from it for the calling method to retrieve.  By the end of the 
+ * interpretation there should only be one result left on the stack which is
+ * the final result of the interpretation of the expression.  The number of 
+ * intermediate results (or stack values) on the stack is normally one at 
+ * the end of each handler, except for the function handler where the number
+ * of stack values may be more than one when the function may take more than
+ * one argument.</p> 
+ */
 class formula_interpreter : public ::boost::noncopyable
 {
     typedef _ixion_unordered_set_type< ::std::string> name_set;
