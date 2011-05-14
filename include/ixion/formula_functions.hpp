@@ -54,8 +54,6 @@ enum formula_function_t
 class formula_functions
 {
 public:
-    typedef ::std::vector<double> args_type;
-
     class invalid_arg : public general_error
     {
     public:
@@ -66,13 +64,13 @@ public:
     static formula_function_t get_function_opcode(const ::std::string& name);
     static const char* get_function_name(formula_function_t oc);
 
-    static double interpret(formula_function_t oc, const args_type& args);
+    static double interpret(formula_function_t oc, const value_stack_t& args);
 
-    static double max(const args_type& args);
-    static double min(const args_type& args);
-    static double sum(const args_type& args);
-    static double average(const args_type& args);
-    static double wait(const args_type& args);
+    static double max(const value_stack_t& args);
+    static double min(const value_stack_t& args);
+    static double sum(const value_stack_t& args);
+    static double average(const value_stack_t& args);
+    static double wait(const value_stack_t& args);
 private:
     formula_functions();
     ~formula_functions();

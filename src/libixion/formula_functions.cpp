@@ -91,7 +91,7 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-double formula_functions::interpret(formula_function_t oc, const args_type& args)
+double formula_functions::interpret(formula_function_t oc, const value_stack_t& args)
 {
     switch (oc)
     {
@@ -112,67 +112,67 @@ double formula_functions::interpret(formula_function_t oc, const args_type& args
     return 0.0;
 }
 
-double formula_functions::max(const args_type& args)
+double formula_functions::max(const value_stack_t& args)
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
+    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = itr->get_value();
     for (++itr; itr != itr_end; ++itr)
     {
-        if (*itr > ret)
-            ret = *itr;
+        if (itr->get_value() > ret)
+            ret = itr->get_value();
     }
     return ret;
 }
 
-double formula_functions::min(const args_type& args)
+double formula_functions::min(const value_stack_t& args)
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
+    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = itr->get_value();
     for (++itr; itr != itr_end; ++itr)
     {
-        if (*itr < ret)
-            ret = *itr;
+        if (itr->get_value() < ret)
+            ret = itr->get_value();
     }
     return ret;
 }
 
-double formula_functions::sum(const args_type& args)
+double formula_functions::sum(const value_stack_t& args)
 {
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
+    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = itr->get_value();
     for (++itr; itr != itr_end; ++itr)
     {
-        ret += *itr;
+        ret += itr->get_value();
     }
     return ret;
 }
 
-double formula_functions::average(const args_type& args)
+double formula_functions::average(const value_stack_t& args)
 {
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
+    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
+    double ret = itr->get_value();
     long count = 1;
     for (++itr; itr != itr_end; ++itr)
     {
-        ret += *itr;
+        ret += itr->get_value();
         ++count;
     }
     return ret / count;
 }
 
-double formula_functions::wait(const args_type& args)
+double formula_functions::wait(const value_stack_t& args)
 {
     global::sleep(1);
     return 1;

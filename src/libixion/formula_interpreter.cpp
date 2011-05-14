@@ -401,12 +401,8 @@ void formula_interpreter::function()
     m_outbuf << ")";
     next();
 
-    // Pop all values from the stack into an array of arguments.
-    vector<double> args;
-    while (!m_stack.empty())
-        args.push_back(pop_value());
-
-    double val = formula_functions::interpret(func_oc, args);
+    double val = formula_functions::interpret(func_oc, m_stack);
+    m_stack.clear();
     push_value(val);
 }
 

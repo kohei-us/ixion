@@ -189,4 +189,12 @@ stack_value::~stack_value()
         delete str;
 }
 
+double stack_value::get_value() const
+{
+    if (type == sv_value)
+        return value;
+
+    return 0.0;
+}
+
 }

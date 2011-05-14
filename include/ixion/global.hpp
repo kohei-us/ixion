@@ -147,12 +147,19 @@ private:
     formula_error_t m_ferror;
 };
 
+/**
+ * Type of stack value which can be used as intermediate value during 
+ * formula interpretation. 
+ */
 enum stack_value_t {
     sv_value,
     sv_string,
     sv_range_ref,
 };
 
+/**
+ * Individual stack value storage.
+ */
 struct stack_value
 {
     stack_value_t type;
@@ -163,6 +170,8 @@ struct stack_value
 
     explicit stack_value(double val);
     ~stack_value();
+
+    double get_value() const;
 };
 
 typedef ::boost::ptr_vector<stack_value> value_stack_t;
