@@ -181,18 +181,23 @@ formula_error_t formula_error::get_error() const
 }
 
 stack_value::stack_value(double val) :
-    type(sv_value), value(val) {}
+    m_type(sv_value), m_value(val) {}
 
 stack_value::~stack_value()
 {
-    if (type == sv_string)
-        delete str;
+    if (m_type == sv_string)
+        delete m_str;
+}
+
+stack_value_t stack_value::get_type() const
+{
+    return m_type;
 }
 
 double stack_value::get_value() const
 {
-    if (type == sv_value)
-        return value;
+    if (m_type == sv_value)
+        return m_value;
 
     return 0.0;
 }

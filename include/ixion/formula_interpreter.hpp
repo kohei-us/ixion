@@ -94,7 +94,8 @@ private:
     void term();
     void factor();
     void paren();
-    void variable();
+    void single_ref();
+    void range_ref();
     void constant();
     void function();
 

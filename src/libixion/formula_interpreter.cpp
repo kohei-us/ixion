@@ -302,7 +302,10 @@ void formula_interpreter::factor()
             constant();
             return;
         case fop_single_ref:
-            variable();
+            single_ref();
+            return;
+        case fop_range_ref:
+            range_ref();
             return;
         case fop_function:
             function();
@@ -329,7 +332,7 @@ void formula_interpreter::paren()
     next();
 }
 
-void formula_interpreter::variable()
+void formula_interpreter::single_ref()
 {
     address_t addr = token().get_single_ref();
 #if DEBUG_FORMULA_INTERPRETER
@@ -355,6 +358,13 @@ void formula_interpreter::variable()
     next();
 
     push_value(val);
+}
+
+void formula_interpreter::range_ref()
+{
+    // TODO: Properly implement this.
+    push_value(-1);
+    next();
 }
 
 void formula_interpreter::constant()
@@ -420,8 +430,8 @@ double formula_interpreter::pop_value()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.type == sv_value)
-        ret = v.value;
+    if (v.get_type() == sv_value)
+        ret = v.get_value();
 
     m_stack.pop_back();
     return ret;

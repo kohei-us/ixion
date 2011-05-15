@@ -114,6 +114,8 @@ struct range_t
 
     range_t();
     range_t(const address_t& _first, const address_t& _last);
+
+    abs_range_t to_abs(const abs_address_t& origin) const;
 };
 
 bool operator==(const range_t& left, const range_t& right);

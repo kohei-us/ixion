@@ -154,23 +154,26 @@ private:
 enum stack_value_t {
     sv_value,
     sv_string,
+    sv_single_ref,
     sv_range_ref,
 };
 
 /**
  * Individual stack value storage.
  */
-struct stack_value
+class stack_value
 {
-    stack_value_t type;
+    stack_value_t m_type;
     union {
-        double value;
-        ::std::string* str;
+        double m_value;
+        ::std::string* m_str;
     };
 
+public:
     explicit stack_value(double val);
     ~stack_value();
 
+    stack_value_t get_type() const;
     double get_value() const;
 };
 

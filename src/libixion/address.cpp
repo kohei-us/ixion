@@ -195,6 +195,14 @@ range_t::range_t() {}
 range_t::range_t(const address_t& _first, const address_t& _last) :
     first(_first), last(_last) {}
 
+abs_range_t range_t::to_abs(const abs_address_t& origin) const
+{
+    abs_range_t ret;
+    ret.first = first.to_abs(origin);
+    ret.last = last.to_abs(origin);
+    return ret;
+}
+
 bool operator==(const range_t& left, const range_t& right)
 {
     return left.first == right.first && left.last == right.last;
