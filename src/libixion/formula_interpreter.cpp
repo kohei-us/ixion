@@ -287,7 +287,7 @@ void formula_interpreter::term()
 
 void formula_interpreter::factor()
 {
-    // <constant> || <variable> || <named expression> || '(' <expression> ')' || <function>
+    // <constant> || <variable> || '(' <expression> ')' || <function>
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
