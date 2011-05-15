@@ -36,6 +36,7 @@
 namespace ixion {
 
 class formula_token_base;
+class model_context;
 
 enum formula_function_t
 {
@@ -60,20 +61,24 @@ public:
         invalid_arg(const ::std::string& msg);
     };
 
+    formula_functions(const model_context& cxt);
+    ~formula_functions();
+
     static formula_function_t get_function_opcode(const formula_token_base& token);
     static formula_function_t get_function_opcode(const ::std::string& name);
     static const char* get_function_name(formula_function_t oc);
 
-    static double interpret(formula_function_t oc, const value_stack_t& args);
+    double interpret(formula_function_t oc, value_stack_t& args) const;
 
-    static double max(const value_stack_t& args);
-    static double min(const value_stack_t& args);
-    static double sum(const value_stack_t& args);
-    static double average(const value_stack_t& args);
-    static double wait(const value_stack_t& args);
 private:
-    formula_functions();
-    ~formula_functions();
+    double max(const value_stack_t& args) const;
+    double min(const value_stack_t& args) const;
+    double sum(const value_stack_t& args) const;
+    double average(const value_stack_t& args) const;
+    double wait(const value_stack_t& args) const;
+
+private:
+    const model_context& m_context;
 };
 
 }

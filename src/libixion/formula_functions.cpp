@@ -27,6 +27,7 @@
 
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_tokens.hpp"
+#include "ixion/model_context.hpp"
 
 #ifdef max
 #undef max
@@ -91,20 +92,29 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-double formula_functions::interpret(formula_function_t oc, const value_stack_t& args)
+formula_functions::formula_functions(const model_context& cxt) :
+    m_context(cxt)
+{
+}
+
+formula_functions::~formula_functions()
+{
+}
+
+double formula_functions::interpret(formula_function_t oc, value_stack_t& args) const
 {
     switch (oc)
     {
         case func_max:
-            return formula_functions::max(args);
+            return max(args);
         case func_average:
-            return formula_functions::average(args);
+            return average(args);
         case func_min:
-            return formula_functions::min(args);
+            return min(args);
         case func_wait:
             return wait(args);
         case func_sum:
-            return formula_functions::sum(args);
+            return sum(args);
         case func_unknown:
         default:
             ;
@@ -112,7 +122,7 @@ double formula_functions::interpret(formula_function_t oc, const value_stack_t& 
     return 0.0;
 }
 
-double formula_functions::max(const value_stack_t& args)
+double formula_functions::max(const value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
@@ -127,7 +137,7 @@ double formula_functions::max(const value_stack_t& args)
     return ret;
 }
 
-double formula_functions::min(const value_stack_t& args)
+double formula_functions::min(const value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
@@ -142,7 +152,7 @@ double formula_functions::min(const value_stack_t& args)
     return ret;
 }
 
-double formula_functions::sum(const value_stack_t& args)
+double formula_functions::sum(const value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
@@ -156,7 +166,7 @@ double formula_functions::sum(const value_stack_t& args)
     return ret;
 }
 
-double formula_functions::average(const value_stack_t& args)
+double formula_functions::average(const value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
@@ -172,7 +182,7 @@ double formula_functions::average(const value_stack_t& args)
     return ret / count;
 }
 
-double formula_functions::wait(const value_stack_t& args)
+double formula_functions::wait(const value_stack_t& args) const
 {
     global::sleep(1);
     return 1;
