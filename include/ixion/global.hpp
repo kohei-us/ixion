@@ -43,6 +43,8 @@ typedef int sheet_t;
 
 class base_cell;
 class formula_cell;
+struct abs_address_t;
+struct abs_range_t;
 
 typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
@@ -166,6 +168,8 @@ class stack_value
     stack_value_t m_type;
     union {
         double m_value;
+        abs_address_t* m_single;
+        abs_range_t* m_range;
         ::std::string* m_str;
     };
 

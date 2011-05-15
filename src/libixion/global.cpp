@@ -27,6 +27,7 @@
 
 #include "ixion/global.hpp"
 #include "ixion/mem_str_buf.hpp"
+#include "ixion/address.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -185,6 +186,22 @@ stack_value::stack_value(double val) :
 
 stack_value::~stack_value()
 {
+
+    switch (m_type)
+    {
+        case sv_range_ref:
+            delete m_range;
+            break;
+        case sv_single_ref:
+            delete m_single;
+            break;
+        case sv_string:
+            delete m_str;
+            break;
+        case sv_value:
+        default:
+            ; // do nothing
+    }
     if (m_type == sv_string)
         delete m_str;
 }
