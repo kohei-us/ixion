@@ -181,7 +181,21 @@ public:
     double get_value() const;
 };
 
-typedef ::boost::ptr_vector<stack_value> value_stack_t;
+class value_stack_t
+{
+    typedef ::boost::ptr_vector<stack_value> store_type;
+    store_type m_stack;
+public:
+    typedef store_type::const_iterator const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
+    bool empty() const;
+    size_t size() const;
+    void clear();
+
+    void push_value(double val);
+    double pop_value();
+};
 
 }
 

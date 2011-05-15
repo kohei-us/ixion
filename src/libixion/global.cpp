@@ -219,4 +219,48 @@ double stack_value::get_value() const
     return 0.0;
 }
 
+value_stack_t::const_iterator value_stack_t::begin() const
+{
+    return m_stack.begin();
+}
+
+value_stack_t::const_iterator value_stack_t::end() const
+{
+    return m_stack.end();
+}
+
+bool value_stack_t::empty() const
+{
+    return m_stack.empty();
+}
+
+size_t value_stack_t::size() const
+{
+    return m_stack.size();
+}
+
+void value_stack_t::clear()
+{
+    return m_stack.clear();
+}
+
+void value_stack_t::push_value(double val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+double value_stack_t::pop_value()
+{
+    double ret = 0.0;
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() == sv_value)
+        ret = v.get_value();
+
+    m_stack.pop_back();
+    return ret;
+}
+
 }

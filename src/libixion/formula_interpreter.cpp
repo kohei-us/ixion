@@ -420,21 +420,12 @@ void formula_interpreter::function()
 
 void formula_interpreter::push_value(double val)
 {
-    m_stack.push_back(new stack_value(val));
+    m_stack.push_value(val);
 }
 
 double formula_interpreter::pop_value()
 {
-    double ret = 0.0;
-    if (m_stack.empty())
-        throw formula_error(fe_stack_error);
-
-    const stack_value& v = m_stack.back();
-    if (v.get_type() == sv_value)
-        ret = v.get_value();
-
-    m_stack.pop_back();
-    return ret;
+    return m_stack.pop_value();
 }
 
 }
