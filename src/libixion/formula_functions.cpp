@@ -101,28 +101,32 @@ formula_functions::~formula_functions()
 {
 }
 
-double formula_functions::interpret(formula_function_t oc, value_stack_t& args) const
+void formula_functions::interpret(formula_function_t oc, value_stack_t& args) const
 {
     switch (oc)
     {
         case func_max:
-            return max(args);
+            max(args);
+            break;
         case func_average:
-            return average(args);
+            average(args);
+            break;
         case func_min:
-            return min(args);
+            min(args);
+            break;
         case func_wait:
-            return wait(args);
+            wait(args);
+            break;
         case func_sum:
-            return sum(args);
+            sum(args);
+            break;
         case func_unknown:
         default:
-            ;
+            throw formula_functions::invalid_arg("unknown function opcode");
     }
-    return 0.0;
 }
 
-double formula_functions::max(const value_stack_t& args) const
+void formula_functions::max(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
@@ -134,10 +138,11 @@ double formula_functions::max(const value_stack_t& args) const
         if (itr->get_value() > ret)
             ret = itr->get_value();
     }
-    return ret;
+    args.clear();
+    args.push_value(ret);
 }
 
-double formula_functions::min(const value_stack_t& args) const
+void formula_functions::min(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
@@ -149,10 +154,11 @@ double formula_functions::min(const value_stack_t& args) const
         if (itr->get_value() < ret)
             ret = itr->get_value();
     }
-    return ret;
+    args.clear();
+    args.push_value(ret);
 }
 
-double formula_functions::sum(const value_stack_t& args) const
+void formula_functions::sum(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
@@ -163,10 +169,11 @@ double formula_functions::sum(const value_stack_t& args) const
     {
         ret += itr->get_value();
     }
-    return ret;
+    args.clear();
+    args.push_value(ret);
 }
 
-double formula_functions::average(const value_stack_t& args) const
+void formula_functions::average(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
@@ -179,13 +186,15 @@ double formula_functions::average(const value_stack_t& args) const
         ret += itr->get_value();
         ++count;
     }
-    return ret / count;
+    args.clear();
+    args.push_value(ret/count);
 }
 
-double formula_functions::wait(const value_stack_t& args) const
+void formula_functions::wait(value_stack_t& args) const
 {
     global::sleep(1);
-    return 1;
+    args.clear();
+    args.push_value(1);
 }
 
 }

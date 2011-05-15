@@ -413,9 +413,7 @@ void formula_interpreter::function()
 
     // Function call uses all stack values pushed onto the stack so far, which
     // gets cleared after the call returns.
-    double val = formula_functions(m_context).interpret(func_oc, m_stack);
-    m_stack.clear();
-    push_value(val);
+    formula_functions(m_context).interpret(func_oc, m_stack);
 }
 
 void formula_interpreter::push_value(double val)
