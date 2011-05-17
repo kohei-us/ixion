@@ -131,14 +131,13 @@ void formula_functions::max(value_stack_t& args) const
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
 
-    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = itr->get_value();
-    for (++itr; itr != itr_end; ++itr)
+    double ret = args.pop_value();
+    while (!args.empty())
     {
-        if (itr->get_value() > ret)
-            ret = itr->get_value();
+        double v = args.pop_value();
+        if (v > ret)
+            ret = v;
     }
-    args.clear();
     args.push_value(ret);
 }
 
@@ -147,14 +146,13 @@ void formula_functions::min(value_stack_t& args) const
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
 
-    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = itr->get_value();
-    for (++itr; itr != itr_end; ++itr)
+    double ret = args.pop_value();
+    while (!args.empty())
     {
-        if (itr->get_value() < ret)
-            ret = itr->get_value();
+        double v = args.pop_value();
+        if (v < ret)
+            ret = v;
     }
-    args.clear();
     args.push_value(ret);
 }
 
@@ -163,13 +161,10 @@ void formula_functions::sum(value_stack_t& args) const
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
 
-    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = itr->get_value();
-    for (++itr; itr != itr_end; ++itr)
-    {
-        ret += itr->get_value();
-    }
-    args.clear();
+    double ret = args.pop_value();
+    while (!args.empty())
+        ret += args.pop_value();
+
     args.push_value(ret);
 }
 
@@ -178,15 +173,14 @@ void formula_functions::average(value_stack_t& args) const
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
 
-    value_stack_t::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = itr->get_value();
+    double ret = args.pop_value();
     long count = 1;
-    for (++itr; itr != itr_end; ++itr)
+    while (!args.empty())
     {
-        ret += itr->get_value();
+        ret += args.pop_value();
         ++count;
     }
-    args.clear();
+
     args.push_value(ret/count);
 }
 
