@@ -168,13 +168,15 @@ class stack_value
     stack_value_t m_type;
     union {
         double m_value;
-        abs_address_t* m_single;
+        abs_address_t* m_address;
         abs_range_t* m_range;
         ::std::string* m_str;
     };
 
 public:
     explicit stack_value(double val);
+    explicit stack_value(const abs_address_t& val);
+    explicit stack_value(const abs_range_t& val);
     ~stack_value();
 
     stack_value_t get_type() const;
@@ -194,7 +196,10 @@ public:
     void clear();
 
     void push_value(double val);
+    void push_single_ref(const abs_address_t& val);
+    void push_range_ref(const abs_range_t& val);
     double pop_value();
+
 };
 
 }

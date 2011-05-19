@@ -184,6 +184,12 @@ formula_error_t formula_error::get_error() const
 stack_value::stack_value(double val) :
     m_type(sv_value), m_value(val) {}
 
+stack_value::stack_value(const abs_address_t& val) :
+    m_type(sv_single_ref), m_address(new abs_address_t(val)) {}
+
+stack_value::stack_value(const abs_range_t& val) :
+    m_type(sv_range_ref), m_range(new abs_range_t(val)) {}
+
 stack_value::~stack_value()
 {
 
@@ -193,7 +199,7 @@ stack_value::~stack_value()
             delete m_range;
             break;
         case sv_single_ref:
-            delete m_single;
+            delete m_address;
             break;
         case sv_string:
             delete m_str;
@@ -245,6 +251,16 @@ void value_stack_t::clear()
 }
 
 void value_stack_t::push_value(double val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+void value_stack_t::push_single_ref(const abs_address_t& val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+void value_stack_t::push_range_ref(const abs_range_t& val)
 {
     m_stack.push_back(new stack_value(val));
 }
