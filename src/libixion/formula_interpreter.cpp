@@ -363,6 +363,13 @@ void formula_interpreter::single_ref()
 void formula_interpreter::range_ref()
 {
     // TODO: Properly implement this.
+    range_t range = token().get_range_ref();
+#if DEBUG_FORMULA_INTERPRETER
+    cout << "formula_interpreter::variable: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
+    cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
+#endif
+    m_outbuf << m_context.get_name_resolver().get_name(range);
+
     m_stack.push_value(-1);
     next();
 }
