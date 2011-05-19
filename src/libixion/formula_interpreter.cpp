@@ -362,7 +362,6 @@ void formula_interpreter::single_ref()
 
 void formula_interpreter::range_ref()
 {
-    // TODO: Properly implement this.
     range_t range = token().get_range_ref();
 #if DEBUG_FORMULA_INTERPRETER
     cout << "formula_interpreter::variable: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
