@@ -369,8 +369,20 @@ void formula_interpreter::range_ref()
     cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
 #endif
     m_outbuf << m_context.get_name_resolver().get_name(range);
+    abs_range_t abs_range = range.to_abs(m_pos);
 
-    m_stack.push_value(-1);
+#if DEBUG_FORMULA_INTERPRETER
+    cout << "formula_interpreter::variable: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
+#endif
+
+    // Check the reference range to make sure it doesn't include the parent cell.
+    if (abs_range.contains(m_pos))
+    {
+        // Referenced range contains the address of this cell.  Not good.
+        throw formula_error(fe_ref_result_not_available);
+    }
+
+    m_stack.push_range_ref(abs_range);
     next();
 }
 
