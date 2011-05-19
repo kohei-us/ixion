@@ -102,7 +102,7 @@ bool formula_interpreter::interpret()
         expression();
         // there should only be one stack value left for the result value.
         assert(m_stack.size() == 1);
-        m_result = pop_value();
+        m_result = m_stack.pop_value();
         m_outbuf << endl << cell_name << ": result = " << m_result << endl;
         cout << m_outbuf.str();
         return true;
@@ -218,7 +218,7 @@ void formula_interpreter::expression()
     // <term> + <term> + <term> + ... + <term>
 
     term();
-    double val = pop_value();
+    double val = m_stack.pop_value();
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
@@ -229,7 +229,7 @@ void formula_interpreter::expression()
                 m_outbuf << "+";
                 next();
                 term();
-                val += pop_value();
+                val += m_stack.pop_value();
             }
             break;
             case fop_minus:
@@ -237,15 +237,15 @@ void formula_interpreter::expression()
                 m_outbuf << "-";
                 next();
                 term();
-                val -= pop_value();
+                val -= m_stack.pop_value();
             }
             break;
             default:
-                push_value(val);
+                m_stack.push_value(val);
                 return;
         }
     }
-    push_value(val);
+    m_stack.push_value(val);
 }
 
 void formula_interpreter::term()
@@ -263,21 +263,21 @@ void formula_interpreter::term()
         {
             m_outbuf << "*";
             next();
-            double val = pop_value();
+            double val = m_stack.pop_value();
             term();
-            push_value(val*pop_value());
+            m_stack.push_value(val*m_stack.pop_value());
             return;
         }
         case fop_divide:
         {
             m_outbuf << "/";
             next();
-            double val = pop_value();
+            double val = m_stack.pop_value();
             term();
-            double val2 = pop_value();
+            double val2 = m_stack.pop_value();
             if (val2 == 0.0)
                 throw formula_error(fe_division_by_zero);
-            push_value(val/val2);
+            m_stack.push_value(val/val2);
             return;
         }
         default:
@@ -317,7 +317,7 @@ void formula_interpreter::factor()
             throw invalid_expression(os.str());
         }
     }
-    push_value(0.0);
+    m_stack.push_value(0.0);
 }
 
 void formula_interpreter::paren()
@@ -357,13 +357,13 @@ void formula_interpreter::single_ref()
     m_outbuf << m_context.get_name_resolver().get_name(addr);
     next();
 
-    push_value(val);
+    m_stack.push_value(val);
 }
 
 void formula_interpreter::range_ref()
 {
     // TODO: Properly implement this.
-    push_value(-1);
+    m_stack.push_value(-1);
     next();
 }
 
@@ -373,7 +373,7 @@ void formula_interpreter::constant()
     m_outbuf << val;
     next();
 
-    push_value(val);
+    m_stack.push_value(val);
 }
 
 void formula_interpreter::function()
@@ -414,16 +414,6 @@ void formula_interpreter::function()
     // Function call uses all stack values pushed onto the stack so far, which
     // gets cleared after the call returns.
     formula_functions(m_context).interpret(func_oc, m_stack);
-}
-
-void formula_interpreter::push_value(double val)
-{
-    m_stack.push_value(val);
-}
-
-double formula_interpreter::pop_value()
-{
-    return m_stack.pop_value();
 }
 
 }

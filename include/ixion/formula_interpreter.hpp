@@ -99,9 +99,6 @@ private:
     void constant();
     void function();
 
-    void push_value(double val);
-    double pop_value();
-
 private:
     const formula_cell*         m_parent_cell;
     const formula_tokens_t&     m_original_tokens;
