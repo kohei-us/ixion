@@ -59,6 +59,7 @@ formula_interpreter::formula_interpreter(const formula_cell* cell, const model_c
     m_parent_cell(cell),
     m_original_tokens(cell->get_tokens()),
     m_context(cxt),
+    m_stack(cxt),
     m_result(0.0),
     m_error(fe_no_error)
 {

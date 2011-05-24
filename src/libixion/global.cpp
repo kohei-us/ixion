@@ -225,6 +225,8 @@ double stack_value::get_value() const
     return 0.0;
 }
 
+value_stack_t::value_stack_t(const model_context& cxt) : m_context(cxt) {}
+
 value_stack_t::const_iterator value_stack_t::begin() const
 {
     return m_stack.begin();

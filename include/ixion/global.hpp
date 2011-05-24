@@ -45,6 +45,7 @@ class base_cell;
 class formula_cell;
 struct abs_address_t;
 struct abs_range_t;
+class model_context;
 
 typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
@@ -187,7 +188,12 @@ class value_stack_t
 {
     typedef ::boost::ptr_vector<stack_value> store_type;
     store_type m_stack;
+    const model_context& m_context;
+
+    value_stack_t(); // disabled
 public:
+    explicit value_stack_t(const model_context& cxt);
+
     typedef store_type::const_iterator const_iterator;
     const_iterator begin() const;
     const_iterator end() const;
