@@ -29,7 +29,9 @@
 
 namespace ixion {
 
-matrix::matrix(size_t rows, size_t cols) {}
+matrix::matrix(size_t rows, size_t cols) : m_data(rows, cols, ::mdds::matrix_density_sparse_zero)
+{
+}
 
 matrix::~matrix() {}
 
