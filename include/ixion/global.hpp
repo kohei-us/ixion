@@ -46,6 +46,7 @@ class formula_cell;
 struct abs_address_t;
 struct abs_range_t;
 class model_context;
+class matrix;
 
 typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
@@ -182,6 +183,7 @@ public:
 
     stack_value_t get_type() const;
     double get_value() const;
+    const abs_range_t& get_range() const;
 };
 
 class value_stack_t
@@ -205,7 +207,8 @@ public:
     void push_single_ref(const abs_address_t& val);
     void push_range_ref(const abs_range_t& val);
     double pop_value();
-
+    matrix pop_range_value();
+    stack_value_t get_type() const;
 };
 
 }

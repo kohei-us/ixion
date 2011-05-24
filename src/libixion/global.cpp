@@ -28,6 +28,8 @@
 #include "ixion/global.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/address.hpp"
+#include "ixion/matrix.hpp"
+#include "ixion/model_context.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -225,6 +227,11 @@ double stack_value::get_value() const
     return 0.0;
 }
 
+const abs_range_t& stack_value::get_range() const
+{
+    return *m_range;
+}
+
 value_stack_t::value_stack_t(const model_context& cxt) : m_context(cxt) {}
 
 value_stack_t::const_iterator value_stack_t::begin() const
@@ -279,6 +286,26 @@ double value_stack_t::pop_value()
 
     m_stack.pop_back();
     return ret;
+}
+
+matrix value_stack_t::pop_range_value()
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() != sv_range_ref)
+        throw formula_error(fe_stack_error);
+
+    return m_context.get_range_value(v.get_range());
+}
+
+stack_value_t value_stack_t::get_type() const
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    return m_stack.back().get_type();
 }
 
 }

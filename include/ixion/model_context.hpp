@@ -39,6 +39,7 @@ namespace ixion {
 
 class formula_name_resolver_base;
 struct abs_address_t;
+class matrix;
 
 /**
  * This class stores all data relevant to current session.  You can think of 
@@ -60,6 +61,8 @@ public:
     base_cell* get_cell(const abs_address_t& addr);
     ::std::string get_cell_name(const base_cell* p) const;
     abs_address_t get_cell_position(const base_cell* p) const;
+
+    matrix get_range_value(const abs_range_t& range) const;
 
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
     formula_cell* get_named_expression(const ::std::string& name);

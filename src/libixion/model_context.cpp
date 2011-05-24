@@ -27,6 +27,7 @@
 
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/matrix.hpp"
 
 using namespace std;
 
@@ -88,6 +89,11 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     }
 
     throw general_error("cell instance not found");
+}
+
+matrix model_context::get_range_value(const abs_range_t& range) const
+{
+    return matrix(0, 0);
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)

@@ -28,6 +28,7 @@
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_tokens.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/matrix.hpp"
 
 #ifdef max
 #undef max
@@ -163,7 +164,20 @@ void formula_functions::sum(value_stack_t& args) const
 
     double ret = 0;
     while (!args.empty())
-        ret += args.pop_value();
+    {
+
+        switch (args.get_type())
+        {
+            case sv_range_ref:
+
+            break;
+            case sv_single_ref:
+            case sv_string:
+            case sv_value:
+            default:
+                ret += args.pop_value();
+        }
+    }
 
     args.push_value(ret);
 }
