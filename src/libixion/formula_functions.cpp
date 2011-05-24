@@ -161,7 +161,7 @@ void formula_functions::sum(value_stack_t& args) const
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
 
-    double ret = args.pop_value();
+    double ret = 0;
     while (!args.empty())
         ret += args.pop_value();
 
@@ -173,8 +173,8 @@ void formula_functions::average(value_stack_t& args) const
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
 
-    double ret = args.pop_value();
-    long count = 1;
+    double ret = 0;
+    double count = 0.0;
     while (!args.empty())
     {
         ret += args.pop_value();
