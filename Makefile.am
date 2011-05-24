@@ -1,4 +1,5 @@
 SUBDIRS = src
+ACLOCAL_AMFLAGS = -I m4
 
 pcfiles = ixion-@IXION_API_VERSION@.pc
 ixion-@IXION_API_VERSION@.pc: ixion.pc
