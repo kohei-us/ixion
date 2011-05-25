@@ -287,7 +287,6 @@ public:
             break;
             case formula_name_type::cell_reference:
             {
-                cout << "cell reference" << endl;
                 abs_address_t addr;
                 addr.sheet = name_type.address.sheet;
                 addr.row = name_type.address.row;
