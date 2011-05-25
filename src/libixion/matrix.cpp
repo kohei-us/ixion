@@ -29,10 +29,14 @@
 
 namespace ixion {
 
-matrix::matrix(size_t rows, size_t cols) : m_data(rows, cols, ::mdds::matrix_density_sparse_zero)
-{
-}
+matrix::matrix(size_t rows, size_t cols, ::mdds::matrix_density_t density_type) : 
+    m_data(rows, cols, density_type) {}
 
 matrix::~matrix() {}
+
+void matrix::set(size_t row, size_t col, double val)
+{
+    m_data.set(row, col, val);
+}
 
 }

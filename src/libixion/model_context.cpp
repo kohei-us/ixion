@@ -93,7 +93,28 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
 
 matrix model_context::get_range_value(const abs_range_t& range) const
 {
-    return matrix(0, 0);
+    if (range.first.sheet != range.last.sheet)
+        throw general_error("multi-sheet range is not allowed.");
+
+    size_t rows = range.last.row - range.first.row + 1;
+    size_t cols = range.last.column - range.first.column + 1;
+
+    matrix ret(rows, cols);
+    for (row_t i = range.first.row; i <= range.last.row; ++i)
+    {
+        for (col_t j = range.first.column; j <= range.last.column; ++j)
+        {
+            const base_cell* p = get_cell(abs_address_t(i, j, range.first.sheet));
+            if (!p)
+                // empty cell.
+                continue;
+
+            // TODO: we need to handle string types when that becomes available.
+            ret.set(i, j, p->get_value());
+        }
+    }
+
+    return ret;
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)

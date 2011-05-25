@@ -62,6 +62,16 @@ public:
     ::std::string get_cell_name(const base_cell* p) const;
     abs_address_t get_cell_position(const base_cell* p) const;
 
+    /**
+     * Obtain range value in matrix form.  Multi-sheet ranges are not 
+     * supported.  If the specified range consists of multiple sheets, it 
+     * throws an exception. 
+     * 
+     * @param range absolute, single-sheet range address.  Multi-sheet ranges 
+     *              are not allowed.
+     * 
+     * @return range value represented as matrix.
+     */
     matrix get_range_value(const abs_range_t& range) const;
 
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
@@ -72,7 +82,7 @@ public:
 private:
     formula_name_resolver_base* mp_name_resolver;
     named_expressions_type m_named_expressions;
-    cell_store_type m_cells;
+    cell_store_type m_cells; // TODO: This storage needs to be optimized.
 };
 
 }
