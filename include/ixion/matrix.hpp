@@ -33,6 +33,11 @@
 
 namespace ixion {
 
+/**
+ * 2-dimensional matrix consisting of elements of variable types.  Each
+ * element can be numeric, string, or empty.  This class is used to
+ * represent range values or in-line matrices.
+ */
 class matrix
 {
     typedef ::mdds::mixed_type_matrix< ::std::string, uint8_t> store_type;
