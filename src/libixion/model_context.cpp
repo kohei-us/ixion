@@ -29,6 +29,8 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
 
+#define DEBUG_MODEL_CONTEXT 1
+
 using namespace std;
 
 namespace ixion {
@@ -44,6 +46,9 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
 
 void model_context::set_cell(const abs_address_t& addr, auto_ptr<base_cell>& cell)
 {
+#if DEBUG_MODEL_CONTEXT
+    cout << "model_context::set_cell: (sheet=" << addr.sheet << "; row=" << addr.row << "; col=" << addr.column << ")" << endl;
+#endif
     m_cells.erase(addr);
     m_cells.insert(addr, cell);
 }
@@ -100,11 +105,16 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     size_t cols = range.last.column - range.first.column + 1;
 
     matrix ret(rows, cols);
-    for (row_t i = range.first.row; i <= range.last.row; ++i)
+    for (row_t i = 0; i < rows; ++i)
     {
-        for (col_t j = range.first.column; j <= range.last.column; ++j)
+        for (col_t j = 0; j < cols; ++j)
         {
-            const base_cell* p = get_cell(abs_address_t(i, j, range.first.sheet));
+            row_t row = i + range.first.row;
+            col_t col = j + range.first.column;
+            const base_cell* p = get_cell(abs_address_t(range.first.sheet, row, col));
+#if DEBUG_MODEL_CONTEXT
+            cout << "model_context::get_range_value: (sheet=" << range.first.sheet << "; row=" << row << "; col=" << col << ") = " << p << endl;
+#endif
             if (!p)
                 // empty cell.
                 continue;
@@ -113,7 +123,6 @@ matrix model_context::get_range_value(const abs_range_t& range) const
             ret.set(i, j, p->get_value());
         }
     }
-
     return ret;
 }
 
