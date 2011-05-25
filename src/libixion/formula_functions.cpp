@@ -60,6 +60,12 @@ size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
 
 const char* unknown_func_name = "unknown";
 
+double sum_matrix_elements(const matrix& mx)
+{
+    // TODO: dummy.  Implement this.
+    return 10.0;
+}
+
 }
 
 // ============================================================================
@@ -169,7 +175,7 @@ void formula_functions::sum(value_stack_t& args) const
         switch (args.get_type())
         {
             case sv_range_ref:
-
+                ret += sum_matrix_elements(args.pop_range_value());
             break;
             case sv_single_ref:
             case sv_string:

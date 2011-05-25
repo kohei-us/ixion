@@ -156,7 +156,7 @@ private:
  * formula interpretation. 
  */
 enum stack_value_t {
-    sv_value,
+    sv_value = 0,
     sv_string,
     sv_single_ref,
     sv_range_ref,

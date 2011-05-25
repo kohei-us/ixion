@@ -219,7 +219,6 @@ void formula_interpreter::expression()
     // <term> + <term> + <term> + ... + <term>
 
     term();
-    double val = m_stack.pop_value();
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
@@ -227,26 +226,28 @@ void formula_interpreter::expression()
         {
             case fop_plus:
             {
+                double val = m_stack.pop_value();
                 m_outbuf << "+";
                 next();
                 term();
                 val += m_stack.pop_value();
+                m_stack.push_value(val);
             }
             break;
             case fop_minus:
             {
+                double val = m_stack.pop_value();
                 m_outbuf << "-";
                 next();
                 term();
                 val -= m_stack.pop_value();
+                m_stack.push_value(val);
             }
             break;
             default:
-                m_stack.push_value(val);
                 return;
         }
     }
-    m_stack.push_value(val);
 }
 
 void formula_interpreter::term()
@@ -365,14 +366,14 @@ void formula_interpreter::range_ref()
 {
     range_t range = token().get_range_ref();
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::variable: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
-    cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
+    cout << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
+    cout << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
 #endif
     m_outbuf << m_context.get_name_resolver().get_name(range);
     abs_range_t abs_range = range.to_abs(m_pos);
 
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::variable: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
+    cout << "formula_interpreter::range_ref: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
 #endif
 
     // Check the reference range to make sure it doesn't include the parent cell.
@@ -399,6 +400,7 @@ void formula_interpreter::function()
 {
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     assert(token().get_opcode() == fop_function);
+    assert(m_stack.empty());
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
     m_outbuf << formula_functions::get_function_name(func_oc);
 

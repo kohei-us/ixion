@@ -194,7 +194,6 @@ stack_value::stack_value(const abs_range_t& val) :
 
 stack_value::~stack_value()
 {
-
     switch (m_type)
     {
         case sv_range_ref:
@@ -210,8 +209,6 @@ stack_value::~stack_value()
         default:
             ; // do nothing
     }
-    if (m_type == sv_string)
-        delete m_str;
 }
 
 stack_value_t stack_value::get_type() const
@@ -297,7 +294,9 @@ matrix value_stack_t::pop_range_value()
     if (v.get_type() != sv_range_ref)
         throw formula_error(fe_stack_error);
 
-    return m_context.get_range_value(v.get_range());
+    matrix ret = m_context.get_range_value(v.get_range());
+    m_stack.pop_back();
+    return ret;
 }
 
 stack_value_t value_stack_t::get_type() const

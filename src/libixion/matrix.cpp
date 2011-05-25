@@ -32,6 +32,9 @@ namespace ixion {
 matrix::matrix(size_t rows, size_t cols, ::mdds::matrix_density_t density_type) : 
     m_data(rows, cols, density_type) {}
 
+matrix::matrix(const matrix& other) :
+    m_data(other.m_data) {}
+
 matrix::~matrix() {}
 
 void matrix::set(size_t row, size_t col, double val)
