@@ -37,9 +37,19 @@ matrix::matrix(const matrix& other) :
 
 matrix::~matrix() {}
 
+double matrix::get_numeric(size_t row, size_t col) const
+{
+    return m_data.get_numeric(row, col);
+}
+
 void matrix::set(size_t row, size_t col, double val)
 {
     m_data.set(row, col, val);
+}
+
+matrix::size_pair_type matrix::size() const
+{
+    return m_data.size();
 }
 
 }

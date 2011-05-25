@@ -60,10 +60,18 @@ size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
 
 const char* unknown_func_name = "unknown";
 
+/**
+ * Traverse all elements of a passed matrix to sum up their values. 
+ */
 double sum_matrix_elements(const matrix& mx)
 {
-    // TODO: dummy.  Implement this.
-    return 10.0;
+    double sum = 0.0;
+    matrix::size_pair_type sz = mx.size();
+    for (size_t row = 0; row < sz.first; ++row)
+        for (size_t col = 0; col < sz.second; ++col)
+            sum += mx.get_numeric(row, col);
+
+    return sum;
 }
 
 }

@@ -42,11 +42,15 @@ class matrix
 {
     typedef ::mdds::mixed_type_matrix< ::std::string, uint8_t> store_type;
 public:
+    typedef store_type::size_pair_type size_pair_type;
+
     matrix(size_t rows, size_t cols, ::mdds::matrix_density_t density_type = ::mdds::matrix_density_sparse_empty);
     matrix(const matrix& other);
     ~matrix();
 
+    double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
+    size_pair_type size() const;
 
 private:
     store_type m_data;
