@@ -36,7 +36,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_INTERPRETER 1
+#define DEBUG_FORMULA_INTERPRETER 0
 
 using namespace std;
 

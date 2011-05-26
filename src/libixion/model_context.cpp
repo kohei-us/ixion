@@ -29,7 +29,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
 
-#define DEBUG_MODEL_CONTEXT 1
+#define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
 
