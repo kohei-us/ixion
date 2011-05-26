@@ -56,8 +56,15 @@ public:
 
     void operator() (formula_token_base& t)
     {
-        if (t.get_opcode() == fop_single_ref)
-            mp_tokens->push_back(&t);
+        switch (t.get_opcode())
+        {
+            case fop_single_ref:
+            case fop_range_ref:
+                mp_tokens->push_back(&t);
+            break;
+            default:
+                ; // ignore the rest.
+        }
     }
 
     void swap_tokens(vector<formula_token_base*>& dest)
