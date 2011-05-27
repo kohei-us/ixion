@@ -39,6 +39,7 @@ namespace ixion {
 
 class formula_name_resolver_base;
 struct abs_address_t;
+class matrix;
 
 /**
  * This class stores all data relevant to current session.  You can think of 
@@ -61,6 +62,27 @@ public:
     ::std::string get_cell_name(const base_cell* p) const;
     abs_address_t get_cell_position(const base_cell* p) const;
 
+    /**
+     * Obtains a set of non-empty cells located within specified range.
+     * 
+     * @param range absolute range
+     * @param cells an array of pointers to non-empty cells.  The caller does 
+     *              not need to delete the instances.
+     */
+    void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
+
+    /**
+     * Obtain range value in matrix form.  Multi-sheet ranges are not 
+     * supported.  If the specified range consists of multiple sheets, it 
+     * throws an exception. 
+     * 
+     * @param range absolute, single-sheet range address.  Multi-sheet ranges 
+     *              are not allowed.
+     * 
+     * @return range value represented as matrix.
+     */
+    matrix get_range_value(const abs_range_t& range) const;
+
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
     formula_cell* get_named_expression(const ::std::string& name);
     const formula_cell* get_named_expression(const ::std::string& name) const;
@@ -69,7 +91,7 @@ public:
 private:
     formula_name_resolver_base* mp_name_resolver;
     named_expressions_type m_named_expressions;
-    cell_store_type m_cells;
+    cell_store_type m_cells; // TODO: This storage needs to be optimized.
 };
 
 }

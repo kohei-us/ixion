@@ -174,6 +174,13 @@ bool operator< (const address_t& left, const address_t& right)
 
 abs_range_t::abs_range_t() {}
 
+bool abs_range_t::contains(const abs_address_t& addr) const
+{
+    return first.sheet <= addr.sheet && addr.sheet <= last.sheet &&
+        first.row <= addr.row && addr.row <= last.row &&
+        first.column <= addr.column && addr.column <= last.column;
+}
+
 bool operator==(const abs_range_t& left, const abs_range_t& right)
 {
     return left.first == right.first && left.last == right.last;
@@ -192,6 +199,16 @@ bool operator<(const abs_range_t& left, const abs_range_t& right)
 }
 
 range_t::range_t() {}
+range_t::range_t(const address_t& _first, const address_t& _last) :
+    first(_first), last(_last) {}
+
+abs_range_t range_t::to_abs(const abs_address_t& origin) const
+{
+    abs_range_t ret;
+    ret.first = first.to_abs(origin);
+    ret.last = last.to_abs(origin);
+    return ret;
+}
 
 bool operator==(const range_t& left, const range_t& right)
 {

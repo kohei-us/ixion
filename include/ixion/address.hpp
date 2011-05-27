@@ -98,6 +98,11 @@ struct abs_range_t
     abs_address_t last;
 
     abs_range_t();
+
+    /**
+     * Check whether or not a given address is contained within this range.
+     */
+    bool contains(const abs_address_t& addr) const;
 };
 
 bool operator==(const abs_range_t& left, const abs_range_t& right);
@@ -113,6 +118,9 @@ struct range_t
     address_t last;
 
     range_t();
+    range_t(const address_t& _first, const address_t& _last);
+
+    abs_range_t to_abs(const abs_address_t& origin) const;
 };
 
 bool operator==(const range_t& left, const range_t& right);

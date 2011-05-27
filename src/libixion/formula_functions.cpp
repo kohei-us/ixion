@@ -27,6 +27,8 @@
 
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_tokens.hpp"
+#include "ixion/model_context.hpp"
+#include "ixion/matrix.hpp"
 
 #ifdef max
 #undef max
@@ -57,6 +59,20 @@ const builtin_func builtin_funcs[] = {
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
 
 const char* unknown_func_name = "unknown";
+
+/**
+ * Traverse all elements of a passed matrix to sum up their values. 
+ */
+double sum_matrix_elements(const matrix& mx)
+{
+    double sum = 0.0;
+    matrix::size_pair_type sz = mx.size();
+    for (size_t row = 0; row < sz.first; ++row)
+        for (size_t col = 0; col < sz.second; ++col)
+            sum += mx.get_numeric(row, col);
+
+    return sum;
+}
 
 }
 
@@ -91,91 +107,116 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-double formula_functions::interpret(formula_function_t oc, const args_type& args)
+formula_functions::formula_functions(const model_context& cxt) :
+    m_context(cxt)
+{
+}
+
+formula_functions::~formula_functions()
+{
+}
+
+void formula_functions::interpret(formula_function_t oc, value_stack_t& args) const
 {
     switch (oc)
     {
         case func_max:
-            return formula_functions::max(args);
+            max(args);
+            break;
         case func_average:
-            return formula_functions::average(args);
+            average(args);
+            break;
         case func_min:
-            return formula_functions::min(args);
+            min(args);
+            break;
         case func_wait:
-            return wait(args);
+            wait(args);
+            break;
         case func_sum:
-            return formula_functions::sum(args);
+            sum(args);
+            break;
         case func_unknown:
         default:
-            ;
+            throw formula_functions::invalid_arg("unknown function opcode");
     }
-    return 0.0;
 }
 
-double formula_functions::max(const args_type& args)
+void formula_functions::max(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
-    for (++itr; itr != itr_end; ++itr)
+    double ret = args.pop_value();
+    while (!args.empty())
     {
-        if (*itr > ret)
-            ret = *itr;
+        double v = args.pop_value();
+        if (v > ret)
+            ret = v;
     }
-    return ret;
+    args.push_value(ret);
 }
 
-double formula_functions::min(const args_type& args)
+void formula_functions::min(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
-    for (++itr; itr != itr_end; ++itr)
+    double ret = args.pop_value();
+    while (!args.empty())
     {
-        if (*itr < ret)
-            ret = *itr;
+        double v = args.pop_value();
+        if (v < ret)
+            ret = v;
     }
-    return ret;
+    args.push_value(ret);
 }
 
-double formula_functions::sum(const args_type& args)
+void formula_functions::sum(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
-    for (++itr; itr != itr_end; ++itr)
+    double ret = 0;
+    while (!args.empty())
     {
-        ret += *itr;
+
+        switch (args.get_type())
+        {
+            case sv_range_ref:
+                ret += sum_matrix_elements(args.pop_range_value());
+            break;
+            case sv_single_ref:
+            case sv_string:
+            case sv_value:
+            default:
+                ret += args.pop_value();
+        }
     }
-    return ret;
+
+    args.push_value(ret);
 }
 
-double formula_functions::average(const args_type& args)
+void formula_functions::average(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
 
-    args_type::const_iterator itr = args.begin(), itr_end = args.end();
-    double ret = *itr;
-    long count = 1;
-    for (++itr; itr != itr_end; ++itr)
+    double ret = 0;
+    double count = 0.0;
+    while (!args.empty())
     {
-        ret += *itr;
+        ret += args.pop_value();
         ++count;
     }
-    return ret / count;
+
+    args.push_value(ret/count);
 }
 
-double formula_functions::wait(const args_type& args)
+void formula_functions::wait(value_stack_t& args) const
 {
     global::sleep(1);
-    return 1;
+    args.clear();
+    args.push_value(1);
 }
 
 }

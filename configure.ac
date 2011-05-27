@@ -18,8 +18,12 @@ AM_INIT_AUTOMAKE
 AC_ARG_WITH(hash-container-compat,
 [
   --with-hash-container-compat use std::hash_foo instead of boost::unordered_foo
-  ],
+],
 ,with_hash_container_compat=no)
+
+AC_ARG_WITH(mdds-include-path,
+    AS_HELP_STRING([--with-mdds-include-path], [specify include path for mdds headers.])
+,)
 
 IXION_API_VERSION=ixion_api_version
 AC_SUBST(IXION_API_VERSION)
@@ -52,8 +56,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-
-CXXFLAGS="-D_REENTRANT"
+DEFINES="-D_REENTRANT"
 
 AC_MSG_CHECKING([whether to turn on hash container compatibility])
 if test "z$with_hash_container_compat" = "zno"; then
@@ -62,8 +65,20 @@ if test "z$with_hash_container_compat" = "zno"; then
     BOOST_UNORDERED
 else
     AC_MSG_RESULT([yes])
-    CXXFLAGS="$CXXFLAGS -D_IXION_HASH_CONTAINER_COMPAT"
+    DEFINES="$DEFINES -D_IXION_HASH_CONTAINER_COMPAT"
 fi
+
+AC_MSG_CHECKING([mdds include path])
+if test "z$with_mdds_include_path" = "z"; then
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([mdds header include path not specified.])
+else
+    AC_MSG_RESULT([$with_mdds_include_path])
+    DEFINES="$DEFINES -DMDDS_HASH_CONTAINER_BOOST"
+fi
+
+CXXFLAGS="$DEFINES -I$with_mdds_include_path"
+
 AC_DEFINE(CXXFLAGS)
 
 BOOST_THREADS

@@ -47,6 +47,7 @@ const char* print_tokens(const formula_tokens_t& tokens, bool verbose);
 enum fopcode_t {
     // data types
     fop_single_ref,
+    fop_range_ref,
     fop_named_expression,
     fop_unresolved_ref,
     fop_string,
@@ -91,6 +92,7 @@ public:
     fopcode_t get_opcode() const;
 
     virtual address_t get_single_ref() const;
+    virtual range_t get_range_ref() const;
     virtual double get_value() const;
     virtual size_t get_index() const;
     virtual std::string get_name() const;
@@ -165,6 +167,21 @@ private:
 
 // ============================================================================
 
+class range_ref_token : public formula_token_base
+{
+public:
+    range_ref_token(const range_t& range);
+    range_ref_token(const range_ref_token& r);
+    virtual ~range_ref_token();
+
+    virtual range_t get_range_ref() const;
+
+private:
+    range_t m_range;
+};
+
+// ============================================================================
+
 /**
  * Token that stores a named expression.
  */
@@ -213,6 +230,8 @@ inline formula_token_base* new_clone(const formula_token_base& r)
             return new opcode_token(r.get_opcode());
         case fop_single_ref:
             return new single_ref_token(r.get_single_ref());
+        case fop_range_ref:
+            return new range_ref_token(r.get_range_ref());
         case fop_named_expression:
             return new named_exp_token(r.get_name());
         case fop_unresolved_ref:

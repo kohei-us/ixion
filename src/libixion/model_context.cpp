@@ -27,6 +27,9 @@
 
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/matrix.hpp"
+
+#define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
 
@@ -43,6 +46,9 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
 
 void model_context::set_cell(const abs_address_t& addr, auto_ptr<base_cell>& cell)
 {
+#if DEBUG_MODEL_CONTEXT
+    cout << "model_context::set_cell: (sheet=" << addr.sheet << "; row=" << addr.row << "; col=" << addr.column << ")" << endl;
+#endif
     m_cells.erase(addr);
     m_cells.insert(addr, cell);
 }
@@ -88,6 +94,49 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     }
 
     throw general_error("cell instance not found");
+}
+
+void model_context::get_cells(const abs_range_t& range, vector<base_cell*>& cells)
+{
+    cell_store_type::iterator itr = m_cells.lower_bound(range.first);
+    cell_store_type::iterator itr_end = m_cells.upper_bound(range.last);
+    vector<base_cell*> hits;
+    for (; itr != itr_end; ++itr)
+    {
+        if (range.contains(itr->first))
+            hits.push_back(itr->second);
+    }
+    cells.swap(hits);
+}
+
+matrix model_context::get_range_value(const abs_range_t& range) const
+{
+    if (range.first.sheet != range.last.sheet)
+        throw general_error("multi-sheet range is not allowed.");
+
+    size_t rows = range.last.row - range.first.row + 1;
+    size_t cols = range.last.column - range.first.column + 1;
+
+    matrix ret(rows, cols);
+    for (row_t i = 0; i < rows; ++i)
+    {
+        for (col_t j = 0; j < cols; ++j)
+        {
+            row_t row = i + range.first.row;
+            col_t col = j + range.first.column;
+            const base_cell* p = get_cell(abs_address_t(range.first.sheet, row, col));
+#if DEBUG_MODEL_CONTEXT
+            cout << "model_context::get_range_value: (sheet=" << range.first.sheet << "; row=" << row << "; col=" << col << ") = " << p << endl;
+#endif
+            if (!p)
+                // empty cell.
+                continue;
+
+            // TODO: we need to handle string types when that becomes available.
+            ret.set(i, j, p->get_value());
+        }
+    }
+    return ret;
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)

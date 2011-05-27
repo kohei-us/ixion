@@ -54,9 +54,15 @@ struct formula_name_type
         bool abs_col:1;
     };
 
+    struct range_type {
+        address_type first;
+        address_type last;
+    };
+
     name_type type;
     union {
         address_type address;
+        range_type range;
         formula_function_t func_oc; // function opcode
     };
 
@@ -70,6 +76,7 @@ public:
     virtual ~formula_name_resolver_base() = 0;
     virtual formula_name_type resolve(const ::std::string& name, const address_t& pos) const = 0;
     virtual ::std::string get_name(const address_t& addr) const = 0;
+    virtual ::std::string get_name(const range_t& range) const = 0;
 };
 
 /**
@@ -84,6 +91,7 @@ public:
     virtual ~formula_name_resolver_simple();
     virtual formula_name_type resolve(const::std::string &name, const address_t& pos) const;
     virtual ::std::string get_name(const address_t& addr) const;
+    virtual ::std::string get_name(const range_t& range) const;
 };
 
 class formula_name_resolver_a1 : public formula_name_resolver_base
@@ -92,6 +100,7 @@ public:
     virtual ~formula_name_resolver_a1();
     virtual formula_name_type resolve(const::std::string &name, const address_t& pos) const;
     virtual ::std::string get_name(const address_t& addr) const;
+    virtual ::std::string get_name(const range_t& range) const;
 };
 
 }

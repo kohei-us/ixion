@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2010 Kohei Yoshida
+ * Copyright (c) 2010, 2011 Kohei Yoshida
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -33,6 +33,7 @@
 
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {
 
@@ -42,6 +43,10 @@ typedef int sheet_t;
 
 class base_cell;
 class formula_cell;
+struct abs_address_t;
+struct abs_range_t;
+class model_context;
+class matrix;
 
 typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name_map_t;
 
@@ -53,7 +58,6 @@ typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name
 typedef _ixion_unordered_set_type<base_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
-
 
 // ============================================================================
 
@@ -126,7 +130,9 @@ enum formula_error_t
     fe_no_error = 0,
     fe_ref_result_not_available,
     fe_division_by_zero,
-    fe_invalid_expression
+    fe_invalid_expression,
+    fe_stack_error,
+    fe_general_error,
 };
 
 const char* get_formula_error_name(formula_error_t fe);
@@ -143,6 +149,66 @@ public:
     formula_error_t get_error() const;
 private:
     formula_error_t m_ferror;
+};
+
+/**
+ * Type of stack value which can be used as intermediate value during 
+ * formula interpretation. 
+ */
+enum stack_value_t {
+    sv_value = 0,
+    sv_string,
+    sv_single_ref,
+    sv_range_ref,
+};
+
+/**
+ * Individual stack value storage.
+ */
+class stack_value
+{
+    stack_value_t m_type;
+    union {
+        double m_value;
+        abs_address_t* m_address;
+        abs_range_t* m_range;
+        ::std::string* m_str;
+    };
+
+public:
+    explicit stack_value(double val);
+    explicit stack_value(const abs_address_t& val);
+    explicit stack_value(const abs_range_t& val);
+    ~stack_value();
+
+    stack_value_t get_type() const;
+    double get_value() const;
+    const abs_range_t& get_range() const;
+};
+
+class value_stack_t
+{
+    typedef ::boost::ptr_vector<stack_value> store_type;
+    store_type m_stack;
+    const model_context& m_context;
+
+    value_stack_t(); // disabled
+public:
+    explicit value_stack_t(const model_context& cxt);
+
+    typedef store_type::const_iterator const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
+    bool empty() const;
+    size_t size() const;
+    void clear();
+
+    void push_value(double val);
+    void push_single_ref(const abs_address_t& val);
+    void push_range_ref(const abs_range_t& val);
+    double pop_value();
+    matrix pop_range_value();
+    stack_value_t get_type() const;
 };
 
 }

@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2010 Kohei Yoshida
+ * Copyright (c) 2010, 2011 Kohei Yoshida
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,6 +27,9 @@
 
 #include "ixion/global.hpp"
 #include "ixion/mem_str_buf.hpp"
+#include "ixion/address.hpp"
+#include "ixion/matrix.hpp"
+#include "ixion/model_context.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -178,6 +181,130 @@ const char* formula_error::what() const throw()
 formula_error_t formula_error::get_error() const
 {
     return m_ferror;
+}
+
+stack_value::stack_value(double val) :
+    m_type(sv_value), m_value(val) {}
+
+stack_value::stack_value(const abs_address_t& val) :
+    m_type(sv_single_ref), m_address(new abs_address_t(val)) {}
+
+stack_value::stack_value(const abs_range_t& val) :
+    m_type(sv_range_ref), m_range(new abs_range_t(val)) {}
+
+stack_value::~stack_value()
+{
+    switch (m_type)
+    {
+        case sv_range_ref:
+            delete m_range;
+            break;
+        case sv_single_ref:
+            delete m_address;
+            break;
+        case sv_string:
+            delete m_str;
+            break;
+        case sv_value:
+        default:
+            ; // do nothing
+    }
+}
+
+stack_value_t stack_value::get_type() const
+{
+    return m_type;
+}
+
+double stack_value::get_value() const
+{
+    if (m_type == sv_value)
+        return m_value;
+
+    return 0.0;
+}
+
+const abs_range_t& stack_value::get_range() const
+{
+    return *m_range;
+}
+
+value_stack_t::value_stack_t(const model_context& cxt) : m_context(cxt) {}
+
+value_stack_t::const_iterator value_stack_t::begin() const
+{
+    return m_stack.begin();
+}
+
+value_stack_t::const_iterator value_stack_t::end() const
+{
+    return m_stack.end();
+}
+
+bool value_stack_t::empty() const
+{
+    return m_stack.empty();
+}
+
+size_t value_stack_t::size() const
+{
+    return m_stack.size();
+}
+
+void value_stack_t::clear()
+{
+    return m_stack.clear();
+}
+
+void value_stack_t::push_value(double val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+void value_stack_t::push_single_ref(const abs_address_t& val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+void value_stack_t::push_range_ref(const abs_range_t& val)
+{
+    m_stack.push_back(new stack_value(val));
+}
+
+double value_stack_t::pop_value()
+{
+    double ret = 0.0;
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() == sv_value)
+        ret = v.get_value();
+
+    m_stack.pop_back();
+    return ret;
+}
+
+matrix value_stack_t::pop_range_value()
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() != sv_range_ref)
+        throw formula_error(fe_stack_error);
+
+    matrix ret = m_context.get_range_value(v.get_range());
+    m_stack.pop_back();
+    return ret;
+}
+
+stack_value_t value_stack_t::get_type() const
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    return m_stack.back().get_type();
 }
 
 }

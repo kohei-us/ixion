@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2010 Kohei Yoshida
+ * Copyright (c) 2011 Kohei Yoshida
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,62 +25,31 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_FORMULA_FUNCTIONS_HPP__
-#define __IXION_FORMULA_FUNCTIONS_HPP__
-
-#include "ixion/global.hpp"
-
-#include <string>
-#include <vector>
+#include "ixion/matrix.hpp"
 
 namespace ixion {
 
-class formula_token_base;
-class model_context;
+matrix::matrix(size_t rows, size_t cols, ::mdds::matrix_density_t density_type) : 
+    m_data(rows, cols, density_type) {}
 
-enum formula_function_t
+matrix::matrix(const matrix& other) :
+    m_data(other.m_data) {}
+
+matrix::~matrix() {}
+
+double matrix::get_numeric(size_t row, size_t col) const
 {
-    func_unknown = 0,
-
-    func_max,
-    func_min,
-    func_average,
-    func_sum,
-
-    func_wait // dummy function used only for testing.
-
-    // TODO: more functions to come...
-};
-
-class formula_functions
-{
-public:
-    class invalid_arg : public general_error
-    {
-    public:
-        invalid_arg(const ::std::string& msg);
-    };
-
-    formula_functions(const model_context& cxt);
-    ~formula_functions();
-
-    static formula_function_t get_function_opcode(const formula_token_base& token);
-    static formula_function_t get_function_opcode(const ::std::string& name);
-    static const char* get_function_name(formula_function_t oc);
-
-    void interpret(formula_function_t oc, value_stack_t& args) const;
-
-private:
-    void max(value_stack_t& args) const;
-    void min(value_stack_t& args) const;
-    void sum(value_stack_t& args) const;
-    void average(value_stack_t& args) const;
-    void wait(value_stack_t& args) const;
-
-private:
-    const model_context& m_context;
-};
-
+    return m_data.get_numeric(row, col);
 }
 
-#endif
+void matrix::set(size_t row, size_t col, double val)
+{
+    m_data.set(row, col, val);
+}
+
+matrix::size_pair_type matrix::size() const
+{
+    return m_data.size();
+}
+
+}

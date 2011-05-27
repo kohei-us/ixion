@@ -58,6 +58,8 @@ const char* get_opcode_name(fopcode_t oc)
             return "separator";
         case fop_single_ref:
             return "single ref";
+        case fop_range_ref:
+            return "range ref";
         case fop_named_expression:
             return "named expression";
         case fop_unresolved_ref:
@@ -98,6 +100,11 @@ fopcode_t formula_token_base::get_opcode() const
 address_t formula_token_base::get_single_ref() const
 {
     return address_t();
+}
+
+range_t formula_token_base::get_range_ref() const
+{
+    return range_t();
 }
 
 double formula_token_base::get_value() const
@@ -169,6 +176,29 @@ single_ref_token::~single_ref_token()
 address_t single_ref_token::get_single_ref() const
 {
     return m_address;
+}
+
+// ============================================================================
+
+range_ref_token::range_ref_token(const range_t& range) :
+    formula_token_base(fop_range_ref),
+    m_range(range)
+{
+}
+
+range_ref_token::range_ref_token(const range_ref_token& r) :
+    formula_token_base(r),
+    m_range(r.m_range)
+{
+}
+
+range_ref_token::~range_ref_token()
+{
+}
+
+range_t range_ref_token::get_range_ref() const
+{
+    return m_range;
 }
 
 // ============================================================================

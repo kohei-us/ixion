@@ -59,6 +59,7 @@ formula_interpreter::formula_interpreter(const formula_cell* cell, const model_c
     m_parent_cell(cell),
     m_original_tokens(cell->get_tokens()),
     m_context(cxt),
+    m_stack(cxt),
     m_result(0.0),
     m_error(fe_no_error)
 {
@@ -99,7 +100,10 @@ bool formula_interpreter::interpret()
         m_outbuf << get_formula_result_output_separator() << endl;
         m_outbuf << cell_name << ": ";
 
-        m_result = expression();
+        expression();
+        // there should only be one stack value left for the result value.
+        assert(m_stack.size() == 1);
+        m_result = m_stack.pop_value();
         m_outbuf << endl << cell_name << ": result = " << m_result << endl;
         cout << m_outbuf.str();
         return true;
@@ -133,6 +137,7 @@ void formula_interpreter::init_tokens()
 {
     name_set used_names;
     m_tokens.clear();
+    m_stack.clear();
     formula_tokens_t::const_iterator itr = m_original_tokens.begin(), itr_end = m_original_tokens.end();
     for (; itr != itr_end; ++itr)
     {
@@ -209,11 +214,11 @@ const formula_token_base& formula_interpreter::next_token()
     return token();
 }
 
-double formula_interpreter::expression()
+void formula_interpreter::expression()
 {
     // <term> + <term> + <term> + ... + <term>
 
-    double val = term();
+    term();
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
@@ -221,102 +226,92 @@ double formula_interpreter::expression()
         {
             case fop_plus:
             {
+                double val = m_stack.pop_value();
                 m_outbuf << "+";
                 next();
-                double val2 = term();
-                val += val2;
+                term();
+                val += m_stack.pop_value();
+                m_stack.push_value(val);
             }
             break;
             case fop_minus:
             {
+                double val = m_stack.pop_value();
                 m_outbuf << "-";
                 next();
-                double val2 = term();
-                val -= val2;
+                term();
+                val -= m_stack.pop_value();
+                m_stack.push_value(val);
             }
             break;
             default:
-                return val;
+                return;
         }
     }
-    return val;
 }
 
-double formula_interpreter::named_expression()
-{
-    const string& expr_name = token().get_name();
-    m_outbuf << expr_name;
-    const formula_cell* expr = m_context.get_named_expression(expr_name);
-    if (!expr)
-    {
-        ostringstream os;
-        os << "unable to find named expression '" << expr_name << "'";
-        throw invalid_expression(os.str());
-    }
-
-    // NOTE: We need look into expanding named expressions prior to
-    // interpreting formula tokens to avoid potential "recursion too deep"
-    // problem.  Plus, this nested interpretation does not resolve circular
-    // name dependency issue.
-    formula_interpreter fi(expr, m_context);
-    if (!fi.interpret())
-    {
-        ostringstream os;
-        os << "failed to interpret named expression '" << expr_name << "'";
-        throw invalid_expression(os.str());
-    }
-    double res = fi.get_result();
-    next();
-    return res;
-}
-
-double formula_interpreter::term()
+void formula_interpreter::term()
 {
     // <factor> || <factor> * <term>
 
-    double val = factor();
+    factor();
     if (!has_token())
-        return val;
+        return;
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
     {
         case fop_multiply:
+        {
             m_outbuf << "*";
             next();
-            return val*term();
+            double val = m_stack.pop_value();
+            term();
+            m_stack.push_value(val*m_stack.pop_value());
+            return;
+        }
         case fop_divide:
         {
             m_outbuf << "/";
             next();
-            double val2 = term();
+            double val = m_stack.pop_value();
+            term();
+            double val2 = m_stack.pop_value();
             if (val2 == 0.0)
                 throw formula_error(fe_division_by_zero);
-            return val/val2;
+            m_stack.push_value(val/val2);
+            return;
         }
         default:
             ;
     }
-    return val;
 }
 
-double formula_interpreter::factor()
+void formula_interpreter::factor()
 {
-    // <constant> || <variable> || <named expression> || '(' <expression> ')' || <function>
+    // <constant> || <variable> || '(' <expression> ')' || <function>
 
     fopcode_t oc = token().get_opcode();
     switch (oc)
     {
         case fop_open:
-            return paren();
+            paren();
+            return;
         case fop_named_expression:
-            return named_expression();
+            // All named expressions are supposed to be expanded prior to interpretation.
+            throw formula_error(fe_general_error);
         case fop_value:
-            return constant();
+            constant();
+            return;
         case fop_single_ref:
-            return variable();
+            single_ref();
+            return;
+        case fop_range_ref:
+            range_ref();
+            return;
         case fop_function:
-            return function();
+            function();
+            return;
         default:
         {
             ostringstream os;
@@ -324,23 +319,22 @@ double formula_interpreter::factor()
             throw invalid_expression(os.str());
         }
     }
-    return 0.0;
+    m_stack.push_value(0.0);
 }
 
-double formula_interpreter::paren()
+void formula_interpreter::paren()
 {
     m_outbuf << "(";
     next();
-    double val = expression();
+    expression();
     if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
     m_outbuf << ")";
     next();
-    return val;
 }
 
-double formula_interpreter::variable()
+void formula_interpreter::single_ref()
 {
     address_t addr = token().get_single_ref();
 #if DEBUG_FORMULA_INTERPRETER
@@ -364,21 +358,49 @@ double formula_interpreter::variable()
         val = pref->get_value();
     m_outbuf << m_context.get_name_resolver().get_name(addr);
     next();
-    return val;
+
+    m_stack.push_value(val);
 }
 
-double formula_interpreter::constant()
+void formula_interpreter::range_ref()
+{
+    range_t range = token().get_range_ref();
+#if DEBUG_FORMULA_INTERPRETER
+    cout << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
+    cout << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
+#endif
+    m_outbuf << m_context.get_name_resolver().get_name(range);
+    abs_range_t abs_range = range.to_abs(m_pos);
+
+#if DEBUG_FORMULA_INTERPRETER
+    cout << "formula_interpreter::range_ref: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
+#endif
+
+    // Check the reference range to make sure it doesn't include the parent cell.
+    if (abs_range.contains(m_pos))
+    {
+        // Referenced range contains the address of this cell.  Not good.
+        throw formula_error(fe_ref_result_not_available);
+    }
+
+    m_stack.push_range_ref(abs_range);
+    next();
+}
+
+void formula_interpreter::constant()
 {
     double val = token().get_value();
     m_outbuf << val;
     next();
-    return val;
+
+    m_stack.push_value(val);
 }
 
-double formula_interpreter::function()
+void formula_interpreter::function()
 {
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     assert(token().get_opcode() == fop_function);
+    assert(m_stack.empty());
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
     m_outbuf << formula_functions::get_function_name(func_oc);
 
@@ -387,7 +409,6 @@ double formula_interpreter::function()
 
     m_outbuf << "(";
 
-    vector<double> args;
     fopcode_t oc = next_token().get_opcode();
     bool expect_sep = false;
     while (oc != fop_close)
@@ -402,8 +423,7 @@ double formula_interpreter::function()
         }
         else
         {
-            double arg = expression();
-            args.push_back(arg);
+            expression();
             expect_sep = true;
         }
         oc = token().get_opcode();
@@ -411,7 +431,10 @@ double formula_interpreter::function()
 
     m_outbuf << ")";
     next();
-    return formula_functions::interpret(func_oc, args);
+
+    // Function call uses all stack values pushed onto the stack so far, which
+    // gets cleared after the call returns.
+    formula_functions(m_context).interpret(func_oc, m_stack);
 }
 
 }

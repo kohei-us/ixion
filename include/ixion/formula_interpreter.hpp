@@ -35,15 +35,30 @@
 #include <sstream>
 
 #include <boost/noncopyable.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {
 
 class formula_cell;
 class model_context;
 
+/**
+ * The formula interpreter parses a series of formula tokens representing a
+ * formula expression, and calculates the result of that expression.
+ *  
+ * <p>Intermediate result of each handler is pushed onto the stack and 
+ * popped from it for the calling method to retrieve.  By the end of the 
+ * interpretation there should only be one result left on the stack which is
+ * the final result of the interpretation of the expression.  The number of 
+ * intermediate results (or stack values) on the stack is normally one at 
+ * the end of each handler, except for the function handler where the number
+ * of stack values may be more than one when the function may take more than
+ * one argument.</p> 
+ */
 class formula_interpreter : public ::boost::noncopyable
 {
     typedef _ixion_unordered_set_type< ::std::string> name_set;
+
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
@@ -75,14 +90,14 @@ private:
     // responsible for setting the token position to the next unprocessed
     // position when it finishes.
 
-    double expression();
-    double named_expression();
-    double term();
-    double factor();
-    double paren();
-    double variable();
-    double constant();
-    double function();
+    void expression();
+    void term();
+    void factor();
+    void paren();
+    void single_ref();
+    void range_ref();
+    void constant();
+    void function();
 
 private:
     const formula_cell*         m_parent_cell;
@@ -90,6 +105,7 @@ private:
     const model_context&        m_context;
     abs_address_t               m_pos;
 
+    value_stack_t m_stack;
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;
