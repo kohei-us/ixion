@@ -96,6 +96,19 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     throw general_error("cell instance not found");
 }
 
+void model_context::get_cells(const abs_range_t& range, vector<base_cell*>& cells)
+{
+    cell_store_type::iterator itr = m_cells.lower_bound(range.first);
+    cell_store_type::iterator itr_end = m_cells.upper_bound(range.last);
+    vector<base_cell*> hits;
+    for (; itr != itr_end; ++itr)
+    {
+        if (range.contains(itr->first))
+            hits.push_back(itr->second);
+    }
+    cells.swap(hits);
+}
+
 matrix model_context::get_range_value(const abs_range_t& range) const
 {
     if (range.first.sheet != range.last.sheet)

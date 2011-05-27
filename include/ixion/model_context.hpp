@@ -63,6 +63,15 @@ public:
     abs_address_t get_cell_position(const base_cell* p) const;
 
     /**
+     * Obtains a set of non-empty cells located within specified range.
+     * 
+     * @param range absolute range
+     * @param cells an array of pointers to non-empty cells.  The caller does 
+     *              not need to delete the instances.
+     */
+    void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
+
+    /**
      * Obtain range value in matrix form.  Multi-sheet ranges are not 
      * supported.  If the specified range consists of multiple sheets, it 
      * throws an exception. 

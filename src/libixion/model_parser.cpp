@@ -50,7 +50,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 1
+#define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
 
@@ -78,22 +78,38 @@ private:
 class ref_cell_picker : public unary_function<formula_token_base*, void>
 {
 public:
-    ref_cell_picker(const model_context& cxt, const abs_address_t& origin, vector<base_cell*>& deps) :
+    ref_cell_picker(model_context& cxt, const abs_address_t& origin, vector<base_cell*>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
     void operator() (formula_token_base* p)
     {
-        if (p->get_opcode() != fop_single_ref)
-            return;
-
-        abs_address_t addr = static_cast<single_ref_token*>(p)->get_single_ref().to_abs(m_origin);
-        const base_cell* refcell = m_context.get_cell(addr);
-        if (refcell)
-            m_deps.push_back(const_cast<base_cell*>(refcell));
+        switch (p->get_opcode())
+        {
+            case fop_single_ref:
+            {
+                abs_address_t addr = p->get_single_ref().to_abs(m_origin);
+                const base_cell* refcell = m_context.get_cell(addr);
+                if (refcell)
+                    m_deps.push_back(const_cast<base_cell*>(refcell));
+            }
+            break;
+            case fop_range_ref:
+            {
+                abs_range_t range = p->get_range_ref().to_abs(m_origin);
+                vector<base_cell*> cells;
+                m_context.get_cells(range, cells);
+                vector<base_cell*>::const_iterator itr = cells.begin(), itr_end = cells.end();
+                for (; itr != itr_end; ++itr)
+                    m_deps.push_back(*itr);
+            }
+            break;
+            default:
+                ; // ignore the rest.
+        }
     }
 
 private:
-    const model_context& m_context;
+    model_context& m_context;
     const abs_address_t& m_origin;
     vector<base_cell*>&  m_deps;
 };
@@ -132,34 +148,54 @@ public:
 
     void operator() (formula_token_base* p) const
     {
-        if (p->get_opcode() == fop_single_ref)
+        switch (p->get_opcode())
         {
-            abs_address_t addr = p->get_single_ref().to_abs(m_addr);
+            case fop_single_ref:
+            {
+                abs_address_t addr = p->get_single_ref().to_abs(m_addr);
 #if DEBUG_MODEL_PARSER
-            cout << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
+                cout << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
 #endif
-            base_cell* cell = m_context.get_cell(addr);
-            if (!cell)
-            {
+                base_cell* cell = m_context.get_cell(addr);
+                if (!cell)
+                {
 #if DEBUG_MODEL_PARSER
-                cout << "formula_cell_listener_handler: cell not found!" << endl;
+                    cout << "formula_cell_listener_handler: cell not found!" << endl;
 #endif
-                return;
+                    return;
+                }
+                process_cell(cell);
             }
-
-            if (m_mode == mode_add)
+            break;
+            case fop_range_ref:
             {
-                cell->add_listener(m_addr);
+                abs_range_t range = p->get_range_ref().to_abs(m_addr);
+                vector<base_cell*> cells;
+                m_context.get_cells(range, cells);
+                vector<base_cell*>::const_iterator itr = cells.begin(), itr_end = cells.end();
+                for (; itr != itr_end; ++itr)
+                    process_cell(*itr);
             }
-            else
-            {
-                assert(m_mode == mode_remove);
-                cell->remove_listener(m_addr);
-            }
+            break;
+            default:
+                ; // ignore the rest.
         }
     }
 
 private:
+    void process_cell(base_cell* p) const
+    {
+        if (m_mode == mode_add)
+        {
+            p->add_listener(m_addr);
+        }
+        else
+        {
+            assert(m_mode == mode_remove);
+            p->remove_listener(m_addr);
+        }
+    }
+
     model_context& m_context;
     const abs_address_t& m_addr;
     formula_cell* mp_cell;
@@ -202,7 +238,7 @@ private:
 class cell_dependency_handler : public unary_function<base_cell*, void>
 {
 public:
-    explicit cell_dependency_handler(const model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
+    explicit cell_dependency_handler(model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
         m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
 
     void operator() (base_cell* pcell)
@@ -239,7 +275,7 @@ public:
     }
 
 private:
-    const model_context& m_context;
+    model_context& m_context;
     dependency_tracker& m_dep_tracker;
     dirty_cells_t& m_dirty_cells;
 };
