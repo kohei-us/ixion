@@ -1,0 +1,25 @@
+%mode init
+A1=SUM(B1:B4)
+A2=SUM(C1:C4)
+B1=1
+B3=5
+C2=10
+C4=100
+%calc
+%mode result
+A1=6
+A2=110
+%check
+%mode edit
+B1=6
+%recalc
+%mode result
+A1=11
+%check
+%mode edit
+C4=1000
+%recalc
+%mode result
+A2=1010
+%check
+
