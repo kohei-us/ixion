@@ -224,6 +224,11 @@ double stack_value::get_value() const
     return 0.0;
 }
 
+const abs_address_t& stack_value::get_address() const
+{
+    return *m_address;
+}
+
 const abs_range_t& stack_value::get_range() const
 {
     return *m_range;
@@ -278,8 +283,26 @@ double value_stack_t::pop_value()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.get_type() == sv_value)
-        ret = v.get_value();
+    switch (v.get_type())
+    {
+        case sv_value:
+            ret = v.get_value();
+        break;
+        case sv_single_ref:
+        {
+            // reference to a single cell.
+            const abs_address_t& addr = v.get_address();
+            const base_cell* p = m_context.get_cell(addr);
+            if (p)
+                ret = p->get_value();
+            else
+                // empty cell has a value of 0.
+                ret = 0.0;
+        }
+        break;
+        default:
+            throw formula_error(fe_stack_error);
+    }
 
     m_stack.pop_back();
     return ret;

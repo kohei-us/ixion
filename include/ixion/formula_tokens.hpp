@@ -217,7 +217,6 @@ private:
 
 inline formula_token_base* new_clone(const formula_token_base& r)
 {
-
     switch (r.get_opcode())
     {
         case fop_close:

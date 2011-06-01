@@ -183,6 +183,7 @@ public:
 
     stack_value_t get_type() const;
     double get_value() const;
+    const abs_address_t& get_address() const;
     const abs_range_t& get_range() const;
 };
 
