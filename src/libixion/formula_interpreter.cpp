@@ -428,9 +428,10 @@ void formula_interpreter::function()
     m_outbuf << ")";
     next();
 
-    // Function call uses all stack values pushed onto the stack so far, which
-    // gets cleared after the call returns.
+    // Function call pops all stack values pushed onto the stack this far, and
+    // pushes the result onto the stack.
     formula_functions(m_context).interpret(func_oc, m_stack);
+    assert(m_stack.size() == 1);
 }
 
 }
