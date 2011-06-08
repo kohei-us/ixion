@@ -243,6 +243,7 @@
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
 				<F N="../include/ixion/model_parser.hpp"/>
+				<F N="../include/ixion/range_listener_tracker.hpp"/>
 				<F N="../include/ixion/sort_input_parser.hpp"/>
 				<F N="../include/ixion/thread.hpp"/>
 			</Folder>
@@ -269,6 +270,7 @@
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
 				<F N="../src/libixion/model_parser.cpp"/>
+				<F N="../src/libixion/range_listener_tracker.cpp"/>
 				<F N="../src/libixion/sort_input_parser.cpp"/>
 			</Folder>
 			<F N="../src/ixion_parser.cpp"/>
