@@ -28,6 +28,10 @@
 #ifndef __IXION_RANGE_LISTENER_TRACKER_HPP__
 #define __IXION_RANGE_LISTENER_TRACKER_HPP__
 
+#include "ixion/address.hpp"
+
+#include <mdds/rectangle_set.hpp>
+
 namespace ixion {
 
 /**
@@ -35,9 +39,14 @@ namespace ixion {
  */
 class range_listener_tracker
 {
+    typedef ::std::vector<abs_address_t> address_list_type;
+    typedef ::mdds::rectangle_set<row_t, address_list_type> range_set_type;
 public:
     range_listener_tracker();
     ~range_listener_tracker();
+
+private:
+    range_set_type m_ranges;
 };
 
 }
