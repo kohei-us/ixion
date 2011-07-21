@@ -34,6 +34,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
+#include "ixion/range_listener_tracker.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -170,11 +171,13 @@ public:
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(m_addr);
-                vector<base_cell*> cells;
-                m_context.get_cells(range, cells);
-                vector<base_cell*>::const_iterator itr = cells.begin(), itr_end = cells.end();
-                for (; itr != itr_end; ++itr)
-                    process_cell(*itr);
+                if (m_mode == mode_add)
+                    m_context.get_range_listener_tracker().add(m_addr, range);
+                else
+                {
+                    assert(m_mode == mode_remove);
+                    m_context.get_range_listener_tracker().remove(m_addr, range);
+                }
             }
             break;
             default:
@@ -351,7 +354,8 @@ public:
                     fcell = static_cast<formula_cell*>(p);
 
                     // Go through all its existing references, and remove
-                    // itself as their listener.
+                    // itself as their listener.  This step is important
+                    // especially during partial re-calculation.
                     vector<formula_token_base*> ref_tokens;
                     fcell->get_ref_tokens(ref_tokens);
                     for_each(ref_tokens.begin(), ref_tokens.end(), 
@@ -386,16 +390,13 @@ public:
 /**
  * Function object that goes through the references of each formula cell and
  * registers the formula cell as a listener to all its referenced cells. 
- * This function object also accumulates all "dirty" cells (those cells that 
- * need re-calculation) during the process. 
  */
-class formula_cell_register_listener_handler : public unary_function<address_cell_pair_type, void>
+class formula_cell_ref_to_listener_handler : public unary_function<address_cell_pair_type, void>
 {
     model_context& m_context;
-    dirty_cells_t& m_dirty_cells;
 public:
-    formula_cell_register_listener_handler(model_context& cxt, dirty_cells_t& dirty_cells) :
-        m_context(cxt), m_dirty_cells(dirty_cells) {}
+    formula_cell_ref_to_listener_handler(model_context& cxt) :
+        m_context(cxt) {}
 
     void operator() (const address_cell_pair_type& v)
     {
@@ -411,11 +412,7 @@ public:
 #endif
         for_each(ref_tokens.begin(), ref_tokens.end(), 
                  formula_cell_listener_handler(m_context,
-                     v.first, formula_cell_listener_handler::mode_add));
-        
-        // Add this cell and all its listeners to the dirty cell list.
-        m_dirty_cells.insert(fcell);
-        fcell->get_all_listeners(m_context, m_dirty_cells);
+                     v.first, formula_cell_listener_handler::mode_add));        
     }
 };
 
@@ -577,9 +574,26 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
     // Next, go through the formula cells and their references, and register
     // the formula cells as listeners to their respective references.
-    dirty_cells_t _dirty_cells;
     for_each(fcells.begin(), fcells.end(), 
-             formula_cell_register_listener_handler(context, _dirty_cells));
+             formula_cell_ref_to_listener_handler(context));
+
+    // Go through all the listeners and determine dirty cells - cells to be
+    // (re-)calculated.
+    dirty_cells_t _dirty_cells;
+    {
+        // single, cell-to-cell listeners.
+        // TODO: I need to move the listener list out of the cell instance and
+        // move it to an external tracker class, to keep the cell object size
+        // small.
+        vector<address_cell_pair_type>::iterator itr = fcells.begin(), itr_end = fcells.end();
+        for (; itr != itr_end; ++itr)
+        {
+            formula_cell* fcell = itr->second;
+            _dirty_cells.insert(fcell);
+            context.get_range_listener_tracker().get_all_listeners(itr->first, _dirty_cells);
+            fcell->get_all_listeners(context, _dirty_cells);
+        }
+    }
 
 #if DEBUG_MODEL_PARSER
     cout << get_formula_result_output_separator() << endl;

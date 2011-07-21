@@ -29,6 +29,7 @@
 #include "ixion/formula_interpreter.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/range_listener_tracker.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -122,7 +123,8 @@ void base_cell::get_all_listeners(model_context& cxt, dirty_cells_t& cells) cons
     listeners_type::iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
     for (; itr != itr_end; ++itr)
     {
-        base_cell* p = cxt.get_cell(*itr);
+        const abs_address_t& addr = *itr; // listener cell address
+        base_cell* p = cxt.get_cell(addr);
         if (!p || p->get_celltype() != celltype_formula)
             // Referenced cell is empty or not a formula cell.  Ignore this.
             continue;
@@ -133,6 +135,7 @@ void base_cell::get_all_listeners(model_context& cxt, dirty_cells_t& cells) cons
         {
             // This cell is not yet on the dirty cell list.  Run recursively.
             cells.insert(fcell);
+            cxt.get_range_listener_tracker().get_all_listeners(addr, cells);
             p->get_all_listeners(cxt, cells);
         }
     }

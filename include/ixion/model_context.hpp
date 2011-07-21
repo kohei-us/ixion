@@ -38,6 +38,7 @@
 namespace ixion {
 
 class formula_name_resolver_base;
+class range_listener_tracker;
 struct abs_address_t;
 class matrix;
 
@@ -54,6 +55,7 @@ public:
     ~model_context();
     
     const formula_name_resolver_base& get_name_resolver() const;
+    range_listener_tracker& get_range_listener_tracker();
 
     void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
     void set_cell(const abs_address_t& addr, base_cell* cell);
@@ -90,6 +92,7 @@ public:
 
 private:
     formula_name_resolver_base* mp_name_resolver;
+    range_listener_tracker* mp_range_tracker;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
 };

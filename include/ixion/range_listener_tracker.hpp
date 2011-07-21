@@ -28,7 +28,9 @@
 #ifndef __IXION_RANGE_LISTENER_TRACKER_HPP__
 #define __IXION_RANGE_LISTENER_TRACKER_HPP__
 
+#include "ixion/global.hpp"
 #include "ixion/address.hpp"
+#include "ixion/model_context.hpp"
 
 #include <mdds/rectangle_set.hpp>
 
@@ -41,11 +43,25 @@ class range_listener_tracker
 {
     typedef ::std::vector<abs_address_t> address_list_type;
     typedef ::mdds::rectangle_set<row_t, address_list_type> range_set_type;
+
+    range_listener_tracker(); // disabled
 public:
-    range_listener_tracker();
+    range_listener_tracker(model_context& cxt);
     ~range_listener_tracker();
 
+    void add(const abs_address_t& cell, const abs_range_t& range);
+    void remove(const abs_address_t& cell, const abs_range_t& range);
+
+    /**
+     * Given a modified cell (target), get all formula cells that need to be 
+     * re-calculated based on the range-to-cells listener relationships. 
+     * 
+     * @param target 
+     * @param listeners 
+     */
+    void get_all_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 private:
+    model_context& m_context;
     range_set_type m_ranges;
 };
 

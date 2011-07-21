@@ -27,10 +27,30 @@
 
 #include "ixion/range_listener_tracker.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 namespace ixion {
 
-range_listener_tracker::range_listener_tracker() {}
+range_listener_tracker::range_listener_tracker(model_context& cxt) :
+    m_context(cxt) {}
 
 range_listener_tracker::~range_listener_tracker() {}
+
+void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
+{
+    cout << "range_listener_tracker: adding" << endl;
+}
+
+void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
+{
+    cout << "range_listener_tracker: removing" << endl;
+}
+
+void range_listener_tracker::get_all_listeners(
+    const abs_address_t& target, dirty_cells_t& listeners) const
+{
+}
 
 }
