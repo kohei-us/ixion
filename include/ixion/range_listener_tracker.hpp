@@ -42,14 +42,30 @@ namespace ixion {
 class range_listener_tracker
 {
     typedef ::std::vector<abs_address_t> address_list_type;
-    typedef ::mdds::rectangle_set<row_t, address_list_type> range_set_type;
+    typedef ::mdds::rectangle_set<row_t, address_list_type> range_query_set_type;
+    typedef ::boost::unordered_map<abs_range_t, address_list_type, abs_range_t::hash> range_store_type;
 
     range_listener_tracker(); // disabled
 public:
     range_listener_tracker(model_context& cxt);
     ~range_listener_tracker();
 
+    /**
+     * Add a reference relationship from a single cell to a range.  The cell 
+     * references the range.  Duplicates are silently ignored.
+     * 
+     * @param cell cell that includes reference to the range.
+     * @param range range referenced by the cell.
+     */
     void add(const abs_address_t& cell, const abs_range_t& range);
+
+    /**
+     * Remove an existing reference relationship from a single cell to a 
+     * range.  If no such relationship exists, it does nothing. 
+     * 
+     * @param cell cell that includes reference to the range.
+     * @param range range referenced by the cell.
+     */
     void remove(const abs_address_t& cell, const abs_range_t& range);
 
     /**
@@ -62,7 +78,8 @@ public:
     void get_all_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 private:
     model_context& m_context;
-    range_set_type m_ranges;
+    range_query_set_type m_query_set; /// used for fast lookup of listeners.
+    range_store_type m_data;          /// store listener data for ranges.
 };
 
 }

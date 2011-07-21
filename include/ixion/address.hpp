@@ -99,6 +99,11 @@ struct abs_range_t
 
     abs_range_t();
 
+    struct hash
+    {
+        size_t operator() (const abs_range_t& range) const;
+    };
+
     /**
      * Check whether or not a given address is contained within this range.
      */

@@ -174,6 +174,12 @@ bool operator< (const address_t& left, const address_t& right)
 
 abs_range_t::abs_range_t() {}
 
+size_t abs_range_t::hash::operator() (const abs_range_t& range) const
+{
+    abs_address_t::hash adr_hash;
+    return adr_hash(range.first) + 65536*adr_hash(range.last);
+}
+
 bool abs_range_t::contains(const abs_address_t& addr) const
 {
     return first.sheet <= addr.sheet && addr.sheet <= last.sheet &&
