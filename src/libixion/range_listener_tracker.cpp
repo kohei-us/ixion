@@ -41,11 +41,40 @@ range_listener_tracker::~range_listener_tracker() {}
 void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
     cout << "range_listener_tracker: adding" << endl;
+    range_store_type::iterator itr = m_data.find(range);
+    if (itr == m_data.end())
+    {
+        // No container for this range yet.  Create one.
+        pair<range_store_type::iterator, bool> r = 
+            m_data.insert(range_store_type::value_type(range, new address_set_type));
+        if (!r.second)
+            throw general_error("failed to insert new address set to range listener tracker.");
+        itr = r.first;
+
+        // Insert the container to the rectangle set as well (for lookup).
+        m_query_set.insert(
+            range.first.column, range.first.row, range.last.column, range.last.row, itr->second);
+    }
+    itr->second->insert(cell);
 }
 
 void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
 {
     cout << "range_listener_tracker: removing" << endl;
+    range_store_type::iterator itr = m_data.find(range);
+    if (itr == m_data.end())
+        // No listeners for this range.  Bail out.
+        return;
+
+    address_set_type* p = itr->second;
+    p->erase(cell);
+    if (p->empty())
+    {
+        // This list is empty.  Remove it from the containers and destroy the instance.
+        m_data.erase(itr);
+        m_query_set.remove(p);
+        delete p;
+    }
 }
 
 void range_listener_tracker::get_all_listeners(

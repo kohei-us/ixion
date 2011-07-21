@@ -31,6 +31,8 @@
 #include "ixion/global.hpp"
 #include "ixion/address.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/hash_container/map.hpp"
+#include "ixion/hash_container/set.hpp"
 
 #include <mdds/rectangle_set.hpp>
 
@@ -41,9 +43,9 @@ namespace ixion {
  */
 class range_listener_tracker
 {
-    typedef ::std::vector<abs_address_t> address_list_type;
-    typedef ::mdds::rectangle_set<row_t, address_list_type> range_query_set_type;
-    typedef ::boost::unordered_map<abs_range_t, address_list_type, abs_range_t::hash> range_store_type;
+    typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
+    typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;
+    typedef _ixion_unordered_map_type<abs_range_t, address_set_type*, abs_range_t::hash> range_store_type;
 
     range_listener_tracker(); // disabled
 public:
