@@ -36,7 +36,13 @@ namespace ixion {
 range_listener_tracker::range_listener_tracker(model_context& cxt) :
     m_context(cxt) {}
 
-range_listener_tracker::~range_listener_tracker() {}
+range_listener_tracker::~range_listener_tracker()
+{
+    // Delete all the listener set instances.
+    range_store_type::iterator itr = m_data.begin(), itr_end = m_data.end();
+    for (; itr != itr_end; ++itr)
+        delete itr->second;
+}
 
 void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
