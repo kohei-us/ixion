@@ -27,7 +27,11 @@
 
 #include "ixion/range_listener_tracker.hpp"
 
+#define DEBUG_RANGE_LISTENER_TRACKER 1
+
+#if DEBUG_RANGE_LISTENER_TRACKER
 #include <iostream>
+#endif
 
 using namespace std;
 
@@ -46,7 +50,9 @@ range_listener_tracker::~range_listener_tracker()
 
 void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
+#if DEBUG_RANGE_LISTENER_TRACKER
     cout << "range_listener_tracker: adding" << endl;
+#endif
     range_store_type::iterator itr = m_data.find(range);
     if (itr == m_data.end())
     {
@@ -58,15 +64,21 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
         itr = r.first;
 
         // Insert the container to the rectangle set as well (for lookup).
+#if DEBUG_RANGE_LISTENER_TRACKER
+        cout << "x1=" << range.first.column << ",y1=" << range.first.row
+            << ",x2=" << range.last.column << ",y2=" << range.last.row << ",p=" << itr->second << endl;
+#endif
         m_query_set.insert(
-            range.first.column, range.first.row, range.last.column, range.last.row, itr->second);
+            range.first.column, range.first.row, range.last.column+1, range.last.row+1, itr->second);
     }
     itr->second->insert(cell);
 }
 
 void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
 {
+#if DEBUG_RANGE_LISTENER_TRACKER
     cout << "range_listener_tracker: removing" << endl;
+#endif
     range_store_type::iterator itr = m_data.find(range);
     if (itr == m_data.end())
         // No listeners for this range.  Bail out.
@@ -86,7 +98,9 @@ void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t
 void range_listener_tracker::get_all_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
+#if DEBUG_RANGE_LISTENER_TRACKER
     cout << "range_listener_tracker: get all listeners recursively" << endl;
+#endif
 }
 
 }
