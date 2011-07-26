@@ -95,12 +95,30 @@ void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t
     }
 }
 
+namespace {
+
+class dirty_cell_inserter : public std::unary_function<range_listener_tracker::address_set_type*, void>
+{
+    const model_context& m_context;
+public:
+    dirty_cell_inserter(const model_context& cxt) : m_context(cxt) {}
+
+    void operator() (const range_listener_tracker::address_set_type* p) const
+    {
+    }
+};
+
+}
+
 void range_listener_tracker::get_all_listeners(
-    const abs_address_t& target, dirty_cells_t& listeners) const
+    const abs_address_t& target, dirty_cells_t& listeners)
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     cout << "range_listener_tracker: get all listeners recursively" << endl;
 #endif
+    dirty_cells_t new_listeners;
+    range_query_set_type::search_result res = m_query_set.search(target.row, target.column);
+    std::for_each(res.begin(), res.end(), dirty_cell_inserter(m_context));
 }
 
 }
