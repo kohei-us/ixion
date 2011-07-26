@@ -7,4 +7,11 @@ D1=SUM(B1:B4)
 %mode result
 D1=6
 %check
+%mode edit
+B2=4
+%recalc
+%mode result
+D1=10
+%check
+
 
