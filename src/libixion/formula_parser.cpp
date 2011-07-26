@@ -35,7 +35,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_PARSER 1
+#define DEBUG_FORMULA_PARSER 0
 
 using namespace std;
 
@@ -149,7 +149,7 @@ formula_parser::~formula_parser()
 {
 }
 
-void formula_parser::set_origin(const address_t& pos)
+void formula_parser::set_origin(const abs_address_t& pos)
 {
     m_pos = pos;
 }

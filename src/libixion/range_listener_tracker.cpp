@@ -27,7 +27,7 @@
 
 #include "ixion/range_listener_tracker.hpp"
 
-#define DEBUG_RANGE_LISTENER_TRACKER 1
+#define DEBUG_RANGE_LISTENER_TRACKER 0
 
 #if DEBUG_RANGE_LISTENER_TRACKER
 #include <iostream>

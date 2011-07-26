@@ -179,6 +179,23 @@ string abs_or_rel(bool _abs)
     return _abs ? "(abs)" : "(rel)";
 }
 
+string _to_string(parse_address_result res)
+{
+
+    switch (res)
+    {
+        case invalid:
+            return "invalid";
+        case range_expected:
+            return "range expected";
+        case valid_address:
+            return "valid address";
+        default:
+            ;
+    }
+    return "unknown parse address result";
+}
+
 string _to_string(const formula_name_type::address_type& addr)
 {
     std::ostringstream os;
@@ -187,6 +204,16 @@ string _to_string(const formula_name_type::address_type& addr)
         << addr.col << abs_or_rel(addr.abs_col) << "]";
 
     return os.str();
+}
+
+void to_relative_address(sheet_t& sheet, row_t& row, col_t& col, bool abs_sheet, bool abs_row, bool abs_col, const abs_address_t& pos)
+{
+    if (!abs_sheet)
+        sheet -= pos.sheet;
+    if (!abs_row)
+        row -= pos.row;
+    if (!abs_col)
+        col -= pos.column;
 }
 
 } // anonymous namespace
@@ -230,7 +257,7 @@ formula_name_resolver_simple::formula_name_resolver_simple() :
 
 formula_name_resolver_simple::~formula_name_resolver_simple() {}
 
-formula_name_type formula_name_resolver_simple::resolve(const string& name, const address_t& pos) const
+formula_name_type formula_name_resolver_simple::resolve(const string& name, const abs_address_t& pos) const
 {
     formula_name_type ret;
     resolve_function_or_name(name, ret);
@@ -250,10 +277,10 @@ string formula_name_resolver_simple::get_name(const range_t& range) const
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
-formula_name_type formula_name_resolver_a1::resolve(const string& name, const address_t& pos) const
+formula_name_type formula_name_resolver_a1::resolve(const string& name, const abs_address_t& pos) const
 {
 #if DEBUG_NAME_RESOLVER
-    cout << "resolve: name=" << name << "; origin=" << pos.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "name=" << name << "; origin=" << pos.get_name() << endl;
 #endif
     formula_name_type ret;
     if (resolve_function(name, ret))
@@ -275,15 +302,14 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
     parse_address_result parse_res = 
         parse_address(p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
 
+#if DEBUG_NAME_RESOLVER
+    __IXION_DEBUG_OUT__ << "parse address result: " << _to_string(parse_res) << endl;
+#endif
+
     if (parse_res == valid_address)
     {
         // This is a single cell address.
-        if (!abs_sheet)
-            sheet -= pos.sheet;
-        if (!abs_row)
-            row -= pos.row;
-        if (!abs_col)
-            col -= pos.column;
+        to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
 
 #if DEBUG_NAME_RESOLVER
         string abs_row_s = abs_row ? "abs" : "rel";
@@ -308,6 +334,8 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
 
         ++p; // skip ':'
 
+        to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
+
         ret.range.first.sheet = sheet;
         ret.range.first.row = row;
         ret.range.first.col = col;
@@ -318,6 +346,8 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ad
         if (parse_res != valid_address)
             // The 2nd part after the ':' is not valid.
             return ret;
+
+        to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
 
         ret.range.last.sheet = sheet;
         ret.range.last.row = row;

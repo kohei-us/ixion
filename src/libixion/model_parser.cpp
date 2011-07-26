@@ -304,12 +304,12 @@ public:
         const string& name = model_cell.get_name();
 
 #if DEBUG_MODEL_PARSER
-        cout << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
+        __IXION_DEBUG_OUT__ << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         formula_parser fparser(model_cell.get_tokens(), m_context);
 
         formula_cell* fcell = NULL;
-        formula_name_type name_type = m_context.get_name_resolver().resolve(name, address_t());
+        formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
         switch (name_type.type)
         {
             case formula_name_type::named_expression:
@@ -330,6 +330,9 @@ public:
                 addr.sheet = name_type.address.sheet;
                 addr.row = name_type.address.row;
                 addr.column = name_type.address.col;
+#if DEBUG_MODEL_PARSER
+                __IXION_DEBUG_OUT__ << addr.get_name() << endl;
+#endif
                 base_cell* p = m_context.get_cell(addr);
                 if (!p)
                 {
@@ -826,7 +829,7 @@ void model_parser::check(const results_type& formula_results)
 const base_cell* model_parser::get_cell_from_name(const string& name)
 {
     const formula_name_resolver_base& resolver = m_context.get_name_resolver();
-    formula_name_type name_type = resolver.resolve(name, address_t());
+    formula_name_type name_type = resolver.resolve(name, abs_address_t());
     switch (name_type.type)
     {
         case formula_name_type::cell_reference:

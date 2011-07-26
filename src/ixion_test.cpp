@@ -50,7 +50,7 @@ void test_name_resolver()
     {
         const char* p = names[i];
         string name_a1(p);
-        formula_name_type res = resolver.resolve(name_a1, address_t());
+        formula_name_type res = resolver.resolve(name_a1, abs_address_t());
         assert(res.type == formula_name_type::cell_reference);
         address_t addr;
         addr.sheet = res.address.sheet;
@@ -72,7 +72,7 @@ void test_name_resolver()
     for (size_t i = 0; range_tests[i].name; ++i)
     {
         string name_a1(range_tests[i].name);
-        formula_name_type res = resolver.resolve(name_a1, address_t());
+        formula_name_type res = resolver.resolve(name_a1, abs_address_t());
         assert(res.type == formula_name_type::range_reference);
         assert(res.range.first.sheet == range_tests[i].sheet1);
         assert(res.range.first.row == range_tests[i].row1);
@@ -81,6 +81,21 @@ void test_name_resolver()
         assert(res.range.last.row == range_tests[i].row2);
         assert(res.range.last.col == range_tests[i].col2);
     }
+
+    formula_name_type res = resolver.resolve("B1", abs_address_t(0,1,1));
+    assert(res.type == formula_name_type::cell_reference);
+    assert(res.address.sheet == 0);
+    assert(res.address.row == -1);
+    assert(res.address.col == 0);
+
+    res = resolver.resolve("B2:B4", abs_address_t(0,0,3));
+    assert(res.type == formula_name_type::range_reference);
+    assert(res.range.first.sheet == 0);
+    assert(res.range.first.row == 1);
+    assert(res.range.first.col == -2);
+    assert(res.range.last.sheet == 0);
+    assert(res.range.last.row == 3);
+    assert(res.range.last.col == -2);
 }
 
 void test_address()
