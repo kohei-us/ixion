@@ -111,7 +111,7 @@ public:
 }
 
 void range_listener_tracker::get_all_listeners(
-    const abs_address_t& target, dirty_cells_t& listeners)
+    const abs_address_t& target, dirty_cells_t& listeners) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     cout << "range_listener_tracker: get all listeners recursively" << endl;

@@ -77,10 +77,10 @@ public:
      * @param target 
      * @param listeners 
      */
-    void get_all_listeners(const abs_address_t& target, dirty_cells_t& listeners);
+    void get_all_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 private:
     model_context& m_context;
-    range_query_set_type m_query_set; /// used for fast lookup of listeners.
+    mutable range_query_set_type m_query_set; /// used for fast lookup of listeners.
     range_store_type m_data;          /// store listener data for ranges.
 };
 
