@@ -56,7 +56,7 @@ void test_name_resolver()
         addr.sheet = res.address.sheet;
         addr.row = res.address.row;
         addr.column = res.address.col;
-        string test_name = resolver.get_name(addr);
+        string test_name = resolver.get_name(addr, abs_address_t());
         assert(name_a1 == test_name);
     }
 

@@ -264,12 +264,12 @@ formula_name_type formula_name_resolver_simple::resolve(const string& name, cons
     return ret;
 }
 
-string formula_name_resolver_simple::get_name(const address_t& addr) const
+string formula_name_resolver_simple::get_name(const address_t& addr, const abs_address_t& pos) const
 {
     return addr.get_name();
 }
 
-string formula_name_resolver_simple::get_name(const range_t& range) const
+string formula_name_resolver_simple::get_name(const range_t& range, const abs_address_t& pos) const
 {
     // TODO: to be implemented.
     return string();
@@ -363,24 +363,41 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ab
     return ret;
 }
 
-string formula_name_resolver_a1::get_name(const address_t& addr) const
+string formula_name_resolver_a1::get_name(const address_t& addr, const abs_address_t& pos) const
 {
     // For now, sheet index is ignored.
     ostringstream os;
-    append_column_name_a1(os, addr.column);
+    col_t col = addr.column;
+    if (!addr.abs_column)
+        col += pos.column;
+
+    append_column_name_a1(os, col);
     os << (addr.row + 1);
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const range_t& range) const
+string formula_name_resolver_a1::get_name(const range_t& range, const abs_address_t& pos) const
 {
     // For now, sheet index is ignored.
     ostringstream os;
-    append_column_name_a1(os, range.first.column);
-    os << (range.first.row + 1);
+    col_t col = range.first.column;
+    row_t row = range.first.row;
+    if (!range.first.abs_column)
+        col += pos.column;
+    if (!range.first.abs_row)
+        row += pos.row;
+    append_column_name_a1(os, col);
+    os << (row + 1);
     os << ":";
-    append_column_name_a1(os, range.last.column);
-    os << (range.last.row + 1);
+
+    col = range.last.column;
+    row = range.last.row;
+    if (!range.last.abs_column)
+        col += pos.column;
+    if (!range.last.abs_row)
+        row += pos.row;
+    append_column_name_a1(os, col);
+    os << (row + 1);
     return os.str();
 }
 

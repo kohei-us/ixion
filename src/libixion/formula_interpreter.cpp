@@ -341,7 +341,7 @@ void formula_interpreter::single_ref()
     cout << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
     cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
 #endif
-    m_outbuf << m_context.get_name_resolver().get_name(addr);
+    m_outbuf << m_context.get_name_resolver().get_name(addr, m_pos);
     abs_address_t abs_addr = addr.to_abs(m_pos);
 #if DEBUG_FORMULA_INTERPRETER
     cout << "formula_interpreter::variable: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
@@ -365,7 +365,7 @@ void formula_interpreter::range_ref()
     cout << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
     cout << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
 #endif
-    m_outbuf << m_context.get_name_resolver().get_name(range);
+    m_outbuf << m_context.get_name_resolver().get_name(range, m_pos);
     abs_range_t abs_range = range.to_abs(m_pos);
 
 #if DEBUG_FORMULA_INTERPRETER
