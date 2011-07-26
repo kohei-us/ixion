@@ -83,6 +83,8 @@ public:
     virtual formula_name_type resolve(const ::std::string& name, const abs_address_t& pos) const = 0;
     virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const = 0;
     virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const = 0;
+    virtual ::std::string get_name(const abs_address_t& addr) const = 0;
+    virtual ::std::string get_name(const abs_range_t& range) const = 0;
 };
 
 /**
@@ -98,6 +100,8 @@ public:
     virtual formula_name_type resolve(const::std::string &name, const abs_address_t& pos) const;
     virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const;
     virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const;
+    virtual ::std::string get_name(const abs_address_t& addr) const;
+    virtual ::std::string get_name(const abs_range_t& range) const;
 };
 
 class formula_name_resolver_a1 : public formula_name_resolver_base
@@ -107,6 +111,8 @@ public:
     virtual formula_name_type resolve(const::std::string &name, const abs_address_t& pos) const;
     virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const;
     virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const;
+    virtual ::std::string get_name(const abs_address_t& addr) const;
+    virtual ::std::string get_name(const abs_range_t& range) const;
 };
 
 }

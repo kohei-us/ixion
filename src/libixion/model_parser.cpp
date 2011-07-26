@@ -568,12 +568,19 @@ void ensure_unique_names(const vector<string>& cell_names)
  */
 void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
 {
+#if DEBUG_MODEL_PARSER
+    __IXION_DEBUG_OUT__ << "number of lexer token cells: " << cells.size() << endl;
+#endif
     vector<address_cell_pair_type> fcells;
 
     // First, convert each lexer token cell into formula token cell, and put
     // the formula cells into the context object.
     for_each(cells.begin(), cells.end(), 
              lexer_formula_cell_converter(context, fcells));
+
+#if DEBUG_MODEL_PARSER
+    __IXION_DEBUG_OUT__ << "number of converted formula cells: " << fcells.size() << endl;
+#endif
 
     // Next, go through the formula cells and their references, and register
     // the formula cells as listeners to their respective references.
@@ -591,6 +598,9 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         vector<address_cell_pair_type>::iterator itr = fcells.begin(), itr_end = fcells.end();
         for (; itr != itr_end; ++itr)
         {
+#if DEBUG_MODEL_PARSER
+            __IXION_DEBUG_OUT__ << "processing " << context.get_name_resolver().get_name(itr->first, abs_address_t()) << endl;
+#endif
             formula_cell* fcell = itr->second;
             _dirty_cells.insert(fcell);
             context.get_range_listener_tracker().get_all_listeners(itr->first, _dirty_cells);

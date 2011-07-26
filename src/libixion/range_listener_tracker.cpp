@@ -30,6 +30,7 @@
 #define DEBUG_RANGE_LISTENER_TRACKER 0
 
 #if DEBUG_RANGE_LISTENER_TRACKER
+#include "ixion/formula_name_resolver.hpp"
 #include <iostream>
 #endif
 
@@ -51,7 +52,8 @@ range_listener_tracker::~range_listener_tracker()
 void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
-    cout << "range_listener_tracker: adding" << endl;
+    const formula_name_resolver_base& res = m_context.get_name_resolver();
+    __IXION_DEBUG_OUT__ << "cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_data.find(range);
     if (itr == m_data.end())
@@ -77,7 +79,8 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
 void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
-    cout << "range_listener_tracker: removing" << endl;
+    const formula_name_resolver_base& res = m_context.get_name_resolver();
+    __IXION_DEBUG_OUT__ << "cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_data.find(range);
     if (itr == m_data.end())
@@ -130,7 +133,7 @@ void range_listener_tracker::get_all_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
-    cout << "range_listener_tracker: get all listeners recursively" << endl;
+    __IXION_DEBUG_OUT__ << "range_listener_tracker: get all listeners recursively" << endl;
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
@@ -144,7 +147,7 @@ void range_listener_tracker::get_all_listeners_re(
     {
         // Target is included in the listener list. Possible circular reference.
 #if DEBUG_RANGE_LISTENER_TRACKER
-        cout << "Possible circular reference" << endl;
+        __IXION_DEBUG_OUT__ << "Possible circular reference" << endl;
 #endif
         return;
     }
@@ -156,7 +159,7 @@ void range_listener_tracker::get_all_listeners_re(
         res.begin(), res.end(), dirty_cell_inserter(m_context, new_listeners, new_listeners_addrs));
 
 #if DEBUG_RANGE_LISTENER_TRACKER
-    cout << "new listener count: " << new_listeners.size() << endl;
+    __IXION_DEBUG_OUT__ << "new listener count: " << new_listeners.size() << endl;
 #endif
 
     // Add new listeners to the caller's list.

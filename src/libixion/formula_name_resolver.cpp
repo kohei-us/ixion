@@ -275,6 +275,18 @@ string formula_name_resolver_simple::get_name(const range_t& range, const abs_ad
     return string();
 }
 
+string formula_name_resolver_simple::get_name(const abs_address_t& addr) const
+{
+    // TODO: to be implemented.
+    return string();
+}
+
+string formula_name_resolver_simple::get_name(const abs_range_t& range) const
+{
+    // TODO: to be implemented.
+    return string();
+}
+
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
 formula_name_type formula_name_resolver_a1::resolve(const string& name, const abs_address_t& pos) const
@@ -368,11 +380,14 @@ string formula_name_resolver_a1::get_name(const address_t& addr, const abs_addre
     // For now, sheet index is ignored.
     ostringstream os;
     col_t col = addr.column;
+    row_t row = addr.row;
     if (!addr.abs_column)
         col += pos.column;
+    if (!addr.abs_row)
+        row += pos.row;
 
     append_column_name_a1(os, col);
-    os << (addr.row + 1);
+    os << (row + 1);
     return os.str();
 }
 
@@ -396,6 +411,32 @@ string formula_name_resolver_a1::get_name(const range_t& range, const abs_addres
         col += pos.column;
     if (!range.last.abs_row)
         row += pos.row;
+    append_column_name_a1(os, col);
+    os << (row + 1);
+    return os.str();
+}
+
+string formula_name_resolver_a1::get_name(const abs_address_t& addr) const
+{
+    // For now, sheet index is ignored.
+    ostringstream os;
+    append_column_name_a1(os, addr.column);
+    os << (addr.row + 1);
+    return os.str();
+}
+
+string formula_name_resolver_a1::get_name(const abs_range_t& range) const
+{
+    // For now, sheet index is ignored.
+    ostringstream os;
+    col_t col = range.first.column;
+    row_t row = range.first.row;
+    append_column_name_a1(os, col);
+    os << (row + 1);
+    os << ":";
+
+    col = range.last.column;
+    row = range.last.row;
     append_column_name_a1(os, col);
     os << (row + 1);
     return os.str();
