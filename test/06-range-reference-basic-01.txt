@@ -1,0 +1,10 @@
+%% Very simple case of range reference tracking.
+%mode init
+B1=1
+B3=5
+D1=SUM(B1:B4)
+%calc
+%mode result
+D1=6
+%check
+
