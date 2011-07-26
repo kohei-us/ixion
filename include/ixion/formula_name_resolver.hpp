@@ -67,6 +67,12 @@ struct formula_name_type
     };
 
     formula_name_type();
+
+    /**
+     * Return a string that represents the data stored internally.  Useful for
+     * debugging.
+     */
+    ::std::string to_string() const;
 };
 
 class formula_name_resolver_base

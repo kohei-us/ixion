@@ -174,9 +174,53 @@ parse_address_result parse_address(
     return valid_address;
 }
 
+string abs_or_rel(bool _abs)
+{
+    return _abs ? "(abs)" : "(rel)";
 }
 
+string _to_string(const formula_name_type::address_type& addr)
+{
+    std::ostringstream os;
+    os << "[sheet=" << addr.sheet << abs_or_rel(addr.abs_sheet) << ",row=" 
+        << addr.row << abs_or_rel(addr.abs_row) << ",column=" 
+        << addr.col << abs_or_rel(addr.abs_col) << "]";
+
+    return os.str();
+}
+
+} // anonymous namespace
+
 formula_name_type::formula_name_type() : type(invalid) {}
+
+string formula_name_type::to_string() const
+{
+    std::ostringstream os;
+
+    switch (type)
+    {
+        case cell_reference:
+            os << "cell reference: " << _to_string(address);
+            break;
+        case function:
+            os << "function";
+            break;
+        case invalid:
+            os << "invalid";
+            break;
+        case named_expression:
+            os << "named expression";
+            break;
+        case range_reference:
+            os << "range raference: first: " << _to_string(range.first) << "  last: "
+                << _to_string(range.last) << endl;
+            break;
+        default:
+            os << "unknown foromula name type";
+    }
+
+    return os.str();
+}
 
 formula_name_resolver_base::formula_name_resolver_base() {}
 formula_name_resolver_base::~formula_name_resolver_base() {}

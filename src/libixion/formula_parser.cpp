@@ -35,7 +35,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_PARSER 0
+#define DEBUG_FORMULA_PARSER 1
 
 using namespace std;
 
@@ -253,13 +253,12 @@ void formula_parser::name(const lexer_token_base& t)
 {
     const string name = t.get_string();
     formula_name_type fn = m_context.get_name_resolver().resolve(name, m_pos);
+#if DEBUG_FORMULA_PARSER
+            __IXION_DEBUG_OUT__ << "name = '" << name << "' - " << fn.to_string() << endl;
+#endif
     switch (fn.type)
     {
         case formula_name_type::cell_reference:
-#if DEBUG_FORMULA_PARSER
-            cout << "'" << name << "' is a cell reference (sheet=" << 
-                fn.address.sheet << "; row=" << fn.address.row << "; col=" << fn.address.col << ")" << endl;
-#endif
             m_formula_tokens.push_back(
                 new single_ref_token(
                     address_t(fn.address.sheet, fn.address.row, fn.address.col,
@@ -267,9 +266,6 @@ void formula_parser::name(const lexer_token_base& t)
         break;
         case formula_name_type::range_reference:
         {
-#if DEBUG_FORMULA_PARSER
-            cout << "'" << name << "' is a range reference." << endl;
-#endif
             address_t first(fn.range.first.sheet, fn.range.first.row, fn.range.first.col,
                             fn.range.first.abs_sheet, fn.range.first.abs_row, fn.range.first.abs_col);
             address_t last(fn.range.last.sheet, fn.range.last.row, fn.range.last.col,
@@ -279,15 +275,9 @@ void formula_parser::name(const lexer_token_base& t)
         }
         break;
         case formula_name_type::function:
-#if DEBUG_FORMULA_PARSER
-            cout << "'" << name << "' is a built-in function." << endl;
-#endif
             m_formula_tokens.push_back(new function_token(static_cast<size_t>(fn.func_oc)));
         break;
         case formula_name_type::named_expression:
-#if DEBUG_FORMULA_PARSER
-            cout << "'" << name << "' is a named expression." << endl;
-#endif
             m_formula_tokens.push_back(new named_exp_token(name));
         break;
         default:
