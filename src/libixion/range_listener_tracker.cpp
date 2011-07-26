@@ -99,12 +99,28 @@ namespace {
 
 class dirty_cell_inserter : public std::unary_function<range_listener_tracker::address_set_type*, void>
 {
-    const model_context& m_context;
+    model_context& m_context;
+    dirty_cells_t& m_dirty_cells;
+    range_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(const model_context& cxt) : m_context(cxt) {}
+    dirty_cell_inserter(model_context& cxt, dirty_cells_t& dirty_cells, range_listener_tracker::address_set_type& addrs) : 
+        m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
-    void operator() (const range_listener_tracker::address_set_type* p) const
+    void operator() (const range_listener_tracker::address_set_type* p)
     {
+        // Add all addresses in this set to the dirty cells list.
+        range_listener_tracker::address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
+        for (; itr != itr_end; ++itr)
+        {
+            const abs_address_t& addr = *itr;
+            base_cell* p = m_context.get_cell(addr);
+            if (p && p->get_celltype() == celltype_formula)
+            {
+                // Formula cell exists at this address.
+                m_dirty_cells.insert(p);
+                m_addrs.insert(addr);
+            }
+        }
     }
 };
 
@@ -116,9 +132,41 @@ void range_listener_tracker::get_all_listeners(
 #if DEBUG_RANGE_LISTENER_TRACKER
     cout << "range_listener_tracker: get all listeners recursively" << endl;
 #endif
+
+    address_set_type listeners_addrs; // to keep track of circular references.
+    get_all_listeners_re(target, listeners, listeners_addrs);
+}
+
+void range_listener_tracker::get_all_listeners_re(
+    const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
+{
+    if (listeners_addrs.count(target))
+    {
+        // Target is included in the listener list. Possible circular reference.
+#if DEBUG_RANGE_LISTENER_TRACKER
+        cout << "Possible circular reference" << endl;
+#endif
+        return;
+    }
+
     dirty_cells_t new_listeners;
+    address_set_type new_listeners_addrs;
     range_query_set_type::search_result res = m_query_set.search(target.row, target.column);
-    std::for_each(res.begin(), res.end(), dirty_cell_inserter(m_context));
+    std::for_each(
+        res.begin(), res.end(), dirty_cell_inserter(m_context, new_listeners, new_listeners_addrs));
+
+#if DEBUG_RANGE_LISTENER_TRACKER
+    cout << "new listener count: " << new_listeners.size() << endl;
+#endif
+
+    // Add new listeners to the caller's list.
+    listeners.insert(new_listeners.begin(), new_listeners.end());
+    listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
+
+    // Go through the new listeners and get their listeners as well.
+    address_set_type::const_iterator itr = new_listeners_addrs.begin(), itr_end = new_listeners_addrs.end();
+    for (; itr != itr_end; ++itr)
+        get_all_listeners_re(*itr, listeners, listeners_addrs);
 }
 
 }

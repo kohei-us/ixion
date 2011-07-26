@@ -79,6 +79,8 @@ public:
      */
     void get_all_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 private:
+    void get_all_listeners_re(const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addr) const;
+
     model_context& m_context;
     mutable range_query_set_type m_query_set; /// used for fast lookup of listeners.
     range_store_type m_data;          /// store listener data for ranges.
