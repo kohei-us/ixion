@@ -27,7 +27,7 @@
 
 #include "ixion/range_listener_tracker.hpp"
 
-#define DEBUG_RANGE_LISTENER_TRACKER 1
+#define DEBUG_RANGE_LISTENER_TRACKER 0
 
 #if DEBUG_RANGE_LISTENER_TRACKER
 #include "ixion/formula_name_resolver.hpp"
@@ -157,7 +157,7 @@ void range_listener_tracker::get_all_listeners_re(
 
     dirty_cells_t new_listeners;
     address_set_type new_listeners_addrs;
-    range_query_set_type::search_result res = m_query_set.search(target.row, target.column);
+    range_query_set_type::search_result res = m_query_set.search(target.column, target.row);
 
 #if DEBUG_RANGE_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "query set count: " << m_query_set.size() << "  search result count: " << res.size() << endl;
