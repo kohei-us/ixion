@@ -27,7 +27,7 @@
 
 #include "ixion/range_listener_tracker.hpp"
 
-#define DEBUG_RANGE_LISTENER_TRACKER 0
+#define DEBUG_RANGE_LISTENER_TRACKER 1
 
 #if DEBUG_RANGE_LISTENER_TRACKER
 #include "ixion/formula_name_resolver.hpp"
@@ -53,7 +53,7 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     const formula_name_resolver_base& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
+    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_data.find(range);
     if (itr == m_data.end())
@@ -68,7 +68,7 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
         // Insert the container to the rectangle set as well (for lookup).
 #if DEBUG_RANGE_LISTENER_TRACKER
         cout << "x1=" << range.first.column << ",y1=" << range.first.row
-            << ",x2=" << range.last.column << ",y2=" << range.last.row << ",p=" << itr->second << endl;
+            << ",x2=" << (range.last.column+1) << ",y2=" << (range.last.row+1) << ",p=" << itr->second << endl;
 #endif
         m_query_set.insert(
             range.first.column, range.first.row, range.last.column+1, range.last.row+1, itr->second);
@@ -80,7 +80,7 @@ void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     const formula_name_resolver_base& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
+    __IXION_DEBUG_OUT__ << "removing - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_data.find(range);
     if (itr == m_data.end())
@@ -133,7 +133,7 @@ void range_listener_tracker::get_all_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "range_listener_tracker: get all listeners recursively" << endl;
+    __IXION_DEBUG_OUT__ << "get all listeners for target " << m_context.get_name_resolver().get_name(target) << endl;
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
@@ -143,6 +143,9 @@ void range_listener_tracker::get_all_listeners(
 void range_listener_tracker::get_all_listeners_re(
     const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
 {
+#if DEBUG_RANGE_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << "target address: " << m_context.get_name_resolver().get_name(target) << endl;
+#endif
     if (listeners_addrs.count(target))
     {
         // Target is included in the listener list. Possible circular reference.
@@ -155,6 +158,11 @@ void range_listener_tracker::get_all_listeners_re(
     dirty_cells_t new_listeners;
     address_set_type new_listeners_addrs;
     range_query_set_type::search_result res = m_query_set.search(target.row, target.column);
+
+#if DEBUG_RANGE_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << "query set count: " << m_query_set.size() << "  search result count: " << res.size() << endl;
+#endif
+
     std::for_each(
         res.begin(), res.end(), dirty_cell_inserter(m_context, new_listeners, new_listeners_addrs));
 
