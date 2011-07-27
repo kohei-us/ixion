@@ -19,5 +19,13 @@ B1=10
 %mode result
 D1=19
 %check
+%mode edit
+B4=1
+%recalc
+%mode result
+D1=20
+%check
+
+
 
 
