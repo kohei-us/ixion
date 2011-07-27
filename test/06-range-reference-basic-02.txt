@@ -15,5 +15,4 @@ A5=1
 %mode result
 A1=1
 A3=1
-A5=1
 %check
