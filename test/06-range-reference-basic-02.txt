@@ -1,0 +1,19 @@
+%% Chained range reference tracking.
+%mode init
+A1=SUM(A2:A3)
+A3=SUM(A4:A5)
+A5=5
+%calc
+%mode result
+A1=5
+A3=5
+A5=5
+%check
+%mode edit
+A5=1
+%recalc
+%mode result
+A1=1
+A3=1
+A5=1
+%check
