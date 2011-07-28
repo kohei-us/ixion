@@ -755,6 +755,8 @@ void model_parser::parse()
             }
             else if (buf_com.equals("mode result"))
             {
+                // Clear any previous result values.
+                data.formula_results.clear();
                 parse_mode = parse_mode_result;
             }
             else if (buf_com.equals("mode edit"))
