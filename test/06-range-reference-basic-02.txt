@@ -16,3 +16,17 @@ A5=1
 A1=1
 A3=1
 %check
+%mode edit
+A4=10
+%recalc
+%mode result
+A3=11
+A1=11
+%check
+%mode edit
+A2=20
+%recalc
+%mode result
+A1=31
+A3=11
+%check
