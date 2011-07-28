@@ -137,11 +137,11 @@ void range_listener_tracker::get_all_listeners(
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
-    get_all_listeners_re(target, listeners, listeners_addrs);
+    get_all_listeners_re(target, target, listeners, listeners_addrs);
 }
 
 void range_listener_tracker::get_all_listeners_re(
-    const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
+    const abs_address_t& origin_target, const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "target address: " << m_context.get_name_resolver().get_name(target) << endl;
@@ -173,7 +173,11 @@ void range_listener_tracker::get_all_listeners_re(
     // Go through the new listeners and get their listeners as well.
     address_set_type::const_iterator itr = new_listeners_addrs.begin(), itr_end = new_listeners_addrs.end();
     for (; itr != itr_end; ++itr)
-        get_all_listeners_re(*itr, listeners, listeners_addrs);
+    {
+        if (*itr == origin_target)
+            continue;
+        get_all_listeners_re(origin_target, *itr, listeners, listeners_addrs);
+    }
 
     // Add new listeners to the caller's list.
     listeners.insert(new_listeners.begin(), new_listeners.end());
