@@ -146,6 +146,14 @@ void range_listener_tracker::get_all_listeners_re(
 #if DEBUG_RANGE_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "target address: " << m_context.get_name_resolver().get_name(target) << endl;
 #endif
+    if (listeners_addrs.count(target))
+    {
+        // Target is included in the listener list.  No need to scan twice.
+#if DEBUG_RANGE_LISTENER_TRACKER
+        __IXION_DEBUG_OUT__ << "listeners for this target has already been retrieved." << endl;
+#endif
+        return;
+    }
 
     dirty_cells_t new_listeners;
     address_set_type new_listeners_addrs;
@@ -162,14 +170,14 @@ void range_listener_tracker::get_all_listeners_re(
     __IXION_DEBUG_OUT__ << "new listener count: " << new_listeners.size() << endl;
 #endif
 
-    // Add new listeners to the caller's list.
-    listeners.insert(new_listeners.begin(), new_listeners.end());
-    listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
-
     // Go through the new listeners and get their listeners as well.
     address_set_type::const_iterator itr = new_listeners_addrs.begin(), itr_end = new_listeners_addrs.end();
     for (; itr != itr_end; ++itr)
         get_all_listeners_re(*itr, listeners, listeners_addrs);
+
+    // Add new listeners to the caller's list.
+    listeners.insert(new_listeners.begin(), new_listeners.end());
+    listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
 }
 
 }
