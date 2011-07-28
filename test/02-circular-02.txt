@@ -1,0 +1,15 @@
+%% Check for single cell circular references during edit.
+%mode init
+A1=B1
+%calc
+%mode result
+A1=0
+%check
+%mode edit
+B1=A1
+%recalc
+%mode result
+A1=#REF!
+B1=#REF!
+%check
+
