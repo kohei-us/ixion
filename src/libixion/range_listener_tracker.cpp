@@ -36,6 +36,19 @@
 
 using namespace std;
 
+namespace {
+
+template<typename _T>
+struct map_value_deleter : public unary_function<typename _T::value_type, void>
+{
+    void operator() (typename _T::value_type& v)
+    {
+        delete v.second;
+    }
+};
+
+}
+
 namespace ixion {
 
 range_listener_tracker::range_listener_tracker(model_context& cxt) :
@@ -44,9 +57,8 @@ range_listener_tracker::range_listener_tracker(model_context& cxt) :
 range_listener_tracker::~range_listener_tracker()
 {
     // Delete all the listener set instances.
-    range_store_type::iterator itr = m_data.begin(), itr_end = m_data.end();
-    for (; itr != itr_end; ++itr)
-        delete itr->second;
+    for_each(m_range_listeners.begin(), m_range_listeners.end(), map_value_deleter<range_store_type>());
+    for_each(m_cell_listeners.begin(), m_cell_listeners.end(), map_value_deleter<cell_store_type>());
 }
 
 void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
@@ -55,12 +67,12 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
     const formula_name_resolver_base& res = m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
-    range_store_type::iterator itr = m_data.find(range);
-    if (itr == m_data.end())
+    range_store_type::iterator itr = m_range_listeners.find(range);
+    if (itr == m_range_listeners.end())
     {
         // No container for this range yet.  Create one.
         pair<range_store_type::iterator, bool> r = 
-            m_data.insert(range_store_type::value_type(range, new address_set_type));
+            m_range_listeners.insert(range_store_type::value_type(range, new address_set_type));
         if (!r.second)
             throw general_error("failed to insert new address set to range listener tracker.");
         itr = r.first;
@@ -82,8 +94,8 @@ void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t
     const formula_name_resolver_base& res = m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "removing - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
-    range_store_type::iterator itr = m_data.find(range);
-    if (itr == m_data.end())
+    range_store_type::iterator itr = m_range_listeners.find(range);
+    if (itr == m_range_listeners.end())
         // No listeners for this range.  Bail out.
         return;
 
@@ -92,7 +104,7 @@ void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t
     if (p->empty())
     {
         // This list is empty.  Remove it from the containers and destroy the instance.
-        m_data.erase(itr);
+        m_range_listeners.erase(itr);
         m_query_set.remove(p);
         delete p;
     }

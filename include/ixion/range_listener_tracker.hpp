@@ -47,6 +47,7 @@ class range_listener_tracker
 public:
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
     typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;
+    typedef _ixion_unordered_map_type<abs_address_t, address_set_type*, abs_address_t::hash> cell_store_type;
     typedef _ixion_unordered_map_type<abs_range_t, address_set_type*, abs_range_t::hash> range_store_type;
 
     range_listener_tracker(model_context& cxt);
@@ -84,8 +85,9 @@ private:
         dirty_cells_t& listeners, address_set_type& listeners_addr) const;
 
     model_context& m_context;
-    mutable range_query_set_type m_query_set; /// used for fast lookup of listeners.
-    range_store_type m_data;          /// store listener data for ranges.
+    mutable range_query_set_type m_query_set; /// used for fast lookup of range listeners.
+    cell_store_type m_cell_listeners;         /// store listeners for single cells.
+    range_store_type m_range_listeners;       /// store listeners for ranges.
 };
 
 }
