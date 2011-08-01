@@ -173,7 +173,7 @@ public:
 
 }
 
-void range_listener_tracker::get_all_listeners(
+void range_listener_tracker::get_all_range_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
@@ -181,10 +181,10 @@ void range_listener_tracker::get_all_listeners(
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
-    get_all_listeners_re(target, target, listeners, listeners_addrs);
+    get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
-void range_listener_tracker::get_all_listeners_re(
+void range_listener_tracker::get_all_range_listeners_re(
     const abs_address_t& origin_target, const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
@@ -220,7 +220,7 @@ void range_listener_tracker::get_all_listeners_re(
     {
         if (*itr == origin_target)
             continue;
-        get_all_listeners_re(origin_target, *itr, listeners, listeners_addrs);
+        get_all_range_listeners_re(origin_target, *itr, listeners, listeners_addrs);
     }
 
     // Add new listeners to the caller's list.

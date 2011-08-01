@@ -603,7 +603,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 #endif
             formula_cell* fcell = itr->second;
             _dirty_cells.insert(fcell);
-            context.get_range_listener_tracker().get_all_listeners(itr->first, _dirty_cells);
+            context.get_range_listener_tracker().get_all_range_listeners(itr->first, _dirty_cells);
             fcell->get_all_listeners(context, _dirty_cells);
         }
     }

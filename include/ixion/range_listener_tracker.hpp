@@ -89,9 +89,9 @@ public:
      * @param target 
      * @param listeners 
      */
-    void get_all_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
+    void get_all_range_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 private:
-    void get_all_listeners_re(
+    void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target, 
         dirty_cells_t& listeners, address_set_type& listeners_addr) const;
 
