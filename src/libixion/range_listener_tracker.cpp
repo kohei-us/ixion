@@ -173,6 +173,36 @@ public:
 
 }
 
+void range_listener_tracker::get_all_cell_listeners(
+    const abs_address_t& target, dirty_cells_t& listeners) const
+{
+    cell_store_type::const_iterator itr = m_cell_listeners.find(target);
+    if (itr == m_cell_listeners.end())
+        // This target cell has no listeners.
+        return;
+
+    const address_set_type& addrs = *itr->second;
+    address_set_type::iterator itr2 = addrs.begin(), itr2_end = addrs.end();
+    for (; itr2 != itr2_end; ++itr2)
+    {
+        const abs_address_t& addr = *itr2; // listener cell address
+        base_cell* p = m_context.get_cell(addr);
+        if (!p || p->get_celltype() != celltype_formula)
+            // Referenced cell is empty or not a formula cell.  Ignore this.
+            continue;
+
+        formula_cell* fcell = static_cast<formula_cell*>(p);
+
+        if (listeners.count(fcell) == 0)
+        {
+            // This cell is not yet on the dirty cell list.  Run recursively.
+            listeners.insert(fcell);
+            get_all_cell_listeners(addr, listeners);
+            get_all_range_listeners(addr, listeners);
+        }
+    }
+}
+
 void range_listener_tracker::get_all_range_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {

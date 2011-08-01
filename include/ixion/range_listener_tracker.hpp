@@ -82,6 +82,8 @@ public:
      */
     void remove(const abs_address_t& cell, const abs_range_t& range);
 
+    void get_all_cell_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
+
     /**
      * Given a modified cell (target), get all formula cells that need to be 
      * re-calculated based on the range-to-cells listener relationships. 
