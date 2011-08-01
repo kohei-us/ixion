@@ -107,7 +107,7 @@ void range_listener_tracker::remove(const abs_address_t& src, const abs_address_
 {
     cell_store_type::iterator itr = m_cell_listeners.find(dest);
     if (itr == m_cell_listeners.end())
-        // No listeners for this range.  Bail out.
+        // No listeners for this cell.  Bail out.
         return;
 
     address_set_type* p = itr->second;
