@@ -54,6 +54,15 @@ public:
     ~range_listener_tracker();
 
     /**
+     * Add a reference relationship between two single cells. 
+     * 
+     * @param src cell that references (therefore listens to) dest cell. 
+     * @param dest cell being referenced (therefore being listened to) by dest 
+     *             cell.
+     */
+    void add(const abs_address_t& src, const abs_address_t& dest);
+
+    /**
      * Add a reference relationship from a single cell to a range.  The cell 
      * references the range.  Duplicates are silently ignored.
      * 
@@ -61,6 +70,8 @@ public:
      * @param range range referenced by the cell.
      */
     void add(const abs_address_t& cell, const abs_range_t& range);
+
+    void remove(const abs_address_t& src, const abs_address_t& dest);
 
     /**
      * Remove an existing reference relationship from a single cell to a 

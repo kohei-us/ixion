@@ -61,6 +61,21 @@ range_listener_tracker::~range_listener_tracker()
     for_each(m_cell_listeners.begin(), m_cell_listeners.end(), map_value_deleter<cell_store_type>());
 }
 
+void range_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
+{
+    cell_store_type::iterator itr = m_cell_listeners.find(dest);
+    if (itr == m_cell_listeners.end())
+    {
+        // No container for this src cell yet.  Create one.
+        pair<cell_store_type::iterator, bool> r = 
+            m_cell_listeners.insert(cell_store_type::value_type(dest, new address_set_type));
+        if (!r.second)
+            throw general_error("failed to insert new address set to cell listener tracker.");
+        itr = r.first;
+    }
+    itr->second->insert(src);
+}
+
 void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
@@ -86,6 +101,23 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
             range.first.column, range.first.row, range.last.column+1, range.last.row+1, itr->second);
     }
     itr->second->insert(cell);
+}
+
+void range_listener_tracker::remove(const abs_address_t& src, const abs_address_t& dest)
+{
+    cell_store_type::iterator itr = m_cell_listeners.find(dest);
+    if (itr == m_cell_listeners.end())
+        // No listeners for this range.  Bail out.
+        return;
+
+    address_set_type* p = itr->second;
+    p->erase(src);
+    if (p->empty())
+    {
+        // This list is empty.  Remove it from the containers and destroy the instance.
+        m_cell_listeners.erase(itr);
+        delete p;
+    }
 }
 
 void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
