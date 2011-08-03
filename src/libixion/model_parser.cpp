@@ -172,11 +172,11 @@ public:
             {
                 abs_range_t range = p->get_range_ref().to_abs(m_addr);
                 if (m_mode == mode_add)
-                    m_context.get_range_listener_tracker().add(m_addr, range);
+                    m_context.get_cell_listener_tracker().add(m_addr, range);
                 else
                 {
                     assert(m_mode == mode_remove);
-                    m_context.get_range_listener_tracker().remove(m_addr, range);
+                    m_context.get_cell_listener_tracker().remove(m_addr, range);
                 }
             }
             break;
@@ -603,7 +603,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 #endif
             formula_cell* fcell = itr->second;
             _dirty_cells.insert(fcell);
-            context.get_range_listener_tracker().get_all_range_listeners(itr->first, _dirty_cells);
+            context.get_cell_listener_tracker().get_all_range_listeners(itr->first, _dirty_cells);
             fcell->get_all_listeners(context, _dirty_cells);
         }
     }

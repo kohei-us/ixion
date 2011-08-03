@@ -135,7 +135,7 @@ void base_cell::get_all_listeners(model_context& cxt, dirty_cells_t& cells) cons
         {
             // This cell is not yet on the dirty cell list.  Run recursively.
             cells.insert(fcell);
-            cxt.get_range_listener_tracker().get_all_range_listeners(addr, cells);
+            cxt.get_cell_listener_tracker().get_all_range_listeners(addr, cells);
             p->get_all_listeners(cxt, cells);
         }
     }

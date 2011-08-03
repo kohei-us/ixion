@@ -46,7 +46,7 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
     return *mp_name_resolver;
 }
 
-cell_listener_tracker& model_context::get_range_listener_tracker()
+cell_listener_tracker& model_context::get_cell_listener_tracker()
 {
     return *mp_range_tracker;
 }

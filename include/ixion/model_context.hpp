@@ -55,7 +55,7 @@ public:
     ~model_context();
     
     const formula_name_resolver_base& get_name_resolver() const;
-    cell_listener_tracker& get_range_listener_tracker();
+    cell_listener_tracker& get_cell_listener_tracker();
 
     void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
     void set_cell(const abs_address_t& addr, base_cell* cell);
