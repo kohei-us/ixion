@@ -19,7 +19,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	mem_str_buf.cpp \
 	model_context.cpp \
 	model_parser.cpp \
-	range_listener_tracker.cpp \
+	cell_listener_tracker.cpp \
 	sort_input_parser.cpp
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined

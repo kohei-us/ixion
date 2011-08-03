@@ -34,7 +34,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
-#include "ixion/range_listener_tracker.hpp"
+#include "ixion/cell_listener_tracker.hpp"
 
 #include <sstream>
 #include <iostream>

@@ -28,7 +28,7 @@
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
-#include "ixion/range_listener_tracker.hpp"
+#include "ixion/cell_listener_tracker.hpp"
 
 #define DEBUG_MODEL_CONTEXT 0
 

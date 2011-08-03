@@ -29,7 +29,7 @@
 #include "ixion/formula_interpreter.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/model_context.hpp"
-#include "ixion/range_listener_tracker.hpp"
+#include "ixion/cell_listener_tracker.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
