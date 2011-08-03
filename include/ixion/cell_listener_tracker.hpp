@@ -93,6 +93,8 @@ public:
      * @param listeners 
      */
     void get_all_range_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
+
+    void print_cell_listeners(const abs_address_t& target) const;
 private:
     void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target, 

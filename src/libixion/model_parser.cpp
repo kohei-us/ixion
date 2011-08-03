@@ -140,7 +140,7 @@ public:
     enum mode_t { mode_add, mode_remove };
 
     explicit formula_cell_listener_handler(model_context& cxt, const abs_address_t& addr, mode_t mode) : 
-        m_context(cxt), m_addr(addr), m_mode(mode)
+        m_context(cxt), m_listener_tracker(cxt.get_cell_listener_tracker()), m_addr(addr), m_mode(mode)
     {
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: cell position=" << m_addr.get_name() << endl;
@@ -165,7 +165,16 @@ public:
 #endif
                     return;
                 }
-                process_cell(cell);
+
+                if (m_mode == mode_add)
+                {
+                    m_listener_tracker.add(m_addr, addr);
+                }
+                else
+                {
+                    assert(m_mode == mode_remove);
+                    m_listener_tracker.remove(m_addr, addr);
+                }
             }
             break;
             case fop_range_ref:
@@ -186,20 +195,8 @@ public:
     }
 
 private:
-    void process_cell(base_cell* p) const
-    {
-        if (m_mode == mode_add)
-        {
-            p->add_listener(m_addr);
-        }
-        else
-        {
-            assert(m_mode == mode_remove);
-            p->remove_listener(m_addr);
-        }
-    }
-
     model_context& m_context;
+    cell_listener_tracker& m_listener_tracker;
     const abs_address_t& m_addr;
     formula_cell* mp_cell;
     mode_t m_mode;
@@ -344,10 +341,7 @@ public:
                 else if (p->get_celltype() != celltype_formula)
                 {
                     // Prior cell exists, but it's not a formula cell.
-                    // Transfer the listener cells over to the new cell
-                    // instance.
                     auto_ptr<base_cell> pcell(new formula_cell);
-                    pcell->swap_listeners(*p);
                     m_context.set_cell(addr, pcell);
                     fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
                 }
@@ -604,7 +598,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
             formula_cell* fcell = itr->second;
             _dirty_cells.insert(fcell);
             context.get_cell_listener_tracker().get_all_range_listeners(itr->first, _dirty_cells);
-            fcell->get_all_listeners(context, _dirty_cells);
+            context.get_cell_listener_tracker().get_all_cell_listeners(itr->first, _dirty_cells);
         }
     }
 
@@ -613,8 +607,8 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     vector<address_cell_pair_type>::const_iterator itr = fcells.begin(), itr_end = fcells.end();
     for (; itr != itr_end; ++itr)
     {
-        const formula_cell* p = itr->second;
-        p->print_listeners(context);
+        const abs_address_t& target = itr->first;
+        context.get_cell_listener_tracker().print_cell_listeners(target);
     }
 
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;

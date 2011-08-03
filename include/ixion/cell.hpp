@@ -64,23 +64,12 @@ public:
     virtual double get_value() const = 0;
     virtual const char* print() const = 0;
 
-    void add_listener(const abs_address_t& addr);
-    void remove_listener(const abs_address_t& addr);
-    void swap_listeners(base_cell& other);
-    void print_listeners(const model_context& cxt) const;
-    void get_all_listeners(model_context& cxt, dirty_cells_t& cell) const;
-
     celltype_t get_celltype() const;
 
 private:
     base_cell(); // disabled
 
 private:
-    /**
-     * List of formula cells that reference this cell.
-     */
-    listeners_type m_listeners;
-
     celltype_t m_celltype;
 };
 

@@ -26,11 +26,11 @@
  ************************************************************************/
 
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 #define DEBUG_RANGE_LISTENER_TRACKER 0
 
 #if DEBUG_RANGE_LISTENER_TRACKER
-#include "ixion/formula_name_resolver.hpp"
 #include <iostream>
 #endif
 
@@ -212,6 +212,21 @@ void cell_listener_tracker::get_all_range_listeners(
 
     address_set_type listeners_addrs; // to keep track of circular references.
     get_all_range_listeners_re(target, target, listeners, listeners_addrs);
+}
+
+void cell_listener_tracker::print_cell_listeners(const abs_address_t& target) const
+{
+    const formula_name_resolver_base& resolver = m_context.get_name_resolver();
+    cout << "The following cells listen to cell " << resolver.get_name(target) << endl;
+    cell_store_type::const_iterator itr = m_cell_listeners.find(target);
+    if (itr == m_cell_listeners.end())
+        // No one listens to this target.
+        return;
+
+    const address_set_type& addrs = *itr->second;
+    address_set_type::iterator itr2 = addrs.begin(), itr2_end = addrs.end();
+    for (; itr2 != itr2_end; ++itr2)
+        cout << "  cell " << resolver.get_name(*itr2) << endl;
 }
 
 void cell_listener_tracker::get_all_range_listeners_re(

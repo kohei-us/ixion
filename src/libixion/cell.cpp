@@ -93,54 +93,6 @@ base_cell::~base_cell()
 {
 }
 
-void base_cell::add_listener(const abs_address_t& addr)
-{
-    m_listeners.insert(addr);
-}
-
-void base_cell::remove_listener(const abs_address_t& addr)
-{
-    m_listeners.erase(addr);
-}
-
-void base_cell::swap_listeners(base_cell& other)
-{
-    m_listeners.swap(other.m_listeners);
-}
-
-void base_cell::print_listeners(const model_context& cxt) const
-{
-    cout << "The following cells listen to cell " << cxt.get_cell_name(this) << endl;
-    listeners_type::const_iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
-    for (; itr != itr_end; ++itr)
-    {
-        cout << "  cell " << itr->get_name() << endl;
-    }
-}
-
-void base_cell::get_all_listeners(model_context& cxt, dirty_cells_t& cells) const
-{
-    listeners_type::iterator itr = m_listeners.begin(), itr_end = m_listeners.end();
-    for (; itr != itr_end; ++itr)
-    {
-        const abs_address_t& addr = *itr; // listener cell address
-        base_cell* p = cxt.get_cell(addr);
-        if (!p || p->get_celltype() != celltype_formula)
-            // Referenced cell is empty or not a formula cell.  Ignore this.
-            continue;
-
-        formula_cell* fcell = static_cast<formula_cell*>(p);
-
-        if (cells.count(fcell) == 0)
-        {
-            // This cell is not yet on the dirty cell list.  Run recursively.
-            cells.insert(fcell);
-            cxt.get_cell_listener_tracker().get_all_range_listeners(addr, cells);
-            p->get_all_listeners(cxt, cells);
-        }
-    }
-}
-
 celltype_t base_cell::get_celltype() const
 {
     return m_celltype;
