@@ -39,19 +39,20 @@
 namespace ixion {
 
 /**
- * Track all range references being listened to by cells.
+ * Track all single and range references being listened to by individual 
+ * cells. 
  */
-class range_listener_tracker
+class cell_listener_tracker
 {
-    range_listener_tracker(); // disabled
+    cell_listener_tracker(); // disabled
 public:
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
     typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;
     typedef _ixion_unordered_map_type<abs_address_t, address_set_type*, abs_address_t::hash> cell_store_type;
     typedef _ixion_unordered_map_type<abs_range_t, address_set_type*, abs_range_t::hash> range_store_type;
 
-    range_listener_tracker(model_context& cxt);
-    ~range_listener_tracker();
+    cell_listener_tracker(model_context& cxt);
+    ~cell_listener_tracker();
 
     /**
      * Add a reference relationship between two single cells. 

@@ -38,7 +38,7 @@ namespace ixion {
 
 model_context::model_context() :
     mp_name_resolver(new formula_name_resolver_a1),
-    mp_range_tracker(new range_listener_tracker(*this))
+    mp_range_tracker(new cell_listener_tracker(*this))
 {}
 
 const formula_name_resolver_base& model_context::get_name_resolver() const
@@ -46,7 +46,7 @@ const formula_name_resolver_base& model_context::get_name_resolver() const
     return *mp_name_resolver;
 }
 
-range_listener_tracker& model_context::get_range_listener_tracker()
+cell_listener_tracker& model_context::get_range_listener_tracker()
 {
     return *mp_range_tracker;
 }

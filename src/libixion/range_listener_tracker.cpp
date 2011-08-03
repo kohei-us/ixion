@@ -51,17 +51,17 @@ struct map_value_deleter : public unary_function<typename _T::value_type, void>
 
 namespace ixion {
 
-range_listener_tracker::range_listener_tracker(model_context& cxt) :
+cell_listener_tracker::cell_listener_tracker(model_context& cxt) :
     m_context(cxt) {}
 
-range_listener_tracker::~range_listener_tracker()
+cell_listener_tracker::~cell_listener_tracker()
 {
     // Delete all the listener set instances.
     for_each(m_range_listeners.begin(), m_range_listeners.end(), map_value_deleter<range_store_type>());
     for_each(m_cell_listeners.begin(), m_cell_listeners.end(), map_value_deleter<cell_store_type>());
 }
 
-void range_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
+void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
 {
     cell_store_type::iterator itr = m_cell_listeners.find(dest);
     if (itr == m_cell_listeners.end())
@@ -76,7 +76,7 @@ void range_listener_tracker::add(const abs_address_t& src, const abs_address_t& 
     itr->second->insert(src);
 }
 
-void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
+void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     const formula_name_resolver_base& res = m_context.get_name_resolver();
@@ -103,7 +103,7 @@ void range_listener_tracker::add(const abs_address_t& cell, const abs_range_t& r
     itr->second->insert(cell);
 }
 
-void range_listener_tracker::remove(const abs_address_t& src, const abs_address_t& dest)
+void cell_listener_tracker::remove(const abs_address_t& src, const abs_address_t& dest)
 {
     cell_store_type::iterator itr = m_cell_listeners.find(dest);
     if (itr == m_cell_listeners.end())
@@ -120,7 +120,7 @@ void range_listener_tracker::remove(const abs_address_t& src, const abs_address_
     }
 }
 
-void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
+void cell_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
     const formula_name_resolver_base& res = m_context.get_name_resolver();
@@ -144,19 +144,19 @@ void range_listener_tracker::remove(const abs_address_t& cell, const abs_range_t
 
 namespace {
 
-class dirty_cell_inserter : public std::unary_function<range_listener_tracker::address_set_type*, void>
+class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
 {
     model_context& m_context;
     dirty_cells_t& m_dirty_cells;
-    range_listener_tracker::address_set_type& m_addrs;
+    cell_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(model_context& cxt, dirty_cells_t& dirty_cells, range_listener_tracker::address_set_type& addrs) : 
+    dirty_cell_inserter(model_context& cxt, dirty_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) : 
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
-    void operator() (const range_listener_tracker::address_set_type* p)
+    void operator() (const cell_listener_tracker::address_set_type* p)
     {
         // Add all addresses in this set to the dirty cells list.
-        range_listener_tracker::address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
+        cell_listener_tracker::address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
         for (; itr != itr_end; ++itr)
         {
             const abs_address_t& addr = *itr;
@@ -173,7 +173,7 @@ public:
 
 }
 
-void range_listener_tracker::get_all_cell_listeners(
+void cell_listener_tracker::get_all_cell_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
@@ -203,7 +203,7 @@ void range_listener_tracker::get_all_cell_listeners(
     }
 }
 
-void range_listener_tracker::get_all_range_listeners(
+void cell_listener_tracker::get_all_range_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
@@ -214,7 +214,7 @@ void range_listener_tracker::get_all_range_listeners(
     get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
-void range_listener_tracker::get_all_range_listeners_re(
+void cell_listener_tracker::get_all_range_listeners_re(
     const abs_address_t& origin_target, const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
