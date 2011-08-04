@@ -743,6 +743,11 @@ void model_parser::parse()
                 // Check cell results.
                 check(data.formula_results);
             }
+            else if (buf_com.equals("exit"))
+            {
+                // Exit the loop.
+                return;
+            }
             else if (buf_com.equals("mode init"))
             {
                 parse_mode = parse_mode_init;
