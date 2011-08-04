@@ -157,15 +157,6 @@ public:
 #if DEBUG_MODEL_PARSER
                 __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
 #endif
-                base_cell* cell = m_context.get_cell(addr);
-                if (!cell)
-                {
-#if DEBUG_MODEL_PARSER
-                    __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: cell not found!" << endl;
-#endif
-                    return;
-                }
-
                 if (m_mode == mode_add)
                 {
                     m_listener_tracker.add(m_addr, addr);
