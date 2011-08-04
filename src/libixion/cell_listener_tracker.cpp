@@ -207,6 +207,7 @@ void cell_listener_tracker::get_all_range_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
 #if DEBUG_RANGE_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
     __IXION_DEBUG_OUT__ << "get all listeners for target " << m_context.get_name_resolver().get_name(target) << endl;
 #endif
 
@@ -264,7 +265,12 @@ void cell_listener_tracker::get_all_range_listeners_re(
     for (; itr != itr_end; ++itr)
     {
         if (*itr == origin_target)
+        {
+#if DEBUG_RANGE_LISTENER_TRACKER
+         __IXION_DEBUG_OUT__ << "this equals origin target.  skipping." << endl;
+#endif
             continue;
+        }
         get_all_range_listeners_re(origin_target, *itr, listeners, listeners_addrs);
     }
 
