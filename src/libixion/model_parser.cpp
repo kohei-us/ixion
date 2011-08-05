@@ -577,9 +577,6 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     dirty_cells_t _dirty_cells;
     {
         // single, cell-to-cell listeners.
-        // TODO: I need to move the listener list out of the cell instance and
-        // move it to an external tracker class, to keep the cell object size
-        // small.
         vector<address_cell_pair_type>::iterator itr = fcells.begin(), itr_end = fcells.end();
         for (; itr != itr_end; ++itr)
         {
