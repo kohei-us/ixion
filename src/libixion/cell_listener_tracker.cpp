@@ -28,7 +28,7 @@
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
-#define DEBUG_CELL_LISTENER_TRACKER 1
+#define DEBUG_CELL_LISTENER_TRACKER 0
 
 #if DEBUG_CELL_LISTENER_TRACKER
 #include <iostream>
