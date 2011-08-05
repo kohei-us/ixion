@@ -171,6 +171,17 @@ public:
     }
 };
 
+class cell_addr_printer : public std::unary_function<abs_address_t, void>
+{
+    const formula_name_resolver_base& m_resolver;
+public:
+    cell_addr_printer(const formula_name_resolver_base& resolver) : m_resolver(resolver) {}
+    void operator() (const abs_address_t& addr) const
+    {
+        cout << m_resolver.get_name(addr) << " ";
+    }
+};
+
 }
 
 void cell_listener_tracker::get_all_cell_listeners(
@@ -234,7 +245,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
     const abs_address_t& origin_target, const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "target address: " << m_context.get_name_resolver().get_name(target) << endl;
+    __IXION_DEBUG_OUT__ << "--- begin: target address: " << m_context.get_name_resolver().get_name(target) << endl;
 #endif
     if (listeners_addrs.count(target))
     {
@@ -255,6 +266,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
 
     std::for_each(
         res.begin(), res.end(), dirty_cell_inserter(m_context, new_listeners, new_listeners_addrs));
+    assert(new_listeners.size() == new_listeners_addrs.size());
 
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "new listener count: " << new_listeners.size() << endl;
@@ -277,6 +289,13 @@ void cell_listener_tracker::get_all_range_listeners_re(
     // Add new listeners to the caller's list.
     listeners.insert(new_listeners.begin(), new_listeners.end());
     listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
+#if DEBUG_CELL_LISTENER_TRACKER
+    cout << "new listeners: ";
+    std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(), 
+                  cell_addr_printer(m_context.get_name_resolver()));
+    cout << endl;
+    __IXION_DEBUG_OUT__ << "--- end: target address: " << m_context.get_name_resolver().get_name(target) << endl;
+#endif
 }
 
 }
