@@ -51,7 +51,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 0
+#define DEBUG_MODEL_PARSER 1
 
 namespace ixion {
 
@@ -208,7 +208,7 @@ public:
             if (!expr_name.empty())
                 name = expr_name;
         }
-        cout << "  cell " << name << endl;
+        __IXION_DEBUG_OUT__ << "  cell " << name << endl;
     }
 };
 
