@@ -28,7 +28,7 @@
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
-#define DEBUG_CELL_LISTENER_TRACKER 0
+#define DEBUG_CELL_LISTENER_TRACKER 1
 
 #if DEBUG_CELL_LISTENER_TRACKER
 #include <iostream>
@@ -290,7 +290,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
     listeners.insert(new_listeners.begin(), new_listeners.end());
     listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
 #if DEBUG_CELL_LISTENER_TRACKER
-    cout << "new listeners: ";
+    __IXION_DEBUG_OUT__ << "new listeners: ";
     std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(), 
                   cell_addr_printer(m_context.get_name_resolver()));
     cout << endl;
