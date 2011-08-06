@@ -36,7 +36,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_INTERPRETER 0
+#define DEBUG_FORMULA_INTERPRETER 1
 
 using namespace std;
 
@@ -338,13 +338,13 @@ void formula_interpreter::single_ref()
 {
     address_t addr = token().get_single_ref();
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
-    cout << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
 #endif
     m_outbuf << m_context.get_name_resolver().get_name(addr, m_pos);
     abs_address_t abs_addr = addr.to_abs(m_pos);
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::variable: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::variable: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
 #endif
     const base_cell* pref = m_context.get_cell(abs_addr);
 
@@ -362,14 +362,14 @@ void formula_interpreter::range_ref()
 {
     range_t range = token().get_range_ref();
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
-    cout << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
 #endif
     m_outbuf << m_context.get_name_resolver().get_name(range, m_pos);
     abs_range_t abs_range = range.to_abs(m_pos);
 
 #if DEBUG_FORMULA_INTERPRETER
-    cout << "formula_interpreter::range_ref: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
 #endif
 
     // Check the reference range to make sure it doesn't include the parent cell.

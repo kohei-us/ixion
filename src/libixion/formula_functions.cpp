@@ -34,6 +34,8 @@
 #undef max
 #endif
 
+#define DEBUG_FORMULA_FUNCTIONS 1
+
 #include <iostream>
 
 using namespace std;
@@ -173,6 +175,9 @@ void formula_functions::min(value_stack_t& args) const
 
 void formula_functions::sum(value_stack_t& args) const
 {
+#if DEBUG_FORMULA_FUNCTIONS
+    __IXION_DEBUG_OUT__ << "function: sum" << endl;
+#endif
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
 
@@ -194,6 +199,10 @@ void formula_functions::sum(value_stack_t& args) const
     }
 
     args.push_value(ret);
+
+#if DEBUG_FORMULA_FUNCTIONS
+    __IXION_DEBUG_OUT__ << "function: sum end" << endl;
+#endif
 }
 
 void formula_functions::average(value_stack_t& args) const

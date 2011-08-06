@@ -30,7 +30,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 
-#define DEBUG_MODEL_CONTEXT 0
+#define DEBUG_MODEL_CONTEXT 1
 
 using namespace std;
 
@@ -133,7 +133,7 @@ matrix model_context::get_range_value(const abs_range_t& range) const
             col_t col = j + range.first.column;
             const base_cell* p = get_cell(abs_address_t(range.first.sheet, row, col));
 #if DEBUG_MODEL_CONTEXT
-            cout << "model_context::get_range_value: (sheet=" << range.first.sheet << "; row=" << row << "; col=" << col << ") = " << p << endl;
+            __IXION_DEBUG_OUT__ << "cell address (sheet=" << range.first.sheet << "; row=" << row << "; col=" << col << ") = " << p << endl;
 #endif
             if (!p)
                 // empty cell.

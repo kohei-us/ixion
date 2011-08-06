@@ -38,7 +38,7 @@
 #include <sstream>
 #include <iostream>
 
-#define DEBUG_FORMULA_CELL 0
+#define DEBUG_FORMULA_CELL 1
 
 using namespace std;
 
@@ -197,10 +197,7 @@ const formula_tokens_t& formula_cell::get_tokens() const
 void formula_cell::interpret(const model_context& context)
 {
 #if DEBUG_FORMULA_CELL
-    ostringstream os;
-    os << get_formula_result_output_separator() << endl;
-    os << context.get_cell_name(this) << ": interpreting" << endl;
-    cout << os.str();
+    __IXION_DEBUG_OUT__ << context.get_cell_name(this) << ": interpreting" << endl;
 #endif
     {
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
@@ -271,7 +268,7 @@ void formula_cell::check_circular(const model_context& cxt)
             ostringstream os;
             os << cxt.get_cell_name(this) << ": ";
             os << "circular dependency detected !!" << endl;
-            cout << os.str();
+            __IXION_DEBUG_OUT__ << os.str();
 #endif
             assert(!m_interpret_status.result);
             m_interpret_status.result = new formula_result(fe_ref_result_not_available);
@@ -310,13 +307,13 @@ const formula_result* formula_cell::get_result_cache() const
 
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
 {
+#if DEBUG_FORMULA_CELL
+    __IXION_DEBUG_OUT__ << "wait for interpreted result" << endl;
+#endif
     while (!m_interpret_status.result)
     {
 #if DEBUG_FORMULA_CELL
-//      ostringstream os;
-//      os << global::get_cell_name(this) << ": ";
-//      os << "waiting" << endl;
-//      cout << os.str();
+        __IXION_DEBUG_OUT__ << "waiting" << endl;
 #endif
         m_interpret_status.cond.wait(lock);
     }
