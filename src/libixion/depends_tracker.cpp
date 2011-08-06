@@ -37,7 +37,7 @@
 #include <iostream>
 #include <fstream>
 
-#define DEBUG_DEPENDS_TRACKER 0
+#define DEBUG_DEPENDS_TRACKER 1
 
 using namespace std;
 
@@ -52,7 +52,7 @@ public:
 
     void operator() (const base_cell* p) const
     {
-        cout << "  " << m_cxt.get_cell_name(p) << endl;
+        __IXION_DEBUG_OUT__ << "  " << m_cxt.get_cell_name(p) << endl;
     }
 
 private:
@@ -133,7 +133,7 @@ dependency_tracker::~dependency_tracker()
 void dependency_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
 {
 #if DEBUG_DEPENDS_TRACKER
-    cout << m_context.get_cell_name(origin_cell) << "->" << m_context.get_cell_name(depend_cell) << endl;
+    __IXION_DEBUG_OUT__ << m_context.get_cell_name(origin_cell) << "->" << m_context.get_cell_name(depend_cell) << endl;
 #endif
     m_deps.insert(origin_cell, depend_cell);
 }
@@ -144,20 +144,20 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     topo_sort_cells(sorted_cells);
 
 #if DEBUG_DEPENDS_TRACKER
-    cout << "Topologically sorted cells ---------------------------------" << endl;
+    __IXION_DEBUG_OUT__ << "Topologically sorted cells ---------------------------------" << endl;
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(m_context));
 #endif
 
     // Reset cell status.
 #if DEBUG_DEPENDS_TRACKER
-    cout << "Reset cell status ------------------------------------------" << endl;
+    __IXION_DEBUG_OUT__ << "Reset cell status ------------------------------------------" << endl;
 #endif
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
 
     // First, detect circular dependencies and mark those circular 
     // dependent cells with appropriate error flags.
 #if DEBUG_DEPENDS_TRACKER
-    cout << "Check circular dependencies --------------------------------" << endl;
+    __IXION_DEBUG_OUT__ << "Check circular dependencies --------------------------------" << endl;
 #endif
     for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler(m_context));
 
