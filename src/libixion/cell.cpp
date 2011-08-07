@@ -30,6 +30,7 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/cells_in_range.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -276,9 +277,20 @@ void formula_cell::check_circular(const model_context& cxt)
                 }
             }
             break;
+            case fop_range_ref:
+            {
+                abs_address_t origin = cxt.get_cell_position(this);
+                abs_range_t range = itr->get_range_ref().to_abs(origin);
+                cells_in_range cell_range = cxt.get_cell_range_iterator(range);
+                cells_in_range::const_iterator itr = cell_range.begin(), itr_end = cell_range.end();
+                for (; itr != itr_end; ++itr)
+                {
+
+                }
+            }
             default:
 #if DEBUG_FORMULA_CELL
-                __IXION_DEBUG_OUT__ << "token type " << get_opcode_name(itr->get_opcode())
+                __IXION_DEBUG_OUT__ << "check_circular: token type " << get_opcode_name(itr->get_opcode())
                     << " was not processed." << endl;
 #endif
         }

@@ -39,6 +39,7 @@ namespace ixion {
 
 class formula_name_resolver_base;
 class cell_listener_tracker;
+class cells_in_range;
 struct abs_address_t;
 class matrix;
 
@@ -63,6 +64,8 @@ public:
     base_cell* get_cell(const abs_address_t& addr);
     ::std::string get_cell_name(const base_cell* p) const;
     abs_address_t get_cell_position(const base_cell* p) const;
+
+    cells_in_range get_cell_range_iterator(const abs_range_t& range) const;
 
     /**
      * Obtains a set of non-empty cells located within specified range.

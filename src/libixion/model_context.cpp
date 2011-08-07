@@ -29,6 +29,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/cells_in_range.hpp"
 
 #define DEBUG_MODEL_CONTEXT 1
 
@@ -101,6 +102,11 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     }
 
     throw general_error("cell instance not found");
+}
+
+cells_in_range model_context::get_cell_range_iterator(const abs_range_t& range) const
+{
+    return cells_in_range(*this, range);
 }
 
 void model_context::get_cells(const abs_range_t& range, vector<base_cell*>& cells)
