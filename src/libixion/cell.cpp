@@ -247,33 +247,42 @@ void formula_cell::check_circular(const model_context& cxt)
     formula_tokens_t::iterator itr = m_tokens.begin(), itr_end = m_tokens.end();
     for (; itr != itr_end; ++itr)
     {
-        fopcode_t op = itr->get_opcode();
-        if (op != fop_single_ref)
-            continue;
-
-        abs_address_t origin = cxt.get_cell_position(this);
-        abs_address_t addr = itr->get_single_ref().to_abs(origin);
-        const base_cell* ref = cxt.get_cell(addr);
-
-        if (!ref)
-            continue;
-
-        if (ref->get_celltype() != celltype_formula)
-            continue;
-
-        if (!static_cast<const formula_cell*>(ref)->is_circular_safe())
+        switch (itr->get_opcode())
         {
-            // Circular dependency detected !!
+            case fop_single_ref:
+            {
+                abs_address_t origin = cxt.get_cell_position(this);
+                abs_address_t addr = itr->get_single_ref().to_abs(origin);
+                const base_cell* ref = cxt.get_cell(addr);
+
+                if (!ref)
+                    continue;
+
+                if (ref->get_celltype() != celltype_formula)
+                    continue;
+
+                if (!static_cast<const formula_cell*>(ref)->is_circular_safe())
+                {
+                    // Circular dependency detected !!
 #if DEBUG_FORMULA_CELL
-            ostringstream os;
-            os << cxt.get_cell_name(this) << ": ";
-            os << "circular dependency detected !!" << endl;
-            __IXION_DEBUG_OUT__ << os.str();
+                    ostringstream os;
+                    os << cxt.get_cell_name(this) << ": ";
+                    os << "circular dependency detected !!" << endl;
+                    __IXION_DEBUG_OUT__ << os.str();
 #endif
-            assert(!m_interpret_status.result);
-            m_interpret_status.result = new formula_result(fe_ref_result_not_available);
-            return;
+                    assert(!m_interpret_status.result);
+                    m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+                    return;
+                }
+            }
+            break;
+            default:
+#if DEBUG_FORMULA_CELL
+                __IXION_DEBUG_OUT__ << "token type " << get_opcode_name(itr->get_opcode())
+                    << " was not processed." << endl;
+#endif
         }
+
     }
 
     // No circular dependencies.  Good.
