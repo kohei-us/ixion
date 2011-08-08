@@ -45,7 +45,11 @@ class matrix;
 
 /**
  * This class stores all data relevant to current session.  You can think of 
- * this like a document model for each formula calculation run.
+ * this like a document model for each formula calculation run. 
+ *  
+ * I will eventually create an interface class for this which is to be 
+ * sub-classed by the consumer application to provide access to the 
+ * application-specific context.
  */
 class model_context : public ::boost::noncopyable
 {
