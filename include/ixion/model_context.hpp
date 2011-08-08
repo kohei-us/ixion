@@ -49,6 +49,8 @@ class matrix;
  */
 class model_context : public ::boost::noncopyable
 {
+    friend class cells_in_range;
+
     typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_type;
     typedef ::boost::ptr_map<abs_address_t, base_cell> cell_store_type;
 public:

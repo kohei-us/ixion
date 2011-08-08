@@ -28,6 +28,8 @@
 #ifndef __IXION_CELL_RANGE_ITERATOR_HPP__
 #define __IXION_CELL_RANGE_ITERATOR_HPP__
 
+#include "ixion/model_context.hpp"
+
 namespace ixion {
 
 class model_context;
@@ -46,8 +48,14 @@ class cells_in_range
 public:
     class const_iterator
     {
+        cells_in_range* mp_parent;
+        model_context::cell_store_type::const_iterator m_cur;
+        model_context::cell_store_type::const_iterator m_beg;
+        model_context::cell_store_type::const_iterator m_end;
+
     public:
         const_iterator();
+        const_iterator(cells_in_range* parent, bool end_pos);
         bool operator== (const const_iterator& r) const;
         bool operator!= (const const_iterator& r) const;
         const_iterator& operator= (const const_iterator& r);
@@ -55,6 +63,10 @@ public:
         const base_cell* operator--();
         const base_cell& operator*() const;
         const base_cell* operator->() const;
+
+    private:
+        void find_next();
+        void find_prev();
     };
 
     cells_in_range(const cells_in_range& r);

@@ -285,7 +285,22 @@ void formula_cell::check_circular(const model_context& cxt)
                 cells_in_range::const_iterator itr = cell_range.begin(), itr_end = cell_range.end();
                 for (; itr != itr_end; ++itr)
                 {
+                    if (itr->get_celltype() != celltype_formula)
+                        continue;
 
+                    const base_cell& cell = *itr;
+                    if (!static_cast<const formula_cell&>(cell).is_circular_safe())
+                    {
+#if DEBUG_FORMULA_CELL
+                        ostringstream os;
+                        os << cxt.get_cell_name(this) << ": ";
+                        os << "circular dependency detected !!" << endl;
+                        __IXION_DEBUG_OUT__ << os.str();
+#endif
+                        assert(!m_interpret_status.result);
+                        m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+                        return;
+                    }
                 }
             }
             default:
