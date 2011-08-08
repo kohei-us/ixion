@@ -38,14 +38,10 @@ class base_cell;
 
 class cells_in_range
 {
-    friend class model_context;
-
-    const model_context& m_context;
-    const abs_range_t& m_range;
-
     cells_in_range(); // disabled
-    cells_in_range(const model_context& cxt, const abs_range_t& range);
 public:
+    cells_in_range(const model_context& cxt, const abs_range_t& range);
+
     class const_iterator
     {
         cells_in_range* mp_parent;
@@ -72,6 +68,10 @@ public:
     cells_in_range(const cells_in_range& r);
     const_iterator begin();
     const_iterator end();
+
+private:
+    const model_context& m_context;
+    const abs_range_t& m_range;
 };
 
 }
