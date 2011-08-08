@@ -39,7 +39,7 @@
 #include <sstream>
 #include <iostream>
 
-#define DEBUG_FORMULA_CELL 1
+#define DEBUG_FORMULA_CELL 0
 
 using namespace std;
 
@@ -307,6 +307,8 @@ void formula_cell::check_circular(const model_context& cxt)
 #if DEBUG_FORMULA_CELL
                 __IXION_DEBUG_OUT__ << "check_circular: token type " << get_opcode_name(itr->get_opcode())
                     << " was not processed." << endl;
+#else
+                ;
 #endif
         }
 

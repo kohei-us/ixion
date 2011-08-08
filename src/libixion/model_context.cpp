@@ -31,7 +31,7 @@
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/cells_in_range.hpp"
 
-#define DEBUG_MODEL_CONTEXT 1
+#define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
 

@@ -34,7 +34,7 @@
 #undef max
 #endif
 
-#define DEBUG_FORMULA_FUNCTIONS 1
+#define DEBUG_FORMULA_FUNCTIONS 0
 
 #include <iostream>
 
