@@ -281,7 +281,7 @@ void formula_cell::check_circular(const model_context& cxt)
             {
                 abs_address_t origin = cxt.get_cell_position(this);
                 abs_range_t range = itr->get_range_ref().to_abs(origin);
-                cells_in_range cell_range = cxt.get_cell_range_iterator(range);
+                cells_in_range cell_range = cxt.get_cells_in_range(range);
                 cells_in_range::const_iterator itr = cell_range.begin(), itr_end = cell_range.end();
                 for (; itr != itr_end; ++itr)
                 {

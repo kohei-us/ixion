@@ -71,7 +71,7 @@ public:
     ::std::string get_cell_name(const base_cell* p) const;
     abs_address_t get_cell_position(const base_cell* p) const;
 
-    cells_in_range get_cell_range_iterator(const abs_range_t& range) const;
+    cells_in_range get_cells_in_range(const abs_range_t& range) const;
 
     /**
      * Obtains a set of non-empty cells located within specified range.

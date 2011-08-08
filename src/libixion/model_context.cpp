@@ -104,7 +104,7 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     throw general_error("cell instance not found");
 }
 
-cells_in_range model_context::get_cell_range_iterator(const abs_range_t& range) const
+cells_in_range model_context::get_cells_in_range(const abs_range_t& range) const
 {
     return cells_in_range(*this, range);
 }
