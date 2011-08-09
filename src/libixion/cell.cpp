@@ -262,19 +262,8 @@ void formula_cell::check_circular(const model_context& cxt)
                 if (ref->get_celltype() != celltype_formula)
                     continue;
 
-                if (!static_cast<const formula_cell*>(ref)->is_circular_safe())
-                {
-                    // Circular dependency detected !!
-#if DEBUG_FORMULA_CELL
-                    ostringstream os;
-                    os << cxt.get_cell_name(this) << ": ";
-                    os << "circular dependency detected !!" << endl;
-                    __IXION_DEBUG_OUT__ << os.str();
-#endif
-                    assert(!m_interpret_status.result);
-                    m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+                if (!check_ref_for_circular_safety(*ref))
                     return;
-                }
             }
             break;
             case fop_range_ref:
@@ -288,19 +277,8 @@ void formula_cell::check_circular(const model_context& cxt)
                     if (itr->get_celltype() != celltype_formula)
                         continue;
 
-                    const base_cell& cell = *itr;
-                    if (!static_cast<const formula_cell&>(cell).is_circular_safe())
-                    {
-#if DEBUG_FORMULA_CELL
-                        ostringstream os;
-                        os << cxt.get_cell_name(this) << ": ";
-                        os << "circular dependency detected !!" << endl;
-                        __IXION_DEBUG_OUT__ << os.str();
-#endif
-                        assert(!m_interpret_status.result);
-                        m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+                    if (!check_ref_for_circular_safety(*itr))
                         return;
-                    }
                 }
             }
             default:
@@ -316,6 +294,25 @@ void formula_cell::check_circular(const model_context& cxt)
 
     // No circular dependencies.  Good.
     m_circular_safe = true;
+}
+
+bool formula_cell::check_ref_for_circular_safety(const base_cell& ref)
+{
+    assert(ref.get_celltype() == celltype_formula);
+    if (!static_cast<const formula_cell&>(ref).is_circular_safe())
+    {
+        // Circular dependency detected !!
+#if DEBUG_FORMULA_CELL
+        ostringstream os;
+        os << cxt.get_cell_name(this) << ": ";
+        os << "circular dependency detected !!" << endl;
+        __IXION_DEBUG_OUT__ << os.str();
+#endif
+        assert(!m_interpret_status.result);
+        m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+        return false;
+    }
+    return true;
 }
 
 void formula_cell::reset()

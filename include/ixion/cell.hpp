@@ -150,6 +150,8 @@ private:
      */
     bool is_circular_safe() const;
 
+    bool check_ref_for_circular_safety(const base_cell& ref);
+
 private:
     formula_tokens_t    m_tokens;
 
