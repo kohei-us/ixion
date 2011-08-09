@@ -36,99 +36,29 @@ cells_in_range::cells_in_range(const model_context& cxt, const abs_range_t& rang
 cells_in_range::cells_in_range(const cells_in_range& r) :
     m_context(r.m_context), m_range(r.m_range) {}
 
-cells_in_range::const_iterator cells_in_range::begin()
+const base_cell* cells_in_range::first()
 {
-    return const_iterator(this, false);
-}
-
-cells_in_range::const_iterator cells_in_range::end()
-{
-    return const_iterator(this, true);
-}
-
-cells_in_range::const_iterator::const_iterator() :
-    mp_parent(NULL) {}
-
-cells_in_range::const_iterator::const_iterator(cells_in_range* parent, bool end_pos) :
-    mp_parent(parent)
-{
-    const model_context::cell_store_type& cells = mp_parent->m_context.m_cells;
-    m_beg = cells.begin();
+    const model_context::cell_store_type& cells = m_context.m_cells;
     m_end = cells.end();
-    if (end_pos)
-    {
-        m_cur = m_end;
-        return;
-    }
-
-    m_cur = m_beg;
-    if (!mp_parent->m_range.contains(m_cur->first))
+    m_cur = cells.begin();
+    if (!m_range.contains(m_cur->first))
         find_next();
+
+    return m_cur == m_end ? NULL : m_cur->second;
 }
 
-bool cells_in_range::const_iterator::operator ==(const const_iterator& r) const
-{
-    return mp_parent == r.mp_parent && m_cur == r.m_cur && m_end == r.m_end;
-}
-
-bool cells_in_range::const_iterator::operator !=(const const_iterator& r) const
-{
-    return !operator==(r);
-}
-
-cells_in_range::const_iterator& cells_in_range::const_iterator::operator =(const const_iterator& r)
-{
-    mp_parent = r.mp_parent;
-    m_cur = r.m_cur;
-    m_beg = r.m_beg;
-    m_end = r.m_end;
-    return *this;
-}
-
-const base_cell* cells_in_range::const_iterator::operator++()
+const base_cell* cells_in_range::next()
 {
     find_next();
     return m_cur == m_end ? NULL : m_cur->second;
 }
 
-const base_cell* cells_in_range::const_iterator::operator--()
+void cells_in_range::find_next()
 {
-    find_prev();
-    const abs_range_t& range = mp_parent->m_range;
-    if (m_cur == m_beg)
-        return range.contains(m_cur->first) ? m_cur->second : NULL;
-
-    return m_cur->second;
-}
-
-const base_cell& cells_in_range::const_iterator::operator*() const
-{
-    return *m_cur->second;
-}
-
-const base_cell* cells_in_range::const_iterator::operator->() const
-{
-    return m_cur->second;
-}
-
-void cells_in_range::const_iterator::find_next()
-{
-    const abs_range_t& range = mp_parent->m_range;
     for (++m_cur; m_cur != m_end; ++m_cur)
     {
         const abs_address_t& addr = m_cur->first;
-        if (range.contains(addr))
-            break;
-    }
-}
-
-void cells_in_range::const_iterator::find_prev()
-{
-    const abs_range_t& range = mp_parent->m_range;
-    for (--m_cur; m_cur != m_beg; --m_cur)
-    {
-        const abs_address_t& addr = m_cur->first;
-        if (range.contains(addr))
+        if (m_range.contains(addr))
             break;
     }
 }

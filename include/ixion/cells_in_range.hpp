@@ -45,37 +45,18 @@ class cells_in_range
     cells_in_range(); // disabled
 public:
     cells_in_range(const model_context& cxt, const abs_range_t& range);
-
-    class const_iterator
-    {
-        cells_in_range* mp_parent;
-        model_context::cell_store_type::const_iterator m_cur;
-        model_context::cell_store_type::const_iterator m_beg;
-        model_context::cell_store_type::const_iterator m_end;
-
-    public:
-        const_iterator();
-        const_iterator(cells_in_range* parent, bool end_pos);
-        bool operator== (const const_iterator& r) const;
-        bool operator!= (const const_iterator& r) const;
-        const_iterator& operator= (const const_iterator& r);
-        const base_cell* operator++();
-        const base_cell* operator--();
-        const base_cell& operator*() const;
-        const base_cell* operator->() const;
-
-    private:
-        void find_next();
-        void find_prev();
-    };
-
     cells_in_range(const cells_in_range& r);
-    const_iterator begin();
-    const_iterator end();
+
+    const base_cell* first();
+    const base_cell* next();
 
 private:
+    void find_next();
+
     const model_context& m_context;
     const abs_range_t& m_range;
+    model_context::cell_store_type::const_iterator m_cur;
+    model_context::cell_store_type::const_iterator m_end;
 };
 
 }
