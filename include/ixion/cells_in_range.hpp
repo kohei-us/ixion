@@ -36,6 +36,10 @@ class model_context;
 class abs_range_t;
 class base_cell;
 
+/**
+ * Provides iterator for iterating through cell instances in a given range.
+ * Empty cells are skipped.
+ */
 class cells_in_range
 {
     cells_in_range(); // disabled
