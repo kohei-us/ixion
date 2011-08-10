@@ -64,11 +64,11 @@ public:
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
     virtual base_cell* get_cell(const abs_address_t& addr);
     virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range) const;
+    virtual ::std::string get_cell_name(const base_cell* p) const;
+    virtual abs_address_t get_cell_position(const base_cell* p) const;
 
     void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
     void set_cell(const abs_address_t& addr, base_cell* cell);
-    ::std::string get_cell_name(const base_cell* p) const;
-    abs_address_t get_cell_position(const base_cell* p) const;
 
 
     /**

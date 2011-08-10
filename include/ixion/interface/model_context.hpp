@@ -28,6 +28,7 @@
 #ifndef __IXION_INTERFACE_MODEL_CONTEXT_HPP__
 #define __IXION_INTERFACE_MODEL_CONTEXT_HPP__
 
+#include <string>
 #include <boost/noncopyable.hpp>
 
 namespace ixion {
@@ -51,6 +52,8 @@ public:
     virtual const base_cell* get_cell(const abs_address_t& addr) const = 0;
     virtual base_cell* get_cell(const abs_address_t& addr) = 0;
     virtual cells_in_range* get_cells_in_range(const abs_range_t& range) const = 0;
+    virtual ::std::string get_cell_name(const base_cell* p) const = 0;
+    virtual abs_address_t get_cell_position(const base_cell* p) const= 0;
 };
 
 }}
