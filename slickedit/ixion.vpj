@@ -225,6 +225,10 @@
 					<F N="../include/ixion/hash_container/map.hpp"/>
 					<F N="../include/ixion/hash_container/set.hpp"/>
 				</Folder>
+				<Folder Name="interface">
+					<F N="../include/ixion/interface/cells_in_range.hpp"/>
+					<F N="../include/ixion/interface/model_context.hpp"/>
+				</Folder>
 				<F N="../include/ixion/address.hpp"/>
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>

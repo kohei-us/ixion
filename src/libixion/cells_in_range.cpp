@@ -36,6 +36,8 @@ cells_in_range::cells_in_range(const model_context& cxt, const abs_range_t& rang
 cells_in_range::cells_in_range(const cells_in_range& r) :
     m_context(r.m_context), m_range(r.m_range) {}
 
+cells_in_range::~cells_in_range() {}
+
 const base_cell* cells_in_range::first()
 {
     const model_context::cell_store_type& cells = m_context.m_cells;

@@ -39,8 +39,15 @@ namespace ixion {
 
 model_context::model_context() :
     mp_name_resolver(new formula_name_resolver_a1),
-    mp_range_tracker(new cell_listener_tracker(*this))
+    mp_range_tracker(new cell_listener_tracker(*this)),
+    mp_cells_in_range(NULL)
 {}
+
+model_context::~model_context()
+{
+    delete mp_range_tracker;
+    delete mp_cells_in_range;
+}
 
 const formula_name_resolver_base& model_context::get_name_resolver() const
 {
@@ -104,9 +111,11 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     throw general_error("cell instance not found");
 }
 
-cells_in_range model_context::get_cells_in_range(const abs_range_t& range) const
+interface::cells_in_range* model_context::get_cells_in_range(const abs_range_t& range) const
 {
-    return cells_in_range(*this, range);
+    delete mp_cells_in_range;
+    mp_cells_in_range = new cells_in_range(*this, range);
+    return mp_cells_in_range;
 }
 
 void model_context::get_cells(const abs_range_t& range, vector<base_cell*>& cells)
@@ -178,11 +187,6 @@ const string* model_context::get_named_expression_name(const formula_cell* expr)
             return &itr->first;
     }
     return NULL;
-}
-
-model_context::~model_context()
-{
-    delete mp_name_resolver;
 }
 
 }

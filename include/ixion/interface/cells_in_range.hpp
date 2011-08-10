@@ -25,42 +25,23 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_CELL_RANGE_ITERATOR_HPP__
-#define __IXION_CELL_RANGE_ITERATOR_HPP__
+#ifndef __IXION_INTERFACE_CELLS_IN_RANGE_HPP__
+#define __IXION_INTERFACE_CELLS_IN_RANGE_HPP__
 
-#include "ixion/interface/cells_in_range.hpp"
-#include "ixion/model_context.hpp"
+namespace ixion { 
 
-namespace ixion {
-
-class model_context;
-class abs_range_t;
 class base_cell;
 
-/**
- * Provides iterator for iterating through cell instances in a given range.
- * Empty cells are skipped.
- */
-class cells_in_range : public interface::cells_in_range
+namespace interface {
+
+class cells_in_range
 {
-    cells_in_range(); // disabled
 public:
-    cells_in_range(const model_context& cxt, const abs_range_t& range);
-    cells_in_range(const cells_in_range& r);
-    virtual ~cells_in_range();
-
-    virtual const base_cell* first();
-    virtual const base_cell* next();
-
-private:
-    void find_next();
-
-    const model_context& m_context;
-    const abs_range_t& m_range;
-    model_context::cell_store_type::const_iterator m_cur;
-    model_context::cell_store_type::const_iterator m_end;
+    virtual ~cells_in_range() {}
+    virtual const base_cell* first() = 0;
+    virtual const base_cell* next() = 0;
 };
 
-}
+}}
 
 #endif

@@ -29,16 +29,14 @@
 #define __IXION_MODEL_CONTEXT_HPP__
 
 #include "ixion/cell.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #include <string>
 #include <memory>
 #include <boost/ptr_container/ptr_map.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
-class formula_name_resolver_base;
-class cell_listener_tracker;
 class cells_in_range;
 struct abs_address_t;
 class matrix;
@@ -51,7 +49,7 @@ class matrix;
  * sub-classed by the consumer application to provide access to the 
  * application-specific context.
  */
-class model_context : public ::boost::noncopyable
+class model_context : public interface::model_context
 {
     friend class cells_in_range;
 
@@ -59,19 +57,19 @@ class model_context : public ::boost::noncopyable
     typedef ::boost::ptr_map<abs_address_t, base_cell> cell_store_type;
 public:
     model_context();
-    ~model_context();
+    virtual ~model_context();
     
-    const formula_name_resolver_base& get_name_resolver() const;
-    cell_listener_tracker& get_cell_listener_tracker();
+    virtual const formula_name_resolver_base& get_name_resolver() const;
+    virtual cell_listener_tracker& get_cell_listener_tracker();
+    virtual const base_cell* get_cell(const abs_address_t& addr) const;
+    virtual base_cell* get_cell(const abs_address_t& addr);
+    virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range) const;
 
     void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
     void set_cell(const abs_address_t& addr, base_cell* cell);
-    const base_cell* get_cell(const abs_address_t& addr) const;
-    base_cell* get_cell(const abs_address_t& addr);
     ::std::string get_cell_name(const base_cell* p) const;
     abs_address_t get_cell_position(const base_cell* p) const;
 
-    cells_in_range get_cells_in_range(const abs_range_t& range) const;
 
     /**
      * Obtains a set of non-empty cells located within specified range.
@@ -101,6 +99,7 @@ public:
 
 private:
     formula_name_resolver_base* mp_name_resolver;
+    mutable cells_in_range* mp_cells_in_range;
     cell_listener_tracker* mp_range_tracker;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.

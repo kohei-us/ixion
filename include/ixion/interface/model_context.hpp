@@ -25,42 +25,34 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_CELL_RANGE_ITERATOR_HPP__
-#define __IXION_CELL_RANGE_ITERATOR_HPP__
+#ifndef __IXION_INTERFACE_MODEL_CONTEXT_HPP__
+#define __IXION_INTERFACE_MODEL_CONTEXT_HPP__
 
-#include "ixion/interface/cells_in_range.hpp"
-#include "ixion/model_context.hpp"
+#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
-class model_context;
-class abs_range_t;
-class base_cell;
+class formula_name_resolver_base;
+class cell_listener_tracker;
+struct abs_address_t;
+struct abs_range_t;
 
-/**
- * Provides iterator for iterating through cell instances in a given range.
- * Empty cells are skipped.
- */
-class cells_in_range : public interface::cells_in_range
+namespace interface {
+
+class cells_in_range;
+
+class model_context : boost::noncopyable
 {
-    cells_in_range(); // disabled
 public:
-    cells_in_range(const model_context& cxt, const abs_range_t& range);
-    cells_in_range(const cells_in_range& r);
-    virtual ~cells_in_range();
+    virtual ~model_context() {}
 
-    virtual const base_cell* first();
-    virtual const base_cell* next();
-
-private:
-    void find_next();
-
-    const model_context& m_context;
-    const abs_range_t& m_range;
-    model_context::cell_store_type::const_iterator m_cur;
-    model_context::cell_store_type::const_iterator m_end;
+    virtual const formula_name_resolver_base& get_name_resolver() const = 0;
+    virtual cell_listener_tracker& get_cell_listener_tracker() = 0;
+    virtual const base_cell* get_cell(const abs_address_t& addr) const = 0;
+    virtual base_cell* get_cell(const abs_address_t& addr) = 0;
+    virtual cells_in_range* get_cells_in_range(const abs_range_t& range) const = 0;
 };
 
-}
+}}
 
 #endif
