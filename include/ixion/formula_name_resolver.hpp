@@ -75,11 +75,11 @@ struct formula_name_type
     ::std::string to_string() const;
 };
 
-class formula_name_resolver_base
+class formula_name_resolver
 {
 public:
-    formula_name_resolver_base();
-    virtual ~formula_name_resolver_base() = 0;
+    formula_name_resolver();
+    virtual ~formula_name_resolver() = 0;
     virtual formula_name_type resolve(const ::std::string& name, const abs_address_t& pos) const = 0;
     virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const = 0;
     virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const = 0;
@@ -92,7 +92,7 @@ public:
  * expressions are named expressions, i.e. no expressions are addressable by
  * cell address syntax. 
  */
-class formula_name_resolver_simple : public formula_name_resolver_base
+class formula_name_resolver_simple : public formula_name_resolver
 {
 public:
     formula_name_resolver_simple();
@@ -104,7 +104,7 @@ public:
     virtual ::std::string get_name(const abs_range_t& range) const;
 };
 
-class formula_name_resolver_a1 : public formula_name_resolver_base
+class formula_name_resolver_a1 : public formula_name_resolver
 {
 public:
     virtual ~formula_name_resolver_a1();

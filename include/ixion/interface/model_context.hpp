@@ -33,7 +33,7 @@
 
 namespace ixion {
 
-class formula_name_resolver_base;
+class formula_name_resolver;
 class cell_listener_tracker;
 class matrix;
 struct abs_address_t;
@@ -48,7 +48,7 @@ class model_context : boost::noncopyable
 public:
     virtual ~model_context() {}
 
-    virtual const formula_name_resolver_base& get_name_resolver() const = 0;
+    virtual const formula_name_resolver& get_name_resolver() const = 0;
     virtual cell_listener_tracker& get_cell_listener_tracker() = 0;
     virtual const base_cell* get_cell(const abs_address_t& addr) const = 0;
     virtual cells_in_range* get_cells_in_range(const abs_range_t& range) const = 0;

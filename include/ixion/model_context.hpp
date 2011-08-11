@@ -59,7 +59,7 @@ public:
     model_context();
     virtual ~model_context();
     
-    virtual const formula_name_resolver_base& get_name_resolver() const;
+    virtual const formula_name_resolver& get_name_resolver() const;
     virtual cell_listener_tracker& get_cell_listener_tracker();
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
     virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range) const;
@@ -87,7 +87,7 @@ public:
     formula_cell* get_named_expression(const ::std::string& name);
 
 private:
-    formula_name_resolver_base* mp_name_resolver;
+    formula_name_resolver* mp_name_resolver;
     mutable cells_in_range* mp_cells_in_range;
     cell_listener_tracker* mp_range_tracker;
     named_expressions_type m_named_expressions;

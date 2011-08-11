@@ -249,11 +249,11 @@ string formula_name_type::to_string() const
     return os.str();
 }
 
-formula_name_resolver_base::formula_name_resolver_base() {}
-formula_name_resolver_base::~formula_name_resolver_base() {}
+formula_name_resolver::formula_name_resolver() {}
+formula_name_resolver::~formula_name_resolver() {}
 
 formula_name_resolver_simple::formula_name_resolver_simple() :
-    formula_name_resolver_base() {}
+    formula_name_resolver() {}
 
 formula_name_resolver_simple::~formula_name_resolver_simple() {}
 

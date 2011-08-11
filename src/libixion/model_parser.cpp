@@ -827,7 +827,7 @@ void model_parser::check(const results_type& formula_results)
 
 const base_cell* model_parser::get_cell_from_name(const string& name)
 {
-    const formula_name_resolver_base& resolver = m_context.get_name_resolver();
+    const formula_name_resolver& resolver = m_context.get_name_resolver();
     formula_name_type name_type = resolver.resolve(name, abs_address_t());
     switch (name_type.type)
     {

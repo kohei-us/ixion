@@ -79,7 +79,7 @@ void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& d
 void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    const formula_name_resolver_base& res = m_context.get_name_resolver();
+    const formula_name_resolver& res = m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_range_listeners.find(range);
@@ -123,7 +123,7 @@ void cell_listener_tracker::remove(const abs_address_t& src, const abs_address_t
 void cell_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    const formula_name_resolver_base& res = m_context.get_name_resolver();
+    const formula_name_resolver& res = m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "removing - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_range_listeners.find(range);
@@ -173,9 +173,9 @@ public:
 
 class cell_addr_printer : public std::unary_function<abs_address_t, void>
 {
-    const formula_name_resolver_base& m_resolver;
+    const formula_name_resolver& m_resolver;
 public:
-    cell_addr_printer(const formula_name_resolver_base& resolver) : m_resolver(resolver) {}
+    cell_addr_printer(const formula_name_resolver& resolver) : m_resolver(resolver) {}
     void operator() (const abs_address_t& addr) const
     {
         cout << m_resolver.get_name(addr) << " ";
@@ -228,7 +228,7 @@ void cell_listener_tracker::get_all_range_listeners(
 
 void cell_listener_tracker::print_cell_listeners(const abs_address_t& target) const
 {
-    const formula_name_resolver_base& resolver = m_context.get_name_resolver();
+    const formula_name_resolver& resolver = m_context.get_name_resolver();
     cout << "The following cells listen to cell " << resolver.get_name(target) << endl;
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
     if (itr == m_cell_listeners.end())

@@ -49,7 +49,7 @@ model_context::~model_context()
     delete mp_cells_in_range;
 }
 
-const formula_name_resolver_base& model_context::get_name_resolver() const
+const formula_name_resolver& model_context::get_name_resolver() const
 {
     return *mp_name_resolver;
 }
