@@ -39,7 +39,12 @@
 namespace ixion {
 
 class base_cell;
+
+namespace interface {
+
 class model_context;
+
+}
 
 /** 
  * This class keeps track of inter-cell dependencies.  Each formula cell 
@@ -60,7 +65,7 @@ class dependency_tracker
     typedef depth_first_search<base_cell*, cell_back_inserter> dfs_type;
 
 public:
-    dependency_tracker(const dirty_cells_t& dirty_cells, const model_context& cxt);
+    dependency_tracker(const dirty_cells_t& dirty_cells, const interface::model_context& cxt);
     ~dependency_tracker();
 
     /** 
@@ -82,7 +87,7 @@ public:
 private:
     dfs_type::precedent_set m_deps;
     const dirty_cells_t& m_dirty_cells;
-    const model_context& m_context;
+    const interface::model_context& m_context;
 };
 
 }

@@ -42,7 +42,12 @@ namespace ixion {
 
 class formula_result;
 class formula_cell;
+
+namespace interface {
+
 class model_context;
+
+}
 
 enum celltype_t
 {
@@ -115,13 +120,13 @@ public:
     virtual double get_value() const;
     virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
-    void interpret(const model_context& context);
+    void interpret(const interface::model_context& context);
 
     /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
      */
-    void check_circular(const model_context& cxt);
+    void check_circular(const interface::model_context& cxt);
 
     /**
      * Reset cell's internal state. 

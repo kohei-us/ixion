@@ -43,6 +43,11 @@ namespace interface {
 
 class cells_in_range;
 
+/**
+ * Interface for model context.  The client code needs to provide concrete
+ * implementation of this interface in order to provide access to its
+ * content.
+ */
 class model_context : boost::noncopyable
 {
 public:

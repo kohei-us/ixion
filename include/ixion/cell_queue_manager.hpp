@@ -35,7 +35,12 @@
 namespace ixion {
 
 class formula_cell;
+
+namespace interface {
+
 class model_context;
+
+}
 
 /**
  * This class manages parallel cell interpretation using threads.  This 
@@ -50,7 +55,7 @@ public:
      *  
      * @param thread_count desired number of worker threads.
      */
-    static void init(size_t thread_count, const model_context& context);
+    static void init(size_t thread_count, const interface::model_context& context);
 
     /**
      * Add new cell to queue to interpret. 

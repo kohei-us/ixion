@@ -28,8 +28,8 @@
 #include "ixion/cell.hpp"
 #include "ixion/formula_interpreter.hpp"
 #include "ixion/formula_result.hpp"
-#include "ixion/model_context.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/interface/model_context.hpp"
 #include "ixion/interface/cells_in_range.hpp"
 
 #include <boost/shared_ptr.hpp>
@@ -195,7 +195,7 @@ const formula_tokens_t& formula_cell::get_tokens() const
     return m_tokens;
 }
 
-void formula_cell::interpret(const model_context& context)
+void formula_cell::interpret(const interface::model_context& context)
 {
 #if DEBUG_FORMULA_CELL
     __IXION_DEBUG_OUT__ << context.get_cell_name(this) << ": interpreting" << endl;
@@ -241,7 +241,7 @@ bool formula_cell::is_circular_safe() const
     return m_circular_safe;
 }
 
-void formula_cell::check_circular(const model_context& cxt)
+void formula_cell::check_circular(const interface::model_context& cxt)
 {
     // TODO: Check to make sure this is being run on the main thread only.
 

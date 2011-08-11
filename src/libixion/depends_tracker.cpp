@@ -30,8 +30,9 @@
 #include "ixion/cell.hpp"
 #include "ixion/formula_interpreter.hpp"
 #include "ixion/cell_queue_manager.hpp"
-#include "ixion/model_context.hpp"
 #include "ixion/hash_container/map.hpp"
+
+#include "ixion/interface/model_context.hpp"
 
 #include <vector>
 #include <iostream>
@@ -48,7 +49,7 @@ namespace {
 class cell_printer : public unary_function<const base_cell*, void>
 {
 public:
-    cell_printer(const model_context& cxt) : m_cxt(cxt) {}
+    cell_printer(const interface::model_context& cxt) : m_cxt(cxt) {}
 
     void operator() (const base_cell* p) const
     {
@@ -56,7 +57,7 @@ public:
     }
 
 private:
-    const model_context& m_cxt;
+    const interface::model_context& m_cxt;
 };
 
 /**
@@ -74,9 +75,9 @@ struct cell_reset_handler : public unary_function<base_cell*, void>
 
 class circular_check_handler : public unary_function<base_cell*, void>
 {
-    const model_context& m_context;
+    const interface::model_context& m_context;
 public:
-    circular_check_handler(const model_context& cxt) : m_context(cxt) {}
+    circular_check_handler(const interface::model_context& cxt) : m_context(cxt) {}
 
     void operator() (base_cell* p) const
     {
@@ -97,7 +98,7 @@ struct thread_queue_handler : public unary_function<base_cell*, void>
 
 struct cell_interpret_handler : public unary_function<base_cell*, void>
 {
-    cell_interpret_handler(const model_context& cxt) :
+    cell_interpret_handler(const interface::model_context& cxt) :
         m_context(cxt) {}
 
     void operator() (base_cell* p) const
@@ -106,7 +107,7 @@ struct cell_interpret_handler : public unary_function<base_cell*, void>
         static_cast<formula_cell*>(p)->interpret(m_context);
     }
 private:
-    const model_context& m_context;
+    const interface::model_context& m_context;
 };
 
 }
@@ -121,7 +122,8 @@ void dependency_tracker::cell_back_inserter::operator() (base_cell* cell)
 
 // ============================================================================
 
-dependency_tracker::dependency_tracker(const dirty_cells_t& dirty_cells, const model_context& cxt) :
+dependency_tracker::dependency_tracker(
+    const dirty_cells_t& dirty_cells, const interface::model_context& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }
