@@ -40,7 +40,12 @@
 namespace ixion {
 
 class formula_cell;
+
+namespace interface {
+
 class model_context;
+
+}
 
 /**
  * The formula interpreter parses a series of formula tokens representing a
@@ -62,7 +67,7 @@ class formula_interpreter : public ::boost::noncopyable
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
-    formula_interpreter(const formula_cell* cell, const model_context& cxt);
+    formula_interpreter(const formula_cell* cell, const interface::model_context& cxt);
     ~formula_interpreter();
 
     void set_origin(const abs_address_t& pos);
@@ -102,7 +107,7 @@ private:
 private:
     const formula_cell*         m_parent_cell;
     const formula_tokens_t&     m_original_tokens;
-    const model_context&        m_context;
+    const interface::model_context& m_context;
     abs_address_t               m_pos;
 
     value_stack_t m_stack;

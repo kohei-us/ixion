@@ -27,8 +27,8 @@
 
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_tokens.hpp"
-#include "ixion/model_context.hpp"
 #include "ixion/matrix.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #ifdef max
 #undef max
@@ -109,7 +109,7 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-formula_functions::formula_functions(const model_context& cxt) :
+formula_functions::formula_functions(const interface::model_context& cxt) :
     m_context(cxt)
 {
 }

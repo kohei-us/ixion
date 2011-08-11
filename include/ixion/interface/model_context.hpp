@@ -35,6 +35,7 @@ namespace ixion {
 
 class formula_name_resolver_base;
 class cell_listener_tracker;
+class matrix;
 struct abs_address_t;
 struct abs_range_t;
 
@@ -50,10 +51,23 @@ public:
     virtual const formula_name_resolver_base& get_name_resolver() const = 0;
     virtual cell_listener_tracker& get_cell_listener_tracker() = 0;
     virtual const base_cell* get_cell(const abs_address_t& addr) const = 0;
-    virtual base_cell* get_cell(const abs_address_t& addr) = 0;
     virtual cells_in_range* get_cells_in_range(const abs_range_t& range) const = 0;
     virtual ::std::string get_cell_name(const base_cell* p) const = 0;
     virtual abs_address_t get_cell_position(const base_cell* p) const= 0;
+    virtual const formula_cell* get_named_expression(const ::std::string& name) const = 0;
+    virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const = 0;
+
+    /**
+     * Obtain range value in matrix form.  Multi-sheet ranges are not 
+     * supported.  If the specified range consists of multiple sheets, it 
+     * throws an exception. 
+     * 
+     * @param range absolute, single-sheet range address.  Multi-sheet ranges 
+     *              are not allowed.
+     * 
+     * @return range value represented as matrix.
+     */
+    virtual matrix get_range_value(const abs_range_t& range) const = 0;
 };
 
 }}

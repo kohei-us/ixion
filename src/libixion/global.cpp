@@ -29,7 +29,8 @@
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/address.hpp"
 #include "ixion/matrix.hpp"
-#include "ixion/model_context.hpp"
+#include "ixion/cell.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -234,7 +235,7 @@ const abs_range_t& stack_value::get_range() const
     return *m_range;
 }
 
-value_stack_t::value_stack_t(const model_context& cxt) : m_context(cxt) {}
+value_stack_t::value_stack_t(const interface::model_context& cxt) : m_context(cxt) {}
 
 value_stack_t::const_iterator value_stack_t::begin() const
 {

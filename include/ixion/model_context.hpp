@@ -53,7 +53,7 @@ class model_context : public interface::model_context
 {
     friend class cells_in_range;
 
-    typedef ::boost::ptr_map< ::std::string, formula_cell> named_expressions_type;
+    typedef ::boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef ::boost::ptr_map<abs_address_t, base_cell> cell_store_type;
 public:
     model_context();
@@ -62,14 +62,16 @@ public:
     virtual const formula_name_resolver_base& get_name_resolver() const;
     virtual cell_listener_tracker& get_cell_listener_tracker();
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
-    virtual base_cell* get_cell(const abs_address_t& addr);
     virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range) const;
     virtual ::std::string get_cell_name(const base_cell* p) const;
     virtual abs_address_t get_cell_position(const base_cell* p) const;
+    virtual const formula_cell* get_named_expression(const ::std::string& name) const;
+    virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
+    virtual matrix get_range_value(const abs_range_t& range) const;
 
+    base_cell* get_cell(const abs_address_t& addr);
     void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
     void set_cell(const abs_address_t& addr, base_cell* cell);
-
 
     /**
      * Obtains a set of non-empty cells located within specified range.
@@ -80,22 +82,9 @@ public:
      */
     void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
 
-    /**
-     * Obtain range value in matrix form.  Multi-sheet ranges are not 
-     * supported.  If the specified range consists of multiple sheets, it 
-     * throws an exception. 
-     * 
-     * @param range absolute, single-sheet range address.  Multi-sheet ranges 
-     *              are not allowed.
-     * 
-     * @return range value represented as matrix.
-     */
-    matrix get_range_value(const abs_range_t& range) const;
 
     void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
     formula_cell* get_named_expression(const ::std::string& name);
-    const formula_cell* get_named_expression(const ::std::string& name) const;
-    const ::std::string* get_named_expression_name(const formula_cell* expr) const;
 
 private:
     formula_name_resolver_base* mp_name_resolver;
