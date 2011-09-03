@@ -86,6 +86,10 @@ BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile
                  ixion.pc
+                 include/Makefile
+                 include/ixion/Makefile
+                 include/ixion/hash_container/Makefile
+                 include/ixion/interface/Makefile
                  src/Makefile
                  src/libixion/Makefile])
 AC_OUTPUT
