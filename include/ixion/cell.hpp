@@ -35,6 +35,7 @@
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <string>
 
@@ -58,11 +59,10 @@ enum celltype_t
 
 // ============================================================================
 
-class base_cell
+class base_cell : boost::noncopyable
 {
 public:
     base_cell(celltype_t celltype);
-    base_cell(const base_cell& r);
     virtual ~base_cell() = 0;
 
     virtual double get_value() const = 0;
@@ -83,7 +83,6 @@ class string_cell : public base_cell
 {
 public:
     string_cell(const ::std::string& formula);
-    string_cell(const string_cell& r);
     virtual ~string_cell();
 
     virtual const char* print() const;
@@ -98,7 +97,7 @@ private:
 
 class formula_cell : public base_cell
 {
-    struct interpret_status
+    struct interpret_status : boost::noncopyable
     {
         ::boost::mutex mtx;
         ::boost::condition_variable cond;
@@ -106,14 +105,12 @@ class formula_cell : public base_cell
         formula_result* result;
 
         interpret_status();
-        interpret_status(const interpret_status& r);
         ~interpret_status();
     };
 
 public:
     formula_cell();
     formula_cell(formula_tokens_t& tokens);
-    formula_cell(const formula_cell& r);
     virtual ~formula_cell();
 
     virtual double get_value() const;
@@ -168,10 +165,10 @@ private:
 
 inline base_cell* new_clone(const base_cell& r)
 {
+    // TODO: Implement cloning and make this function usable.
     switch (r.get_celltype())
     {
         case celltype_formula:
-            return new formula_cell(static_cast<const formula_cell&>(r));
         case celltype_string:
         case celltype_unknown:
         default:

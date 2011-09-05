@@ -246,11 +246,6 @@ inline formula_token_base* new_clone(const formula_token_base& r)
     return NULL;
 }
 
-inline void delete_clone(const formula_token_base* p)
-{
-    delete p;
-}
-
 // ============================================================================
 
 }

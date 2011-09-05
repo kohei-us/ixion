@@ -85,11 +85,6 @@ base_cell::base_cell(celltype_t celltype) :
 {
 }
 
-base_cell::base_cell(const base_cell& r) :
-    m_celltype(r.m_celltype)
-{
-}
-
 base_cell::~base_cell()
 {
 }
@@ -107,12 +102,6 @@ string_cell::string_cell(const string& formula) :
 {
 }
 
-string_cell::string_cell(const string_cell& r) :
-    base_cell(r),
-    m_formula(r.m_formula)
-{
-}
-
 string_cell::~string_cell()
 {
 }
@@ -125,15 +114,7 @@ const char* string_cell::print() const
 // ============================================================================
 
 formula_cell::interpret_status::interpret_status() :
-    result(NULL)
-{}
-
-formula_cell::interpret_status::interpret_status(const interpret_status& r) :
-    result(NULL)
-{
-    if (r.result)
-        result = new formula_result(*r.result);
-}
+    result(NULL) {}
 
 formula_cell::interpret_status::~interpret_status()
 {
@@ -154,14 +135,6 @@ formula_cell::formula_cell(formula_tokens_t& tokens) :
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
-}
-
-formula_cell::formula_cell(const formula_cell& r) :
-    base_cell(r),
-    m_tokens(r.m_tokens),
-    m_interpret_status(r.m_interpret_status),
-    m_circular_safe(r.m_circular_safe)
-{
 }
 
 formula_cell::~formula_cell()
