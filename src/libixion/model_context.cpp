@@ -55,6 +55,7 @@ model_context::~model_context()
 
 const config& model_context::get_config() const
 {
+    return *mp_config;
 }
 
 const formula_name_resolver& model_context::get_name_resolver() const
