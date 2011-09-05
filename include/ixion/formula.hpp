@@ -52,10 +52,9 @@ void parse_formula_string(
  * Convert formula tokens into a human-readable string representation.
  *
  * @param tokens formula tokens.
- *
- * @return string representation of the formula tokens.
+ * @param str string representation of the formula tokens.
  */
-std::string print_formula_tokens(const formula_tokens_t& tokens);
+void print_formula_tokens(const formula_tokens_t& tokens, std::string& str);
 
 }
 

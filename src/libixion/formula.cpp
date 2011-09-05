@@ -29,6 +29,8 @@
 #include "ixion/formula_lexer.hpp"
 #include "ixion/formula_parser.hpp"
 
+#include <sstream>
+
 namespace ixion {
 
 void parse_formula_string(
@@ -46,9 +48,49 @@ void parse_formula_string(
     parser.get_tokens().swap(tokens);
 }
 
-std::string print_formula_tokens(const formula_tokens_t& tokens)
+void print_formula_tokens(const formula_tokens_t& tokens, std::string& str)
 {
-    return std::string();
+    std::ostringstream os;
+    formula_tokens_t::const_iterator itr = tokens.begin(), itr_end = tokens.end();
+    for (; itr != itr_end; ++itr)
+    {
+        switch (itr->get_opcode())
+        {
+            case fop_close:
+                os << ")";
+                break;
+            case fop_divide:
+                os << "/";
+                break;
+            case fop_minus:
+                os << "-";
+                break;
+            case fop_multiply:
+                os << "*";
+                break;
+            case fop_open:
+                os << "(";
+                break;
+            case fop_plus:
+                os << "+";
+                break;
+            case fop_value:
+                os << itr->get_value();
+                break;
+            case fop_err_no_ref:
+            case fop_function:
+            case fop_named_expression:
+            case fop_range_ref:
+            case fop_sep:
+            case fop_single_ref:
+            case fop_string:
+            case fop_unknown:
+            case fop_unresolved_ref:
+            default:
+                ;
+        }
+    }
+    str = os.str();
 }
 
 }

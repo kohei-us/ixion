@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,11 +30,6 @@
 using ::std::string;
 
 namespace ixion {
-
-const char* print_tokens(const formula_tokens_t& tokens, bool verbose)
-{
-    return "";
-}
 
 const char* get_opcode_name(fopcode_t oc)
 {
@@ -237,7 +232,7 @@ std::string unresolved_ref_token::get_name() const
 
 // ============================================================================
 
-function_token::function_token(size_t func_oc) : 
+function_token::function_token(size_t func_oc) :
     formula_token_base(fop_function),
     m_func_oc(func_oc)
 {

@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -124,7 +124,7 @@ const char* string_cell::print() const
 
 // ============================================================================
 
-formula_cell::interpret_status::interpret_status() : 
+formula_cell::interpret_status::interpret_status() :
     result(NULL)
 {}
 
@@ -187,7 +187,7 @@ double formula_cell::get_value() const
 
 const char* formula_cell::print() const
 {
-    return print_tokens(m_tokens, false);
+    return "";
 }
 
 const formula_tokens_t& formula_cell::get_tokens() const
@@ -204,10 +204,10 @@ void formula_cell::interpret(const interface::model_context& context)
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
 
         string cell_name = context.get_cell_name(this);
-    
+
         if (m_interpret_status.result)
         {
-            // When the result is already cached before the cell is interpreted, 
+            // When the result is already cached before the cell is interpreted,
             // it can mean the cell has circular dependency.
             if (m_interpret_status.result->get_type() == formula_result::rt_error)
             {
@@ -218,7 +218,7 @@ void formula_cell::interpret(const interface::model_context& context)
             }
             return;
         }
-    
+
         formula_interpreter fin(this, context);
         fin.set_origin(context.get_cell_position(this));
         m_interpret_status.result = new formula_result;

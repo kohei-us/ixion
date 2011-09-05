@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -27,10 +27,14 @@
 
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/address.hpp"
+#include "ixion/formula.hpp"
+#include "ixion/model_context.hpp"
 
 #include <iostream>
 #include <cassert>
 #include <string>
+#include <cstring>
+#include <sstream>
 
 using namespace std;
 using namespace ixion;
@@ -107,9 +111,46 @@ void test_address()
     assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
 }
 
+namespace {
+
+bool check_formula_expression(const model_context& cxt, const char* p)
+{
+    size_t n = strlen(p);
+    cout << "testing formula expression '" << p << "'" << endl;
+    formula_tokens_t tokens;
+    parse_formula_string(cxt, p, n, abs_address_t(), tokens);
+    std::string str;
+    print_formula_tokens(tokens, str);
+    int res = strcmp(p, str.c_str());
+    if (res)
+        cout << "formula expressions differ: '" << p << "' (before); '" << str << "' (after)" << endl;
+
+    return res == 0;
+}
+
+}
+
+void test_external_formula_functions()
+{
+    cout << "test external formula functions" << endl;
+    const char* exps[] = {
+        "1/3*1.4",
+        "2.3*(1+2)/(34*(3-2))",
+        "SUM(1,2,3)"
+    };
+    size_t num_exps = sizeof(exps) / sizeof(exps[0]);
+    model_context cxt;
+    for (size_t i = 0; i < num_exps; ++i)
+    {
+        bool result = check_formula_expression(cxt, exps[i]);
+        assert(result);
+    }
+}
+
 int main()
 {
     test_name_resolver();
     test_address();
+    test_external_formula_functions();
     return EXIT_SUCCESS;
 }
