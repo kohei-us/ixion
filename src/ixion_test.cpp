@@ -118,9 +118,9 @@ bool check_formula_expression(const model_context& cxt, const char* p)
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;
     formula_tokens_t tokens;
-    parse_formula_string(cxt, p, n, abs_address_t(), tokens);
+    parse_formula_string(cxt, abs_address_t(), p, n, tokens);
     std::string str;
-    print_formula_tokens(cxt, tokens, abs_address_t(), str);
+    print_formula_tokens(cxt, abs_address_t(), tokens, str);
     int res = strcmp(p, str.c_str());
     if (res)
         cout << "formula expressions differ: '" << p << "' (before) -> '" << str << "' (after)" << endl;

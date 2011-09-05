@@ -45,8 +45,8 @@ namespace ixion {
  * @param tokens formula tokens representing the parsed formula expression.
  */
 void parse_formula_string(
-    const interface::model_context& cxt, const char* p, size_t n, const abs_address_t& pos,
-    formula_tokens_t& tokens);
+    const interface::model_context& cxt, const abs_address_t& pos,
+    const char* p, size_t n, formula_tokens_t& tokens);
 
 /**
  * Convert formula tokens into a human-readable string representation.
@@ -55,8 +55,8 @@ void parse_formula_string(
  * @param str string representation of the formula tokens.
  */
 void print_formula_tokens(
-    const interface::model_context& cxt, const formula_tokens_t& tokens, const abs_address_t& pos,
-    std::string& str);
+    const interface::model_context& cxt, const abs_address_t& pos,
+    const formula_tokens_t& tokens, std::string& str);
 
 }
 

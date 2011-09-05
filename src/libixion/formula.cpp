@@ -35,7 +35,7 @@
 namespace ixion {
 
 void parse_formula_string(
-    const interface::model_context& cxt, const char* p, size_t n, const abs_address_t& pos,
+    const interface::model_context& cxt, const abs_address_t& pos, const char* p, size_t n,
     formula_tokens_t& tokens)
 {
     lexer_tokens_t lxr_tokens;
@@ -125,8 +125,8 @@ public:
 };
 
 void print_formula_tokens(
-    const interface::model_context& cxt, const formula_tokens_t& tokens, const abs_address_t& pos,
-    std::string& str)
+    const interface::model_context& cxt, const abs_address_t& pos,
+    const formula_tokens_t& tokens, std::string& str)
 {
     std::ostringstream os;
     std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, os));
