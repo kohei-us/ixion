@@ -24,5 +24,4 @@ libixion_HEADERS = \
 	model_context.hpp \
 	model_parser.hpp \
 	sort_input_parser.hpp \
-	thread.hpp \
-	types.hpp
+	thread.hpp

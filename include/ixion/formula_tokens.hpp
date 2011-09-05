@@ -29,13 +29,15 @@
 #define __FORMULA_TOKENS_HPP__
 
 #include <string>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 #include "ixion/address.hpp"
-#include "ixion/types.hpp"
 
 namespace ixion {
 
 class formula_token_base;
+
+typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
 
 const char* print_tokens(const formula_tokens_t& tokens, bool verbose);
 

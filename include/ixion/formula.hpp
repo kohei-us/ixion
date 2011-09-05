@@ -28,7 +28,7 @@
 #ifndef __IXION_INTERFACE_FORMULA_HPP__
 #define __IXION_INTERFACE_FORMULA_HPP__
 
-#include "ixion/types.hpp"
+#include "ixion/formula_tokens.hpp"
 
 namespace ixion {
 
