@@ -54,7 +54,9 @@ void parse_formula_string(
  * @param tokens formula tokens.
  * @param str string representation of the formula tokens.
  */
-void print_formula_tokens(const formula_tokens_t& tokens, std::string& str);
+void print_formula_tokens(
+    const interface::model_context& cxt, const formula_tokens_t& tokens, const abs_address_t& pos,
+    std::string& str);
 
 }
 

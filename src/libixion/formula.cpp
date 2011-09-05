@@ -28,6 +28,7 @@
 #include "ixion/formula.hpp"
 #include "ixion/formula_lexer.hpp"
 #include "ixion/formula_parser.hpp"
+#include "ixion/formula_functions.hpp"
 
 #include <sstream>
 
@@ -48,7 +49,9 @@ void parse_formula_string(
     parser.get_tokens().swap(tokens);
 }
 
-void print_formula_tokens(const formula_tokens_t& tokens, std::string& str)
+void print_formula_tokens(
+    const interface::model_context& cxt, const formula_tokens_t& tokens, const abs_address_t& pos,
+    std::string& str)
 {
     std::ostringstream os;
     formula_tokens_t::const_iterator itr = tokens.begin(), itr_end = tokens.end();
@@ -77,11 +80,38 @@ void print_formula_tokens(const formula_tokens_t& tokens, std::string& str)
             case fop_value:
                 os << itr->get_value();
                 break;
-            case fop_err_no_ref:
+            case fop_sep:
+                os << ",";
+            break;
             case fop_function:
+            {
+                formula_function_t fop = static_cast<formula_function_t>(itr->get_index());
+                switch (fop)
+                {
+                    case func_average:
+                        os << "AVERAGE";
+                        break;
+                    case func_max:
+                        os << "MAX";
+                        break;
+                    case func_min:
+                        os << "MIN";
+                        break;
+                    case func_sum:
+                        os << "SUM";
+                        break;
+                    case func_wait:
+                        os << "WAIT";
+                        break;
+                    case func_unknown:
+                    default:
+                        os << "<unknown function>";
+                }
+            }
+            break;
+            case fop_err_no_ref:
             case fop_named_expression:
             case fop_range_ref:
-            case fop_sep:
             case fop_single_ref:
             case fop_string:
             case fop_unknown:

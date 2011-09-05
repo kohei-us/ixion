@@ -120,10 +120,10 @@ bool check_formula_expression(const model_context& cxt, const char* p)
     formula_tokens_t tokens;
     parse_formula_string(cxt, p, n, abs_address_t(), tokens);
     std::string str;
-    print_formula_tokens(tokens, str);
+    print_formula_tokens(cxt, tokens, abs_address_t(), str);
     int res = strcmp(p, str.c_str());
     if (res)
-        cout << "formula expressions differ: '" << p << "' (before); '" << str << "' (after)" << endl;
+        cout << "formula expressions differ: '" << p << "' (before) -> '" << str << "' (after)" << endl;
 
     return res == 0;
 }
