@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -60,7 +60,6 @@ enum celltype_t
 
 class base_cell
 {
-    typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> listeners_type;
 public:
     base_cell(celltype_t celltype);
     base_cell(const base_cell& r);
@@ -129,7 +128,7 @@ public:
     void check_circular(const interface::model_context& cxt);
 
     /**
-     * Reset cell's internal state. 
+     * Reset cell's internal state.
      */
     void reset();
 
@@ -142,15 +141,15 @@ public:
 private:
     /**
      * Block until the result becomes available.
-     * 
+     *
      * @param lock mutex lock associated with the result cache data.
      */
     void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const;
 
     /**
-     * Check if this cell contains a circular reference. 
-     *  
-     * @return true if this cell contains no circular reference, hence 
+     * Check if this cell contains a circular reference.
+     *
+     * @return true if this cell contains no circular reference, hence
      *         considered "safe", false otherwise.
      */
     bool is_circular_safe() const;
@@ -168,7 +167,7 @@ private:
 // ============================================================================
 
 inline base_cell* new_clone(const base_cell& r)
-{    
+{
     switch (r.get_celltype())
     {
         case celltype_formula:
