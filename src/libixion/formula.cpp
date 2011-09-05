@@ -27,15 +27,23 @@
 
 #include "ixion/formula.hpp"
 #include "ixion/formula_lexer.hpp"
+#include "ixion/formula_parser.hpp"
 
 namespace ixion {
 
-void parse_formula_string(const char* p, size_t n, formula_tokens_t& tokens)
+void parse_formula_string(
+    const interface::model_context& cxt, const char* p, size_t n, const abs_address_t& pos,
+    formula_tokens_t& tokens)
 {
     lexer_tokens_t lxr_tokens;
     formula_lexer lexer(p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
+
+    formula_parser parser(lxr_tokens, cxt);
+    parser.set_origin(pos);
+    parser.parse();
+    parser.get_tokens().swap(tokens);
 }
 
 std::string print_formula_tokens(const formula_tokens_t& tokens)

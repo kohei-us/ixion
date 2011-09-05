@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -38,11 +38,11 @@
 
 namespace ixion {
 
-class model_context;
+namespace interface { class model_context; }
 
-/** 
- * Class formula_parser parses a series of primitive (or lexer) tokens 
- * passed on from the lexer, and turn them into a series of formula tokens. 
+/**
+ * Class formula_parser parses a series of primitive (or lexer) tokens
+ * passed on from the lexer, and turn them into a series of formula tokens.
  * It also picks up a list of cells that it depends on.
  */
 class formula_parser : public ::boost::noncopyable
@@ -54,7 +54,7 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, const model_context& cxt);
+    formula_parser(const lexer_tokens_t& tokens, const interface::model_context& cxt);
     ~formula_parser();
 
     void set_origin(const abs_address_t& pos);
@@ -62,7 +62,7 @@ public:
     void print_tokens() const;
 
     formula_tokens_t& get_tokens();
-    
+
 private:
     formula_parser(); // disabled
 
@@ -71,7 +71,7 @@ private:
     void value(const lexer_token_base& t);
 
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
-    const model_context&    m_context;
+    const interface::model_context& m_context;
     formula_tokens_t        m_formula_tokens;
     abs_address_t           m_pos;    // reference position (usually current cell). always absolute.
 };

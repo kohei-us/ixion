@@ -29,6 +29,7 @@
 #define __IXION_FORMULA_HPP__
 
 #include "ixion/formula_tokens.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #include <string>
 
@@ -37,11 +38,15 @@ namespace ixion {
 /**
  * Parse a raw formula expression string into formula tokens.
  *
+ * @param cxt model context.
  * @param p pointer to the first character of raw formula expression string.
  * @param n size of the raw formula expression string.
+ * @param pos address of the cell that has the formula expression.
  * @param tokens formula tokens representing the parsed formula expression.
  */
-void parse_formula_string(const char* p, size_t n, formula_tokens_t& tokens);
+void parse_formula_string(
+    const interface::model_context& cxt, const char* p, size_t n, const abs_address_t& pos,
+    formula_tokens_t& tokens);
 
 /**
  * Convert formula tokens into a human-readable string representation.

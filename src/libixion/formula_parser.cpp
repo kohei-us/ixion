@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,7 +28,7 @@
 #include "ixion/formula_parser.hpp"
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/model_context.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #include "ixion/hash_container/map.hpp"
 
@@ -59,7 +59,7 @@ public:
 
     void operator() (const formula_token_base& token) const
     {
-        fopcode_t oc = token.get_opcode();   
+        fopcode_t oc = token.get_opcode();
         ostringstream os;
         os << " ";
         os << "<" << get_opcode_name(oc) << ">'";
@@ -98,7 +98,7 @@ public:
             case fop_range_ref:
             {
                 range_t range = token.get_range_ref();
-                os << "(s=" << range.first.sheet << ":" << range.last.sheet 
+                os << "(s=" << range.first.sheet << ":" << range.last.sheet
                     << ",r=" << range.first.row << ":" << range.last.row
                     << ",c=" << range.first.column << ":" << range.last.column << ")";
             }
@@ -139,7 +139,7 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, const model_context& cxt) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, const interface::model_context& cxt) :
     m_tokens(tokens),
     m_context(cxt)
 {
@@ -284,7 +284,7 @@ void formula_parser::name(const lexer_token_base& t)
         {
             ostringstream os;
             os << "failed to resolve a name '" << name << "'.";
-            throw parse_error(os.str());      
+            throw parse_error(os.str());
         }
     }
 }
