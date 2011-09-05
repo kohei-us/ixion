@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/cells_in_range.hpp"
+#include "ixion/config.hpp"
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -38,6 +39,7 @@ using namespace std;
 namespace ixion {
 
 model_context::model_context() :
+    mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
     mp_range_tracker(new cell_listener_tracker(*this)),
     mp_cells_in_range(NULL)
@@ -45,8 +47,14 @@ model_context::model_context() :
 
 model_context::~model_context()
 {
+    delete mp_config;
+    delete mp_name_resolver;
     delete mp_range_tracker;
     delete mp_cells_in_range;
+}
+
+const config& model_context::get_config() const
+{
 }
 
 const formula_name_resolver& model_context::get_name_resolver() const

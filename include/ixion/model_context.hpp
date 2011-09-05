@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,14 +39,15 @@ namespace ixion {
 
 class cells_in_range;
 struct abs_address_t;
+struct config;
 class matrix;
 
 /**
- * This class stores all data relevant to current session.  You can think of 
- * this like a document model for each formula calculation run. 
- *  
- * I will eventually create an interface class for this which is to be 
- * sub-classed by the consumer application to provide access to the 
+ * This class stores all data relevant to current session.  You can think of
+ * this like a document model for each formula calculation run.
+ *
+ * I will eventually create an interface class for this which is to be
+ * sub-classed by the consumer application to provide access to the
  * application-specific context.
  */
 class model_context : public interface::model_context
@@ -58,7 +59,8 @@ class model_context : public interface::model_context
 public:
     model_context();
     virtual ~model_context();
-    
+
+    virtual const config& get_config() const;
     virtual const formula_name_resolver& get_name_resolver() const;
     virtual cell_listener_tracker& get_cell_listener_tracker();
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
@@ -75,9 +77,9 @@ public:
 
     /**
      * Obtains a set of non-empty cells located within specified range.
-     * 
+     *
      * @param range absolute range
-     * @param cells an array of pointers to non-empty cells.  The caller does 
+     * @param cells an array of pointers to non-empty cells.  The caller does
      *              not need to delete the instances.
      */
     void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
@@ -87,6 +89,7 @@ public:
     formula_cell* get_named_expression(const ::std::string& name);
 
 private:
+    config* mp_config;
     formula_name_resolver* mp_name_resolver;
     mutable cells_in_range* mp_cells_in_range;
     cell_listener_tracker* mp_range_tracker;

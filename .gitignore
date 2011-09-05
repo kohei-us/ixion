@@ -1,7 +1,10 @@
 aclocal.m4
 autom4te.cache
-config.*
 configure
+config.guess
+config.log
+config.status
+config.sub
 depcomp
 INSTALL
 install-sh

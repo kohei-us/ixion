@@ -6,6 +6,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	cell.cpp \
 	cell_queue_manager.cpp \
 	cells_in_range.cpp \
+	config.cpp \
 	depends_tracker.cpp \
 	formula.cpp \
 	formula_functions.cpp \
