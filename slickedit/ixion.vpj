@@ -236,6 +236,7 @@
 				<F N="../include/ixion/cells_in_range.hpp"/>
 				<F N="../include/ixion/depends_tracker.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
+				<F N="../include/ixion/formula.hpp"/>
 				<F N="../include/ixion/formula_functions.hpp"/>
 				<F N="../include/ixion/formula_interpreter.hpp"/>
 				<F N="../include/ixion/formula_lexer.hpp"/>
@@ -251,6 +252,7 @@
 				<F N="../include/ixion/model_parser.hpp"/>
 				<F N="../include/ixion/sort_input_parser.hpp"/>
 				<F N="../include/ixion/thread.hpp"/>
+				<F N="../include/ixion/types.hpp"/>
 			</Folder>
 		</Folder>
 		<Folder Name="../src">
@@ -261,6 +263,7 @@
 				<F N="../src/libixion/cell_queue_manager.cpp"/>
 				<F N="../src/libixion/cells_in_range.cpp"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>
+				<F N="../src/libixion/formula.cpp"/>
 				<F N="../src/libixion/formula_functions.cpp"/>
 				<F N="../src/libixion/formula_interpreter.cpp"/>
 				<F N="../src/libixion/formula_lexer.cpp"/>

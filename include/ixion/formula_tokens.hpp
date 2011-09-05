@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -29,15 +29,13 @@
 #define __FORMULA_TOKENS_HPP__
 
 #include <string>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 #include "ixion/address.hpp"
+#include "ixion/types.hpp"
 
 namespace ixion {
 
 class formula_token_base;
-
-typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
 
 const char* print_tokens(const formula_tokens_t& tokens, bool verbose);
 
@@ -73,9 +71,9 @@ enum fopcode_t {
 
 /**
  * Get a printable name for a formula opcode.
- * 
+ *
  * @param oc formula opcode
- * 
+ *
  * @return printable name for a formula opcode.
  */
 const char* get_opcode_name(fopcode_t oc);
@@ -149,7 +147,7 @@ private:
 // ============================================================================
 
 /**
- * Token that stores a cell reference.  Note that the address it stores may 
+ * Token that stores a cell reference.  Note that the address it stores may
  * be either relative to the origin cell or absolute.
  */
 class single_ref_token : public formula_token_base
