@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -67,7 +67,7 @@ void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& d
     if (itr == m_cell_listeners.end())
     {
         // No container for this src cell yet.  Create one.
-        pair<cell_store_type::iterator, bool> r = 
+        pair<cell_store_type::iterator, bool> r =
             m_cell_listeners.insert(cell_store_type::value_type(dest, new address_set_type));
         if (!r.second)
             throw general_error("failed to insert new address set to cell listener tracker.");
@@ -86,7 +86,7 @@ void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& ra
     if (itr == m_range_listeners.end())
     {
         // No container for this range yet.  Create one.
-        pair<range_store_type::iterator, bool> r = 
+        pair<range_store_type::iterator, bool> r =
             m_range_listeners.insert(range_store_type::value_type(range, new address_set_type));
         if (!r.second)
             throw general_error("failed to insert new address set to range listener tracker.");
@@ -150,7 +150,7 @@ class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::ad
     dirty_cells_t& m_dirty_cells;
     cell_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(model_context& cxt, dirty_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) : 
+    dirty_cell_inserter(model_context& cxt, dirty_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
     void operator() (const cell_listener_tracker::address_set_type* p)
@@ -291,7 +291,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
     listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "new listeners: ";
-    std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(), 
+    std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(),
                   cell_addr_printer(m_context.get_name_resolver()));
     cout << endl;
     __IXION_DEBUG_OUT__ << "--- end: target address: " << m_context.get_name_resolver().get_name(target) << endl;

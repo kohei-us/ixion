@@ -33,6 +33,8 @@
 
 namespace ixion {
 
+class base_cell;
+class formula_cell;
 class formula_name_resolver;
 class cell_listener_tracker;
 class matrix;
@@ -56,7 +58,6 @@ public:
 
     virtual const config& get_config() const = 0;
     virtual const formula_name_resolver& get_name_resolver() const = 0;
-    virtual cell_listener_tracker& get_cell_listener_tracker() = 0;
     virtual const base_cell* get_cell(const abs_address_t& addr) const = 0;
     virtual cells_in_range* get_cells_in_range(const abs_range_t& range) const = 0;
     virtual ::std::string get_cell_name(const base_cell* p) const = 0;
