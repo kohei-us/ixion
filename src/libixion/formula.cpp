@@ -49,63 +49,65 @@ void parse_formula_string(
     parser.get_tokens().swap(tokens);
 }
 
-void print_formula_tokens(
-    const interface::model_context& cxt, const formula_tokens_t& tokens, const abs_address_t& pos,
-    std::string& str)
+class print_formula_token : std::unary_function<formula_token_base, void>
 {
-    std::ostringstream os;
-    formula_tokens_t::const_iterator itr = tokens.begin(), itr_end = tokens.end();
-    for (; itr != itr_end; ++itr)
+    const interface::model_context& m_cxt;
+    std::ostringstream& m_os;
+public:
+    print_formula_token(const interface::model_context& cxt, std::ostringstream& os) :
+        m_cxt(cxt), m_os(os) {}
+
+    void operator() (const formula_token_base& token)
     {
-        switch (itr->get_opcode())
+        switch (token.get_opcode())
         {
             case fop_close:
-                os << ")";
+                m_os << ")";
                 break;
             case fop_divide:
-                os << "/";
+                m_os << "/";
                 break;
             case fop_minus:
-                os << "-";
+                m_os << "-";
                 break;
             case fop_multiply:
-                os << "*";
+                m_os << "*";
                 break;
             case fop_open:
-                os << "(";
+                m_os << "(";
                 break;
             case fop_plus:
-                os << "+";
+                m_os << "+";
                 break;
             case fop_value:
-                os << itr->get_value();
+                m_os << token.get_value();
                 break;
             case fop_sep:
-                os << ",";
+                m_os << ",";
             break;
             case fop_function:
             {
-                formula_function_t fop = static_cast<formula_function_t>(itr->get_index());
+                formula_function_t fop = static_cast<formula_function_t>(token.get_index());
                 switch (fop)
                 {
                     case func_average:
-                        os << "AVERAGE";
+                        m_os << "AVERAGE";
                         break;
                     case func_max:
-                        os << "MAX";
+                        m_os << "MAX";
                         break;
                     case func_min:
-                        os << "MIN";
+                        m_os << "MIN";
                         break;
                     case func_sum:
-                        os << "SUM";
+                        m_os << "SUM";
                         break;
                     case func_wait:
-                        os << "WAIT";
+                        m_os << "WAIT";
                         break;
                     case func_unknown:
                     default:
-                        os << "<unknown function>";
+                        m_os << "<unknown function>";
                 }
             }
             break;
@@ -120,6 +122,14 @@ void print_formula_tokens(
                 ;
         }
     }
+};
+
+void print_formula_tokens(
+    const interface::model_context& cxt, const formula_tokens_t& tokens, const abs_address_t& pos,
+    std::string& str)
+{
+    std::ostringstream os;
+    std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, os));
     str = os.str();
 }
 
