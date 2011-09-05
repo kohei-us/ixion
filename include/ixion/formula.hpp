@@ -30,9 +30,27 @@
 
 #include "ixion/formula_tokens.hpp"
 
+#include <string>
+
 namespace ixion {
 
+/**
+ * Parse a raw formula expression string into formula tokens.
+ *
+ * @param p pointer to the first character of raw formula expression string.
+ * @param n size of the raw formula expression string.
+ * @param tokens formula tokens representing the parsed formula expression.
+ */
 void parse_formula_string(const char* p, size_t n, formula_tokens_t& tokens);
+
+/**
+ * Convert formula tokens into a human-readable string representation.
+ *
+ * @param tokens formula tokens.
+ *
+ * @return string representation of the formula tokens.
+ */
+std::string print_formula_tokens(const formula_tokens_t& tokens);
 
 }
 

@@ -33,4 +33,9 @@ void parse_formula_string(const char* p, size_t n, formula_tokens_t& tokens)
 {
 }
 
+std::string print_formula_tokens(const formula_tokens_t& tokens)
+{
+    return std::string();
+}
+
 }
