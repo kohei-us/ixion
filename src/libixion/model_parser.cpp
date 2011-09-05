@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -118,8 +118,8 @@ private:
 class depcell_inserter : public unary_function<base_cell*, void>
 {
 public:
-    depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) : 
-        m_tracker(tracker), 
+    depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) :
+        m_tracker(tracker),
         m_dirty_cells(dirty_cells),
         mp_fcell(fcell) {}
 
@@ -139,7 +139,7 @@ class formula_cell_listener_handler : public unary_function<formula_token_base*,
 public:
     enum mode_t { mode_add, mode_remove };
 
-    explicit formula_cell_listener_handler(model_context& cxt, const abs_address_t& addr, mode_t mode) : 
+    explicit formula_cell_listener_handler(model_context& cxt, const abs_address_t& addr, mode_t mode) :
         m_context(cxt), m_listener_tracker(cxt.get_cell_listener_tracker()), m_addr(addr), m_mode(mode)
     {
 #if DEBUG_MODEL_PARSER
@@ -215,7 +215,7 @@ public:
 class ptr_name_map_builder : public unary_function<const base_cell*, void>
 {
 public:
-    ptr_name_map_builder(cell_ptr_name_map_t& map) : 
+    ptr_name_map_builder(cell_ptr_name_map_t& map) :
         m_map(map) {}
 
     void operator() (const base_cell* p) const
@@ -274,17 +274,17 @@ private:
 typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
 
 /**
- * Function object to convert each lexer token cell into formula token cell. 
- * Converted cells are put into the context object during this process. 
- * Note that each cell passed on to this function represents either a 
- * brand-new cell, or an edited cell. 
+ * Function object to convert each lexer token cell into formula token cell.
+ * Converted cells are put into the context object during this process.
+ * Note that each cell passed on to this function represents either a
+ * brand-new cell, or an edited cell.
  */
 class lexer_formula_cell_converter : public unary_function<model_parser::cell, void>
 {
     model_context& m_context;
     vector<address_cell_pair_type>& m_fcells;
 public:
-    lexer_formula_cell_converter(model_context& cxt, vector<address_cell_pair_type>& fcells) : 
+    lexer_formula_cell_converter(model_context& cxt, vector<address_cell_pair_type>& fcells) :
         m_context(cxt), m_fcells(fcells) {}
 
     void operator() (const model_parser::cell& model_cell)
@@ -346,7 +346,7 @@ public:
                     // especially during partial re-calculation.
                     vector<formula_token_base*> ref_tokens;
                     fcell->get_ref_tokens(ref_tokens);
-                    for_each(ref_tokens.begin(), ref_tokens.end(), 
+                    for_each(ref_tokens.begin(), ref_tokens.end(),
                              formula_cell_listener_handler(m_context,
                                  addr, formula_cell_listener_handler::mode_remove));
                 }
@@ -377,7 +377,7 @@ public:
 
 /**
  * Function object that goes through the references of each formula cell and
- * registers the formula cell as a listener to all its referenced cells. 
+ * registers the formula cell as a listener to all its referenced cells.
  */
 class formula_cell_ref_to_listener_handler : public unary_function<address_cell_pair_type, void>
 {
@@ -398,9 +398,9 @@ public:
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "  number of reference tokens: " << ref_tokens.size() << endl;
 #endif
-        for_each(ref_tokens.begin(), ref_tokens.end(), 
+        for_each(ref_tokens.begin(), ref_tokens.end(),
                  formula_cell_listener_handler(m_context,
-                     v.first, formula_cell_listener_handler::mode_add));        
+                     v.first, formula_cell_listener_handler::mode_add));
     }
 };
 
@@ -454,9 +454,9 @@ void parse_init(const char*& p, parse_data& data)
 
         formula = buf;
 
-        // tokenize the formula string, and create a formula cell 
+        // tokenize the formula string, and create a formula cell
         // with the tokens.
-        formula_lexer lexer(formula);
+        formula_lexer lexer(formula.get(), formula.size());
         lexer.tokenize();
         lexer_tokens_t tokens;
         lexer.swap_tokens(tokens);
@@ -508,7 +508,7 @@ void parse_result(const char*& p, model_parser::results_type& results)
     if (itr == results.end())
     {
         // This cell doesn't exist yet.
-        pair<model_parser::results_type::iterator, bool> r = 
+        pair<model_parser::results_type::iterator, bool> r =
             results.insert(model_parser::results_type::value_type(name_s, res));
         if (!r.second)
             throw model_parser::parse_error("failed to insert a new result.");
@@ -543,9 +543,9 @@ void ensure_unique_names(const vector<string>& cell_names)
 }
 
 /**
- * This is where primitive lexer tokens get converted to formula tokens, and 
- * any dependency tracking information gets built. 
- * 
+ * This is where primitive lexer tokens get converted to formula tokens, and
+ * any dependency tracking information gets built.
+ *
  * @param cells array of cells containing lexer tokens.  <i>This array only
  *              contains either new cells or edited cells.</i>
  * @param context context representing current session.
@@ -560,7 +560,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
     // First, convert each lexer token cell into formula token cell, and put
     // the formula cells into the context object.
-    for_each(cells.begin(), cells.end(), 
+    for_each(cells.begin(), cells.end(),
              lexer_formula_cell_converter(context, fcells));
 
 #if DEBUG_MODEL_PARSER
@@ -569,7 +569,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 
     // Next, go through the formula cells and their references, and register
     // the formula cells as listeners to their respective references.
-    for_each(fcells.begin(), fcells.end(), 
+    for_each(fcells.begin(), fcells.end(),
              formula_cell_ref_to_listener_handler(context));
 
     // Go through all the listeners and determine dirty cells - cells to be

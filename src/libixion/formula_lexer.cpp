@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,8 +36,6 @@ using namespace std;
 
 namespace ixion {
 
-// ============================================================================
-
 class tokenizer : public ::boost::noncopyable
 {
     enum buffer_type {
@@ -46,12 +44,13 @@ class tokenizer : public ::boost::noncopyable
     };
 
 public:
-    explicit tokenizer(lexer_tokens_t& tokens, const mem_str_buf& formula) :
+    explicit tokenizer(lexer_tokens_t& tokens, const char* p, size_t n) :
         m_tokens(tokens),
-        m_formula(formula),
         m_sep_arg(','),
         m_sep_decimal('.'),
-        mp(NULL),
+        mp_first(p),
+        mp_char(NULL),
+        m_size(n),
         m_pos(0),
         m_buf_type(buf_name)
     {
@@ -78,13 +77,14 @@ private:
     void flush_buffer();
 
 private:
-    lexer_tokens_t&     m_tokens;
-    const mem_str_buf&  m_formula;
+    lexer_tokens_t& m_tokens;
 
     char m_sep_arg;
     char m_sep_decimal;
 
-    const char* mp;
+    const char* mp_first;
+    const char* mp_char;
+    size_t m_size;
     size_t m_pos;
 
     mem_str_buf m_buf;
@@ -95,23 +95,22 @@ void tokenizer::run()
 {
     m_tokens.clear();
 
-    if (m_formula.empty())
+    if (!m_size)
         // Nothing to do.
         return;
 
-    mp = m_formula.get();
+    mp_char = mp_first;
     m_pos = 0;
 
-    size_t n = m_formula.size();
-    while (m_pos < n)
+    while (m_pos < m_size)
     {
-        if (*mp == m_sep_arg)
+        if (*mp_char == m_sep_arg)
         {
             sep_arg();
             continue;
         }
 
-        switch (*mp)
+        switch (*mp_char)
         {
             case '0':
             case '1':
@@ -170,9 +169,9 @@ void tokenizer::numeral()
         push_back();
         next();
 
-        if (is_digit(*mp))
+        if (is_digit(*mp_char))
             continue;
-        if (*mp == m_sep_decimal && ++sep_count <= 1)
+        if (*mp_char == m_sep_decimal && ++sep_count <= 1)
             continue;
         break;
     }
@@ -196,7 +195,7 @@ void tokenizer::space()
 void tokenizer::name()
 {
     if (m_buf_type != buf_name)
-    {    
+    {
         flush_buffer();
         m_buf_type = buf_name;
     }
@@ -256,14 +255,14 @@ void tokenizer::close_bracket()
 
 void tokenizer::next()
 {
-    ++mp;
+    ++mp_char;
     ++m_pos;
 }
 
 void tokenizer::push_back()
 {
     if (m_buf.empty())
-        m_buf.set_start(mp);
+        m_buf.set_start(mp_char);
     else
         m_buf.inc();
 }
@@ -309,21 +308,17 @@ const char* formula_lexer::tokenize_error::what() const throw()
     return m_msg.c_str();
 }
 
-formula_lexer::formula_lexer(const mem_str_buf& formula) :
-    m_formula(formula)
-{
-}
+formula_lexer::formula_lexer(const char* p, size_t n) :
+    mp_first(p), m_size(n) {}
 
-formula_lexer::~formula_lexer()
-{
-}
+formula_lexer::~formula_lexer() {}
 
 void formula_lexer::tokenize()
 {
 #if DEBUG_LEXER
-    cout << "formula string: '" << m_formula.str() << "'" << endl;
-#endif        
-    tokenizer tkr(m_tokens, m_formula);
+    cout << "formula string: '" << std::string(mp_first, m_size) << "'" << endl;
+#endif
+    tokenizer tkr(m_tokens, mp_first, m_size);
     tkr.run();
 }
 

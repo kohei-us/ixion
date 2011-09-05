@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -50,12 +50,12 @@ public:
         ::std::string m_msg;
     };
 
-    formula_lexer(const mem_str_buf& formula);
+    formula_lexer(const char* p, size_t n);
     ~formula_lexer();
 
     void tokenize();
 
-    /** 
+    /**
      * Note that this will empty the tokens stored inside the lexer instance.
      *
      * @param tokens token container to move the tokens to.
@@ -66,6 +66,8 @@ private:
     formula_lexer();
 
     lexer_tokens_t m_tokens;
+    const char* mp_first;
+    size_t m_size;
     mem_str_buf m_formula;
 };
 
