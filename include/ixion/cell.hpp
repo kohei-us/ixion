@@ -154,11 +154,9 @@ private:
     bool check_ref_for_circular_safety(const base_cell& ref);
 
 private:
-    formula_tokens_t    m_tokens;
-
-    mutable interpret_status    m_interpret_status;
-
-    bool m_circular_safe;
+    formula_tokens_t m_tokens;
+    mutable interpret_status m_interpret_status;
+    bool m_circular_safe:1;
 };
 
 // ============================================================================
