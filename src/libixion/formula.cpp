@@ -49,6 +49,8 @@ void parse_formula_string(
     parser.get_tokens().swap(tokens);
 }
 
+namespace {
+
 class print_formula_token : std::unary_function<formula_token_base, void>
 {
     const interface::model_context& m_cxt;
@@ -123,6 +125,8 @@ public:
         }
     }
 };
+
+}
 
 void print_formula_tokens(
     const interface::model_context& cxt, const abs_address_t& pos,
