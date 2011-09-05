@@ -25,8 +25,8 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_INTERFACE_FORMULA_HPP__
-#define __IXION_INTERFACE_FORMULA_HPP__
+#ifndef __IXION_FORMULA_HPP__
+#define __IXION_FORMULA_HPP__
 
 #include "ixion/formula_tokens.hpp"
 
