@@ -65,11 +65,7 @@ class base_cell : boost::noncopyable
 public:
     static void delete_instance(const base_cell* p);
 
-    base_cell(celltype_t celltype, double value);
-    base_cell(celltype_t celltype, size_t identifier);
-
     double get_value() const;
-
     celltype_t get_celltype() const;
 
 private:
@@ -79,6 +75,8 @@ private:
     celltype_t m_celltype;
 
 protected:
+    base_cell(celltype_t celltype, double value);
+    base_cell(celltype_t celltype, size_t identifier);
     ~base_cell();
 
     union {
