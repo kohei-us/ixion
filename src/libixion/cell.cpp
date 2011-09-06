@@ -80,13 +80,50 @@ private:
 
 }
 
-base_cell::base_cell(celltype_t celltype) :
-    m_celltype(celltype)
+void base_cell::delete_instance(const base_cell* p)
 {
+    if (!p)
+        return;
+
+    switch (p->get_celltype())
+    {
+        case celltype_string:
+            delete static_cast<const string_cell*>(p);
+        break;
+        case celltype_numeric:
+            delete static_cast<const numeric_cell*>(p);
+        break;
+        case celltype_formula:
+            delete static_cast<const formula_cell*>(p);
+        break;
+        default:
+            assert(!"unknown cell type instance attempted for deletion!");
+    }
 }
 
-base_cell::~base_cell()
+base_cell::base_cell(celltype_t celltype, double value) :
+    m_celltype(celltype),
+    m_value(value) {}
+
+base_cell::base_cell(celltype_t celltype, size_t identifier) :
+    m_celltype(celltype),
+    m_identifier(identifier) {}
+
+base_cell::~base_cell() {}
+
+double base_cell::get_value() const
 {
+    switch (m_celltype)
+    {
+        case celltype_formula:
+            return static_cast<const formula_cell*>(this)->get_value();
+        case celltype_numeric:
+            return m_value;
+        case celltype_string:
+        case celltype_unknown:
+        default:
+            return 0.0;
+    }
 }
 
 celltype_t base_cell::get_celltype() const
@@ -94,19 +131,11 @@ celltype_t base_cell::get_celltype() const
     return m_celltype;
 }
 
-// ============================================================================
+string_cell::string_cell(size_t identifier) :
+    base_cell(celltype_string, identifier) {}
 
-string_cell::string_cell(const string& formula) :
-    base_cell(celltype_string),
-    m_formula(formula)
-{
-}
-
-string_cell::~string_cell()
-{
-}
-
-// ============================================================================
+numeric_cell::numeric_cell(double value) :
+    base_cell(celltype_numeric, value) {}
 
 formula_cell::interpret_status::interpret_status() :
     result(NULL) {}
@@ -119,13 +148,13 @@ formula_cell::interpret_status::~interpret_status()
 // ============================================================================
 
 formula_cell::formula_cell() :
-    base_cell(celltype_formula),
+    base_cell(celltype_formula, static_cast<size_t>(0)),
     m_circular_safe(false)
 {
 }
 
 formula_cell::formula_cell(formula_tokens_t& tokens) :
-    base_cell(celltype_formula),
+    base_cell(celltype_formula, static_cast<size_t>(0)),
     m_circular_safe(false)
 {
     // Note that this will empty the passed token container !

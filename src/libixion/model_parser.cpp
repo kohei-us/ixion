@@ -325,15 +325,13 @@ public:
                 if (!p)
                 {
                     // No prior cell at this address. Create a new one.
-                    auto_ptr<base_cell> pcell(new formula_cell);
-                    m_context.set_cell(addr, pcell);
+                    m_context.set_cell(addr, new formula_cell);
                     fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
                 }
                 else if (p->get_celltype() != celltype_formula)
                 {
                     // Prior cell exists, but it's not a formula cell.
-                    auto_ptr<base_cell> pcell(new formula_cell);
-                    m_context.set_cell(addr, pcell);
+                    m_context.set_cell(addr, new formula_cell);
                     fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
                 }
                 else

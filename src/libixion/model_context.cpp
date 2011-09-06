@@ -68,19 +68,11 @@ cell_listener_tracker& model_context::get_cell_listener_tracker()
     return *mp_range_tracker;
 }
 
-void model_context::set_cell(const abs_address_t& addr, auto_ptr<base_cell>& cell)
-{
-#if DEBUG_MODEL_CONTEXT
-    cout << "model_context::set_cell: (sheet=" << addr.sheet << "; row=" << addr.row << "; col=" << addr.column << ")" << endl;
-#endif
-    m_cells.erase(addr);
-    m_cells.insert(addr, cell);
-}
-
 void model_context::set_cell(const abs_address_t& addr, base_cell* cell)
 {
-    auto_ptr<base_cell> p(cell);
-    set_cell(addr, p);
+    abs_address_t addr2(addr);
+    m_cells.erase(addr2);
+    m_cells.insert(addr2, cell);
 }
 
 const base_cell* model_context::get_cell(const abs_address_t& addr) const

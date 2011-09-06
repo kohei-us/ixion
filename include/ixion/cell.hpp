@@ -37,8 +37,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/noncopyable.hpp>
 
-#include <string>
-
 namespace ixion {
 
 class formula_result;
@@ -53,19 +51,24 @@ class model_context;
 enum celltype_t
 {
     celltype_string,
+    celltype_numeric,
     celltype_formula,
     celltype_unknown
 };
 
-// ============================================================================
-
+/**
+ * You can't delete a base_cell instance with the normal delete operator;
+ * you must call base_cell::delete_instance() to delete it.
+ */
 class base_cell : boost::noncopyable
 {
 public:
-    base_cell(celltype_t celltype);
-    virtual ~base_cell() = 0;
+    static void delete_instance(const base_cell* p);
 
-    virtual double get_value() const = 0;
+    base_cell(celltype_t celltype, double value);
+    base_cell(celltype_t celltype, size_t identifier);
+
+    double get_value() const;
 
     celltype_t get_celltype() const;
 
@@ -74,23 +77,33 @@ private:
 
 private:
     celltype_t m_celltype;
-};
 
-// ============================================================================
+protected:
+    ~base_cell();
+
+    union {
+        double m_value;
+        size_t m_identifier;
+    };
+};
 
 class string_cell : public base_cell
 {
 public:
-    string_cell(const ::std::string& formula);
-    virtual ~string_cell();
+    string_cell(size_t identifier);
 
 private:
     string_cell();
-
-    ::std::string m_formula;
 };
 
-// ============================================================================
+class numeric_cell : public base_cell
+{
+public:
+    numeric_cell(double value);
+
+private:
+    numeric_cell();
+};
 
 class formula_cell : public base_cell
 {
@@ -108,9 +121,9 @@ class formula_cell : public base_cell
 public:
     formula_cell();
     formula_cell(formula_tokens_t& tokens);
-    virtual ~formula_cell();
+    ~formula_cell();
 
-    virtual double get_value() const;
+    double get_value() const;
     const formula_tokens_t& get_tokens() const;
     void interpret(const interface::model_context& context);
 
@@ -169,6 +182,11 @@ inline base_cell* new_clone(const base_cell& r)
             ;
     }
     return NULL;
+}
+
+inline void delete_clone(const base_cell* p)
+{
+    base_cell::delete_instance(p);
 }
 
 inline bool operator <(const base_cell& l, const base_cell& r)

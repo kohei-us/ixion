@@ -72,7 +72,6 @@ public:
 
     cell_listener_tracker& get_cell_listener_tracker();
     base_cell* get_cell(const abs_address_t& addr);
-    void set_cell(const abs_address_t& addr, ::std::auto_ptr<base_cell>& cell);
     void set_cell(const abs_address_t& addr, base_cell* cell);
 
     /**
