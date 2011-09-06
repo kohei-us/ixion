@@ -195,8 +195,6 @@ void formula_cell::interpret(const interface::model_context& context)
     {
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
 
-        string cell_name = context.get_cell_name(this);
-
         if (m_interpret_status.result)
         {
             // When the result is already cached before the cell is interpreted,
@@ -205,7 +203,8 @@ void formula_cell::interpret(const interface::model_context& context)
             {
                 ostringstream os;
                 os << get_formula_result_output_separator() << endl;
-                os << cell_name << ": result = " << get_formula_error_name(m_interpret_status.result->get_error()) << endl;
+                os << context.get_cell_name(this) << ": result = "
+                    << get_formula_error_name(m_interpret_status.result->get_error()) << endl;
                 cout << os.str();
             }
             return;
