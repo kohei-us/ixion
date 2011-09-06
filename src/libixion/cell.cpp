@@ -128,7 +128,7 @@ double base_cell::get_value() const
 
 celltype_t base_cell::get_celltype() const
 {
-    return m_celltype;
+    return static_cast<celltype_t>(m_celltype & celltype_mask);
 }
 
 string_cell::string_cell(size_t identifier) :

@@ -50,10 +50,11 @@ class model_context;
 
 enum celltype_t
 {
-    celltype_string,
-    celltype_numeric,
-    celltype_formula,
-    celltype_unknown
+    celltype_unknown = 0x0000,
+    celltype_string  = 0x0001,
+    celltype_numeric = 0x0002,
+    celltype_formula = 0x0003,
+    celltype_mask    = 0x000F
 };
 
 /**
