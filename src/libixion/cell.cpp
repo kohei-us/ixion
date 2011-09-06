@@ -106,11 +106,6 @@ string_cell::~string_cell()
 {
 }
 
-const char* string_cell::print() const
-{
-    return m_formula.c_str();
-}
-
 // ============================================================================
 
 formula_cell::interpret_status::interpret_status() :
@@ -156,11 +151,6 @@ double formula_cell::get_value() const
 
     assert(m_interpret_status.result->get_type() == formula_result::rt_value);
     return m_interpret_status.result->get_value();
-}
-
-const char* formula_cell::print() const
-{
-    return "";
 }
 
 const formula_tokens_t& formula_cell::get_tokens() const

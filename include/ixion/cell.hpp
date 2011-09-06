@@ -66,7 +66,6 @@ public:
     virtual ~base_cell() = 0;
 
     virtual double get_value() const = 0;
-    virtual const char* print() const = 0;
 
     celltype_t get_celltype() const;
 
@@ -84,8 +83,6 @@ class string_cell : public base_cell
 public:
     string_cell(const ::std::string& formula);
     virtual ~string_cell();
-
-    virtual const char* print() const;
 
 private:
     string_cell();
@@ -114,7 +111,6 @@ public:
     virtual ~formula_cell();
 
     virtual double get_value() const;
-    virtual const char* print() const;
     const formula_tokens_t& get_tokens() const;
     void interpret(const interface::model_context& context);
 
