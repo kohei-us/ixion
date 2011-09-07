@@ -52,6 +52,7 @@ void test_size()
     cout << "string_cell: " << sizeof(string_cell) << endl;
     cout << "numeric_cell: " << sizeof(numeric_cell) << endl;
     cout << "formula_cell: " << sizeof(formula_cell) << endl;
+    cout << "formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
 }
 
 void test_name_resolver()
