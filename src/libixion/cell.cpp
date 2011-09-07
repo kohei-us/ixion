@@ -127,6 +127,16 @@ void base_cell::set_flag(int mask, bool value)
         m_data.flag &= ~mask;
 }
 
+bool base_cell::get_flag(int mask) const
+{
+    return (m_data.flag & mask);
+}
+
+void base_cell::reset_flag()
+{
+    m_data.flag = 0;
+}
+
 double base_cell::get_value() const
 {
     switch (get_celltype())
@@ -243,7 +253,7 @@ void formula_cell::interpret(const interface::model_context& context)
 
 bool formula_cell::is_circular_safe() const
 {
-    return (m_data.flag & FORMULA_CIRCULAR_SAFE);
+    return get_flag(FORMULA_CIRCULAR_SAFE);
 }
 
 void formula_cell::check_circular(const interface::model_context& cxt)
@@ -324,7 +334,7 @@ void formula_cell::reset()
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
-    m_data.flag = 0;
+    reset_flag();
 }
 
 void formula_cell::swap_tokens(formula_tokens_t& tokens)

@@ -72,13 +72,6 @@ public:
 private:
     base_cell(); // disabled
 
-protected:
-    base_cell(celltype_t celltype, double value);
-    base_cell(celltype_t celltype, size_t identifier);
-    ~base_cell();
-
-    void set_flag(int mask, bool value);
-
     union {
         int m_raw_bits:32;
         struct {
@@ -86,6 +79,15 @@ protected:
             int celltype:8;
         } m_data;
     };
+
+protected:
+    base_cell(celltype_t celltype, double value);
+    base_cell(celltype_t celltype, size_t identifier);
+    ~base_cell();
+
+    void set_flag(int mask, bool value);
+    bool get_flag(int mask) const;
+    void reset_flag();
 
     union {
         double m_value;
