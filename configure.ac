@@ -77,7 +77,7 @@ else
     DEFINES="$DEFINES -DMDDS_HASH_CONTAINER_BOOST"
 fi
 
-CXXFLAGS="$DEFINES -I$with_mdds_include_path -g"
+CXXFLAGS="$DEFINES -I$with_mdds_include_path -g -Os"
 
 AC_DEFINE(CXXFLAGS)
 

@@ -29,6 +29,7 @@
 #include "ixion/address.hpp"
 #include "ixion/formula.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/cell.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -38,6 +39,20 @@
 
 using namespace std;
 using namespace ixion;
+
+void test_size()
+{
+    cout << "test size" << endl;
+    cout << "int: " << sizeof(int) << endl;
+    cout << "long: " << sizeof(long) << endl;
+    cout << "double: " << sizeof(double) << endl;
+    cout << "size_t: " << sizeof(size_t) << endl;
+    cout << "celltype_t: " << sizeof(celltype_t) << endl;
+    cout << "base_cell: " << sizeof(base_cell) << endl;
+    cout << "string_cell: " << sizeof(string_cell) << endl;
+    cout << "numeric_cell: " << sizeof(numeric_cell) << endl;
+    cout << "formula_cell: " << sizeof(formula_cell) << endl;
+}
 
 void test_name_resolver()
 {
@@ -149,6 +164,7 @@ void test_external_formula_functions()
 
 int main()
 {
+    test_size();
     test_name_resolver();
     test_address();
     test_external_formula_functions();

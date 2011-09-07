@@ -41,6 +41,8 @@
 
 #define DEBUG_FORMULA_CELL 0
 
+#define FORMULA_CIRCULAR_SAFE 0x000001
+
 using namespace std;
 
 namespace ixion {
@@ -102,18 +104,32 @@ void base_cell::delete_instance(const base_cell* p)
 }
 
 base_cell::base_cell(celltype_t celltype, double value) :
-    m_celltype(celltype),
-    m_value(value) {}
+    m_raw_bits(0),
+    m_value(value)
+{
+    m_data.celltype = celltype;
+}
 
 base_cell::base_cell(celltype_t celltype, size_t identifier) :
-    m_celltype(celltype),
-    m_identifier(identifier) {}
+    m_raw_bits(0),
+    m_identifier(identifier)
+{
+    m_data.celltype = celltype;
+}
 
 base_cell::~base_cell() {}
 
+void base_cell::set_flag(int mask, bool value)
+{
+    if (value)
+        m_data.flag |= mask;
+    else
+        m_data.flag &= ~mask;
+}
+
 double base_cell::get_value() const
 {
-    switch (m_celltype)
+    switch (get_celltype())
     {
         case celltype_formula:
             return static_cast<const formula_cell*>(this)->get_value();
@@ -128,7 +144,7 @@ double base_cell::get_value() const
 
 celltype_t base_cell::get_celltype() const
 {
-    return static_cast<celltype_t>(m_celltype & celltype_mask);
+    return static_cast<celltype_t>(m_data.celltype & celltype_mask);
 }
 
 string_cell::string_cell(size_t identifier) :
@@ -148,14 +164,12 @@ formula_cell::interpret_status::~interpret_status()
 // ============================================================================
 
 formula_cell::formula_cell() :
-    base_cell(celltype_formula, static_cast<size_t>(0)),
-    m_circular_safe(false)
+    base_cell(celltype_formula, static_cast<size_t>(0))
 {
 }
 
 formula_cell::formula_cell(formula_tokens_t& tokens) :
-    base_cell(celltype_formula, static_cast<size_t>(0)),
-    m_circular_safe(false)
+    base_cell(celltype_formula, static_cast<size_t>(0))
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
@@ -229,7 +243,7 @@ void formula_cell::interpret(const interface::model_context& context)
 
 bool formula_cell::is_circular_safe() const
 {
-    return m_circular_safe;
+    return (m_data.flag & FORMULA_CIRCULAR_SAFE);
 }
 
 void formula_cell::check_circular(const interface::model_context& cxt)
@@ -283,7 +297,7 @@ void formula_cell::check_circular(const interface::model_context& cxt)
     }
 
     // No circular dependencies.  Good.
-    m_circular_safe = true;
+    set_flag(FORMULA_CIRCULAR_SAFE, true);
 }
 
 bool formula_cell::check_ref_for_circular_safety(const base_cell& ref)
@@ -310,7 +324,7 @@ void formula_cell::reset()
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
-    m_circular_safe = false;
+    m_data.flag = 0;
 }
 
 void formula_cell::swap_tokens(formula_tokens_t& tokens)

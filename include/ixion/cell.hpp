@@ -72,13 +72,20 @@ public:
 private:
     base_cell(); // disabled
 
-private:
-    celltype_t m_celltype;
-
 protected:
     base_cell(celltype_t celltype, double value);
     base_cell(celltype_t celltype, size_t identifier);
     ~base_cell();
+
+    void set_flag(int mask, bool value);
+
+    union {
+        int m_raw_bits:32;
+        struct {
+            int flag:24;
+            int celltype:8;
+        } m_data;
+    };
 
     union {
         double m_value;
@@ -160,7 +167,6 @@ private:
 private:
     formula_tokens_t m_tokens;
     mutable interpret_status m_interpret_status;
-    bool m_circular_safe:1;
 };
 
 // ============================================================================
