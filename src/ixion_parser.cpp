@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -45,7 +45,7 @@ int main (int argc, char** argv)
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "print this help.")
-        ("thread,t", po::value<size_t>(), 
+        ("thread,t", po::value<size_t>(),
          "specify the number of threads to use for calculation.  Note that the number specified by this option corresponds with the number of calculation threads i.e. those child threads that perform cell interpretations.  The main thread does not perform any calculations; instead, it creates a new child thread to manage the calculation threads, the number of which is specified by the arg.  Therefore, the total number of threads used by this program will be arg + 2.");
 
     po::options_description hidden("Hidden options");

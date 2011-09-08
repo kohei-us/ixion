@@ -64,9 +64,22 @@ const formula_name_resolver& model_context::get_name_resolver() const
 
 void model_context::set_cell(const abs_address_t& addr, base_cell* cell)
 {
+    erase_cell(addr);
     abs_address_t addr2(addr);
-    m_cells.erase(addr2);
     m_cells.insert(addr2, cell);
+}
+
+void model_context::erase_cell(const abs_address_t& addr)
+{
+    cell_store_type::iterator itr = m_cells.find(addr);
+    if (itr == m_cells.end())
+        return;
+
+    const base_cell& cell = *itr->second;
+    if (cell.get_celltype() == celltype_formula)
+        remove_formula_tokens(cell.get_identifier());
+
+    m_cells.erase(itr);
 }
 
 const base_cell* model_context::get_cell(const abs_address_t& addr) const
@@ -158,7 +171,14 @@ matrix model_context::get_range_value(const abs_range_t& range) const
 
 formula_tokens_t* model_context::get_formula_tokens(size_t identifier)
 {
-    if (m_tokens.size() >= identifier)
+    if (m_tokens.size() <= identifier)
+        return NULL;
+    return m_tokens[identifier];
+}
+
+const formula_tokens_t* model_context::get_formula_tokens(size_t identifier) const
+{
+    if (m_tokens.size() <= identifier)
         return NULL;
     return m_tokens[identifier];
 }

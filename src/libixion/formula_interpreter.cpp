@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -57,8 +57,8 @@ opcode_token paren_close = opcode_token(fop_close);
 
 formula_interpreter::formula_interpreter(const formula_cell* cell, const interface::model_context& cxt) :
     m_parent_cell(cell),
-    m_original_tokens(cell->get_tokens()),
     m_context(cxt),
+    m_token_identifier(cell->get_tokens_identifier()),
     m_stack(cxt),
     m_result(0.0),
     m_error(fe_no_error)
@@ -138,7 +138,11 @@ void formula_interpreter::init_tokens()
     name_set used_names;
     m_tokens.clear();
     m_stack.clear();
-    formula_tokens_t::const_iterator itr = m_original_tokens.begin(), itr_end = m_original_tokens.end();
+    const formula_tokens_t* orig_tokens = m_context.get_formula_tokens(m_token_identifier);
+    if (!orig_tokens)
+        return;
+
+    formula_tokens_t::const_iterator itr = orig_tokens->begin(), itr_end = orig_tokens->end();
     for (; itr != itr_end; ++itr)
     {
         const formula_token_base* p = &(*itr);
@@ -167,9 +171,13 @@ void formula_interpreter::expand_named_expression(
         throw invalid_expression(os.str());
     }
 
-    const formula_tokens_t& expr_tokens = expr->get_tokens();
+    size_t tokens_id = expr->get_tokens_identifier();
+    const formula_tokens_t* expr_tokens = m_context.get_formula_tokens(tokens_id);
+    if (!expr_tokens)
+        return;
+
     m_tokens.push_back(&paren_open);
-    formula_tokens_t::const_iterator itr = expr_tokens.begin(), itr_end = expr_tokens.end();
+    formula_tokens_t::const_iterator itr = expr_tokens->begin(), itr_end = expr_tokens->end();
     for (; itr != itr_end; ++itr)
     {
         if (itr->get_opcode() == fop_named_expression)

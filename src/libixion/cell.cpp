@@ -152,6 +152,11 @@ double base_cell::get_value() const
     }
 }
 
+size_t base_cell::get_identifier() const
+{
+    return get_celltype() == celltype_numeric ? 0 : m_identifier;
+}
+
 celltype_t base_cell::get_celltype() const
 {
     return static_cast<celltype_t>(m_data.celltype & celltype_mask);
@@ -178,11 +183,9 @@ formula_cell::formula_cell() :
 {
 }
 
-formula_cell::formula_cell(formula_tokens_t& tokens) :
-    base_cell(celltype_formula, static_cast<size_t>(0))
+formula_cell::formula_cell(size_t tokens_identifier) :
+    base_cell(celltype_formula, tokens_identifier)
 {
-    // Note that this will empty the passed token container !
-    m_tokens.swap(tokens);
 }
 
 formula_cell::~formula_cell()
@@ -206,9 +209,9 @@ double formula_cell::get_value() const
     return m_interpret_status.result->get_value();
 }
 
-const formula_tokens_t& formula_cell::get_tokens() const
+size_t formula_cell::get_tokens_identifier() const
 {
-    return m_tokens;
+    return m_identifier;
 }
 
 void formula_cell::interpret(const interface::model_context& context)
@@ -259,8 +262,8 @@ bool formula_cell::is_circular_safe() const
 void formula_cell::check_circular(const interface::model_context& cxt)
 {
     // TODO: Check to make sure this is being run on the main thread only.
-
-    formula_tokens_t::iterator itr = m_tokens.begin(), itr_end = m_tokens.end();
+    const formula_tokens_t* tokens = cxt.get_formula_tokens(m_identifier);
+    formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();
     for (; itr != itr_end; ++itr)
     {
         switch (itr->get_opcode())
@@ -337,15 +340,21 @@ void formula_cell::reset()
     reset_flag();
 }
 
-void formula_cell::swap_tokens(formula_tokens_t& tokens)
+void formula_cell::swap_tokens(interface::model_context& cxt, formula_tokens_t& tokens)
 {
-    m_tokens.swap(tokens);
+    formula_tokens_t* new_tokens = new formula_tokens_t;
+    new_tokens->swap(tokens);
+    m_identifier = cxt.add_formula_tokens(new_tokens);
 }
 
-void formula_cell::get_ref_tokens(vector<formula_token_base*>& tokens)
+void formula_cell::get_ref_tokens(interface::model_context& cxt, vector<formula_token_base*>& tokens)
 {
+    formula_tokens_t* this_tokens = cxt.get_formula_tokens(m_identifier);
+    if (!this_tokens)
+        return;
+
     ref_token_picker func;
-    for_each(m_tokens.begin(), m_tokens.end(), func).swap_tokens(tokens);
+    for_each(this_tokens->begin(), this_tokens->end(), func).swap_tokens(tokens);
 }
 
 const formula_result* formula_cell::get_result_cache() const

@@ -67,6 +67,7 @@ public:
     static void delete_instance(const base_cell* p);
 
     double get_value() const;
+    size_t get_identifier() const;
     celltype_t get_celltype() const;
 
 private:
@@ -124,11 +125,11 @@ class formula_cell : public base_cell
 
 public:
     formula_cell();
-    formula_cell(formula_tokens_t& tokens);
+    formula_cell(size_t tokens_identifier);
     ~formula_cell();
 
     double get_value() const;
-    const formula_tokens_t& get_tokens() const;
+    size_t get_tokens_identifier() const;
     void interpret(const interface::model_context& context);
 
     /**
@@ -142,9 +143,9 @@ public:
      */
     void reset();
 
-    void swap_tokens(formula_tokens_t& tokens);
+    void swap_tokens(interface::model_context& cxt, formula_tokens_t& tokens);
 
-    void get_ref_tokens(::std::vector<formula_token_base*>& tokens);
+    void get_ref_tokens(interface::model_context& cxt, std::vector<formula_token_base*>& tokens);
 
     const formula_result* get_result_cache() const;
 
@@ -167,7 +168,6 @@ private:
     bool check_ref_for_circular_safety(const base_cell& ref);
 
 private:
-    formula_tokens_t m_tokens;
     mutable interpret_status m_interpret_status;
 };
 

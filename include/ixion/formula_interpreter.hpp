@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -50,15 +50,15 @@ class model_context;
 /**
  * The formula interpreter parses a series of formula tokens representing a
  * formula expression, and calculates the result of that expression.
- *  
- * <p>Intermediate result of each handler is pushed onto the stack and 
- * popped from it for the calling method to retrieve.  By the end of the 
+ *
+ * <p>Intermediate result of each handler is pushed onto the stack and
+ * popped from it for the calling method to retrieve.  By the end of the
  * interpretation there should only be one result left on the stack which is
- * the final result of the interpretation of the expression.  The number of 
- * intermediate results (or stack values) on the stack is normally one at 
+ * the final result of the interpretation of the expression.  The number of
+ * intermediate results (or stack values) on the stack is normally one at
  * the end of each handler, except for the function handler where the number
  * of stack values may be more than one when the function may take more than
- * one argument.</p> 
+ * one argument.</p>
  */
 class formula_interpreter : public ::boost::noncopyable
 {
@@ -77,8 +77,8 @@ public:
 
 private:
     /**
-     * Expand all named expressions into a flat set of tokens.  This is also 
-     * where we detect circular referencing of named expressions. 
+     * Expand all named expressions into a flat set of tokens.  This is also
+     * where we detect circular referencing of named expressions.
      */
     void init_tokens();
 
@@ -106,8 +106,8 @@ private:
 
 private:
     const formula_cell*         m_parent_cell;
-    const formula_tokens_t&     m_original_tokens;
     const interface::model_context& m_context;
+    size_t                      m_token_identifier;
     abs_address_t               m_pos;
 
     value_stack_t m_stack;

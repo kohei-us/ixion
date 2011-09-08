@@ -244,7 +244,7 @@ public:
         // Register cell dependencies.
         formula_cell* fcell = static_cast<formula_cell*>(pcell);
         vector<formula_token_base*> ref_tokens;
-        fcell->get_ref_tokens(ref_tokens);
+        fcell->get_ref_tokens(m_context, ref_tokens);
 
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;
@@ -343,7 +343,7 @@ public:
                     // itself as their listener.  This step is important
                     // especially during partial re-calculation.
                     vector<formula_token_base*> ref_tokens;
-                    fcell->get_ref_tokens(ref_tokens);
+                    fcell->get_ref_tokens(m_context, ref_tokens);
                     for_each(ref_tokens.begin(), ref_tokens.end(),
                              formula_cell_listener_handler(m_context,
                                  addr, formula_cell_listener_handler::mode_remove));
@@ -369,7 +369,7 @@ public:
         fparser.print_tokens();
 
         // Put the formula tokens into formula cell instance.
-        fcell->swap_tokens(fparser.get_tokens());
+        fcell->swap_tokens(m_context, fparser.get_tokens());
     }
 };
 
@@ -392,7 +392,7 @@ public:
 #endif
         // Now, register the formula cell as a listener to all its references.
         vector<formula_token_base*> ref_tokens;
-        fcell->get_ref_tokens(ref_tokens);
+        fcell->get_ref_tokens(m_context, ref_tokens);
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "  number of reference tokens: " << ref_tokens.size() << endl;
 #endif

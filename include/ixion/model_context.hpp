@@ -74,10 +74,12 @@ public:
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual formula_tokens_t* get_formula_tokens(size_t identifier);
+    virtual const formula_tokens_t* get_formula_tokens(size_t identifier) const;
     virtual size_t add_formula_tokens(formula_tokens_t* p);
     virtual void remove_formula_tokens(size_t identifier);
 
     void set_cell(const abs_address_t& addr, base_cell* cell);
+    void erase_cell(const abs_address_t& addr);
 
     /**
      * Obtains a set of non-empty cells located within specified range.
