@@ -63,6 +63,7 @@ public:
     virtual const config& get_config() const;
     virtual const formula_name_resolver& get_name_resolver() const;
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
+    virtual base_cell* get_cell(const abs_address_t& addr);
     virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range) const;
     virtual ::std::string get_cell_name(const base_cell* p) const;
     virtual abs_address_t get_cell_position(const base_cell* p) const;
@@ -71,7 +72,6 @@ public:
     virtual matrix get_range_value(const abs_range_t& range) const;
 
     cell_listener_tracker& get_cell_listener_tracker();
-    base_cell* get_cell(const abs_address_t& addr);
     void set_cell(const abs_address_t& addr, base_cell* cell);
 
     /**
