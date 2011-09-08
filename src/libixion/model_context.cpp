@@ -28,7 +28,6 @@
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
-#include "ixion/cell_listener_tracker.hpp"
 #include "ixion/cells_in_range.hpp"
 #include "ixion/config.hpp"
 
@@ -41,7 +40,6 @@ namespace ixion {
 model_context::model_context() :
     mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
-    mp_range_tracker(new cell_listener_tracker(*this)),
     mp_cells_in_range(NULL)
 {}
 
@@ -49,7 +47,6 @@ model_context::~model_context()
 {
     delete mp_config;
     delete mp_name_resolver;
-    delete mp_range_tracker;
     delete mp_cells_in_range;
 }
 
@@ -61,11 +58,6 @@ const config& model_context::get_config() const
 const formula_name_resolver& model_context::get_name_resolver() const
 {
     return *mp_name_resolver;
-}
-
-cell_listener_tracker& model_context::get_cell_listener_tracker()
-{
-    return *mp_range_tracker;
 }
 
 void model_context::set_cell(const abs_address_t& addr, base_cell* cell)

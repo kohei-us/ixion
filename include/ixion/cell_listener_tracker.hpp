@@ -49,6 +49,8 @@ class cell_listener_tracker
 {
     cell_listener_tracker(); // disabled
 public:
+    static cell_listener_tracker& get(interface::model_context& cxt);
+
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
     typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;
     typedef _ixion_unordered_map_type<abs_address_t, address_set_type*, abs_address_t::hash> cell_store_type;

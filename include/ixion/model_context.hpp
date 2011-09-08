@@ -71,7 +71,6 @@ public:
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
 
-    cell_listener_tracker& get_cell_listener_tracker();
     void set_cell(const abs_address_t& addr, base_cell* cell);
 
     /**
@@ -91,7 +90,6 @@ private:
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
     mutable cells_in_range* mp_cells_in_range;
-    cell_listener_tracker* mp_range_tracker;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
 };

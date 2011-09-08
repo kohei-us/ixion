@@ -140,7 +140,7 @@ public:
     enum mode_t { mode_add, mode_remove };
 
     explicit formula_cell_listener_handler(model_context& cxt, const abs_address_t& addr, mode_t mode) :
-        m_context(cxt), m_listener_tracker(cxt.get_cell_listener_tracker()), m_addr(addr), m_mode(mode)
+        m_context(cxt), m_listener_tracker(cell_listener_tracker::get(cxt)), m_addr(addr), m_mode(mode)
     {
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: cell position=" << m_addr.get_name() << endl;
@@ -172,11 +172,11 @@ public:
             {
                 abs_range_t range = p->get_range_ref().to_abs(m_addr);
                 if (m_mode == mode_add)
-                    m_context.get_cell_listener_tracker().add(m_addr, range);
+                    cell_listener_tracker::get(m_context).add(m_addr, range);
                 else
                 {
                     assert(m_mode == mode_remove);
-                    m_context.get_cell_listener_tracker().remove(m_addr, range);
+                    cell_listener_tracker::get(m_context).remove(m_addr, range);
                 }
             }
             break;
@@ -583,8 +583,9 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
 #endif
             formula_cell* fcell = itr->second;
             _dirty_cells.insert(fcell);
-            context.get_cell_listener_tracker().get_all_range_listeners(itr->first, _dirty_cells);
-            context.get_cell_listener_tracker().get_all_cell_listeners(itr->first, _dirty_cells);
+            cell_listener_tracker& tracker = cell_listener_tracker::get(context);
+            tracker.get_all_range_listeners(itr->first, _dirty_cells);
+            tracker.get_all_cell_listeners(itr->first, _dirty_cells);
         }
     }
 
@@ -594,7 +595,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
     for (; itr != itr_end; ++itr)
     {
         const abs_address_t& target = itr->first;
-        context.get_cell_listener_tracker().print_cell_listeners(target);
+        cell_listener_tracker::get(context).print_cell_listeners(target);
     }
 
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;

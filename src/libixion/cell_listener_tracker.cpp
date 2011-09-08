@@ -30,6 +30,8 @@
 #include "ixion/interface/model_context.hpp"
 #include "ixion/cell.hpp"
 
+#include <boost/scoped_ptr.hpp>
+
 #define DEBUG_CELL_LISTENER_TRACKER 0
 
 #if DEBUG_CELL_LISTENER_TRACKER
@@ -49,9 +51,18 @@ struct map_value_deleter : public unary_function<typename _T::value_type, void>
     }
 };
 
+boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
+
 }
 
 namespace ixion {
+
+cell_listener_tracker& cell_listener_tracker::get(interface::model_context& cxt)
+{
+    if (!p_instance)
+        p_instance.reset(new cell_listener_tracker(cxt));
+    return *p_instance;
+}
 
 cell_listener_tracker::cell_listener_tracker(interface::model_context& cxt) :
     m_context(cxt) {}
