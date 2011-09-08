@@ -32,6 +32,7 @@
 #include "ixion/interface/model_context.hpp"
 
 #include <string>
+#include <deque>
 #include <memory>
 #include <boost/ptr_container/ptr_map.hpp>
 
@@ -54,8 +55,10 @@ class model_context : public interface::model_context
 {
     friend class cells_in_range;
 
-    typedef ::boost::ptr_map<std::string, formula_cell> named_expressions_type;
-    typedef ::boost::ptr_map<abs_address_t, base_cell> cell_store_type;
+    typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
+    typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
+    typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
+
 public:
     model_context();
     virtual ~model_context();
@@ -70,6 +73,9 @@ public:
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
+    virtual formula_tokens_t* get_formula_tokens(size_t identifier);
+    virtual size_t add_formula_tokens(formula_tokens_t* p);
+    virtual void remove_formula_tokens(size_t identifier);
 
     void set_cell(const abs_address_t& addr, base_cell* cell);
 
@@ -92,6 +98,7 @@ private:
     mutable cells_in_range* mp_cells_in_range;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
+    formula_tokens_store_type m_tokens;
 };
 
 }

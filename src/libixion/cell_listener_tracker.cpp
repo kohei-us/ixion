@@ -42,15 +42,6 @@ using namespace std;
 
 namespace {
 
-template<typename _T>
-struct map_value_deleter : public unary_function<typename _T::value_type, void>
-{
-    void operator() (typename _T::value_type& v)
-    {
-        delete v.second;
-    }
-};
-
 boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
 
 }
@@ -70,8 +61,8 @@ cell_listener_tracker::cell_listener_tracker(interface::model_context& cxt) :
 cell_listener_tracker::~cell_listener_tracker()
 {
     // Delete all the listener set instances.
-    for_each(m_range_listeners.begin(), m_range_listeners.end(), map_value_deleter<range_store_type>());
-    for_each(m_cell_listeners.begin(), m_cell_listeners.end(), map_value_deleter<cell_store_type>());
+    for_each(m_range_listeners.begin(), m_range_listeners.end(), delete_map_value<range_store_type>());
+    for_each(m_cell_listeners.begin(), m_cell_listeners.end(), delete_map_value<cell_store_type>());
 }
 
 void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)

@@ -31,6 +31,8 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
+#include "ixion/formula_tokens_fwd.hpp"
+
 namespace ixion {
 
 class base_cell;
@@ -77,6 +79,10 @@ public:
      * @return range value represented as matrix.
      */
     virtual matrix get_range_value(const abs_range_t& range) const = 0;
+
+    virtual formula_tokens_t* get_formula_tokens(size_t identifier) = 0;
+    virtual size_t add_formula_tokens(formula_tokens_t* p) = 0;
+    virtual void remove_formula_tokens(size_t identifier) = 0;
 };
 
 }}

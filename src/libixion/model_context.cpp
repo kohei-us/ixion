@@ -48,6 +48,8 @@ model_context::~model_context()
     delete mp_config;
     delete mp_name_resolver;
     delete mp_cells_in_range;
+
+    for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
 }
 
 const config& model_context::get_config() const
@@ -152,6 +154,41 @@ matrix model_context::get_range_value(const abs_range_t& range) const
         }
     }
     return ret;
+}
+
+formula_tokens_t* model_context::get_formula_tokens(size_t identifier)
+{
+    if (m_tokens.size() >= identifier)
+        return NULL;
+    return m_tokens[identifier];
+}
+
+size_t model_context::add_formula_tokens(formula_tokens_t* p)
+{
+    // First, search for a NULL spot.
+    formula_tokens_store_type::iterator itr = std::find(
+        m_tokens.begin(), m_tokens.end(), static_cast<formula_tokens_t*>(NULL));
+
+    if (itr != m_tokens.end())
+    {
+        // NULL spot found.
+        size_t pos = std::distance(m_tokens.begin(), itr);
+        m_tokens[pos] = p;
+        return pos;
+    }
+
+    size_t identifier = m_tokens.size();
+    m_tokens.push_back(p);
+    return identifier;
+}
+
+void model_context::remove_formula_tokens(size_t identifier)
+{
+    if (m_tokens.size() >= identifier)
+        return;
+
+    delete m_tokens[identifier];
+    m_tokens[identifier] = NULL;
 }
 
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)
