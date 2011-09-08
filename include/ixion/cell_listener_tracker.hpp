@@ -48,6 +48,7 @@ namespace interface {
 class cell_listener_tracker
 {
     cell_listener_tracker(); // disabled
+    cell_listener_tracker(interface::model_context& cxt);
 public:
     static cell_listener_tracker& get(interface::model_context& cxt);
 
@@ -56,7 +57,6 @@ public:
     typedef _ixion_unordered_map_type<abs_address_t, address_set_type*, abs_address_t::hash> cell_store_type;
     typedef _ixion_unordered_map_type<abs_range_t, address_set_type*, abs_range_t::hash> range_store_type;
 
-    cell_listener_tracker(interface::model_context& cxt);
     ~cell_listener_tracker();
 
     /**
