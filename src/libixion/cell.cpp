@@ -157,6 +157,11 @@ size_t base_cell::get_identifier() const
     return get_celltype() == celltype_numeric ? 0 : m_identifier;
 }
 
+void base_cell::set_identifier(size_t identifier)
+{
+    m_identifier = identifier;
+}
+
 celltype_t base_cell::get_celltype() const
 {
     return static_cast<celltype_t>(m_data.celltype & celltype_mask);
@@ -333,13 +338,6 @@ void formula_cell::reset()
     delete m_interpret_status.result;
     m_interpret_status.result = NULL;
     reset_flag();
-}
-
-void formula_cell::swap_tokens(interface::model_context& cxt, formula_tokens_t& tokens)
-{
-    formula_tokens_t* new_tokens = new formula_tokens_t;
-    new_tokens->swap(tokens);
-    m_identifier = cxt.add_formula_tokens(new_tokens);
 }
 
 void formula_cell::get_ref_tokens(interface::model_context& cxt, vector<formula_token_base*>& tokens)

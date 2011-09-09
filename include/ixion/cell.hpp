@@ -68,6 +68,7 @@ public:
 
     double get_value() const;
     size_t get_identifier() const;
+    void set_identifier(size_t identifier);
     celltype_t get_celltype() const;
 
 private:
@@ -141,8 +142,6 @@ public:
      * Reset cell's internal state.
      */
     void reset();
-
-    void swap_tokens(interface::model_context& cxt, formula_tokens_t& tokens);
 
     void get_ref_tokens(interface::model_context& cxt, std::vector<formula_token_base*>& tokens);
 

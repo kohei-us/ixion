@@ -368,8 +368,10 @@ public:
         fparser.parse();
         fparser.print_tokens();
 
-        // Put the formula tokens into formula cell instance.
-        fcell->swap_tokens(m_context, fparser.get_tokens());
+        // Associate the formula tokens with the formula cell instance.
+        formula_tokens_t* p = new formula_tokens_t;
+        p->swap(fparser.get_tokens());
+        fcell->set_identifier(m_context.add_formula_tokens(p));
     }
 };
 
