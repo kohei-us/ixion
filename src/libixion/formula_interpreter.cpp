@@ -58,7 +58,7 @@ opcode_token paren_close = opcode_token(fop_close);
 formula_interpreter::formula_interpreter(const formula_cell* cell, const interface::model_context& cxt) :
     m_parent_cell(cell),
     m_context(cxt),
-    m_token_identifier(cell->get_tokens_identifier()),
+    m_token_identifier(cell->get_identifier()),
     m_stack(cxt),
     m_result(0.0),
     m_error(fe_no_error)
@@ -171,7 +171,7 @@ void formula_interpreter::expand_named_expression(
         throw invalid_expression(os.str());
     }
 
-    size_t tokens_id = expr->get_tokens_identifier();
+    size_t tokens_id = expr->get_identifier();
     const formula_tokens_t* expr_tokens = m_context.get_formula_tokens(tokens_id);
     if (!expr_tokens)
         return;

@@ -129,7 +129,6 @@ public:
     ~formula_cell();
 
     double get_value() const;
-    size_t get_tokens_identifier() const;
     void interpret(const interface::model_context& context);
 
     /**

@@ -209,11 +209,6 @@ double formula_cell::get_value() const
     return m_interpret_status.result->get_value();
 }
 
-size_t formula_cell::get_tokens_identifier() const
-{
-    return m_identifier;
-}
-
 void formula_cell::interpret(const interface::model_context& context)
 {
 #if DEBUG_FORMULA_CELL
