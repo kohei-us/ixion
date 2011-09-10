@@ -58,8 +58,11 @@ enum celltype_t
 };
 
 /**
- * You can't delete a base_cell instance with the normal delete operator;
- * you must call base_cell::delete_instance() to delete it.
+ * This class itself cannot be directly instantiated; you always need to
+ * instantiate its child classes.
+ *
+ * You can't delete a base_cell instance with the normal delete operator
+ * either; call base_cell::delete_instance() to delete it instead.
  */
 class base_cell : boost::noncopyable
 {
