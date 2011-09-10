@@ -96,8 +96,6 @@ bool formula_interpreter::interpret()
         m_error = fe_no_error;
         m_result = 0.0;
 
-//      m_outbuf.clear();
-
         expression();
         // there should only be one stack value left for the result value.
         assert(m_stack.size() == 1);
@@ -105,8 +103,6 @@ bool formula_interpreter::interpret()
 
         if (mp_handler)
             mp_handler->set_result(m_result);
-
-//      cout << m_outbuf.str();
 
         return true;
     }
