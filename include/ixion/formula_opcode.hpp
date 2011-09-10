@@ -25,37 +25,39 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_INTERFACE_SESSION_HANDLER_HPP__
-#define __IXION_INTERFACE_SESSION_HANDLER_HPP__
-
-#include "ixion/formula_opcode.hpp"
-#include "ixion/formula_function_opcode.hpp"
+#ifndef __IXION_FORMULA_OPCODE_HPP__
+#define __IXION_FORMULA_OPCODE_HPP__
 
 namespace ixion {
 
-class formula_cell;
-struct address_t;
-struct range_t;
-struct abs_address_t;
+/** formula opcode type */
+enum fopcode_t {
+    // data types
+    fop_single_ref,
+    fop_range_ref,
+    fop_named_expression,
+    fop_unresolved_ref,
+    fop_string,
+    fop_value,
+    fop_function,
 
-namespace interface {
+    // arithmetic operators
+    fop_plus,
+    fop_minus,
+    fop_divide,
+    fop_multiply,
 
-class session_handler
-{
-public:
-    virtual ~session_handler() {}
+    // parentheses, separators
+    fop_open,
+    fop_close,
+    fop_sep,
 
-    virtual void begin_cell_interpret(const formula_cell* p) = 0;
-    virtual void set_result(double result) = 0;
-    virtual void set_invalid_expression(const char* msg) = 0;
-    virtual void set_formula_error(const char* msg) = 0;
-    virtual void push_token(fopcode_t fop) = 0;
-    virtual void push_value(double val) = 0;
-    virtual void push_single_ref(const address_t& addr, const abs_address_t& pos) = 0;
-    virtual void push_range_ref(const range_t& range, const abs_address_t& pos) = 0;
-    virtual void push_function(formula_function_t foc) = 0;
+    // error conditions
+    fop_err_no_ref,
+
+    fop_unknown
 };
 
-}}
+}
 
 #endif

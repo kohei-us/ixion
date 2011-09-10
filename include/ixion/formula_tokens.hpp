@@ -33,38 +33,9 @@
 
 #include "ixion/address.hpp"
 #include "ixion/formula_tokens_fwd.hpp"
+#include "ixion/formula_opcode.hpp"
 
 namespace ixion {
-
-// ============================================================================
-
-/** formula opcode type */
-enum fopcode_t {
-    // data types
-    fop_single_ref,
-    fop_range_ref,
-    fop_named_expression,
-    fop_unresolved_ref,
-    fop_string,
-    fop_value,
-    fop_function,
-
-    // arithmetic operators
-    fop_plus,
-    fop_minus,
-    fop_divide,
-    fop_multiply,
-
-    // parentheses, separators
-    fop_open,
-    fop_close,
-    fop_sep,
-
-    // error conditions
-    fop_err_no_ref,
-
-    fop_unknown
-};
 
 /**
  * Get a printable name for a formula opcode.
@@ -74,6 +45,8 @@ enum fopcode_t {
  * @return printable name for a formula opcode.
  */
 const char* get_opcode_name(fopcode_t oc);
+
+const char* get_formula_opcode_string(fopcode_t oc);
 
 // ============================================================================
 

@@ -25,37 +25,25 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_INTERFACE_SESSION_HANDLER_HPP__
-#define __IXION_INTERFACE_SESSION_HANDLER_HPP__
-
-#include "ixion/formula_opcode.hpp"
-#include "ixion/formula_function_opcode.hpp"
+#ifndef __IXION_FORMULA_FUNCTION_OPCODE_HPP__
+#define __IXION_FORMULA_FUNCTION_OPCODE_HPP__
 
 namespace ixion {
 
-class formula_cell;
-struct address_t;
-struct range_t;
-struct abs_address_t;
-
-namespace interface {
-
-class session_handler
+enum formula_function_t
 {
-public:
-    virtual ~session_handler() {}
+    func_unknown = 0,
 
-    virtual void begin_cell_interpret(const formula_cell* p) = 0;
-    virtual void set_result(double result) = 0;
-    virtual void set_invalid_expression(const char* msg) = 0;
-    virtual void set_formula_error(const char* msg) = 0;
-    virtual void push_token(fopcode_t fop) = 0;
-    virtual void push_value(double val) = 0;
-    virtual void push_single_ref(const address_t& addr, const abs_address_t& pos) = 0;
-    virtual void push_range_ref(const range_t& range, const abs_address_t& pos) = 0;
-    virtual void push_function(formula_function_t foc) = 0;
+    func_max,
+    func_min,
+    func_average,
+    func_sum,
+
+    func_wait // dummy function used only for testing.
+
+    // TODO: more functions to come...
 };
 
-}}
+}
 
 #endif

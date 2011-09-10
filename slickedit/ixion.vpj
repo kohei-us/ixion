@@ -239,10 +239,12 @@
 				<F N="../include/ixion/depends_tracker.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
 				<F N="../include/ixion/formula.hpp"/>
+				<F N="../include/ixion/formula_function_opcode.hpp"/>
 				<F N="../include/ixion/formula_functions.hpp"/>
 				<F N="../include/ixion/formula_interpreter.hpp"/>
 				<F N="../include/ixion/formula_lexer.hpp"/>
 				<F N="../include/ixion/formula_name_resolver.hpp"/>
+				<F N="../include/ixion/formula_opcode.hpp"/>
 				<F N="../include/ixion/formula_parser.hpp"/>
 				<F N="../include/ixion/formula_result.hpp"/>
 				<F N="../include/ixion/formula_tokens.hpp"/>
@@ -287,6 +289,7 @@
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
 				<F N="../src/libixion/model_parser.cpp"/>
+				<F N="../src/libixion/session_handler.cpp"/>
 				<F N="../src/libixion/sort_input_parser.cpp"/>
 			</Folder>
 			<F N="../src/ixion_parser.cpp"/>

@@ -71,6 +71,38 @@ const char* get_opcode_name(fopcode_t oc)
     return "unknown";
 }
 
+const char* get_formula_opcode_string(fopcode_t oc)
+{
+    switch (oc)
+    {
+        case fop_close:
+            return ")";
+        case fop_divide:
+            return "/";
+        case fop_minus:
+            return "-";
+        case fop_multiply:
+            return "*";
+        case fop_open:
+            return "(";
+        case fop_plus:
+            return "+";
+        case fop_sep:
+            return ",";
+        case fop_string:
+        case fop_value:
+        case fop_function:
+        case fop_err_no_ref:
+        case fop_single_ref:
+        case fop_range_ref:
+        case fop_named_expression:
+        case fop_unresolved_ref:
+        default:
+            ;
+    }
+    return "";
+}
+
 // ============================================================================
 
 formula_token_base::formula_token_base(fopcode_t op) :

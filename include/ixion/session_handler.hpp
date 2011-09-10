@@ -29,16 +29,32 @@
 #define __IXION_SESSION_HANDLER_HPP__
 
 #include "ixion/interface/session_handler.hpp"
+#include "ixion/model_context.hpp"
+
+#include <string>
 
 namespace ixion {
 
 class session_handler : public interface::session_handler
 {
 public:
-    session_handler();
+    session_handler(const model_context& cxt);
     virtual ~session_handler();
 
-    virtual void begin_cell_interpret(const base_cell* p);
+    virtual void begin_cell_interpret(const formula_cell* p);
+    virtual void set_result(double result);
+    virtual void set_invalid_expression(const char* msg);
+    virtual void set_formula_error(const char* msg);
+
+    virtual void push_token(fopcode_t fop);
+    virtual void push_value(double val);
+    virtual void push_single_ref(const address_t& addr, const abs_address_t& pos);
+    virtual void push_range_ref(const range_t& range, const abs_address_t& pos);
+    virtual void push_function(formula_function_t foc);
+
+private:
+    const model_context& m_context;
+    std::string m_cell_name;
 };
 
 }

@@ -42,7 +42,7 @@ model_context::model_context() :
     mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
     mp_cells_in_range(NULL),
-    mp_session_handler(new session_handler)
+    mp_session_handler(new session_handler(*this))
 {}
 
 model_context::~model_context()

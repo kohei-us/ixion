@@ -44,6 +44,7 @@ class formula_cell;
 namespace interface {
 
 class model_context;
+class session_handler;
 
 }
 
@@ -107,6 +108,7 @@ private:
 private:
     const formula_cell*         m_parent_cell;
     const interface::model_context& m_context;
+    interface::session_handler* mp_handler;
     size_t                      m_token_identifier;
     abs_address_t               m_pos;
 
@@ -114,8 +116,6 @@ private:
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;
-
-    ::std::ostringstream        m_outbuf; // output buffer (for debug purposes)
 
     double m_result;
     formula_error_t m_error;

@@ -31,6 +31,7 @@
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/model_context.hpp"
+#include "ixion/interface/session_handler.hpp"
 
 #include <string>
 #include <iostream>
@@ -58,6 +59,7 @@ opcode_token paren_close = opcode_token(fop_close);
 formula_interpreter::formula_interpreter(const formula_cell* cell, const interface::model_context& cxt) :
     m_parent_cell(cell),
     m_context(cxt),
+    mp_handler(NULL),
     m_token_identifier(cell->get_identifier()),
     m_stack(cxt),
     m_result(0.0),
@@ -76,12 +78,9 @@ void formula_interpreter::set_origin(const abs_address_t& pos)
 
 bool formula_interpreter::interpret()
 {
-    string cell_name("<unknown cell>");
-    const string* p = m_context.get_named_expression_name(m_parent_cell);
-    if (p)
-        cell_name = *p;
-    else
-        cell_name = m_context.get_cell_name(m_parent_cell);
+    mp_handler = m_context.get_session_handler();
+    if (mp_handler)
+        mp_handler->begin_cell_interpret(m_parent_cell);
 
     try
     {
@@ -96,28 +95,33 @@ bool formula_interpreter::interpret()
         m_cur_token_itr = m_tokens.begin();
         m_error = fe_no_error;
         m_result = 0.0;
-        m_outbuf.clear();
-        m_outbuf << get_formula_result_output_separator() << endl;
-        m_outbuf << cell_name << ": ";
+
+//      m_outbuf.clear();
 
         expression();
         // there should only be one stack value left for the result value.
         assert(m_stack.size() == 1);
         m_result = m_stack.pop_value();
-        m_outbuf << endl << cell_name << ": result = " << m_result << endl;
-        cout << m_outbuf.str();
+
+        if (mp_handler)
+            mp_handler->set_result(m_result);
+
+//      cout << m_outbuf.str();
+
         return true;
     }
     catch (const invalid_expression& e)
     {
-        m_outbuf << endl << cell_name << ": invalid expression: " << e.what() << endl;
-        cout << m_outbuf.str();
+        if (mp_handler)
+            mp_handler->set_invalid_expression(e.what());
+
         m_error = fe_invalid_expression;
     }
     catch (const formula_error& e)
     {
-        m_outbuf << endl << "result = " << e.what() << endl;
-        cout <<  m_outbuf.str();
+        if (mp_handler)
+            mp_handler->set_formula_error(e.what());
+
         m_error = e.get_error();
     }
     return false;
@@ -235,7 +239,9 @@ void formula_interpreter::expression()
             case fop_plus:
             {
                 double val = m_stack.pop_value();
-                m_outbuf << "+";
+                if (mp_handler)
+                    mp_handler->push_token(oc);
+
                 next();
                 term();
                 val += m_stack.pop_value();
@@ -245,7 +251,9 @@ void formula_interpreter::expression()
             case fop_minus:
             {
                 double val = m_stack.pop_value();
-                m_outbuf << "-";
+                if (mp_handler)
+                    mp_handler->push_token(oc);
+
                 next();
                 term();
                 val -= m_stack.pop_value();
@@ -271,7 +279,9 @@ void formula_interpreter::term()
     {
         case fop_multiply:
         {
-            m_outbuf << "*";
+            if (mp_handler)
+                mp_handler->push_token(oc);
+
             next();
             double val = m_stack.pop_value();
             term();
@@ -280,7 +290,9 @@ void formula_interpreter::term()
         }
         case fop_divide:
         {
-            m_outbuf << "/";
+            if (mp_handler)
+                mp_handler->push_token(oc);
+
             next();
             double val = m_stack.pop_value();
             term();
@@ -332,13 +344,17 @@ void formula_interpreter::factor()
 
 void formula_interpreter::paren()
 {
-    m_outbuf << "(";
+    if (mp_handler)
+        mp_handler->push_token(fop_open);
+
     next();
     expression();
     if (token().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
-    m_outbuf << ")";
+    if (mp_handler)
+        mp_handler->push_token(fop_close);
+
     next();
 }
 
@@ -349,7 +365,9 @@ void formula_interpreter::single_ref()
     __IXION_DEBUG_OUT__ << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
     __IXION_DEBUG_OUT__ << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
 #endif
-    m_outbuf << m_context.get_name_resolver().get_name(addr, m_pos);
+    if (mp_handler)
+        mp_handler->push_single_ref(addr, m_pos);
+
     abs_address_t abs_addr = addr.to_abs(m_pos);
 #if DEBUG_FORMULA_INTERPRETER
     __IXION_DEBUG_OUT__ << "formula_interpreter::variable: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
@@ -373,7 +391,9 @@ void formula_interpreter::range_ref()
     __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
     __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
 #endif
-    m_outbuf << m_context.get_name_resolver().get_name(range, m_pos);
+    if (mp_handler)
+        mp_handler->push_range_ref(range, m_pos);
+
     abs_range_t abs_range = range.to_abs(m_pos);
 
 #if DEBUG_FORMULA_INTERPRETER
@@ -394,10 +414,10 @@ void formula_interpreter::range_ref()
 void formula_interpreter::constant()
 {
     double val = token().get_value();
-    m_outbuf << val;
     next();
-
     m_stack.push_value(val);
+    if (mp_handler)
+        mp_handler->push_value(val);
 }
 
 void formula_interpreter::function()
@@ -406,12 +426,14 @@ void formula_interpreter::function()
     assert(token().get_opcode() == fop_function);
     assert(m_stack.empty());
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
-    m_outbuf << formula_functions::get_function_name(func_oc);
+    if (mp_handler)
+        mp_handler->push_function(func_oc);
 
     if (next_token().get_opcode() != fop_open)
         throw invalid_expression("expecting a '(' after a function name.");
 
-    m_outbuf << "(";
+    if (mp_handler)
+        mp_handler->push_token(fop_open);
 
     fopcode_t oc = next_token().get_opcode();
     bool expect_sep = false;
@@ -423,7 +445,9 @@ void formula_interpreter::function()
                 throw invalid_expression("argument separator is expected, but not found.");
             next();
             expect_sep = false;
-            m_outbuf << ",";
+
+            if (mp_handler)
+                mp_handler->push_token(oc);
         }
         else
         {
@@ -433,7 +457,9 @@ void formula_interpreter::function()
         oc = token().get_opcode();
     }
 
-    m_outbuf << ")";
+    if (mp_handler)
+        mp_handler->push_token(oc);
+
     next();
 
     // Function call pops all stack values pushed onto the stack this far, and
