@@ -31,6 +31,7 @@
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/interface/cells_in_range.hpp"
+#include "ixion/interface/session_handler.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -228,11 +229,13 @@ void formula_cell::interpret(const interface::model_context& context)
             // it can mean the cell has circular dependency.
             if (m_interpret_status.result->get_type() == formula_result::rt_error)
             {
-                ostringstream os;
-                os << get_formula_result_output_separator() << endl;
-                os << context.get_cell_name(this) << ": result = "
-                    << get_formula_error_name(m_interpret_status.result->get_error()) << endl;
-                cout << os.str();
+                interface::session_handler* handler = context.get_session_handler();
+                if (handler)
+                {
+                    handler->begin_cell_interpret(this);
+                    const char* msg = get_formula_error_name(m_interpret_status.result->get_error());
+                    handler->set_formula_error(msg);
+                }
             }
             return;
         }
