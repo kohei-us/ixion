@@ -40,16 +40,11 @@
 
 using namespace std;
 
-namespace {
-
-boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
-
-}
-
 namespace ixion {
 
 cell_listener_tracker& cell_listener_tracker::get(interface::model_context& cxt)
 {
+    static boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
     if (!p_instance)
         p_instance.reset(new cell_listener_tracker(cxt));
     return *p_instance;
