@@ -30,6 +30,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/cells_in_range.hpp"
 #include "ixion/config.hpp"
+#include "ixion/session_handler.hpp"
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -40,7 +41,8 @@ namespace ixion {
 model_context::model_context() :
     mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
-    mp_cells_in_range(NULL)
+    mp_cells_in_range(NULL),
+    mp_session_handler(new session_handler)
 {}
 
 model_context::~model_context()
@@ -48,6 +50,7 @@ model_context::~model_context()
     delete mp_config;
     delete mp_name_resolver;
     delete mp_cells_in_range;
+    delete mp_session_handler;
 
     for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
 }
@@ -167,6 +170,11 @@ matrix model_context::get_range_value(const abs_range_t& range) const
         }
     }
     return ret;
+}
+
+interface::session_handler* model_context::get_session_handler() const
+{
+    return mp_session_handler;
 }
 
 formula_tokens_t* model_context::get_formula_tokens(size_t identifier)

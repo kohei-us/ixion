@@ -25,5 +25,6 @@ libixion_HEADERS = \
 	mem_str_buf.hpp \
 	model_context.hpp \
 	model_parser.hpp \
+	session_handler.hpp \
 	sort_input_parser.hpp \
 	thread.hpp

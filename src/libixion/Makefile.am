@@ -23,7 +23,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_context.cpp \
 	model_parser.cpp \
 	cell_listener_tracker.cpp \
-	sort_input_parser.cpp
+	sort_input_parser.cpp \
+	session_handler.cpp
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 

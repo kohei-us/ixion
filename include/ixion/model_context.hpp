@@ -39,6 +39,7 @@
 namespace ixion {
 
 class cells_in_range;
+class session_handler;
 struct abs_address_t;
 struct config;
 class matrix;
@@ -73,6 +74,7 @@ public:
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
+    virtual interface::session_handler* get_session_handler() const;
     virtual formula_tokens_t* get_formula_tokens(size_t identifier);
     virtual const formula_tokens_t* get_formula_tokens(size_t identifier) const;
     virtual size_t add_formula_tokens(formula_tokens_t* p);
@@ -98,6 +100,7 @@ private:
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
     mutable cells_in_range* mp_cells_in_range;
+    session_handler* mp_session_handler;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;

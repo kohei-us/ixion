@@ -47,6 +47,7 @@ struct config;
 namespace interface {
 
 class cells_in_range;
+class session_handler;
 
 /**
  * Interface for model context.  The client code needs to provide concrete
@@ -79,6 +80,17 @@ public:
      * @return range value represented as matrix.
      */
     virtual matrix get_range_value(const abs_range_t& range) const = 0;
+
+    /**
+     * Session handler instance receives various events from the formula
+     * interpretation run, in order to respond to those events.  This is
+     * optional; the model context implementation is not required to provide a
+     * handler.
+     *
+     * @return non-NULL pointer of the model context provides a session
+     *         handler, otherwise a NULL pointer is returned.
+     */
+    virtual session_handler* get_session_handler() const = 0;
 
     virtual formula_tokens_t* get_formula_tokens(size_t identifier) = 0;
     virtual const formula_tokens_t* get_formula_tokens(size_t identifier) const = 0;
