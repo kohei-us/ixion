@@ -1,0 +1,14 @@
+%% Test for parsing value cells.  A value cell begins with a cell name
+%% followed by a ':' immediately followed by a number.
+%mode init
+A1:0
+A2:1
+A3:12.5
+A4:-1.2
+%calc
+%mode result
+A1=0
+A2=1
+A3=12.5
+A4=-1.2
+%check
