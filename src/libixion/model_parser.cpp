@@ -295,7 +295,7 @@ public:
                 convert_formula_cell(model_cell);
             break;
             case model_parser::ct_value:
-                convert_value_cell(model_cell);
+                convert_numeric_cell(model_cell);
             break;
             default:
                 throw general_error("???");
@@ -303,7 +303,7 @@ public:
     }
 
 private:
-    void convert_value_cell(const model_parser::cell& model_cell)
+    void convert_numeric_cell(const model_parser::cell& model_cell)
     {
         const string& name = model_cell.get_name();
         formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
