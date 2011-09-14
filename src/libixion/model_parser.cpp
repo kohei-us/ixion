@@ -308,7 +308,12 @@ private:
         const string& name = model_cell.get_name();
         formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
         if (name_type.type != formula_name_type::cell_reference)
-            throw general_error("only a normal cell instance can be a value cell.");
+        {
+            ostringstream os;
+            os << "failed to convert " << name << " to a numeric cell.  ";
+            os << "Only a normal cell instance can be a numeric cell.";
+            throw general_error(os.str());
+        }
 
         // For a value cell, there should be no more than 2 lexer tokens: one
         // for the sign and one for the number.
@@ -893,18 +898,34 @@ void model_parser::check(const results_type& formula_results)
             throw check_error(os.str());
         }
 
-        if (pcell->get_celltype() != celltype_formula)
-            throw check_error("expected formula cell");
-
-        const formula_result* res_cell = static_cast<const formula_cell*>(pcell)->get_result_cache();
-        if (!res_cell)
-            throw check_error("result is not cached");
-
-        if (*res_cell != res)
+        switch (pcell->get_celltype())
         {
-            ostringstream os;
-            os << "unexpected result: (expected: " << res.str() << "; actual: " << res_cell->str() << ")";
-            throw check_error(os.str());
+            case celltype_formula:
+            {
+                const formula_result* res_cell = static_cast<const formula_cell*>(pcell)->get_result_cache();
+                if (!res_cell)
+                    throw check_error("result is not cached");
+
+                if (*res_cell != res)
+                {
+                    ostringstream os;
+                    os << "unexpected result: (expected: " << res.str() << "; actual: " << res_cell->str() << ")";
+                    throw check_error(os.str());
+                }
+            }
+            break;
+            case celltype_numeric:
+            {
+                if (pcell->get_value() != res.get_value())
+                {
+                    ostringstream os;
+                    os << "unexpected numeric result: (expected: " << res.get_value() << "; actual: " << pcell->get_value() << ")";
+                    throw check_error(os.str());
+                }
+            }
+            break;
+            default:
+                throw check_error("unhandled cell type.");
         }
     }
 }
