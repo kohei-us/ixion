@@ -51,7 +51,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 1
+#define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
 
@@ -514,8 +514,9 @@ void parse_init(const char*& p, parse_data& data)
     mem_str_buf buf, name, formula;
     for (; *p != '\n'; ++p)
     {
-        if (*p == '=' || *p == ':')
+        if (name.empty() && (*p == '=' || *p == ':'))
         {
+            // Separator encountered.  Set the name and clear the buffer.
             if (buf.empty())
                 throw model_parser::parse_error("left hand side is empty");
 
@@ -532,6 +533,10 @@ void parse_init(const char*& p, parse_data& data)
                 buf.inc();
         }
     }
+
+#if DEBUG_MODEL_PARSER
+    __IXION_DEBUG_OUT__ << "name: " << name.str() << "  buf: " << buf.str() << endl;
+#endif
 
     if (!buf.empty())
     {
