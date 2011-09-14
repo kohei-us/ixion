@@ -283,9 +283,10 @@ class lexer_formula_cell_converter : public unary_function<model_parser::cell, v
 {
     model_context& m_context;
     vector<address_cell_pair_type>& m_fcells;
+    bool m_first_static_content;
 public:
     lexer_formula_cell_converter(model_context& cxt, vector<address_cell_pair_type>& fcells) :
-        m_context(cxt), m_fcells(fcells) {}
+        m_context(cxt), m_fcells(fcells), m_first_static_content(true) {}
 
     void operator() (const model_parser::cell& model_cell)
     {
@@ -369,6 +370,14 @@ private:
         }
 
         m_context.set_cell(addr, new numeric_cell(value));
+
+        if (m_first_static_content)
+        {
+            cout << get_formula_result_output_separator() << endl;
+            m_first_static_content = false;
+        }
+        const formula_name_resolver& resolver = m_context.get_name_resolver();
+        cout << resolver.get_name(addr) << ": (n) " << value << endl;
     }
 
     void convert_formula_cell(const model_parser::cell& model_cell)
