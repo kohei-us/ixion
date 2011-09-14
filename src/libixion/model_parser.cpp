@@ -51,7 +51,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 0
+#define DEBUG_MODEL_PARSER 1
 
 namespace ixion {
 
@@ -289,6 +289,85 @@ public:
 
     void operator() (const model_parser::cell& model_cell)
     {
+        switch (model_cell.get_type())
+        {
+            case model_parser::ct_formula:
+                convert_formula_cell(model_cell);
+            break;
+            case model_parser::ct_value:
+                convert_value_cell(model_cell);
+            break;
+            default:
+                throw general_error("???");
+        }
+    }
+
+private:
+    void convert_value_cell(const model_parser::cell& model_cell)
+    {
+        const string& name = model_cell.get_name();
+        formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
+        if (name_type.type != formula_name_type::cell_reference)
+            throw general_error("only a normal cell instance can be a value cell.");
+
+        // For a value cell, there should be no more than 2 lexer tokens: one
+        // for the sign and one for the number.
+        const lexer_tokens_t& lexer_tokens = model_cell.get_tokens();
+        if (lexer_tokens.empty())
+            throw general_error("no lexer tokens for a value cell.");
+        size_t token_count = lexer_tokens.size();
+        if (token_count > 2)
+            throw general_error("there should be no more than 2 lexer tokens for a value cell.");
+
+        const lexer_token_base& value_token = lexer_tokens.back();
+        if (value_token.get_opcode() != op_value)
+            throw general_error("value token expected, but not found.");
+
+        double value = value_token.get_value();
+        if (token_count == 2)
+        {
+            const lexer_token_base& sign_token = lexer_tokens.front();
+            switch (sign_token.get_opcode())
+            {
+                case op_plus:
+                    // do nothing.
+                break;
+                case op_minus:
+                    value *= -1.0;
+                break;
+                default:
+                    throw general_error("unexpected first token type.");
+            }
+        }
+
+        abs_address_t addr;
+        addr.sheet = name_type.address.sheet;
+        addr.row = name_type.address.row;
+        addr.column = name_type.address.col;
+#if DEBUG_MODEL_PARSER
+        __IXION_DEBUG_OUT__ << addr.get_name() << " : value = " << value << endl;
+#endif
+        base_cell* p = m_context.get_cell(addr);
+        if (p && p->get_celltype() == celltype_formula)
+        {
+            // Pre-existing formula cell.
+            formula_cell* fcell = static_cast<formula_cell*>(p);
+
+            // Go through all its existing references, and remove
+            // itself as their listener.  This step is important
+            // especially during partial re-calculation.
+            vector<formula_token_base*> ref_tokens;
+            fcell->get_ref_tokens(m_context, ref_tokens);
+            for_each(ref_tokens.begin(), ref_tokens.end(),
+                     formula_cell_listener_handler(m_context,
+                         addr, formula_cell_listener_handler::mode_remove));
+        }
+
+        m_context.set_cell(addr, new numeric_cell(value));
+    }
+
+    void convert_formula_cell(const model_parser::cell& model_cell)
+    {
         const string& name = model_cell.get_name();
 
 #if DEBUG_MODEL_PARSER
@@ -438,7 +517,7 @@ void parse_init(const char*& p, parse_data& data)
             name = buf;
             buf.clear();
             data.cell_names.push_back(name.str());
-            content_type = *p == ':' ? model_parser::ct_formula : model_parser::ct_value;
+            content_type = *p == '=' ? model_parser::ct_formula : model_parser::ct_value;
         }
         else
         {
@@ -658,6 +737,11 @@ string model_parser::cell::print() const
 const string& model_parser::cell::get_name() const
 {
     return m_name;
+}
+
+model_parser::cell_type model_parser::cell::get_type() const
+{
+    return m_type;
 }
 
 const lexer_tokens_t& model_parser::cell::get_tokens() const

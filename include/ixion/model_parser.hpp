@@ -88,6 +88,7 @@ public:
 
         ::std::string print() const;
         const ::std::string& get_name() const;
+        cell_type get_type() const;
         const lexer_tokens_t& get_tokens() const;
 
     private:

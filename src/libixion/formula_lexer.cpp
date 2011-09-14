@@ -30,7 +30,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_LEXER 0
+#define IXION_DEBUG_LEXER 0
 
 using namespace std;
 
@@ -315,7 +315,7 @@ formula_lexer::~formula_lexer() {}
 
 void formula_lexer::tokenize()
 {
-#if DEBUG_LEXER
+#if IXION_DEBUG_LEXER
     cout << "formula string: '" << std::string(mp_first, m_size) << "'" << endl;
 #endif
     tokenizer tkr(m_tokens, mp_first, m_size);
