@@ -28,6 +28,8 @@
 #ifndef __IXION_FORMULA_TOKENS_FWD_HPP__
 #define __IXION_FORMULA_TOKENS_FWD_HPP__
 
+#include <boost/ptr_container/ptr_vector.hpp>
+
 namespace ixion {
 
 class formula_token_base;

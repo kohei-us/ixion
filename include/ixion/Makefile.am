@@ -11,10 +11,12 @@ libixion_HEADERS = \
 	depends_tracker.hpp \
 	depth_first_search.hpp \
 	formula.hpp \
+	formula_function_opcode.hpp \
 	formula_functions.hpp \
 	formula_interpreter.hpp \
 	formula_lexer.hpp \
 	formula_name_resolver.hpp \
+	formula_opcode.hpp \
 	formula_parser.hpp \
 	formula_result.hpp \
 	formula_tokens.hpp \
