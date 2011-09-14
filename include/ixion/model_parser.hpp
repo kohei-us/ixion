@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -65,22 +65,34 @@ public:
     };
 
     /**
-     * 'cell' in this context is just a named storage containing lexer tokens. 
-     * A 'cell' may be either a formula cell, or a named expression. 
+     * Right-hand-side cell content type.
+     */
+    enum cell_type
+    {
+        ct_unknown = 0,
+        ct_formula,
+        ct_value,
+        ct_string
+    };
+
+    /**
+     * 'cell' in this context is just a named storage containing lexer tokens.
+     * A 'cell' may be either a formula cell, or a named expression.
      */
     class cell
     {
     public:
-        cell(const ::std::string& name, lexer_tokens_t& tokens);
+        cell(const ::std::string& name, cell_type type, lexer_tokens_t& tokens);
         cell(const cell& r);
         ~cell();
-    
+
         ::std::string print() const;
         const ::std::string& get_name() const;
         const lexer_tokens_t& get_tokens() const;
-    
+
     private:
         ::std::string m_name;
+        cell_type m_type;
         lexer_tokens_t m_tokens;
     };
 

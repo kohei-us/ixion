@@ -426,10 +426,11 @@ struct parse_data
 
 void parse_init(const char*& p, parse_data& data)
 {
+    model_parser::cell_type content_type = model_parser::ct_unknown;
     mem_str_buf buf, name, formula;
     for (; *p != '\n'; ++p)
     {
-        if (*p == '=')
+        if (*p == '=' || *p == ':')
         {
             if (buf.empty())
                 throw model_parser::parse_error("left hand side is empty");
@@ -437,6 +438,7 @@ void parse_init(const char*& p, parse_data& data)
             name = buf;
             buf.clear();
             data.cell_names.push_back(name.str());
+            content_type = *p == ':' ? model_parser::ct_formula : model_parser::ct_value;
         }
         else
         {
@@ -450,7 +452,7 @@ void parse_init(const char*& p, parse_data& data)
     if (!buf.empty())
     {
         if (name.empty())
-            throw model_parser::parse_error("'=' is missing");
+            throw model_parser::parse_error("separator is missing");
 
         formula = buf;
 
@@ -466,7 +468,7 @@ void parse_init(const char*& p, parse_data& data)
         __IXION_DEBUG_OUT__ << "tokens from lexer: " << print_tokens(tokens, true) << endl;
 #endif
 
-        model_parser::cell fcell(name.str(), tokens);
+        model_parser::cell fcell(name.str(), content_type, tokens);
         data.cells.push_back(fcell);
     }
 }
@@ -634,8 +636,8 @@ model_parser::check_error::check_error(const string& msg) :
 
 // ============================================================================
 
-model_parser::cell::cell(const string& name, lexer_tokens_t& tokens) :
-    m_name(name)
+model_parser::cell::cell(const string& name, cell_type type, lexer_tokens_t& tokens) :
+    m_name(name), m_type(type)
 {
     // Note that this will empty the passed token container !
     m_tokens.swap(tokens);
@@ -643,13 +645,10 @@ model_parser::cell::cell(const string& name, lexer_tokens_t& tokens) :
 
 model_parser::cell::cell(const model_parser::cell& r) :
     m_name(r.m_name),
-    m_tokens(r.m_tokens)
-{
-}
+    m_type(r.m_type),
+    m_tokens(r.m_tokens) {}
 
-model_parser::cell::~cell()
-{
-}
+model_parser::cell::~cell() {}
 
 string model_parser::cell::print() const
 {
