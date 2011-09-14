@@ -304,6 +304,18 @@ public:
     }
 
 private:
+    void remove_self_as_listener(formula_cell* fcell, const abs_address_t& addr)
+    {
+        // Go through all its existing references, and remove
+        // itself as their listener.  This step is important
+        // especially during partial re-calculation.
+        vector<formula_token_base*> ref_tokens;
+        fcell->get_ref_tokens(m_context, ref_tokens);
+        for_each(ref_tokens.begin(), ref_tokens.end(),
+                 formula_cell_listener_handler(m_context,
+                     addr, formula_cell_listener_handler::mode_remove));
+    }
+
     void convert_numeric_cell(const model_parser::cell& model_cell)
     {
         const string& name = model_cell.get_name();
@@ -358,15 +370,7 @@ private:
         {
             // Pre-existing formula cell.
             formula_cell* fcell = static_cast<formula_cell*>(p);
-
-            // Go through all its existing references, and remove
-            // itself as their listener.  This step is important
-            // especially during partial re-calculation.
-            vector<formula_token_base*> ref_tokens;
-            fcell->get_ref_tokens(m_context, ref_tokens);
-            for_each(ref_tokens.begin(), ref_tokens.end(),
-                     formula_cell_listener_handler(m_context,
-                         addr, formula_cell_listener_handler::mode_remove));
+            remove_self_as_listener(fcell, addr);
         }
 
         m_context.set_cell(addr, new numeric_cell(value));
@@ -431,15 +435,7 @@ private:
                 {
                     // Pre-existing formula cell.
                     fcell = static_cast<formula_cell*>(p);
-
-                    // Go through all its existing references, and remove
-                    // itself as their listener.  This step is important
-                    // especially during partial re-calculation.
-                    vector<formula_token_base*> ref_tokens;
-                    fcell->get_ref_tokens(m_context, ref_tokens);
-                    for_each(ref_tokens.begin(), ref_tokens.end(),
-                             formula_cell_listener_handler(m_context,
-                                 addr, formula_cell_listener_handler::mode_remove));
+                    remove_self_as_listener(fcell, addr);
                 }
 
                 if (!fcell)
