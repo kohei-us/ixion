@@ -51,7 +51,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 1
+#define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
 
@@ -331,8 +331,39 @@ private:
             throw general_error(os.str());
         }
 
+        abs_address_t addr;
+        addr.sheet = name_type.address.sheet;
+        addr.row = name_type.address.row;
+        addr.column = name_type.address.col;
+
+        // For a string cell, there should be only one lexer token which must
+        // be a string token.
         const lexer_tokens_t& lexer_tokens = model_cell.get_tokens();
-        cout << "string cell: lexer token count = " << lexer_tokens.size() << endl;
+        if (lexer_tokens.size() != 1)
+            throw general_error("there should only be one lexer token for a string cell.");
+
+        const lexer_token_base& token = lexer_tokens.back();
+        if (token.get_opcode() != op_string)
+            throw general_error("string lexer token expected, but not found.");
+        string str = token.get_string();
+
+        base_cell* p = m_context.get_cell(addr);
+        if (p && p->get_celltype() == celltype_formula)
+        {
+            // Pre-existing formula cell.
+            formula_cell* fcell = static_cast<formula_cell*>(p);
+            remove_self_as_listener(fcell, addr);
+        }
+
+        m_context.set_cell(addr, new string_cell(0));
+
+        if (m_first_static_content)
+        {
+            cout << get_formula_result_output_separator() << endl;
+            m_first_static_content = false;
+        }
+        const formula_name_resolver& resolver = m_context.get_name_resolver();
+        cout << resolver.get_name(addr) << ": (s) " << str << endl;
     }
 
     void convert_numeric_cell(const model_parser::cell& model_cell)
