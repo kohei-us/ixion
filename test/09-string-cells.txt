@@ -5,3 +5,9 @@ B1@"Bruce"
 C1@"Charles"
 D1@"David"
 %calc
+%mode result
+A1="Andy"
+B1="Bruce"
+C1="Charles"
+D1="David"
+%check

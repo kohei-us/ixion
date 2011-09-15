@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -29,6 +29,12 @@
 #include "ixion/mem_str_buf.hpp"
 
 #include <sstream>
+
+#define DEBUG_FORMULA_RESULT 1
+
+#if DEBUG_FORMULA_RESULT
+#include <iostream>
+#endif
 
 using namespace std;
 
@@ -122,7 +128,7 @@ formula_result::result_type formula_result::get_type() const
 }
 
 string formula_result::str() const
-{    
+{
     switch (m_type)
     {
         case rt_error:
@@ -254,7 +260,24 @@ void formula_result::parse_error(const string& str)
 
 void formula_result::parse_string(const string& str)
 {
-    throw general_error("formula_result::parse_string() is not implemented yet.");
+    const char* p = &str[0];
+    size_t n = str.size();
+    assert(*p == '"');
+    ++p;
+    const char* p_first = p;
+    size_t len = 0;
+    for (size_t i = 1; i < n; ++i, ++len, ++p)
+    {
+        char c = *p;
+        if (c == '"')
+            break;
+    }
+
+    if (!len)
+        throw general_error("failed to parse string result.");
+
+    m_type = rt_string;
+    m_string = new string(p_first, len);
 }
 
 }
