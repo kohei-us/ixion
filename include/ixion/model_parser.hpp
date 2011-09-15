@@ -82,17 +82,17 @@ public:
     class cell
     {
     public:
-        cell(const ::std::string& name, cell_type type, lexer_tokens_t& tokens);
+        cell(const mem_str_buf& name, cell_type type, lexer_tokens_t& tokens);
         cell(const cell& r);
         ~cell();
 
         ::std::string print() const;
-        const ::std::string& get_name() const;
+        const mem_str_buf& get_name() const;
         cell_type get_type() const;
         const lexer_tokens_t& get_tokens() const;
 
     private:
-        ::std::string m_name;
+        mem_str_buf m_name;
         cell_type m_type;
         lexer_tokens_t m_tokens;
     };

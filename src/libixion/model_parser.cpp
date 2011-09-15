@@ -321,12 +321,12 @@ private:
 
     void convert_string_cell(const model_parser::cell& model_cell)
     {
-        const string& name = model_cell.get_name();
-        formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
+        const mem_str_buf& name = model_cell.get_name();
+        formula_name_type name_type = m_context.get_name_resolver().resolve(name.str(), abs_address_t());
         if (name_type.type != formula_name_type::cell_reference)
         {
             ostringstream os;
-            os << "failed to convert " << name << " to a string cell.  ";
+            os << "failed to convert " << name.str() << " to a string cell.  ";
             os << "Only a normal cell instance can be a string cell.";
             throw general_error(os.str());
         }
@@ -368,12 +368,12 @@ private:
 
     void convert_numeric_cell(const model_parser::cell& model_cell)
     {
-        const string& name = model_cell.get_name();
-        formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
+        const mem_str_buf& name = model_cell.get_name();
+        formula_name_type name_type = m_context.get_name_resolver().resolve(name.str(), abs_address_t());
         if (name_type.type != formula_name_type::cell_reference)
         {
             ostringstream os;
-            os << "failed to convert " << name << " to a numeric cell.  ";
+            os << "failed to convert " << name.str() << " to a numeric cell.  ";
             os << "Only a normal cell instance can be a numeric cell.";
             throw general_error(os.str());
         }
@@ -436,7 +436,7 @@ private:
 
     void convert_formula_cell(const model_parser::cell& model_cell)
     {
-        const string& name = model_cell.get_name();
+        const string& name = model_cell.get_name().str();
 
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
@@ -630,7 +630,7 @@ void parse_init(const char*& p, parse_data& data)
         __IXION_DEBUG_OUT__ << "tokens from lexer: " << print_tokens(tokens, true) << endl;
 #endif
 
-        model_parser::cell fcell(name.str(), content_type, tokens);
+        model_parser::cell fcell(name, content_type, tokens);
         data.cells.push_back(fcell);
     }
 }
@@ -798,7 +798,7 @@ model_parser::check_error::check_error(const string& msg) :
 
 // ============================================================================
 
-model_parser::cell::cell(const string& name, cell_type type, lexer_tokens_t& tokens) :
+model_parser::cell::cell(const mem_str_buf& name, cell_type type, lexer_tokens_t& tokens) :
     m_name(name), m_type(type)
 {
     // Note that this will empty the passed token container !
@@ -817,7 +817,7 @@ string model_parser::cell::print() const
     return print_tokens(m_tokens, false);
 }
 
-const string& model_parser::cell::get_name() const
+const mem_str_buf& model_parser::cell::get_name() const
 {
     return m_name;
 }
