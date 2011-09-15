@@ -32,6 +32,8 @@
 #include "ixion/config.hpp"
 #include "ixion/session_handler.hpp"
 
+#include <memory>
+
 #define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
@@ -221,14 +223,16 @@ void model_context::remove_formula_tokens(size_t identifier)
 
 size_t model_context::add_string(const char* p, size_t n)
 {
-    mem_str_buf str_new(p, n);
-    string_map_type::iterator itr = m_string_map.find(str_new);
+    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
     if (itr != m_string_map.end())
         return itr->second;
 
     size_t str_id = m_strings.size();
-    m_strings.push_back(new string(p, n));
-    m_string_map.insert(string_map_type::value_type(str_new, str_id));
+    std::auto_ptr<string> ps(new string(p, n));
+    p = &(*ps)[0];
+    mem_str_buf key(p, n);
+    m_strings.push_back(ps);
+    m_string_map.insert(string_map_type::value_type(key, str_id));
     return str_id;
 }
 

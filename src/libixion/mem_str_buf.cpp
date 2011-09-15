@@ -36,7 +36,7 @@ namespace ixion {
 
 size_t mem_str_buf::hash::operator() (const mem_str_buf& s) const
 {
-    // copied from the hash function for pstring from ixion.
+    // copied from the hash function for pstring from orcus.
     size_t hash_val = s.size();
     size_t loop_size = std::min<size_t>(hash_val, 20); // prevent too much looping.
     const char* p = s.get();
