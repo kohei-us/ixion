@@ -37,7 +37,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_INTERPRETER 0
+#define DEBUG_FORMULA_INTERPRETER 1
 
 using namespace std;
 
@@ -358,15 +358,15 @@ void formula_interpreter::single_ref()
 {
     address_t addr = token().get_single_ref();
 #if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "formula_interpreter::variable: ref=" << addr.get_name() << endl;
-    __IXION_DEBUG_OUT__ << "formula_interpreter::variable: origin=" << m_pos.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: ref=" << addr.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: origin=" << m_pos.get_name() << endl;
 #endif
     if (mp_handler)
         mp_handler->push_single_ref(addr, m_pos);
 
     abs_address_t abs_addr = addr.to_abs(m_pos);
 #if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "formula_interpreter::variable: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
+    __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
 #endif
     const base_cell* pref = m_context.get_cell(abs_addr);
 

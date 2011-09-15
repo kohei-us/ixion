@@ -4,10 +4,12 @@ A1@"Andy"
 B1@"Bruce"
 C1@"Charles"
 D1@"David"
+A2=A1
 %calc
 %mode result
 A1="Andy"
 B1="Bruce"
 C1="Charles"
 D1="David"
+A2="Andy"
 %check
