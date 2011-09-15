@@ -355,7 +355,8 @@ private:
         }
 
         mem_str_buf str = token.get_string();
-        m_context.set_cell(addr, new string_cell(0));
+        size_t str_id = m_context.add_string(str.get(), str.size());
+        m_context.set_cell(addr, new string_cell(str_id));
 
         if (m_first_static_content)
         {

@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -34,6 +34,21 @@ using namespace std;
 
 namespace ixion {
 
+size_t mem_str_buf::hash::operator() (const mem_str_buf& s) const
+{
+    // copied from the hash function for pstring from ixion.
+    size_t hash_val = s.size();
+    size_t loop_size = std::min<size_t>(hash_val, 20); // prevent too much looping.
+    const char* p = s.get();
+    for (size_t i = 0; i < loop_size; ++i, ++p)
+    {
+        hash_val += static_cast<size_t>(*p);
+        hash_val *= 2;
+    }
+
+    return hash_val;
+}
+
 mem_str_buf::mem_str_buf() : mp_buf(NULL), m_size(0) {}
 mem_str_buf::mem_str_buf(const char* p, size_t n) : mp_buf(p), m_size(n) {}
 
@@ -52,24 +67,24 @@ void mem_str_buf::set_start(const char* p)
 }
 
 void mem_str_buf::inc()
-{ 
+{
     assert(mp_buf);
-    ++m_size; 
+    ++m_size;
 }
 
-bool mem_str_buf::empty() const 
-{ 
-    return m_size == 0; 
+bool mem_str_buf::empty() const
+{
+    return m_size == 0;
 }
 
-size_t mem_str_buf::size() const 
-{ 
-    return m_size; 
+size_t mem_str_buf::size() const
+{
+    return m_size;
 }
 
-const char* mem_str_buf::get() const 
-{ 
-    return mp_buf; 
+const char* mem_str_buf::get() const
+{
+    return mp_buf;
 }
 
 void mem_str_buf::clear()

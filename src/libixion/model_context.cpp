@@ -219,6 +219,27 @@ void model_context::remove_formula_tokens(size_t identifier)
     m_tokens[identifier] = NULL;
 }
 
+size_t model_context::add_string(const char* p, size_t n)
+{
+    mem_str_buf str_new(p, n);
+    string_map_type::iterator itr = m_string_map.find(str_new);
+    if (itr != m_string_map.end())
+        return itr->second;
+
+    size_t str_id = m_strings.size();
+    m_strings.push_back(new string(p, n));
+    m_string_map.insert(string_map_type::value_type(str_new, str_id));
+    return str_id;
+}
+
+const std::string* model_context::get_string(size_t identifier) const
+{
+    if (identifier >= m_strings.size())
+        return NULL;
+
+    return &m_strings[identifier];
+}
+
 void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)
 {
     m_named_expressions.insert(name, cell);

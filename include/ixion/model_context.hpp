@@ -29,12 +29,15 @@
 #define __IXION_MODEL_CONTEXT_HPP__
 
 #include "ixion/cell.hpp"
+#include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/model_context.hpp"
 
 #include <string>
 #include <deque>
 #include <memory>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/unordered_map.hpp>
 
 namespace ixion {
 
@@ -59,6 +62,8 @@ class model_context : public interface::model_context
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
+    typedef boost::ptr_vector<std::string> strings_type;
+    typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
 
 public:
     model_context();
@@ -79,6 +84,8 @@ public:
     virtual const formula_tokens_t* get_formula_tokens(size_t identifier) const;
     virtual size_t add_formula_tokens(formula_tokens_t* p);
     virtual void remove_formula_tokens(size_t identifier);
+    virtual size_t add_string(const char* p, size_t n);
+    virtual const std::string* get_string(size_t identifier) const;
 
     void set_cell(const abs_address_t& addr, base_cell* cell);
     void erase_cell(const abs_address_t& addr);
@@ -104,6 +111,8 @@ private:
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;
+    strings_type m_strings;
+    string_map_type m_string_map;
 };
 
 }
