@@ -251,8 +251,8 @@ void formula_parser::primitive(lexer_opcode_t oc)
 
 void formula_parser::name(const lexer_token_base& t)
 {
-    const string name = t.get_string();
-    formula_name_type fn = m_context.get_name_resolver().resolve(name, m_pos);
+    mem_str_buf name = t.get_string();
+    formula_name_type fn = m_context.get_name_resolver().resolve(name.str(), m_pos);
 #if DEBUG_FORMULA_PARSER
             __IXION_DEBUG_OUT__ << "name = '" << name << "' - " << fn.to_string() << endl;
 #endif
@@ -278,12 +278,12 @@ void formula_parser::name(const lexer_token_base& t)
             m_formula_tokens.push_back(new function_token(static_cast<size_t>(fn.func_oc)));
         break;
         case formula_name_type::named_expression:
-            m_formula_tokens.push_back(new named_exp_token(name));
+            m_formula_tokens.push_back(new named_exp_token(name.get(), name.size()));
         break;
         default:
         {
             ostringstream os;
-            os << "failed to resolve a name '" << name << "'.";
+            os << "failed to resolve a name '" << name.str() << "'.";
             throw parse_error(os.str());
         }
     }

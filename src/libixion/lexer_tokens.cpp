@@ -110,9 +110,9 @@ double lexer_token_base::get_value() const
     return 0.0;
 }
 
-string lexer_token_base::get_string() const
+mem_str_buf lexer_token_base::get_string() const
 {
-    return string();
+    return mem_str_buf();
 }
 
 // ============================================================================
@@ -193,36 +193,34 @@ lexer_string_token::lexer_string_token(const lexer_string_token& r) :
 
 lexer_string_token::~lexer_string_token() {}
 
-string lexer_string_token::get_string() const
+mem_str_buf lexer_string_token::get_string() const
 {
     return m_str;
 }
 
 string lexer_string_token::print() const
 {
-    return m_str;
+    return m_str.str();
 }
 
 // ============================================================================
 
-lexer_name_token::lexer_name_token(const string& name) :
-    lexer_token_base(op_name),
-    m_name(name)
-{
-}
+lexer_name_token::lexer_name_token(const char* p, size_t n) :
+    lexer_token_base(op_name), m_str(p, n) {}
 
-lexer_name_token::~lexer_name_token()
-{
-}
+lexer_name_token::lexer_name_token(const lexer_name_token& r) :
+    lexer_token_base(r), m_str(r.m_str) {}
 
-string lexer_name_token::get_string() const
+lexer_name_token::~lexer_name_token() {}
+
+mem_str_buf lexer_name_token::get_string() const
 {
-    return m_name;
+    return m_str;
 }
 
 string lexer_name_token::print() const
 {
-    return m_name.c_str();
+    return m_str.str();
 }
 
 // ============================================================================

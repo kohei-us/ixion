@@ -345,7 +345,6 @@ private:
         const lexer_token_base& token = lexer_tokens.back();
         if (token.get_opcode() != op_string)
             throw general_error("string lexer token expected, but not found.");
-        string str = token.get_string();
 
         base_cell* p = m_context.get_cell(addr);
         if (p && p->get_celltype() == celltype_formula)
@@ -355,6 +354,7 @@ private:
             remove_self_as_listener(fcell, addr);
         }
 
+        mem_str_buf str = token.get_string();
         m_context.set_cell(addr, new string_cell(0));
 
         if (m_first_static_content)
@@ -363,7 +363,7 @@ private:
             m_first_static_content = false;
         }
         const formula_name_resolver& resolver = m_context.get_name_resolver();
-        cout << resolver.get_name(addr) << ": (s) " << str << endl;
+        cout << resolver.get_name(addr) << ": (s) " << str.str() << endl;
     }
 
     void convert_numeric_cell(const model_parser::cell& model_cell)

@@ -230,9 +230,9 @@ range_t range_ref_token::get_range_ref() const
 
 // ============================================================================
 
-named_exp_token::named_exp_token(const std::string& name) :
+named_exp_token::named_exp_token(const char* p, size_t n) :
     formula_token_base(fop_named_expression),
-    m_name(name) {}
+    m_name(p, n) {}
 
 named_exp_token::named_exp_token(const named_exp_token& r) :
     formula_token_base(r),

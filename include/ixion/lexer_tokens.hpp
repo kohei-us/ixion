@@ -28,7 +28,7 @@
 #ifndef __IXION_LEXER_TOKENS_HPP__
 #define __IXION_LEXER_TOKENS_HPP__
 
-#include <string>
+#include "ixion/mem_str_buf.hpp"
 
 #include <boost/ptr_container/ptr_vector.hpp>
 
@@ -73,7 +73,7 @@ public:
     virtual ~lexer_token_base();
 
     virtual double get_value() const;
-    virtual ::std::string get_string() const;
+    virtual mem_str_buf get_string() const;
     virtual ::std::string print() const = 0;
 
     lexer_opcode_t get_opcode() const;
@@ -116,10 +116,10 @@ public:
     lexer_string_token(const lexer_string_token& r);
     virtual ~lexer_string_token();
 
-    virtual ::std::string get_string() const;
+    virtual mem_str_buf get_string() const;
     virtual ::std::string print() const;
 private:
-    ::std::string m_str;
+    mem_str_buf m_str;
 };
 
 // ============================================================================
@@ -127,13 +127,14 @@ private:
 class lexer_name_token : public lexer_token_base
 {
 public:
-    lexer_name_token(const ::std::string& name);
+    lexer_name_token(const char* p, size_t n);
+    lexer_name_token(const lexer_name_token& r);
     virtual ~lexer_name_token();
 
-    virtual ::std::string get_string() const;
+    virtual mem_str_buf get_string() const;
     virtual ::std::string print() const;
 private:
-    ::std::string m_name;
+    mem_str_buf m_str;
 };
 
 // ============================================================================
@@ -151,7 +152,7 @@ inline lexer_token_base* new_clone(const lexer_token_base& r)
         case op_string:
             return new lexer_string_token(static_cast<const lexer_string_token&>(r));
         case op_name:
-            return new lexer_name_token(r.get_string());
+            return new lexer_name_token(static_cast<const lexer_name_token&>(r));
         case op_close:
         case op_divide:
         case op_minus:

@@ -156,7 +156,7 @@ private:
 class named_exp_token : public formula_token_base
 {
 public:
-    named_exp_token(const ::std::string& name);
+    named_exp_token(const char* p, size_t n);
     named_exp_token(const named_exp_token& r);
     virtual ~named_exp_token();
     virtual std::string get_name() const;
@@ -200,7 +200,7 @@ inline formula_token_base* new_clone(const formula_token_base& r)
         case fop_range_ref:
             return new range_ref_token(r.get_range_ref());
         case fop_named_expression:
-            return new named_exp_token(r.get_name());
+            return new named_exp_token(static_cast<const named_exp_token&>(r));
         case fop_unresolved_ref:
             return new unresolved_ref_token(r.get_name());
         case fop_string:

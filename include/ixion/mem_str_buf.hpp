@@ -40,6 +40,7 @@ class mem_str_buf
 {
 public:
     mem_str_buf();
+    mem_str_buf(const char* p, size_t n);
 
     void append(const char* p);
     void set_start(const char* p);

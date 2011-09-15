@@ -35,6 +35,7 @@ using namespace std;
 namespace ixion {
 
 mem_str_buf::mem_str_buf() : mp_buf(NULL), m_size(0) {}
+mem_str_buf::mem_str_buf(const char* p, size_t n) : mp_buf(p), m_size(n) {}
 
 void mem_str_buf::append(const char* p)
 {

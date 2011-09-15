@@ -316,7 +316,7 @@ void tokenizer::flush_buffer()
         break;
         case buf_name:
         {
-            m_tokens.push_back(new lexer_name_token(m_buf.str()));
+            m_tokens.push_back(new lexer_name_token(m_buf.get(), m_buf.size()));
         }
         break;
         default:
