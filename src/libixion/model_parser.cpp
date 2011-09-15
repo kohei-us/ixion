@@ -1003,6 +1003,21 @@ void model_parser::check(const results_type& formula_results)
                 }
             }
             break;
+            case celltype_string:
+            {
+                size_t str_id = pcell->get_identifier();
+                const string* ps = m_context.get_string(str_id);
+                if (!ps)
+                    throw check_error("failed to retrieve a string value for a string cell.");
+
+                if (*ps != res.get_string())
+                {
+                    ostringstream os;
+                    os << "unexpected string result: (expected: " << res.get_string() << "; actual: " << *ps << ")";
+                    throw check_error(os.str());
+                }
+            }
+            break;
             default:
                 throw check_error("unhandled cell type.");
         }
