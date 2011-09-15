@@ -112,7 +112,8 @@ private:
 class lexer_string_token : public lexer_token_base
 {
 public:
-    lexer_string_token(const ::std::string& str);
+    lexer_string_token(const char* p, size_t n);
+    lexer_string_token(const lexer_string_token& r);
     virtual ~lexer_string_token();
 
     virtual ::std::string get_string() const;
@@ -148,7 +149,7 @@ inline lexer_token_base* new_clone(const lexer_token_base& r)
         case op_value:
             return new lexer_value_token(r.get_value());
         case op_string:
-            return new lexer_string_token(r.get_string());
+            return new lexer_string_token(static_cast<const lexer_string_token&>(r));
         case op_name:
             return new lexer_name_token(r.get_string());
         case op_close:

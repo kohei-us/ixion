@@ -61,6 +61,8 @@ public:
 private:
     static bool is_digit(char c);
 
+    void init();
+
     void numeral();
     void space();
     void name();
@@ -71,7 +73,9 @@ private:
     void sep_arg();
     void open_bracket();
     void close_bracket();
+    void string();
 
+    bool has_char() const;
     void next();
     void push_back();
     void flush_buffer();
@@ -91,6 +95,12 @@ private:
     buffer_type m_buf_type;
 };
 
+void tokenizer::init()
+{
+    mp_char = mp_first;
+    m_pos = 0;
+}
+
 void tokenizer::run()
 {
     m_tokens.clear();
@@ -99,8 +109,7 @@ void tokenizer::run()
         // Nothing to do.
         return;
 
-    mp_char = mp_first;
-    m_pos = 0;
+    init();
 
     while (m_pos < m_size)
     {
@@ -144,6 +153,9 @@ void tokenizer::run()
                 break;
             case ')':
                 close_bracket();
+                break;
+            case '"':
+                string();
                 break;
             default:
                 name();
@@ -253,10 +265,31 @@ void tokenizer::close_bracket()
     next();
 }
 
+void tokenizer::string()
+{
+    flush_buffer();
+    next();
+    const char* p = mp_char;
+    size_t len = 0;
+    for (; *mp_char != '"' && has_char(); ++len)
+        next();
+
+    if (len)
+        m_tokens.push_back(new lexer_string_token(p, len));
+
+    if (*mp_char == '"')
+        next();
+}
+
 void tokenizer::next()
 {
     ++mp_char;
     ++m_pos;
+}
+
+bool tokenizer::has_char() const
+{
+    return m_pos < m_size;
 }
 
 void tokenizer::push_back()
@@ -276,7 +309,7 @@ void tokenizer::flush_buffer()
     {
         case buf_numeral:
         {
-            string s = m_buf.str();
+            std::string s = m_buf.str();
             double val = strtod(s.c_str(), NULL);
             m_tokens.push_back(new lexer_value_token(val));
         }

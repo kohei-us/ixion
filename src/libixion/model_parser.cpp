@@ -51,7 +51,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 0
+#define DEBUG_MODEL_PARSER 1
 
 namespace ixion {
 
@@ -298,8 +298,11 @@ public:
             case model_parser::ct_value:
                 convert_numeric_cell(model_cell);
             break;
+            case model_parser::ct_string:
+                convert_string_cell(model_cell);
+            break;
             default:
-                throw general_error("???");
+                throw general_error("unhandled lexer cell type.");
         }
     }
 
@@ -314,6 +317,22 @@ private:
         for_each(ref_tokens.begin(), ref_tokens.end(),
                  formula_cell_listener_handler(m_context,
                      addr, formula_cell_listener_handler::mode_remove));
+    }
+
+    void convert_string_cell(const model_parser::cell& model_cell)
+    {
+        const string& name = model_cell.get_name();
+        formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
+        if (name_type.type != formula_name_type::cell_reference)
+        {
+            ostringstream os;
+            os << "failed to convert " << name << " to a string cell.  ";
+            os << "Only a normal cell instance can be a string cell.";
+            throw general_error(os.str());
+        }
+
+        const lexer_tokens_t& lexer_tokens = model_cell.get_tokens();
+        cout << "string cell: lexer token count = " << lexer_tokens.size() << endl;
     }
 
     void convert_numeric_cell(const model_parser::cell& model_cell)
@@ -513,13 +532,18 @@ struct parse_data
     model_parser::results_type  formula_results;
 };
 
+bool is_separator(char c)
+{
+    return c == '=' || c == ':' || c == '@';
+}
+
 void parse_init(const char*& p, parse_data& data)
 {
     model_parser::cell_type content_type = model_parser::ct_unknown;
     mem_str_buf buf, name, formula;
     for (; *p != '\n'; ++p)
     {
-        if (name.empty() && (*p == '=' || *p == ':'))
+        if (name.empty() && is_separator(*p))
         {
             // Separator encountered.  Set the name and clear the buffer.
             if (buf.empty())
@@ -528,7 +552,20 @@ void parse_init(const char*& p, parse_data& data)
             name = buf;
             buf.clear();
             data.cell_names.push_back(name.str());
-            content_type = *p == '=' ? model_parser::ct_formula : model_parser::ct_value;
+            switch (*p)
+            {
+                case '=':
+                    content_type = model_parser::ct_formula;
+                break;
+                case ':':
+                    content_type = model_parser::ct_value;
+                break;
+                case '@':
+                    content_type = model_parser::ct_string;
+                break;
+                default:
+                    ;
+            }
         }
         else
         {

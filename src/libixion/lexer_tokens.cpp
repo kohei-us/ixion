@@ -185,15 +185,13 @@ string lexer_value_token::print() const
 
 // ============================================================================
 
-lexer_string_token::lexer_string_token(const string& str) :
-    lexer_token_base(op_string),
-    m_str(str)
-{
-}
+lexer_string_token::lexer_string_token(const char* p, size_t n) :
+    lexer_token_base(op_string), m_str(p, n) {}
 
-lexer_string_token::~lexer_string_token()
-{
-}
+lexer_string_token::lexer_string_token(const lexer_string_token& r) :
+    lexer_token_base(r), m_str(r.m_str) {}
+
+lexer_string_token::~lexer_string_token() {}
 
 string lexer_string_token::get_string() const
 {
