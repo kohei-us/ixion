@@ -100,7 +100,7 @@ public:
     void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
 
 
-    void set_named_expression(const ::std::string& name, ::std::auto_ptr<formula_cell>& cell);
+    void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);
 
 private:

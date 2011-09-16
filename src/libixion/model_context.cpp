@@ -244,8 +244,9 @@ const std::string* model_context::get_string(size_t identifier) const
     return &m_strings[identifier];
 }
 
-void model_context::set_named_expression(const string& name, auto_ptr<formula_cell>& cell)
+void model_context::set_named_expression(const char* p, size_t n, formula_cell* cell)
 {
+    string name(p, n);
     m_named_expressions.insert(name, cell);
 }
 

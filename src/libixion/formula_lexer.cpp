@@ -60,6 +60,8 @@ public:
 
 private:
     static bool is_digit(char c);
+    bool is_arg_sep(char c) const;
+    bool is_decimal_sep(char c) const;
 
     void init();
 
@@ -77,7 +79,7 @@ private:
 
     bool has_char() const;
     void next();
-    void push_back();
+    void push_to_buffer();
     void flush_buffer();
 
 private:
@@ -111,50 +113,53 @@ void tokenizer::run()
 
     init();
 
-    while (m_pos < m_size)
+    while (has_char())
     {
-        if (*mp_char == m_sep_arg)
+        if (is_digit(*mp_char))
         {
+            numeral();
+            continue;
+        }
+
+        if (is_arg_sep(*mp_char))
+        {
+            flush_buffer();
             sep_arg();
             continue;
         }
 
         switch (*mp_char)
         {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                numeral();
-                break;
             case ' ':
+                flush_buffer();
                 space();
                 break;
             case '+':
+                flush_buffer();
                 plus();
                 break;
             case '-':
+                flush_buffer();
                 minus();
                 break;
             case '/':
+                flush_buffer();
                 divide();
                 break;
             case '*':
+                flush_buffer();
                 multiply();
                 break;
             case '(':
+                flush_buffer();
                 open_bracket();
                 break;
             case ')':
+                flush_buffer();
                 close_bracket();
                 break;
             case '"':
+                flush_buffer();
                 string();
                 break;
             default:
@@ -170,6 +175,16 @@ bool tokenizer::is_digit(char c)
     return ('0' <= c && c <= '9');
 }
 
+bool tokenizer::is_arg_sep(char c) const
+{
+    return c == m_sep_arg;
+}
+
+bool tokenizer::is_decimal_sep(char c) const
+{
+    return c == m_sep_decimal;
+}
+
 void tokenizer::numeral()
 {
     if (m_buf.empty())
@@ -178,12 +193,12 @@ void tokenizer::numeral()
     size_t sep_count = 0;
     while (true)
     {
-        push_back();
+        push_to_buffer();
         next();
 
         if (is_digit(*mp_char))
             continue;
-        if (*mp_char == m_sep_decimal && ++sep_count <= 1)
+        if (is_decimal_sep(*mp_char) && ++sep_count <= 1)
             continue;
         break;
     }
@@ -198,8 +213,6 @@ void tokenizer::numeral()
 
 void tokenizer::space()
 {
-    flush_buffer();
-
     // space is ignored for now.
     next();
 }
@@ -212,62 +225,54 @@ void tokenizer::name()
         m_buf_type = buf_name;
     }
 
-    push_back();
+    push_to_buffer();
     next();
 }
 
 void tokenizer::plus()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_plus));
     next();
 }
 
 void tokenizer::minus()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_minus));
     next();
 }
 
 void tokenizer::divide()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_divide));
     next();
 }
 
 void tokenizer::multiply()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_multiply));
     next();
 }
 
 void tokenizer::sep_arg()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_sep));
     next();
 }
 
 void tokenizer::open_bracket()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_open));
     next();
 }
 
 void tokenizer::close_bracket()
 {
-    flush_buffer();
     m_tokens.push_back(new lexer_token(op_close));
     next();
 }
 
 void tokenizer::string()
 {
-    flush_buffer();
     next();
     const char* p = mp_char;
     size_t len = 0;
@@ -292,7 +297,7 @@ bool tokenizer::has_char() const
     return m_pos < m_size;
 }
 
-void tokenizer::push_back()
+void tokenizer::push_to_buffer()
 {
     if (m_buf.empty())
         m_buf.set_start(mp_char);

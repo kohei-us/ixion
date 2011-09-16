@@ -458,8 +458,7 @@ private:
                 if (!fcell)
                 {
                     // No prior named expression with the same name.
-                    auto_ptr<formula_cell> pcell(new formula_cell);
-                    m_context.set_named_expression(name.str(), pcell);
+                    m_context.set_named_expression(name.get(), name.size(), new formula_cell);
                     fcell = m_context.get_named_expression(name.str());
                 }
                 if (!fcell)
