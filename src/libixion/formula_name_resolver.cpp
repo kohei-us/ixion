@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,9 +39,9 @@ namespace ixion {
 
 namespace {
 
-bool resolve_function(const string& name, formula_name_type& ret)
+bool resolve_function(const char* p, size_t n, formula_name_type& ret)
 {
-    formula_function_t func_oc = formula_functions::get_function_opcode(name);
+    formula_function_t func_oc = formula_functions::get_function_opcode(p, n);
     if (func_oc != func_unknown)
     {
         // This is a built-in function.
@@ -53,15 +53,15 @@ bool resolve_function(const string& name, formula_name_type& ret)
 }
 
 /**
- * Check if the name is a built-in function, or else it's considered a named 
- * expression. 
- * 
+ * Check if the name is a built-in function, or else it's considered a named
+ * expression.
+ *
  * @param name name to be resolved
  * @param ret resolved name type
  */
-void resolve_function_or_name(const string& name, formula_name_type& ret)
+void resolve_function_or_name(const char* p, size_t n, formula_name_type& ret)
 {
-    if (resolve_function(name, ret))
+    if (resolve_function(p, n, ret))
         return;
 
     // Everything else is assumed to be a named expression.
@@ -199,8 +199,8 @@ string _to_string(parse_address_result res)
 string _to_string(const formula_name_type::address_type& addr)
 {
     std::ostringstream os;
-    os << "[sheet=" << addr.sheet << abs_or_rel(addr.abs_sheet) << ",row=" 
-        << addr.row << abs_or_rel(addr.abs_row) << ",column=" 
+    os << "[sheet=" << addr.sheet << abs_or_rel(addr.abs_sheet) << ",row="
+        << addr.row << abs_or_rel(addr.abs_row) << ",column="
         << addr.col << abs_or_rel(addr.abs_col) << "]";
 
     return os.str();
@@ -257,10 +257,11 @@ formula_name_resolver_simple::formula_name_resolver_simple() :
 
 formula_name_resolver_simple::~formula_name_resolver_simple() {}
 
-formula_name_type formula_name_resolver_simple::resolve(const string& name, const abs_address_t& pos) const
+formula_name_type formula_name_resolver_simple::resolve(
+    const char* p, size_t n, const abs_address_t& pos) const
 {
     formula_name_type ret;
-    resolve_function_or_name(name, ret);
+    resolve_function_or_name(p, n, ret);
     return ret;
 }
 
@@ -289,21 +290,20 @@ string formula_name_resolver_simple::get_name(const abs_range_t& range) const
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
-formula_name_type formula_name_resolver_a1::resolve(const string& name, const abs_address_t& pos) const
+formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, const abs_address_t& pos) const
 {
 #if DEBUG_NAME_RESOLVER
     __IXION_DEBUG_OUT__ << "name=" << name << "; origin=" << pos.get_name() << endl;
 #endif
     formula_name_type ret;
-    if (resolve_function(name, ret))
+    if (resolve_function(p, n, ret))
         return ret;
 
-    size_t n = name.size();
     if (!n)
         return ret;
 
-    const char* p = &name[0];
-    const char* p_last = &name[n-1];
+    const char* p_last = p;
+    std::advance(p_last, n -1);
     col_t col = 0;
     row_t row = 0;
     sheet_t sheet = 0;
@@ -311,7 +311,7 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ab
     bool abs_row = false;
     bool abs_sheet = false;
 
-    parse_address_result parse_res = 
+    parse_address_result parse_res =
         parse_address(p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
 
 #if DEBUG_NAME_RESOLVER
@@ -337,7 +337,7 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ab
         ret.address.abs_col = abs_col;
         return ret;
     }
-    
+
     if (parse_res == range_expected)
     {
         if (p == p_last)
@@ -371,7 +371,7 @@ formula_name_type formula_name_resolver_a1::resolve(const string& name, const ab
         return ret;
     }
 
-    resolve_function_or_name(name, ret);
+    resolve_function_or_name(p, n, ret);
     return ret;
 }
 

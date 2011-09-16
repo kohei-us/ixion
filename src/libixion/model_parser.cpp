@@ -322,7 +322,9 @@ private:
     void convert_string_cell(const model_parser::cell& model_cell)
     {
         const mem_str_buf& name = model_cell.get_name();
-        formula_name_type name_type = m_context.get_name_resolver().resolve(name.str(), abs_address_t());
+        formula_name_type name_type = m_context.get_name_resolver().resolve(
+            name.get(), name.size(), abs_address_t());
+
         if (name_type.type != formula_name_type::cell_reference)
         {
             ostringstream os;
@@ -370,7 +372,9 @@ private:
     void convert_numeric_cell(const model_parser::cell& model_cell)
     {
         const mem_str_buf& name = model_cell.get_name();
-        formula_name_type name_type = m_context.get_name_resolver().resolve(name.str(), abs_address_t());
+        formula_name_type name_type = m_context.get_name_resolver().resolve(
+            name.get(), name.size(), abs_address_t());
+
         if (name_type.type != formula_name_type::cell_reference)
         {
             ostringstream os;
@@ -437,7 +441,7 @@ private:
 
     void convert_formula_cell(const model_parser::cell& model_cell)
     {
-        const string& name = model_cell.get_name().str();
+        const mem_str_buf& name = model_cell.get_name();
 
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
@@ -445,17 +449,18 @@ private:
         formula_parser fparser(model_cell.get_tokens(), m_context);
 
         formula_cell* fcell = NULL;
-        formula_name_type name_type = m_context.get_name_resolver().resolve(name, abs_address_t());
+        formula_name_type name_type = m_context.get_name_resolver().resolve(
+            name.get(), name.size(), abs_address_t());
         switch (name_type.type)
         {
             case formula_name_type::named_expression:
-                fcell = m_context.get_named_expression(name);
+                fcell = m_context.get_named_expression(name.str());
                 if (!fcell)
                 {
                     // No prior named expression with the same name.
                     auto_ptr<formula_cell> pcell(new formula_cell);
-                    m_context.set_named_expression(name, pcell);
-                    fcell = m_context.get_named_expression(name);
+                    m_context.set_named_expression(name.str(), pcell);
+                    fcell = m_context.get_named_expression(name.str());
                 }
                 if (!fcell)
                     throw general_error("failed to insert a named expression");
@@ -1026,8 +1031,11 @@ void model_parser::check(const results_type& formula_results)
 
 const base_cell* model_parser::get_cell_from_name(const string& name)
 {
+    if (name.empty())
+        return NULL;
+
     const formula_name_resolver& resolver = m_context.get_name_resolver();
-    formula_name_type name_type = resolver.resolve(name, abs_address_t());
+    formula_name_type name_type = resolver.resolve(&name[0], name.size(), abs_address_t());
     switch (name_type.type)
     {
         case formula_name_type::cell_reference:

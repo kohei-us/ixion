@@ -45,6 +45,7 @@ public:
     };
 
     mem_str_buf();
+    mem_str_buf(const char* p);
     mem_str_buf(const char* p, size_t n);
 
     void append(const char* p);

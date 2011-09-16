@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,6 +28,7 @@
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_tokens.hpp"
 #include "ixion/matrix.hpp"
+#include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/model_context.hpp"
 
 #ifdef max
@@ -63,7 +64,7 @@ size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
 const char* unknown_func_name = "unknown";
 
 /**
- * Traverse all elements of a passed matrix to sum up their values. 
+ * Traverse all elements of a passed matrix to sum up their values.
  */
 double sum_matrix_elements(const matrix& mx)
 {
@@ -89,11 +90,12 @@ formula_function_t formula_functions::get_function_opcode(const formula_token_ba
     return static_cast<formula_function_t>(token.get_index());
 }
 
-formula_function_t formula_functions::get_function_opcode(const string& name)
+formula_function_t formula_functions::get_function_opcode(const char* p, size_t n)
 {
+    mem_str_buf name(p, n);
     for (size_t i = 0; i < builtin_func_count; ++i)
     {
-        if (name == string(builtin_funcs[i].name))
+        if (name == mem_str_buf(builtin_funcs[i].name))
             return builtin_funcs[i].oc;
     }
     return func_unknown;

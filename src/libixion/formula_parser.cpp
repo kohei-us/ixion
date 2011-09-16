@@ -252,7 +252,7 @@ void formula_parser::primitive(lexer_opcode_t oc)
 void formula_parser::name(const lexer_token_base& t)
 {
     mem_str_buf name = t.get_string();
-    formula_name_type fn = m_context.get_name_resolver().resolve(name.str(), m_pos);
+    formula_name_type fn = m_context.get_name_resolver().resolve(name.get(), name.size(), m_pos);
 #if DEBUG_FORMULA_PARSER
             __IXION_DEBUG_OUT__ << "name = '" << name << "' - " << fn.to_string() << endl;
 #endif
