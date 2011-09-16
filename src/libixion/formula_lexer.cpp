@@ -62,6 +62,7 @@ private:
     static bool is_digit(char c);
     bool is_arg_sep(char c) const;
     bool is_decimal_sep(char c) const;
+    bool is_op(char c) const;
 
     void init();
 
@@ -121,9 +122,16 @@ void tokenizer::run()
             continue;
         }
 
+        if (!is_op(*mp_char))
+        {
+            name();
+            continue;
+        }
+
+        flush_buffer();
+
         if (is_arg_sep(*mp_char))
         {
-            flush_buffer();
             sep_arg();
             continue;
         }
@@ -131,39 +139,29 @@ void tokenizer::run()
         switch (*mp_char)
         {
             case ' ':
-                flush_buffer();
                 space();
                 break;
             case '+':
-                flush_buffer();
                 plus();
                 break;
             case '-':
-                flush_buffer();
                 minus();
                 break;
             case '/':
-                flush_buffer();
                 divide();
                 break;
             case '*':
-                flush_buffer();
                 multiply();
                 break;
             case '(':
-                flush_buffer();
                 open_bracket();
                 break;
             case ')':
-                flush_buffer();
                 close_bracket();
                 break;
             case '"':
-                flush_buffer();
                 string();
                 break;
-            default:
-                name();
         }
     }
 
@@ -183,6 +181,26 @@ bool tokenizer::is_arg_sep(char c) const
 bool tokenizer::is_decimal_sep(char c) const
 {
     return c == m_sep_decimal;
+}
+
+bool tokenizer::is_op(char c) const
+{
+    if (is_arg_sep(c))
+        return true;
+
+    switch (*mp_char)
+    {
+        case ' ':
+        case '+':
+        case '-':
+        case '/':
+        case '*':
+        case '(':
+        case ')':
+        case '"':
+            return true;
+    }
+    return false;
 }
 
 void tokenizer::numeral()
