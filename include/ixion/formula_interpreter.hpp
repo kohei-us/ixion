@@ -30,6 +30,7 @@
 
 #include "ixion/global.hpp"
 #include "ixion/formula_tokens.hpp"
+#include "ixion/formula_result.hpp"
 #include "ixion/hash_container/set.hpp"
 
 #include <sstream>
@@ -73,7 +74,7 @@ public:
 
     void set_origin(const abs_address_t& pos);
     bool interpret();
-    double get_result() const;
+    const formula_result& get_result() const;
     formula_error_t get_error() const;
 
 private:
@@ -82,6 +83,8 @@ private:
      * where we detect circular referencing of named expressions.
      */
     void init_tokens();
+
+    void pop_result();
 
     void expand_named_expression(
         const ::std::string& expr_name, const formula_cell* expr, name_set& used_names);
@@ -117,7 +120,7 @@ private:
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;
 
-    double m_result;
+    formula_result m_result;
     formula_error_t m_error;
 };
 

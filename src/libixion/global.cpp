@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -60,7 +60,7 @@ struct _cell_name_data {
 
 const char* get_formula_result_output_separator()
 {
-    static const char* sep = 
+    static const char* sep =
         "---------------------------------------------------------";
     return sep;
 }
@@ -147,7 +147,7 @@ const char* general_error::what() const throw()
 
 // ============================================================================
 
-file_not_found::file_not_found(const string& fpath) : 
+file_not_found::file_not_found(const string& fpath) :
     m_fpath(fpath)
 {
 }
@@ -225,6 +225,13 @@ double stack_value::get_value() const
     return 0.0;
 }
 
+const string* stack_value::get_string() const
+{
+    if (m_type == sv_string)
+        return m_str;
+    return NULL;
+}
+
 const abs_address_t& stack_value::get_address() const
 {
     return *m_address;
@@ -260,6 +267,11 @@ size_t value_stack_t::size() const
 void value_stack_t::clear()
 {
     return m_stack.clear();
+}
+
+const stack_value& value_stack_t::back() const
+{
+    return m_stack.back();
 }
 
 void value_stack_t::push_value(double val)

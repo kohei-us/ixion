@@ -37,7 +37,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_INTERPRETER 1
+#define DEBUG_FORMULA_INTERPRETER 0
 
 using namespace std;
 
@@ -62,7 +62,6 @@ formula_interpreter::formula_interpreter(const formula_cell* cell, const interfa
     mp_handler(NULL),
     m_token_identifier(cell->get_identifier()),
     m_stack(cxt),
-    m_result(0.0),
     m_error(fe_no_error)
 {
 }
@@ -94,15 +93,10 @@ bool formula_interpreter::interpret()
 
         m_cur_token_itr = m_tokens.begin();
         m_error = fe_no_error;
-        m_result = 0.0;
+        m_result.reset();
 
         expression();
-        // there should only be one stack value left for the result value.
-        assert(m_stack.size() == 1);
-        m_result = m_stack.pop_value();
-
-        if (mp_handler)
-            mp_handler->set_result(m_result);
+        pop_result();
 
         return true;
     }
@@ -123,7 +117,7 @@ bool formula_interpreter::interpret()
     return false;
 }
 
-double formula_interpreter::get_result() const
+const formula_result& formula_interpreter::get_result() const
 {
     return m_result;
 }
@@ -159,6 +153,73 @@ void formula_interpreter::init_tokens()
             m_tokens.push_back(p);
     }
     m_end_token_pos = m_tokens.end();
+}
+
+namespace {
+
+void get_result_from_cell(const interface::model_context& cxt, formula_result& res, const base_cell& cell)
+{
+    switch (cell.get_celltype())
+    {
+        case celltype_formula:
+        {
+            const formula_cell& fcell = static_cast<const formula_cell&>(cell);
+            const formula_result* fres = fcell.get_result_cache();
+            if (fres)
+                res = *fres;
+        }
+        break;
+        case celltype_numeric:
+            res.set_value(cell.get_value());
+        break;
+        case celltype_string:
+        {
+            size_t str_id = cell.get_identifier();
+            res.set_string(cxt.get_string(str_id));
+        }
+        break;
+        case celltype_unknown:
+        default:
+            ;
+    }
+}
+
+}
+
+void formula_interpreter::pop_result()
+{
+    // there should only be one stack value left for the result value.
+    assert(m_stack.size() == 1);
+    const stack_value& res = m_stack.back();
+    switch (res.get_type())
+    {
+        case sv_range_ref:
+        {
+            const abs_range_t& range = res.get_range();
+            const base_cell* p = m_context.get_cell(range.first);
+            if (p)
+                get_result_from_cell(m_context, m_result, *p);
+        }
+        break;
+        case sv_single_ref:
+        {
+            const base_cell* p = m_context.get_cell(res.get_address());
+            if (p)
+                get_result_from_cell(m_context, m_result, *p);
+        }
+        break;
+        case sv_string:
+            m_result.set_string(res.get_string());
+        break;
+        case sv_value:
+            m_result.set_value(res.get_value());
+        break;
+        default:
+            ;
+    }
+
+    if (mp_handler)
+        mp_handler->set_result(m_result);
 }
 
 void formula_interpreter::expand_named_expression(

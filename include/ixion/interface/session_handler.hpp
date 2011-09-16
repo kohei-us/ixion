@@ -34,6 +34,7 @@
 namespace ixion {
 
 class formula_cell;
+class formula_result;
 struct address_t;
 struct range_t;
 struct abs_address_t;
@@ -46,7 +47,7 @@ public:
     virtual ~session_handler() {}
 
     virtual void begin_cell_interpret(const formula_cell* p) = 0;
-    virtual void set_result(double result) = 0;
+    virtual void set_result(const formula_result& result) = 0;
     virtual void set_invalid_expression(const char* msg) = 0;
     virtual void set_formula_error(const char* msg) = 0;
     virtual void push_token(fopcode_t fop) = 0;

@@ -77,6 +77,15 @@ formula_result::~formula_result()
         delete m_string;
 }
 
+void formula_result::reset()
+{
+    if (m_type == rt_string)
+        delete m_string;
+
+    m_type = rt_value;
+    m_value = 0.0;
+}
+
 void formula_result::set_value(double v)
 {
     if (m_type == rt_string)
@@ -86,13 +95,16 @@ void formula_result::set_value(double v)
     m_value = v;
 }
 
-void formula_result::set_string(string* p)
+void formula_result::set_string(const string* p)
 {
     if (m_type == rt_string)
         delete m_string;
 
+    if (!p)
+        return;
+
     m_type = rt_string;
-    m_string = p;
+    m_string = new string(*p);
 }
 
 void formula_result::set_error(formula_error_t e)

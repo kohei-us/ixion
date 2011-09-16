@@ -246,7 +246,7 @@ void formula_cell::interpret(const interface::model_context& context)
         if (fin.interpret())
         {
             // Successful interpretation.
-            m_interpret_status.result->set_value(fin.get_result());
+            *m_interpret_status.result = fin.get_result();
         }
         else
         {

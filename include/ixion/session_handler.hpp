@@ -42,7 +42,7 @@ public:
     virtual ~session_handler();
 
     virtual void begin_cell_interpret(const formula_cell* p);
-    virtual void set_result(double result);
+    virtual void set_result(const formula_result& result);
     virtual void set_invalid_expression(const char* msg);
     virtual void set_formula_error(const char* msg);
 

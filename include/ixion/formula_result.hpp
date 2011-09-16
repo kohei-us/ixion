@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,7 +36,7 @@ namespace ixion {
 
 /**
  * Store formula result which may be either numeric, textural, or error.  In
- * case the result is textural, it owns the instance of the string. 
+ * case the result is textural, it owns the instance of the string.
  */
 class formula_result
 {
@@ -50,10 +50,11 @@ public:
     formula_result(formula_error_t e);
     ~formula_result();
 
+    void reset();
     void set_value(double v);
-    void set_string(::std::string* p);
+    void set_string(const std::string* p);
     void set_error(formula_error_t e);
-    
+
     double get_value() const;
     const ::std::string& get_string() const;
     formula_error_t get_error() const;
@@ -63,9 +64,9 @@ public:
     ::std::string str() const;
 
     /**
-     * Parse a textural representation of a formula result, and set result 
+     * Parse a textural representation of a formula result, and set result
      * value of appropriate type.
-     * 
+     *
      * @param str textural representation of a formula result.
      */
     void parse(const ::std::string& str);
@@ -86,6 +87,22 @@ private:
         formula_error_t m_error;
     };
 };
+
+inline std::ostream& operator<< (std::ostream& os, const formula_result& res)
+{
+    switch (res.get_type())
+    {
+        case formula_result::rt_value:
+            return os << res.get_value();
+        case formula_result::rt_string:
+            return os << res.get_string();
+        case formula_result::rt_error:
+            return os << get_formula_error_name(res.get_error());
+        default:
+            ;
+    }
+    return os;
+}
 
 }
 

@@ -28,6 +28,7 @@
 #include "ixion/session_handler.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_functions.hpp"
+#include "ixion/formula_result.hpp"
 
 #include <string>
 #include <iostream>
@@ -54,7 +55,7 @@ void session_handler::begin_cell_interpret(const formula_cell *p)
     cout << m_cell_name << ": ";
 }
 
-void session_handler::set_result(double result)
+void session_handler::set_result(const formula_result& result)
 {
     cout << endl << m_cell_name << ": result = " << result << endl;
 }

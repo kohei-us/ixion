@@ -190,6 +190,7 @@ public:
 
     stack_value_t get_type() const;
     double get_value() const;
+    const std::string* get_string() const;
     const abs_address_t& get_address() const;
     const abs_range_t& get_range() const;
 };
@@ -210,6 +211,7 @@ public:
     bool empty() const;
     size_t size() const;
     void clear();
+    const stack_value& back() const;
 
     void push_value(double val);
     void push_single_ref(const abs_address_t& val);
