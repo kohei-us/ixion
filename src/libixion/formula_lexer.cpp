@@ -51,8 +51,7 @@ public:
         mp_first(p),
         mp_char(NULL),
         m_size(n),
-        m_pos(0),
-        m_buf_type(buf_name)
+        m_pos(0)
     {
     }
 
@@ -80,8 +79,6 @@ private:
 
     bool has_char() const;
     void next();
-    void push_to_buffer();
-    void flush_buffer();
 
 private:
     lexer_tokens_t& m_tokens;
@@ -93,9 +90,6 @@ private:
     const char* mp_char;
     size_t m_size;
     size_t m_pos;
-
-    mem_str_buf m_buf;
-    buffer_type m_buf_type;
 };
 
 void tokenizer::init()
@@ -127,8 +121,6 @@ void tokenizer::run()
             name();
             continue;
         }
-
-        flush_buffer();
 
         if (is_arg_sep(*mp_char))
         {
@@ -164,8 +156,6 @@ void tokenizer::run()
                 break;
         }
     }
-
-    flush_buffer();
 }
 
 bool tokenizer::is_digit(char c)
@@ -205,15 +195,11 @@ bool tokenizer::is_op(char c) const
 
 void tokenizer::numeral()
 {
-    if (m_buf.empty())
-        m_buf_type = buf_numeral;
-
+    const char* p = mp_char;
+    size_t len = 1;
     size_t sep_count = 0;
-    while (true)
+    for (next(); has_char(); next(), ++len)
     {
-        push_to_buffer();
-        next();
-
         if (is_digit(*mp_char))
             continue;
         if (is_decimal_sep(*mp_char) && ++sep_count <= 1)
@@ -221,12 +207,15 @@ void tokenizer::numeral()
         break;
     }
 
-    if (sep_count > 1 && m_buf_type == buf_numeral)
+    if (sep_count > 1)
     {
         ostringstream os;
-        os << "error parsing numeral: " << m_buf.str();
+        os << "error parsing numeral: " << std::string(p, len);
         throw formula_lexer::tokenize_error(os.str());
     }
+    std::string s(p, len);
+    double val = strtod(s.c_str(), NULL);
+    m_tokens.push_back(new lexer_value_token(val));
 }
 
 void tokenizer::space()
@@ -237,14 +226,15 @@ void tokenizer::space()
 
 void tokenizer::name()
 {
-    if (m_buf_type != buf_name)
+    const char* p = mp_char;
+    size_t len = 1;
+    for (next(); has_char(); next(), ++len)
     {
-        flush_buffer();
-        m_buf_type = buf_name;
+        if (is_op(*mp_char))
+            break;
     }
 
-    push_to_buffer();
-    next();
+    m_tokens.push_back(new lexer_name_token(p, len));
 }
 
 void tokenizer::plus()
@@ -313,39 +303,6 @@ void tokenizer::next()
 bool tokenizer::has_char() const
 {
     return m_pos < m_size;
-}
-
-void tokenizer::push_to_buffer()
-{
-    if (m_buf.empty())
-        m_buf.set_start(mp_char);
-    else
-        m_buf.inc();
-}
-
-void tokenizer::flush_buffer()
-{
-    if (m_buf.empty())
-        return;
-
-    switch (m_buf_type)
-    {
-        case buf_numeral:
-        {
-            std::string s = m_buf.str();
-            double val = strtod(s.c_str(), NULL);
-            m_tokens.push_back(new lexer_value_token(val));
-        }
-        break;
-        case buf_name:
-        {
-            m_tokens.push_back(new lexer_name_token(m_buf.get(), m_buf.size()));
-        }
-        break;
-        default:
-            throw formula_lexer::tokenize_error("unknown buffer type");
-    }
-    m_buf.clear();
 }
 
 // ============================================================================
