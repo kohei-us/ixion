@@ -159,20 +159,19 @@ string formula_result::str() const
     return string();
 }
 
-void formula_result::parse(const string& r)
+void formula_result::parse(const char* p, size_t n)
 {
-    if (r.empty())
+    if (!n)
         return;
 
-    const char* p = r.c_str();
     if (*p == '#')
-        parse_error(r);
+        parse_error(p, n);
     else if (*p == '"')
-        parse_string(r);
+        parse_string(p, n);
     else
     {
         // parse this as a number.
-        m_value = global::to_double(&r[0], r.size());
+        m_value = global::to_double(p, n);
         m_type = rt_value;
     }
 
@@ -227,11 +226,8 @@ bool formula_result::operator!= (const formula_result& r) const
     return !operator== (r);
 }
 
-void formula_result::parse_error(const string& str)
+void formula_result::parse_error(const char* p, size_t n)
 {
-    const char* p = &str[0];
-    size_t n = str.size();
-
     assert(n);
     assert(*p == '#');
 
@@ -266,14 +262,15 @@ void formula_result::parse_error(const string& str)
     }
 
     ostringstream os;
-    os << "malformed error string: " << str;
+    os << "malformed error string: " << string(p, n);
     throw general_error(os.str());
 }
 
-void formula_result::parse_string(const string& str)
+void formula_result::parse_string(const char* p, size_t n)
 {
-    const char* p = &str[0];
-    size_t n = str.size();
+    if (n <= 1)
+        return;
+
     assert(*p == '"');
     ++p;
     const char* p_first = p;

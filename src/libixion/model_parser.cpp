@@ -672,7 +672,7 @@ void parse_result(const char*& p, model_parser::results_type& results)
 
     string name_s = name.str();
     formula_result res;
-    res.parse(result.str());
+    res.parse(result.get(), result.size());
     model_parser::results_type::iterator itr = results.find(name_s);
     if (itr == results.end())
     {
