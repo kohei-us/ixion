@@ -100,6 +100,7 @@ public:
      */
     static void load_file_content(const ::std::string& filepath, ::std::string& content);
 
+    static double to_double(const char* p, size_t n);
 private:
     global();
     global(const global& r);

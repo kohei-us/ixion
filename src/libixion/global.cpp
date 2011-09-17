@@ -114,6 +114,65 @@ void global::load_file_content(const string& filepath, string& content)
     os.str().swap(content);
 }
 
+double global::to_double(const char* p, size_t n)
+{
+    if (!n)
+        return 0.0;
+
+    // First, use the standard C API.
+    const char* p_last_check = p + n;
+    char* p_last;
+    double val = strtod(p, &p_last);
+    if (p_last == p_last_check)
+        return val;
+
+    // If that fails, do the manual conversion, which may introduce rounding
+    // errors.  Revise this to reduce the amount of rounding error.
+    bool dot = false;
+    double frac = 1.0;
+    double sign = 1.0;
+    for (size_t i = 0; i < n; ++i, ++p)
+    {
+        if (i == 0)
+        {
+            if (*p == '+')
+                // Skip this.
+                continue;
+
+            if (*p == '-')
+            {
+                sign = -1.0;
+                continue;
+            }
+        }
+        if (*p == '.')
+        {
+            if (dot)
+                // Second dot is not allowed.
+                break;
+            dot = true;
+            continue;
+        }
+
+        if (*p < '0' || '9' < *p)
+            // not a digit.  End the parse.
+            break;
+
+        int digit = *p - '0';
+        if (dot)
+        {
+            frac *= 0.1;
+            val += digit * frac;
+        }
+        else
+        {
+            val *= 10.0;
+            val += digit;
+        }
+    }
+    return sign*val;
+}
+
 const char* get_formula_error_name(formula_error_t fe)
 {
     static const char* names[] = {

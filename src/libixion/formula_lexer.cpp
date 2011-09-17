@@ -26,6 +26,7 @@
  ************************************************************************/
 
 #include "ixion/formula_lexer.hpp"
+#include "ixion/global.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -212,8 +213,7 @@ void tokenizer::numeral()
         os << "error parsing numeral: " << std::string(p, len);
         throw formula_lexer::tokenize_error(os.str());
     }
-    std::string s(p, len);
-    double val = strtod(s.c_str(), NULL);
+    double val = global::to_double(p, len);
     m_tokens.push_back(new lexer_value_token(val));
 }
 

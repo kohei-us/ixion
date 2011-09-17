@@ -30,6 +30,7 @@
 #include "ixion/formula.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/global.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -53,6 +54,25 @@ void test_size()
     cout << "numeric_cell: " << sizeof(numeric_cell) << endl;
     cout << "formula_cell: " << sizeof(formula_cell) << endl;
     cout << "formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
+}
+
+void test_string_to_double()
+{
+    cout << "test string to double" << endl;
+    struct { const char* s; double v; } tests[] = {
+        { "12", 12.0 },
+        { "0", 0.0 },
+        { "1.3", 1.3 },
+        { "1234.00983", 1234.00983 },
+        { "-123.3", -123.3 }
+    };
+
+    size_t n = sizeof(tests) / sizeof(tests[0]);
+    for (size_t i = 0; i < n; ++i)
+    {
+        double v = global::to_double(tests[i].s, strlen(tests[i].s));
+        assert(v == tests[i].v);
+    }
 }
 
 void test_name_resolver()
@@ -166,6 +186,7 @@ void test_external_formula_functions()
 int main()
 {
     test_size();
+    test_string_to_double();
     test_name_resolver();
     test_address();
     test_external_formula_functions();

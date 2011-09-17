@@ -172,7 +172,7 @@ void formula_result::parse(const string& r)
     else
     {
         // parse this as a number.
-        m_value = strtod(p, NULL);
+        m_value = global::to_double(&r[0], r.size());
         m_type = rt_value;
     }
 
