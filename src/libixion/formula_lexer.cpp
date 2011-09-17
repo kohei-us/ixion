@@ -88,20 +88,19 @@ private:
 
     const char* mp_first;
     const char* mp_char;
-    size_t m_size;
+    const size_t m_size;
     size_t m_pos;
 };
 
 void tokenizer::init()
 {
+    m_tokens.clear();
     mp_char = mp_first;
     m_pos = 0;
 }
 
 void tokenizer::run()
 {
-    m_tokens.clear();
-
     if (!m_size)
         // Nothing to do.
         return;
