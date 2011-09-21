@@ -82,7 +82,7 @@ void model_context::erase_cell(const abs_address_t& addr)
 
     const base_cell& cell = *itr->second;
     if (cell.get_celltype() == celltype_formula)
-        remove_formula_tokens(cell.get_identifier());
+        remove_formula_tokens(addr.sheet, cell.get_identifier());
 
     m_cells.erase(itr);
 }
@@ -179,21 +179,21 @@ interface::session_handler* model_context::get_session_handler() const
     return mp_session_handler;
 }
 
-formula_tokens_t* model_context::get_formula_tokens(size_t identifier)
+formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier)
 {
     if (m_tokens.size() <= identifier)
         return NULL;
     return m_tokens[identifier];
 }
 
-const formula_tokens_t* model_context::get_formula_tokens(size_t identifier) const
+const formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier) const
 {
     if (m_tokens.size() <= identifier)
         return NULL;
     return m_tokens[identifier];
 }
 
-size_t model_context::add_formula_tokens(formula_tokens_t* p)
+size_t model_context::add_formula_tokens(sheet_t sheet, formula_tokens_t* p)
 {
     // First, search for a NULL spot.
     formula_tokens_store_type::iterator itr = std::find(
@@ -212,7 +212,7 @@ size_t model_context::add_formula_tokens(formula_tokens_t* p)
     return identifier;
 }
 
-void model_context::remove_formula_tokens(size_t identifier)
+void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
 {
     if (m_tokens.size() >= identifier)
         return;

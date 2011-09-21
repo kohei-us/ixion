@@ -49,6 +49,8 @@ using namespace std;
 
 namespace ixion {
 
+const sheet_t global_scope = -1;
+
 namespace {
 
 struct _cell_name_data {

@@ -449,6 +449,7 @@ private:
         formula_parser fparser(model_cell.get_tokens(), m_context);
 
         formula_cell* fcell = NULL;
+        sheet_t fcell_sheet = global_scope;
         formula_name_type name_type = m_context.get_name_resolver().resolve(
             name.get(), name.size(), abs_address_t());
         switch (name_type.type)
@@ -500,6 +501,7 @@ private:
                     address_cell_pair_type(addr, fcell));
 
                 fparser.set_origin(addr);
+                fcell_sheet = addr.sheet;
             }
             break;
             default:
@@ -515,7 +517,7 @@ private:
         // Associate the formula tokens with the formula cell instance.
         formula_tokens_t* p = new formula_tokens_t;
         p->swap(fparser.get_tokens());
-        fcell->set_identifier(m_context.add_formula_tokens(p));
+        fcell->set_identifier(m_context.add_formula_tokens(fcell_sheet, p));
     }
 };
 

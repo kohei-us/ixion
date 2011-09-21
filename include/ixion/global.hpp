@@ -43,6 +43,8 @@ typedef int col_t;
 typedef int row_t;
 typedef int sheet_t;
 
+extern const sheet_t global_scope;
+
 class base_cell;
 class formula_cell;
 struct abs_address_t;

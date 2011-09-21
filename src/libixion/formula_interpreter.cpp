@@ -132,7 +132,7 @@ void formula_interpreter::init_tokens()
     name_set used_names;
     m_tokens.clear();
     m_stack.clear();
-    const formula_tokens_t* orig_tokens = m_context.get_formula_tokens(m_token_identifier);
+    const formula_tokens_t* orig_tokens = m_context.get_formula_tokens(m_pos.sheet, m_token_identifier);
     if (!orig_tokens)
         return;
 
@@ -233,7 +233,7 @@ void formula_interpreter::expand_named_expression(
     }
 
     size_t tokens_id = expr->get_identifier();
-    const formula_tokens_t* expr_tokens = m_context.get_formula_tokens(tokens_id);
+    const formula_tokens_t* expr_tokens = m_context.get_formula_tokens(global_scope, tokens_id);
     if (!expr_tokens)
         return;
 

@@ -265,7 +265,8 @@ bool formula_cell::is_circular_safe() const
 void formula_cell::check_circular(const interface::model_context& cxt)
 {
     // TODO: Check to make sure this is being run on the main thread only.
-    const formula_tokens_t* tokens = cxt.get_formula_tokens(m_identifier);
+    abs_address_t pos = cxt.get_cell_position(this);
+    const formula_tokens_t* tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
     formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();
     for (; itr != itr_end; ++itr)
     {
@@ -345,7 +346,8 @@ void formula_cell::reset()
 
 void formula_cell::get_ref_tokens(interface::model_context& cxt, vector<formula_token_base*>& tokens)
 {
-    formula_tokens_t* this_tokens = cxt.get_formula_tokens(m_identifier);
+    abs_address_t pos = cxt.get_cell_position(this);
+    formula_tokens_t* this_tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
     if (!this_tokens)
         return;
 
