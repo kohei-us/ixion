@@ -32,6 +32,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "ixion/formula_tokens_fwd.hpp"
+#include "ixion/types.hpp"
 
 namespace ixion {
 

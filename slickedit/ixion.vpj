@@ -261,6 +261,7 @@
 				<F N="../include/ixion/session_handler.hpp"/>
 				<F N="../include/ixion/sort_input_parser.hpp"/>
 				<F N="../include/ixion/thread.hpp"/>
+				<F N="../include/ixion/types.hpp"/>
 			</Folder>
 		</Folder>
 		<Folder Name="../src">

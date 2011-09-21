@@ -30,6 +30,7 @@
 
 #include "ixion/hash_container/map.hpp"
 #include "ixion/hash_container/set.hpp"
+#include "ixion/types.hpp"
 
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
@@ -38,10 +39,6 @@
 #define __IXION_DEBUG_OUT__ ::std::cout << __FILE__ << "#" << __LINE__ << ": "
 
 namespace ixion {
-
-typedef int col_t;
-typedef int row_t;
-typedef int sheet_t;
 
 extern const sheet_t global_scope;
 
