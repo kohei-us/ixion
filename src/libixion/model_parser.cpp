@@ -35,6 +35,7 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/function_objects.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -132,65 +133,6 @@ private:
     dependency_tracker& m_tracker;
     const dirty_cells_t& m_dirty_cells;
     formula_cell* mp_fcell;
-};
-
-class formula_cell_listener_handler : public unary_function<formula_token_base*, void>
-{
-public:
-    enum mode_t { mode_add, mode_remove };
-
-    explicit formula_cell_listener_handler(model_context& cxt, const abs_address_t& addr, mode_t mode) :
-        m_context(cxt), m_listener_tracker(cell_listener_tracker::get(cxt)), m_addr(addr), m_mode(mode)
-    {
-#if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: cell position=" << m_addr.get_name() << endl;
-#endif
-    }
-
-    void operator() (formula_token_base* p) const
-    {
-        switch (p->get_opcode())
-        {
-            case fop_single_ref:
-            {
-                abs_address_t addr = p->get_single_ref().to_abs(m_addr);
-#if DEBUG_MODEL_PARSER
-                __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
-#endif
-                if (m_mode == mode_add)
-                {
-                    m_listener_tracker.add(m_addr, addr);
-                }
-                else
-                {
-                    assert(m_mode == mode_remove);
-                    m_listener_tracker.remove(m_addr, addr);
-                }
-            }
-            break;
-            case fop_range_ref:
-            {
-                abs_range_t range = p->get_range_ref().to_abs(m_addr);
-                if (m_mode == mode_add)
-                    cell_listener_tracker::get(m_context).add(m_addr, range);
-                else
-                {
-                    assert(m_mode == mode_remove);
-                    cell_listener_tracker::get(m_context).remove(m_addr, range);
-                }
-            }
-            break;
-            default:
-                ; // ignore the rest.
-        }
-    }
-
-private:
-    model_context& m_context;
-    cell_listener_tracker& m_listener_tracker;
-    const abs_address_t& m_addr;
-    formula_cell* mp_cell;
-    mode_t m_mode;
 };
 
 class formula_cell_printer : public unary_function<const base_cell*, void>

@@ -25,44 +25,39 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_FORMULA_HPP__
-#define __IXION_FORMULA_HPP__
+#ifndef __IXION_FUNCTION_OBJECTS_HPP__
+#define __IXION_FUNCTION_OBJECTS_HPP__
 
-#include "ixion/formula_tokens.hpp"
-#include "ixion/interface/model_context.hpp"
-
-#include <string>
+#include <functional>
 
 namespace ixion {
 
-/**
- * Parse a raw formula expression string into formula tokens.
- *
- * @param cxt model context.
- * @param pos address of the cell that has the formula expression.
- * @param p pointer to the first character of raw formula expression string.
- * @param n size of the raw formula expression string.
- * @param tokens formula tokens representing the parsed formula expression.
- */
-void parse_formula_string(
-    const interface::model_context& cxt, const abs_address_t& pos,
-    const char* p, size_t n, formula_tokens_t& tokens);
+namespace interface {
+    class model_context;
+}
 
-/**
- * Convert formula tokens into a human-readable string representation.
- *
- * @param cxt model context.
- * @param pos address of the cell that has the formula tokens.
- * @param tokens formula tokens.
- * @param str string representation of the formula tokens.
- */
-void print_formula_tokens(
-    const interface::model_context& cxt, const abs_address_t& pos,
-    const formula_tokens_t& tokens, std::string& str);
+class cell_listener_tracker;
+class formula_cell;
+class formula_token_base;
+struct abs_address_t;
 
-void register_formula_cell(
-    const interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
+class formula_cell_listener_handler : public std::unary_function<formula_token_base*, void>
+{
+public:
+    enum mode_t { mode_add, mode_remove };
 
+    explicit formula_cell_listener_handler(
+        interface::model_context& cxt, const abs_address_t& addr, mode_t mode);
+
+    void operator() (formula_token_base* p) const;
+
+private:
+    interface::model_context& m_context;
+    cell_listener_tracker& m_listener_tracker;
+    const abs_address_t& m_addr;
+    formula_cell* mp_cell;
+    mode_t m_mode;
+};
 
 }
 

@@ -137,4 +137,16 @@ void print_formula_tokens(
     str = os.str();
 }
 
+void register_formula_cell(
+    const interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
+{
+#if 0
+    vector<formula_token_base*> ref_tokens;
+    cell->get_ref_tokens(cxt, ref_tokens);
+    std::for_each(ref_tokens.begin(), ref_tokens.end(),
+             formula_cell_listener_handler(cxt,
+                 pos, formula_cell_listener_handler::mode_add));
+#endif
+}
+
 }
