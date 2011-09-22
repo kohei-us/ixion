@@ -54,12 +54,12 @@ class ref_token_picker : public unary_function<formula_token_base, void>
 {
 public:
     ref_token_picker() :
-        mp_tokens(new vector<formula_token_base*>()) {}
+        mp_tokens(new vector<const formula_token_base*>()) {}
 
     ref_token_picker(const ref_token_picker& r) :
         mp_tokens(r.mp_tokens) {}
 
-    void operator() (formula_token_base& t)
+    void operator() (const formula_token_base& t)
     {
         switch (t.get_opcode())
         {
@@ -72,13 +72,13 @@ public:
         }
     }
 
-    void swap_tokens(vector<formula_token_base*>& dest)
+    void swap_tokens(vector<const formula_token_base*>& dest)
     {
         mp_tokens->swap(dest);
     }
 
 private:
-    ::boost::shared_ptr<vector<formula_token_base*> > mp_tokens;
+    ::boost::shared_ptr<vector<const formula_token_base*> > mp_tokens;
 };
 
 }
@@ -344,10 +344,10 @@ void formula_cell::reset()
     reset_flag();
 }
 
-void formula_cell::get_ref_tokens(interface::model_context& cxt, vector<formula_token_base*>& tokens)
+void formula_cell::get_ref_tokens(const interface::model_context& cxt, vector<const formula_token_base*>& tokens)
 {
     abs_address_t pos = cxt.get_cell_position(this);
-    formula_tokens_t* this_tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+    const formula_tokens_t* this_tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
     if (!this_tokens)
         return;
 

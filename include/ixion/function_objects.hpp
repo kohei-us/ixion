@@ -49,7 +49,7 @@ public:
     explicit formula_cell_listener_handler(
         interface::model_context& cxt, const abs_address_t& addr, mode_t mode);
 
-    void operator() (formula_token_base* p) const;
+    void operator() (const formula_token_base* p) const;
 
 private:
     interface::model_context& m_context;

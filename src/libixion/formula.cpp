@@ -29,6 +29,8 @@
 #include "ixion/formula_lexer.hpp"
 #include "ixion/formula_parser.hpp"
 #include "ixion/formula_functions.hpp"
+#include "ixion/function_objects.hpp"
+#include "ixion/cell.hpp"
 
 #include <sstream>
 
@@ -141,7 +143,7 @@ void register_formula_cell(
     const interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
 {
 #if 0
-    vector<formula_token_base*> ref_tokens;
+    std::vector<formula_token_base*> ref_tokens;
     cell->get_ref_tokens(cxt, ref_tokens);
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,

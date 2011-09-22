@@ -45,7 +45,7 @@ formula_cell_listener_handler::formula_cell_listener_handler(
 #endif
 }
 
-void formula_cell_listener_handler::operator() (formula_token_base* p) const
+void formula_cell_listener_handler::operator() (const formula_token_base* p) const
 {
     switch (p->get_opcode())
     {

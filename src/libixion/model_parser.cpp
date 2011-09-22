@@ -77,13 +77,13 @@ private:
     ptr_map<string, base_cell>& m_cell_map;
 };
 
-class ref_cell_picker : public unary_function<formula_token_base*, void>
+class ref_cell_picker : public unary_function<const formula_token_base*, void>
 {
 public:
     ref_cell_picker(model_context& cxt, const abs_address_t& origin, vector<base_cell*>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
-    void operator() (formula_token_base* p)
+    void operator() (const formula_token_base* p)
     {
         switch (p->get_opcode())
         {
@@ -185,7 +185,7 @@ public:
 #endif
         // Register cell dependencies.
         formula_cell* fcell = static_cast<formula_cell*>(pcell);
-        vector<formula_token_base*> ref_tokens;
+        vector<const formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(m_context, ref_tokens);
 
 #if DEBUG_MODEL_PARSER
@@ -254,7 +254,7 @@ private:
         // Go through all its existing references, and remove
         // itself as their listener.  This step is important
         // especially during partial re-calculation.
-        vector<formula_token_base*> ref_tokens;
+        vector<const formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(m_context, ref_tokens);
         for_each(ref_tokens.begin(), ref_tokens.end(),
                  formula_cell_listener_handler(m_context,
@@ -481,7 +481,7 @@ public:
         __IXION_DEBUG_OUT__ << "processing formula cell at " << m_context.get_cell_name(fcell) << endl;
 #endif
         // Now, register the formula cell as a listener to all its references.
-        vector<formula_token_base*> ref_tokens;
+        vector<const formula_token_base*> ref_tokens;
         fcell->get_ref_tokens(m_context, ref_tokens);
 #if DEBUG_MODEL_PARSER
         __IXION_DEBUG_OUT__ << "  number of reference tokens: " << ref_tokens.size() << endl;

@@ -146,7 +146,7 @@ public:
      */
     void reset();
 
-    void get_ref_tokens(interface::model_context& cxt, std::vector<formula_token_base*>& tokens);
+    void get_ref_tokens(const interface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
 
     const formula_result* get_result_cache() const;
 
