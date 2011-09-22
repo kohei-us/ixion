@@ -61,7 +61,7 @@ void print_formula_tokens(
     const formula_tokens_t& tokens, std::string& str);
 
 void register_formula_cell(
-    const interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
+    interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
 
 }
