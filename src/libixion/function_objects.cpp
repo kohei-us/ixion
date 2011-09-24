@@ -69,7 +69,7 @@ public:
                 {
                     base_cell* cell = *itr;
                     if (cell->get_celltype() == celltype_formula)
-                    m_deps.push_back(static_cast<formula_cell*>(cell));
+                        m_deps.push_back(static_cast<formula_cell*>(cell));
                 }
             }
             break;
