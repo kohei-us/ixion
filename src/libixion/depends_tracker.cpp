@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -46,12 +46,12 @@ namespace ixion {
 
 namespace {
 
-class cell_printer : public unary_function<const base_cell*, void>
+class cell_printer : public unary_function<const formula_cell*, void>
 {
 public:
     cell_printer(const interface::model_context& cxt) : m_cxt(cxt) {}
 
-    void operator() (const base_cell* p) const
+    void operator() (const formula_cell* p) const
     {
         __IXION_DEBUG_OUT__ << "  " << m_cxt.get_cell_name(p) << endl;
     }
@@ -64,35 +64,31 @@ private:
  * Function object to reset the status of formula cell to pre-interpretation
  * status.
  */
-struct cell_reset_handler : public unary_function<base_cell*, void>
+struct cell_reset_handler : public unary_function<formula_cell*, void>
 {
-    void operator() (base_cell* p) const
+    void operator() (formula_cell* p) const
     {
-        assert(p->get_celltype() == celltype_formula);
-        static_cast<formula_cell*>(p)->reset();
+        p->reset();
     }
 };
 
-class circular_check_handler : public unary_function<base_cell*, void>
+class circular_check_handler : public unary_function<formula_cell*, void>
 {
     const interface::model_context& m_context;
 public:
     circular_check_handler(const interface::model_context& cxt) : m_context(cxt) {}
 
-    void operator() (base_cell* p) const
+    void operator() (formula_cell* p) const
     {
-        assert(p->get_celltype() == celltype_formula);
-        static_cast<formula_cell*>(p)->check_circular(m_context);
+        p->check_circular(m_context);
     }
 };
 
-struct thread_queue_handler : public unary_function<base_cell*, void>
+struct thread_queue_handler : public unary_function<formula_cell*, void>
 {
-    void operator() (base_cell* p) const
+    void operator() (formula_cell* p) const
     {
-        assert(p->get_celltype() == celltype_formula);
-        formula_cell* fcell = static_cast<formula_cell*>(p);
-        cell_queue_manager::add_cell(fcell);
+        cell_queue_manager::add_cell(p);
     }
 };
 
@@ -112,10 +108,10 @@ private:
 
 }
 
-dependency_tracker::cell_back_inserter::cell_back_inserter(vector<base_cell*> & sorted_cells) :
+dependency_tracker::cell_back_inserter::cell_back_inserter(vector<formula_cell*> & sorted_cells) :
     m_sorted_cells(sorted_cells) {}
 
-void dependency_tracker::cell_back_inserter::operator() (base_cell* cell)
+void dependency_tracker::cell_back_inserter::operator() (formula_cell* cell)
 {
     m_sorted_cells.push_back(cell);
 }
@@ -132,7 +128,7 @@ dependency_tracker::~dependency_tracker()
 {
 }
 
-void dependency_tracker::insert_depend(base_cell* origin_cell, base_cell* depend_cell)
+void dependency_tracker::insert_depend(formula_cell* origin_cell, formula_cell* depend_cell)
 {
 #if DEBUG_DEPENDS_TRACKER
     __IXION_DEBUG_OUT__ << m_context.get_cell_name(origin_cell) << "->" << m_context.get_cell_name(depend_cell) << endl;
@@ -142,7 +138,7 @@ void dependency_tracker::insert_depend(base_cell* origin_cell, base_cell* depend
 
 void dependency_tracker::interpret_all_cells(size_t thread_count)
 {
-    vector<base_cell*> sorted_cells;
+    vector<formula_cell*> sorted_cells;
     topo_sort_cells(sorted_cells);
 
 #if DEBUG_DEPENDS_TRACKER
@@ -156,7 +152,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
 #endif
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
 
-    // First, detect circular dependencies and mark those circular 
+    // First, detect circular dependencies and mark those circular
     // dependent cells with appropriate error flags.
 #if DEBUG_DEPENDS_TRACKER
     __IXION_DEBUG_OUT__ << "Check circular dependencies --------------------------------" << endl;
@@ -177,14 +173,14 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     }
 }
 
-void dependency_tracker::topo_sort_cells(vector<base_cell*>& sorted_cells) const
+void dependency_tracker::topo_sort_cells(vector<formula_cell*>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
-    vector<base_cell*> all_cells;
+    vector<formula_cell*> all_cells;
     all_cells.reserve(m_dirty_cells.size());
     dirty_cells_t::const_iterator itr = m_dirty_cells.begin(), itr_end = m_dirty_cells.end();
     for (; itr != itr_end; ++itr)
-        all_cells.push_back(const_cast<base_cell*>(*itr));
+        all_cells.push_back(*itr);
 
     dfs_type dfs(all_cells, m_deps.get(), handler);
     dfs.run();

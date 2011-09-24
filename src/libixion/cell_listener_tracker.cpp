@@ -163,7 +163,7 @@ public:
             if (p && p->get_celltype() == celltype_formula)
             {
                 // Formula cell exists at this address.
-                m_dirty_cells.insert(p);
+                m_dirty_cells.insert(static_cast<formula_cell*>(p));
                 m_addrs.insert(addr);
             }
         }

@@ -61,7 +61,7 @@ typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name
  * reference modified cells.  Note that dirty cells can be of any cell
  * types.
  */
-typedef _ixion_unordered_set_type<base_cell*> dirty_cells_t;
+typedef _ixion_unordered_set_type<formula_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
 

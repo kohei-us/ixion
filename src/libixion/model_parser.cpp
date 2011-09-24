@@ -80,7 +80,7 @@ private:
 class ref_cell_picker : public unary_function<const formula_token_base*, void>
 {
 public:
-    ref_cell_picker(model_context& cxt, const abs_address_t& origin, vector<base_cell*>& deps) :
+    ref_cell_picker(model_context& cxt, const abs_address_t& origin, vector<formula_cell*>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
     void operator() (const formula_token_base* p)
@@ -90,9 +90,9 @@ public:
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(m_origin);
-                const base_cell* refcell = m_context.get_cell(addr);
-                if (refcell)
-                    m_deps.push_back(const_cast<base_cell*>(refcell));
+                base_cell* refcell = m_context.get_cell(addr);
+                if (refcell && refcell->get_celltype() == celltype_formula)
+                    m_deps.push_back(static_cast<formula_cell*>(refcell));
             }
             break;
             case fop_range_ref:
@@ -102,7 +102,11 @@ public:
                 m_context.get_cells(range, cells);
                 vector<base_cell*>::const_iterator itr = cells.begin(), itr_end = cells.end();
                 for (; itr != itr_end; ++itr)
-                    m_deps.push_back(*itr);
+                {
+                    base_cell* cell = *itr;
+                    if (cell->get_celltype() == celltype_formula)
+                    m_deps.push_back(static_cast<formula_cell*>(cell));
+                }
             }
             break;
             default:
@@ -113,10 +117,10 @@ public:
 private:
     model_context& m_context;
     const abs_address_t& m_origin;
-    vector<base_cell*>&  m_deps;
+    vector<formula_cell*>&  m_deps;
 };
 
-class depcell_inserter : public unary_function<base_cell*, void>
+class depcell_inserter : public unary_function<formula_cell*, void>
 {
 public:
     depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) :
@@ -124,7 +128,7 @@ public:
         m_dirty_cells(dirty_cells),
         mp_fcell(fcell) {}
 
-    void operator() (base_cell* p)
+    void operator() (formula_cell* p)
     {
         if (m_dirty_cells.count(p) > 0)
             m_tracker.insert_depend(mp_fcell, p);
@@ -194,7 +198,7 @@ public:
         // Pick up the referenced cells from the ref tokens.  I should
         // probably combine this with the above get_ref_tokens() call above
         // for efficiency.
-        vector<base_cell*> deps;
+        vector<formula_cell*> deps;
         abs_address_t cell_pos = m_context.get_cell_position(pcell);
         for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, cell_pos, deps));
 
