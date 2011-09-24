@@ -27,6 +27,7 @@
 
 #include "ixion/formula.hpp"
 #include "ixion/formula_lexer.hpp"
+#include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_parser.hpp"
 #include "ixion/formula_functions.hpp"
 #include "ixion/function_objects.hpp"
@@ -56,10 +57,11 @@ namespace {
 class print_formula_token : std::unary_function<formula_token_base, void>
 {
     const interface::model_context& m_cxt;
+    const abs_address_t& m_pos;
     std::ostringstream& m_os;
 public:
-    print_formula_token(const interface::model_context& cxt, std::ostringstream& os) :
-        m_cxt(cxt), m_os(os) {}
+    print_formula_token(const interface::model_context& cxt, const abs_address_t& pos, std::ostringstream& os) :
+        m_cxt(cxt), m_pos(pos), m_os(os) {}
 
     void operator() (const formula_token_base& token)
     {
@@ -115,10 +117,16 @@ public:
                 }
             }
             break;
+            case fop_single_ref:
+            {
+                abs_address_t addr = token.get_single_ref().to_abs(m_pos);
+                const formula_name_resolver& resolver = m_cxt.get_name_resolver();
+                m_os << resolver.get_name(addr);
+            }
+            break;
             case fop_err_no_ref:
             case fop_named_expression:
             case fop_range_ref:
-            case fop_single_ref:
             case fop_string:
             case fop_unknown:
             case fop_unresolved_ref:
@@ -135,7 +143,7 @@ void print_formula_tokens(
     const formula_tokens_t& tokens, std::string& str)
 {
     std::ostringstream os;
-    std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, os));
+    std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, pos, os));
     str = os.str();
 }
 

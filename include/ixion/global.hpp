@@ -28,8 +28,6 @@
 #ifndef __IXION_GLOBAL_HPP__
 #define __IXION_GLOBAL_HPP__
 
-#include "ixion/hash_container/map.hpp"
-#include "ixion/hash_container/set.hpp"
 #include "ixion/types.hpp"
 
 #include <string>
@@ -53,13 +51,6 @@ namespace interface {
 class model_context;
 
 }
-
-/**
- * Dirty cells are those cells that have been modified or cells that
- * reference modified cells.  Note that dirty cells can be of any cell
- * types.
- */
-typedef _ixion_unordered_set_type<formula_cell*> dirty_cells_t;
 
 const char* get_formula_result_output_separator();
 
