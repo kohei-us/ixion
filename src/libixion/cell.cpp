@@ -287,7 +287,7 @@ void formula_cell::check_circular(const interface::model_context& cxt)
                 if (ref->get_celltype() != celltype_formula)
                     continue;
 
-                if (!check_ref_for_circular_safety(*ref))
+                if (!check_ref_for_circular_safety(static_cast<const formula_cell&>(*ref)))
                     return;
             }
             break;
@@ -301,7 +301,7 @@ void formula_cell::check_circular(const interface::model_context& cxt)
                     if (p->get_celltype() != celltype_formula)
                         continue;
 
-                    if (!check_ref_for_circular_safety(*p))
+                    if (!check_ref_for_circular_safety(static_cast<const formula_cell&>(*p)))
                         return;
                 }
             }
@@ -320,10 +320,9 @@ void formula_cell::check_circular(const interface::model_context& cxt)
     set_flag(FORMULA_CIRCULAR_SAFE, true);
 }
 
-bool formula_cell::check_ref_for_circular_safety(const base_cell& ref)
+bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref)
 {
-    assert(ref.get_celltype() == celltype_formula);
-    if (!static_cast<const formula_cell&>(ref).is_circular_safe())
+    if (!ref.is_circular_safe())
     {
         // Circular dependency detected !!
 #if DEBUG_FORMULA_CELL
