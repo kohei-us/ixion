@@ -78,6 +78,7 @@ public:
     virtual abs_address_t get_cell_position(const base_cell* p) const;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
+    virtual void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual interface::session_handler* get_session_handler() const;
     virtual formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier);
@@ -89,16 +90,6 @@ public:
 
     void set_cell(const abs_address_t& addr, base_cell* cell);
     void erase_cell(const abs_address_t& addr);
-
-    /**
-     * Obtains a set of non-empty cells located within specified range.
-     *
-     * @param range absolute range
-     * @param cells an array of pointers to non-empty cells.  The caller does
-     *              not need to delete the instances.
-     */
-    void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
-
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);

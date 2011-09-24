@@ -63,6 +63,7 @@ void print_formula_tokens(
 void register_formula_cell(
     interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
+void calculate_cells(interface::model_context& cxt, dirty_cells_t& cell, size_t thread_count);
 
 }
 

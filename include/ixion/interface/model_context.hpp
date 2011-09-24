@@ -28,11 +28,12 @@
 #ifndef __IXION_INTERFACE_MODEL_CONTEXT_HPP__
 #define __IXION_INTERFACE_MODEL_CONTEXT_HPP__
 
-#include <string>
-#include <boost/noncopyable.hpp>
-
 #include "ixion/formula_tokens_fwd.hpp"
 #include "ixion/types.hpp"
+
+#include <string>
+#include <vector>
+#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
@@ -69,6 +70,15 @@ public:
     virtual abs_address_t get_cell_position(const base_cell* p) const= 0;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const = 0;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const = 0;
+
+    /**
+     * Obtains a set of non-empty cells located within specified range.
+     *
+     * @param range absolute range
+     * @param cells an array of pointers to non-empty cells.  The caller does
+     *              not need to delete the instances.
+     */
+    virtual void get_cells(const abs_range_t& range, std::vector<base_cell*>& cells) = 0;
 
     /**
      * Obtain range value in matrix form.  Multi-sheet ranges are not

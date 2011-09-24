@@ -28,6 +28,8 @@
 #ifndef __IXION_FUNCTION_OBJECTS_HPP__
 #define __IXION_FUNCTION_OBJECTS_HPP__
 
+#include "ixion/types.hpp"
+
 #include <functional>
 
 namespace ixion {
@@ -37,6 +39,7 @@ namespace interface {
 }
 
 class cell_listener_tracker;
+class dependency_tracker;
 class formula_cell;
 class formula_token_base;
 struct abs_address_t;
@@ -57,6 +60,20 @@ private:
     const abs_address_t& m_addr;
     formula_cell* mp_cell;
     mode_t m_mode;
+};
+
+class cell_dependency_handler : public std::unary_function<formula_cell*, void>
+{
+public:
+    explicit cell_dependency_handler(
+        interface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells);
+
+    void operator() (formula_cell* fcell);
+
+private:
+    interface::model_context& m_context;
+    dependency_tracker& m_dep_tracker;
+    dirty_cells_t& m_dirty_cells;
 };
 
 }

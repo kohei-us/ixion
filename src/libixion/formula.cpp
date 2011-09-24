@@ -32,6 +32,7 @@
 #include "ixion/formula_functions.hpp"
 #include "ixion/function_objects.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/depends_tracker.hpp"
 
 #include <sstream>
 
@@ -155,6 +156,14 @@ void register_formula_cell(
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_add));
+}
+
+void calculate_cells(interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count)
+{
+    dependency_tracker deptracker(cells, cxt);
+    std::for_each(cells.begin(), cells.end(),
+                  cell_dependency_handler(cxt, deptracker, cells));
+    deptracker.interpret_all_cells(thread_count);
 }
 
 }

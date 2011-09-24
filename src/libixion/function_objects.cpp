@@ -28,10 +28,82 @@
 #include "ixion/function_objects.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/address.hpp"
+#include "ixion/depends_tracker.hpp"
 #include "ixion/formula_tokens.hpp"
+#include "ixion/cell.hpp"
 #include "ixion/interface/model_context.hpp"
 
+#include <vector>
+
+#define DEBUG_FUNCTION_OBJECTS 0
+
 namespace ixion {
+
+namespace {
+
+class ref_cell_picker : public std::unary_function<const formula_token_base*, void>
+{
+public:
+    ref_cell_picker(interface::model_context& cxt, const abs_address_t& origin, std::vector<formula_cell*>& deps) :
+        m_context(cxt), m_origin(origin), m_deps(deps) {}
+
+    void operator() (const formula_token_base* p)
+    {
+        switch (p->get_opcode())
+        {
+            case fop_single_ref:
+            {
+                abs_address_t addr = p->get_single_ref().to_abs(m_origin);
+                base_cell* refcell = m_context.get_cell(addr);
+                if (refcell && refcell->get_celltype() == celltype_formula)
+                    m_deps.push_back(static_cast<formula_cell*>(refcell));
+            }
+            break;
+            case fop_range_ref:
+            {
+                abs_range_t range = p->get_range_ref().to_abs(m_origin);
+                std::vector<base_cell*> cells;
+                m_context.get_cells(range, cells);
+                std::vector<base_cell*>::const_iterator itr = cells.begin(), itr_end = cells.end();
+                for (; itr != itr_end; ++itr)
+                {
+                    base_cell* cell = *itr;
+                    if (cell->get_celltype() == celltype_formula)
+                    m_deps.push_back(static_cast<formula_cell*>(cell));
+                }
+            }
+            break;
+            default:
+                ; // ignore the rest.
+        }
+    }
+
+private:
+    interface::model_context& m_context;
+    const abs_address_t& m_origin;
+    std::vector<formula_cell*>&  m_deps;
+};
+
+class depcell_inserter : public std::unary_function<formula_cell*, void>
+{
+public:
+    depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) :
+        m_tracker(tracker),
+        m_dirty_cells(dirty_cells),
+        mp_fcell(fcell) {}
+
+    void operator() (formula_cell* p)
+    {
+        if (m_dirty_cells.count(p) > 0)
+            m_tracker.insert_depend(mp_fcell, p);
+    }
+private:
+    dependency_tracker& m_tracker;
+    const dirty_cells_t& m_dirty_cells;
+    formula_cell* mp_fcell;
+};
+
+}
 
 formula_cell_listener_handler::formula_cell_listener_handler(
     interface::model_context& cxt, const abs_address_t& addr, mode_t mode) :
@@ -40,7 +112,7 @@ formula_cell_listener_handler::formula_cell_listener_handler(
     m_addr(addr),
     m_mode(mode)
 {
-#if DEBUG_MODEL_PARSER
+#if DEBUG_FUNCTION_OBJECTS
     __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: cell position=" << m_addr.get_name() << endl;
 #endif
 }
@@ -52,7 +124,7 @@ void formula_cell_listener_handler::operator() (const formula_token_base* p) con
         case fop_single_ref:
         {
             abs_address_t addr = p->get_single_ref().to_abs(m_addr);
-#if DEBUG_MODEL_PARSER
+#if DEBUG_FUNCTION_OBJECTS
             __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
 #endif
             if (m_mode == mode_add)
@@ -81,6 +153,39 @@ void formula_cell_listener_handler::operator() (const formula_token_base* p) con
         default:
             ; // ignore the rest.
     }
+}
+
+cell_dependency_handler::cell_dependency_handler(
+    interface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
+    m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
+
+void cell_dependency_handler::operator() (formula_cell* fcell)
+{
+#if DEBUG_FUNCTION_OBJECTS
+    __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
+    __IXION_DEBUG_OUT__ << "processing dependency of " << m_context.get_cell_name(fcell) << endl;
+#endif
+    // Register cell dependencies.
+    std::vector<const formula_token_base*> ref_tokens;
+    fcell->get_ref_tokens(m_context, ref_tokens);
+
+#if DEBUG_FUNCTION_OBJECTS
+    __IXION_DEBUG_OUT__ << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;
+#endif
+    // Pick up the referenced cells from the ref tokens.  I should
+    // probably combine this with the above get_ref_tokens() call above
+    // for efficiency.
+    std::vector<formula_cell*> deps;
+    abs_address_t cell_pos = m_context.get_cell_position(fcell);
+    for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, cell_pos, deps));
+
+#if DEBUG_FUNCTION_OBJECTS
+    __IXION_DEBUG_OUT__ << "number of precedent cells picked up: " << deps.size() << endl;
+#endif
+    // Register dependency information.  Only dirty cells should be
+    // registered as precedent cells since non-dirty cells are equivalent
+    // to constants.
+    for_each(deps.begin(), deps.end(), depcell_inserter(m_dep_tracker, m_dirty_cells, fcell));
 }
 
 }
