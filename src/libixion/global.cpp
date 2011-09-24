@@ -51,32 +51,11 @@ namespace ixion {
 
 const sheet_t global_scope = -1;
 
-namespace {
-
-struct _cell_name_data {
-    const cell_ptr_name_map_t* store;
-    ::boost::mutex mtx;
-} cell_name_data;
-
-}
-
 const char* get_formula_result_output_separator()
 {
     static const char* sep =
         "---------------------------------------------------------";
     return sep;
-}
-
-string global::get_cell_name(const base_cell* cell)
-{
-    ::boost::mutex::scoped_lock lock(cell_name_data.mtx);
-    if (cell_name_data.store)
-    {
-        cell_ptr_name_map_t::const_iterator itr = cell_name_data.store->find(cell);
-        if (itr != cell_name_data.store->end())
-            return itr->second;
-    }
-    return string("<unknown cell>");
 }
 
 double global::get_current_time()

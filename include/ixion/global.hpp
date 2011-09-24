@@ -54,8 +54,6 @@ class model_context;
 
 }
 
-typedef _ixion_unordered_map_type<const base_cell*, ::std::string> cell_ptr_name_map_t;
-
 /**
  * Dirty cells are those cells that have been modified or cells that
  * reference modified cells.  Note that dirty cells can be of any cell
@@ -70,8 +68,6 @@ const char* get_formula_result_output_separator();
 class global
 {
 public:
-    static ::std::string get_cell_name(const base_cell* cell);
-
     /**
      * Get current time in seconds since epoch.  Note that the value
      * representing a time may differ from platform to platform.  Use this

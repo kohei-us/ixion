@@ -158,20 +158,6 @@ public:
     }
 };
 
-class ptr_name_map_builder : public unary_function<const base_cell*, void>
-{
-public:
-    ptr_name_map_builder(cell_ptr_name_map_t& map) :
-        m_map(map) {}
-
-    void operator() (const base_cell* p) const
-    {
-        m_map.insert(cell_ptr_name_map_t::value_type(p, global::get_cell_name(p)));
-    }
-private:
-    cell_ptr_name_map_t& m_map;
-};
-
 class cell_dependency_handler : public unary_function<base_cell*, void>
 {
 public:
