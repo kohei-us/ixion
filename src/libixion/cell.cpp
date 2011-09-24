@@ -267,6 +267,9 @@ void formula_cell::check_circular(const interface::model_context& cxt)
     // TODO: Check to make sure this is being run on the main thread only.
     abs_address_t pos = cxt.get_cell_position(this);
     const formula_tokens_t* tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+    if (!tokens)
+        throw general_error("failed to retrieve formula tokens from formula cell's identifier.");
+
     formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();
     for (; itr != itr_end; ++itr)
     {
