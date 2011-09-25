@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,6 +36,7 @@ namespace ixion {
 class model_context;
 class abs_range_t;
 class base_cell;
+class cells_in_range_impl;
 
 /**
  * Provides iterator for iterating through cell instances in a given range.
@@ -45,20 +46,30 @@ class cells_in_range : public interface::cells_in_range
 {
     cells_in_range(); // disabled
 public:
-    cells_in_range(const model_context& cxt, const abs_range_t& range);
+    cells_in_range(model_context& cxt, const abs_range_t& range);
     cells_in_range(const cells_in_range& r);
     virtual ~cells_in_range();
+
+    virtual base_cell* first();
+    virtual base_cell* next();
+
+private:
+    cells_in_range_impl* mp_impl;
+};
+
+class const_cells_in_range : public interface::const_cells_in_range
+{
+    const_cells_in_range(); // disabled
+public:
+    const_cells_in_range(const model_context& cxt, const abs_range_t& range);
+    const_cells_in_range(const const_cells_in_range& r);
+    virtual ~const_cells_in_range();
 
     virtual const base_cell* first();
     virtual const base_cell* next();
 
 private:
-    void find_next();
-
-    const model_context& m_context;
-    const abs_range_t& m_range;
-    model_context::cell_store_type::const_iterator m_cur;
-    model_context::cell_store_type::const_iterator m_end;
+    cells_in_range_impl* mp_impl;
 };
 
 }

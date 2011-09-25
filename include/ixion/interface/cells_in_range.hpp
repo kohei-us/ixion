@@ -50,7 +50,7 @@ public:
      * @return pointer to the first non-empty cell instance in the range, or
      *         NULL if all cells in the range are empty.
      */
-    virtual const base_cell* first() = 0;
+    virtual base_cell* first() = 0;
 
     /**
      * Return a pointer to the next cell instance in the range.  Calling this
@@ -60,6 +60,18 @@ public:
      * @return pointer to the next cell instance in the range, or NULL if no
      *         more cell instances are present.
      */
+    virtual base_cell* next() = 0;
+};
+
+/**
+ * Identical to cells_in_range, except that the first() and next() methods
+ * both return const base_cell pointers.
+ */
+class const_cells_in_range
+{
+public:
+    virtual ~const_cells_in_range() {}
+    virtual const base_cell* first() = 0;
     virtual const base_cell* next() = 0;
 };
 

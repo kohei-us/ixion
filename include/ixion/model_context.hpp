@@ -42,6 +42,8 @@
 namespace ixion {
 
 class cells_in_range;
+class cells_in_range_impl;
+class const_cells_in_range;
 class session_handler;
 struct abs_address_t;
 struct config;
@@ -57,7 +59,7 @@ class matrix;
  */
 class model_context : public interface::model_context
 {
-    friend class cells_in_range;
+    friend class cells_in_range_impl;
 
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
@@ -73,12 +75,12 @@ public:
     virtual const formula_name_resolver& get_name_resolver() const;
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
     virtual base_cell* get_cell(const abs_address_t& addr);
-    virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range) const;
+    virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range);
+    virtual interface::const_cells_in_range* get_cells_in_range(const abs_range_t& range) const;
     virtual ::std::string get_cell_name(const base_cell* p) const;
     virtual abs_address_t get_cell_position(const base_cell* p) const;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
-    virtual void get_cells(const abs_range_t& range, ::std::vector<base_cell*>& cells);
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual interface::session_handler* get_session_handler() const;
     virtual formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier);
@@ -97,7 +99,6 @@ public:
 private:
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
-    mutable cells_in_range* mp_cells_in_range;
     session_handler* mp_session_handler;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.

@@ -32,8 +32,10 @@
 #include "ixion/formula_tokens.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/interface/model_context.hpp"
+#include "ixion/cells_in_range.hpp"
 
 #include <vector>
+#include <boost/scoped_ptr.hpp>
 
 #define DEBUG_FUNCTION_OBJECTS 0
 
@@ -62,14 +64,11 @@ public:
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(m_origin);
-                std::vector<base_cell*> cells;
-                m_context.get_cells(range, cells);
-                std::vector<base_cell*>::const_iterator itr = cells.begin(), itr_end = cells.end();
-                for (; itr != itr_end; ++itr)
+                boost::scoped_ptr<interface::cells_in_range> cells(m_context.get_cells_in_range(range));
+                for (base_cell* p = cells->first(); p; p = cells->next())
                 {
-                    base_cell* cell = *itr;
-                    if (cell->get_celltype() == celltype_formula)
-                        m_deps.push_back(static_cast<formula_cell*>(cell));
+                    if (p->get_celltype() == celltype_formula)
+                        m_deps.push_back(static_cast<formula_cell*>(p));
                 }
             }
             break;

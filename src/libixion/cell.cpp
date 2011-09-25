@@ -35,6 +35,7 @@
 #include "ixion/interface/session_handler.hpp"
 
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 
 #include <string>
@@ -296,7 +297,8 @@ void formula_cell::check_circular(const interface::model_context& cxt)
             {
                 abs_address_t origin = cxt.get_cell_position(this);
                 abs_range_t range = itr->get_range_ref().to_abs(origin);
-                interface::cells_in_range* cell_range = cxt.get_cells_in_range(range);
+                boost::scoped_ptr<interface::const_cells_in_range> cell_range(
+                    cxt.get_cells_in_range(range));
                 for (const base_cell* p = cell_range->first(); p; p = cell_range->next())
                 {
                     if (p->get_celltype() != celltype_formula)

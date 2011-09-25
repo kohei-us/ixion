@@ -43,7 +43,6 @@ namespace ixion {
 model_context::model_context() :
     mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
-    mp_cells_in_range(NULL),
     mp_session_handler(new session_handler(*this))
 {}
 
@@ -51,7 +50,6 @@ model_context::~model_context()
 {
     delete mp_config;
     delete mp_name_resolver;
-    delete mp_cells_in_range;
     delete mp_session_handler;
 
     for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
@@ -124,24 +122,14 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     throw general_error("cell instance not found");
 }
 
-interface::cells_in_range* model_context::get_cells_in_range(const abs_range_t& range) const
+interface::cells_in_range* model_context::get_cells_in_range(const abs_range_t& range)
 {
-    delete mp_cells_in_range;
-    mp_cells_in_range = new cells_in_range(*this, range);
-    return mp_cells_in_range;
+    return new cells_in_range(*this, range);
 }
 
-void model_context::get_cells(const abs_range_t& range, vector<base_cell*>& cells)
+interface::const_cells_in_range* model_context::get_cells_in_range(const abs_range_t& range) const
 {
-    cell_store_type::iterator itr = m_cells.lower_bound(range.first);
-    cell_store_type::iterator itr_end = m_cells.upper_bound(range.last);
-    vector<base_cell*> hits;
-    for (; itr != itr_end; ++itr)
-    {
-        if (range.contains(itr->first))
-            hits.push_back(itr->second);
-    }
-    cells.swap(hits);
+    return new const_cells_in_range(*this, range);
 }
 
 matrix model_context::get_range_value(const abs_range_t& range) const
