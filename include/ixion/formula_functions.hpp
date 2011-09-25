@@ -29,6 +29,7 @@
 #define __IXION_FORMULA_FUNCTIONS_HPP__
 
 #include "ixion/global.hpp"
+#include "ixion/exceptions.hpp"
 #include "ixion/formula_function_opcode.hpp"
 
 #include <string>

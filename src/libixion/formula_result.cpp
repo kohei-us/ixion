@@ -27,10 +27,11 @@
 
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
+#include "ixion/exceptions.hpp"
 
 #include <sstream>
 
-#define DEBUG_FORMULA_RESULT 1
+#define DEBUG_FORMULA_RESULT 0
 
 #if DEBUG_FORMULA_RESULT
 #include <iostream>

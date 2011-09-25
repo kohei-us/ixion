@@ -8,6 +8,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	cells_in_range.cpp \
 	config.cpp \
 	depends_tracker.cpp \
+	exceptions.cpp \
 	formula.cpp \
 	formula_functions.cpp \
 	formula_interpreter.cpp \

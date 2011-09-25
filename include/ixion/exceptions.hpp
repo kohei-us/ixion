@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2010, 2011 Kohei Yoshida
+ * Copyright (c) 2011 Kohei Yoshida
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,55 +25,32 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_SORT_INPUT_PARSER_HXX__
-#define __IXION_SORT_INPUT_PARSER_HXX__
+#ifndef __IXION_EXCEPTIONS_HPP__
+#define __IXION_EXCEPTIONS_HPP__
 
-#include "ixion/depth_first_search.hpp"
-#include "ixion/mem_str_buf.hpp"
-#include "ixion/exceptions.hpp"
-
-#include <vector>
+#include <exception>
+#include <string>
 
 namespace ixion {
 
-class sort_input_parser
+class general_error : public std::exception
 {
-    class parse_error : public general_error
-    {
-    public:
-        parse_error(const ::std::string& msg);
-        virtual ~parse_error() throw();
-    };
-
-    class cell_handler : public ::std::unary_function<mem_str_buf, void>
-    {
-    public:
-        cell_handler(::std::vector<mem_str_buf>& sorted);
-        void operator() (const mem_str_buf& s);
-    private:
-        ::std::vector<mem_str_buf>& m_sorted;
-    };
-
-    typedef depth_first_search<mem_str_buf, cell_handler> dfs_type;
-
 public:
-    sort_input_parser(const ::std::string& filepath);
-    ~sort_input_parser();
-
-    void parse();
-    void print();
-
+    explicit general_error(const std::string& msg);
+    ~general_error() throw();
+    virtual const char* what() const throw();
 private:
-    void remove_duplicate_cells();
-    void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
+    std::string m_msg;
+};
 
+class file_not_found : public std::exception
+{
+public:
+    explicit file_not_found(const std::string& fpath);
+    ~file_not_found() throw();
+    virtual const char* what() const throw();
 private:
-    dfs_type::precedent_set    m_set;
-    ::std::string           m_content;
-    ::std::vector<mem_str_buf>   m_all_cells;
-
-    const char* mp;
-    const char* mp_last;
+    std::string m_fpath;
 };
 
 }

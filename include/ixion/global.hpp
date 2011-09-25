@@ -95,30 +95,6 @@ private:
 
 // ============================================================================
 
-class general_error : public ::std::exception
-{
-public:
-    explicit general_error(const ::std::string& msg);
-    ~general_error() throw();
-    virtual const char* what() const throw();
-private:
-    ::std::string m_msg;
-};
-
-// ============================================================================
-
-class file_not_found : public ::std::exception
-{
-public:
-    explicit file_not_found(const ::std::string& fpath);
-    ~file_not_found() throw();
-    virtual const char* what() const throw();
-private:
-    ::std::string m_fpath;
-};
-
-// ============================================================================
-
 enum formula_error_t
 {
     fe_no_error = 0,

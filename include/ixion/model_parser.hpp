@@ -29,6 +29,7 @@
 #define __IXION_MODEL_PARSER_HPP__
 
 #include "ixion/cell.hpp"
+#include "ixion/exceptions.hpp"
 #include "ixion/lexer_tokens.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/hash_container/map.hpp"

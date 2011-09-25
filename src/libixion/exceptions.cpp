@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2010, 2011 Kohei Yoshida
+ * Copyright (c) 2011 Kohei Yoshida
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,57 +25,36 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_SORT_INPUT_PARSER_HXX__
-#define __IXION_SORT_INPUT_PARSER_HXX__
-
-#include "ixion/depth_first_search.hpp"
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
 
-#include <vector>
+#include <sstream>
 
 namespace ixion {
 
-class sort_input_parser
+general_error::general_error(const std::string& msg) :
+    m_msg(msg) {}
+
+general_error::~general_error() throw() {}
+
+const char* general_error::what() const throw()
 {
-    class parse_error : public general_error
-    {
-    public:
-        parse_error(const ::std::string& msg);
-        virtual ~parse_error() throw();
-    };
-
-    class cell_handler : public ::std::unary_function<mem_str_buf, void>
-    {
-    public:
-        cell_handler(::std::vector<mem_str_buf>& sorted);
-        void operator() (const mem_str_buf& s);
-    private:
-        ::std::vector<mem_str_buf>& m_sorted;
-    };
-
-    typedef depth_first_search<mem_str_buf, cell_handler> dfs_type;
-
-public:
-    sort_input_parser(const ::std::string& filepath);
-    ~sort_input_parser();
-
-    void parse();
-    void print();
-
-private:
-    void remove_duplicate_cells();
-    void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
-
-private:
-    dfs_type::precedent_set    m_set;
-    ::std::string           m_content;
-    ::std::vector<mem_str_buf>   m_all_cells;
-
-    const char* mp;
-    const char* mp_last;
-};
-
+    return m_msg.c_str();
 }
 
-#endif
+file_not_found::file_not_found(const std::string& fpath) :
+    m_fpath(fpath)
+{
+}
+
+file_not_found::~file_not_found() throw()
+{
+}
+
+const char* file_not_found::what() const throw()
+{
+    std::ostringstream oss;
+    oss << "specified file not found: " << m_fpath;
+    return oss.str().c_str();
+}
+
+}

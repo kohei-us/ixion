@@ -28,7 +28,7 @@
 #ifndef __IXION_FORMULA_PARSER_HPP__
 #define __IXION_FORMULA_PARSER_HPP__
 
-#include "ixion/global.hpp"
+#include "ixion/exceptions.hpp"
 #include "ixion/lexer_tokens.hpp"
 #include "ixion/formula_tokens.hpp"
 #include "ixion/hash_container/map.hpp"

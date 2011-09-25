@@ -29,7 +29,6 @@
 #define __IXION_CELL_HPP__
 
 #include "ixion/formula_tokens.hpp"
-#include "ixion/global.hpp"
 #include "ixion/address.hpp"
 #include "ixion/hash_container/set.hpp"
 

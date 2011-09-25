@@ -30,6 +30,7 @@
 #include "ixion/address.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/exceptions.hpp"
 #include "ixion/interface/model_context.hpp"
 
 #include <iostream>
@@ -167,40 +168,6 @@ const char* get_formula_error_name(formula_error_t fe)
         return names[fe];
 
     return "#ERR!";
-}
-
-// ============================================================================
-
-general_error::general_error(const string& msg) :
-    m_msg(msg)
-{
-}
-
-general_error::~general_error() throw()
-{
-}
-
-const char* general_error::what() const throw()
-{
-    return m_msg.c_str();
-}
-
-// ============================================================================
-
-file_not_found::file_not_found(const string& fpath) :
-    m_fpath(fpath)
-{
-}
-
-file_not_found::~file_not_found() throw()
-{
-}
-
-const char* file_not_found::what() const throw()
-{
-    ostringstream oss;
-    oss << "specified file not found: " << m_fpath;
-    return oss.str().c_str();
 }
 
 // ============================================================================
