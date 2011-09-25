@@ -167,13 +167,6 @@ interface::session_handler* model_context::get_session_handler() const
     return mp_session_handler;
 }
 
-formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier)
-{
-    if (m_tokens.size() <= identifier)
-        return NULL;
-    return m_tokens[identifier];
-}
-
 const formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier) const
 {
     if (m_tokens.size() <= identifier)

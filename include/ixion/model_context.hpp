@@ -83,7 +83,6 @@ public:
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual interface::session_handler* get_session_handler() const;
-    virtual formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier);
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     virtual void remove_formula_tokens(sheet_t sheet, size_t identifier);

@@ -122,7 +122,6 @@ public:
      */
     virtual session_handler* get_session_handler() const = 0;
 
-    virtual formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) = 0;
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
     virtual size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p) = 0;
     virtual void remove_formula_tokens(sheet_t sheet, size_t identifier) = 0;
