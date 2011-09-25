@@ -30,6 +30,7 @@
 
 #include "ixion/formula_tokens_fwd.hpp"
 #include "ixion/types.hpp"
+#include "ixion/exceptions.hpp"
 
 #include <string>
 #include <vector>
@@ -45,6 +46,12 @@ class matrix;
 struct abs_address_t;
 struct abs_range_t;
 struct config;
+
+class model_context_error : public general_error
+{
+public:
+    model_context_error(const std::string& msg) : general_error(msg) {}
+};
 
 namespace interface {
 
