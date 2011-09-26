@@ -346,9 +346,9 @@ private:
             fcell->set_identifier(m_context.add_formula_tokens(addr.sheet, p));
     }
 
-    bool set_shared_formula_tokens_to_cell(const abs_address_t& addr, formula_cell* fcell, formula_tokens_t* p)
+    bool set_shared_formula_tokens_to_cell(const abs_address_t& addr, formula_cell* fcell, formula_tokens_t* new_tokens)
     {
-        assert(p);
+        assert(new_tokens);
         if (addr.sheet == global_scope)
             return false;
 
@@ -358,20 +358,32 @@ private:
 
         abs_address_t test = addr;
         test.row -= 1;
-        const base_cell* test_cell = m_context.get_cell(test);
-        if (!test_cell || test_cell->get_celltype() != celltype_formula)
+        base_cell* p = m_context.get_cell(test);
+        if (!p || p->get_celltype() != celltype_formula)
             return false;
 
-        size_t tid = test_cell->get_identifier();
-        const formula_tokens_t* tokens = m_context.get_formula_tokens(addr.sheet, tid);
+        formula_cell* test_cell = static_cast<formula_cell*>(p);
+        size_t token_id = test_cell->get_identifier();
+        const formula_tokens_t* tokens = m_context.get_formula_tokens(addr.sheet, token_id);
         assert(tokens);
 
-#if 0
-        if (*p == *tokens)
-            cout << "equals!!!" << endl;
-#endif
+        if (*new_tokens != *tokens)
+            return false;
 
-        return false;
+        // Equal token set.
+        if (test_cell->is_shared())
+        {
+            fcell->set_identifier(token_id);
+            fcell->set_shared(true);
+        }
+        else
+        {
+            // Move the token ste of the master cell to the shared token storage.
+            size_t shared_id = m_context.set_formula_tokens_shared(addr.sheet, token_id);
+            test_cell->set_shared(true);
+            fcell->set_identifier(shared_id);
+            fcell->set_shared(true);
+        }
     }
 };
 

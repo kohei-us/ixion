@@ -87,6 +87,7 @@ public:
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     virtual void remove_formula_tokens(sheet_t sheet, size_t identifier);
+    virtual size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
     virtual size_t add_string(const char* p, size_t n);
     virtual const std::string* get_string(size_t identifier) const;
 

@@ -368,6 +368,16 @@ const formula_result* formula_cell::get_result_cache() const
     return m_interpret_status.result;
 }
 
+bool formula_cell::is_shared() const
+{
+    return get_flag(FORMULA_SHARED_TOKENS);
+}
+
+void formula_cell::set_shared(bool b)
+{
+    set_flag(FORMULA_SHARED_TOKENS, b);
+}
+
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
 {
 #if DEBUG_FORMULA_CELL

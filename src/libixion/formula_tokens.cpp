@@ -26,6 +26,7 @@
  ************************************************************************/
 
 #include "ixion/formula_tokens.hpp"
+#include "ixion/exceptions.hpp"
 
 using ::std::string;
 
@@ -119,6 +120,44 @@ formula_token_base::~formula_token_base()
 fopcode_t formula_token_base::get_opcode() const
 {
     return m_opcode;
+}
+
+bool formula_token_base::operator== (const formula_token_base& r) const
+{
+    if (m_opcode != r.m_opcode)
+        return false;
+
+    switch (m_opcode)
+    {
+        case fop_close:
+        case fop_divide:
+        case fop_minus:
+        case fop_multiply:
+        case fop_open:
+        case fop_plus:
+        case fop_sep:
+            return true;
+        case fop_single_ref:
+            return get_single_ref() == r.get_single_ref();
+        case fop_range_ref:
+            return get_range_ref() == r.get_range_ref();
+        case fop_named_expression:
+            return get_name() == r.get_name();
+        case fop_string:
+            throw general_error("we don't support string token yet.");
+        case fop_value:
+            return get_value() == r.get_value();
+        case fop_function:
+            return get_index() == r.get_index();
+        default:
+            ;
+    }
+    return false;
+}
+
+bool formula_token_base::operator!= (const formula_token_base& r) const
+{
+    return !operator== (r);
 }
 
 address_t formula_token_base::get_single_ref() const
@@ -263,6 +302,21 @@ function_token::~function_token()
 size_t function_token::get_index() const
 {
     return m_func_oc;
+}
+
+bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
+{
+    size_t n = left.size();
+    if (n != right.size())
+        return false;
+
+    formula_tokens_t::const_iterator itr = left.begin(), itr_end = left.end(), itr2 = right.begin();
+    for (; itr != itr_end; ++itr, ++itr2)
+    {
+        if (*itr != *itr2)
+            return false;
+    }
+    return true;
 }
 
 }

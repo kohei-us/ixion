@@ -149,6 +149,9 @@ public:
 
     const formula_result* get_result_cache() const;
 
+    bool is_shared() const;
+    void set_shared(bool b);
+
 private:
     /**
      * Block until the result becomes available.

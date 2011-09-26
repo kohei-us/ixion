@@ -206,6 +206,29 @@ void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
     m_tokens[identifier] = NULL;
 }
 
+size_t model_context::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
+{
+    formula_tokens_t* token = m_tokens.at(identifier);
+    assert(token);
+    m_tokens[identifier] = NULL;
+
+    // First, search for a NULL spot.
+    formula_tokens_store_type::iterator itr = std::find(
+        m_shared_tokens.begin(), m_shared_tokens.end(), static_cast<formula_tokens_t*>(NULL));
+
+    if (itr != m_shared_tokens.end())
+    {
+        // NULL spot found.
+        size_t pos = std::distance(m_shared_tokens.begin(), itr);
+        m_shared_tokens[pos] = token;
+        return pos;
+    }
+
+    size_t shared_identifier = m_shared_tokens.size();
+    m_tokens.push_back(token);
+    return shared_identifier;
+}
+
 size_t model_context::add_string(const char* p, size_t n)
 {
     string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));

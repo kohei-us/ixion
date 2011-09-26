@@ -59,6 +59,9 @@ public:
 
     fopcode_t get_opcode() const;
 
+    bool operator== (const formula_token_base& r) const;
+    bool operator!= (const formula_token_base& r) const;
+
     virtual address_t get_single_ref() const;
     virtual range_t get_range_ref() const;
     virtual double get_value() const;
@@ -163,6 +166,8 @@ private:
 };
 
 // ============================================================================
+
+bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
 
 // We need the following inline functions for boost::ptr_container.
 
