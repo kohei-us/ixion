@@ -42,12 +42,22 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
+
+}
+
 cell_listener_tracker& cell_listener_tracker::get(interface::model_context& cxt)
 {
-    static boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
     if (!p_instance)
         p_instance.reset(new cell_listener_tracker(cxt));
     return *p_instance;
+}
+
+void cell_listener_tracker::reset()
+{
+    p_instance.reset(NULL);
 }
 
 cell_listener_tracker::cell_listener_tracker(interface::model_context& cxt) :

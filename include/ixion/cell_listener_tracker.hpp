@@ -51,6 +51,7 @@ class cell_listener_tracker
     cell_listener_tracker(interface::model_context& cxt);
 public:
     static cell_listener_tracker& get(interface::model_context& cxt);
+    static void reset();
 
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
     typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;
