@@ -172,7 +172,12 @@ void test_external_formula_functions()
     const char* exps[] = {
         "1/3*1.4",
         "2.3*(1+2)/(34*(3-2))",
-        "SUM(1,2,3)"
+        "SUM(1,2,3)",
+        "A1",
+        "B10",
+        "XFD1048576",
+        "C10:D20",
+        "A1:XFD1048576"
     };
     size_t num_exps = sizeof(exps) / sizeof(exps[0]);
     model_context cxt;
