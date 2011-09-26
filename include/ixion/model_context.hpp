@@ -66,6 +66,7 @@ class model_context : public interface::model_context
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
+    typedef std::deque<abs_range_t> formula_token_range_type;
 
 public:
     model_context();
@@ -102,6 +103,8 @@ private:
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;
+    formula_tokens_store_type m_shared_tokens;
+    formula_token_range_type m_shared_token_ranges;
     strings_type m_strings;
     string_map_type m_string_map;
 };

@@ -274,7 +274,9 @@ private:
         formula_parser fparser(model_cell.get_tokens(), m_context);
 
         formula_cell* fcell = NULL;
-        sheet_t fcell_sheet = global_scope;
+        abs_address_t addr;
+        addr.sheet = global_scope; // global scope for named expressions.
+
         formula_name_type name_type = m_context.get_name_resolver().resolve(
             name.get(), name.size(), abs_address_t());
         switch (name_type.type)
@@ -292,7 +294,6 @@ private:
             break;
             case formula_name_type::cell_reference:
             {
-                abs_address_t addr;
                 addr.sheet = name_type.address.sheet;
                 addr.row = name_type.address.row;
                 addr.column = name_type.address.col;
@@ -326,7 +327,6 @@ private:
                     address_cell_pair_type(addr, fcell));
 
                 fparser.set_origin(addr);
-                fcell_sheet = addr.sheet;
             }
             break;
             default:
@@ -342,7 +342,36 @@ private:
         // Associate the formula tokens with the formula cell instance.
         formula_tokens_t* p = new formula_tokens_t;
         p->swap(fparser.get_tokens());
-        fcell->set_identifier(m_context.add_formula_tokens(fcell_sheet, p));
+        if (!set_shared_formula_tokens_to_cell(addr, fcell, p))
+            fcell->set_identifier(m_context.add_formula_tokens(addr.sheet, p));
+    }
+
+    bool set_shared_formula_tokens_to_cell(const abs_address_t& addr, formula_cell* fcell, formula_tokens_t* p)
+    {
+        assert(p);
+        if (addr.sheet == global_scope)
+            return false;
+
+        // Check its neighbors for adjacent formula cells.
+        if (addr.row == 0)
+            return false;
+
+        abs_address_t test = addr;
+        test.row -= 1;
+        const base_cell* test_cell = m_context.get_cell(test);
+        if (!test_cell || test_cell->get_celltype() != celltype_formula)
+            return false;
+
+        size_t tid = test_cell->get_identifier();
+        const formula_tokens_t* tokens = m_context.get_formula_tokens(addr.sheet, tid);
+        assert(tokens);
+
+#if 0
+        if (*p == *tokens)
+            cout << "equals!!!" << endl;
+#endif
+
+        return false;
     }
 };
 

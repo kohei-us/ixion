@@ -54,6 +54,7 @@ model_context::~model_context()
     delete mp_session_handler;
 
     for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
+    for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_element<formula_tokens_t>());
 
     cell_listener_tracker::reset();
 }
