@@ -31,6 +31,7 @@
 #include "ixion/cells_in_range.hpp"
 #include "ixion/config.hpp"
 #include "ixion/session_handler.hpp"
+#include "ixion/cell_listener_tracker.hpp"
 
 #include <memory>
 
@@ -53,6 +54,8 @@ model_context::~model_context()
     delete mp_session_handler;
 
     for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
+
+    cell_listener_tracker::reset();
 }
 
 const config& model_context::get_config() const

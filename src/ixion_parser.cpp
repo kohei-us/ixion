@@ -26,7 +26,6 @@
  ************************************************************************/
 
 #include "ixion/model_parser.hpp"
-#include "ixion/cell_listener_tracker.hpp"
 
 #include <string>
 #include <vector>
@@ -100,8 +99,6 @@ int main (int argc, char** argv)
     vector<string>::const_iterator itr = files.begin(), itr_end = files.end();
     for (; itr != itr_end; ++itr)
     {
-        cell_listener_tracker::reset();
-
         const string& fpath = *itr;
         double start_time = global::get_current_time();
         cout << get_formula_result_output_separator() << endl;
