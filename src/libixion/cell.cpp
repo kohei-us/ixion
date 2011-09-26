@@ -45,6 +45,7 @@
 #define DEBUG_FORMULA_CELL 0
 
 #define FORMULA_CIRCULAR_SAFE 0x000001
+#define FORMULA_SHARED_TOKENS 0x000002
 
 using namespace std;
 
@@ -191,9 +192,10 @@ formula_cell::formula_cell() :
 {
 }
 
-formula_cell::formula_cell(size_t tokens_identifier) :
+formula_cell::formula_cell(size_t tokens_identifier, bool shared) :
     base_cell(celltype_formula, tokens_identifier)
 {
+    set_flag(FORMULA_SHARED_TOKENS, shared);
 }
 
 formula_cell::~formula_cell()
