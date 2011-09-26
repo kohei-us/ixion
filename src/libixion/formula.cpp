@@ -125,9 +125,15 @@ public:
                 m_os << resolver.get_name(addr);
             }
             break;
+            case fop_range_ref:
+            {
+                abs_range_t range = token.get_range_ref().to_abs(m_pos);
+                const formula_name_resolver& resolver = m_cxt.get_name_resolver();
+                m_os << resolver.get_name(range);
+            }
+            break;
             case fop_err_no_ref:
             case fop_named_expression:
-            case fop_range_ref:
             case fop_string:
             case fop_unknown:
             case fop_unresolved_ref:
