@@ -57,8 +57,6 @@ const char* get_opcode_name(fopcode_t oc)
             return "range ref";
         case fop_named_expression:
             return "named expression";
-        case fop_unresolved_ref:
-            return "unresolved ref";
         case fop_string:
             return "string";
         case fop_value:
@@ -96,7 +94,6 @@ const char* get_formula_opcode_string(fopcode_t oc)
         case fop_single_ref:
         case fop_range_ref:
         case fop_named_expression:
-        case fop_unresolved_ref:
         default:
             ;
     }
@@ -241,23 +238,6 @@ named_exp_token::named_exp_token(const named_exp_token& r) :
 named_exp_token::~named_exp_token() {}
 
 string named_exp_token::get_name() const
-{
-    return m_name;
-}
-
-// ============================================================================
-
-unresolved_ref_token::unresolved_ref_token(const std::string& name) :
-    formula_token_base(fop_unresolved_ref),
-    m_name(name)
-{
-}
-
-unresolved_ref_token::~unresolved_ref_token()
-{
-}
-
-std::string unresolved_ref_token::get_name() const
 {
     return m_name;
 }

@@ -36,7 +36,6 @@ enum fopcode_t {
     fop_single_ref,
     fop_range_ref,
     fop_named_expression,
-    fop_unresolved_ref,
     fop_string,
     fop_value,
     fop_function,

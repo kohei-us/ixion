@@ -106,9 +106,6 @@ public:
             case fop_named_expression:
                 os << token.get_name();
                 break;
-            case fop_unresolved_ref:
-                os << token.get_name();
-                break;
             case fop_string:
                 break;
             case fop_value:

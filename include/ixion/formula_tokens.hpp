@@ -100,23 +100,6 @@ private:
 // ============================================================================
 
 /**
- * Token that stores an unresolved name.
- */
-class unresolved_ref_token : public formula_token_base
-{
-public:
-    unresolved_ref_token(const std::string& name);
-    virtual ~unresolved_ref_token();
-
-    virtual std::string get_name() const;
-
-private:
-    std::string m_name; // unresolved reference name
-};
-
-// ============================================================================
-
-/**
  * Token that stores a cell reference.  Note that the address it stores may
  * be either relative to the origin cell or absolute.
  */
@@ -201,8 +184,6 @@ inline formula_token_base* new_clone(const formula_token_base& r)
             return new range_ref_token(r.get_range_ref());
         case fop_named_expression:
             return new named_exp_token(static_cast<const named_exp_token&>(r));
-        case fop_unresolved_ref:
-            return new unresolved_ref_token(r.get_name());
         case fop_string:
             break;
         case fop_value:

@@ -136,7 +136,6 @@ public:
             case fop_named_expression:
             case fop_string:
             case fop_unknown:
-            case fop_unresolved_ref:
             default:
                 ;
         }
