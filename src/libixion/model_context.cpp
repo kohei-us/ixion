@@ -41,6 +41,38 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+struct delete_shared_tokens : public std::unary_function<model_context::shared_tokens, void>
+{
+    void operator() (const model_context::shared_tokens& v)
+    {
+        delete v.tokens;
+    }
+};
+
+class find_tokens_by_pointer : public std::unary_function<model_context::shared_tokens, bool>
+{
+    const formula_tokens_t* m_ptr;
+public:
+    find_tokens_by_pointer(const formula_tokens_t* p) : m_ptr(p) {}
+    bool operator() (const model_context::shared_tokens& v) const
+    {
+        return v.tokens == m_ptr;
+    }
+};
+
+}
+
+model_context::shared_tokens::shared_tokens() : tokens(NULL) {}
+model_context::shared_tokens::shared_tokens(formula_tokens_t* _tokens) : tokens(_tokens) {}
+model_context::shared_tokens::shared_tokens(const shared_tokens& r) : tokens(r.tokens), range(r.range) {}
+
+bool model_context::shared_tokens::operator== (const shared_tokens& r) const
+{
+    return tokens == r.tokens && range == r.range;
+}
+
 model_context::model_context() :
     mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
@@ -54,7 +86,7 @@ model_context::~model_context()
     delete mp_session_handler;
 
     for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
-    for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_element<formula_tokens_t>());
+    for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_shared_tokens());
 
     cell_listener_tracker::reset();
 }
@@ -208,25 +240,38 @@ void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
 
 size_t model_context::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
 {
-    formula_tokens_t* token = m_tokens.at(identifier);
-    assert(token);
+    formula_tokens_t* tokens = m_tokens.at(identifier);
+    assert(tokens);
     m_tokens[identifier] = NULL;
 
     // First, search for a NULL spot.
-    formula_tokens_store_type::iterator itr = std::find(
-        m_shared_tokens.begin(), m_shared_tokens.end(), static_cast<formula_tokens_t*>(NULL));
+    shared_tokens_type::iterator itr = std::find_if(
+        m_shared_tokens.begin(), m_shared_tokens.end(),
+        find_tokens_by_pointer(static_cast<const formula_tokens_t*>(NULL)));
 
     if (itr != m_shared_tokens.end())
     {
         // NULL spot found.
         size_t pos = std::distance(m_shared_tokens.begin(), itr);
-        m_shared_tokens[pos] = token;
+        m_shared_tokens[pos].tokens = tokens;
         return pos;
     }
 
     size_t shared_identifier = m_shared_tokens.size();
-    m_tokens.push_back(token);
+    m_shared_tokens.push_back(shared_tokens(tokens));
     return shared_identifier;
+}
+
+abs_range_t model_context::get_shared_formula_range(sheet_t sheet, size_t identifier) const
+{
+    return m_shared_token_ranges.at(identifier);
+}
+
+void model_context::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
+{
+    if (identifier >= m_shared_token_ranges.size())
+        m_shared_token_ranges.resize(identifier+1);
+    m_shared_token_ranges[identifier] = range;
 }
 
 size_t model_context::add_string(const char* p, size_t n)

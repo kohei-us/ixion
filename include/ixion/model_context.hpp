@@ -69,6 +69,19 @@ class model_context : public interface::model_context
     typedef std::deque<abs_range_t> formula_token_range_type;
 
 public:
+    struct shared_tokens
+    {
+        formula_tokens_t* tokens;
+        abs_range_t range;
+
+        shared_tokens();
+        shared_tokens(formula_tokens_t* tokens);
+        shared_tokens(const shared_tokens& r);
+
+        bool operator== (const shared_tokens& r) const;
+    };
+    typedef std::vector<shared_tokens> shared_tokens_type;
+
     model_context();
     virtual ~model_context();
 
@@ -88,6 +101,8 @@ public:
     virtual size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     virtual void remove_formula_tokens(sheet_t sheet, size_t identifier);
     virtual size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
+    virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
+    virtual void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
     virtual size_t add_string(const char* p, size_t n);
     virtual const std::string* get_string(size_t identifier) const;
 
@@ -104,7 +119,7 @@ private:
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;
-    formula_tokens_store_type m_shared_tokens;
+    shared_tokens_type m_shared_tokens;
     formula_token_range_type m_shared_token_ranges;
     strings_type m_strings;
     string_map_type m_string_map;

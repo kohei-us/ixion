@@ -370,19 +370,42 @@ private:
         if (*new_tokens != *tokens)
             return false;
 
-        // Equal token set.
+        // Tokens are equal.  Let's share them.
+
         if (test_cell->is_shared())
         {
+            // Make sure that we can extend the shared range properly.
+            abs_range_t range = m_context.get_shared_formula_range(addr.sheet, token_id);
+            if (range.first.sheet != addr.sheet)
+                // Wrong sheet
+                return false;
+
+            if (range.first.column != range.last.column)
+                // Must be a single column.
+                return false;
+
+            if (range.last.row != (addr.row - 1))
+                // Last row is not immediately above the current cell.
+                return false;
+
             fcell->set_identifier(token_id);
             fcell->set_shared(true);
+
+            range.last.row += 1;
+            m_context.set_shared_formula_range(addr.sheet, token_id, range);
         }
         else
         {
-            // Move the token ste of the master cell to the shared token storage.
+            // Move the tokens of the master cell to the shared token storage.
             size_t shared_id = m_context.set_formula_tokens_shared(addr.sheet, token_id);
             test_cell->set_shared(true);
             fcell->set_identifier(shared_id);
             fcell->set_shared(true);
+            abs_range_t range;
+            range.first = addr;
+            range.last = addr;
+            range.first.row -= 1;
+            m_context.set_shared_formula_range(addr.sheet, shared_id, range);
         }
     }
 };
