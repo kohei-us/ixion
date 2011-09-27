@@ -192,10 +192,9 @@ formula_cell::formula_cell() :
 {
 }
 
-formula_cell::formula_cell(size_t tokens_identifier, bool shared) :
+formula_cell::formula_cell(size_t tokens_identifier) :
     base_cell(celltype_formula, tokens_identifier)
 {
-    set_flag(FORMULA_SHARED_TOKENS, shared);
 }
 
 formula_cell::~formula_cell()

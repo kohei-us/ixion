@@ -128,7 +128,7 @@ class formula_cell : public base_cell
 
 public:
     formula_cell();
-    formula_cell(size_t tokens_identifier, bool shared = false);
+    formula_cell(size_t tokens_identifier);
     ~formula_cell();
 
     double get_value() const;
