@@ -60,7 +60,6 @@ formula_interpreter::formula_interpreter(const formula_cell* cell, const interfa
     m_parent_cell(cell),
     m_context(cxt),
     mp_handler(NULL),
-    m_token_identifier(cell->get_identifier()),
     m_stack(cxt),
     m_error(fe_no_error)
 {
@@ -132,7 +131,12 @@ void formula_interpreter::init_tokens()
     name_set used_names;
     m_tokens.clear();
     m_stack.clear();
-    const formula_tokens_t* orig_tokens = m_context.get_formula_tokens(m_pos.sheet, m_token_identifier);
+    const formula_tokens_t* orig_tokens = NULL;
+    if (m_parent_cell->is_shared())
+        orig_tokens = m_context.get_shared_formula_tokens(m_pos.sheet, m_parent_cell->get_identifier());
+    else
+        orig_tokens = m_context.get_formula_tokens(m_pos.sheet, m_parent_cell->get_identifier());
+
     if (!orig_tokens)
         return;
 

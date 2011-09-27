@@ -238,8 +238,23 @@ void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
     m_tokens[identifier] = NULL;
 }
 
+const formula_tokens_t* model_context::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
+{
+#if DEBUG_MODEL_CONTEXT
+    __IXION_DEBUG_OUT__ << "identifier: " << identifier << "  shared token count: " << m_shared_tokens.size() << endl;
+#endif
+    if (m_shared_tokens.size() <= identifier)
+        return NULL;
+
+#if DEBUG_MODEL_CONTEXT
+    __IXION_DEBUG_OUT__ << "tokens: " << m_shared_tokens[identifier].tokens << endl;
+#endif
+    return m_shared_tokens[identifier].tokens;
+}
+
 size_t model_context::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
 {
+    assert(identifier < m_tokens.size());
     formula_tokens_t* tokens = m_tokens.at(identifier);
     assert(tokens);
     m_tokens[identifier] = NULL;
@@ -264,14 +279,13 @@ size_t model_context::set_formula_tokens_shared(sheet_t sheet, size_t identifier
 
 abs_range_t model_context::get_shared_formula_range(sheet_t sheet, size_t identifier) const
 {
-    return m_shared_token_ranges.at(identifier);
+    assert(identifier < m_shared_tokens.size());
+    return m_shared_tokens.at(identifier).range;
 }
 
 void model_context::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
 {
-    if (identifier >= m_shared_token_ranges.size())
-        m_shared_token_ranges.resize(identifier+1);
-    m_shared_token_ranges[identifier] = range;
+    m_shared_tokens.at(identifier).range = range;
 }
 
 size_t model_context::add_string(const char* p, size_t n)

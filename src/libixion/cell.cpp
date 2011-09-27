@@ -138,7 +138,7 @@ bool base_cell::get_flag(int mask) const
 
 void base_cell::reset_flag()
 {
-    m_data.flag = 0;
+    m_data.flag &= ~FORMULA_CIRCULAR_SAFE;
 }
 
 double base_cell::get_value() const
@@ -270,9 +270,22 @@ void formula_cell::check_circular(const interface::model_context& cxt)
 {
     // TODO: Check to make sure this is being run on the main thread only.
     abs_address_t pos = cxt.get_cell_position(this);
-    const formula_tokens_t* tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+    const formula_tokens_t* tokens = NULL;
+    if (is_shared())
+        tokens = cxt.get_shared_formula_tokens(pos.sheet, m_identifier);
+    else
+        tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+
     if (!tokens)
-        throw model_context_error("failed to retrieve formula tokens from formula cell's identifier.");
+    {
+        std::ostringstream os;
+        if (is_shared())
+            os << "failed to retrieve shared formula tokens from formula cell's identifier. ";
+        else
+            os << "failed to retrieve formula tokens from formula cell's identifier. ";
+        os << "(identifier=" << m_identifier << ")";
+        throw model_context_error(os.str());
+    }
 
     formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();
     for (; itr != itr_end; ++itr)

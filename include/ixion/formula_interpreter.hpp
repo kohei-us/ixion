@@ -112,7 +112,6 @@ private:
     const formula_cell*         m_parent_cell;
     const interface::model_context& m_context;
     interface::session_handler* mp_handler;
-    size_t                      m_token_identifier;
     abs_address_t               m_pos;
 
     value_stack_t m_stack;

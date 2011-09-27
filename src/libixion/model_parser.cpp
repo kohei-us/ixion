@@ -269,7 +269,7 @@ private:
         const mem_str_buf& name = model_cell.get_name();
 
 #if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << "parsing cell " << name << " (initial content:" << model_cell.print() << ")" << endl;
+        __IXION_DEBUG_OUT__ << "parsing cell " << name.str() << " (initial content:" << model_cell.print() << ")" << endl;
 #endif
         formula_parser fparser(model_cell.get_tokens(), m_context);
 
@@ -360,20 +360,20 @@ private:
         test.row -= 1;
         base_cell* p = m_context.get_cell(test);
         if (!p || p->get_celltype() != celltype_formula)
+            // The neighboring cell is not a formula cell.
             return false;
 
         formula_cell* test_cell = static_cast<formula_cell*>(p);
-        size_t token_id = test_cell->get_identifier();
-        const formula_tokens_t* tokens = m_context.get_formula_tokens(addr.sheet, token_id);
-        assert(tokens);
-
-        if (*new_tokens != *tokens)
-            return false;
-
-        // Tokens are equal.  Let's share them.
 
         if (test_cell->is_shared())
         {
+            size_t token_id = test_cell->get_identifier();
+            const formula_tokens_t* tokens = m_context.get_shared_formula_tokens(addr.sheet, token_id);
+            assert(tokens);
+
+            if (*new_tokens != *tokens)
+                return false;
+
             // Make sure that we can extend the shared range properly.
             abs_range_t range = m_context.get_shared_formula_range(addr.sheet, token_id);
             if (range.first.sheet != addr.sheet)
@@ -396,17 +396,28 @@ private:
         }
         else
         {
+            size_t token_id = test_cell->get_identifier();
+            const formula_tokens_t* tokens = m_context.get_formula_tokens(addr.sheet, token_id);
+            assert(tokens);
+
+            if (*new_tokens != *tokens)
+                return false;
+
             // Move the tokens of the master cell to the shared token storage.
             size_t shared_id = m_context.set_formula_tokens_shared(addr.sheet, token_id);
             test_cell->set_shared(true);
+            test_cell->set_identifier(shared_id);
+            assert(test_cell->is_shared());
             fcell->set_identifier(shared_id);
             fcell->set_shared(true);
+            assert(fcell->is_shared());
             abs_range_t range;
             range.first = addr;
             range.last = addr;
             range.first.row -= 1;
             m_context.set_shared_formula_range(addr.sheet, shared_id, range);
         }
+        return true;
     }
 };
 

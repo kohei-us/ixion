@@ -100,6 +100,7 @@ public:
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     virtual void remove_formula_tokens(sheet_t sheet, size_t identifier);
+    virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
     virtual void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
@@ -120,7 +121,6 @@ private:
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;
     shared_tokens_type m_shared_tokens;
-    formula_token_range_type m_shared_token_ranges;
     strings_type m_strings;
     string_map_type m_string_map;
 };
