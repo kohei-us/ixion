@@ -366,7 +366,12 @@ void formula_cell::reset()
 void formula_cell::get_ref_tokens(const interface::model_context& cxt, vector<const formula_token_base*>& tokens)
 {
     abs_address_t pos = cxt.get_cell_position(this);
-    const formula_tokens_t* this_tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+    const formula_tokens_t* this_tokens = NULL;
+    if (is_shared())
+        this_tokens = cxt.get_shared_formula_tokens(pos.sheet, m_identifier);
+    else
+        this_tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+
     if (!this_tokens)
         return;
 

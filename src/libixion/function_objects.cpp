@@ -39,6 +39,12 @@
 
 #define DEBUG_FUNCTION_OBJECTS 0
 
+#if DEBUG_FUNCTION_OBJECTS
+#include <iostream>
+using std::cout;
+using std::endl;
+#endif
+
 namespace ixion {
 
 namespace {
