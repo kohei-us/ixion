@@ -35,6 +35,12 @@
 
 namespace ixion {
 
+namespace interface {
+
+class model_context;
+
+}
+
 struct formula_name_type
 {
     enum name_type {
@@ -107,12 +113,16 @@ public:
 class formula_name_resolver_a1 : public formula_name_resolver
 {
 public:
+    formula_name_resolver_a1();
+    formula_name_resolver_a1(const interface::model_context* cxt);
     virtual ~formula_name_resolver_a1();
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const;
     virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const;
     virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const;
     virtual ::std::string get_name(const abs_address_t& addr) const;
     virtual ::std::string get_name(const abs_range_t& range) const;
+private:
+    const interface::model_context* mp_cxt;
 };
 
 }

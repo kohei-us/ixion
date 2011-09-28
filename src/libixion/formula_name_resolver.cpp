@@ -181,7 +181,6 @@ string abs_or_rel(bool _abs)
 
 string _to_string(parse_address_result res)
 {
-
     switch (res)
     {
         case invalid:
@@ -287,6 +286,12 @@ string formula_name_resolver_simple::get_name(const abs_range_t& range) const
     // TODO: to be implemented.
     return string();
 }
+
+formula_name_resolver_a1::formula_name_resolver_a1() :
+    formula_name_resolver(), mp_cxt(NULL) {}
+
+formula_name_resolver_a1::formula_name_resolver_a1(const interface::model_context* cxt) :
+    formula_name_resolver(), mp_cxt(cxt) {}
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}
 
