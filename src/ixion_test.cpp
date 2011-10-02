@@ -41,6 +41,8 @@
 using namespace std;
 using namespace ixion;
 
+namespace {
+
 void test_size()
 {
     cout << "test size" << endl;
@@ -147,8 +149,6 @@ void test_address()
     assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
 }
 
-namespace {
-
 bool check_formula_expression(const model_context& cxt, const char* p)
 {
     size_t n = strlen(p);
@@ -162,8 +162,6 @@ bool check_formula_expression(const model_context& cxt, const char* p)
         cout << "formula expressions differ: '" << p << "' (before) -> '" << str << "' (after)" << endl;
 
     return res == 0;
-}
-
 }
 
 void test_external_formula_functions()
@@ -186,6 +184,8 @@ void test_external_formula_functions()
         bool result = check_formula_expression(cxt, exps[i]);
         assert(result);
     }
+}
+
 }
 
 int main()
