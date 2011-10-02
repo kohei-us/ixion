@@ -51,11 +51,10 @@ class matrix;
 
 /**
  * This class stores all data relevant to current session.  You can think of
- * this like a document model for each formula calculation run.
- *
- * I will eventually create an interface class for this which is to be
- * sub-classed by the consumer application to provide access to the
- * application-specific context.
+ * this like a document model for each formula calculation run.  Note that
+ * only those methods called from the formula interpreter are specified in
+ * the interface; this explains why accessors for the most part only have
+ * the 'get' method not paired with its 'set' counterpart.
  */
 class model_context : public interface::model_context
 {
@@ -98,15 +97,15 @@ public:
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual interface::session_handler* get_session_handler() const;
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
-    virtual size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
-    virtual void remove_formula_tokens(sheet_t sheet, size_t identifier);
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
-    virtual size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
-    virtual void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
-    virtual size_t add_string(const char* p, size_t n);
     virtual const std::string* get_string(size_t identifier) const;
 
+    size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
+    void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
+    size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
+    size_t add_string(const char* p, size_t n);
+    void remove_formula_tokens(sheet_t sheet, size_t identifier);
     void set_cell(const abs_address_t& addr, base_cell* cell);
     void erase_cell(const abs_address_t& addr);
 
@@ -121,6 +120,7 @@ private:
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;
     shared_tokens_type m_shared_tokens;
+    strings_type m_sheet_names; /// index to sheet name map.
     strings_type m_strings;
     string_map_type m_string_map;
 };

@@ -81,7 +81,8 @@ void test_name_resolver()
 {
     cout << "test name resolver" << endl;
 
-    formula_name_resolver_a1 resolver;
+    model_context cxt;
+    formula_name_resolver_a1 resolver(&cxt);
 
     // Parse single cell addresses.
     const char* names[] = {
