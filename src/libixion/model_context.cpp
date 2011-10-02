@@ -311,6 +311,11 @@ const std::string* model_context::get_string(size_t identifier) const
     return &m_strings[identifier];
 }
 
+sheet_t model_context::get_sheet_index(const char* p, size_t n) const
+{
+    return 0;
+}
+
 void model_context::set_named_expression(const char* p, size_t n, formula_cell* cell)
 {
     string name(p, n);
@@ -338,6 +343,11 @@ const string* model_context::get_named_expression_name(const formula_cell* expr)
             return &itr->first;
     }
     return NULL;
+}
+
+void model_context::append_sheet_name(const char* p, size_t n)
+{
+    m_sheet_names.push_back(new string(p, n));
 }
 
 }

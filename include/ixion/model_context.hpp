@@ -100,6 +100,7 @@ public:
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
     virtual const std::string* get_string(size_t identifier) const;
+    virtual sheet_t get_sheet_index(const char* p, size_t n) const;
 
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
@@ -111,6 +112,8 @@ public:
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);
+
+    void append_sheet_name(const char* p, size_t n);
 
 private:
     config* mp_config;

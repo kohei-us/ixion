@@ -127,6 +127,16 @@ public:
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const = 0;
 
     virtual const std::string* get_string(size_t identifier) const = 0;
+
+    /**
+     * Get the index of sheet from sheet name.
+     *
+     * @param p pointer to the first character of the sheet name string.
+     * @param n length of the sheet name string.
+     *
+     * @return sheet index
+     */
+    virtual sheet_t get_sheet_index(const char* p, size_t n) const = 0;
 };
 
 }}

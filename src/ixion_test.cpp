@@ -82,11 +82,15 @@ void test_name_resolver()
     cout << "test name resolver" << endl;
 
     model_context cxt;
+    cxt.append_sheet_name("One", 3);
+    cxt.append_sheet_name("Two", 3);
+    cxt.append_sheet_name("Three", 5);
     formula_name_resolver_a1 resolver(&cxt);
 
     // Parse single cell addresses.
     const char* names[] = {
-        "A1", "Z1", "AA23", "AB23", "BA1", "AAA2", "ABA1", "BAA1", 0
+        "A1", "Z1", "AA23", "AB23", "BA1", "AAA2", "ABA1", "BAA1", "XFD1048576",
+        "One!A1", "One!XFD1048576", 0
     };
 
     for (size_t i = 0; names[i]; ++i)
@@ -94,13 +98,21 @@ void test_name_resolver()
         const char* p = names[i];
         string name_a1(p);
         formula_name_type res = resolver.resolve(&name_a1[0], name_a1.size(), abs_address_t());
-        assert(res.type == formula_name_type::cell_reference);
+        if (res.type != formula_name_type::cell_reference)
+        {
+            cerr << "failed to resolve cell address: " << name_a1 << endl;
+            assert(false);
+        }
         address_t addr;
         addr.sheet = res.address.sheet;
         addr.row = res.address.row;
         addr.column = res.address.col;
         string test_name = resolver.get_name(addr, abs_address_t());
-        assert(name_a1 == test_name);
+        if (name_a1 != test_name)
+        {
+            cerr << "failed to compile name from address: " << name_a1 << endl;
+            assert(false);
+        }
     }
 
     // Parse range addresses.
