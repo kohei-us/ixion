@@ -313,7 +313,26 @@ const std::string* model_context::get_string(size_t identifier) const
 
 sheet_t model_context::get_sheet_index(const char* p, size_t n) const
 {
-    return 0;
+    strings_type::const_iterator itr_beg = m_sheet_names.begin(), itr_end = m_sheet_names.end();
+    for (strings_type::const_iterator itr = itr_beg; itr != itr_end; ++itr)
+    {
+        const std::string& s = *itr;
+        if (s.empty())
+            continue;
+
+        mem_str_buf s1(&s[0], s.size()), s2(p, n);
+        if (s1 == s2)
+            return static_cast<sheet_t>(std::distance(itr_beg, itr));
+    }
+    return invalid_sheet;
+}
+
+std::string model_context::get_sheet_name(sheet_t sheet) const
+{
+    if (m_sheet_names.size() <= static_cast<size_t>(sheet))
+        return std::string();
+
+    return m_sheet_names[sheet];
 }
 
 void model_context::set_named_expression(const char* p, size_t n, formula_cell* cell)

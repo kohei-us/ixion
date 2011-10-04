@@ -50,8 +50,6 @@ using namespace std;
 
 namespace ixion {
 
-const sheet_t global_scope = -1;
-
 const char* get_formula_result_output_separator()
 {
     static const char* sep =

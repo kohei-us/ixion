@@ -38,8 +38,6 @@
 
 namespace ixion {
 
-extern const sheet_t global_scope;
-
 class base_cell;
 class formula_cell;
 struct abs_address_t;

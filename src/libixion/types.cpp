@@ -25,28 +25,11 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_TYPES_HPP__
-#define __IXION_TYPES_HPP__
-
-#include "ixion/hash_container/set.hpp"
+#include "ixion/types.hpp"
 
 namespace ixion {
 
-typedef int col_t;
-typedef int row_t;
-typedef int sheet_t;
-
-extern const sheet_t global_scope;
-extern const sheet_t invalid_sheet;
-
-class formula_cell;
-
-/**
- * Dirty cells are those formula cells that have been modified or formula
- * cells that reference other modified cells.
- */
-typedef _ixion_unordered_set_type<formula_cell*> dirty_cells_t;
+const sheet_t global_scope = -1;
+const sheet_t invalid_sheet = -2;
 
 }
-
-#endif

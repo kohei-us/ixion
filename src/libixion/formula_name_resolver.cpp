@@ -27,6 +27,7 @@
 
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_functions.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -101,7 +102,34 @@ enum parse_address_result
     range_expected
 };
 
+void parse_sheet_name(const ixion::interface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+{
+    const char* p_old = p;
+    size_t len = 0;
+
+    // parse until we hit the sheet-address separator.
+    while (true)
+    {
+        if (*p == sep)
+        {
+            sheet = cxt.get_sheet_index(p_old, len);
+            if (p != p_last)
+                ++p;
+            return;
+        }
+
+        if (p == p_last)
+            break;
+
+        ++p;
+        ++len;
+    }
+
+    p = p_old;
+}
+
 parse_address_result parse_address(
+    const ixion::interface::model_context* cxt,
     const char*& p, const char* p_last, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
 {
     sheet = 0;
@@ -110,6 +138,9 @@ parse_address_result parse_address(
     abs_sheet = false;
     abs_row = false;
     abs_col = false;
+
+    if (cxt)
+        parse_sheet_name(*cxt, '!', p, p_last, sheet);
 
     resolver_parse_mode mode = resolver_parse_column;
 
@@ -317,7 +348,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
     bool abs_sheet = false;
 
     parse_address_result parse_res =
-        parse_address(p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
+        parse_address(mp_cxt, p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
 
 #if DEBUG_NAME_RESOLVER
     __IXION_DEBUG_OUT__ << "parse address result: " << _to_string(parse_res) << endl;
@@ -359,7 +390,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
         ret.range.first.abs_sheet = abs_sheet;
         ret.range.first.abs_row = abs_row;
         ret.range.first.abs_col = abs_col;
-        parse_res = parse_address(p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
+        parse_res = parse_address(NULL, p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
         if (parse_res != valid_address)
             // The 2nd part after the ':' is not valid.
             return ret;

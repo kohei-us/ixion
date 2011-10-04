@@ -137,6 +137,8 @@ public:
      * @return sheet index
      */
     virtual sheet_t get_sheet_index(const char* p, size_t n) const = 0;
+
+    virtual std::string get_sheet_name(sheet_t sheet) const = 0;
 };
 
 }}

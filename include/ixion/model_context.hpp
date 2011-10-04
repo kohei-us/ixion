@@ -101,6 +101,7 @@ public:
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
     virtual const std::string* get_string(size_t identifier) const;
     virtual sheet_t get_sheet_index(const char* p, size_t n) const;
+    virtual std::string get_sheet_name(sheet_t sheet) const;
 
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);

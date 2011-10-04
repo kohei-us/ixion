@@ -295,6 +295,7 @@
 				<F N="../src/libixion/model_parser.cpp"/>
 				<F N="../src/libixion/session_handler.cpp"/>
 				<F N="../src/libixion/sort_input_parser.cpp"/>
+				<F N="../src/libixion/types.cpp"/>
 			</Folder>
 			<F N="../src/ixion_parser.cpp"/>
 			<F N="../src/ixion_sorter.cpp"/>
