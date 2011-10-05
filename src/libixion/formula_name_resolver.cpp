@@ -390,6 +390,9 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
         ret.range.first.abs_sheet = abs_sheet;
         ret.range.first.abs_row = abs_row;
         ret.range.first.abs_col = abs_col;
+
+        // For now, we assume the sheet index of the end address is identical
+        // to that of the begin address.
         parse_res = parse_address(NULL, p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
         if (parse_res != valid_address)
             // The 2nd part after the ':' is not valid.
@@ -397,7 +400,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
 
         to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
 
-        ret.range.last.sheet = sheet;
+        ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
         ret.range.last.row = row;
         ret.range.last.col = col;
         ret.range.last.abs_sheet = abs_sheet;
