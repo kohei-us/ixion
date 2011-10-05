@@ -413,14 +413,19 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
 
 string formula_name_resolver_a1::get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
 {
-    // For now, sheet index is ignored.
     ostringstream os;
     col_t col = addr.column;
     row_t row = addr.row;
+    sheet_t sheet = addr.sheet;
     if (!addr.abs_column)
         col += pos.column;
     if (!addr.abs_row)
         row += pos.row;
+    if (!addr.abs_sheet)
+        sheet += pos.sheet;
+
+    if (sheet_name && mp_cxt)
+        os << mp_cxt->get_sheet_name(sheet) << '!';
 
     append_column_name_a1(os, col);
     os << (row + 1);
@@ -429,14 +434,22 @@ string formula_name_resolver_a1::get_name(const address_t& addr, const abs_addre
 
 string formula_name_resolver_a1::get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
 {
-    // For now, sheet index is ignored.
+    // For now, sheet index of the end-range address is ignored.
+
     ostringstream os;
     col_t col = range.first.column;
     row_t row = range.first.row;
+    sheet_t sheet = range.first.sheet;
     if (!range.first.abs_column)
         col += pos.column;
     if (!range.first.abs_row)
         row += pos.row;
+    if (!range.first.abs_sheet)
+        sheet += pos.sheet;
+
+    if (sheet_name && mp_cxt)
+        os << mp_cxt->get_sheet_name(sheet) << '!';
+
     append_column_name_a1(os, col);
     os << (row + 1);
     os << ":";
@@ -454,8 +467,10 @@ string formula_name_resolver_a1::get_name(const range_t& range, const abs_addres
 
 string formula_name_resolver_a1::get_name(const abs_address_t& addr, bool sheet_name) const
 {
-    // For now, sheet index is ignored.
     ostringstream os;
+    if (sheet_name && mp_cxt)
+        os << mp_cxt->get_sheet_name(addr.sheet) << '!';
+
     append_column_name_a1(os, addr.column);
     os << (addr.row + 1);
     return os.str();
@@ -463,8 +478,12 @@ string formula_name_resolver_a1::get_name(const abs_address_t& addr, bool sheet_
 
 string formula_name_resolver_a1::get_name(const abs_range_t& range, bool sheet_name) const
 {
-    // For now, sheet index is ignored.
+    // For now, sheet index of the end-range address is ignored.
+
     ostringstream os;
+    if (sheet_name && mp_cxt)
+        os << mp_cxt->get_sheet_name(range.first.sheet) << '!';
+
     col_t col = range.first.column;
     row_t row = range.first.row;
     append_column_name_a1(os, col);
