@@ -139,7 +139,7 @@ string model_context::get_cell_name(const base_cell* p) const
     for (; itr != itr_end; ++itr)
     {
         if (itr->second == p)
-            return get_name_resolver().get_name(itr->first, abs_address_t());
+            return get_name_resolver().get_name(itr->first, abs_address_t(), false);
     }
 
     // Cell not found.  Return an empty string.

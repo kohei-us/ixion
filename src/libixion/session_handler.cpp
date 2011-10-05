@@ -82,12 +82,12 @@ void session_handler::push_value(double val)
 
 void session_handler::push_single_ref(const address_t& addr, const abs_address_t& pos)
 {
-    cout << m_context.get_name_resolver().get_name(addr, pos);
+    cout << m_context.get_name_resolver().get_name(addr, pos, false);
 }
 
 void session_handler::push_range_ref(const range_t& range, const abs_address_t& pos)
 {
-    cout << m_context.get_name_resolver().get_name(range, pos);
+    cout << m_context.get_name_resolver().get_name(range, pos, false);
 }
 
 void session_handler::push_function(formula_function_t foc)

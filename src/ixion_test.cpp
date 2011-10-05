@@ -88,14 +88,26 @@ void test_name_resolver()
     formula_name_resolver_a1 resolver(&cxt);
 
     // Parse single cell addresses.
-    const char* names[] = {
-        "A1", "Z1", "AA23", "AB23", "BA1", "AAA2", "ABA1", "BAA1", "XFD1048576",
-        "One!A1", "One!XFD1048576", 0
+    struct {
+        const char* name; bool sheet_name;
+    } names[] = {
+        { "A1", false },
+        { "Z1", false },
+        { "AA23", false },
+        { "AB23", false },
+        { "BA1", false },
+        { "AAA2", false },
+        { "ABA1", false },
+        { "BAA1", false },
+        { "XFD1048576", false },
+        { "One!A1", true },
+        { "One!XFD1048576", true },
+        { 0, false }
     };
 
-    for (size_t i = 0; names[i]; ++i)
+    for (size_t i = 0; names[i].name; ++i)
     {
-        const char* p = names[i];
+        const char* p = names[i].name;
         string name_a1(p);
         formula_name_type res = resolver.resolve(&name_a1[0], name_a1.size(), abs_address_t());
         if (res.type != formula_name_type::cell_reference)
@@ -107,7 +119,7 @@ void test_name_resolver()
         addr.sheet = res.address.sheet;
         addr.row = res.address.row;
         addr.column = res.address.col;
-        string test_name = resolver.get_name(addr, abs_address_t());
+        string test_name = resolver.get_name(addr, abs_address_t(), names[i].sheet_name);
         if (name_a1 != test_name)
         {
             cerr << "failed to compile name from address: " << name_a1 << endl;

@@ -295,24 +295,24 @@ formula_name_type formula_name_resolver_simple::resolve(
     return ret;
 }
 
-string formula_name_resolver_simple::get_name(const address_t& addr, const abs_address_t& pos) const
+string formula_name_resolver_simple::get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
 {
     return addr.get_name();
 }
 
-string formula_name_resolver_simple::get_name(const range_t& range, const abs_address_t& pos) const
+string formula_name_resolver_simple::get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
 {
     // TODO: to be implemented.
     return string();
 }
 
-string formula_name_resolver_simple::get_name(const abs_address_t& addr) const
+string formula_name_resolver_simple::get_name(const abs_address_t& addr, bool sheet_name) const
 {
     // TODO: to be implemented.
     return string();
 }
 
-string formula_name_resolver_simple::get_name(const abs_range_t& range) const
+string formula_name_resolver_simple::get_name(const abs_range_t& range, bool sheet_name) const
 {
     // TODO: to be implemented.
     return string();
@@ -411,7 +411,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
     return ret;
 }
 
-string formula_name_resolver_a1::get_name(const address_t& addr, const abs_address_t& pos) const
+string formula_name_resolver_a1::get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
 {
     // For now, sheet index is ignored.
     ostringstream os;
@@ -427,7 +427,7 @@ string formula_name_resolver_a1::get_name(const address_t& addr, const abs_addre
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const range_t& range, const abs_address_t& pos) const
+string formula_name_resolver_a1::get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
 {
     // For now, sheet index is ignored.
     ostringstream os;
@@ -452,7 +452,7 @@ string formula_name_resolver_a1::get_name(const range_t& range, const abs_addres
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const abs_address_t& addr) const
+string formula_name_resolver_a1::get_name(const abs_address_t& addr, bool sheet_name) const
 {
     // For now, sheet index is ignored.
     ostringstream os;
@@ -461,7 +461,7 @@ string formula_name_resolver_a1::get_name(const abs_address_t& addr) const
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const abs_range_t& range) const
+string formula_name_resolver_a1::get_name(const abs_range_t& range, bool sheet_name) const
 {
     // For now, sheet index is ignored.
     ostringstream os;

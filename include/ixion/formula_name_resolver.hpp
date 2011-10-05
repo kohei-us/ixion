@@ -87,10 +87,10 @@ public:
     formula_name_resolver();
     virtual ~formula_name_resolver() = 0;
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
-    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const = 0;
-    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const = 0;
-    virtual ::std::string get_name(const abs_address_t& addr) const = 0;
-    virtual ::std::string get_name(const abs_range_t& range) const = 0;
+    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
+    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
+    virtual ::std::string get_name(const abs_address_t& addr, bool sheet_name) const = 0;
+    virtual ::std::string get_name(const abs_range_t& range, bool sheet_name) const = 0;
 };
 
 /**
@@ -104,10 +104,10 @@ public:
     formula_name_resolver_simple();
     virtual ~formula_name_resolver_simple();
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const abs_address_t& addr) const;
-    virtual ::std::string get_name(const abs_range_t& range) const;
+    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const;
+    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const;
+    virtual ::std::string get_name(const abs_address_t& addr, bool sheet_name) const;
+    virtual ::std::string get_name(const abs_range_t& range, bool sheet_name) const;
 };
 
 class formula_name_resolver_a1 : public formula_name_resolver
@@ -117,10 +117,10 @@ public:
     formula_name_resolver_a1(const interface::model_context* cxt);
     virtual ~formula_name_resolver_a1();
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const abs_address_t& addr) const;
-    virtual ::std::string get_name(const abs_range_t& range) const;
+    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const;
+    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const;
+    virtual ::std::string get_name(const abs_address_t& addr, bool sheet_name) const;
+    virtual ::std::string get_name(const abs_range_t& range, bool sheet_name) const;
 private:
     const interface::model_context* mp_cxt;
 };

@@ -89,7 +89,7 @@ void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& ra
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     const formula_name_resolver& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
+    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell, false) << "  range: " << res.get_name(range) << endl;
 #endif
     range_store_type::iterator itr = m_range_listeners.find(range);
     if (itr == m_range_listeners.end())
@@ -133,7 +133,7 @@ void cell_listener_tracker::remove(const abs_address_t& cell, const abs_range_t&
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     const formula_name_resolver& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "removing - cell: " << res.get_name(cell) << "  range: " << res.get_name(range) << endl;
+    __IXION_DEBUG_OUT__ << "removing - cell: " << res.get_name(cell, false) << "  range: " << res.get_name(range, false) << endl;
 #endif
     range_store_type::iterator itr = m_range_listeners.find(range);
     if (itr == m_range_listeners.end())
@@ -187,7 +187,7 @@ public:
     cell_addr_printer(const formula_name_resolver& resolver) : m_resolver(resolver) {}
     void operator() (const abs_address_t& addr) const
     {
-        cout << m_resolver.get_name(addr) << " ";
+        cout << m_resolver.get_name(addr, false) << " ";
     }
 };
 
@@ -228,7 +228,7 @@ void cell_listener_tracker::get_all_range_listeners(
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
-    __IXION_DEBUG_OUT__ << "get all listeners for target " << m_context.get_name_resolver().get_name(target) << endl;
+    __IXION_DEBUG_OUT__ << "get all listeners for target " << m_context.get_name_resolver().get_name(target, false) << endl;
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
@@ -238,7 +238,7 @@ void cell_listener_tracker::get_all_range_listeners(
 void cell_listener_tracker::print_cell_listeners(const abs_address_t& target) const
 {
     const formula_name_resolver& resolver = m_context.get_name_resolver();
-    cout << "The following cells listen to cell " << resolver.get_name(target) << endl;
+    cout << "The following cells listen to cell " << resolver.get_name(target, false) << endl;
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
     if (itr == m_cell_listeners.end())
         // No one listens to this target.
@@ -247,14 +247,14 @@ void cell_listener_tracker::print_cell_listeners(const abs_address_t& target) co
     const address_set_type& addrs = *itr->second;
     address_set_type::iterator itr2 = addrs.begin(), itr2_end = addrs.end();
     for (; itr2 != itr2_end; ++itr2)
-        cout << "  cell " << resolver.get_name(*itr2) << endl;
+        cout << "  cell " << resolver.get_name(*itr2, false) << endl;
 }
 
 void cell_listener_tracker::get_all_range_listeners_re(
     const abs_address_t& origin_target, const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "--- begin: target address: " << m_context.get_name_resolver().get_name(target) << endl;
+    __IXION_DEBUG_OUT__ << "--- begin: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
 #endif
     if (listeners_addrs.count(target))
     {
@@ -303,7 +303,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
     std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(),
                   cell_addr_printer(m_context.get_name_resolver()));
     cout << endl;
-    __IXION_DEBUG_OUT__ << "--- end: target address: " << m_context.get_name_resolver().get_name(target) << endl;
+    __IXION_DEBUG_OUT__ << "--- end: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
 #endif
 }
 

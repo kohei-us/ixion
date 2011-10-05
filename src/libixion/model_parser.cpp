@@ -191,7 +191,7 @@ private:
             m_first_static_content = false;
         }
         const formula_name_resolver& resolver = m_context.get_name_resolver();
-        cout << resolver.get_name(addr) << ": (s) " << str.str() << endl;
+        cout << resolver.get_name(addr, false) << ": (s) " << str.str() << endl;
     }
 
     void convert_numeric_cell(const model_parser::cell& model_cell)
@@ -261,7 +261,7 @@ private:
             m_first_static_content = false;
         }
         const formula_name_resolver& resolver = m_context.get_name_resolver();
-        cout << resolver.get_name(addr) << ": (n) " << value << endl;
+        cout << resolver.get_name(addr, false) << ": (n) " << value << endl;
     }
 
     void convert_formula_cell(const model_parser::cell& model_cell)
@@ -652,7 +652,7 @@ void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context
         for (; itr != itr_end; ++itr)
         {
 #if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "processing " << context.get_name_resolver().get_name(itr->first, abs_address_t()) << endl;
+            __IXION_DEBUG_OUT__ << "processing " << context.get_name_resolver().get_name(itr->first, abs_address_t(), false) << endl;
 #endif
             formula_cell* fcell = itr->second;
             _dirty_cells.insert(fcell);
