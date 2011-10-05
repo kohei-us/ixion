@@ -102,6 +102,8 @@ void test_name_resolver()
         { "XFD1048576", false },
         { "One!A1", true },
         { "One!XFD1048576", true },
+        { "Two!B10", true },
+        { "Three!CFD234", true },
         { 0, false }
     };
 
