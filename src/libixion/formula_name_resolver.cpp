@@ -132,7 +132,6 @@ parse_address_result parse_address(
     const ixion::interface::model_context* cxt,
     const char*& p, const char* p_last, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
 {
-    sheet = 0;
     row = 0;
     col = 0;
     abs_sheet = false;
@@ -140,6 +139,7 @@ parse_address_result parse_address(
     abs_col = false;
 
     if (cxt)
+        // Overwrite the sheet index *only when* sheet name is parsed successfully.
         parse_sheet_name(*cxt, '!', p, p_last, sheet);
 
     resolver_parse_mode mode = resolver_parse_column;
@@ -342,7 +342,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
     std::advance(p_last, n -1);
     col_t col = 0;
     row_t row = 0;
-    sheet_t sheet = 0;
+    sheet_t sheet = pos.sheet; // Use the sheet where the cell is unless sheet name is explicitly given.
     bool abs_col = false;
     bool abs_row = false;
     bool abs_sheet = false;
