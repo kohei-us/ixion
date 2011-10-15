@@ -124,7 +124,7 @@ private:
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;
     shared_tokens_type m_shared_tokens;
-    strings_type m_sheet_names; /// index to sheet name map.
+    strings_type m_sheet_names; ///< index to sheet name map.
     strings_type m_strings;
     string_map_type m_string_map;
 };

@@ -107,9 +107,9 @@ private:
         dirty_cells_t& listeners, address_set_type& listeners_addr) const;
 
     interface::model_context& m_context;
-    mutable range_query_set_type m_query_set; /// used for fast lookup of range listeners.
-    cell_store_type m_cell_listeners;         /// store listeners for single cells.
-    range_store_type m_range_listeners;       /// store listeners for ranges.
+    mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
+    cell_store_type m_cell_listeners;         ///< store listeners for single cells.
+    range_store_type m_range_listeners;       ///< store listeners for ranges.
 };
 
 }
