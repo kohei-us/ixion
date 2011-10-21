@@ -76,9 +76,9 @@ void register_formula_cell(
  * @param cxt model context.
  * @param cells all dirty cells to be calculated.
  * @param thread_count number of calculation threads to use.  Note that
- *                     passing 0 will make the program use a single thread
+ *                     passing 0 will make the process use the main thread
  *                     only, while passing any number greater than 0 will
- *                     make the program spawn specified number of
+ *                     make the process spawn specified number of
  *                     calculation threads plus one additional method
  *                     (besides the main thread) to manage the calculation
  *                     threads.
