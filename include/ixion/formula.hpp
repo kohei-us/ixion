@@ -60,10 +60,30 @@ void print_formula_tokens(
     const interface::model_context& cxt, const abs_address_t& pos,
     const formula_tokens_t& tokens, std::string& str);
 
+/**
+ * Regisiter a formula cell with cell dependency tracker.
+ *
+ * @param cxt model context.
+ * @param pos address of the cell being registered.
+ * @param cell instance of the cell being registered.
+ */
 void register_formula_cell(
     interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
-void calculate_cells(interface::model_context& cxt, dirty_cells_t& cell, size_t thread_count);
+/**
+ * Calculate all dirty cells in order of dependency.
+ *
+ * @param cxt model context.
+ * @param cells all dirty cells to be calculated.
+ * @param thread_count number of calculation threads to use.  Note that
+ *                     passing 0 will make the program use a single thread
+ *                     only, while passing any number greater than 0 will
+ *                     make the program spawn specified number of
+ *                     calculation threads plus one additional method
+ *                     (besides the main thread) to manage the calculation
+ *                     threads.
+ */
+void calculate_cells(interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);
 
 }
 

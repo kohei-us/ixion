@@ -156,6 +156,9 @@ void print_formula_tokens(
 void register_formula_cell(
     interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
 {
+    // TODO: Check for an existing formula cell at the specified position, and
+    // if there is one, unregister it first.
+
     std::vector<const formula_token_base*> ref_tokens;
     cell->get_ref_tokens(cxt, ref_tokens);
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
