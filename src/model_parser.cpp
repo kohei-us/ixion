@@ -25,7 +25,8 @@
  *
  ************************************************************************/
 
-#include "ixion/model_parser.hpp"
+#include "model_parser.hpp"
+
 #include "ixion/cell.hpp"
 #include "ixion/formula_lexer.hpp"
 #include "ixion/formula_parser.hpp"

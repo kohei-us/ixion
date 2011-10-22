@@ -23,7 +23,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	matrix.cpp \
 	mem_str_buf.cpp \
 	model_context.cpp \
-	model_parser.cpp \
 	cell_listener_tracker.cpp \
 	sort_input_parser.cpp \
 	session_handler.cpp \
