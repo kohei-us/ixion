@@ -37,6 +37,40 @@
 using namespace std;
 using namespace ixion;
 
+namespace {
+
+class parse_file : public unary_function<void, string>
+{
+    size_t m_thread_count;
+public:
+    parse_file(size_t thread_count) : m_thread_count(thread_count) {}
+
+    void operator() (const string& fpath) const
+    {
+        double start_time = global::get_current_time();
+        cout << get_formula_result_output_separator() << endl;
+        cout << "parsing " << fpath << endl;
+
+        try
+        {
+            model_parser parser(fpath, m_thread_count);
+            parser.parse();
+        }
+        catch (const exception& e)
+        {
+            cerr << e.what() << endl;
+            cerr << "failed to parse " << fpath << endl;
+            throw e;
+        }
+
+        cout << get_formula_result_output_separator() << endl;
+        cout << "(duration: " << global::get_current_time() - start_time << " sec)" << endl;
+        cout << get_formula_result_output_separator() << endl;
+    }
+};
+
+}
+
 int main (int argc, char** argv)
 {
     namespace po = ::boost::program_options;
@@ -95,30 +129,14 @@ int main (int argc, char** argv)
         cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
     }
 
-    // Parse all files one at a time.
-    vector<string>::const_iterator itr = files.begin(), itr_end = files.end();
-    for (; itr != itr_end; ++itr)
+    try
     {
-        const string& fpath = *itr;
-        double start_time = global::get_current_time();
-        cout << get_formula_result_output_separator() << endl;
-        cout << "parsing " << fpath << endl;
-
-        try
-        {
-            model_parser parser(fpath, thread_count);
-            parser.parse();
-        }
-        catch (const exception& e)
-        {
-            cerr << e.what() << endl;
-            cerr << "failed to parse " << fpath << endl;
-            return EXIT_FAILURE;
-        }
-
-        cout << get_formula_result_output_separator() << endl;
-        cout << "(duration: " << global::get_current_time() - start_time << " sec)" << endl;
-        cout << get_formula_result_output_separator() << endl;
+        // Parse all files one at a time.
+        for_each(files.begin(), files.end(), parse_file(thread_count));
+    }
+    catch (const exception& e)
+    {
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;
