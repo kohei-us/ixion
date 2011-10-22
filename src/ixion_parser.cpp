@@ -41,7 +41,7 @@ namespace {
 
 class parse_file : public unary_function<void, string>
 {
-    size_t m_thread_count;
+    const size_t m_thread_count;
 public:
     parse_file(size_t thread_count) : m_thread_count(thread_count) {}
 
