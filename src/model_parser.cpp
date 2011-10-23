@@ -49,6 +49,7 @@
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
+#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 
 using namespace std;
 using ::boost::ptr_map;
@@ -815,10 +816,12 @@ void model_parser::parse_init(const char*& p)
 #if DEBUG_MODEL_PARSER
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
 #endif
-            formula_tokens_t* tokens = new formula_tokens_t;
+            boost::interprocess::unique_ptr<
+                formula_tokens_t, generic_deleter<formula_tokens_t> >
+                    tokens(new formula_tokens_t);
             parse_formula_string(m_context, pos, buf.get(), buf.size(), *tokens);
 
-            size_t tkid = m_context.add_formula_tokens(0, tokens);
+            size_t tkid = m_context.add_formula_tokens(0, tokens.release());
             formula_cell* fcell = new formula_cell(tkid);
             m_context.set_cell(pos, fcell);
             m_dirty_cells.insert(fcell);

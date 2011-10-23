@@ -200,6 +200,15 @@ struct delete_map_value : public std::unary_function<typename _T::value_type, vo
     }
 };
 
+template<typename _T>
+struct generic_deleter
+{
+    void operator() (const _T* p) const
+    {
+        delete p;
+    }
+};
+
 }
 
 #endif
