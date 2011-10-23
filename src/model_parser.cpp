@@ -54,7 +54,7 @@ using namespace std;
 using ::boost::ptr_map;
 using ::boost::assign::ptr_map_insert;
 
-#define DEBUG_MODEL_PARSER 1
+#define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
 
@@ -742,6 +742,7 @@ void model_parser::parse()
             else if (buf_com.equals("mode init"))
             {
                 parse_mode = parse_mode_init;
+                m_print_separator = true;
             }
             else if (buf_com.equals("mode result"))
             {
@@ -755,6 +756,7 @@ void model_parser::parse()
                 data.cells.clear();
                 data.cell_names.clear();
                 m_dirty_cells.clear();
+                m_print_separator = true;
             }
             else
             {
@@ -910,7 +912,11 @@ void model_parser::parse_init(const char*& p)
                 mem_str_buf str = token.get_string();
                 size_t str_id = m_context.add_string(str.get(), str.size());
                 m_context.set_cell(pos, new string_cell(str_id));
-
+                if (m_print_separator)
+                {
+                    m_print_separator = false;
+                    cout << get_formula_result_output_separator() << endl;
+                }
                 cout << name.str() << ": (s) " << str.str() << endl;
             }
             break;
@@ -956,6 +962,12 @@ void model_parser::parse_init(const char*& p)
                 }
 
                 m_context.set_cell(pos, new numeric_cell(value));
+
+                if (m_print_separator)
+                {
+                    m_print_separator = false;
+                    cout << get_formula_result_output_separator() << endl;
+                }
                 cout << resolver.get_name(pos, false) << ": (n) " << value << endl;
             }
             break;

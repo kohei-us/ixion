@@ -117,6 +117,7 @@ private:
     size_t m_thread_count;
     model_context m_context;
     dirty_cells_t m_dirty_cells;
+    bool m_print_separator:1;
 };
 
 }
