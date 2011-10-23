@@ -468,8 +468,6 @@ enum parse_mode_t
 struct parse_data
 {
     vector<model_parser::cell>  cells;
-    vector<string>              cell_names;
-    model_parser::results_type  formula_results;
 };
 
 bool is_separator(char c)
@@ -538,14 +536,6 @@ void parse_command(const char*& p, mem_str_buf& com)
     for (++p; *p != '\n'; ++p)
         _com.inc();
     _com.swap(com);
-}
-
-void ensure_unique_names(const vector<string>& cell_names)
-{
-    vector<string> names = cell_names;
-    sort(names.begin(), names.end());
-    if (unique(names.begin(), names.end()) != names.end())
-        throw general_error("Duplicate names exist in the list of cell names.");
 }
 
 /**
@@ -727,7 +717,7 @@ void model_parser::parse()
             else if (buf_com.equals("check"))
             {
                 // Check cell results.
-                check(data.formula_results);
+                check();
             }
             else if (buf_com.equals("exit"))
             {
@@ -742,14 +732,13 @@ void model_parser::parse()
             else if (buf_com.equals("mode result"))
             {
                 // Clear any previous result values.
-                data.formula_results.clear();
+                m_formula_results.clear();
                 parse_mode = parse_mode_result;
             }
             else if (buf_com.equals("mode edit"))
             {
                 parse_mode = parse_mode_edit;
                 data.cells.clear();
-                data.cell_names.clear();
                 m_dirty_cells.clear();
                 m_print_separator = true;
             }
@@ -771,7 +760,7 @@ void model_parser::parse()
                 parse_init(p);
             break;
             case parse_mode_result:
-                parse_result(p, data.formula_results);
+                parse_result(p, m_formula_results);
             break;
             default:
                 throw parse_error("unknown parse mode");
@@ -977,13 +966,13 @@ void model_parser::calc(dirty_cells_t& cells)
     calculate_cells(m_context, cells, m_thread_count);
 }
 
-void model_parser::check(const results_type& formula_results)
+void model_parser::check()
 {
     cout << get_formula_result_output_separator() << endl
          << "checking results" << endl
          << get_formula_result_output_separator() << endl;
 
-    results_type::const_iterator itr = formula_results.begin(), itr_end = formula_results.end();
+    results_type::const_iterator itr = m_formula_results.begin(), itr_end = m_formula_results.end();
     for (; itr != itr_end; ++itr)
     {
         const string& name = itr->first;
