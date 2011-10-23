@@ -174,9 +174,6 @@ void get_all_dirty_cells(
     dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
     for (; itr != itr_end; ++itr)
     {
-#if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << "processing " << cxt.get_name_resolver().get_name(itr->first, abs_address_t(), false) << endl;
-#endif
         cell_listener_tracker& tracker = cell_listener_tracker::get(cxt);
         tracker.get_all_range_listeners(*itr, cells);
         tracker.get_all_cell_listeners(*itr, cells);

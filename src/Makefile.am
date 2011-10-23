@@ -4,11 +4,6 @@ INCLUDES = -I$(top_srcdir)/include
 
 bin_PROGRAMS = ixion-parser ixion-sorter ixion-test
 
-ixion_parserdir = .
-
-ixion_parser_HEADERS = \
-	model_parser.hpp
-
 ixion_parser_SOURCES = \
 	ixion_parser.cpp \
 	model_parser.cpp
