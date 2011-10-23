@@ -782,7 +782,14 @@ void model_parser::parse_init(const char*& p)
 #endif
 
     if (name.empty())
+    {
+        if (buf.empty())
+            // This is an empty line. Bail out.
+            return;
+
+        // Buffer is not empty but name is not given.  We must be missing a separator.
         throw model_parser::parse_error("separator is missing");
+    }
 
     const formula_name_resolver& resolver = m_context.get_name_resolver();
     formula_name_type ret = resolver.resolve(name.get(), name.size(), abs_address_t());
