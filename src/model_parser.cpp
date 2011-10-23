@@ -713,8 +713,7 @@ void model_parser::parse()
                     throw parse_error("'calc' command must be used in the init mode.");
 
                 // Perform full calculation on currently stored cells.
-
-                calc(m_dirty_cells);
+                calculate_cells(m_context, m_dirty_cells, m_thread_count);
             }
             else if (buf_com.equals("recalc"))
             {
@@ -979,11 +978,7 @@ void model_parser::parse_init(const char*& p)
 
 void model_parser::calc(dirty_cells_t& cells)
 {
-    // Now, register the dependency info on each dirty cell, and interpret all
-    // dirty cells.
-    dependency_tracker deptracker(cells, m_context);
-    for_each(cells.begin(), cells.end(), cell_dependency_handler(m_context, deptracker, cells));
-    deptracker.interpret_all_cells(m_thread_count);
+    calculate_cells(m_context, cells, m_thread_count);
 }
 
 void model_parser::check(const results_type& formula_results)
