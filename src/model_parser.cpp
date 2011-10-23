@@ -882,42 +882,7 @@ void model_parser::parse_init(const char*& p)
 #if DEBUG_MODEL_PARSER
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: numeric" << endl;
 #endif
-            // TODO: Parse the number without the lexer.
-            formula_lexer lexer(buf.get(), buf.size());
-            lexer.tokenize();
-            lexer_tokens_t tokens;
-            lexer.swap_tokens(tokens);
-
-            // For a numeric cell, there should be no more than 2 lexer
-            // tokens: one for the sign and one for the number.
-            if (tokens.empty())
-                throw general_error("no lexer tokens for a value cell.");
-
-            size_t token_count = tokens.size();
-            if (token_count > 2)
-                throw general_error("there should be no more than 2 lexer tokens for a value cell.");
-
-            const lexer_token_base& value_token = tokens.back();
-            if (value_token.get_opcode() != op_value)
-                throw general_error("value token expected, but not found.");
-
-            double value = value_token.get_value();
-            if (token_count == 2)
-            {
-                const lexer_token_base& sign_token = tokens.front();
-                switch (sign_token.get_opcode())
-                {
-                    case op_plus:
-                        // do nothing.
-                    break;
-                    case op_minus:
-                        value *= -1.0;
-                    break;
-                    default:
-                        throw general_error("unexpected first token type.");
-                }
-            }
-
+            double value = global::to_double(buf.get(), buf.size());
             m_context.set_cell(pos, new numeric_cell(value));
 
             if (m_print_separator)
