@@ -475,52 +475,6 @@ bool is_separator(char c)
     return c == '=' || c == ':' || c == '@';
 }
 
-void parse_result(const char*& p, model_parser::results_type& results)
-{
-    mem_str_buf buf, name, result;
-    for (; *p != '\n'; ++p)
-    {
-        if (*p == '=')
-        {
-            if (buf.empty())
-                throw model_parser::parse_error("left hand side is empty");
-
-            name = buf;
-            buf.clear();
-        }
-        else
-        {
-            if (buf.empty())
-                buf.set_start(p);
-            else
-                buf.inc();
-        }
-    }
-
-    if (!buf.empty())
-    {
-        if (name.empty())
-            throw model_parser::parse_error("'=' is missing");
-
-        result = buf;
-    }
-
-    string name_s = name.str();
-    formula_result res;
-    res.parse(result.get(), result.size());
-    model_parser::results_type::iterator itr = results.find(name_s);
-    if (itr == results.end())
-    {
-        // This cell doesn't exist yet.
-        pair<model_parser::results_type::iterator, bool> r =
-            results.insert(model_parser::results_type::value_type(name_s, res));
-        if (!r.second)
-            throw model_parser::parse_error("failed to insert a new result.");
-    }
-    else
-        itr->second = res;
-}
-
 void parse_command(const char*& p, mem_str_buf& com)
 {
     mem_str_buf _com;
@@ -760,7 +714,7 @@ void model_parser::parse()
                 parse_init(p);
             break;
             case parse_mode_result:
-                parse_result(p, m_formula_results);
+                parse_result(p);
             break;
             default:
                 throw parse_error("unknown parse mode");
@@ -959,6 +913,52 @@ void model_parser::parse_init(const char*& p)
                 throw model_parser::parse_error("unknown content type");
         }
     }
+}
+
+void model_parser::parse_result(const char*& p)
+{
+    mem_str_buf buf, name, result;
+    for (; *p != '\n'; ++p)
+    {
+        if (*p == '=')
+        {
+            if (buf.empty())
+                throw model_parser::parse_error("left hand side is empty");
+
+            name = buf;
+            buf.clear();
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(p);
+            else
+                buf.inc();
+        }
+    }
+
+    if (!buf.empty())
+    {
+        if (name.empty())
+            throw model_parser::parse_error("'=' is missing");
+
+        result = buf;
+    }
+
+    string name_s = name.str();
+    formula_result res;
+    res.parse(result.get(), result.size());
+    model_parser::results_type::iterator itr = m_formula_results.find(name_s);
+    if (itr == m_formula_results.end())
+    {
+        // This cell doesn't exist yet.
+        pair<model_parser::results_type::iterator, bool> r =
+            m_formula_results.insert(model_parser::results_type::value_type(name_s, res));
+        if (!r.second)
+            throw model_parser::parse_error("failed to insert a new result.");
+    }
+    else
+        itr->second = res;
 }
 
 void model_parser::calc(dirty_cells_t& cells)

@@ -107,6 +107,7 @@ private:
     model_parser(); // disabled
 
     void parse_init(const char*& p);
+    void parse_result(const char*& p);
 
     void calc(dirty_cells_t& cells);
     void check();
