@@ -814,7 +814,12 @@ void model_parser::parse_init(const char*& p)
     }
 
     if (buf.empty())
+    {
+        // A valid name is given but with empty definition.  Just remove the
+        // existing cell.
+        m_context.erase_cell(pos);
         return;
+    }
 
     switch (content_type)
     {
