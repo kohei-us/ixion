@@ -780,138 +780,141 @@ void model_parser::parse_init(const char*& p)
     __IXION_DEBUG_OUT__ << "name: " << name.str() << "  buf: " << buf.str() << endl;
 #endif
 
-    if (!buf.empty())
+    if (name.empty())
+        throw model_parser::parse_error("separator is missing");
+
+    const formula_name_resolver& resolver = m_context.get_name_resolver();
+    formula_name_type ret = resolver.resolve(name.get(), name.size(), abs_address_t());
+    if (ret.type != formula_name_type::cell_reference)
     {
-        if (name.empty())
-            throw model_parser::parse_error("separator is missing");
+        ostringstream os;
+        os << "invalid cell name: " << name.str();
+        throw model_parser::parse_error(os.str());
+    }
 
-        const formula_name_resolver& resolver = m_context.get_name_resolver();
-        formula_name_type ret = resolver.resolve(name.get(), name.size(), abs_address_t());
-        if (ret.type != formula_name_type::cell_reference)
-        {
-            ostringstream os;
-            os << "invalid cell name: " << name.str();
-            throw model_parser::parse_error(os.str());
-        }
+    abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
 
-        abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
-
+    {
+        // When there is a formula cell at this position, unregister it from
+        // the dependency tree.
         base_cell* p = m_context.get_cell(pos);
         if (p && p->get_celltype() == celltype_formula)
         {
-            // Pre-existing formula cell.
             formula_cell* fcell = static_cast<formula_cell*>(p);
             remove_self_as_listener(m_context, fcell, pos);
         }
+    }
 
-        switch (content_type)
+    if (buf.empty())
+        return;
+
+    switch (content_type)
+    {
+        case ct_formula:
         {
-            case ct_formula:
-            {
 #if DEBUG_MODEL_PARSER
-                __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
 #endif
-                formula_tokens_t* tokens = new formula_tokens_t;
-                parse_formula_string(m_context, pos, buf.get(), buf.size(), *tokens);
+            formula_tokens_t* tokens = new formula_tokens_t;
+            parse_formula_string(m_context, pos, buf.get(), buf.size(), *tokens);
 
-                size_t tkid = m_context.add_formula_tokens(0, tokens);
-                formula_cell* fcell = new formula_cell(tkid);
-                m_context.set_cell(pos, fcell);
-                m_dirty_cells.insert(fcell);
-                m_dirty_cell_addrs.push_back(pos);
-                register_formula_cell(m_context, pos, fcell);
+            size_t tkid = m_context.add_formula_tokens(0, tokens);
+            formula_cell* fcell = new formula_cell(tkid);
+            m_context.set_cell(pos, fcell);
+            m_dirty_cells.insert(fcell);
+            m_dirty_cell_addrs.push_back(pos);
+            register_formula_cell(m_context, pos, fcell);
 #if DEBUG_MODEL_PARSER
-                std::string s;
-                print_formula_tokens(m_context, pos, *tokens, s);
-                __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
+            std::string s;
+            print_formula_tokens(m_context, pos, *tokens, s);
+            __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
 #endif
-            }
-            break;
-            case ct_string:
-            {
-#if DEBUG_MODEL_PARSER
-                __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: string" << endl;
-#endif
-                // For now, we compile the raw string using lexer.  It should
-                // only generate one lexer token that represents the string
-                // value.  TODO: parse raw string without the lexer.
-                formula_lexer lexer(buf.get(), buf.size());
-                lexer.tokenize();
-                lexer_tokens_t tokens;
-                lexer.swap_tokens(tokens);
-
-                if (tokens.size() != 1)
-                    throw general_error("there should only be one lexer token for a string cell.");
-
-                const lexer_token_base& token = tokens.back();
-                if (token.get_opcode() != op_string)
-                    throw general_error("string lexer token expected, but not found.");
-
-                mem_str_buf str = token.get_string();
-                size_t str_id = m_context.add_string(str.get(), str.size());
-                m_context.set_cell(pos, new string_cell(str_id));
-                if (m_print_separator)
-                {
-                    m_print_separator = false;
-                    cout << get_formula_result_output_separator() << endl;
-                }
-                cout << name.str() << ": (s) " << str.str() << endl;
-            }
-            break;
-            case ct_value:
-            {
-#if DEBUG_MODEL_PARSER
-                __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: numeric" << endl;
-#endif
-                // TODO: Parse the number without the lexer.
-                formula_lexer lexer(buf.get(), buf.size());
-                lexer.tokenize();
-                lexer_tokens_t tokens;
-                lexer.swap_tokens(tokens);
-
-                // For a numeric cell, there should be no more than 2 lexer
-                // tokens: one for the sign and one for the number.
-                if (tokens.empty())
-                    throw general_error("no lexer tokens for a value cell.");
-
-                size_t token_count = tokens.size();
-                if (token_count > 2)
-                    throw general_error("there should be no more than 2 lexer tokens for a value cell.");
-
-                const lexer_token_base& value_token = tokens.back();
-                if (value_token.get_opcode() != op_value)
-                    throw general_error("value token expected, but not found.");
-
-                double value = value_token.get_value();
-                if (token_count == 2)
-                {
-                    const lexer_token_base& sign_token = tokens.front();
-                    switch (sign_token.get_opcode())
-                    {
-                        case op_plus:
-                            // do nothing.
-                        break;
-                        case op_minus:
-                            value *= -1.0;
-                        break;
-                        default:
-                            throw general_error("unexpected first token type.");
-                    }
-                }
-
-                m_context.set_cell(pos, new numeric_cell(value));
-
-                if (m_print_separator)
-                {
-                    m_print_separator = false;
-                    cout << get_formula_result_output_separator() << endl;
-                }
-                cout << resolver.get_name(pos, false) << ": (n) " << value << endl;
-            }
-            break;
-            default:
-                throw model_parser::parse_error("unknown content type");
         }
+        break;
+        case ct_string:
+        {
+#if DEBUG_MODEL_PARSER
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: string" << endl;
+#endif
+            // For now, we compile the raw string using lexer.  It should
+            // only generate one lexer token that represents the string
+            // value.  TODO: parse raw string without the lexer.
+            formula_lexer lexer(buf.get(), buf.size());
+            lexer.tokenize();
+            lexer_tokens_t tokens;
+            lexer.swap_tokens(tokens);
+
+            if (tokens.size() != 1)
+                throw general_error("there should only be one lexer token for a string cell.");
+
+            const lexer_token_base& token = tokens.back();
+            if (token.get_opcode() != op_string)
+                throw general_error("string lexer token expected, but not found.");
+
+            mem_str_buf str = token.get_string();
+            size_t str_id = m_context.add_string(str.get(), str.size());
+            m_context.set_cell(pos, new string_cell(str_id));
+            if (m_print_separator)
+            {
+                m_print_separator = false;
+                cout << get_formula_result_output_separator() << endl;
+            }
+            cout << name.str() << ": (s) " << str.str() << endl;
+        }
+        break;
+        case ct_value:
+        {
+#if DEBUG_MODEL_PARSER
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: numeric" << endl;
+#endif
+            // TODO: Parse the number without the lexer.
+            formula_lexer lexer(buf.get(), buf.size());
+            lexer.tokenize();
+            lexer_tokens_t tokens;
+            lexer.swap_tokens(tokens);
+
+            // For a numeric cell, there should be no more than 2 lexer
+            // tokens: one for the sign and one for the number.
+            if (tokens.empty())
+                throw general_error("no lexer tokens for a value cell.");
+
+            size_t token_count = tokens.size();
+            if (token_count > 2)
+                throw general_error("there should be no more than 2 lexer tokens for a value cell.");
+
+            const lexer_token_base& value_token = tokens.back();
+            if (value_token.get_opcode() != op_value)
+                throw general_error("value token expected, but not found.");
+
+            double value = value_token.get_value();
+            if (token_count == 2)
+            {
+                const lexer_token_base& sign_token = tokens.front();
+                switch (sign_token.get_opcode())
+                {
+                    case op_plus:
+                        // do nothing.
+                    break;
+                    case op_minus:
+                        value *= -1.0;
+                    break;
+                    default:
+                        throw general_error("unexpected first token type.");
+                }
+            }
+
+            m_context.set_cell(pos, new numeric_cell(value));
+
+            if (m_print_separator)
+            {
+                m_print_separator = false;
+                cout << get_formula_result_output_separator() << endl;
+            }
+            cout << resolver.get_name(pos, false) << ": (n) " << value << endl;
+        }
+        break;
+        default:
+            throw model_parser::parse_error("unknown content type");
     }
 }
 
