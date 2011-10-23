@@ -677,13 +677,9 @@ const lexer_tokens_t& model_parser::cell::get_tokens() const
 // ============================================================================
 
 model_parser::model_parser(const string& filepath, size_t thread_count) :
-    m_filepath(filepath), m_thread_count(thread_count)
-{
-}
+    m_filepath(filepath), m_thread_count(thread_count), m_print_separator(true) {}
 
-model_parser::~model_parser()
-{
-}
+model_parser::~model_parser() {}
 
 void model_parser::parse()
 {
