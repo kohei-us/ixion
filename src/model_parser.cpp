@@ -712,15 +712,9 @@ void model_parser::parse()
                 if (parse_mode != parse_mode_init)
                     throw parse_error("'calc' command must be used in the init mode.");
 
-                ensure_unique_names(data.cell_names);
-
                 // Perform full calculation on currently stored cells.
 
-                // Convert lexer tokens into formula tokens and put them into
-                // formula cells.
-                dirty_cells_t dirty_cells;
-                convert_lexer_tokens(data.cells, m_context, dirty_cells);
-                calc(dirty_cells);
+                calc(m_dirty_cells);
             }
             else if (buf_com.equals("recalc"))
             {
