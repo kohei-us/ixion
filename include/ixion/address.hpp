@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -31,6 +31,7 @@
 #include "ixion/global.hpp"
 
 #include <string>
+#include <vector>
 
 namespace ixion {
 
@@ -71,7 +72,7 @@ struct address_t
     bool    abs_column:1;
 
     address_t();
-    address_t(sheet_t _sheet, row_t _row, col_t _column, 
+    address_t(sheet_t _sheet, row_t _row, col_t _column,
               bool _abs_sheet=true, bool _abs_row=true, bool _abs_column=true);
     address_t(const address_t& r);
     address_t(const abs_address_t& r);
@@ -130,6 +131,8 @@ struct range_t
 
 bool operator==(const range_t& left, const range_t& right);
 bool operator!=(const range_t& left, const range_t& right);
+
+typedef std::vector<abs_address_t> dirty_cell_addrs_t;
 
 }
 

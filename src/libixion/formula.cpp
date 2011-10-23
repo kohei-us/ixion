@@ -33,6 +33,7 @@
 #include "ixion/function_objects.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/depends_tracker.hpp"
+#include "ixion/cell_listener_tracker.hpp"
 
 #include <sstream>
 
@@ -164,6 +165,22 @@ void register_formula_cell(
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_add));
+}
+
+void get_all_dirty_cells(
+    interface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
+{
+    // single, cell-to-cell listeners.
+    dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
+    for (; itr != itr_end; ++itr)
+    {
+#if DEBUG_MODEL_PARSER
+        __IXION_DEBUG_OUT__ << "processing " << cxt.get_name_resolver().get_name(itr->first, abs_address_t(), false) << endl;
+#endif
+        cell_listener_tracker& tracker = cell_listener_tracker::get(cxt);
+        tracker.get_all_range_listeners(*itr, cells);
+        tracker.get_all_cell_listeners(*itr, cells);
+    }
 }
 
 void calculate_cells(interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count)

@@ -71,6 +71,18 @@ void register_formula_cell(
     interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
 /**
+ * Get all cells that directly or indirectly depend on known modified cells.
+ * We call such cells "dirty cells".
+ *
+ * @param cxt model context
+ * @param addrs list of addresses of cells that have been modified.
+ * @param cells all dirty cells are inserted into this container when this
+ *              function returns.
+ */
+void get_all_dirty_cells(
+    interface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells);
+
+/**
  * Calculate all dirty cells in order of dependency.
  *
  * @param cxt model context.
@@ -83,7 +95,8 @@ void register_formula_cell(
  *                     (besides the main thread) to manage the calculation
  *                     threads.
  */
-void calculate_cells(interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);
+void calculate_cells(
+    interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);
 
 }
 

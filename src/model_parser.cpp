@@ -660,13 +660,11 @@ void model_parser::parse()
                 if (parse_mode != parse_mode_edit)
                     throw parse_error("'recalc' command must be used in the edit mode.");
 
-                ostringstream os;
-                os << get_formula_result_output_separator() << endl
+                cout << get_formula_result_output_separator() << endl
                     << "recalculating" << endl;
-                cout << os.str();
-                dirty_cells_t dirty_cells;
-                convert_lexer_tokens(data.cells, m_context, dirty_cells);
-                calc(dirty_cells);
+
+                get_all_dirty_cells(m_context, m_dirty_cell_addrs, m_dirty_cells);
+                calculate_cells(m_context, m_dirty_cells, m_thread_count);
             }
             else if (buf_com.equals("check"))
             {
@@ -694,6 +692,7 @@ void model_parser::parse()
                 parse_mode = parse_mode_edit;
                 data.cells.clear();
                 m_dirty_cells.clear();
+                m_dirty_cell_addrs.clear();
                 m_print_separator = true;
             }
             else
@@ -819,6 +818,7 @@ void model_parser::parse_init(const char*& p)
                 formula_cell* fcell = new formula_cell(tkid);
                 m_context.set_cell(pos, fcell);
                 m_dirty_cells.insert(fcell);
+                m_dirty_cell_addrs.push_back(pos);
                 register_formula_cell(m_context, pos, fcell);
 #if DEBUG_MODEL_PARSER
                 std::string s;
@@ -959,11 +959,6 @@ void model_parser::parse_result(const char*& p)
     }
     else
         itr->second = res;
-}
-
-void model_parser::calc(dirty_cells_t& cells)
-{
-    calculate_cells(m_context, cells, m_thread_count);
 }
 
 void model_parser::check()
