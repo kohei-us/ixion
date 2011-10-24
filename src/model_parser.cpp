@@ -580,9 +580,17 @@ void model_parser::parse()
 
 namespace {
 
-void remove_self_as_listener(
-    model_context& cxt, formula_cell* fcell, const abs_address_t& addr)
+void unregister_existing_formula_cell(model_context& cxt, const abs_address_t& pos)
 {
+    // When there is a formula cell at this position, unregister it from
+    // the dependency tree.
+    base_cell* p = cxt.get_cell(pos);
+    if (!p || p->get_celltype() != celltype_formula)
+        // Not a formula cell. Bail out.
+        return;
+
+    formula_cell* fcell = static_cast<formula_cell*>(p);
+
     // Go through all its existing references, and remove
     // itself as their listener.  This step is important
     // especially during partial re-calculation.
@@ -590,7 +598,7 @@ void remove_self_as_listener(
     fcell->get_ref_tokens(cxt, ref_tokens);
     for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
-                 addr, formula_cell_listener_handler::mode_remove));
+                 pos, formula_cell_listener_handler::mode_remove));
 }
 
 }
@@ -658,17 +666,7 @@ void model_parser::parse_init(const char*& p)
 
     abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
     m_dirty_cell_addrs.push_back(pos);
-
-    {
-        // When there is a formula cell at this position, unregister it from
-        // the dependency tree.
-        base_cell* p = m_context.get_cell(pos);
-        if (p && p->get_celltype() == celltype_formula)
-        {
-            formula_cell* fcell = static_cast<formula_cell*>(p);
-            remove_self_as_listener(m_context, fcell, pos);
-        }
-    }
+    unregister_existing_formula_cell(m_context, pos);
 
     if (buf.empty())
     {
