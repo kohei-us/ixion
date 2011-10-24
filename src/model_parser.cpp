@@ -61,331 +61,6 @@ namespace ixion {
 
 namespace {
 
-typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
-
-/**
- * Function object to convert each lexer token cell into formula token cell.
- * Converted cells are put into the context object during this process.
- * Note that each cell passed on to this function represents either a
- * brand-new cell, or an edited cell.
- */
-class lexer_formula_cell_converter : public unary_function<model_parser::cell, void>
-{
-    model_context& m_context;
-    vector<address_cell_pair_type>& m_fcells;
-    bool m_first_static_content;
-public:
-    lexer_formula_cell_converter(model_context& cxt, vector<address_cell_pair_type>& fcells) :
-        m_context(cxt), m_fcells(fcells), m_first_static_content(true) {}
-
-    void operator() (const model_parser::cell& model_cell)
-    {
-        switch (model_cell.get_type())
-        {
-            case model_parser::ct_formula:
-                convert_formula_cell(model_cell);
-            break;
-            case model_parser::ct_value:
-                convert_numeric_cell(model_cell);
-            break;
-            case model_parser::ct_string:
-                convert_string_cell(model_cell);
-            break;
-            default:
-                throw general_error("unhandled lexer cell type.");
-        }
-    }
-
-private:
-    void remove_self_as_listener(formula_cell* fcell, const abs_address_t& addr)
-    {
-        // Go through all its existing references, and remove
-        // itself as their listener.  This step is important
-        // especially during partial re-calculation.
-        vector<const formula_token_base*> ref_tokens;
-        fcell->get_ref_tokens(m_context, ref_tokens);
-        for_each(ref_tokens.begin(), ref_tokens.end(),
-                 formula_cell_listener_handler(m_context,
-                     addr, formula_cell_listener_handler::mode_remove));
-    }
-
-    void convert_string_cell(const model_parser::cell& model_cell)
-    {
-        const mem_str_buf& name = model_cell.get_name();
-        formula_name_type name_type = m_context.get_name_resolver().resolve(
-            name.get(), name.size(), abs_address_t());
-
-        if (name_type.type != formula_name_type::cell_reference)
-        {
-            ostringstream os;
-            os << "failed to convert " << name.str() << " to a string cell.  ";
-            os << "Only a normal cell instance can be a string cell.";
-            throw general_error(os.str());
-        }
-
-        abs_address_t addr;
-        addr.sheet = name_type.address.sheet;
-        addr.row = name_type.address.row;
-        addr.column = name_type.address.col;
-
-        // For a string cell, there should be only one lexer token which must
-        // be a string token.
-        const lexer_tokens_t& lexer_tokens = model_cell.get_tokens();
-        if (lexer_tokens.size() != 1)
-            throw general_error("there should only be one lexer token for a string cell.");
-
-        const lexer_token_base& token = lexer_tokens.back();
-        if (token.get_opcode() != op_string)
-            throw general_error("string lexer token expected, but not found.");
-
-        base_cell* p = m_context.get_cell(addr);
-        if (p && p->get_celltype() == celltype_formula)
-        {
-            // Pre-existing formula cell.
-            formula_cell* fcell = static_cast<formula_cell*>(p);
-            remove_self_as_listener(fcell, addr);
-        }
-
-        mem_str_buf str = token.get_string();
-        size_t str_id = m_context.add_string(str.get(), str.size());
-        m_context.set_cell(addr, new string_cell(str_id));
-
-        if (m_first_static_content)
-        {
-            cout << get_formula_result_output_separator() << endl;
-            m_first_static_content = false;
-        }
-        const formula_name_resolver& resolver = m_context.get_name_resolver();
-        cout << resolver.get_name(addr, false) << ": (s) " << str.str() << endl;
-    }
-
-    void convert_numeric_cell(const model_parser::cell& model_cell)
-    {
-        const mem_str_buf& name = model_cell.get_name();
-        formula_name_type name_type = m_context.get_name_resolver().resolve(
-            name.get(), name.size(), abs_address_t());
-
-        if (name_type.type != formula_name_type::cell_reference)
-        {
-            ostringstream os;
-            os << "failed to convert " << name.str() << " to a numeric cell.  ";
-            os << "Only a normal cell instance can be a numeric cell.";
-            throw general_error(os.str());
-        }
-
-        // For a value cell, there should be no more than 2 lexer tokens: one
-        // for the sign and one for the number.
-        const lexer_tokens_t& lexer_tokens = model_cell.get_tokens();
-        if (lexer_tokens.empty())
-            throw general_error("no lexer tokens for a value cell.");
-        size_t token_count = lexer_tokens.size();
-        if (token_count > 2)
-            throw general_error("there should be no more than 2 lexer tokens for a value cell.");
-
-        const lexer_token_base& value_token = lexer_tokens.back();
-        if (value_token.get_opcode() != op_value)
-            throw general_error("value token expected, but not found.");
-
-        double value = value_token.get_value();
-        if (token_count == 2)
-        {
-            const lexer_token_base& sign_token = lexer_tokens.front();
-            switch (sign_token.get_opcode())
-            {
-                case op_plus:
-                    // do nothing.
-                break;
-                case op_minus:
-                    value *= -1.0;
-                break;
-                default:
-                    throw general_error("unexpected first token type.");
-            }
-        }
-
-        abs_address_t addr;
-        addr.sheet = name_type.address.sheet;
-        addr.row = name_type.address.row;
-        addr.column = name_type.address.col;
-#if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << addr.get_name() << " : value = " << value << endl;
-#endif
-        base_cell* p = m_context.get_cell(addr);
-        if (p && p->get_celltype() == celltype_formula)
-        {
-            // Pre-existing formula cell.
-            formula_cell* fcell = static_cast<formula_cell*>(p);
-            remove_self_as_listener(fcell, addr);
-        }
-
-        m_context.set_cell(addr, new numeric_cell(value));
-
-        if (m_first_static_content)
-        {
-            cout << get_formula_result_output_separator() << endl;
-            m_first_static_content = false;
-        }
-        const formula_name_resolver& resolver = m_context.get_name_resolver();
-        cout << resolver.get_name(addr, false) << ": (n) " << value << endl;
-    }
-
-    void convert_formula_cell(const model_parser::cell& model_cell)
-    {
-        const mem_str_buf& name = model_cell.get_name();
-
-#if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << "parsing cell " << name.str() << " (initial content:" << model_cell.print() << ")" << endl;
-#endif
-        formula_parser fparser(model_cell.get_tokens(), m_context);
-
-        formula_cell* fcell = NULL;
-        abs_address_t addr;
-        addr.sheet = global_scope; // global scope for named expressions.
-
-        formula_name_type name_type = m_context.get_name_resolver().resolve(
-            name.get(), name.size(), abs_address_t());
-        switch (name_type.type)
-        {
-            case formula_name_type::named_expression:
-                fcell = m_context.get_named_expression(name.str());
-                if (!fcell)
-                {
-                    // No prior named expression with the same name.
-                    m_context.set_named_expression(name.get(), name.size(), new formula_cell);
-                    fcell = m_context.get_named_expression(name.str());
-                }
-                if (!fcell)
-                    throw general_error("failed to insert a named expression");
-            break;
-            case formula_name_type::cell_reference:
-            {
-                addr.sheet = name_type.address.sheet;
-                addr.row = name_type.address.row;
-                addr.column = name_type.address.col;
-#if DEBUG_MODEL_PARSER
-                __IXION_DEBUG_OUT__ << addr.get_name() << endl;
-#endif
-                base_cell* p = m_context.get_cell(addr);
-                if (!p)
-                {
-                    // No prior cell at this address. Create a new one.
-                    m_context.set_cell(addr, new formula_cell);
-                    fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
-                }
-                else if (p->get_celltype() != celltype_formula)
-                {
-                    // Prior cell exists, but it's not a formula cell.
-                    m_context.set_cell(addr, new formula_cell);
-                    fcell = static_cast<formula_cell*>(m_context.get_cell(addr));
-                }
-                else
-                {
-                    // Pre-existing formula cell.
-                    fcell = static_cast<formula_cell*>(p);
-                    remove_self_as_listener(fcell, addr);
-                }
-
-                if (!fcell)
-                    throw general_error("failed to insert a new formula cell");
-
-                m_fcells.push_back(
-                    address_cell_pair_type(addr, fcell));
-
-                fparser.set_origin(addr);
-            }
-            break;
-            default:
-                throw general_error("unknown name type.");
-        }
-
-        assert(fcell);
-
-        // Parse the lexer tokens and turn them into formula tokens.
-        fparser.parse();
-        fparser.print_tokens();
-
-        // Associate the formula tokens with the formula cell instance.
-        formula_tokens_t* p = new formula_tokens_t;
-        p->swap(fparser.get_tokens());
-        if (!set_shared_formula_tokens_to_cell(addr, fcell, p))
-            fcell->set_identifier(m_context.add_formula_tokens(addr.sheet, p));
-    }
-
-    bool set_shared_formula_tokens_to_cell(const abs_address_t& addr, formula_cell* fcell, formula_tokens_t* new_tokens)
-    {
-        assert(new_tokens);
-        if (addr.sheet == global_scope)
-            return false;
-
-        // Check its neighbors for adjacent formula cells.
-        if (addr.row == 0)
-            return false;
-
-        abs_address_t test = addr;
-        test.row -= 1;
-        base_cell* p = m_context.get_cell(test);
-        if (!p || p->get_celltype() != celltype_formula)
-            // The neighboring cell is not a formula cell.
-            return false;
-
-        formula_cell* test_cell = static_cast<formula_cell*>(p);
-
-        if (test_cell->is_shared())
-        {
-            size_t token_id = test_cell->get_identifier();
-            const formula_tokens_t* tokens = m_context.get_shared_formula_tokens(addr.sheet, token_id);
-            assert(tokens);
-
-            if (*new_tokens != *tokens)
-                return false;
-
-            // Make sure that we can extend the shared range properly.
-            abs_range_t range = m_context.get_shared_formula_range(addr.sheet, token_id);
-            if (range.first.sheet != addr.sheet)
-                // Wrong sheet
-                return false;
-
-            if (range.first.column != range.last.column)
-                // Must be a single column.
-                return false;
-
-            if (range.last.row != (addr.row - 1))
-                // Last row is not immediately above the current cell.
-                return false;
-
-            fcell->set_identifier(token_id);
-            fcell->set_shared(true);
-
-            range.last.row += 1;
-            m_context.set_shared_formula_range(addr.sheet, token_id, range);
-        }
-        else
-        {
-            size_t token_id = test_cell->get_identifier();
-            const formula_tokens_t* tokens = m_context.get_formula_tokens(addr.sheet, token_id);
-            assert(tokens);
-
-            if (*new_tokens != *tokens)
-                return false;
-
-            // Move the tokens of the master cell to the shared token storage.
-            size_t shared_id = m_context.set_formula_tokens_shared(addr.sheet, token_id);
-            test_cell->set_shared(true);
-            test_cell->set_identifier(shared_id);
-            assert(test_cell->is_shared());
-            fcell->set_identifier(shared_id);
-            fcell->set_shared(true);
-            assert(fcell->is_shared());
-            abs_range_t range;
-            range.first = addr;
-            range.last = addr;
-            range.first.row -= 1;
-            m_context.set_shared_formula_range(addr.sheet, shared_id, range);
-        }
-        return true;
-    }
-};
-
 enum parse_mode_t
 {
     parse_mode_unknown = 0,
@@ -414,6 +89,101 @@ void parse_command(const char*& p, mem_str_buf& com)
     for (++p; *p != '\n'; ++p)
         _com.inc();
     _com.swap(com);
+}
+
+void unregister_existing_formula_cell(model_context& cxt, const abs_address_t& pos)
+{
+    // When there is a formula cell at this position, unregister it from
+    // the dependency tree.
+    base_cell* p = cxt.get_cell(pos);
+    if (!p || p->get_celltype() != celltype_formula)
+        // Not a formula cell. Bail out.
+        return;
+
+    formula_cell* fcell = static_cast<formula_cell*>(p);
+
+    // Go through all its existing references, and remove
+    // itself as their listener.  This step is important
+    // especially during partial re-calculation.
+    vector<const formula_token_base*> ref_tokens;
+    fcell->get_ref_tokens(cxt, ref_tokens);
+    for_each(ref_tokens.begin(), ref_tokens.end(),
+             formula_cell_listener_handler(cxt,
+                 pos, formula_cell_listener_handler::mode_remove));
+}
+
+bool set_shared_formula_tokens_to_cell(
+    model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
+{
+    if (addr.sheet == global_scope)
+        return false;
+
+    // Check its neighbors for adjacent formula cells.
+    if (addr.row == 0)
+        return false;
+
+    abs_address_t test = addr;
+    test.row -= 1;
+    base_cell* p = cxt.get_cell(test);
+    if (!p || p->get_celltype() != celltype_formula)
+        // The neighboring cell is not a formula cell.
+        return false;
+
+    formula_cell* test_cell = static_cast<formula_cell*>(p);
+
+    if (test_cell->is_shared())
+    {
+        size_t token_id = test_cell->get_identifier();
+        const formula_tokens_t* tokens = cxt.get_shared_formula_tokens(addr.sheet, token_id);
+        assert(tokens);
+
+        if (new_tokens != *tokens)
+            return false;
+
+        // Make sure that we can extend the shared range properly.
+        abs_range_t range = cxt.get_shared_formula_range(addr.sheet, token_id);
+        if (range.first.sheet != addr.sheet)
+            // Wrong sheet
+            return false;
+
+        if (range.first.column != range.last.column)
+            // Must be a single column.
+            return false;
+
+        if (range.last.row != (addr.row - 1))
+            // Last row is not immediately above the current cell.
+            return false;
+
+        fcell.set_identifier(token_id);
+        fcell.set_shared(true);
+
+        range.last.row += 1;
+        cxt.set_shared_formula_range(addr.sheet, token_id, range);
+    }
+    else
+    {
+        size_t token_id = test_cell->get_identifier();
+        const formula_tokens_t* tokens = cxt.get_formula_tokens(addr.sheet, token_id);
+        assert(tokens);
+
+        if (new_tokens != *tokens)
+            return false;
+
+        // Move the tokens of the master cell to the shared token storage.
+        size_t shared_id = cxt.set_formula_tokens_shared(addr.sheet, token_id);
+        test_cell->set_shared(true);
+        test_cell->set_identifier(shared_id);
+        assert(test_cell->is_shared());
+        fcell.set_identifier(shared_id);
+        fcell.set_shared(true);
+        assert(fcell.is_shared());
+        abs_range_t range;
+        range.first = addr;
+        range.last = addr;
+        range.first.row -= 1;
+        cxt.set_shared_formula_range(addr.sheet, shared_id, range);
+    }
+    return true;
 }
 
 }
@@ -578,31 +348,6 @@ void model_parser::parse()
     }
 }
 
-namespace {
-
-void unregister_existing_formula_cell(model_context& cxt, const abs_address_t& pos)
-{
-    // When there is a formula cell at this position, unregister it from
-    // the dependency tree.
-    base_cell* p = cxt.get_cell(pos);
-    if (!p || p->get_celltype() != celltype_formula)
-        // Not a formula cell. Bail out.
-        return;
-
-    formula_cell* fcell = static_cast<formula_cell*>(p);
-
-    // Go through all its existing references, and remove
-    // itself as their listener.  This step is important
-    // especially during partial re-calculation.
-    vector<const formula_token_base*> ref_tokens;
-    fcell->get_ref_tokens(cxt, ref_tokens);
-    for_each(ref_tokens.begin(), ref_tokens.end(),
-             formula_cell_listener_handler(cxt,
-                 pos, formula_cell_listener_handler::mode_remove));
-}
-
-}
-
 void model_parser::parse_init(const char*& p)
 {
     model_parser::cell_type content_type = model_parser::ct_unknown;
@@ -687,9 +432,12 @@ void model_parser::parse_init(const char*& p)
                 formula_tokens_t, generic_deleter<formula_tokens_t> >
                     tokens(new formula_tokens_t);
             parse_formula_string(m_context, pos, buf.get(), buf.size(), *tokens);
-
-            size_t tkid = m_context.add_formula_tokens(0, tokens.release());
-            formula_cell* fcell = new formula_cell(tkid);
+            formula_cell* fcell = new formula_cell;
+            if (!set_shared_formula_tokens_to_cell(m_context, pos, *fcell, *tokens))
+            {
+                size_t tkid = m_context.add_formula_tokens(0, tokens.release());
+                fcell->set_identifier(tkid);
+            }
             m_context.set_cell(pos, fcell);
             m_dirty_cells.insert(fcell);
             register_formula_cell(m_context, pos, fcell);
