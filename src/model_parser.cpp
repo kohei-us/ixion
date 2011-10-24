@@ -707,30 +707,14 @@ void model_parser::parse_init(const char*& p)
 #if DEBUG_MODEL_PARSER
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: string" << endl;
 #endif
-            // For now, we compile the raw string using lexer.  It should
-            // only generate one lexer token that represents the string
-            // value.  TODO: parse raw string without the lexer.
-            formula_lexer lexer(buf.get(), buf.size());
-            lexer.tokenize();
-            lexer_tokens_t tokens;
-            lexer.swap_tokens(tokens);
-
-            if (tokens.size() != 1)
-                throw general_error("there should only be one lexer token for a string cell.");
-
-            const lexer_token_base& token = tokens.back();
-            if (token.get_opcode() != op_string)
-                throw general_error("string lexer token expected, but not found.");
-
-            mem_str_buf str = token.get_string();
-            size_t str_id = m_context.add_string(str.get(), str.size());
+            size_t str_id = m_context.add_string(buf.get(), buf.size());
             m_context.set_cell(pos, new string_cell(str_id));
             if (m_print_separator)
             {
                 m_print_separator = false;
                 cout << get_formula_result_output_separator() << endl;
             }
-            cout << name.str() << ": (s) " << str.str() << endl;
+            cout << name.str() << ": (s) " << buf.str() << endl;
         }
         break;
         case ct_value:

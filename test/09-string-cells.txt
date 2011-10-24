@@ -1,9 +1,9 @@
 %% Test for parsing string cells.
 %mode init
-A1@"Andy"
-B1@"Bruce"
-C1@"Charles"
-D1@"David"
+A1@Andy
+B1@Bruce
+C1@Charles
+D1@David
 A2=A1
 %calc
 %mode result
