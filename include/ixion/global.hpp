@@ -33,6 +33,7 @@
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 
 #define __IXION_DEBUG_OUT__ ::std::cout << __FILE__ << "#" << __LINE__ << ": "
 
@@ -201,12 +202,19 @@ struct delete_map_value : public std::unary_function<typename _T::value_type, vo
 };
 
 template<typename _T>
-struct generic_deleter
+struct default_deleter
 {
     void operator() (const _T* p) const
     {
         delete p;
     }
+};
+
+template<typename _T>
+class unique_ptr : public boost::interprocess::unique_ptr<_T, default_deleter<_T> >
+{
+public:
+    unique_ptr(_T* p) : boost::interprocess::unique_ptr<_T, default_deleter<_T> >(p) {}
 };
 
 }

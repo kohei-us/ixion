@@ -47,13 +47,7 @@
 #include <cassert>
 #include <memory>
 
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/assign/ptr_map_inserter.hpp>
-#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
-
 using namespace std;
-using ::boost::ptr_map;
-using ::boost::assign::ptr_map_insert;
 
 #define DEBUG_MODEL_PARSER 0
 
@@ -428,19 +422,18 @@ void model_parser::parse_init(const char*& p)
 #if DEBUG_MODEL_PARSER
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
 #endif
-            boost::interprocess::unique_ptr<
-                formula_tokens_t, generic_deleter<formula_tokens_t> >
-                    tokens(new formula_tokens_t);
+            unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
             parse_formula_string(m_context, pos, buf.get(), buf.size(), *tokens);
-            formula_cell* fcell = new formula_cell;
+            unique_ptr<formula_cell> fcell(new formula_cell);
             if (!set_shared_formula_tokens_to_cell(m_context, pos, *fcell, *tokens))
             {
                 size_t tkid = m_context.add_formula_tokens(0, tokens.release());
                 fcell->set_identifier(tkid);
             }
-            m_context.set_cell(pos, fcell);
-            m_dirty_cells.insert(fcell);
-            register_formula_cell(m_context, pos, fcell);
+            formula_cell* p = fcell.get();
+            m_context.set_cell(pos, fcell.release());
+            m_dirty_cells.insert(p);
+            register_formula_cell(m_context, pos, p);
 #if DEBUG_MODEL_PARSER
             std::string s;
             print_formula_tokens(m_context, pos, *tokens, s);
