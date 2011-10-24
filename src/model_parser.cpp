@@ -61,44 +61,6 @@ namespace ixion {
 
 namespace {
 
-// ============================================================================
-// Function objects
-
-class formula_cell_inserter : public unary_function<string, void>
-{
-public:
-    formula_cell_inserter(ptr_map<string, base_cell>& cell_name_ptr_map) :
-        m_cell_map(cell_name_ptr_map) {}
-
-    void operator() (const string& name)
-    {
-        // This inserts a new'ed formula_cell instance associated with the name.
-        ptr_map_insert<formula_cell>(m_cell_map)(name);
-    }
-
-private:
-    ptr_map<string, base_cell>& m_cell_map;
-};
-
-class formula_cell_printer : public unary_function<const base_cell*, void>
-{
-    const model_context& m_context;
-public:
-    formula_cell_printer(const model_context& cxt) : m_context(cxt) {}
-
-    void operator() (const base_cell* p) const
-    {
-        string name = "<unknown>";
-        if (p->get_celltype() == celltype_formula)
-        {
-            string expr_name = m_context.get_cell_name(p);
-            if (!expr_name.empty())
-                name = expr_name;
-        }
-        __IXION_DEBUG_OUT__ << "  cell " << name << endl;
-    }
-};
-
 typedef ::std::pair<abs_address_t, formula_cell*> address_cell_pair_type;
 
 /**
@@ -424,51 +386,12 @@ private:
     }
 };
 
-/**
- * Function object that goes through the references of each formula cell and
- * registers the formula cell as a listener to all its referenced cells.
- */
-class formula_cell_ref_to_listener_handler : public unary_function<address_cell_pair_type, void>
-{
-    model_context& m_context;
-public:
-    formula_cell_ref_to_listener_handler(model_context& cxt) :
-        m_context(cxt) {}
-
-    void operator() (const address_cell_pair_type& v)
-    {
-        formula_cell* fcell = v.second;
-#if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << "processing formula cell at " << m_context.get_cell_name(fcell) << endl;
-#endif
-        // Now, register the formula cell as a listener to all its references.
-        vector<const formula_token_base*> ref_tokens;
-        fcell->get_ref_tokens(m_context, ref_tokens);
-#if DEBUG_MODEL_PARSER
-        __IXION_DEBUG_OUT__ << "  number of reference tokens: " << ref_tokens.size() << endl;
-#endif
-        for_each(ref_tokens.begin(), ref_tokens.end(),
-                 formula_cell_listener_handler(m_context,
-                     v.first, formula_cell_listener_handler::mode_add));
-    }
-};
-
-// ============================================================================
-
 enum parse_mode_t
 {
     parse_mode_unknown = 0,
     parse_mode_init,
     parse_mode_result,
     parse_mode_edit
-};
-
-/**
- * A bucket of data used during model definition parsing.
- */
-struct parse_data
-{
-    vector<model_parser::cell>  cells;
 };
 
 bool is_separator(char c)
@@ -491,71 +414,6 @@ void parse_command(const char*& p, mem_str_buf& com)
     for (++p; *p != '\n'; ++p)
         _com.inc();
     _com.swap(com);
-}
-
-/**
- * This is where primitive lexer tokens get converted to formula tokens, and
- * any dependency tracking information gets built.
- *
- * @param cells array of cells containing lexer tokens.  <i>This array only
- *              contains either new cells or edited cells.</i>
- * @param context context representing current session.
- * @param dirty_cells cells that need to be re-calculated.
- */
-void convert_lexer_tokens(const vector<model_parser::cell>& cells, model_context& context, dirty_cells_t& dirty_cells)
-{
-#if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << "number of lexer token cells: " << cells.size() << endl;
-#endif
-    vector<address_cell_pair_type> fcells;
-
-    // First, convert each lexer token cell into formula token cell, and put
-    // the formula cells into the context object.
-    for_each(cells.begin(), cells.end(),
-             lexer_formula_cell_converter(context, fcells));
-
-#if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << "number of converted formula cells: " << fcells.size() << endl;
-#endif
-
-    // Next, go through the formula cells and their references, and register
-    // the formula cells as listeners to their respective references.
-    for_each(fcells.begin(), fcells.end(),
-             formula_cell_ref_to_listener_handler(context));
-
-    // Go through all the listeners and determine dirty cells - cells to be
-    // (re-)calculated.
-    dirty_cells_t _dirty_cells;
-    {
-        // single, cell-to-cell listeners.
-        vector<address_cell_pair_type>::iterator itr = fcells.begin(), itr_end = fcells.end();
-        for (; itr != itr_end; ++itr)
-        {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "processing " << context.get_name_resolver().get_name(itr->first, abs_address_t(), false) << endl;
-#endif
-            formula_cell* fcell = itr->second;
-            _dirty_cells.insert(fcell);
-            cell_listener_tracker& tracker = cell_listener_tracker::get(context);
-            tracker.get_all_range_listeners(itr->first, _dirty_cells);
-            tracker.get_all_cell_listeners(itr->first, _dirty_cells);
-        }
-    }
-
-#if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
-    vector<address_cell_pair_type>::const_iterator itr = fcells.begin(), itr_end = fcells.end();
-    for (; itr != itr_end; ++itr)
-    {
-        const abs_address_t& target = itr->first;
-        cell_listener_tracker::get(context).print_cell_listeners(target);
-    }
-
-    __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
-    __IXION_DEBUG_OUT__ << "All dirty cells: " << endl;
-    for_each(_dirty_cells.begin(), _dirty_cells.end(), formula_cell_printer(context));
-#endif
-    dirty_cells.swap(_dirty_cells);
 }
 
 }
@@ -633,7 +491,6 @@ void model_parser::parse()
 
     parse_mode_t parse_mode = parse_mode_unknown;
     const char *p = &strm[0], *p_last = &strm[strm.size()-1];
-    parse_data data;
 
     for (; p != p_last; ++p)
     {
@@ -691,7 +548,6 @@ void model_parser::parse()
             else if (buf_com.equals("mode edit"))
             {
                 parse_mode = parse_mode_edit;
-                data.cells.clear();
                 m_dirty_cells.clear();
                 m_dirty_cell_addrs.clear();
                 m_print_separator = true;
