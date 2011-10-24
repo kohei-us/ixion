@@ -1,0 +1,23 @@
+%% Modify non-formula cell which should trigger formula cells referencing it
+%% to get re-calculated.
+%mode init
+A1:1
+A2=A1*A1
+A3=A1*3
+B1=A1*3+10
+%calc
+%mode result
+A2=1
+A3=3
+B1=13
+%check
+%mode edit
+A1:2
+%recalc
+%mode result
+A2=4
+A3=6
+B1=16
+%check
+
+
