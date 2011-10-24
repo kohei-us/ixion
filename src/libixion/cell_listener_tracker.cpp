@@ -72,6 +72,11 @@ cell_listener_tracker::~cell_listener_tracker()
 
 void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
 {
+#if DEBUG_CELL_LISTENER_TRACKER
+    const formula_name_resolver& res = m_context.get_name_resolver();
+    __IXION_DEBUG_OUT__ << "adding - cell src: " << res.get_name(src, false) 
+        << "  cell dest: " << res.get_name(dest, false) << endl;
+#endif
     cell_store_type::iterator itr = m_cell_listeners.find(dest);
     if (itr == m_cell_listeners.end())
     {
@@ -89,7 +94,8 @@ void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& ra
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     const formula_name_resolver& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell, false) << "  range: " << res.get_name(range) << endl;
+    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell, false) 
+        << "  range: " << res.get_name(range, false) << endl;
 #endif
     range_store_type::iterator itr = m_range_listeners.find(range);
     if (itr == m_range_listeners.end())
@@ -196,6 +202,10 @@ public:
 void cell_listener_tracker::get_all_cell_listeners(
     const abs_address_t& target, dirty_cells_t& listeners) const
 {
+#if DEBUG_CELL_LISTENER_TRACKER
+    const formula_name_resolver& res = m_context.get_name_resolver();
+    __IXION_DEBUG_OUT__ << "target cell: " << res.get_name(target, false) << endl;
+#endif
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
     if (itr == m_cell_listeners.end())
         // This target cell has no listeners.

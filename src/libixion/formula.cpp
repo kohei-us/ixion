@@ -35,7 +35,15 @@
 #include "ixion/depends_tracker.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 
+#define DEBUG_FORMULA_API 0
+
 #include <sstream>
+
+#if DEBUG_FORMULA_API
+#include <iostream>
+using namespace std;
+#endif
+
 
 namespace ixion {
 
@@ -170,6 +178,9 @@ void register_formula_cell(
 void get_all_dirty_cells(
     interface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
 {
+#if DEBUG_FORMULA_API
+    __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
+#endif
     // single, cell-to-cell listeners.
     dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
     for (; itr != itr_end; ++itr)

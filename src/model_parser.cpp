@@ -801,6 +801,7 @@ void model_parser::parse_init(const char*& p)
     }
 
     abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
+    m_dirty_cell_addrs.push_back(pos);
 
     {
         // When there is a formula cell at this position, unregister it from
@@ -837,7 +838,6 @@ void model_parser::parse_init(const char*& p)
             formula_cell* fcell = new formula_cell(tkid);
             m_context.set_cell(pos, fcell);
             m_dirty_cells.insert(fcell);
-            m_dirty_cell_addrs.push_back(pos);
             register_formula_cell(m_context, pos, fcell);
 #if DEBUG_MODEL_PARSER
             std::string s;
