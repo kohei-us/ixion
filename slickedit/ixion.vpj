@@ -260,7 +260,6 @@
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
 				<F N="../include/ixion/session_handler.hpp"/>
-				<F N="../include/ixion/sort_input_parser.hpp"/>
 				<F N="../include/ixion/thread.hpp"/>
 				<F N="../include/ixion/types.hpp"/>
 			</Folder>
@@ -292,7 +291,6 @@
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
 				<F N="../src/libixion/session_handler.cpp"/>
-				<F N="../src/libixion/sort_input_parser.cpp"/>
 				<F N="../src/libixion/types.cpp"/>
 			</Folder>
 			<F N="../src/ixion_parser.cpp"/>
@@ -303,6 +301,8 @@
 				Type="Makefile"/>
 			<F N="../src/model_parser.cpp"/>
 			<F N="../src/model_parser.hpp"/>
+			<F N="../src/sort_input_parser.cpp"/>
+			<F N="../src/sort_input_parser.hpp"/>
 		</Folder>
 	</Files>
 </Project>
