@@ -106,6 +106,11 @@ void unregister_existing_formula_cell(model_context& cxt, const abs_address_t& p
                  pos, formula_cell_listener_handler::mode_remove));
 }
 
+/**
+ * @return true if the formula cell is stored in the model with a shared
+ *         formula token set, false if the formula cell has a non-shared
+ *         formula token set, and is not yet stored in the model.
+ */
 bool set_shared_formula_tokens_to_cell(
     model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
 {
