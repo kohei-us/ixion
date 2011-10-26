@@ -6,7 +6,6 @@ License:        MIT/X11
 Source:         %{name}_%{version}.tar.bz2
 Group:          Development/Libraries/C and C++
 Summary:        Threaded multi-target formula parser & interpreter.
-BuildArch:      x86_64
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  gcc-c++, libstdc++-devel, boost-devel, mdds-devel >= 0.5.4
 Requires:       boost >= 1.39
@@ -60,11 +59,11 @@ rm -rf %buildroot
 %dir /usr/bin
 %dir /usr/lib64
 %dir /usr/lib64/pkgconfig
-/usr/bin/ixion-parser
-/usr/bin/ixion-sorter
-/usr/lib64/%{_libname}.so
-/usr/lib64/%{_libname}.so.*
-/usr/lib64/pkgconfig/%{_libname}.pc
+%{_bindir}/ixion-parser
+%{_bindir}/ixion-sorter
+%{_libdir}/%{_libname}.so
+%{_libdir}/%{_libname}.so.*
+%{_libdir}/pkgconfig/%{_libname}.pc
 
 %files devel
 %defattr(-,root,root)

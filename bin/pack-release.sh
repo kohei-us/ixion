@@ -1,6 +1,7 @@
 #!/bin/sh
 
-VERSION=0.4.0
+PROGDIR=`dirname $0`
+VERSION=`cat $PROGDIR/../VERSION`
 DIR=libixion_$VERSION
 
 #git clone git://gitorious.org/ixion/ixion.git $DIR || exit 1
