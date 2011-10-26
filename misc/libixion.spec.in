@@ -40,7 +40,7 @@ Authors:
 %setup -q -n %{name}_%{version}
 
 %build
-%configure --docdir=%{_docdir} --with-mdds-include-path=/usr/include
+%configure --docdir=%{_docdir}
 make -j4
 
 %check
