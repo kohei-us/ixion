@@ -55,8 +55,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%dir %{_bindir}
-%dir %{_libdir}
 %{_bindir}/ixion-parser
 %{_bindir}/ixion-sorter
 %{_libdir}/%{_libname}.so
@@ -64,7 +62,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
-%dir %{_libdir}/pkgconfig
 %{_includedir}/%{_libname}
 %{_libdir}/pkgconfig/%{_libname}.pc
 
