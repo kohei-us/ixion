@@ -21,7 +21,7 @@ Authors:
 %package devel
 License:        MIT/X11
 Group:          Development/Libraries/C and C++
-Summary:        Threaded multi-target formula parser & interpreter.
+Summary:        Threaded multi-target formula parser & interpreter
 
 %description devel
 Ixion is a general purpose formula parser & interpreter that can calculate
