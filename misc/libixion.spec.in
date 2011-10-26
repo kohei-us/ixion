@@ -1,0 +1,71 @@
+Name:           libixion
+Version:        @VERSION@
+Release:        1
+Url:            http://gitorious.org/ixion
+License:        MIT/X11
+Source:         %{name}_%{version}.tar.bz2
+Group:          Development/Libraries/C and C++
+Summary:        Threaded multi-target formula parser & interpreter.
+BuildArch:      x86_64
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  gcc-c++, libstdc++-devel, boost-devel, mdds-devel >= 0.5.4
+Requires:       boost >= 1.39
+
+%description
+Ixion is a general purpose formula parser & interpreter that can calculate
+multiple named targets, or "cells".
+
+Authors:
+--------
+    Kohei Yoshida <kohei.yoshida@suse.com>
+
+%package devel
+License:        MIT/X11
+Group:          Development/Libraries/C and C++
+Summary:        Threaded multi-target formula parser & interpreter.
+
+%description devel
+Ixion is a general purpose formula parser & interpreter that can calculate
+multiple named targets, or "cells".
+
+Authors:
+--------
+    Kohei Yoshida <kohei.yoshida@suse.com>
+
+%define _docdir %{_defaultdocdir}/%{name}-devel
+
+%prep
+%setup -q -n %{name}_%{version}
+
+%build
+%configure --docdir=%{_docdir} --with-mdds-include-path=/usr/include
+make -j4
+
+%check
+make check
+
+%install
+make DESTDIR=%buildroot install
+rm %buildroot/usr/bin/ixion-test
+rm %buildroot/usr/lib64/libixion-0.4.a
+rm %buildroot/usr/lib64/libixion-0.4.la
+
+%clean
+rm -rf %buildroot
+
+%files
+%defattr(-,root,root)
+%dir /usr/bin
+%dir /usr/lib64
+%dir /usr/lib64/pkgconfig
+/usr/bin/ixion-parser
+/usr/bin/ixion-sorter
+/usr/lib64/libixion-0.4.so
+/usr/lib64/libixion-0.4.so.*
+/usr/lib64/pkgconfig/ixion-0.4.pc
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/%{name}-0.4
+
+
