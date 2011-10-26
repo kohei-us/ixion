@@ -5,9 +5,9 @@ Url:            http://gitorious.org/ixion
 License:        MIT/X11
 Source:         %{name}_%{version}.tar.bz2
 Group:          Development/Libraries/C and C++
-Summary:        Threaded multi-target formula parser & interpreter.
+Summary:        Threaded multi-target formula parser & interpreter
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-BuildRequires:  gcc-c++, libstdc++-devel, boost-devel, mdds-devel >= 0.5.4
+BuildRequires:  gcc-c++, libstdc++-devel, coreutils, boost-devel, mdds-devel >= 0.5.4
 Requires:       boost >= 1.39
 
 %description
@@ -33,40 +33,39 @@ Authors:
 
 %define _apiver @IXION_API_VERSION@
 %define _libname %{name}-%{_apiver}
-%define _docdir %{_defaultdocdir}/%{name}-devel
 
 %prep
 %setup -q -n %{name}_%{version}
 
 %build
-%configure --docdir=%{_docdir}
+./autogen.sh --prefix=/usr --libdir=%_libdir
 make -j4
 
 %check
 make check
 
 %install
-make DESTDIR=%buildroot install
-rm %buildroot/usr/bin/ixion-test
-rm %buildroot/usr/lib64/%{_libname}.a
-rm %buildroot/usr/lib64/%{_libname}.la
+make DESTDIR=$RPM_BUILD_ROOT install
+rm $RPM_BUILD_ROOT%_bindir/ixion-test
+rm $RPM_BUILD_ROOT%_libdir/%{_libname}.a
+rm $RPM_BUILD_ROOT%_libdir/%{_libname}.la
 
 %clean
-rm -rf %buildroot
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%dir /usr/bin
-%dir /usr/lib64
-%dir /usr/lib64/pkgconfig
+%dir %{_bindir}
+%dir %{_libdir}
 %{_bindir}/ixion-parser
 %{_bindir}/ixion-sorter
 %{_libdir}/%{_libname}.so
 %{_libdir}/%{_libname}.so.*
-%{_libdir}/pkgconfig/%{_libname}.pc
 
 %files devel
 %defattr(-,root,root)
+%dir %{_libdir}/pkgconfig
 %{_includedir}/%{_libname}
+%{_libdir}/pkgconfig/%{_libname}.pc
 
 

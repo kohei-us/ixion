@@ -10,6 +10,8 @@ pushd . > /dev/null
 cd $DIR
 rm -rf .git
 rm -f .gitignore
+rm -rf autom4te.cache
+rm -rf slickedit
 
 touch ChangeLog
 
