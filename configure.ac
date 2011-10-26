@@ -69,14 +69,15 @@ else
 fi
 
 if test "z$with_mdds_include_path" != "z"; then
+    # Custom mdds include path is given.  Use it.
     AC_MSG_CHECKING([mdds include path])
     AC_MSG_RESULT([$with_mdds_include_path])
     CPPFLAGS="$CPPFLAGS -I$with_mdds_include_path"
-else
-    AC_LANG_PUSH([C++])
-    AC_CHECK_HEADERS([mdds/rectangle_set.hpp mdds/mixed_type_matrix.hpp], [], [AC_MSG_ERROR([not all required mdds headers found.])])
-    AC_LANG_POP([C++])
 fi
+
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([mdds/rectangle_set.hpp mdds/mixed_type_matrix.hpp], [], [AC_MSG_ERROR([not all required mdds headers found.])])
+AC_LANG_POP([C++])
 
 CPPFLAGS="$CPPFLAGS -g -Os"
 
