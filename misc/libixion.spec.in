@@ -32,6 +32,8 @@ Authors:
 --------
     Kohei Yoshida <kohei.yoshida@suse.com>
 
+%define _apiver @IXION_API_VERSION@
+%define _libname %{name}-%{_apiver}
 %define _docdir %{_defaultdocdir}/%{name}-devel
 
 %prep
@@ -47,8 +49,8 @@ make check
 %install
 make DESTDIR=%buildroot install
 rm %buildroot/usr/bin/ixion-test
-rm %buildroot/usr/lib64/libixion-0.4.a
-rm %buildroot/usr/lib64/libixion-0.4.la
+rm %buildroot/usr/lib64/%{_libname}.a
+rm %buildroot/usr/lib64/%{_libname}.la
 
 %clean
 rm -rf %buildroot
@@ -60,12 +62,12 @@ rm -rf %buildroot
 %dir /usr/lib64/pkgconfig
 /usr/bin/ixion-parser
 /usr/bin/ixion-sorter
-/usr/lib64/libixion-0.4.so
-/usr/lib64/libixion-0.4.so.*
-/usr/lib64/pkgconfig/ixion-0.4.pc
+/usr/lib64/%{_libname}.so
+/usr/lib64/%{_libname}.so.*
+/usr/lib64/pkgconfig/%{_libname}.pc
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/%{name}-0.4
+%{_includedir}/%{_libname}
 
 

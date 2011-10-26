@@ -1,15 +1,15 @@
 SUBDIRS = src include
 ACLOCAL_AMFLAGS = -I m4
 
-pcfiles = ixion-@IXION_API_VERSION@.pc
-ixion-@IXION_API_VERSION@.pc: ixion.pc
-		@cp -f $< $@
+pcfiles = libixion-@IXION_API_VERSION@.pc
+libixion-@IXION_API_VERSION@.pc: libixion.pc
+	@cp -f $< $@
 
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
 EXTRA_DIST = \
-	ixion.pc.in
+	libixion.pc.in
 
 dist-hook:
 	@if test -d "$(srcdir)/.git"; \
