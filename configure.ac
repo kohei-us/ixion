@@ -90,6 +90,7 @@ AC_CONFIG_FILES([Makefile
                  include/ixion/Makefile
                  include/ixion/hash_container/Makefile
                  include/ixion/interface/Makefile
+                 misc/libixion.spec
                  src/Makefile
                  src/libixion/Makefile])
 AC_OUTPUT
