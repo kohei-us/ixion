@@ -56,7 +56,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-DEFINES="-D_REENTRANT"
+CPPFLAGS="-D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST"
 
 AC_MSG_CHECKING([whether to turn on hash container compatibility])
 if test "z$with_hash_container_compat" = "zno"; then
@@ -68,18 +68,17 @@ else
     DEFINES="$DEFINES -D_IXION_HASH_CONTAINER_COMPAT"
 fi
 
-AC_MSG_CHECKING([mdds include path])
-if test "z$with_mdds_include_path" = "z"; then
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([mdds header include path not specified.])
-else
+if test "z$with_mdds_include_path" != "z"; then
+    AC_MSG_CHECKING([mdds include path])
     AC_MSG_RESULT([$with_mdds_include_path])
-    DEFINES="$DEFINES -DMDDS_HASH_CONTAINER_BOOST"
+    CPPFLAGS="$CPPFLAGS -I$with_mdds_include_path"
+else
+    AC_LANG_PUSH([C++])
+    AC_CHECK_HEADERS([mdds/rectangle_set.hpp mdds/mixed_type_matrix.hpp], [], [AC_MSG_ERROR([not all required mdds headers found.])])
+    AC_LANG_POP([C++])
 fi
 
-CXXFLAGS="$DEFINES -I$with_mdds_include_path -g -Os"
-
-AC_DEFINE(CXXFLAGS)
+CPPFLAGS="$CPPFLAGS -g -Os"
 
 BOOST_THREADS
 BOOST_PROGRAM_OPTIONS
