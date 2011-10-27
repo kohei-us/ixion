@@ -13,15 +13,6 @@ rm -f .gitignore
 rm -rf autom4te.cache
 rm -rf slickedit
 
-touch ChangeLog
-
-if [ ! -e ltmain.sh ]; then
-    libtoolize
-fi
-
-aclocal -I m4
-automake --gnu --add-missing
-autoconf
 popd > /dev/null
 
 tar jcvf $DIR.tar.bz2 $DIR
