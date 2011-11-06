@@ -45,7 +45,7 @@ namespace ixion {
  * @param tokens formula tokens representing the parsed formula expression.
  */
 void parse_formula_string(
-    const interface::model_context& cxt, const abs_address_t& pos,
+    const iface::model_context& cxt, const abs_address_t& pos,
     const char* p, size_t n, formula_tokens_t& tokens);
 
 /**
@@ -57,7 +57,7 @@ void parse_formula_string(
  * @param str string representation of the formula tokens.
  */
 void print_formula_tokens(
-    const interface::model_context& cxt, const abs_address_t& pos,
+    const iface::model_context& cxt, const abs_address_t& pos,
     const formula_tokens_t& tokens, std::string& str);
 
 /**
@@ -68,7 +68,7 @@ void print_formula_tokens(
  * @param cell instance of the cell being registered.
  */
 void register_formula_cell(
-    interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
+    iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
 /**
  * Get all cells that directly or indirectly depend on known modified cells.
@@ -80,7 +80,7 @@ void register_formula_cell(
  *              function returns.
  */
 void get_all_dirty_cells(
-    interface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells);
+    iface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells);
 
 /**
  * Calculate all dirty cells in order of dependency.
@@ -96,7 +96,7 @@ void get_all_dirty_cells(
  *                     threads.
  */
 void calculate_cells(
-    interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);
+    iface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);
 
 }
 

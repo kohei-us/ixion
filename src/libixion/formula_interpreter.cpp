@@ -56,7 +56,7 @@ opcode_token paren_close = opcode_token(fop_close);
 
 }
 
-formula_interpreter::formula_interpreter(const formula_cell* cell, const interface::model_context& cxt) :
+formula_interpreter::formula_interpreter(const formula_cell* cell, const iface::model_context& cxt) :
     m_parent_cell(cell),
     m_context(cxt),
     mp_handler(NULL),
@@ -161,7 +161,7 @@ void formula_interpreter::init_tokens()
 
 namespace {
 
-void get_result_from_cell(const interface::model_context& cxt, formula_result& res, const base_cell& cell)
+void get_result_from_cell(const iface::model_context& cxt, formula_result& res, const base_cell& cell)
 {
     switch (cell.get_celltype())
     {

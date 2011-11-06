@@ -158,12 +158,12 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     throw general_error("cell instance not found");
 }
 
-interface::cells_in_range* model_context::get_cells_in_range(const abs_range_t& range)
+iface::cells_in_range* model_context::get_cells_in_range(const abs_range_t& range)
 {
     return new cells_in_range(*this, range);
 }
 
-interface::const_cells_in_range* model_context::get_cells_in_range(const abs_range_t& range) const
+iface::const_cells_in_range* model_context::get_cells_in_range(const abs_range_t& range) const
 {
     return new const_cells_in_range(*this, range);
 }
@@ -173,8 +173,8 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     if (range.first.sheet != range.last.sheet)
         throw general_error("multi-sheet range is not allowed.");
 
-    size_t rows = range.last.row - range.first.row + 1;
-    size_t cols = range.last.column - range.first.column + 1;
+    row_t rows = range.last.row - range.first.row + 1;
+    col_t cols = range.last.column - range.first.column + 1;
 
     matrix ret(rows, cols);
     for (row_t i = 0; i < rows; ++i)
@@ -198,7 +198,7 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     return ret;
 }
 
-interface::session_handler* model_context::get_session_handler() const
+iface::session_handler* model_context::get_session_handler() const
 {
     return mp_session_handler;
 }

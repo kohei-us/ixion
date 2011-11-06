@@ -49,7 +49,7 @@ namespace {
 class cell_printer : public unary_function<const formula_cell*, void>
 {
 public:
-    cell_printer(const interface::model_context& cxt) : m_cxt(cxt) {}
+    cell_printer(const iface::model_context& cxt) : m_cxt(cxt) {}
 
     void operator() (const formula_cell* p) const
     {
@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    const interface::model_context& m_cxt;
+    const iface::model_context& m_cxt;
 };
 
 /**
@@ -74,9 +74,9 @@ struct cell_reset_handler : public unary_function<formula_cell*, void>
 
 class circular_check_handler : public unary_function<formula_cell*, void>
 {
-    const interface::model_context& m_context;
+    const iface::model_context& m_context;
 public:
-    circular_check_handler(const interface::model_context& cxt) : m_context(cxt) {}
+    circular_check_handler(const iface::model_context& cxt) : m_context(cxt) {}
 
     void operator() (formula_cell* p) const
     {
@@ -94,7 +94,7 @@ struct thread_queue_handler : public unary_function<formula_cell*, void>
 
 struct cell_interpret_handler : public unary_function<base_cell*, void>
 {
-    cell_interpret_handler(const interface::model_context& cxt) :
+    cell_interpret_handler(const iface::model_context& cxt) :
         m_context(cxt) {}
 
     void operator() (base_cell* p) const
@@ -103,7 +103,7 @@ struct cell_interpret_handler : public unary_function<base_cell*, void>
         static_cast<formula_cell*>(p)->interpret(m_context);
     }
 private:
-    const interface::model_context& m_context;
+    const iface::model_context& m_context;
 };
 
 }
@@ -119,7 +119,7 @@ void dependency_tracker::cell_back_inserter::operator() (formula_cell* cell)
 // ============================================================================
 
 dependency_tracker::dependency_tracker(
-    const dirty_cells_t& dirty_cells, const interface::model_context& cxt) :
+    const dirty_cells_t& dirty_cells, const iface::model_context& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }

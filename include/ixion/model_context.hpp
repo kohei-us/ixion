@@ -56,7 +56,7 @@ class matrix;
  * the interface; this explains why accessors for the most part only have
  * the 'get' method not paired with its 'set' counterpart.
  */
-class model_context : public interface::model_context
+class model_context : public iface::model_context
 {
     friend class cells_in_range_impl;
 
@@ -88,14 +88,14 @@ public:
     virtual const formula_name_resolver& get_name_resolver() const;
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
     virtual base_cell* get_cell(const abs_address_t& addr);
-    virtual interface::cells_in_range* get_cells_in_range(const abs_range_t& range);
-    virtual interface::const_cells_in_range* get_cells_in_range(const abs_range_t& range) const;
+    virtual iface::cells_in_range* get_cells_in_range(const abs_range_t& range);
+    virtual iface::const_cells_in_range* get_cells_in_range(const abs_range_t& range) const;
     virtual ::std::string get_cell_name(const base_cell* p) const;
     virtual abs_address_t get_cell_position(const base_cell* p) const;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
-    virtual interface::session_handler* get_session_handler() const;
+    virtual iface::session_handler* get_session_handler() const;
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;

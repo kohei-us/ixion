@@ -36,7 +36,7 @@ namespace ixion {
 
 class formula_cell;
 
-namespace interface {
+namespace iface {
 
 class model_context;
 
@@ -55,7 +55,7 @@ public:
      *  
      * @param thread_count desired number of worker threads.
      */
-    static void init(size_t thread_count, const interface::model_context& context);
+    static void init(size_t thread_count, const iface::model_context& context);
 
     /**
      * Add new cell to queue to interpret. 

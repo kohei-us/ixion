@@ -37,7 +37,7 @@
 
 namespace ixion {
 
-namespace interface {
+namespace iface {
     class model_context;
 }
 
@@ -48,9 +48,9 @@ namespace interface {
 class cell_listener_tracker
 {
     cell_listener_tracker(); // disabled
-    cell_listener_tracker(interface::model_context& cxt);
+    cell_listener_tracker(iface::model_context& cxt);
 public:
-    static cell_listener_tracker& get(interface::model_context& cxt);
+    static cell_listener_tracker& get(iface::model_context& cxt);
     static void reset();
 
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
@@ -106,7 +106,7 @@ private:
         const abs_address_t& origin_target, const abs_address_t& target,
         dirty_cells_t& listeners, address_set_type& listeners_addr) const;
 
-    interface::model_context& m_context;
+    iface::model_context& m_context;
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
     cell_store_type m_cell_listeners;         ///< store listeners for single cells.
     range_store_type m_range_listeners;       ///< store listeners for ranges.

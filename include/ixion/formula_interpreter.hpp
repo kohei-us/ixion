@@ -42,7 +42,7 @@ namespace ixion {
 
 class formula_cell;
 
-namespace interface {
+namespace iface {
 
 class model_context;
 class session_handler;
@@ -69,7 +69,7 @@ class formula_interpreter : public ::boost::noncopyable
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
-    formula_interpreter(const formula_cell* cell, const interface::model_context& cxt);
+    formula_interpreter(const formula_cell* cell, const iface::model_context& cxt);
     ~formula_interpreter();
 
     void set_origin(const abs_address_t& pos);
@@ -110,8 +110,8 @@ private:
 
 private:
     const formula_cell*         m_parent_cell;
-    const interface::model_context& m_context;
-    interface::session_handler* mp_handler;
+    const iface::model_context& m_context;
+    iface::session_handler* mp_handler;
     abs_address_t               m_pos;
 
     value_stack_t m_stack;

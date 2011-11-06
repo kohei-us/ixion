@@ -102,7 +102,7 @@ enum parse_address_result
     range_expected
 };
 
-void parse_sheet_name(const ixion::interface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     const char* p_old = p;
     size_t len = 0;
@@ -129,7 +129,7 @@ void parse_sheet_name(const ixion::interface::model_context& cxt, const char sep
 }
 
 parse_address_result parse_address(
-    const ixion::interface::model_context* cxt,
+    const ixion::iface::model_context* cxt,
     const char*& p, const char* p_last, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
 {
     row = 0;
@@ -321,7 +321,7 @@ string formula_name_resolver_simple::get_name(const abs_range_t& range, bool she
 formula_name_resolver_a1::formula_name_resolver_a1() :
     formula_name_resolver(), mp_cxt(NULL) {}
 
-formula_name_resolver_a1::formula_name_resolver_a1(const interface::model_context* cxt) :
+formula_name_resolver_a1::formula_name_resolver_a1(const iface::model_context* cxt) :
     formula_name_resolver(), mp_cxt(cxt) {}
 
 formula_name_resolver_a1::~formula_name_resolver_a1() {}

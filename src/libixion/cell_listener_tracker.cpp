@@ -48,7 +48,7 @@ boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
 
 }
 
-cell_listener_tracker& cell_listener_tracker::get(interface::model_context& cxt)
+cell_listener_tracker& cell_listener_tracker::get(iface::model_context& cxt)
 {
     if (!p_instance)
         p_instance.reset(new cell_listener_tracker(cxt));
@@ -60,7 +60,7 @@ void cell_listener_tracker::reset()
     p_instance.reset(NULL);
 }
 
-cell_listener_tracker::cell_listener_tracker(interface::model_context& cxt) :
+cell_listener_tracker::cell_listener_tracker(iface::model_context& cxt) :
     m_context(cxt) {}
 
 cell_listener_tracker::~cell_listener_tracker()
@@ -161,11 +161,11 @@ namespace {
 
 class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
 {
-    interface::model_context& m_context;
+    iface::model_context& m_context;
     dirty_cells_t& m_dirty_cells;
     cell_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(interface::model_context& cxt, dirty_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
+    dirty_cell_inserter(iface::model_context& cxt, dirty_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
     void operator() (const cell_listener_tracker::address_set_type* p)

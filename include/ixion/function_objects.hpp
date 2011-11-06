@@ -34,7 +34,7 @@
 
 namespace ixion {
 
-namespace interface {
+namespace iface {
     class model_context;
 }
 
@@ -50,12 +50,12 @@ public:
     enum mode_t { mode_add, mode_remove };
 
     explicit formula_cell_listener_handler(
-        interface::model_context& cxt, const abs_address_t& addr, mode_t mode);
+        iface::model_context& cxt, const abs_address_t& addr, mode_t mode);
 
     void operator() (const formula_token_base* p) const;
 
 private:
-    interface::model_context& m_context;
+    iface::model_context& m_context;
     cell_listener_tracker& m_listener_tracker;
     const abs_address_t& m_addr;
     formula_cell* mp_cell;
@@ -66,12 +66,12 @@ class cell_dependency_handler : public std::unary_function<formula_cell*, void>
 {
 public:
     explicit cell_dependency_handler(
-        interface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells);
+        iface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells);
 
     void operator() (formula_cell* fcell);
 
 private:
-    interface::model_context& m_context;
+    iface::model_context& m_context;
     dependency_tracker& m_dep_tracker;
     dirty_cells_t& m_dirty_cells;
 };

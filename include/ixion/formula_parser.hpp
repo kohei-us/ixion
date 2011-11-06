@@ -38,7 +38,7 @@
 
 namespace ixion {
 
-namespace interface { class model_context; }
+namespace iface { class model_context; }
 
 /**
  * Class formula_parser parses a series of primitive (or lexer) tokens
@@ -54,7 +54,7 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, const interface::model_context& cxt);
+    formula_parser(const lexer_tokens_t& tokens, const iface::model_context& cxt);
     ~formula_parser();
 
     void set_origin(const abs_address_t& pos);
@@ -71,7 +71,7 @@ private:
     void value(const lexer_token_base& t);
 
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
-    const interface::model_context& m_context;
+    const iface::model_context& m_context;
     formula_tokens_t        m_formula_tokens;
     abs_address_t           m_pos;    // reference position (usually current cell). always absolute.
 };

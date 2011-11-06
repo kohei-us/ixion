@@ -53,7 +53,7 @@ public:
     model_context_error(const std::string& msg) : general_error(msg) {}
 };
 
-namespace interface {
+namespace iface {
 
 class cells_in_range;
 class const_cells_in_range;

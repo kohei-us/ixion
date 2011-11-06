@@ -52,7 +52,7 @@ namespace {
 class ref_cell_picker : public std::unary_function<const formula_token_base*, void>
 {
 public:
-    ref_cell_picker(interface::model_context& cxt, const abs_address_t& origin, std::vector<formula_cell*>& deps) :
+    ref_cell_picker(iface::model_context& cxt, const abs_address_t& origin, std::vector<formula_cell*>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
     void operator() (const formula_token_base* p)
@@ -70,7 +70,7 @@ public:
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(m_origin);
-                boost::scoped_ptr<interface::cells_in_range> cells(m_context.get_cells_in_range(range));
+                boost::scoped_ptr<iface::cells_in_range> cells(m_context.get_cells_in_range(range));
                 for (base_cell* p = cells->first(); p; p = cells->next())
                 {
                     if (p->get_celltype() == celltype_formula)
@@ -84,7 +84,7 @@ public:
     }
 
 private:
-    interface::model_context& m_context;
+    iface::model_context& m_context;
     const abs_address_t& m_origin;
     std::vector<formula_cell*>&  m_deps;
 };
@@ -111,7 +111,7 @@ private:
 }
 
 formula_cell_listener_handler::formula_cell_listener_handler(
-    interface::model_context& cxt, const abs_address_t& addr, mode_t mode) :
+    iface::model_context& cxt, const abs_address_t& addr, mode_t mode) :
     m_context(cxt),
     m_listener_tracker(cell_listener_tracker::get(cxt)),
     m_addr(addr),
@@ -161,7 +161,7 @@ void formula_cell_listener_handler::operator() (const formula_token_base* p) con
 }
 
 cell_dependency_handler::cell_dependency_handler(
-    interface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
+    iface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
     m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
 
 void cell_dependency_handler::operator() (formula_cell* fcell)

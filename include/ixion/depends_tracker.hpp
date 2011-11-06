@@ -40,7 +40,7 @@ namespace ixion {
 
 class formula_cell;
 
-namespace interface {
+namespace iface {
 
 class model_context;
 
@@ -65,7 +65,7 @@ class dependency_tracker
     typedef depth_first_search<formula_cell*, cell_back_inserter> dfs_type;
 
 public:
-    dependency_tracker(const dirty_cells_t& dirty_cells, const interface::model_context& cxt);
+    dependency_tracker(const dirty_cells_t& dirty_cells, const iface::model_context& cxt);
     ~dependency_tracker();
 
     /**
@@ -87,7 +87,7 @@ public:
 private:
     dfs_type::precedent_set m_deps;
     const dirty_cells_t& m_dirty_cells;
-    const interface::model_context& m_context;
+    const iface::model_context& m_context;
 };
 
 }

@@ -42,7 +42,7 @@ class cells_in_range_impl;
  * Provides iterator for iterating through cell instances in a given range.
  * Empty cells are skipped.
  */
-class cells_in_range : public interface::cells_in_range
+class cells_in_range : public iface::cells_in_range
 {
     cells_in_range(); // disabled
 public:
@@ -57,7 +57,7 @@ private:
     cells_in_range_impl* mp_impl;
 };
 
-class const_cells_in_range : public interface::const_cells_in_range
+class const_cells_in_range : public iface::const_cells_in_range
 {
     const_cells_in_range(); // disabled
 public:

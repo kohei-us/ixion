@@ -136,7 +136,7 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, const interface::model_context& cxt) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, const iface::model_context& cxt) :
     m_tokens(tokens),
     m_context(cxt)
 {

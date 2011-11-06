@@ -218,7 +218,7 @@ double formula_cell::get_value() const
     return m_interpret_status.result->get_value();
 }
 
-void formula_cell::interpret(const interface::model_context& context)
+void formula_cell::interpret(const iface::model_context& context)
 {
 #if DEBUG_FORMULA_CELL
     __IXION_DEBUG_OUT__ << context.get_cell_name(this) << ": interpreting" << endl;
@@ -232,7 +232,7 @@ void formula_cell::interpret(const interface::model_context& context)
             // it can mean the cell has circular dependency.
             if (m_interpret_status.result->get_type() == formula_result::rt_error)
             {
-                interface::session_handler* handler = context.get_session_handler();
+                iface::session_handler* handler = context.get_session_handler();
                 if (handler)
                 {
                     handler->begin_cell_interpret(this);
@@ -265,7 +265,7 @@ bool formula_cell::is_circular_safe() const
     return get_flag(FORMULA_CIRCULAR_SAFE);
 }
 
-void formula_cell::check_circular(const interface::model_context& cxt)
+void formula_cell::check_circular(const iface::model_context& cxt)
 {
     // TODO: Check to make sure this is being run on the main thread only.
     abs_address_t pos = cxt.get_cell_position(this);
@@ -311,7 +311,7 @@ void formula_cell::check_circular(const interface::model_context& cxt)
             {
                 abs_address_t origin = cxt.get_cell_position(this);
                 abs_range_t range = itr->get_range_ref().to_abs(origin);
-                boost::scoped_ptr<interface::const_cells_in_range> cell_range(
+                boost::scoped_ptr<iface::const_cells_in_range> cell_range(
                     cxt.get_cells_in_range(range));
                 for (const base_cell* p = cell_range->first(); p; p = cell_range->next())
                 {
@@ -363,7 +363,7 @@ void formula_cell::reset()
     reset_flag();
 }
 
-void formula_cell::get_ref_tokens(const interface::model_context& cxt, vector<const formula_token_base*>& tokens)
+void formula_cell::get_ref_tokens(const iface::model_context& cxt, vector<const formula_token_base*>& tokens)
 {
     abs_address_t pos = cxt.get_cell_position(this);
     const formula_tokens_t* this_tokens = NULL;

@@ -35,7 +35,7 @@
 
 namespace ixion {
 
-class session_handler : public interface::session_handler
+class session_handler : public iface::session_handler
 {
 public:
     session_handler(const model_context& cxt);

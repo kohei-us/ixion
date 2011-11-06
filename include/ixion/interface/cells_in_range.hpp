@@ -32,7 +32,7 @@ namespace ixion {
 
 class base_cell;
 
-namespace interface {
+namespace iface {
 
 /**
  * Provides a means to iterate through non-empty cell instances in a range.

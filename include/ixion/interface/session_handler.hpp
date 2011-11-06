@@ -39,7 +39,7 @@ struct address_t;
 struct range_t;
 struct abs_address_t;
 
-namespace interface {
+namespace iface {
 
 class session_handler
 {

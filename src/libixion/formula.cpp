@@ -48,7 +48,7 @@ using namespace std;
 namespace ixion {
 
 void parse_formula_string(
-    const interface::model_context& cxt, const abs_address_t& pos, const char* p, size_t n,
+    const iface::model_context& cxt, const abs_address_t& pos, const char* p, size_t n,
     formula_tokens_t& tokens)
 {
     lexer_tokens_t lxr_tokens;
@@ -66,11 +66,11 @@ namespace {
 
 class print_formula_token : std::unary_function<formula_token_base, void>
 {
-    const interface::model_context& m_cxt;
+    const iface::model_context& m_cxt;
     const abs_address_t& m_pos;
     std::ostringstream& m_os;
 public:
-    print_formula_token(const interface::model_context& cxt, const abs_address_t& pos, std::ostringstream& os) :
+    print_formula_token(const iface::model_context& cxt, const abs_address_t& pos, std::ostringstream& os) :
         m_cxt(cxt), m_pos(pos), m_os(os) {}
 
     void operator() (const formula_token_base& token)
@@ -154,7 +154,7 @@ public:
 }
 
 void print_formula_tokens(
-    const interface::model_context& cxt, const abs_address_t& pos,
+    const iface::model_context& cxt, const abs_address_t& pos,
     const formula_tokens_t& tokens, std::string& str)
 {
     std::ostringstream os;
@@ -163,7 +163,7 @@ void print_formula_tokens(
 }
 
 void register_formula_cell(
-    interface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
+    iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
 {
     // TODO: Check for an existing formula cell at the specified position, and
     // if there is one, unregister it first.
@@ -176,7 +176,7 @@ void register_formula_cell(
 }
 
 void get_all_dirty_cells(
-    interface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
+    iface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
 {
 #if DEBUG_FORMULA_API
     __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
@@ -191,7 +191,7 @@ void get_all_dirty_cells(
     }
 }
 
-void calculate_cells(interface::model_context& cxt, dirty_cells_t& cells, size_t thread_count)
+void calculate_cells(iface::model_context& cxt, dirty_cells_t& cells, size_t thread_count)
 {
     dependency_tracker deptracker(cells, cxt);
     std::for_each(cells.begin(), cells.end(),

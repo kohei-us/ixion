@@ -247,7 +247,7 @@ const abs_range_t& stack_value::get_range() const
     return *m_range;
 }
 
-value_stack_t::value_stack_t(const interface::model_context& cxt) : m_context(cxt) {}
+value_stack_t::value_stack_t(const iface::model_context& cxt) : m_context(cxt) {}
 
 value_stack_t::const_iterator value_stack_t::begin() const
 {

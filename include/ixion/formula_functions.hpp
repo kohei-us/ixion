@@ -39,7 +39,7 @@ namespace ixion {
 
 class formula_token_base;
 
-namespace interface {
+namespace iface {
 
 class model_context;
 
@@ -54,7 +54,7 @@ public:
         invalid_arg(const ::std::string& msg);
     };
 
-    formula_functions(const interface::model_context& cxt);
+    formula_functions(const iface::model_context& cxt);
     ~formula_functions();
 
     static formula_function_t get_function_opcode(const formula_token_base& token);
@@ -71,7 +71,7 @@ private:
     void wait(value_stack_t& args) const;
 
 private:
-    const interface::model_context& m_context;
+    const iface::model_context& m_context;
 };
 
 }

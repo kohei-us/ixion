@@ -41,7 +41,7 @@ namespace ixion {
 class formula_result;
 class formula_cell;
 
-namespace interface {
+namespace iface {
 
 class model_context;
 
@@ -132,20 +132,20 @@ public:
     ~formula_cell();
 
     double get_value() const;
-    void interpret(const interface::model_context& context);
+    void interpret(const iface::model_context& context);
 
     /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
      */
-    void check_circular(const interface::model_context& cxt);
+    void check_circular(const iface::model_context& cxt);
 
     /**
      * Reset cell's internal state.
      */
     void reset();
 
-    void get_ref_tokens(const interface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
+    void get_ref_tokens(const iface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
 
     const formula_result* get_result_cache() const;
 

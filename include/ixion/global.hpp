@@ -45,7 +45,7 @@ struct abs_address_t;
 struct abs_range_t;
 class matrix;
 
-namespace interface {
+namespace iface {
 
 class model_context;
 
@@ -161,11 +161,11 @@ class value_stack_t
 {
     typedef ::boost::ptr_vector<stack_value> store_type;
     store_type m_stack;
-    const interface::model_context& m_context;
+    const iface::model_context& m_context;
 
     value_stack_t(); // disabled
 public:
-    explicit value_stack_t(const interface::model_context& cxt);
+    explicit value_stack_t(const iface::model_context& cxt);
 
     typedef store_type::const_iterator const_iterator;
     const_iterator begin() const;
