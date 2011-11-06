@@ -29,6 +29,7 @@
 #define __IXION_GLOBAL_HPP__
 
 #include "ixion/types.hpp"
+#include "ixion/env.hpp"
 
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
@@ -51,11 +52,11 @@ class model_context;
 
 }
 
-const char* get_formula_result_output_separator();
+DLL_PUBLIC const char* get_formula_result_output_separator();
 
 // ============================================================================
 
-class global
+class DLL_PUBLIC global
 {
 public:
     /**

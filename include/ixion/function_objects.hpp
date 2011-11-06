@@ -29,6 +29,7 @@
 #define __IXION_FUNCTION_OBJECTS_HPP__
 
 #include "ixion/types.hpp"
+#include "ixion/env.hpp"
 
 #include <functional>
 
@@ -44,7 +45,7 @@ class formula_cell;
 class formula_token_base;
 struct abs_address_t;
 
-class formula_cell_listener_handler : public std::unary_function<formula_token_base*, void>
+class DLL_PUBLIC formula_cell_listener_handler : public std::unary_function<formula_token_base*, void>
 {
 public:
     enum mode_t { mode_add, mode_remove };

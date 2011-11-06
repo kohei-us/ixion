@@ -238,6 +238,7 @@
 				<F N="../include/ixion/config.hpp"/>
 				<F N="../include/ixion/depends_tracker.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
+				<F N="../include/ixion/env.hpp"/>
 				<F N="../include/ixion/exceptions.hpp"/>
 				<F N="../include/ixion/formula.hpp"/>
 				<F N="../include/ixion/formula_function_opcode.hpp"/>

@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2010, 2011 Kohei Yoshida
+ * Copyright (c) 2011 Kohei Yoshida
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,54 +25,32 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_MEM_STR_BUF_HPP__
-#define __IXION_MEM_STR_BUF_HPP__
+#ifndef __IXION_ENV_HPP__
+#define __IXION_ENV_HPP__
 
-#include "ixion/env.hpp"
-
-#include <string>
-
-namespace ixion {
-
-/**
- * String buffer that only stores the first char position in memory and the
- * size of the string.
- */
-class DLL_PUBLIC mem_str_buf
-{
-public:
-    struct hash
-    {
-        size_t operator() (const mem_str_buf& s) const;
-    };
-
-    mem_str_buf();
-    mem_str_buf(const char* p);
-    mem_str_buf(const char* p, size_t n);
-
-    void append(const char* p);
-    void set_start(const char* p);
-    void inc();
-    bool empty() const;
-    size_t size() const;
-    const char* get() const;
-    void clear();
-    void swap(mem_str_buf& r);
-    bool equals(const char* s) const;
-    ::std::string str() const;
-    mem_str_buf& operator= (const mem_str_buf& r);
-    char operator[] (size_t pos) const;
-    bool operator== (const mem_str_buf& r) const;
-    bool operator!= (const mem_str_buf& r) const { return !operator==(r); }
-
-private:
-    const char* mp_buf;
-    size_t m_size;
-};
-
-bool operator<  (const mem_str_buf& left, const mem_str_buf& right);
-bool operator>  (const mem_str_buf& left, const mem_str_buf& right);
-
-}
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL
+    #ifdef __GNUC__
+      #define DLL_PUBLIC __attribute__ ((dllexport))
+    #else
+      #define DLL_PUBLIC __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define DLL_PUBLIC __attribute__ ((dllimport))
+    #else
+      #define DLL_PUBLIC __declspec(dllimport)
+    #endif
+  #endif
+  #define DLL_LOCAL
+#else
+  #if __GNUC__ >= 4
+    #define DLL_PUBLIC __attribute__ ((visibility ("default")))
+    #define DLL_LOCAL  __attribute__ ((visibility ("hidden")))
+  #else
+    #define DLL_PUBLIC
+    #define DLL_LOCAL
+  #endif
+#endif
 
 #endif

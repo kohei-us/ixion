@@ -38,7 +38,7 @@ namespace ixion {
 /**
  * Stores absolute address, and absolute address only.
  */
-struct abs_address_t
+struct DLL_PUBLIC abs_address_t
 {
     sheet_t sheet;
     row_t   row;
@@ -93,7 +93,7 @@ bool operator<(const address_t& left, const address_t& right);
 /**
  * Stores absolute range address.
  */
-struct abs_range_t
+struct DLL_PUBLIC abs_range_t
 {
     abs_address_t first;
     abs_address_t last;

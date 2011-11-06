@@ -30,6 +30,7 @@
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/interface/model_context.hpp"
+#include "ixion/env.hpp"
 
 #include <string>
 
@@ -44,7 +45,7 @@ namespace ixion {
  * @param n size of the raw formula expression string.
  * @param tokens formula tokens representing the parsed formula expression.
  */
-void parse_formula_string(
+void DLL_PUBLIC parse_formula_string(
     const iface::model_context& cxt, const abs_address_t& pos,
     const char* p, size_t n, formula_tokens_t& tokens);
 
@@ -56,7 +57,7 @@ void parse_formula_string(
  * @param tokens formula tokens.
  * @param str string representation of the formula tokens.
  */
-void print_formula_tokens(
+void DLL_PUBLIC print_formula_tokens(
     const iface::model_context& cxt, const abs_address_t& pos,
     const formula_tokens_t& tokens, std::string& str);
 
@@ -67,7 +68,7 @@ void print_formula_tokens(
  * @param pos address of the cell being registered.
  * @param cell instance of the cell being registered.
  */
-void register_formula_cell(
+void DLL_PUBLIC register_formula_cell(
     iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
 /**
@@ -79,7 +80,7 @@ void register_formula_cell(
  * @param cells all dirty cells are inserted into this container when this
  *              function returns.
  */
-void get_all_dirty_cells(
+void DLL_PUBLIC get_all_dirty_cells(
     iface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells);
 
 /**
@@ -95,7 +96,7 @@ void get_all_dirty_cells(
  *                     (besides the main thread) to manage the calculation
  *                     threads.
  */
-void calculate_cells(
+void DLL_PUBLIC calculate_cells(
     iface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);
 
 }

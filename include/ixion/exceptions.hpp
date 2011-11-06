@@ -28,12 +28,14 @@
 #ifndef __IXION_EXCEPTIONS_HPP__
 #define __IXION_EXCEPTIONS_HPP__
 
+#include "env.hpp"
+
 #include <exception>
 #include <string>
 
 namespace ixion {
 
-class general_error : public std::exception
+class DLL_PUBLIC general_error : public std::exception
 {
 public:
     explicit general_error(const std::string& msg);
@@ -43,7 +45,7 @@ private:
     std::string m_msg;
 };
 
-class file_not_found : public std::exception
+class DLL_PUBLIC file_not_found : public std::exception
 {
 public:
     explicit file_not_found(const std::string& fpath);

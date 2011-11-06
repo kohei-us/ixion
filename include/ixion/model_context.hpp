@@ -31,6 +31,7 @@
 #include "ixion/cell.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/model_context.hpp"
+#include "ixion/env.hpp"
 
 #include <string>
 #include <deque>
@@ -56,7 +57,7 @@ class matrix;
  * the interface; this explains why accessors for the most part only have
  * the 'get' method not paired with its 'set' counterpart.
  */
-class model_context : public iface::model_context
+class DLL_PUBLIC model_context : public iface::model_context
 {
     friend class cells_in_range_impl;
 

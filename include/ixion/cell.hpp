@@ -71,7 +71,7 @@ public:
     double get_value() const;
     size_t get_identifier() const;
     void set_identifier(size_t identifier);
-    celltype_t get_celltype() const;
+    DLL_PUBLIC celltype_t get_celltype() const;
 
 private:
     base_cell(); // disabled
@@ -99,21 +99,21 @@ protected:
     };
 };
 
-class string_cell : public base_cell
+class DLL_PUBLIC string_cell : public base_cell
 {
     string_cell();
 public:
     string_cell(size_t identifier);
 };
 
-class numeric_cell : public base_cell
+class DLL_PUBLIC numeric_cell : public base_cell
 {
     numeric_cell();
 public:
     numeric_cell(double value);
 };
 
-class formula_cell : public base_cell
+class DLL_PUBLIC formula_cell : public base_cell
 {
     struct interpret_status : boost::noncopyable
     {
