@@ -133,7 +133,7 @@ void base_cell::set_flag(int mask, bool value)
 
 bool base_cell::get_flag(int mask) const
 {
-    return (m_data.flag & mask);
+    return (m_data.flag & mask) != 0;
 }
 
 void base_cell::reset_flag()

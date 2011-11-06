@@ -34,6 +34,9 @@
 #ifdef max
 #undef max
 #endif
+#ifdef min
+#undef min
+#endif
 
 #define DEBUG_FORMULA_FUNCTIONS 0
 

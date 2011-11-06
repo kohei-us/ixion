@@ -34,7 +34,7 @@
 namespace ixion {
 
 class model_context;
-class abs_range_t;
+struct abs_range_t;
 class base_cell;
 class cells_in_range_impl;
 

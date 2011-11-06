@@ -185,18 +185,18 @@ void formula_parser::parse()
             }
         }
     }
+#if DEBUG_FORMULA_PARSER
     catch (const ref_error& e)
     {
-#if DEBUG_FORMULA_PARSER
         cout << "reference error: " << e.what() << endl;
-#endif
     }
     catch (const parse_error& e)
     {
-#if DEBUG_FORMULA_PARSER
         cout << "parse error: " << e.what() << endl;
-#endif
     }
+#else
+    catch (const general_error&) {}
+#endif
 }
 
 void formula_parser::print_tokens() const

@@ -40,7 +40,7 @@ namespace ixion {
  */
 class matrix
 {
-    typedef ::mdds::mixed_type_matrix< ::std::string, uint8_t> store_type;
+    typedef ::mdds::mixed_type_matrix< ::std::string, unsigned char> store_type;
 public:
     typedef store_type::size_pair_type size_pair_type;
 
