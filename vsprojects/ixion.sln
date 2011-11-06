@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libixion", "libixion\libixion.vcproj", "{409ADA92-17CA-4901-9CD8-D835D7446C08}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ixion-parser", "ixion-parser\ixion-parser.vcproj", "{228C5572-D5D8-49C8-AFDC-585BF8264D15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{409ADA92-17CA-4901-9CD8-D835D7446C08} = {409ADA92-17CA-4901-9CD8-D835D7446C08}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{409ADA92-17CA-4901-9CD8-D835D7446C08}.Debug|Win32.ActiveCfg = Debug|Win32
+		{409ADA92-17CA-4901-9CD8-D835D7446C08}.Debug|Win32.Build.0 = Debug|Win32
+		{409ADA92-17CA-4901-9CD8-D835D7446C08}.Release|Win32.ActiveCfg = Release|Win32
+		{409ADA92-17CA-4901-9CD8-D835D7446C08}.Release|Win32.Build.0 = Release|Win32
+		{228C5572-D5D8-49C8-AFDC-585BF8264D15}.Debug|Win32.ActiveCfg = Debug|Win32
+		{228C5572-D5D8-49C8-AFDC-585BF8264D15}.Debug|Win32.Build.0 = Debug|Win32
+		{228C5572-D5D8-49C8-AFDC-585BF8264D15}.Release|Win32.ActiveCfg = Release|Win32
+		{228C5572-D5D8-49C8-AFDC-585BF8264D15}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
