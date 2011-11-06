@@ -66,11 +66,11 @@ enum celltype_t
 class base_cell : boost::noncopyable
 {
 public:
-    static void delete_instance(const base_cell* p);
+    DLL_PUBLIC static void delete_instance(const base_cell* p);
 
-    double get_value() const;
-    size_t get_identifier() const;
-    void set_identifier(size_t identifier);
+    DLL_PUBLIC double get_value() const;
+    DLL_PUBLIC size_t get_identifier() const;
+    DLL_PUBLIC void set_identifier(size_t identifier);
     DLL_PUBLIC celltype_t get_celltype() const;
 
 private:
@@ -113,7 +113,7 @@ public:
     numeric_cell(double value);
 };
 
-class DLL_PUBLIC formula_cell : public base_cell
+class formula_cell : public base_cell
 {
     struct interpret_status : boost::noncopyable
     {
@@ -127,12 +127,12 @@ class DLL_PUBLIC formula_cell : public base_cell
     };
 
 public:
-    formula_cell();
-    formula_cell(size_t tokens_identifier);
-    ~formula_cell();
+    DLL_PUBLIC formula_cell();
+    DLL_PUBLIC formula_cell(size_t tokens_identifier);
+    DLL_PUBLIC ~formula_cell();
 
-    double get_value() const;
-    void interpret(const iface::model_context& context);
+    DLL_PUBLIC double get_value() const;
+    DLL_PUBLIC void interpret(const iface::model_context& context);
 
     /**
      * Determine if this cell contains circular reference by walking through
@@ -143,14 +143,14 @@ public:
     /**
      * Reset cell's internal state.
      */
-    void reset();
+    DLL_PUBLIC void reset();
 
-    void get_ref_tokens(const iface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
+    DLL_PUBLIC void get_ref_tokens(const iface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
 
-    const formula_result* get_result_cache() const;
+    DLL_PUBLIC const formula_result* get_result_cache() const;
 
-    bool is_shared() const;
-    void set_shared(bool b);
+    DLL_PUBLIC bool is_shared() const;
+    DLL_PUBLIC void set_shared(bool b);
 
 private:
     /**

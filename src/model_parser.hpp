@@ -30,7 +30,6 @@
 
 #include "ixion/cell.hpp"
 #include "ixion/exceptions.hpp"
-#include "ixion/lexer_tokens.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/hash_container/map.hpp"
 
@@ -74,28 +73,6 @@ public:
         ct_formula,
         ct_value,
         ct_string
-    };
-
-    /**
-     * 'cell' in this context is just a named storage containing lexer tokens.
-     * A 'cell' may be either a formula cell, or a named expression.
-     */
-    class cell
-    {
-    public:
-        cell(const mem_str_buf& name, cell_type type, lexer_tokens_t& tokens);
-        cell(const cell& r);
-        ~cell();
-
-        ::std::string print() const;
-        const mem_str_buf& get_name() const;
-        cell_type get_type() const;
-        const lexer_tokens_t& get_tokens() const;
-
-    private:
-        mem_str_buf m_name;
-        cell_type m_type;
-        lexer_tokens_t m_tokens;
     };
 
     model_parser(const ::std::string& filepath, size_t thread_count);

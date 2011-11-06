@@ -29,7 +29,6 @@
 
 #include "ixion/cell.hpp"
 #include "ixion/formula.hpp"
-#include "ixion/formula_lexer.hpp"
 #include "ixion/formula_parser.hpp"
 #include "ixion/depends_tracker.hpp"
 #include "ixion/formula_interpreter.hpp"
@@ -209,42 +208,6 @@ const char* model_parser::parse_error::what() const throw()
 
 model_parser::check_error::check_error(const string& msg) :
     general_error(msg) {}
-
-// ============================================================================
-
-model_parser::cell::cell(const mem_str_buf& name, cell_type type, lexer_tokens_t& tokens) :
-    m_name(name), m_type(type)
-{
-    // Note that this will empty the passed token container !
-    m_tokens.swap(tokens);
-}
-
-model_parser::cell::cell(const model_parser::cell& r) :
-    m_name(r.m_name),
-    m_type(r.m_type),
-    m_tokens(r.m_tokens) {}
-
-model_parser::cell::~cell() {}
-
-string model_parser::cell::print() const
-{
-    return print_tokens(m_tokens, false);
-}
-
-const mem_str_buf& model_parser::cell::get_name() const
-{
-    return m_name;
-}
-
-model_parser::cell_type model_parser::cell::get_type() const
-{
-    return m_type;
-}
-
-const lexer_tokens_t& model_parser::cell::get_tokens() const
-{
-    return m_tokens;
-}
 
 // ============================================================================
 

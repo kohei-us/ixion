@@ -38,7 +38,7 @@ namespace ixion {
  * Store formula result which may be either numeric, textural, or error.  In
  * case the result is textural, it owns the instance of the string.
  */
-class formula_result
+class DLL_PUBLIC formula_result
 {
 public:
     enum result_type { rt_value, rt_string, rt_error };

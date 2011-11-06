@@ -29,6 +29,7 @@
 #define __IXION_TYPES_HPP__
 
 #include "ixion/hash_container/set.hpp"
+#include "ixion/env.hpp"
 
 namespace ixion {
 
@@ -36,8 +37,8 @@ typedef int col_t;
 typedef int row_t;
 typedef int sheet_t;
 
-extern const sheet_t global_scope;
-extern const sheet_t invalid_sheet;
+DLL_PUBLIC extern const sheet_t global_scope;
+DLL_PUBLIC extern const sheet_t invalid_sheet;
 
 class formula_cell;
 

@@ -134,7 +134,7 @@ int main (int argc, char** argv)
         // Parse all files one at a time.
         for_each(files.begin(), files.end(), parse_file(thread_count));
     }
-    catch (const exception& e)
+    catch (const exception&)
     {
         return EXIT_FAILURE;
     }

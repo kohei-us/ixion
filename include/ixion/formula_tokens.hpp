@@ -50,7 +50,7 @@ const char* get_formula_opcode_string(fopcode_t oc);
 
 // ============================================================================
 
-class formula_token_base
+class DLL_PUBLIC formula_token_base
 {
 public:
     formula_token_base(fopcode_t op);
