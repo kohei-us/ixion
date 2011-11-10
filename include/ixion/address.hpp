@@ -55,9 +55,9 @@ struct IXION_DLLPUBLIC abs_address_t
     };
 };
 
-bool operator==(const abs_address_t& left, const abs_address_t& right);
-bool operator!=(const abs_address_t& left, const abs_address_t& right);
-bool operator<(const abs_address_t& left, const abs_address_t& right);
+IXION_DLLPUBLIC bool operator==(const abs_address_t& left, const abs_address_t& right);
+IXION_DLLPUBLIC bool operator!=(const abs_address_t& left, const abs_address_t& right);
+IXION_DLLPUBLIC bool operator<(const abs_address_t& left, const abs_address_t& right);
 
 /**
  * Stores either absolute or relative address.
@@ -86,9 +86,9 @@ struct IXION_DLLPUBLIC address_t
     };
 };
 
-bool operator==(const address_t& left, const address_t& right);
-bool operator!=(const address_t& left, const address_t& right);
-bool operator<(const address_t& left, const address_t& right);
+IXION_DLLPUBLIC bool operator==(const address_t& left, const address_t& right);
+IXION_DLLPUBLIC bool operator!=(const address_t& left, const address_t& right);
+IXION_DLLPUBLIC bool operator<(const address_t& left, const address_t& right);
 
 /**
  * Stores absolute range address.
@@ -111,9 +111,9 @@ struct IXION_DLLPUBLIC abs_range_t
     bool contains(const abs_address_t& addr) const;
 };
 
-bool operator==(const abs_range_t& left, const abs_range_t& right);
-bool operator!=(const abs_range_t& left, const abs_range_t& right);
-bool operator<(const abs_range_t& left, const abs_range_t& right);
+IXION_DLLPUBLIC bool operator==(const abs_range_t& left, const abs_range_t& right);
+IXION_DLLPUBLIC bool operator!=(const abs_range_t& left, const abs_range_t& right);
+IXION_DLLPUBLIC bool operator<(const abs_range_t& left, const abs_range_t& right);
 
 /**
  * Stores range whose component may be relative or absolute.

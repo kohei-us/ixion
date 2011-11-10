@@ -28,13 +28,15 @@
 #ifndef __IXION_CONFIG_HPP__
 #define __IXION_CONFIG_HPP__
 
+#include "ixion/env.hpp"
+
 namespace ixion {
 
 /**
  * This structure store parameters that influence various aspects of the
  * ixion formula engine.
  */
-struct config
+struct IXION_DLLPUBLIC config
 {
     /**
      * Function argument separator.  By default it's ','.
