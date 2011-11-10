@@ -57,7 +57,7 @@ class matrix;
  * the interface; this explains why accessors for the most part only have
  * the 'get' method not paired with its 'set' counterpart.
  */
-class DLL_PUBLIC model_context : public iface::model_context
+class IXION_DLLPUBLIC model_context : public iface::model_context
 {
     friend class cells_in_range_impl;
 

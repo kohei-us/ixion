@@ -38,7 +38,7 @@ namespace ixion {
  * String buffer that only stores the first char position in memory and the
  * size of the string.
  */
-class DLL_PUBLIC mem_str_buf
+class IXION_DLLPUBLIC mem_str_buf
 {
 public:
     struct hash
@@ -70,8 +70,8 @@ private:
     size_t m_size;
 };
 
-bool operator<  (const mem_str_buf& left, const mem_str_buf& right);
-bool operator>  (const mem_str_buf& left, const mem_str_buf& right);
+IXION_DLLPUBLIC bool operator<  (const mem_str_buf& left, const mem_str_buf& right);
+IXION_DLLPUBLIC bool operator>  (const mem_str_buf& left, const mem_str_buf& right);
 
 }
 

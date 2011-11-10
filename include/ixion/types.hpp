@@ -37,8 +37,8 @@ typedef int col_t;
 typedef int row_t;
 typedef int sheet_t;
 
-DLL_PUBLIC extern const sheet_t global_scope;
-DLL_PUBLIC extern const sheet_t invalid_sheet;
+IXION_DLLPUBLIC extern const sheet_t global_scope;
+IXION_DLLPUBLIC extern const sheet_t invalid_sheet;
 
 class formula_cell;
 

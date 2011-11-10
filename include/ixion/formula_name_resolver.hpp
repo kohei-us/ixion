@@ -110,7 +110,7 @@ public:
     virtual ::std::string get_name(const abs_range_t& range, bool sheet_name) const;
 };
 
-class formula_name_resolver_a1 : public formula_name_resolver
+class IXION_DLLPUBLIC formula_name_resolver_a1 : public formula_name_resolver
 {
 public:
     formula_name_resolver_a1();

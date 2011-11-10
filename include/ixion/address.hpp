@@ -38,7 +38,7 @@ namespace ixion {
 /**
  * Stores absolute address, and absolute address only.
  */
-struct DLL_PUBLIC abs_address_t
+struct IXION_DLLPUBLIC abs_address_t
 {
     sheet_t sheet;
     row_t   row;
@@ -62,7 +62,7 @@ bool operator<(const abs_address_t& left, const abs_address_t& right);
 /**
  * Stores either absolute or relative address.
  */
-struct address_t
+struct IXION_DLLPUBLIC address_t
 {
     sheet_t sheet;
     row_t   row;
@@ -93,7 +93,7 @@ bool operator<(const address_t& left, const address_t& right);
 /**
  * Stores absolute range address.
  */
-struct DLL_PUBLIC abs_range_t
+struct IXION_DLLPUBLIC abs_range_t
 {
     abs_address_t first;
     abs_address_t last;
@@ -118,7 +118,7 @@ bool operator<(const abs_range_t& left, const abs_range_t& right);
 /**
  * Stores range whose component may be relative or absolute.
  */
-struct range_t
+struct IXION_DLLPUBLIC range_t
 {
     address_t first;
     address_t last;

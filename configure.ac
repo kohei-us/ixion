@@ -56,7 +56,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-CPPFLAGS="-D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST"
+CPPFLAGS="-D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST -D__IXION_BUILDING_DLL"
 
 AC_MSG_CHECKING([whether to turn on hash container compatibility])
 if test "z$with_hash_container_compat" = "zno"; then
@@ -79,7 +79,7 @@ AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([mdds/rectangle_set.hpp mdds/mixed_type_matrix.hpp], [], [AC_MSG_ERROR([not all required mdds headers found.])])
 AC_LANG_POP([C++])
 
-CPPFLAGS="$CPPFLAGS -g -Os"
+CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
 
 BOOST_THREADS
 BOOST_PROGRAM_OPTIONS

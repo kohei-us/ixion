@@ -45,7 +45,7 @@ class formula_cell;
 class formula_token_base;
 struct abs_address_t;
 
-class DLL_PUBLIC formula_cell_listener_handler : public std::unary_function<formula_token_base*, void>
+class IXION_DLLPUBLIC formula_cell_listener_handler : public std::unary_function<formula_token_base*, void>
 {
 public:
     enum mode_t { mode_add, mode_remove };

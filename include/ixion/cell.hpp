@@ -66,12 +66,12 @@ enum celltype_t
 class base_cell : boost::noncopyable
 {
 public:
-    DLL_PUBLIC static void delete_instance(const base_cell* p);
+    IXION_DLLPUBLIC static void delete_instance(const base_cell* p);
 
-    DLL_PUBLIC double get_value() const;
-    DLL_PUBLIC size_t get_identifier() const;
-    DLL_PUBLIC void set_identifier(size_t identifier);
-    DLL_PUBLIC celltype_t get_celltype() const;
+    IXION_DLLPUBLIC double get_value() const;
+    IXION_DLLPUBLIC size_t get_identifier() const;
+    IXION_DLLPUBLIC void set_identifier(size_t identifier);
+    IXION_DLLPUBLIC celltype_t get_celltype() const;
 
 private:
     base_cell(); // disabled
@@ -99,14 +99,14 @@ protected:
     };
 };
 
-class DLL_PUBLIC string_cell : public base_cell
+class IXION_DLLPUBLIC string_cell : public base_cell
 {
     string_cell();
 public:
     string_cell(size_t identifier);
 };
 
-class DLL_PUBLIC numeric_cell : public base_cell
+class IXION_DLLPUBLIC numeric_cell : public base_cell
 {
     numeric_cell();
 public:
@@ -127,12 +127,12 @@ class formula_cell : public base_cell
     };
 
 public:
-    DLL_PUBLIC formula_cell();
-    DLL_PUBLIC formula_cell(size_t tokens_identifier);
-    DLL_PUBLIC ~formula_cell();
+    IXION_DLLPUBLIC formula_cell();
+    IXION_DLLPUBLIC formula_cell(size_t tokens_identifier);
+    IXION_DLLPUBLIC ~formula_cell();
 
-    DLL_PUBLIC double get_value() const;
-    DLL_PUBLIC void interpret(const iface::model_context& context);
+    IXION_DLLPUBLIC double get_value() const;
+    IXION_DLLPUBLIC void interpret(const iface::model_context& context);
 
     /**
      * Determine if this cell contains circular reference by walking through
@@ -143,14 +143,14 @@ public:
     /**
      * Reset cell's internal state.
      */
-    DLL_PUBLIC void reset();
+    IXION_DLLPUBLIC void reset();
 
-    DLL_PUBLIC void get_ref_tokens(const iface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
+    IXION_DLLPUBLIC void get_ref_tokens(const iface::model_context& cxt, std::vector<const formula_token_base*>& tokens);
 
-    DLL_PUBLIC const formula_result* get_result_cache() const;
+    IXION_DLLPUBLIC const formula_result* get_result_cache() const;
 
-    DLL_PUBLIC bool is_shared() const;
-    DLL_PUBLIC void set_shared(bool b);
+    IXION_DLLPUBLIC bool is_shared() const;
+    IXION_DLLPUBLIC void set_shared(bool b);
 
 private:
     /**

@@ -52,11 +52,11 @@ class model_context;
 
 }
 
-DLL_PUBLIC const char* get_formula_result_output_separator();
+IXION_DLLPUBLIC const char* get_formula_result_output_separator();
 
 // ============================================================================
 
-class DLL_PUBLIC global
+class IXION_DLLPUBLIC global
 {
 public:
     /**

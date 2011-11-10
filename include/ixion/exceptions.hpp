@@ -35,7 +35,7 @@
 
 namespace ixion {
 
-class DLL_PUBLIC general_error : public std::exception
+class IXION_DLLPUBLIC general_error : public std::exception
 {
 public:
     explicit general_error(const std::string& msg);
@@ -45,7 +45,7 @@ private:
     std::string m_msg;
 };
 
-class DLL_PUBLIC file_not_found : public std::exception
+class IXION_DLLPUBLIC file_not_found : public std::exception
 {
 public:
     explicit file_not_found(const std::string& fpath);
