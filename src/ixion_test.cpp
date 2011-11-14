@@ -194,9 +194,9 @@ bool check_formula_expression(const model_context& cxt, const char* p)
     return res == 0;
 }
 
-void test_external_formula_functions()
+void test_public_formula_api()
 {
-    cout << "test external formula functions" << endl;
+    cout << "test public formula api" << endl;
     const char* exps[] = {
         "1/3*1.4",
         "2.3*(1+2)/(34*(3-2))",
@@ -224,6 +224,6 @@ int main()
     test_string_to_double();
     test_name_resolver();
     test_address();
-    test_external_formula_functions();
+    test_public_formula_api();
     return EXIT_SUCCESS;
 }
