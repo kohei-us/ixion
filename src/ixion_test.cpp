@@ -194,6 +194,9 @@ bool check_formula_expression(const model_context& cxt, const char* p)
     return res == 0;
 }
 
+/**
+ * Make sure the public API works as advertized.
+ */
 void test_public_formula_api()
 {
     cout << "test public formula api" << endl;
@@ -216,6 +219,27 @@ void test_public_formula_api()
     }
 }
 
+/**
+ * Function name must be resolved case-insensitively.
+ */
+void test_function_name_resolution()
+{
+    cout << "test function name resolution" << endl;
+    model_context cxt;
+    const formula_name_resolver& resolver = cxt.get_name_resolver();
+    const char* names[] = {
+        "SUM", "sum", "Sum"
+    };
+    size_t n = sizeof(names) / sizeof(names[0]);
+    for (size_t i = 0; i < n; ++i)
+    {
+        const char* name = names[i];
+        cout << "name: " << name << endl;
+        formula_name_type t = resolver.resolve(name, strlen(name), abs_address_t());
+        assert(t.type == formula_name_type::function);
+    }
+}
+
 }
 
 int main()
@@ -225,5 +249,6 @@ int main()
     test_name_resolver();
     test_address();
     test_public_formula_api();
+    test_function_name_resolution();
     return EXIT_SUCCESS;
 }
