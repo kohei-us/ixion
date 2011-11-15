@@ -80,6 +80,38 @@ double sum_matrix_elements(const matrix& mx)
     return sum;
 }
 
+/**
+ * Compare given string with a known function name to see if they are equal.
+ * The comparison is case-insensitive.
+ *
+ * @param func_name function name. Null-terminated, and is all in upper
+ *                  case.
+ * @param p string to test. Not null-terminated and may be in mixed case.
+ * @param n length of the string being tested.
+ *
+ * @return true if they are equal, false otherwise.
+ */
+bool match_func_name(const char* func_name, const char* p, size_t n)
+{
+    const char* fp = func_name;
+    for (size_t i = 0; i < n; ++i, ++p, ++fp)
+    {
+        if (!*fp)
+            // function name ended first.
+            return false;
+
+        char c = *p;
+        if (c > 'Z')
+            // convert to upper case.
+            c -= 'a' - 'A';
+
+        if (c != *fp)
+            return false;
+    }
+
+    return *fp == 0;
+}
+
 }
 
 // ============================================================================
@@ -95,10 +127,9 @@ formula_function_t formula_functions::get_function_opcode(const formula_token_ba
 
 formula_function_t formula_functions::get_function_opcode(const char* p, size_t n)
 {
-    mem_str_buf name(p, n);
     for (size_t i = 0; i < builtin_func_count; ++i)
     {
-        if (name == mem_str_buf(builtin_funcs[i].name))
+        if (match_func_name(builtin_funcs[i].name, p, n))
             return builtin_funcs[i].oc;
     }
     return func_unknown;

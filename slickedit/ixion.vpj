@@ -254,6 +254,7 @@
 				<F N="../include/ixion/function_objects.hpp"/>
 				<F N="../include/ixion/global.hpp"/>
 				<F N="../include/ixion/lexer_tokens.hpp"/>
+				<F N="../include/ixion/macros.hpp"/>
 				<F
 					N="../include/ixion/Makefile.am"
 					Type="Makefile"/>

@@ -31,6 +31,7 @@
 #include "ixion/model_context.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/global.hpp"
+#include "ixion/macros.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -225,18 +226,33 @@ void test_public_formula_api()
 void test_function_name_resolution()
 {
     cout << "test function name resolution" << endl;
+
+    const char* valid_names[] = {
+        "SUM", "sum", "Sum", "Average", "max", "min"
+    };
+
+    const char* invalid_names[] = {
+        "suma", "foo", "", "su", "maxx", "minmin"
+    };
+
     model_context cxt;
     const formula_name_resolver& resolver = cxt.get_name_resolver();
-    const char* names[] = {
-        "SUM", "sum", "Sum"
-    };
-    size_t n = sizeof(names) / sizeof(names[0]);
+    size_t n = IXION_N_ELEMENTS(valid_names);
     for (size_t i = 0; i < n; ++i)
     {
-        const char* name = names[i];
-        cout << "name: " << name << endl;
+        const char* name = valid_names[i];
+        cout << "valid name: " << name << endl;
         formula_name_type t = resolver.resolve(name, strlen(name), abs_address_t());
         assert(t.type == formula_name_type::function);
+    }
+
+    n = IXION_N_ELEMENTS(invalid_names);
+    for (size_t i = 0; i < n; ++i)
+    {
+        const char* name = invalid_names[i];
+        cout << "invalid name: " << name << endl;
+        formula_name_type t = resolver.resolve(name, strlen(name), abs_address_t());
+        assert(t.type != formula_name_type::function);
     }
 }
 
