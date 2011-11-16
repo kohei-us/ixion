@@ -83,9 +83,9 @@ void test_name_resolver()
     cout << "test name resolver" << endl;
 
     model_context cxt;
-    cxt.append_sheet_name("One", 3);
-    cxt.append_sheet_name("Two", 3);
-    cxt.append_sheet_name("Three", 5);
+    cxt.append_sheet_name(IXION_ASCII("One"));
+    cxt.append_sheet_name(IXION_ASCII("Two"));
+    cxt.append_sheet_name(IXION_ASCII("Three"));
     formula_name_resolver_a1 resolver(&cxt);
 
     // Parse single cell addresses.
