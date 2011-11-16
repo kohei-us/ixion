@@ -48,10 +48,8 @@ namespace iface {
 class cell_listener_tracker
 {
     cell_listener_tracker(); // disabled
-    cell_listener_tracker(iface::model_context& cxt);
 public:
-    static cell_listener_tracker& get(iface::model_context& cxt);
-    static void reset();
+    cell_listener_tracker(iface::model_context& cxt);
 
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
     typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;

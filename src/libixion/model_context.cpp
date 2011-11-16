@@ -76,6 +76,7 @@ bool model_context::shared_tokens::operator== (const shared_tokens& r) const
 model_context::model_context() :
     mp_config(new config),
     mp_name_resolver(new formula_name_resolver_a1),
+    mp_cell_listener_tracker(new cell_listener_tracker(*this)),
     mp_session_handler(new session_handler(*this))
 {}
 
@@ -83,12 +84,11 @@ model_context::~model_context()
 {
     delete mp_config;
     delete mp_name_resolver;
+    delete mp_cell_listener_tracker;
     delete mp_session_handler;
 
     for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
     for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_shared_tokens());
-
-    cell_listener_tracker::reset();
 }
 
 const config& model_context::get_config() const
@@ -99,6 +99,11 @@ const config& model_context::get_config() const
 const formula_name_resolver& model_context::get_name_resolver() const
 {
     return *mp_name_resolver;
+}
+
+cell_listener_tracker& model_context::get_cell_listener_tracker()
+{
+    return *mp_cell_listener_tracker;
 }
 
 void model_context::set_cell(const abs_address_t& addr, base_cell* cell)

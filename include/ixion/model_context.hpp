@@ -87,6 +87,7 @@ public:
 
     virtual const config& get_config() const;
     virtual const formula_name_resolver& get_name_resolver() const;
+    virtual cell_listener_tracker& get_cell_listener_tracker();
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
     virtual base_cell* get_cell(const abs_address_t& addr);
     virtual iface::cells_in_range* get_cells_in_range(const abs_range_t& range);
@@ -120,6 +121,7 @@ public:
 private:
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
+    cell_listener_tracker* mp_cell_listener_tracker;
     session_handler* mp_session_handler;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.

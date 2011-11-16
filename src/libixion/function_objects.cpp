@@ -113,7 +113,7 @@ private:
 formula_cell_listener_handler::formula_cell_listener_handler(
     iface::model_context& cxt, const abs_address_t& addr, mode_t mode) :
     m_context(cxt),
-    m_listener_tracker(cell_listener_tracker::get(cxt)),
+    m_listener_tracker(cxt.get_cell_listener_tracker()),
     m_addr(addr),
     m_mode(mode)
 {
@@ -147,11 +147,11 @@ void formula_cell_listener_handler::operator() (const formula_token_base* p) con
         {
             abs_range_t range = p->get_range_ref().to_abs(m_addr);
             if (m_mode == mode_add)
-                cell_listener_tracker::get(m_context).add(m_addr, range);
+                m_context.get_cell_listener_tracker().add(m_addr, range);
             else
             {
                 assert(m_mode == mode_remove);
-                cell_listener_tracker::get(m_context).remove(m_addr, range);
+                m_context.get_cell_listener_tracker().remove(m_addr, range);
             }
         }
         break;

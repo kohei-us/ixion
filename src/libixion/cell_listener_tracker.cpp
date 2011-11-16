@@ -42,24 +42,6 @@ using namespace std;
 
 namespace ixion {
 
-namespace {
-
-boost::scoped_ptr<ixion::cell_listener_tracker> p_instance;
-
-}
-
-cell_listener_tracker& cell_listener_tracker::get(iface::model_context& cxt)
-{
-    if (!p_instance)
-        p_instance.reset(new cell_listener_tracker(cxt));
-    return *p_instance;
-}
-
-void cell_listener_tracker::reset()
-{
-    p_instance.reset(NULL);
-}
-
 cell_listener_tracker::cell_listener_tracker(iface::model_context& cxt) :
     m_context(cxt) {}
 
@@ -74,7 +56,7 @@ void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& d
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     const formula_name_resolver& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "adding - cell src: " << res.get_name(src, false) 
+    __IXION_DEBUG_OUT__ << "adding - cell src: " << res.get_name(src, false)
         << "  cell dest: " << res.get_name(dest, false) << endl;
 #endif
     cell_store_type::iterator itr = m_cell_listeners.find(dest);
@@ -94,7 +76,7 @@ void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& ra
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     const formula_name_resolver& res = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell, false) 
+    __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell, false)
         << "  range: " << res.get_name(range, false) << endl;
 #endif
     range_store_type::iterator itr = m_range_listeners.find(range);

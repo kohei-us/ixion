@@ -185,7 +185,7 @@ void get_all_dirty_cells(
     dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
     for (; itr != itr_end; ++itr)
     {
-        cell_listener_tracker& tracker = cell_listener_tracker::get(cxt);
+        cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
         tracker.get_all_range_listeners(*itr, cells);
         tracker.get_all_cell_listeners(*itr, cells);
     }
