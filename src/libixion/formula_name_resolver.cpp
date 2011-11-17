@@ -102,8 +102,47 @@ enum parse_address_result
     range_expected
 };
 
+void parse_sheet_name_quoted(const ixion::iface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+{
+    const char* p_old = p;
+    ++p; // skip the open quote.
+    size_t len = 0;
+
+    // parse until the closing quote is reached.
+    while (true)
+    {
+        if (*p == '\'')
+        {
+            if (p == p_last || *(p+1) != sep)
+                // the next char must be the separator.  Parse failed.
+                break;
+
+            const char* p1 = p_old + 1;
+            sheet = cxt.get_sheet_index(p1, len);
+            ++p; // skip the closing quote.
+            if (p != p_last)
+                ++p; // skip the separator.
+            return;
+        }
+
+        if (p == p_last)
+            break;
+
+        ++p;
+        ++len;
+    }
+
+    p = p_old;
+}
+
 void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
+    if (*p == '\'')
+    {
+        parse_sheet_name_quoted(cxt, sep, p, p_last, sheet);
+        return;
+    }
+
     const char* p_old = p;
     size_t len = 0;
 
@@ -114,7 +153,7 @@ void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, co
         {
             sheet = cxt.get_sheet_index(p_old, len);
             if (p != p_last)
-                ++p;
+                ++p; // skip the separator.
             return;
         }
 
@@ -428,7 +467,16 @@ string formula_name_resolver_a1::get_name(const address_t& addr, const abs_addre
         sheet += pos.sheet;
 
     if (sheet_name && mp_cxt)
-        os << mp_cxt->get_sheet_name(sheet) << '!';
+    {
+        string sheet_name = mp_cxt->get_sheet_name(sheet);
+        bool quote = sheet_name.find_first_of(' ') != string::npos;
+        if (quote)
+            os << '\'';
+        os << mp_cxt->get_sheet_name(sheet);
+        if (quote)
+            os << '\'';
+        os << '!';
+    }
 
     append_column_name_a1(os, col);
     os << (row + 1);

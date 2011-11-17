@@ -86,6 +86,7 @@ void test_name_resolver()
     cxt.append_sheet_name(IXION_ASCII("One"));
     cxt.append_sheet_name(IXION_ASCII("Two"));
     cxt.append_sheet_name(IXION_ASCII("Three"));
+    cxt.append_sheet_name(IXION_ASCII("A B C")); // name with space
     formula_name_resolver_a1 resolver(&cxt);
 
     // Parse single cell addresses.
@@ -105,6 +106,7 @@ void test_name_resolver()
         { "One!XFD1048576", true },
         { "Two!B10", true },
         { "Three!CFD234", true },
+        { "'A B C'!Z12", true },
         { 0, false }
     };
 
