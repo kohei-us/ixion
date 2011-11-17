@@ -100,6 +100,18 @@ private:
     double m_value;
 };
 
+class string_token : public formula_token_base
+{
+    string_token(); // disabled
+public:
+    explicit string_token(size_t str_identifier);
+    virtual ~string_token();
+
+    virtual size_t get_index() const;
+private:
+    size_t m_str_identifier;
+};
+
 // ============================================================================
 
 /**
@@ -190,7 +202,7 @@ inline formula_token_base* new_clone(const formula_token_base& r)
         case fop_named_expression:
             return new named_exp_token(static_cast<const named_exp_token&>(r));
         case fop_string:
-            break;
+            return new string_token(r.get_index());
         case fop_value:
             return new value_token(r.get_value());
             break;

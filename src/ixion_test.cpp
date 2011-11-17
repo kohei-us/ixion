@@ -182,7 +182,7 @@ void test_address()
     assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
 }
 
-bool check_formula_expression(const model_context& cxt, const char* p)
+bool check_formula_expression(model_context& cxt, const char* p)
 {
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;

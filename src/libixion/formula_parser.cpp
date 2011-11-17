@@ -136,7 +136,7 @@ formula_parser::parse_error::parse_error(const string& msg) :
 
 // ----------------------------------------------------------------------------
 
-formula_parser::formula_parser(const lexer_tokens_t& tokens, const iface::model_context& cxt) :
+formula_parser::formula_parser(const lexer_tokens_t& tokens, iface::model_context& cxt) :
     m_tokens(tokens),
     m_context(cxt)
 {
@@ -175,7 +175,7 @@ void formula_parser::parse()
                     name(t);
                     break;
                 case op_string:
-                    // TODO: not implemented yet.
+                    literal(t);
                     break;
                 case op_value:
                     value(t);
@@ -284,6 +284,13 @@ void formula_parser::name(const lexer_token_base& t)
             throw parse_error(os.str());
         }
     }
+}
+
+void formula_parser::literal(const lexer_token_base& t)
+{
+    mem_str_buf s = t.get_string();
+    size_t sid = m_context.add_string(s.get(), s.size());
+    m_formula_tokens.push_back(new string_token(sid));
 }
 
 void formula_parser::value(const lexer_token_base& t)

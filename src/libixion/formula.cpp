@@ -48,7 +48,7 @@ using namespace std;
 namespace ixion {
 
 void parse_formula_string(
-    const iface::model_context& cxt, const abs_address_t& pos, const char* p, size_t n,
+    iface::model_context& cxt, const abs_address_t& pos, const char* p, size_t n,
     formula_tokens_t& tokens)
 {
     lexer_tokens_t lxr_tokens;
@@ -141,9 +141,15 @@ public:
                 m_os << resolver.get_name(range, false);
             }
             break;
+            case fop_string:
+            {
+                const std::string* p = m_cxt.get_string(token.get_index());
+                if (p)
+                    m_os << *p;
+            }
+            break;
             case fop_err_no_ref:
             case fop_named_expression:
-            case fop_string:
             case fop_unknown:
             default:
                 ;

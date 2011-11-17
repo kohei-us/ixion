@@ -101,6 +101,7 @@ public:
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
+    virtual size_t add_string(const char* p, size_t n);
     virtual const std::string* get_string(size_t identifier) const;
     virtual sheet_t get_sheet_index(const char* p, size_t n) const;
     virtual std::string get_sheet_name(sheet_t sheet) const;
@@ -108,7 +109,6 @@ public:
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
     size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
-    size_t add_string(const char* p, size_t n);
     void remove_formula_tokens(sheet_t sheet, size_t identifier);
     void set_cell(const abs_address_t& addr, base_cell* cell);
     void erase_cell(const abs_address_t& addr);

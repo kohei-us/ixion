@@ -46,7 +46,7 @@ namespace ixion {
  * @param tokens formula tokens representing the parsed formula expression.
  */
 void IXION_DLLPUBLIC parse_formula_string(
-    const iface::model_context& cxt, const abs_address_t& pos,
+    iface::model_context& cxt, const abs_address_t& pos,
     const char* p, size_t n, formula_tokens_t& tokens);
 
 /**

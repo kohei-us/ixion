@@ -127,6 +127,7 @@ public:
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const = 0;
 
+    virtual size_t add_string(const char* p, size_t n) = 0;
     virtual const std::string* get_string(size_t identifier) const = 0;
 
     /**

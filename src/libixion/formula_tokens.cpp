@@ -144,7 +144,7 @@ bool formula_token_base::operator== (const formula_token_base& r) const
         case fop_named_expression:
             return get_name() == r.get_name();
         case fop_string:
-            throw general_error("we don't support string token yet.");
+            return get_index() == r.get_index();
         case fop_value:
             return get_value() == r.get_value();
         case fop_function:
@@ -216,6 +216,17 @@ value_token::~value_token()
 double value_token::get_value() const
 {
     return m_value;
+}
+
+string_token::string_token(size_t str_identifier) :
+    formula_token_base(fop_string),
+    m_str_identifier(str_identifier) {}
+
+string_token::~string_token() {}
+
+size_t string_token::get_index() const
+{
+    return m_str_identifier;
 }
 
 // ============================================================================
