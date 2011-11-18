@@ -93,7 +93,7 @@ inline std::ostream& operator<< (std::ostream& os, const formula_result& res)
         case formula_result::rt_value:
             return os << res.get_value();
         case formula_result::rt_string:
-            return os << res.get_string();
+            return os << '"' << res.get_string() << '"';
         case formula_result::rt_error:
             return os << get_formula_error_name(res.get_error());
         default:
