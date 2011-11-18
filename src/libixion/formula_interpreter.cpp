@@ -213,7 +213,10 @@ void formula_interpreter::pop_result()
         }
         break;
         case sv_string:
-            m_result.set_string(res.get_string());
+        {
+            const string* p = m_context.get_string(res.get_string());
+            m_result.set_string(p);
+        }
         break;
         case sv_value:
             m_result.set_value(res.get_value());
@@ -393,6 +396,9 @@ void formula_interpreter::factor()
         case fop_function:
             function();
             return;
+        case fop_string:
+            literal();
+            return;
         default:
         {
             ostringstream os;
@@ -479,6 +485,15 @@ void formula_interpreter::constant()
     m_stack.push_value(val);
     if (mp_handler)
         mp_handler->push_value(val);
+}
+
+void formula_interpreter::literal()
+{
+    size_t sid = token().get_index();
+    next();
+    m_stack.push_string(sid);
+    if (mp_handler)
+        mp_handler->push_string(sid);
 }
 
 void formula_interpreter::function()

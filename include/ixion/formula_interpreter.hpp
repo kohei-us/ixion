@@ -106,6 +106,7 @@ private:
     void single_ref();
     void range_ref();
     void constant();
+    void literal();
     void function();
 
 private:

@@ -80,6 +80,17 @@ void session_handler::push_value(double val)
     cout << val;
 }
 
+void session_handler::push_string(size_t sid)
+{
+    const string* p = m_context.get_string(sid);
+    cout << '"';
+    if (p)
+        cout << *p;
+    else
+        cout << "(null string)";
+    cout << '"';
+}
+
 void session_handler::push_single_ref(const address_t& addr, const abs_address_t& pos)
 {
     cout << m_context.get_name_resolver().get_name(addr, pos, false);

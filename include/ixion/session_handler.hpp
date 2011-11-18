@@ -48,6 +48,7 @@ public:
 
     virtual void push_token(fopcode_t fop);
     virtual void push_value(double val);
+    virtual void push_string(size_t sid);
     virtual void push_single_ref(const address_t& addr, const abs_address_t& pos);
     virtual void push_range_ref(const range_t& range, const abs_address_t& pos);
     virtual void push_function(formula_function_t foc);

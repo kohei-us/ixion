@@ -142,18 +142,19 @@ class stack_value
         double m_value;
         abs_address_t* m_address;
         abs_range_t* m_range;
-        ::std::string* m_str;
+        size_t m_str_identifier;
     };
 
 public:
     explicit stack_value(double val);
+    explicit stack_value(size_t sid);
     explicit stack_value(const abs_address_t& val);
     explicit stack_value(const abs_range_t& val);
     ~stack_value();
 
     stack_value_t get_type() const;
     double get_value() const;
-    const std::string* get_string() const;
+    size_t get_string() const;
     const abs_address_t& get_address() const;
     const abs_range_t& get_range() const;
 };
@@ -177,6 +178,7 @@ public:
     const stack_value& back() const;
 
     void push_value(double val);
+    void push_string(size_t sid);
     void push_single_ref(const abs_address_t& val);
     void push_range_ref(const abs_range_t& val);
     double pop_value();

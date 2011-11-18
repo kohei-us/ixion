@@ -31,6 +31,8 @@
 #include "ixion/formula_opcode.hpp"
 #include "ixion/formula_function_opcode.hpp"
 
+#include <cstdlib>
+
 namespace ixion {
 
 class formula_cell;
@@ -52,6 +54,7 @@ public:
     virtual void set_formula_error(const char* msg) = 0;
     virtual void push_token(fopcode_t fop) = 0;
     virtual void push_value(double val) = 0;
+    virtual void push_string(size_t sid) = 0;
     virtual void push_single_ref(const address_t& addr, const abs_address_t& pos) = 0;
     virtual void push_range_ref(const range_t& range, const abs_address_t& pos) = 0;
     virtual void push_function(formula_function_t foc) = 0;

@@ -192,6 +192,9 @@ formula_error_t formula_error::get_error() const
 stack_value::stack_value(double val) :
     m_type(sv_value), m_value(val) {}
 
+stack_value::stack_value(size_t sid) :
+    m_type(sv_string), m_str_identifier(sid) {}
+
 stack_value::stack_value(const abs_address_t& val) :
     m_type(sv_single_ref), m_address(new abs_address_t(val)) {}
 
@@ -209,8 +212,6 @@ stack_value::~stack_value()
             delete m_address;
             break;
         case sv_string:
-            delete m_str;
-            break;
         case sv_value:
         default:
             ; // do nothing
@@ -230,11 +231,11 @@ double stack_value::get_value() const
     return 0.0;
 }
 
-const string* stack_value::get_string() const
+size_t stack_value::get_string() const
 {
     if (m_type == sv_string)
-        return m_str;
-    return NULL;
+        return m_str_identifier;
+    return 0;
 }
 
 const abs_address_t& stack_value::get_address() const
@@ -282,6 +283,11 @@ const stack_value& value_stack_t::back() const
 void value_stack_t::push_value(double val)
 {
     m_stack.push_back(new stack_value(val));
+}
+
+void value_stack_t::push_string(size_t sid)
+{
+    m_stack.push_back(new stack_value(sid));
 }
 
 void value_stack_t::push_single_ref(const abs_address_t& val)
