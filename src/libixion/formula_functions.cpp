@@ -59,7 +59,8 @@ const builtin_func builtin_funcs[] = {
     { "MIN", func_min },
     { "AVERAGE", func_average },
     { "WAIT", func_wait },
-    { "SUM", func_sum }
+    { "SUM", func_sum },
+    { "LEN", func_len }
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -173,6 +174,9 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args) co
         case func_sum:
             sum(args);
             break;
+        case func_len:
+            len(args);
+            break;
         case func_unknown:
         default:
             throw formula_functions::invalid_arg("unknown function opcode");
@@ -255,6 +259,38 @@ void formula_functions::average(value_stack_t& args) const
     }
 
     args.push_value(ret/count);
+}
+
+void formula_functions::len(value_stack_t& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("LEN requires exactly one argument.");
+
+    double ret = 1;
+    const stack_value& v = args.back();
+
+    switch (v.get_type())
+    {
+//      case sv_range_ref:
+//          break;
+//      case sv_single_ref:
+//          break;
+//      case sv_value:
+//      break;
+        case sv_string:
+        {
+            const string* p = m_context.get_string(v.get_string());
+            if (!p)
+                throw formula_functions::invalid_arg("LEN: failed to retrieve string value.");
+            ret = p->size();
+        }
+        break;
+        default:
+            throw formula_functions::invalid_arg("LEN: argument type unknown");
+    }
+
+    args.clear();
+    args.push_value(ret);
 }
 
 void formula_functions::wait(value_stack_t& args) const

@@ -39,6 +39,9 @@ enum formula_function_t
     func_average,
     func_sum,
 
+    // string functions
+    func_len,
+
     func_wait // dummy function used only for testing.
 
     // TODO: more functions to come...

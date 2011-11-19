@@ -104,27 +104,7 @@ public:
             case fop_function:
             {
                 formula_function_t fop = static_cast<formula_function_t>(token.get_index());
-                switch (fop)
-                {
-                    case func_average:
-                        m_os << "AVERAGE";
-                        break;
-                    case func_max:
-                        m_os << "MAX";
-                        break;
-                    case func_min:
-                        m_os << "MIN";
-                        break;
-                    case func_sum:
-                        m_os << "SUM";
-                        break;
-                    case func_wait:
-                        m_os << "WAIT";
-                        break;
-                    case func_unknown:
-                    default:
-                        m_os << "<unknown function>";
-                }
+                m_os << formula_functions::get_function_name(fop);
             }
             break;
             case fop_single_ref:

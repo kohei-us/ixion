@@ -68,6 +68,9 @@ private:
     void min(value_stack_t& args) const;
     void sum(value_stack_t& args) const;
     void average(value_stack_t& args) const;
+
+    void len(value_stack_t& args) const;
+
     void wait(value_stack_t& args) const;
 
 private:

@@ -4,8 +4,6 @@ A1="A"
 A2="n"
 A3="d"
 A4="y"
-%calc
-%mode edit
 A5=A1
-%recalc
-
+A6=LEN("test")
+%calc
