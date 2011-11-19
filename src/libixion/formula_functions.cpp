@@ -267,36 +267,9 @@ void formula_functions::len(value_stack_t& args) const
     if (args.size() != 1)
         throw formula_functions::invalid_arg("LEN requires exactly one argument.");
 
-    double ret = 1;
-    const stack_value& v = args.back();
-
-    switch (v.get_type())
-    {
-//      case sv_range_ref:
-//          break;
-//      case sv_single_ref:
-//          break;
-        case sv_value:
-        {
-            ostringstream os;
-            os << v.get_value();
-            ret = os.str().size();
-        }
-        break;
-        case sv_string:
-        {
-            const string* p = m_context.get_string(v.get_string());
-            if (!p)
-                throw formula_functions::invalid_arg("LEN: failed to retrieve string value.");
-            ret = p->size();
-        }
-        break;
-        default:
-            throw formula_functions::invalid_arg("LEN: argument type unknown");
-    }
-
+    string s = args.pop_string();
     args.clear();
-    args.push_value(ret);
+    args.push_value(s.size());
 }
 
 void formula_functions::wait(value_stack_t& args) const

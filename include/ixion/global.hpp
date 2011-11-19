@@ -182,6 +182,7 @@ public:
     void push_single_ref(const abs_address_t& val);
     void push_range_ref(const abs_range_t& val);
     double pop_value();
+    const std::string pop_string();
     matrix pop_range_value();
     stack_value_t get_type() const;
 };

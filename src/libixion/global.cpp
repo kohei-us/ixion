@@ -332,6 +332,35 @@ double value_stack_t::pop_value()
     return ret;
 }
 
+const string value_stack_t::pop_string()
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    switch (v.get_type())
+    {
+        case sv_string:
+        {
+            const string* p = m_context.get_string(v.get_string());
+            m_stack.pop_back();
+            return p ? *p : string();
+        }
+        break;
+        case sv_value:
+        {
+            ostringstream os;
+            os << v.get_value();
+            m_stack.pop_back();
+            return os.str();
+        }
+        break;
+        default:
+            ;
+    }
+    throw formula_error(fe_stack_error);
+}
+
 matrix value_stack_t::pop_range_value()
 {
     if (m_stack.empty())
