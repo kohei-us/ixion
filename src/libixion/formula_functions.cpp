@@ -41,6 +41,7 @@
 #define DEBUG_FORMULA_FUNCTIONS 0
 
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -275,8 +276,13 @@ void formula_functions::len(value_stack_t& args) const
 //          break;
 //      case sv_single_ref:
 //          break;
-//      case sv_value:
-//      break;
+        case sv_value:
+        {
+            ostringstream os;
+            os << v.get_value();
+            ret = os.str().size();
+        }
+        break;
         case sv_string:
         {
             const string* p = m_context.get_string(v.get_string());
