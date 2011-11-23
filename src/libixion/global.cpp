@@ -355,6 +355,27 @@ const string value_stack_t::pop_string()
             return os.str();
         }
         break;
+        case sv_single_ref:
+        {
+            // reference to a single cell.
+            const abs_address_t& addr = v.get_address();
+            const base_cell* p = m_context.get_cell(addr);
+            if (!p)
+                // empty cell.
+                return string();
+
+            // TODO: for now, we only return if and only if the referenced
+            // cell is string cell.  For this to work in all cell types, I
+            // need to first have formula_result store a string ID instead of
+            // raw string array.
+            if (p->get_celltype() == celltype_string)
+            {
+                const string* ps = m_context.get_string(p->get_identifier());
+                if (ps)
+                    return *ps;
+            }
+        }
+        break;
         default:
             ;
     }
