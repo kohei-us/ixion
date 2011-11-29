@@ -179,7 +179,7 @@ void get_result_from_cell(const iface::model_context& cxt, formula_result& res, 
         case celltype_string:
         {
             size_t str_id = cell.get_identifier();
-            res.set_string(cxt.get_string(str_id));
+            res.set_string(str_id);
         }
         break;
         case celltype_unknown:
@@ -213,10 +213,7 @@ void formula_interpreter::pop_result()
         }
         break;
         case sv_string:
-        {
-            const string* p = m_context.get_string(res.get_string());
-            m_result.set_string(p);
-        }
+            m_result.set_string(res.get_string());
         break;
         case sv_value:
             m_result.set_value(res.get_value());

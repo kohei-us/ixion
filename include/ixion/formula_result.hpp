@@ -46,28 +46,28 @@ public:
     formula_result();
     formula_result(const formula_result& r);
     formula_result(double v);
-    formula_result(::std::string* p);
+    formula_result(size_t strid);
     formula_result(formula_error_t e);
     ~formula_result();
 
     void reset();
     void set_value(double v);
-    void set_string(const std::string* p);
+    void set_string(size_t strid);
     void set_error(formula_error_t e);
 
     double get_value() const;
-    const ::std::string& get_string() const;
+    size_t get_string() const;
     formula_error_t get_error() const;
 
     result_type get_type() const;
 
-    ::std::string str() const;
+    std::string str(const iface::model_context& cxt) const;
 
     /**
      * Parse a textural representation of a formula result, and set result
      * value of appropriate type.
      */
-    void parse(const char* p, size_t n);
+    void parse(iface::model_context& cxt, const char* p, size_t n);
 
     formula_result& operator= (const formula_result& r);
     bool operator== (const formula_result& r) const;
@@ -75,12 +75,12 @@ public:
 
 private:
     void parse_error(const char* p, size_t n);
-    void parse_string(const char* p, size_t n);
+    void parse_string(iface::model_context& cxt, const char* p, size_t n);
 
 private:
     result_type m_type;
     union {
-        ::std::string* m_string;
+        size_t m_str_identifier;
         double m_value;
         formula_error_t m_error;
     };

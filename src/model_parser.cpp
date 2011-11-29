@@ -477,7 +477,7 @@ void model_parser::parse_result(const char*& p)
 
     string name_s = name.str();
     formula_result res;
-    res.parse(result.get(), result.size());
+    res.parse(m_context, result.get(), result.size());
     model_parser::results_type::iterator itr = m_formula_results.find(name_s);
     if (itr == m_formula_results.end())
     {
@@ -502,7 +502,7 @@ void model_parser::check()
     {
         const string& name = itr->first;
         const formula_result& res = itr->second;
-        cout << name << " : " << res.str() << endl;
+        cout << name << " : " << res.str(m_context) << endl;
         // resolve name and get cell instance from the context.  The cell may
         // be either a real cell, or a named expression.
         const base_cell* pcell = get_cell_from_name(name);
@@ -524,7 +524,7 @@ void model_parser::check()
                 if (*res_cell != res)
                 {
                     ostringstream os;
-                    os << "unexpected result: (expected: " << res.str() << "; actual: " << res_cell->str() << ")";
+                    os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell->str(m_context) << ")";
                     throw check_error(os.str());
                 }
             }
@@ -542,12 +542,13 @@ void model_parser::check()
             case celltype_string:
             {
                 size_t str_id = pcell->get_identifier();
-                const string* ps = m_context.get_string(str_id);
-                if (!ps)
-                    throw check_error("failed to retrieve a string value for a string cell.");
 
-                if (*ps != res.get_string())
+                if (str_id != res.get_string())
                 {
+                    const string* ps = m_context.get_string(str_id);
+                    if (!ps)
+                        throw check_error("failed to retrieve a string value for a string cell.");
+
                     ostringstream os;
                     os << "unexpected string result: (expected: " << res.get_string() << "; actual: " << *ps << ")";
                     throw check_error(os.str());

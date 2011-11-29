@@ -28,6 +28,7 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
+#include "ixion/interface/model_context.hpp"
 
 #include <sstream>
 
@@ -53,7 +54,7 @@ formula_result::formula_result(const formula_result& r) :
             m_value = r.m_value;
         break;
         case rt_string:
-            m_string = new string(*r.m_string);
+            m_str_identifier = r.m_str_identifier;
         break;
         case rt_error:
             m_error = r.m_error;
@@ -66,53 +67,34 @@ formula_result::formula_result(const formula_result& r) :
 formula_result::formula_result(double v) :
     m_type(rt_value), m_value(v) {}
 
-formula_result::formula_result(string* p) :
-    m_type(rt_string), m_string(p) {}
+formula_result::formula_result(size_t strid) :
+    m_type(rt_string), m_str_identifier(strid) {}
 
 formula_result::formula_result(formula_error_t e) :
     m_type(rt_error), m_error(e) {}
 
-formula_result::~formula_result()
-{
-    if (m_type == rt_string)
-        delete m_string;
-}
+formula_result::~formula_result() {}
 
 void formula_result::reset()
 {
-    if (m_type == rt_string)
-        delete m_string;
-
     m_type = rt_value;
     m_value = 0.0;
 }
 
 void formula_result::set_value(double v)
 {
-    if (m_type == rt_string)
-        delete m_string;
-
     m_type = rt_value;
     m_value = v;
 }
 
-void formula_result::set_string(const string* p)
+void formula_result::set_string(size_t strid)
 {
-    if (m_type == rt_string)
-        delete m_string;
-
-    if (!p)
-        return;
-
     m_type = rt_string;
-    m_string = new string(*p);
+    m_str_identifier = strid;
 }
 
 void formula_result::set_error(formula_error_t e)
 {
-    if (m_type == rt_string)
-        delete m_string;
-
     m_type = rt_error;
     m_error = e;
 }
@@ -123,10 +105,10 @@ double formula_result::get_value() const
     return m_value;
 }
 
-const string& formula_result::get_string() const
+size_t formula_result::get_string() const
 {
     assert(m_type == rt_string);
-    return *m_string;
+    return m_str_identifier;
 }
 
 formula_error_t formula_result::get_error() const
@@ -140,14 +122,17 @@ formula_result::result_type formula_result::get_type() const
     return m_type;
 }
 
-string formula_result::str() const
+string formula_result::str(const iface::model_context& cxt) const
 {
     switch (m_type)
     {
         case rt_error:
             return string(get_formula_error_name(m_error));
         case rt_string:
-            return *m_string;
+        {
+            const string* p = cxt.get_string(m_str_identifier);
+            return p ? *p : string();
+        }
         case rt_value:
         {
             ostringstream os;
@@ -160,7 +145,7 @@ string formula_result::str() const
     return string();
 }
 
-void formula_result::parse(const char* p, size_t n)
+void formula_result::parse(iface::model_context& cxt, const char* p, size_t n)
 {
     if (!n)
         return;
@@ -168,7 +153,7 @@ void formula_result::parse(const char* p, size_t n)
     if (*p == '#')
         parse_error(p, n);
     else if (*p == '"')
-        parse_string(p, n);
+        parse_string(cxt, p, n);
     else
     {
         // parse this as a number.
@@ -187,7 +172,7 @@ formula_result& formula_result::operator= (const formula_result& r)
             m_value = r.m_value;
         break;
         case rt_string:
-            m_string = new string(*r.m_string);
+            m_str_identifier = r.m_str_identifier;
         break;
         case rt_error:
             m_error = r.m_error;
@@ -209,7 +194,7 @@ bool formula_result::operator== (const formula_result& r) const
             return m_value == r.m_value;
         break;
         case rt_string:
-            return *m_string == *r.m_string;
+            return m_str_identifier == r.m_str_identifier;
         break;
         case rt_error:
             return m_error == r.m_error;
@@ -267,7 +252,7 @@ void formula_result::parse_error(const char* p, size_t n)
     throw general_error(os.str());
 }
 
-void formula_result::parse_string(const char* p, size_t n)
+void formula_result::parse_string(iface::model_context& cxt, const char* p, size_t n)
 {
     if (n <= 1)
         return;
@@ -287,7 +272,7 @@ void formula_result::parse_string(const char* p, size_t n)
         throw general_error("failed to parse string result.");
 
     m_type = rt_string;
-    m_string = new string(p_first, len);
+    m_str_identifier = cxt.add_string(p_first, len);
 }
 
 }
