@@ -360,8 +360,9 @@ const string value_stack_t::pop_string()
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
-            m_stack.pop_back();
             const base_cell* p = m_context.get_cell(addr);
+            m_stack.pop_back();
+
             if (!p)
                 // empty cell.
                 return string();
