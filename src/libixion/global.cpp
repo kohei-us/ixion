@@ -31,6 +31,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/exceptions.hpp"
+#include "ixion/formula_result.hpp"
 #include "ixion/interface/model_context.hpp"
 
 #include <iostream>
@@ -359,20 +360,60 @@ const string value_stack_t::pop_string()
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
+            m_stack.pop_back();
             const base_cell* p = m_context.get_cell(addr);
             if (!p)
                 // empty cell.
                 return string();
 
-            // TODO: for now, we only return if and only if the referenced
-            // cell is string cell.  For this to work in all cell types, I
-            // need to first have formula_result store a string ID instead of
-            // raw string array.
-            if (p->get_celltype() == celltype_string)
+            switch (p->get_celltype())
             {
-                const string* ps = m_context.get_string(p->get_identifier());
-                if (ps)
+                case celltype_formula:
+                {
+                    const formula_cell* fc = static_cast<const formula_cell*>(p);
+                    const formula_result* res = fc->get_result_cache();
+                    if (!res)
+                        break;
+
+                    switch (res->get_type())
+                    {
+                        case formula_result::rt_error:
+                            throw formula_error(res->get_error());
+                        case formula_result::rt_string:
+                        {
+                            const string* ps = m_context.get_string(res->get_string());
+                            if (!ps)
+                                throw formula_error(fe_stack_error);
+                            return *ps;
+                        }
+                        break;
+                        case formula_result::rt_value:
+                        {
+                            ostringstream os;
+                            os << res->get_value();
+                            return os.str();
+                        }
+                        default:
+                            throw formula_error(fe_stack_error);
+                    }
+                }
+                break;
+                case celltype_numeric:
+                {
+                    ostringstream os;
+                    os << p->get_value();
+                    return os.str();
+                }
+                case celltype_string:
+                {
+                    const string* ps = m_context.get_string(p->get_identifier());
+                    if (!ps)
+                        throw formula_error(fe_stack_error);
                     return *ps;
+                }
+                break;
+                default:
+                    throw formula_error(fe_stack_error);
             }
         }
         break;

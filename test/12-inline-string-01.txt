@@ -8,4 +8,6 @@ A5=A1
 A6=LEN("test")
 A7=LEN(123)
 A8=LEN(123.45)
+A9="Andy"
+A10=LEN(A9)
 %calc

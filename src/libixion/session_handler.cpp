@@ -57,7 +57,7 @@ void session_handler::begin_cell_interpret(const formula_cell *p)
 
 void session_handler::set_result(const formula_result& result)
 {
-    cout << endl << m_cell_name << ": result = " << result << endl;
+    cout << endl << m_cell_name << ": result = " << result.str(m_context) << endl;
 }
 
 void session_handler::set_invalid_expression(const char* msg)
