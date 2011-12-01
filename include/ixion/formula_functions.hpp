@@ -54,14 +54,14 @@ public:
         invalid_arg(const ::std::string& msg);
     };
 
-    formula_functions(const iface::model_context& cxt);
+    formula_functions(iface::model_context& cxt);
     ~formula_functions();
 
     static formula_function_t get_function_opcode(const formula_token_base& token);
     static formula_function_t get_function_opcode(const char* p, size_t n);
     static const char* get_function_name(formula_function_t oc);
 
-    void interpret(formula_function_t oc, value_stack_t& args) const;
+    void interpret(formula_function_t oc, value_stack_t& args);
 
 private:
     void max(value_stack_t& args) const;
@@ -70,11 +70,12 @@ private:
     void average(value_stack_t& args) const;
 
     void len(value_stack_t& args) const;
+    void concatenate(value_stack_t& args);
 
     void wait(value_stack_t& args) const;
 
 private:
-    const iface::model_context& m_context;
+    iface::model_context& m_context;
 };
 
 }

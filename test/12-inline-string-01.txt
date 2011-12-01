@@ -11,6 +11,8 @@ A8=LEN(123.45)
 A9="Andy"
 A10=A9
 A11=LEN(A9)
+A12=CONCATENAME(A1,A2,A3,A4)
+A13=CONCATENAME(A12," is smart")
 %calc
 %mode result
 A1="A"
@@ -24,4 +26,6 @@ A8=6
 A9="Andy"
 A10="Andy"
 A11=4
+A12="Andy"
+A13="Andy is smart"
 %check

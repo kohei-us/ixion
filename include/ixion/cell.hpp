@@ -132,7 +132,7 @@ public:
     IXION_DLLPUBLIC ~formula_cell();
 
     IXION_DLLPUBLIC double get_value() const;
-    IXION_DLLPUBLIC void interpret(const iface::model_context& context);
+    IXION_DLLPUBLIC void interpret(iface::model_context& context);
 
     /**
      * Determine if this cell contains circular reference by walking through

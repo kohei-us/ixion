@@ -94,7 +94,7 @@ struct thread_queue_handler : public unary_function<formula_cell*, void>
 
 struct cell_interpret_handler : public unary_function<base_cell*, void>
 {
-    cell_interpret_handler(const iface::model_context& cxt) :
+    cell_interpret_handler(iface::model_context& cxt) :
         m_context(cxt) {}
 
     void operator() (base_cell* p) const
@@ -103,7 +103,7 @@ struct cell_interpret_handler : public unary_function<base_cell*, void>
         static_cast<formula_cell*>(p)->interpret(m_context);
     }
 private:
-    const iface::model_context& m_context;
+    iface::model_context& m_context;
 };
 
 }
@@ -119,7 +119,7 @@ void dependency_tracker::cell_back_inserter::operator() (formula_cell* cell)
 // ============================================================================
 
 dependency_tracker::dependency_tracker(
-    const dirty_cells_t& dirty_cells, const iface::model_context& cxt) :
+    const dirty_cells_t& dirty_cells, iface::model_context& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }

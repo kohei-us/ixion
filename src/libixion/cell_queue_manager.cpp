@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -152,7 +152,7 @@ worker_thread_status wts;
 /**
  * Main worker thread routine.
  */
-void worker_main(worker_thread_data* data, const iface::model_context* context)
+void worker_main(worker_thread_data* data, iface::model_context* context)
 {
     StackPrinter __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->action.mtx);
@@ -221,7 +221,7 @@ struct manage_queue_data
 
 manage_queue_data data;
 
-void init_workers(size_t worker_count, const iface::model_context* context)
+void init_workers(size_t worker_count, iface::model_context* context)
 {
     // Create specified number of worker threads.
     for (size_t i = 0; i < worker_count; ++i)
@@ -278,7 +278,7 @@ void interpret_cell(worker_thread_data& wt)
 /**
  * Main queue manager thread routine.
  */
-void manage_queue_main(size_t worker_count, const iface::model_context* context)
+void manage_queue_main(size_t worker_count, iface::model_context* context)
 {
     StackPrinter __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
@@ -311,7 +311,7 @@ void manage_queue_main(size_t worker_count, const iface::model_context* context)
         }
     }
 
-    // Termination is being requested.  Finish interpreting the rest of the 
+    // Termination is being requested.  Finish interpreting the rest of the
     // cells, as no more new cells will be added.
 
     tprintf("terminating manage queue thread...");
@@ -372,7 +372,7 @@ thread thr_queue;
 
 } // anonymous namespace
 
-void cell_queue_manager::init(size_t thread_count, const iface::model_context& context)
+void cell_queue_manager::init(size_t thread_count, iface::model_context& context)
 {
     // Don't forget to reset the global data.
     data.reset();

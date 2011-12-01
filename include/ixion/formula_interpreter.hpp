@@ -69,7 +69,7 @@ class formula_interpreter : public ::boost::noncopyable
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
-    formula_interpreter(const formula_cell* cell, const iface::model_context& cxt);
+    formula_interpreter(const formula_cell* cell, iface::model_context& cxt);
     ~formula_interpreter();
 
     void set_origin(const abs_address_t& pos);
@@ -111,7 +111,7 @@ private:
 
 private:
     const formula_cell*         m_parent_cell;
-    const iface::model_context& m_context;
+    iface::model_context& m_context;
     iface::session_handler* mp_handler;
     abs_address_t               m_pos;
 

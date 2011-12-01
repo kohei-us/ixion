@@ -61,7 +61,8 @@ const builtin_func builtin_funcs[] = {
     { "AVERAGE", func_average },
     { "WAIT", func_wait },
     { "SUM", func_sum },
-    { "LEN", func_len }
+    { "LEN", func_len },
+    { "CONCATENAME", func_concatenate },
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -147,7 +148,7 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-formula_functions::formula_functions(const iface::model_context& cxt) :
+formula_functions::formula_functions(iface::model_context& cxt) :
     m_context(cxt)
 {
 }
@@ -156,7 +157,7 @@ formula_functions::~formula_functions()
 {
 }
 
-void formula_functions::interpret(formula_function_t oc, value_stack_t& args) const
+void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
 {
     switch (oc)
     {
@@ -177,6 +178,9 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args) co
             break;
         case func_len:
             len(args);
+            break;
+        case func_concatenate:
+            concatenate(args);
             break;
         case func_unknown:
         default:
@@ -270,6 +274,15 @@ void formula_functions::len(value_stack_t& args) const
     string s = args.pop_string();
     args.clear();
     args.push_value(s.size());
+}
+
+void formula_functions::concatenate(value_stack_t& args)
+{
+    string s;
+    while (!args.empty())
+        s = args.pop_string() + s;
+    size_t sid = m_context.add_string(&s[0], s.size());
+    args.push_string(sid);
 }
 
 void formula_functions::wait(value_stack_t& args) const

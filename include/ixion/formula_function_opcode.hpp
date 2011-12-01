@@ -41,6 +41,7 @@ enum formula_function_t
 
     // string functions
     func_len,
+    func_concatenate,
 
     func_wait // dummy function used only for testing.
 

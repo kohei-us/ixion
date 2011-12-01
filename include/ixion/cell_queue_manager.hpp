@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -43,23 +43,23 @@ class model_context;
 }
 
 /**
- * This class manages parallel cell interpretation using threads.  This 
- * class should never be instantiated. 
+ * This class manages parallel cell interpretation using threads.  This
+ * class should never be instantiated.
  */
 class cell_queue_manager
 {
 public:
     /**
-     * Initialize queue manager thread, with specified number of worker 
-     * threads. 
-     *  
+     * Initialize queue manager thread, with specified number of worker
+     * threads.
+     *
      * @param thread_count desired number of worker threads.
      */
-    static void init(size_t thread_count, const iface::model_context& context);
+    static void init(size_t thread_count, iface::model_context& context);
 
     /**
-     * Add new cell to queue to interpret. 
-     * 
+     * Add new cell to queue to interpret.
+     *
      * @param cell pointer to cell instance to interpret.
      */
     static void add_cell(formula_cell* cell);

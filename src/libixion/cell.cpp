@@ -218,7 +218,7 @@ double formula_cell::get_value() const
     return m_interpret_status.result->get_value();
 }
 
-void formula_cell::interpret(const iface::model_context& context)
+void formula_cell::interpret(iface::model_context& context)
 {
 #if DEBUG_FORMULA_CELL
     __IXION_DEBUG_OUT__ << context.get_cell_name(this) << ": interpreting" << endl;
