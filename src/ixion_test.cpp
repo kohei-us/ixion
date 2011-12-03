@@ -200,7 +200,7 @@ bool check_formula_expression(model_context& cxt, const char* p)
 /**
  * Make sure the public API works as advertized.
  */
-void test_public_formula_api()
+void test_parse_and_print_expressions()
 {
     cout << "test public formula api" << endl;
     const char* exps[] = {
@@ -266,7 +266,7 @@ int main()
     test_string_to_double();
     test_name_resolver();
     test_address();
-    test_public_formula_api();
+    test_parse_and_print_expressions();
     test_function_name_resolution();
     return EXIT_SUCCESS;
 }
