@@ -118,11 +118,22 @@ public:
 
     void append_sheet_name(const char* p, size_t n);
 
+    /**
+     * Set new session handler instance.  The client code needs to allocate
+     * the new instance and pass it to the model context; the model context
+     * will in turn manage the life cycle of the passed instance. Passing NULL
+     * here will only delete the existing session handler, which disables
+     * session handling altogether.
+     *
+     * @param handler pointer to the new session handler instance.
+     */
+    void set_session_handler(iface::session_handler* handler);
+
 private:
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
     cell_listener_tracker* mp_cell_listener_tracker;
-    session_handler* mp_session_handler;
+    iface::session_handler* mp_session_handler;
     named_expressions_type m_named_expressions;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
     formula_tokens_store_type m_tokens;

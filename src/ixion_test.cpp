@@ -263,7 +263,10 @@ void test_volatile_function()
     cout << "test volatile function" << endl;
 
     model_context cxt;
+    cxt.set_session_handler(NULL);
+
     dirty_cells_t dirty_cells;
+    dirty_cell_addrs_t dirty_addrs;
 
     // Set values into A1:A3.
     cxt.set_cell(abs_address_t(0,0,0), new numeric_cell(1.0));
@@ -282,6 +285,26 @@ void test_volatile_function()
     cxt.set_cell(pos, fcell.release());
     dirty_cells.insert(p);
     register_formula_cell(cxt, pos, p);
+
+    // Initial full calculation.
+    calculate_cells(cxt, dirty_cells, 0);
+
+    const base_cell* bcell = cxt.get_cell(abs_address_t(0, 3, 0));
+    assert(bcell != NULL);
+    assert(bcell->get_value() == 6);
+
+    // Modify the value of A2.  This should flag A4 dirty.
+    cxt.set_cell(abs_address_t(0,1,0), new numeric_cell(10.0));
+    dirty_cells.clear();
+    dirty_addrs.push_back(abs_address_t(0,1,0));
+    get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
+    assert(dirty_cells.size() == 1);
+
+    // Partial recalculation.
+    calculate_cells(cxt, dirty_cells, 0);
+    bcell = cxt.get_cell(abs_address_t(0, 3, 0));
+    assert(bcell != NULL);
+    assert(bcell->get_value() == 14);
 }
 
 }

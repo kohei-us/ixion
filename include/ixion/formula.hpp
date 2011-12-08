@@ -104,9 +104,8 @@ void IXION_DLLPUBLIC get_all_dirty_cells(
  *                     passing 0 will make the process use the main thread
  *                     only, while passing any number greater than 0 will
  *                     make the process spawn specified number of
- *                     calculation threads plus one additional method
- *                     (besides the main thread) to manage the calculation
- *                     threads.
+ *                     calculation threads plus one additional thread to
+ *                     manage the calculation threads.
  */
 void IXION_DLLPUBLIC calculate_cells(
     iface::model_context& cxt, dirty_cells_t& cells, size_t thread_count);

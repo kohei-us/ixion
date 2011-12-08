@@ -374,4 +374,10 @@ void model_context::append_sheet_name(const char* p, size_t n)
     m_sheet_names.push_back(new string(p, n));
 }
 
+void model_context::set_session_handler(iface::session_handler* handler)
+{
+    delete mp_session_handler;
+    mp_session_handler = handler;
+}
+
 }
