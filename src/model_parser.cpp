@@ -84,27 +84,6 @@ void parse_command(const char*& p, mem_str_buf& com)
     _com.swap(com);
 }
 
-void unregister_existing_formula_cell(model_context& cxt, const abs_address_t& pos)
-{
-    // When there is a formula cell at this position, unregister it from
-    // the dependency tree.
-    base_cell* p = cxt.get_cell(pos);
-    if (!p || p->get_celltype() != celltype_formula)
-        // Not a formula cell. Bail out.
-        return;
-
-    formula_cell* fcell = static_cast<formula_cell*>(p);
-
-    // Go through all its existing references, and remove
-    // itself as their listener.  This step is important
-    // especially during partial re-calculation.
-    vector<const formula_token_base*> ref_tokens;
-    fcell->get_ref_tokens(cxt, ref_tokens);
-    for_each(ref_tokens.begin(), ref_tokens.end(),
-             formula_cell_listener_handler(cxt,
-                 pos, formula_cell_listener_handler::mode_remove));
-}
-
 /**
  * @return true if the formula cell is stored in the model with a shared
  *         formula token set, false if the formula cell has a non-shared
@@ -373,7 +352,7 @@ void model_parser::parse_init(const char*& p)
 
     abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
     m_dirty_cell_addrs.push_back(pos);
-    unregister_existing_formula_cell(m_context, pos);
+    unregister_formula_cell(m_context, pos);
 
     if (buf.empty())
     {

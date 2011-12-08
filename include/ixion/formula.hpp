@@ -72,6 +72,18 @@ void IXION_DLLPUBLIC register_formula_cell(
     iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
 
 /**
+ * Unregister a formula cell with cell dependency tracker if a formula cell
+ * exists at specified cell address.  If there is no existing cell at the
+ * specified address, or the cell is not a formula cell, this function is a
+ * no-op.
+ *
+ * @param cxt model context.
+ * @param pos address of the cell being unregistered.
+ */
+void IXION_DLLPUBLIC unregister_formula_cell(
+    iface::model_context& cxt, const abs_address_t& pos);
+
+/**
  * Get all cells that directly or indirectly depend on known modified cells.
  * We call such cells "dirty cells".
  *

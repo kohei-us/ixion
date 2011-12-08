@@ -151,14 +151,36 @@ void print_formula_tokens(
 void register_formula_cell(
     iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
 {
-    // TODO: Check for an existing formula cell at the specified position, and
-    // if there is one, unregister it first.
+    // Check for an existing formula cell at the specified position, and if
+    // there is one, unregister it first.
+    unregister_formula_cell(cxt, pos);
 
     std::vector<const formula_token_base*> ref_tokens;
     cell->get_ref_tokens(cxt, ref_tokens);
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_add));
+}
+
+void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos)
+{
+    // When there is a formula cell at this position, unregister it from
+    // the dependency tree.
+    base_cell* p = cxt.get_cell(pos);
+    if (!p || p->get_celltype() != celltype_formula)
+        // Not a formula cell. Bail out.
+        return;
+
+    formula_cell* fcell = static_cast<formula_cell*>(p);
+
+    // Go through all its existing references, and remove
+    // itself as their listener.  This step is important
+    // especially during partial re-calculation.
+    std::vector<const formula_token_base*> ref_tokens;
+    fcell->get_ref_tokens(cxt, ref_tokens);
+    for_each(ref_tokens.begin(), ref_tokens.end(),
+             formula_cell_listener_handler(cxt,
+                 pos, formula_cell_listener_handler::mode_remove));
 }
 
 void get_all_dirty_cells(
