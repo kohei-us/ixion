@@ -258,6 +258,32 @@ void test_function_name_resolution()
     }
 }
 
+void test_volatile_function()
+{
+    cout << "test volatile function" << endl;
+
+    model_context cxt;
+    dirty_cells_t dirty_cells;
+
+    // Set values into A1:A3.
+    cxt.set_cell(abs_address_t(0,0,0), new numeric_cell(1.0));
+    cxt.set_cell(abs_address_t(0,1,0), new numeric_cell(2.0));
+    cxt.set_cell(abs_address_t(0,2,0), new numeric_cell(3.0));
+
+    // Set formula in A4 that references A1:A3.
+    const char* formula_exp = "SUM(A1:A3)";
+    abs_address_t pos(0, 3, 0);
+    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
+    parse_formula_string(cxt, pos, formula_exp, strlen(formula_exp), *tokens);
+    unique_ptr<formula_cell> fcell(new formula_cell);
+    size_t tkid = cxt.add_formula_tokens(0, tokens.release());
+    fcell->set_identifier(tkid);
+    formula_cell* p = fcell.get();
+    cxt.set_cell(pos, fcell.release());
+    dirty_cells.insert(p);
+    register_formula_cell(cxt, pos, p);
+}
+
 }
 
 int main()
@@ -268,5 +294,6 @@ int main()
     test_address();
     test_parse_and_print_expressions();
     test_function_name_resolution();
+    test_volatile_function();
     return EXIT_SUCCESS;
 }
