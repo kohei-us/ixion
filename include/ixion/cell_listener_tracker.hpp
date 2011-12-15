@@ -87,6 +87,9 @@ public:
      */
     void remove(const abs_address_t& cell, const abs_range_t& range);
 
+    void add_volatile(const abs_address_t& pos);
+    void remove_volatile(const abs_address_t& pos);
+
     void get_all_cell_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 
     /**
@@ -108,6 +111,7 @@ private:
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
     cell_store_type m_cell_listeners;         ///< store listeners for single cells.
     range_store_type m_range_listeners;       ///< store listeners for ranges.
+    address_set_type m_volatile_cells;
 };
 
 }

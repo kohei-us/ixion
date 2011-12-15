@@ -30,6 +30,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_parser.hpp"
 #include "ixion/formula_functions.hpp"
+#include "ixion/formula_function_opcode.hpp"
 #include "ixion/function_objects.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/depends_tracker.hpp"
@@ -148,6 +149,26 @@ void print_formula_tokens(
     str = os.str();
 }
 
+namespace {
+
+bool has_volatile(const formula_tokens_t& tokens)
+{
+    formula_tokens_t::const_iterator i = tokens.begin(), iend = tokens.end();
+    for (; i != iend; ++i)
+    {
+        const formula_token_base& t = *i;
+        if (t.get_opcode() != fop_function)
+            continue;
+
+        formula_function_t func = static_cast<formula_function_t>(t.get_index());
+        if (is_volatile(func))
+            return true;
+    }
+    return false;
+}
+
+}
+
 void register_formula_cell(
     iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
 {
@@ -156,6 +177,11 @@ void register_formula_cell(
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_add));
+
+    // Check if the cell is volatile.
+    const formula_tokens_t* tokens = cxt.get_formula_tokens(pos.sheet, cell->get_identifier());
+    if (tokens && has_volatile(*tokens))
+        cxt.get_cell_listener_tracker().add_volatile(pos);
 }
 
 void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos)
@@ -166,6 +192,9 @@ void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos
     if (!p || p->get_celltype() != celltype_formula)
         // Not a formula cell. Bail out.
         return;
+
+    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+    tracker.remove_volatile(pos);
 
     formula_cell* fcell = static_cast<formula_cell*>(p);
 
