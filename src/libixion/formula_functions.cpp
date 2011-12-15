@@ -294,8 +294,11 @@ void formula_functions::now(value_stack_t& args) const
     if (!args.empty())
         throw formula_functions::invalid_arg("NOW takes no argument.");
 
-    // TODO: this value is currently not accurate.
-    args.push_value(global::get_current_time());
+    // TODO: this value is currently not accurate since we don't take into
+    // account the zero date yet.
+    double cur_time = global::get_current_time();
+    cur_time /= 86400.0; // convert seconds to days.
+    args.push_value(cur_time);
 }
 
 void formula_functions::wait(value_stack_t& args) const

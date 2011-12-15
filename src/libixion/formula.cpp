@@ -209,18 +209,36 @@ void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos
 }
 
 void get_all_dirty_cells(
-    iface::model_context& cxt, const dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
+    iface::model_context& cxt, dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
 {
 #if DEBUG_FORMULA_API
     __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
 #endif
-    // single, cell-to-cell listeners.
-    dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
-    for (; itr != itr_end; ++itr)
+
+    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+
+    // Volatile cells are always included.
+    const cell_listener_tracker::address_set_type& vcells = tracker.get_volatile_cells();
     {
-        cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
-        tracker.get_all_range_listeners(*itr, cells);
-        tracker.get_all_cell_listeners(*itr, cells);
+        cell_listener_tracker::address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
+        for (; itr != itr_end; ++itr)
+        {
+            base_cell* p = cxt.get_cell(*itr);
+            if (!p || p->get_celltype() != celltype_formula)
+                continue;
+
+            addrs.push_back(*itr);
+            cells.insert(static_cast<formula_cell*>(p));
+        }
+    }
+
+    {
+        dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
+        for (; itr != itr_end; ++itr)
+        {
+            tracker.get_all_range_listeners(*itr, cells);
+            tracker.get_all_cell_listeners(*itr, cells);
+        }
     }
 }
 

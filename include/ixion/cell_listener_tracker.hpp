@@ -89,6 +89,7 @@ public:
 
     void add_volatile(const abs_address_t& pos);
     void remove_volatile(const abs_address_t& pos);
+    const address_set_type& get_volatile_cells() const;
 
     void get_all_cell_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
 

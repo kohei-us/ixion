@@ -149,6 +149,11 @@ void cell_listener_tracker::remove_volatile(const abs_address_t& pos)
     m_volatile_cells.erase(pos);
 }
 
+const cell_listener_tracker::address_set_type& cell_listener_tracker::get_volatile_cells() const
+{
+    return m_volatile_cells;
+}
+
 namespace {
 
 class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
