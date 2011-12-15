@@ -276,6 +276,7 @@
 				<F N="../src/libixion/config.cpp"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>
 				<F N="../src/libixion/formula.cpp"/>
+				<F N="../src/libixion/formula_function_opcode.cpp"/>
 				<F N="../src/libixion/formula_functions.cpp"/>
 				<F N="../src/libixion/formula_interpreter.cpp"/>
 				<F N="../src/libixion/formula_lexer.cpp"/>

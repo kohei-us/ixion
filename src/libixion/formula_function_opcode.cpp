@@ -25,31 +25,13 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_FORMULA_FUNCTION_OPCODE_HPP__
-#define __IXION_FORMULA_FUNCTION_OPCODE_HPP__
+#include "ixion/formula_function_opcode.hpp"
 
 namespace ixion {
 
-enum formula_function_t
+bool is_volatile(formula_function_t func)
 {
-    func_unknown = 0,
-
-    func_max,
-    func_min,
-    func_average,
-    func_sum,
-
-    // string functions
-    func_len,
-    func_concatenate,
-
-    func_wait // dummy function used only for testing.
-
-    // TODO: more functions to come...
-};
-
-bool is_volatile(formula_function_t func);
-
+    return false;
 }
 
-#endif
+}

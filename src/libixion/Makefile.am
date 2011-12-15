@@ -10,6 +10,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	depends_tracker.cpp \
 	exceptions.cpp \
 	formula.cpp \
+	formula_function_opcode.cpp \
 	formula_functions.cpp \
 	formula_interpreter.cpp \
 	formula_lexer.cpp \
