@@ -378,6 +378,7 @@ void model_parser::parse_init(const char*& p)
                 fcell->set_identifier(tkid);
             }
             formula_cell* p = fcell.get();
+            unregister_formula_cell(m_context, pos);
             m_context.set_cell(pos, fcell.release());
             m_dirty_cells.insert(p);
             register_formula_cell(m_context, pos, p);
