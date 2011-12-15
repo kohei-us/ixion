@@ -258,6 +258,19 @@ void test_function_name_resolution()
     }
 }
 
+formula_cell* insert_formula(model_context& cxt, const abs_address_t& pos, const char* exp)
+{
+    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
+    parse_formula_string(cxt, pos, exp, strlen(exp), *tokens);
+    unique_ptr<formula_cell> fcell(new formula_cell);
+    size_t tkid = cxt.add_formula_tokens(0, tokens.release());
+    fcell->set_identifier(tkid);
+    formula_cell* p = fcell.get();
+    cxt.set_cell(pos, fcell.release());
+    register_formula_cell(cxt, pos, p);
+    return p;
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -274,22 +287,14 @@ void test_volatile_function()
     cxt.set_cell(abs_address_t(0,2,0), new numeric_cell(3.0));
 
     // Set formula in A4 that references A1:A3.
-    const char* formula_exp = "SUM(A1:A3)";
-    abs_address_t pos(0, 3, 0);
-    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(cxt, pos, formula_exp, strlen(formula_exp), *tokens);
-    unique_ptr<formula_cell> fcell(new formula_cell);
-    size_t tkid = cxt.add_formula_tokens(0, tokens.release());
-    fcell->set_identifier(tkid);
-    formula_cell* p = fcell.get();
-    cxt.set_cell(pos, fcell.release());
+    formula_cell* p = insert_formula(cxt, abs_address_t(0,3,0), "SUM(A1:A3)");
+    assert(p);
     dirty_cells.insert(p);
-    register_formula_cell(cxt, pos, p);
 
     // Initial full calculation.
     calculate_cells(cxt, dirty_cells, 0);
 
-    const base_cell* bcell = cxt.get_cell(abs_address_t(0, 3, 0));
+    const base_cell* bcell = cxt.get_cell(abs_address_t(0,3,0));
     assert(bcell != NULL);
     assert(bcell->get_value() == 6);
 
@@ -305,6 +310,34 @@ void test_volatile_function()
     bcell = cxt.get_cell(abs_address_t(0, 3, 0));
     assert(bcell != NULL);
     assert(bcell->get_value() == 14);
+
+    // Insert a volatile cell into B1.  At this point B1 should be the only dirty cell.
+    dirty_cells.clear();
+    dirty_addrs.clear();
+    p = insert_formula(cxt, abs_address_t(0,0,1), "NOW()");
+    assert(p);
+    dirty_cells.insert(p);
+    dirty_addrs.push_back(abs_address_t(0,0,1));
+    get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
+    assert(dirty_cells.size() == 1);
+
+    // Partial recalc again.
+    calculate_cells(cxt, dirty_cells, 0);
+    bcell = cxt.get_cell(abs_address_t(0,0,1));
+    assert(bcell);
+    double t1 = bcell->get_value();
+    cout << "t1=" << t1 << endl;
+
+    // No modification, but B1 should still be flagged dirty.
+    dirty_cells.clear();
+    dirty_addrs.clear();
+    get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
+    assert(dirty_cells.size() == 1);
+    bcell = cxt.get_cell(abs_address_t(0,0,1));
+    assert(bcell);
+    double t2 = bcell->get_value();
+    cout << "t2=" << t1 << endl;
+    cout << "delta=" << (t2-t1) << endl;
 }
 
 }
