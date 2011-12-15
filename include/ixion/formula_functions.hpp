@@ -45,6 +45,12 @@ class model_context;
 
 }
 
+/**
+ * Collection of built-in cell function implementations.  Note that those
+ * functions that return a string result <i>may</i> modify the state of the
+ * model context when the result string is not yet in the shared string
+ * pool.
+ */
 class formula_functions
 {
 public:
@@ -71,6 +77,8 @@ private:
 
     void len(value_stack_t& args) const;
     void concatenate(value_stack_t& args);
+
+    void now(value_stack_t& args) const;
 
     void wait(value_stack_t& args) const;
 

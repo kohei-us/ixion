@@ -63,6 +63,7 @@ const builtin_func builtin_funcs[] = {
     { "SUM", func_sum },
     { "LEN", func_len },
     { "CONCATENAME", func_concatenate },
+    { "NOW", func_now },
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -182,6 +183,9 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
         case func_concatenate:
             concatenate(args);
             break;
+        case func_now:
+            now(args);
+            break;
         case func_unknown:
         default:
             throw formula_functions::invalid_arg("unknown function opcode");
@@ -283,6 +287,15 @@ void formula_functions::concatenate(value_stack_t& args)
         s = args.pop_string() + s;
     size_t sid = m_context.add_string(&s[0], s.size());
     args.push_string(sid);
+}
+
+void formula_functions::now(value_stack_t& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("NOW takes no argument.");
+
+    // TODO: this value is currently not accurate.
+    args.push_value(global::get_current_time());
 }
 
 void formula_functions::wait(value_stack_t& args) const

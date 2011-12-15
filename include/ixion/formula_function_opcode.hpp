@@ -43,6 +43,9 @@ enum formula_function_t
     func_len,
     func_concatenate,
 
+    // date & time functions
+    func_now,
+
     func_wait // dummy function used only for testing.
 
     // TODO: more functions to come...

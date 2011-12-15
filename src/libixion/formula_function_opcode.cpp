@@ -31,6 +31,13 @@ namespace ixion {
 
 bool is_volatile(formula_function_t func)
 {
+    switch (func)
+    {
+        case func_now:
+            return true;
+        default:
+            ;
+    }
     return false;
 }
 
