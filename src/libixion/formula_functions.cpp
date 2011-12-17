@@ -303,7 +303,7 @@ void formula_functions::now(value_stack_t& args) const
 
 void formula_functions::wait(value_stack_t& args) const
 {
-    global::sleep(1);
+    global::sleep(1000);
     args.clear();
     args.push_value(1);
 }

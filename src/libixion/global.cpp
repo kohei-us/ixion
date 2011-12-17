@@ -72,12 +72,12 @@ double global::get_current_time()
 #endif
 }
 
-void global::sleep(unsigned int seconds)
+void global::sleep(unsigned int mseconds)
 {
 #ifdef _WIN32
-    ::Sleep(1000*seconds);
+    ::Sleep(mseconds);
 #else
-    ::sleep(seconds);
+    ::usleep(1000*mseconds);
 #endif
 }
 

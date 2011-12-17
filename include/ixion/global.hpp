@@ -73,7 +73,7 @@ public:
      *
      * @param seconds duration of sleep.
      */
-    static void sleep(unsigned int seconds);
+    static void sleep(unsigned int mseconds);
 
     /**
      * Load the entire content of a file on disk.  When loading, this function

@@ -326,18 +326,25 @@ void test_volatile_function()
     bcell = cxt.get_cell(abs_address_t(0,0,1));
     assert(bcell);
     double t1 = bcell->get_value();
-    cout << "t1=" << t1 << endl;
+
+    // Pause for 0.2 second.
+    global::sleep(200);
 
     // No modification, but B1 should still be flagged dirty.
     dirty_cells.clear();
     dirty_addrs.clear();
     get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
     assert(dirty_cells.size() == 1);
+    calculate_cells(cxt, dirty_cells, 0);
     bcell = cxt.get_cell(abs_address_t(0,0,1));
     assert(bcell);
     double t2 = bcell->get_value();
-    cout << "t2=" << t1 << endl;
-    cout << "delta=" << (t2-t1) << endl;
+    double delta = (t2-t1)*24*60*60;
+    cout << "delta = " << delta << endl;
+
+    // The delta should be close to 0.2.  It may be a little larger depending
+    // on the CPU speed.
+    assert(0.2 <= delta && delta <= 0.3);
 }
 
 }
