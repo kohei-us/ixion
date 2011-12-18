@@ -110,10 +110,10 @@ private:
     void function();
 
 private:
-    const formula_cell*         m_parent_cell;
+    const formula_cell* m_parent_cell;
     iface::model_context& m_context;
     iface::session_handler* mp_handler;
-    abs_address_t               m_pos;
+    abs_address_t m_pos;
 
     value_stack_t m_stack;
     local_tokens_type m_tokens;
