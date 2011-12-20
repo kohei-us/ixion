@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -55,6 +55,9 @@ enum lexer_opcode_t
     op_minus,
     op_divide,
     op_multiply,
+
+    // relational operators
+    op_equal,
 
     // parentheses, separators
     op_open,
@@ -158,6 +161,7 @@ inline lexer_token_base* new_clone(const lexer_token_base& r)
         case op_divide:
         case op_minus:
         case op_multiply:
+        case op_equal:
         case op_open:
         case op_plus:
         case op_sep:

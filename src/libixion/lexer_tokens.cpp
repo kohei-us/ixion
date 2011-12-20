@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -74,6 +74,7 @@ const char* get_opcode_name(lexer_opcode_t oc)
         case op_divide:     return "divide";
         case op_minus:      return "minus";
         case op_multiply:   return "multiply";
+        case op_equal:      return "equal";
         case op_plus:       return "plus";
         case op_open:       return "open";
         case op_close:      return "close";
@@ -138,6 +139,8 @@ string lexer_token::print() const
             return "/";
         case op_multiply:
             return "*";
+        case op_equal:
+            return "=";
         case op_open:
             return "(";
         case op_close:
@@ -157,13 +160,13 @@ string lexer_token::print() const
 
 lexer_value_token::lexer_value_token(double val) :
     lexer_token_base(op_value),
-    m_val(val) 
+    m_val(val)
 {
 }
 
 lexer_value_token::lexer_value_token(const lexer_value_token& r) :
     lexer_token_base(r),
-    m_val(r.m_val) 
+    m_val(r.m_val)
 {
 }
 

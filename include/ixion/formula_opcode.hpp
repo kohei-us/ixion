@@ -46,6 +46,9 @@ enum fopcode_t {
     fop_divide,
     fop_multiply,
 
+    // relational operators
+    fop_equal,
+
     // parentheses, separators
     fop_open,
     fop_close,

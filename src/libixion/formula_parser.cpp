@@ -167,6 +167,7 @@ void formula_parser::parse()
                 case op_plus:
                 case op_minus:
                 case op_multiply:
+                case op_equal:
                 case op_divide:
                 case op_sep:
                     primitive(oc);
@@ -230,6 +231,9 @@ void formula_parser::primitive(lexer_opcode_t oc)
             break;
         case op_multiply:
             foc = fop_multiply;
+            break;
+        case op_equal:
+            foc = fop_equal;
             break;
         case op_open:
             foc = fop_open;

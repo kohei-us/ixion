@@ -73,6 +73,7 @@ private:
     void minus();
     void divide();
     void multiply();
+    void equal();
     void sep_arg();
     void open_bracket();
     void close_bracket();
@@ -145,6 +146,9 @@ void tokenizer::run()
             case '*':
                 multiply();
                 break;
+            case '=':
+                equal();
+                break;
             case '(':
                 open_bracket();
                 break;
@@ -188,6 +192,7 @@ bool tokenizer::is_op(char c) const
         case '(':
         case ')':
         case '"':
+        case '=':
             return true;
     }
     return false;
@@ -260,6 +265,12 @@ void tokenizer::multiply()
     next();
 }
 
+void tokenizer::equal()
+{
+    m_tokens.push_back(new lexer_token(op_equal));
+    next();
+}
+
 void tokenizer::sep_arg()
 {
     m_tokens.push_back(new lexer_token(op_sep));
@@ -328,10 +339,13 @@ formula_lexer::~formula_lexer() {}
 void formula_lexer::tokenize()
 {
 #if IXION_DEBUG_LEXER
-    cout << "formula string: '" << std::string(mp_first, m_size) << "'" << endl;
+    __IXION_DEBUG_OUT__ << "formula string: '" << std::string(mp_first, m_size) << "'" << endl;
 #endif
     tokenizer tkr(m_tokens, mp_first, m_size);
     tkr.run();
+#if IXION_DEBUG_LEXER
+    __IXION_DEBUG_OUT__ << print_tokens(m_tokens, true) << endl;
+#endif
 }
 
 void formula_lexer::swap_tokens(lexer_tokens_t& tokens)
