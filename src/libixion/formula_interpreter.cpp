@@ -95,6 +95,12 @@ bool formula_interpreter::interpret()
         m_result.reset();
 
         expression();
+        if (m_cur_token_itr != m_tokens.end())
+        {
+            if (mp_handler)
+                mp_handler->set_invalid_expression("formula token interpretation ended prematurely.");
+            return false;
+        }
         pop_result();
 
         return true;
