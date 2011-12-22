@@ -293,6 +293,24 @@ const formula_token_base& formula_interpreter::next_token()
     return token();
 }
 
+namespace {
+
+bool valid_expression_op(fopcode_t oc)
+{
+    switch (oc)
+    {
+        case fop_plus:
+        case fop_minus:
+        case fop_equal:
+        case fop_less:
+        case fop_greater:
+            return true;
+    }
+    return false;
+}
+
+}
+
 void formula_interpreter::expression()
 {
     // <term> + <term> + <term> + ... + <term>
@@ -301,67 +319,37 @@ void formula_interpreter::expression()
     while (has_token())
     {
         fopcode_t oc = token().get_opcode();
+        if (!valid_expression_op(oc))
+            return;
+
+        double val1 = m_stack.pop_value();
+
+        if (mp_handler)
+            mp_handler->push_token(oc);
+
+        next();
+        term();
+        double val2 = m_stack.pop_value();
+
         switch (oc)
         {
             case fop_plus:
-            {
-                double val = m_stack.pop_value();
-                if (mp_handler)
-                    mp_handler->push_token(oc);
-
-                next();
-                term();
-                val += m_stack.pop_value();
-                m_stack.push_value(val);
-            }
+                m_stack.push_value(val1 + val2);
             break;
             case fop_minus:
-            {
-                double val = m_stack.pop_value();
-                if (mp_handler)
-                    mp_handler->push_token(oc);
-
-                next();
-                term();
-                val -= m_stack.pop_value();
-                m_stack.push_value(val);
-            }
+                m_stack.push_value(val1 - val2);
             break;
             case fop_equal:
-            {
-                double val1 = m_stack.pop_value();
-                if (mp_handler)
-                    mp_handler->push_token(oc);
-                next();
-                term();
-                double val2 = m_stack.pop_value();
                 m_stack.push_value(val1 == val2);
-            }
             break;
             case fop_less:
-            {
-                double val1 = m_stack.pop_value();
-                if (mp_handler)
-                    mp_handler->push_token(oc);
-                next();
-                term();
-                double val2 = m_stack.pop_value();
                 m_stack.push_value(val1 < val2);
-            }
             break;
             case fop_greater:
-            {
-                double val1 = m_stack.pop_value();
-                if (mp_handler)
-                    mp_handler->push_token(oc);
-                next();
-                term();
-                double val2 = m_stack.pop_value();
                 m_stack.push_value(val1 > val2);
-            }
             break;
             default:
-                return;
+                throw invalid_expression("unknown expression operator.");
         }
     }
 }
