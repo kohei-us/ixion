@@ -327,6 +327,17 @@ void formula_interpreter::expression()
                 m_stack.push_value(val);
             }
             break;
+            case fop_equal:
+            {
+                double val1 = m_stack.pop_value();
+                if (mp_handler)
+                    mp_handler->push_token(oc);
+                next();
+                term();
+                double val2 = m_stack.pop_value();
+                m_stack.push_value(val1 == val2);
+            }
+            break;
             default:
                 return;
         }

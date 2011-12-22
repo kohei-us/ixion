@@ -1,0 +1,11 @@
+%% Test for relational operators.
+%mode init
+A1=1=1
+A2=1=2
+A3=1*6=2*3
+%calc
+%mode result
+A1=1
+A2=0
+A3=1
+%check
