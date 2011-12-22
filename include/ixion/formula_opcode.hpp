@@ -50,6 +50,8 @@ enum fopcode_t {
     fop_equal,
     fop_less,
     fop_greater,
+    fop_less_equal,
+    fop_greater_equal,
 
     // parentheses, separators
     fop_open,

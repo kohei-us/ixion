@@ -345,8 +345,15 @@ void formula_interpreter::expression()
             case fop_less:
                 m_stack.push_value(val1 < val2);
             break;
+            case fop_less_equal:
+                m_stack.push_value(val1 <= val2);
+            break;
             case fop_greater:
                 m_stack.push_value(val1 > val2);
+            break;
+            case fop_greater_equal:
+                m_stack.push_value(val1 >= val2);
+            break;
             break;
             default:
                 throw invalid_expression("unknown expression operator.");
