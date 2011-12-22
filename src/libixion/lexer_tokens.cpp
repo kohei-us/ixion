@@ -75,6 +75,8 @@ const char* get_opcode_name(lexer_opcode_t oc)
         case op_minus:      return "minus";
         case op_multiply:   return "multiply";
         case op_equal:      return "equal";
+        case op_less:       return "less";
+        case op_greater:    return "greater";
         case op_plus:       return "plus";
         case op_open:       return "open";
         case op_close:      return "close";
@@ -141,6 +143,10 @@ string lexer_token::print() const
             return "*";
         case op_equal:
             return "=";
+        case op_less:
+            return "<";
+        case op_greater:
+            return ">";
         case op_open:
             return "(";
         case op_close:

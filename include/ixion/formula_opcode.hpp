@@ -48,6 +48,8 @@ enum fopcode_t {
 
     // relational operators
     fop_equal,
+    fop_less,
+    fop_greater,
 
     // parentheses, separators
     fop_open,

@@ -142,6 +142,12 @@ void tokenizer::run()
             case '=':
                 op(op_equal);
                 break;
+            case '<':
+                op(op_less);
+                break;
+            case '>':
+                op(op_greater);
+                break;
             case '(':
                 op(op_open);
                 break;
@@ -186,6 +192,8 @@ bool tokenizer::is_op(char c) const
         case ')':
         case '"':
         case '=':
+        case '<':
+        case '>':
             return true;
     }
     return false;
