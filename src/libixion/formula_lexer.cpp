@@ -69,14 +69,7 @@ private:
     void numeral();
     void space();
     void name();
-    void plus();
-    void minus();
-    void divide();
-    void multiply();
-    void equal();
-    void sep_arg();
-    void open_bracket();
-    void close_bracket();
+    void op(lexer_opcode_t oc);
     void string();
 
     bool has_char() const;
@@ -125,7 +118,7 @@ void tokenizer::run()
 
         if (is_arg_sep(*mp_char))
         {
-            sep_arg();
+            op(op_sep);
             continue;
         }
 
@@ -135,25 +128,25 @@ void tokenizer::run()
                 space();
                 break;
             case '+':
-                plus();
+                op(op_plus);
                 break;
             case '-':
-                minus();
+                op(op_minus);
                 break;
             case '/':
-                divide();
+                op(op_divide);
                 break;
             case '*':
-                multiply();
+                op(op_multiply);
                 break;
             case '=':
-                equal();
+                op(op_equal);
                 break;
             case '(':
-                open_bracket();
+                op(op_open);
                 break;
             case ')':
-                close_bracket();
+                op(op_close);
                 break;
             case '"':
                 string();
@@ -241,51 +234,9 @@ void tokenizer::name()
     m_tokens.push_back(new lexer_name_token(p, len));
 }
 
-void tokenizer::plus()
+void tokenizer::op(lexer_opcode_t oc)
 {
-    m_tokens.push_back(new lexer_token(op_plus));
-    next();
-}
-
-void tokenizer::minus()
-{
-    m_tokens.push_back(new lexer_token(op_minus));
-    next();
-}
-
-void tokenizer::divide()
-{
-    m_tokens.push_back(new lexer_token(op_divide));
-    next();
-}
-
-void tokenizer::multiply()
-{
-    m_tokens.push_back(new lexer_token(op_multiply));
-    next();
-}
-
-void tokenizer::equal()
-{
-    m_tokens.push_back(new lexer_token(op_equal));
-    next();
-}
-
-void tokenizer::sep_arg()
-{
-    m_tokens.push_back(new lexer_token(op_sep));
-    next();
-}
-
-void tokenizer::open_bracket()
-{
-    m_tokens.push_back(new lexer_token(op_open));
-    next();
-}
-
-void tokenizer::close_bracket()
-{
-    m_tokens.push_back(new lexer_token(op_close));
+    m_tokens.push_back(new lexer_token(oc));
     next();
 }
 

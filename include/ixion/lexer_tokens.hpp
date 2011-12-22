@@ -58,6 +58,8 @@ enum lexer_opcode_t
 
     // relational operators
     op_equal,
+    op_less,
+    op_more,
 
     // parentheses, separators
     op_open,
@@ -162,6 +164,8 @@ inline lexer_token_base* new_clone(const lexer_token_base& r)
         case op_minus:
         case op_multiply:
         case op_equal:
+        case op_less:
+        case op_more:
         case op_open:
         case op_plus:
         case op_sep:
