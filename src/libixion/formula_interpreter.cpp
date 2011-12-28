@@ -302,6 +302,7 @@ bool valid_expression_op(fopcode_t oc)
         case fop_plus:
         case fop_minus:
         case fop_equal:
+        case fop_not_equal:
         case fop_less:
         case fop_less_equal:
         case fop_greater:
@@ -343,6 +344,9 @@ void formula_interpreter::expression()
             break;
             case fop_equal:
                 m_stack.push_value(val1 == val2);
+            break;
+            case fop_not_equal:
+                m_stack.push_value(val1 != val2);
             break;
             case fop_less:
                 m_stack.push_value(val1 < val2);

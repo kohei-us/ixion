@@ -243,12 +243,6 @@ void formula_parser::primitive(lexer_opcode_t oc)
         case op_equal:
             foc = fop_equal;
             break;
-        case op_less:
-            foc = fop_less;
-            break;
-        case op_greater:
-            foc = fop_greater;
-            break;
         case op_open:
             foc = fop_open;
             break;
@@ -322,10 +316,16 @@ void formula_parser::less(const lexer_token_base& t)
     if (has_next())
     {
         next();
-        if (get_token().get_opcode() == op_equal)
+        switch (get_token().get_opcode())
         {
-            m_formula_tokens.push_back(new opcode_token(fop_less_equal));
-            return;
+            case op_equal:
+                m_formula_tokens.push_back(new opcode_token(fop_less_equal));
+                return;
+            case op_greater:
+                m_formula_tokens.push_back(new opcode_token(fop_not_equal));
+                return;
+            default:
+                ;
         }
         prev();
     }

@@ -90,6 +90,8 @@ const char* get_formula_opcode_string(fopcode_t oc)
             return ",";
         case fop_equal:
             return "=";
+        case fop_not_equal:
+            return "<>";
         case fop_less:
             return "<";
         case fop_less_equal:
