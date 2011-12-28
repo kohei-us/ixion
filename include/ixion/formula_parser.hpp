@@ -71,6 +71,14 @@ private:
     void literal(const lexer_token_base& t);
     void value(const lexer_token_base& t);
 
+    const lexer_token_base& get_token() const;
+    bool has_token() const;
+    bool has_next() const;
+    void next();
+
+    lexer_tokens_t::const_iterator m_itr_cur;
+    lexer_tokens_t::const_iterator m_itr_end;
+
     const lexer_tokens_t&   m_tokens; // lexer tokens of this expression
     iface::model_context&   m_context;
     formula_tokens_t        m_formula_tokens;

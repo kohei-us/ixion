@@ -137,6 +137,8 @@ formula_parser::parse_error::parse_error(const string& msg) :
 // ----------------------------------------------------------------------------
 
 formula_parser::formula_parser(const lexer_tokens_t& tokens, iface::model_context& cxt) :
+    m_itr_cur(tokens.end()),
+    m_itr_end(tokens.end()),
     m_tokens(tokens),
     m_context(cxt)
 {
@@ -155,10 +157,10 @@ void formula_parser::parse()
 {
     try
     {
-        size_t n = m_tokens.size();
-        for (size_t i = 0; i < n; ++i)
+        m_itr_cur = m_tokens.begin();
+        for (m_itr_cur = m_tokens.begin(); has_token(); next())
         {
-            const lexer_token_base& t = m_tokens[i];
+            const lexer_token_base& t = get_token();
             lexer_opcode_t oc = t.get_opcode();
             switch (oc)
             {
@@ -309,6 +311,26 @@ void formula_parser::value(const lexer_token_base& t)
 {
     double val = t.get_value();
     m_formula_tokens.push_back(new value_token(val));
+}
+
+const lexer_token_base& formula_parser::get_token() const
+{
+    return *m_itr_cur;
+}
+
+bool formula_parser::has_token() const
+{
+    return m_itr_cur != m_itr_end;
+}
+
+bool formula_parser::has_next() const
+{
+    return (m_itr_cur+1) != m_itr_end;
+}
+
+void formula_parser::next()
+{
+    ++m_itr_cur;
 }
 
 }
