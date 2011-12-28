@@ -303,7 +303,9 @@ bool valid_expression_op(fopcode_t oc)
         case fop_minus:
         case fop_equal:
         case fop_less:
+        case fop_less_equal:
         case fop_greater:
+        case fop_greater_equal:
             return true;
     }
     return false;

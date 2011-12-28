@@ -170,8 +170,6 @@ void formula_parser::parse()
                 case op_minus:
                 case op_multiply:
                 case op_equal:
-                case op_less:
-                case op_greater:
                 case op_divide:
                 case op_sep:
                     primitive(oc);
@@ -184,6 +182,12 @@ void formula_parser::parse()
                     break;
                 case op_value:
                     value(t);
+                    break;
+                case op_less:
+                    less(t);
+                    break;
+                case op_greater:
+                    greater(t);
                     break;
                 default:
                     ;
@@ -313,6 +317,37 @@ void formula_parser::value(const lexer_token_base& t)
     m_formula_tokens.push_back(new value_token(val));
 }
 
+void formula_parser::less(const lexer_token_base& t)
+{
+    if (has_next())
+    {
+        next();
+        if (get_token().get_opcode() == op_equal)
+        {
+            m_formula_tokens.push_back(new opcode_token(fop_less_equal));
+            return;
+        }
+        prev();
+    }
+    m_formula_tokens.push_back(new opcode_token(fop_less));
+}
+
+void formula_parser::greater(const lexer_token_base& t)
+{
+    if (has_next())
+    {
+        next();
+        if (get_token().get_opcode() == op_equal)
+        {
+            m_formula_tokens.push_back(new opcode_token(fop_greater_equal));
+            return;
+        }
+        prev();
+    }
+    m_formula_tokens.push_back(new opcode_token(fop_greater));
+
+}
+
 const lexer_token_base& formula_parser::get_token() const
 {
     return *m_itr_cur;
@@ -331,6 +366,11 @@ bool formula_parser::has_next() const
 void formula_parser::next()
 {
     ++m_itr_cur;
+}
+
+void formula_parser::prev()
+{
+    --m_itr_cur;
 }
 
 }

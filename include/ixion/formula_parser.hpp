@@ -70,12 +70,16 @@ private:
     void name(const lexer_token_base& t);
     void literal(const lexer_token_base& t);
     void value(const lexer_token_base& t);
+    void less(const lexer_token_base& t);
+    void greater(const lexer_token_base& t);
 
     const lexer_token_base& get_token() const;
     bool has_token() const;
     bool has_next() const;
     void next();
+    void prev();
 
+private:
     lexer_tokens_t::const_iterator m_itr_cur;
     lexer_tokens_t::const_iterator m_itr_end;
 

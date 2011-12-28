@@ -92,8 +92,12 @@ const char* get_formula_opcode_string(fopcode_t oc)
             return "=";
         case fop_less:
             return "<";
+        case fop_less_equal:
+            return "<=";
         case fop_greater:
             return ">";
+        case fop_greater_equal:
+            return ">=";
         case fop_string:
         case fop_value:
         case fop_function:
