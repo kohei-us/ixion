@@ -1,0 +1,18 @@
+%% Test for relational operators with strings.
+%mode init
+A1@A
+A2@B
+A3@C
+B1=A1=A1
+B2=A1>=A1
+B3=A2<=A2
+B4=A1>A2
+B5=A1<A2
+%calc
+%mode result
+B1=1
+B2=1
+B3=1
+B4=0
+B5=1
+%check
