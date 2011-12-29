@@ -330,7 +330,11 @@ void formula_interpreter::expression()
         if (!valid_expression_op(oc))
             return;
 
-        double val1 = m_stack.pop_value();
+        double val1 = 0.0, val2 = 0.0;
+        string str1, str2;
+        bool is_val1 = true, is_val2 = true;
+
+        val1 = m_stack.pop_value();
 
         if (mp_handler)
             mp_handler->push_token(oc);
@@ -338,7 +342,7 @@ void formula_interpreter::expression()
         next();
         term();
 
-        double val2 = m_stack.pop_value();
+        val2 = m_stack.pop_value();
 
         switch (oc)
         {
