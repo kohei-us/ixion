@@ -47,6 +47,8 @@
 
 #include <boost/thread/mutex.hpp>
 
+#define IXION_DEBUG_GLOBAL 0
+
 using namespace std;
 
 namespace ixion {
@@ -326,6 +328,9 @@ double value_stack_t::pop_value()
         }
         break;
         default:
+#if IXION_DEBUG_GLOBAL
+            __IXION_DEBUG_OUT__ << "value is being popped, but the stack value type is not appropriate." << endl;
+#endif
             throw formula_error(fe_stack_error);
     }
 

@@ -86,7 +86,9 @@ bool formula_interpreter::interpret()
 
         if (m_tokens.empty())
         {
-            cout << "interpreter error: no tokens to interpret" << endl;
+#if DEBUG_FORMULA_INTERPRETER
+            __IXION_DEBUG_OUT__ << "interpreter error: no tokens to interpret" << endl;
+#endif
             return false;
         }
 
@@ -114,6 +116,9 @@ bool formula_interpreter::interpret()
     }
     catch (const formula_error& e)
     {
+#if DEBUG_FORMULA_INTERPRETER
+        __IXION_DEBUG_OUT__ << "formula error" << endl;
+#endif
         if (mp_handler)
             mp_handler->set_formula_error(e.what());
 
@@ -323,16 +328,28 @@ void formula_interpreter::expression()
     {
         fopcode_t oc = token().get_opcode();
         if (!valid_expression_op(oc))
+        {
+#if DEBUG_FORMULA_INTERPRETER
+            __IXION_DEBUG_OUT__ << "invalid expression operator" << endl;
+#endif
             return;
+        }
 
         double val1 = m_stack.pop_value();
 
+#if DEBUG_FORMULA_INTERPRETER
+        __IXION_DEBUG_OUT__ << "value 1: " << val1 << endl;
+#endif
         if (mp_handler)
             mp_handler->push_token(oc);
 
         next();
         term();
         double val2 = m_stack.pop_value();
+
+#if DEBUG_FORMULA_INTERPRETER
+        __IXION_DEBUG_OUT__ << "value 2: " << val2 << endl;
+#endif
 
         switch (oc)
         {
@@ -419,6 +436,9 @@ void formula_interpreter::factor()
             paren();
             return;
         case fop_named_expression:
+#if DEBUG_FORMULA_INTERPRETER
+            __IXION_DEBUG_OUT__ << "named expression encountered in factor" << endl;
+#endif
             // All named expressions are supposed to be expanded prior to interpretation.
             throw formula_error(fe_general_error);
         case fop_value:
