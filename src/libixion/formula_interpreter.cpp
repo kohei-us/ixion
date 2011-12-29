@@ -328,28 +328,17 @@ void formula_interpreter::expression()
     {
         fopcode_t oc = token().get_opcode();
         if (!valid_expression_op(oc))
-        {
-#if DEBUG_FORMULA_INTERPRETER
-            __IXION_DEBUG_OUT__ << "invalid expression operator" << endl;
-#endif
             return;
-        }
 
         double val1 = m_stack.pop_value();
 
-#if DEBUG_FORMULA_INTERPRETER
-        __IXION_DEBUG_OUT__ << "value 1: " << val1 << endl;
-#endif
         if (mp_handler)
             mp_handler->push_token(oc);
 
         next();
         term();
-        double val2 = m_stack.pop_value();
 
-#if DEBUG_FORMULA_INTERPRETER
-        __IXION_DEBUG_OUT__ << "value 2: " << val2 << endl;
-#endif
+        double val2 = m_stack.pop_value();
 
         switch (oc)
         {
