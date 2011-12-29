@@ -429,6 +429,20 @@ const string value_stack_t::pop_string()
     throw formula_error(fe_stack_error);
 }
 
+abs_address_t value_stack_t::pop_single_ref()
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() != sv_single_ref)
+        throw formula_error(fe_stack_error);
+
+    abs_address_t addr = v.get_address();
+    m_stack.pop_back();
+    return addr;
+}
+
 matrix value_stack_t::pop_range_value()
 {
     if (m_stack.empty())

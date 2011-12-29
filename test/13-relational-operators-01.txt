@@ -1,4 +1,4 @@
-%% Test for relational operators.
+%% Test for relational operators with in-line numbers.
 %mode init
 A1=1=1
 A2=1=2
