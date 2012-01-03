@@ -398,6 +398,129 @@ bool pop_stack_value_or_string(const iface::model_context& cxt,
     return true;
 }
 
+void compare_values(value_stack_t& vs, fopcode_t oc, double val1, double val2)
+{
+    switch (oc)
+    {
+        case fop_plus:
+            vs.push_value(val1 + val2);
+        break;
+        case fop_minus:
+            vs.push_value(val1 - val2);
+        break;
+        case fop_equal:
+            vs.push_value(val1 == val2);
+        break;
+        case fop_not_equal:
+            vs.push_value(val1 != val2);
+        break;
+        case fop_less:
+            vs.push_value(val1 < val2);
+        break;
+        case fop_less_equal:
+            vs.push_value(val1 <= val2);
+        break;
+        case fop_greater:
+            vs.push_value(val1 > val2);
+        break;
+        case fop_greater_equal:
+            vs.push_value(val1 >= val2);
+        break;
+        default:
+            throw invalid_expression("unknown expression operator.");
+    }
+}
+
+void compare_strings(value_stack_t& vs, fopcode_t oc, const std::string& str1, const std::string& str2)
+{
+    switch (oc)
+    {
+        case fop_plus:
+        case fop_minus:
+            throw formula_error(fe_invalid_expression);
+        case fop_equal:
+            vs.push_value(str1 == str2);
+        break;
+        case fop_not_equal:
+            vs.push_value(str1 != str2);
+        break;
+        case fop_less:
+            vs.push_value(str1 < str2);
+        break;
+        case fop_less_equal:
+            vs.push_value(str1 <= str2);
+        break;
+        case fop_greater:
+            vs.push_value(str1 > str2);
+        break;
+        case fop_greater_equal:
+            vs.push_value(str1 >= str2);
+        break;
+        default:
+            throw invalid_expression("unknown expression operator.");
+    }
+}
+
+void compare_value_to_string(
+    value_stack_t& vs, fopcode_t oc, double /*val1*/, const std::string& /*str2*/)
+{
+    // Value 1 is numeric while value 2 is string.  String is
+    // always greater than numeric value.
+    switch (oc)
+    {
+        case fop_plus:
+        case fop_minus:
+            throw formula_error(fe_invalid_expression);
+        case fop_equal:
+            vs.push_value(false);
+        break;
+        case fop_not_equal:
+            vs.push_value(true);
+        break;
+        case fop_less:
+        case fop_less_equal:
+            // val1 < str2
+            vs.push_value(true);
+        break;
+        case fop_greater:
+        case fop_greater_equal:
+            // val1 > str2
+            vs.push_value(false);
+        break;
+        default:
+            throw invalid_expression("unknown expression operator.");
+    }
+}
+
+void compare_string_to_value(
+    value_stack_t& vs, fopcode_t oc, const std::string& /*str1*/, double /*val2*/)
+{
+    switch (oc)
+    {
+        case fop_plus:
+        case fop_minus:
+            throw formula_error(fe_invalid_expression);
+        case fop_equal:
+            vs.push_value(false);
+        break;
+        case fop_not_equal:
+            vs.push_value(true);
+        break;
+        case fop_less:
+        case fop_less_equal:
+            // str1 < val2
+            vs.push_value(false);
+        break;
+        case fop_greater:
+        case fop_greater_equal:
+            // str1 > val2
+            vs.push_value(true);
+        break;
+        default:
+            throw invalid_expression("unknown expression operator.");
+    }
+}
+
 }
 
 void formula_interpreter::expression()
@@ -436,64 +559,11 @@ void formula_interpreter::expression()
             if (is_val2)
             {
                 // Both are numeric values.
-                switch (oc)
-                {
-                    case fop_plus:
-                        m_stack.push_value(val1 + val2);
-                    break;
-                    case fop_minus:
-                        m_stack.push_value(val1 - val2);
-                    break;
-                    case fop_equal:
-                        m_stack.push_value(val1 == val2);
-                    break;
-                    case fop_not_equal:
-                        m_stack.push_value(val1 != val2);
-                    break;
-                    case fop_less:
-                        m_stack.push_value(val1 < val2);
-                    break;
-                    case fop_less_equal:
-                        m_stack.push_value(val1 <= val2);
-                    break;
-                    case fop_greater:
-                        m_stack.push_value(val1 > val2);
-                    break;
-                    case fop_greater_equal:
-                        m_stack.push_value(val1 >= val2);
-                    break;
-                    default:
-                        throw invalid_expression("unknown expression operator.");
-                }
+                compare_values(m_stack, oc, val1, val2);
             }
             else
             {
-                // Value 1 is numeric while value 2 is string.  String is
-                // always greater than numeric value.
-                switch (oc)
-                {
-                    case fop_plus:
-                    case fop_minus:
-                        throw formula_error(fe_invalid_expression);
-                    case fop_equal:
-                        m_stack.push_value(false);
-                    break;
-                    case fop_not_equal:
-                        m_stack.push_value(true);
-                    break;
-                    case fop_less:
-                    case fop_less_equal:
-                        // val1 < str2
-                        m_stack.push_value(true);
-                    break;
-                    case fop_greater:
-                    case fop_greater_equal:
-                        // val1 > str2
-                        m_stack.push_value(false);
-                    break;
-                    default:
-                        throw invalid_expression("unknown expression operator.");
-                }
+                compare_value_to_string(m_stack, oc, val1, str2);
             }
         }
         else
@@ -501,60 +571,12 @@ void formula_interpreter::expression()
             if (is_val2)
             {
                 // Value 1 is string while value 2 is numeric.
-                switch (oc)
-                {
-                    case fop_plus:
-                    case fop_minus:
-                        throw formula_error(fe_invalid_expression);
-                    case fop_equal:
-                        m_stack.push_value(false);
-                    break;
-                    case fop_not_equal:
-                        m_stack.push_value(true);
-                    break;
-                    case fop_less:
-                    case fop_less_equal:
-                        // str1 < val2
-                        m_stack.push_value(false);
-                    break;
-                    case fop_greater:
-                    case fop_greater_equal:
-                        // str1 > val2
-                        m_stack.push_value(true);
-                    break;
-                    default:
-                        throw invalid_expression("unknown expression operator.");
-                }
+                compare_string_to_value(m_stack, oc, str1, val2);
             }
             else
             {
                 // Both are strings.
-                switch (oc)
-                {
-                    case fop_plus:
-                    case fop_minus:
-                        throw formula_error(fe_invalid_expression);
-                    case fop_equal:
-                        m_stack.push_value(str1 == str2);
-                    break;
-                    case fop_not_equal:
-                        m_stack.push_value(str1 != str2);
-                    break;
-                    case fop_less:
-                        m_stack.push_value(str1 < str2);
-                    break;
-                    case fop_less_equal:
-                        m_stack.push_value(str1 <= str2);
-                    break;
-                    case fop_greater:
-                        m_stack.push_value(str1 > str2);
-                    break;
-                    case fop_greater_equal:
-                        m_stack.push_value(str1 >= str2);
-                    break;
-                    default:
-                        throw invalid_expression("unknown expression operator.");
-                }
+                compare_strings(m_stack, oc, str1, str2);
             }
         }
     }
