@@ -61,6 +61,7 @@ const builtin_func builtin_funcs[] = {
     { "AVERAGE", func_average },
     { "WAIT", func_wait },
     { "SUM", func_sum },
+    { "IF", func_if },
     { "LEN", func_len },
     { "CONCATENAME", func_concatenate },
     { "NOW", func_now },
@@ -163,28 +164,31 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
     switch (oc)
     {
         case func_max:
-            max(args);
+            fnc_max(args);
             break;
         case func_average:
-            average(args);
+            fnc_average(args);
             break;
         case func_min:
-            min(args);
+            fnc_min(args);
             break;
         case func_wait:
-            wait(args);
+            fnc_wait(args);
             break;
         case func_sum:
-            sum(args);
+            fnc_sum(args);
+            break;
+        case func_if:
+            fnc_if(args);
             break;
         case func_len:
-            len(args);
+            fnc_len(args);
             break;
         case func_concatenate:
-            concatenate(args);
+            fnc_concatenate(args);
             break;
         case func_now:
-            now(args);
+            fnc_now(args);
             break;
         case func_unknown:
         default:
@@ -192,7 +196,7 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
     }
 }
 
-void formula_functions::max(value_stack_t& args) const
+void formula_functions::fnc_max(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
@@ -207,7 +211,7 @@ void formula_functions::max(value_stack_t& args) const
     args.push_value(ret);
 }
 
-void formula_functions::min(value_stack_t& args) const
+void formula_functions::fnc_min(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
@@ -222,7 +226,7 @@ void formula_functions::min(value_stack_t& args) const
     args.push_value(ret);
 }
 
-void formula_functions::sum(value_stack_t& args) const
+void formula_functions::fnc_sum(value_stack_t& args) const
 {
 #if DEBUG_FORMULA_FUNCTIONS
     __IXION_DEBUG_OUT__ << "function: sum" << endl;
@@ -254,7 +258,7 @@ void formula_functions::sum(value_stack_t& args) const
 #endif
 }
 
-void formula_functions::average(value_stack_t& args) const
+void formula_functions::fnc_average(value_stack_t& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
@@ -270,7 +274,24 @@ void formula_functions::average(value_stack_t& args) const
     args.push_value(ret/count);
 }
 
-void formula_functions::len(value_stack_t& args) const
+void formula_functions::fnc_if(value_stack_t& args) const
+{
+    if (args.size() != 3)
+        throw formula_functions::invalid_arg("IF requires exactly 3 arguments.");
+
+    value_stack_t ret(m_context);
+    value_stack_t::iterator pos = args.begin();
+    bool eval = args.get_value(0);
+    if (eval)
+        std::advance(pos, 1);
+    else
+        std::advance(pos, 2);
+
+    ret.push_back(args.release(pos));
+    args.swap(ret);
+}
+
+void formula_functions::fnc_len(value_stack_t& args) const
 {
     if (args.size() != 1)
         throw formula_functions::invalid_arg("LEN requires exactly one argument.");
@@ -280,7 +301,7 @@ void formula_functions::len(value_stack_t& args) const
     args.push_value(s.size());
 }
 
-void formula_functions::concatenate(value_stack_t& args)
+void formula_functions::fnc_concatenate(value_stack_t& args)
 {
     string s;
     while (!args.empty())
@@ -289,7 +310,7 @@ void formula_functions::concatenate(value_stack_t& args)
     args.push_string(sid);
 }
 
-void formula_functions::now(value_stack_t& args) const
+void formula_functions::fnc_now(value_stack_t& args) const
 {
     if (!args.empty())
         throw formula_functions::invalid_arg("NOW takes no argument.");
@@ -301,7 +322,7 @@ void formula_functions::now(value_stack_t& args) const
     args.push_value(cur_time);
 }
 
-void formula_functions::wait(value_stack_t& args) const
+void formula_functions::fnc_wait(value_stack_t& args) const
 {
     global::sleep(1000);
     args.clear();

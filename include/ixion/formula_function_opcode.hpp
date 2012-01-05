@@ -34,10 +34,14 @@ enum formula_function_t
 {
     func_unknown = 0,
 
+    // statistical functions
     func_max,
     func_min,
     func_average,
     func_sum,
+
+    // logical functions
+    func_if,
 
     // string functions
     func_len,

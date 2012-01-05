@@ -70,17 +70,19 @@ public:
     void interpret(formula_function_t oc, value_stack_t& args);
 
 private:
-    void max(value_stack_t& args) const;
-    void min(value_stack_t& args) const;
-    void sum(value_stack_t& args) const;
-    void average(value_stack_t& args) const;
+    void fnc_max(value_stack_t& args) const;
+    void fnc_min(value_stack_t& args) const;
+    void fnc_sum(value_stack_t& args) const;
+    void fnc_average(value_stack_t& args) const;
 
-    void len(value_stack_t& args) const;
-    void concatenate(value_stack_t& args);
+    void fnc_if(value_stack_t& args) const;
 
-    void now(value_stack_t& args) const;
+    void fnc_len(value_stack_t& args) const;
+    void fnc_concatenate(value_stack_t& args);
 
-    void wait(value_stack_t& args) const;
+    void fnc_now(value_stack_t& args) const;
+
+    void fnc_wait(value_stack_t& args) const;
 
 private:
     iface::model_context& m_context;

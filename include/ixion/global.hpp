@@ -169,22 +169,35 @@ class value_stack_t
 public:
     explicit value_stack_t(const iface::model_context& cxt);
 
+    typedef store_type::auto_type auto_type;
+    typedef store_type::iterator iterator;
     typedef store_type::const_iterator const_iterator;
+    iterator begin();
+    iterator end();
     const_iterator begin() const;
     const_iterator end() const;
+    auto_type release(iterator pos);
     bool empty() const;
     size_t size() const;
     void clear();
-    const stack_value& back() const;
+    void swap(value_stack_t& other);
 
+    const stack_value& back() const;
+    const stack_value& operator[](size_t pos) const;
+
+    double get_value(size_t pos) const;
+
+    void push_back(auto_type val);
     void push_value(double val);
     void push_string(size_t sid);
     void push_single_ref(const abs_address_t& val);
     void push_range_ref(const abs_range_t& val);
+
     double pop_value();
     const std::string pop_string();
     abs_address_t pop_single_ref();
     matrix pop_range_value();
+
     stack_value_t get_type() const;
 };
 

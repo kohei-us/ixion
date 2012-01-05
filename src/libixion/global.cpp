@@ -192,6 +192,39 @@ formula_error_t formula_error::get_error() const
     return m_ferror;
 }
 
+namespace {
+
+double get_numeric_value(const iface::model_context& cxt, const stack_value& v)
+{
+    double ret = 0.0;
+    switch (v.get_type())
+    {
+        case sv_value:
+            ret = v.get_value();
+        break;
+        case sv_single_ref:
+        {
+            // reference to a single cell.
+            const abs_address_t& addr = v.get_address();
+            const base_cell* p = cxt.get_cell(addr);
+            if (p)
+                ret = p->get_value();
+            else
+                // empty cell has a value of 0.
+                ret = 0.0;
+        }
+        break;
+        default:
+#if IXION_DEBUG_GLOBAL
+            __IXION_DEBUG_OUT__ << "value is being popped, but the stack value type is not appropriate." << endl;
+#endif
+            throw formula_error(fe_stack_error);
+    }
+    return ret;
+}
+
+}
+
 stack_value::stack_value(double val) :
     m_type(sv_value), m_value(val) {}
 
@@ -253,6 +286,16 @@ const abs_range_t& stack_value::get_range() const
 
 value_stack_t::value_stack_t(const iface::model_context& cxt) : m_context(cxt) {}
 
+value_stack_t::iterator value_stack_t::begin()
+{
+    return m_stack.begin();
+}
+
+value_stack_t::iterator value_stack_t::end()
+{
+    return m_stack.end();
+}
+
 value_stack_t::const_iterator value_stack_t::begin() const
 {
     return m_stack.begin();
@@ -261,6 +304,11 @@ value_stack_t::const_iterator value_stack_t::begin() const
 value_stack_t::const_iterator value_stack_t::end() const
 {
     return m_stack.end();
+}
+
+value_stack_t::auto_type value_stack_t::release(iterator pos)
+{
+    return m_stack.release(pos);
 }
 
 bool value_stack_t::empty() const
@@ -278,9 +326,30 @@ void value_stack_t::clear()
     return m_stack.clear();
 }
 
+void value_stack_t::swap(value_stack_t& other)
+{
+    m_stack.swap(other.m_stack);
+}
+
 const stack_value& value_stack_t::back() const
 {
     return m_stack.back();
+}
+
+const stack_value& value_stack_t::operator[](size_t pos) const
+{
+    return m_stack[pos];
+}
+
+double value_stack_t::get_value(size_t pos) const
+{
+    const stack_value& v = m_stack[pos];
+    return get_numeric_value(m_context, v);
+}
+
+void value_stack_t::push_back(auto_type val)
+{
+    m_stack.push_back(val.release());
 }
 
 void value_stack_t::push_value(double val)
@@ -310,30 +379,7 @@ double value_stack_t::pop_value()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    switch (v.get_type())
-    {
-        case sv_value:
-            ret = v.get_value();
-        break;
-        case sv_single_ref:
-        {
-            // reference to a single cell.
-            const abs_address_t& addr = v.get_address();
-            const base_cell* p = m_context.get_cell(addr);
-            if (p)
-                ret = p->get_value();
-            else
-                // empty cell has a value of 0.
-                ret = 0.0;
-        }
-        break;
-        default:
-#if IXION_DEBUG_GLOBAL
-            __IXION_DEBUG_OUT__ << "value is being popped, but the stack value type is not appropriate." << endl;
-#endif
-            throw formula_error(fe_stack_error);
-    }
-
+    ret = get_numeric_value(m_context, v);
     m_stack.pop_back();
     return ret;
 }
