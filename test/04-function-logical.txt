@@ -1,0 +1,14 @@
+%% Test case for built-in logical functions.
+%mode init
+A1:2
+A2:3
+A3=if(A1=A2,"equal","not equal")
+A4=if(A1<>A2,"not equal","equal")
+%calc
+%mode result
+A3="not equal"
+A4="not equal"
+%check
+
+
+
