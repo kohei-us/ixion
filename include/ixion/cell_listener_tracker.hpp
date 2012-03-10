@@ -45,7 +45,7 @@ namespace iface {
  * Track all single and range references being listened to by individual
  * cells.
  */
-class cell_listener_tracker
+class IXION_DLLPUBLIC cell_listener_tracker
 {
     cell_listener_tracker(); // disabled
 public:
