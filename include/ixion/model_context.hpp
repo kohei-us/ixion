@@ -114,6 +114,7 @@ public:
     void erase_cell(const abs_address_t& addr);
 
     void set_numeric_cell(const abs_address_t& addr, double val);
+    void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);

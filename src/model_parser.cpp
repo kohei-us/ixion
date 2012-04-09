@@ -394,8 +394,7 @@ void model_parser::parse_init(const char*& p)
 #if DEBUG_MODEL_PARSER
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: string" << endl;
 #endif
-            size_t str_id = m_context.add_string(buf.get(), buf.size());
-            m_context.set_cell(pos, new string_cell(str_id));
+            m_context.set_string_cell(pos, buf.get(), buf.size());
             if (m_print_separator)
             {
                 m_print_separator = false;
