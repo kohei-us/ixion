@@ -126,6 +126,13 @@ void model_context::erase_cell(const abs_address_t& addr)
     m_cells.erase(itr);
 }
 
+void model_context::set_numeric_cell(const abs_address_t& addr, double val)
+{
+    erase_cell(addr);
+    abs_address_t addr2(addr);
+    m_cells.insert(addr2, new numeric_cell(val));
+}
+
 const base_cell* model_context::get_cell(const abs_address_t& addr) const
 {
     cell_store_type::const_iterator itr = m_cells.find(addr);

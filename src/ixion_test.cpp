@@ -282,9 +282,9 @@ void test_volatile_function()
     dirty_cell_addrs_t dirty_addrs;
 
     // Set values into A1:A3.
-    cxt.set_cell(abs_address_t(0,0,0), new numeric_cell(1.0));
-    cxt.set_cell(abs_address_t(0,1,0), new numeric_cell(2.0));
-    cxt.set_cell(abs_address_t(0,2,0), new numeric_cell(3.0));
+    cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);
+    cxt.set_numeric_cell(abs_address_t(0,1,0), 2.0);
+    cxt.set_numeric_cell(abs_address_t(0,2,0), 3.0);
 
     // Set formula in A4 that references A1:A3.
     formula_cell* p = insert_formula(cxt, abs_address_t(0,3,0), "SUM(A1:A3)");
@@ -299,7 +299,7 @@ void test_volatile_function()
     assert(bcell->get_value() == 6);
 
     // Modify the value of A2.  This should flag A4 dirty.
-    cxt.set_cell(abs_address_t(0,1,0), new numeric_cell(10.0));
+    cxt.set_numeric_cell(abs_address_t(0,1,0), 10.0);
     dirty_cells.clear();
     dirty_addrs.push_back(abs_address_t(0,1,0));
     get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);

@@ -410,7 +410,7 @@ void model_parser::parse_init(const char*& p)
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: numeric" << endl;
 #endif
             double value = global::to_double(buf.get(), buf.size());
-            m_context.set_cell(pos, new numeric_cell(value));
+            m_context.set_numeric_cell(pos, value);
 
             if (m_print_separator)
             {
