@@ -260,13 +260,10 @@ void test_function_name_resolution()
 
 formula_cell* insert_formula(model_context& cxt, const abs_address_t& pos, const char* exp)
 {
-    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(cxt, pos, exp, strlen(exp), *tokens);
-    unique_ptr<formula_cell> fcell(new formula_cell);
-    size_t tkid = cxt.add_formula_tokens(0, tokens.release());
-    fcell->set_identifier(tkid);
-    formula_cell* p = fcell.get();
-    cxt.set_cell(pos, fcell.release());
+    cxt.set_formula_cell(pos, exp, strlen(exp));
+    base_cell* pb = cxt.get_cell(pos);
+    assert(pb && pb->get_celltype() == celltype_formula);
+    formula_cell* p = static_cast<formula_cell*>(pb);
     register_formula_cell(cxt, pos, p);
     return p;
 }

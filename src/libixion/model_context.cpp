@@ -32,6 +32,7 @@
 #include "ixion/config.hpp"
 #include "ixion/session_handler.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/formula.hpp"
 
 #include <memory>
 
@@ -61,6 +62,85 @@ public:
         return v.tokens == m_ptr;
     }
 };
+
+/**
+ * @return true if the formula cell is stored in the model with a shared
+ *         formula token set, false if the formula cell has a non-shared
+ *         formula token set, and is not yet stored in the model.
+ */
+bool set_shared_formula_tokens_to_cell(
+    model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
+{
+    if (addr.sheet == global_scope)
+        return false;
+
+    // Check its neighbors for adjacent formula cells.
+    if (addr.row == 0)
+        return false;
+
+    abs_address_t test = addr;
+    test.row -= 1;
+    base_cell* p = cxt.get_cell(test);
+    if (!p || p->get_celltype() != celltype_formula)
+        // The neighboring cell is not a formula cell.
+        return false;
+
+    formula_cell* test_cell = static_cast<formula_cell*>(p);
+
+    if (test_cell->is_shared())
+    {
+        size_t token_id = test_cell->get_identifier();
+        const formula_tokens_t* tokens = cxt.get_shared_formula_tokens(addr.sheet, token_id);
+        assert(tokens);
+
+        if (new_tokens != *tokens)
+            return false;
+
+        // Make sure that we can extend the shared range properly.
+        abs_range_t range = cxt.get_shared_formula_range(addr.sheet, token_id);
+        if (range.first.sheet != addr.sheet)
+            // Wrong sheet
+            return false;
+
+        if (range.first.column != range.last.column)
+            // Must be a single column.
+            return false;
+
+        if (range.last.row != (addr.row - 1))
+            // Last row is not immediately above the current cell.
+            return false;
+
+        fcell.set_identifier(token_id);
+        fcell.set_shared(true);
+
+        range.last.row += 1;
+        cxt.set_shared_formula_range(addr.sheet, token_id, range);
+    }
+    else
+    {
+        size_t token_id = test_cell->get_identifier();
+        const formula_tokens_t* tokens = cxt.get_formula_tokens(addr.sheet, token_id);
+        assert(tokens);
+
+        if (new_tokens != *tokens)
+            return false;
+
+        // Move the tokens of the master cell to the shared token storage.
+        size_t shared_id = cxt.set_formula_tokens_shared(addr.sheet, token_id);
+        test_cell->set_shared(true);
+        test_cell->set_identifier(shared_id);
+        assert(test_cell->is_shared());
+        fcell.set_identifier(shared_id);
+        fcell.set_shared(true);
+        assert(fcell.is_shared());
+        abs_range_t range;
+        range.first = addr;
+        range.last = addr;
+        range.first.row -= 1;
+        cxt.set_shared_formula_range(addr.sheet, shared_id, range);
+    }
+    return true;
+}
 
 }
 
@@ -139,6 +219,22 @@ void model_context::set_string_cell(const abs_address_t& addr, const char* p, si
     size_t str_id = add_string(p, n);
     abs_address_t addr2(addr);
     m_cells.insert(addr2, new string_cell(str_id));
+}
+
+void model_context::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
+{
+    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
+    parse_formula_string(*this, addr, p, n, *tokens);
+    unique_ptr<formula_cell> fcell(new formula_cell);
+    if (!set_shared_formula_tokens_to_cell(*this, addr, *fcell, *tokens))
+    {
+        size_t tkid = add_formula_tokens(0, tokens.release());
+        fcell->set_identifier(tkid);
+    }
+
+    erase_cell(addr);
+    abs_address_t addr2(addr);
+    m_cells.insert(addr2, fcell.release());
 }
 
 const base_cell* model_context::get_cell(const abs_address_t& addr) const
