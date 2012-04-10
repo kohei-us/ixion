@@ -186,13 +186,6 @@ cell_listener_tracker& model_context::get_cell_listener_tracker()
     return *mp_cell_listener_tracker;
 }
 
-void model_context::set_cell(const abs_address_t& addr, base_cell* cell)
-{
-    erase_cell(addr);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, cell);
-}
-
 void model_context::erase_cell(const abs_address_t& addr)
 {
     cell_store_type::iterator itr = m_cells.find(addr);

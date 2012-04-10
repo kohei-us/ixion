@@ -110,7 +110,6 @@ public:
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
     size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
     void remove_formula_tokens(sheet_t sheet, size_t identifier);
-    void set_cell(const abs_address_t& addr, base_cell* cell);
     void erase_cell(const abs_address_t& addr);
 
     void set_numeric_cell(const abs_address_t& addr, double val);
