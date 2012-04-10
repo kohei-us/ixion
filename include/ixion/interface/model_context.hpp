@@ -76,6 +76,8 @@ public:
     virtual base_cell* get_cell(const abs_address_t& addr) = 0;
 
     virtual double get_numeric_value(const abs_address_t& addr) const = 0;
+    virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
+    virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
     /**
      * Get an iterator that iterates through non-empty cells in a given range.

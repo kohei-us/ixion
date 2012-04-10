@@ -80,12 +80,10 @@ bool set_shared_formula_tokens_to_cell(
 
     abs_address_t test = addr;
     test.row -= 1;
-    base_cell* p = cxt.get_cell(test);
-    if (!p || p->get_celltype() != celltype_formula)
+    formula_cell* test_cell = cxt.get_formula_cell(test);
+    if (!test_cell)
         // The neighboring cell is not a formula cell.
         return false;
-
-    formula_cell* test_cell = static_cast<formula_cell*>(p);
 
     if (test_cell->is_shared())
     {
@@ -252,6 +250,36 @@ double model_context::get_numeric_value(const abs_address_t& addr) const
     return it->second->get_value();
 }
 
+const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty cell
+        return NULL;
+
+    const base_cell* p = it->second;
+    assert(p);
+    if (p->get_celltype() != celltype_formula)
+        return NULL;
+
+    return static_cast<const formula_cell*>(p);
+}
+
+formula_cell* model_context::get_formula_cell(const abs_address_t& addr)
+{
+    cell_store_type::iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty cell
+        return NULL;
+
+    base_cell* p = it->second;
+    assert(p);
+    if (p->get_celltype() != celltype_formula)
+        return NULL;
+
+    return static_cast<formula_cell*>(p);
+}
+
 string model_context::get_cell_name(const base_cell* p) const
 {
     cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
@@ -302,16 +330,10 @@ matrix model_context::get_range_value(const abs_range_t& range) const
         {
             row_t row = i + range.first.row;
             col_t col = j + range.first.column;
-            const base_cell* p = get_cell(abs_address_t(range.first.sheet, row, col));
-#if DEBUG_MODEL_CONTEXT
-            __IXION_DEBUG_OUT__ << "cell address (sheet=" << range.first.sheet << "; row=" << row << "; col=" << col << ") = " << p << endl;
-#endif
-            if (!p)
-                // empty cell.
-                continue;
+            double val = get_numeric_value(abs_address_t(range.first.sheet, row, col));
 
             // TODO: we need to handle string types when that becomes available.
-            ret.set(i, j, p->get_value());
+            ret.set(i, j, val);
         }
     }
     return ret;

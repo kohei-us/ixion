@@ -291,9 +291,8 @@ void model_parser::parse_init(const char*& p)
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
 #endif
             m_context.set_formula_cell(pos, buf.get(), buf.size());
-            base_cell* pb = m_context.get_cell(pos);
-            assert(pb && pb->get_celltype() == celltype_formula);
-            formula_cell* p = static_cast<formula_cell*>(pb);
+            formula_cell* p = m_context.get_formula_cell(pos);
+            assert(p);
             unregister_formula_cell(m_context, pos);
             m_dirty_cells.insert(p);
             register_formula_cell(m_context, pos, p);

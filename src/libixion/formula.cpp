@@ -188,15 +188,13 @@ void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos
 {
     // When there is a formula cell at this position, unregister it from
     // the dependency tree.
-    base_cell* p = cxt.get_cell(pos);
-    if (!p || p->get_celltype() != celltype_formula)
+    formula_cell* fcell = cxt.get_formula_cell(pos);
+    if (!fcell)
         // Not a formula cell. Bail out.
         return;
 
     cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
     tracker.remove_volatile(pos);
-
-    formula_cell* fcell = static_cast<formula_cell*>(p);
 
     // Go through all its existing references, and remove
     // itself as their listener.  This step is important
@@ -223,12 +221,12 @@ void get_all_dirty_cells(
         cell_listener_tracker::address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
         for (; itr != itr_end; ++itr)
         {
-            base_cell* p = cxt.get_cell(*itr);
-            if (!p || p->get_celltype() != celltype_formula)
+            formula_cell* p = cxt.get_formula_cell(*itr);
+            if (!p)
                 continue;
 
             addrs.push_back(*itr);
-            cells.insert(static_cast<formula_cell*>(p));
+            cells.insert(p);
         }
     }
 

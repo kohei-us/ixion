@@ -88,9 +88,13 @@ public:
     virtual const config& get_config() const;
     virtual const formula_name_resolver& get_name_resolver() const;
     virtual cell_listener_tracker& get_cell_listener_tracker();
+
     virtual const base_cell* get_cell(const abs_address_t& addr) const;
     virtual base_cell* get_cell(const abs_address_t& addr);
     virtual double get_numeric_value(const abs_address_t& addr) const;
+    virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const;
+    virtual formula_cell* get_formula_cell(const abs_address_t& addr);
+
     virtual iface::cells_in_range* get_cells_in_range(const abs_range_t& range);
     virtual iface::const_cells_in_range* get_cells_in_range(const abs_range_t& range) const;
     virtual ::std::string get_cell_name(const base_cell* p) const;

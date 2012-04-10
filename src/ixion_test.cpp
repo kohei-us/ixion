@@ -261,9 +261,8 @@ void test_function_name_resolution()
 formula_cell* insert_formula(model_context& cxt, const abs_address_t& pos, const char* exp)
 {
     cxt.set_formula_cell(pos, exp, strlen(exp));
-    base_cell* pb = cxt.get_cell(pos);
-    assert(pb && pb->get_celltype() == celltype_formula);
-    formula_cell* p = static_cast<formula_cell*>(pb);
+    formula_cell* p = cxt.get_formula_cell(pos);
+    assert(p);
     register_formula_cell(cxt, pos, p);
     return p;
 }

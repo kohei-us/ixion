@@ -295,15 +295,12 @@ void formula_cell::check_circular(const iface::model_context& cxt)
             {
                 abs_address_t origin = cxt.get_cell_position(this);
                 abs_address_t addr = itr->get_single_ref().to_abs(origin);
-                const base_cell* ref = cxt.get_cell(addr);
+                const formula_cell* ref = cxt.get_formula_cell(addr);
 
                 if (!ref)
                     continue;
 
-                if (ref->get_celltype() != celltype_formula)
-                    continue;
-
-                if (!check_ref_for_circular_safety(static_cast<const formula_cell&>(*ref)))
+                if (!check_ref_for_circular_safety(*ref))
                     return;
             }
             break;

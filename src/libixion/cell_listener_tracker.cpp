@@ -172,11 +172,11 @@ public:
         for (; itr != itr_end; ++itr)
         {
             const abs_address_t& addr = *itr;
-            base_cell* p = m_context.get_cell(addr);
-            if (p && p->get_celltype() == celltype_formula)
+            formula_cell* p = m_context.get_formula_cell(addr);
+            if (p)
             {
                 // Formula cell exists at this address.
-                m_dirty_cells.insert(static_cast<formula_cell*>(p));
+                m_dirty_cells.insert(p);
                 m_addrs.insert(addr);
             }
         }
@@ -213,12 +213,10 @@ void cell_listener_tracker::get_all_cell_listeners(
     for (; itr2 != itr2_end; ++itr2)
     {
         const abs_address_t& addr = *itr2; // listener cell address
-        base_cell* p = m_context.get_cell(addr);
-        if (!p || p->get_celltype() != celltype_formula)
+        formula_cell* fcell = m_context.get_formula_cell(addr);
+        if (!fcell)
             // Referenced cell is empty or not a formula cell.  Ignore this.
             continue;
-
-        formula_cell* fcell = static_cast<formula_cell*>(p);
 
         if (listeners.count(fcell) == 0)
         {
