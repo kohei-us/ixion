@@ -291,9 +291,8 @@ void test_volatile_function()
     // Initial full calculation.
     calculate_cells(cxt, dirty_cells, 0);
 
-    const base_cell* bcell = cxt.get_cell(abs_address_t(0,3,0));
-    assert(bcell != NULL);
-    assert(bcell->get_value() == 6);
+    double val = cxt.get_numeric_value(abs_address_t(0,3,0));
+    assert(val == 6);
 
     // Modify the value of A2.  This should flag A4 dirty.
     cxt.set_numeric_cell(abs_address_t(0,1,0), 10.0);
@@ -304,9 +303,8 @@ void test_volatile_function()
 
     // Partial recalculation.
     calculate_cells(cxt, dirty_cells, 0);
-    bcell = cxt.get_cell(abs_address_t(0, 3, 0));
-    assert(bcell != NULL);
-    assert(bcell->get_value() == 14);
+    val = cxt.get_numeric_value(abs_address_t(0, 3, 0));
+    assert(val == 14);
 
     // Insert a volatile cell into B1.  At this point B1 should be the only dirty cell.
     dirty_cells.clear();
@@ -320,9 +318,7 @@ void test_volatile_function()
 
     // Partial recalc again.
     calculate_cells(cxt, dirty_cells, 0);
-    bcell = cxt.get_cell(abs_address_t(0,0,1));
-    assert(bcell);
-    double t1 = bcell->get_value();
+    double t1 = cxt.get_numeric_value(abs_address_t(0,0,1));
 
     // Pause for 0.2 second.
     global::sleep(200);
@@ -333,9 +329,7 @@ void test_volatile_function()
     get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
     assert(dirty_cells.size() == 1);
     calculate_cells(cxt, dirty_cells, 0);
-    bcell = cxt.get_cell(abs_address_t(0,0,1));
-    assert(bcell);
-    double t2 = bcell->get_value();
+    double t2 = cxt.get_numeric_value(abs_address_t(0,0,1));
     double delta = (t2-t1)*24*60*60;
     cout << "delta = " << delta << endl;
 

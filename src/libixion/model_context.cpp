@@ -242,6 +242,16 @@ base_cell* model_context::get_cell(const abs_address_t& addr)
     return itr == m_cells.end() ? NULL : itr->second;
 }
 
+double model_context::get_numeric_value(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty cell has a value of 0.0.
+        return 0.0;
+
+    return it->second->get_value();
+}
+
 string model_context::get_cell_name(const base_cell* p) const
 {
     cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();

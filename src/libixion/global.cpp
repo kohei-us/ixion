@@ -206,12 +206,7 @@ double get_numeric_value(const iface::model_context& cxt, const stack_value& v)
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
-            const base_cell* p = cxt.get_cell(addr);
-            if (p)
-                ret = p->get_value();
-            else
-                // empty cell has a value of 0.
-                ret = 0.0;
+            ret = cxt.get_numeric_value(addr);
         }
         break;
         default:
