@@ -31,6 +31,7 @@
 #include "ixion/formula_tokens.hpp"
 #include "ixion/address.hpp"
 #include "ixion/hash_container/set.hpp"
+#include "ixion/types.hpp"
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -46,15 +47,6 @@ namespace iface {
 class model_context;
 
 }
-
-enum celltype_t
-{
-    celltype_unknown = 0x0000,
-    celltype_string  = 0x0001,
-    celltype_numeric = 0x0002,
-    celltype_formula = 0x0003,
-    celltype_mask    = 0x000F
-};
 
 /**
  * This class itself cannot be directly instantiated; you always need to

@@ -240,6 +240,21 @@ base_cell* model_context::get_cell(const abs_address_t& addr)
     return itr == m_cells.end() ? NULL : itr->second;
 }
 
+bool model_context::is_empty(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    return it == m_cells.end();
+}
+
+celltype_t model_context::get_celltype(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        throw general_error("empty cell");
+
+    return it->second->get_celltype();
+}
+
 double model_context::get_numeric_value(const abs_address_t& addr) const
 {
     cell_store_type::const_iterator it = m_cells.find(addr);

@@ -172,23 +172,34 @@ void formula_interpreter::init_tokens()
 
 namespace {
 
-void get_result_from_cell(const iface::model_context& cxt, formula_result& res, const base_cell& cell)
+void get_result_from_cell(const iface::model_context& cxt, const abs_address_t& addr, formula_result& res)
 {
-    switch (cell.get_celltype())
+    if (cxt.is_empty(addr))
+        return;
+
+    switch (cxt.get_celltype(addr))
     {
         case celltype_formula:
         {
-            const formula_cell& fcell = static_cast<const formula_cell&>(cell);
-            const formula_result* fres = fcell.get_result_cache();
+            const formula_cell* fcell = cxt.get_formula_cell(addr);
+            if (!fcell)
+                return;
+
+            const formula_result* fres = fcell->get_result_cache();
             if (fres)
                 res = *fres;
         }
         break;
         case celltype_numeric:
-            res.set_value(cell.get_value());
+            res.set_value(cxt.get_numeric_value(addr));
         break;
         case celltype_string:
         {
+            const base_cell* p = cxt.get_cell(addr);
+            if (!p)
+                return;
+
+            const base_cell& cell = *p;
             size_t str_id = cell.get_identifier();
             res.set_string(str_id);
         }
@@ -211,16 +222,12 @@ void formula_interpreter::pop_result()
         case sv_range_ref:
         {
             const abs_range_t& range = res.get_range();
-            const base_cell* p = m_context.get_cell(range.first);
-            if (p)
-                get_result_from_cell(m_context, m_result, *p);
+            get_result_from_cell(m_context, range.first, m_result);
         }
         break;
         case sv_single_ref:
         {
-            const base_cell* p = m_context.get_cell(res.get_address());
-            if (p)
-                get_result_from_cell(m_context, m_result, *p);
+            get_result_from_cell(m_context, res.get_address(), m_result);
         }
         break;
         case sv_string:
