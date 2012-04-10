@@ -156,7 +156,11 @@ model_context::model_context() :
     mp_name_resolver(new formula_name_resolver_a1),
     mp_cell_listener_tracker(new cell_listener_tracker(*this)),
     mp_session_handler(new session_handler(*this))
-{}
+{
+    // For convenience, string ID of 0 is associated with an empty string.
+    m_strings.push_back(new std::string);
+    m_string_map.insert(string_map_type::value_type(mem_str_buf(), 0));
+}
 
 model_context::~model_context()
 {
@@ -263,6 +267,18 @@ double model_context::get_numeric_value(const abs_address_t& addr) const
         return 0.0;
 
     return it->second->get_value();
+}
+
+size_t model_context::get_string_value(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty string for empty cell.
+        return 0;
+
+    const base_cell* p = it->second;
+    assert(p);
+    return p->get_celltype() == celltype_string ? p->get_identifier() : 0;
 }
 
 const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const
