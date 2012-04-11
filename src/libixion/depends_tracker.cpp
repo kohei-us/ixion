@@ -92,15 +92,14 @@ struct thread_queue_handler : public unary_function<formula_cell*, void>
     }
 };
 
-struct cell_interpret_handler : public unary_function<base_cell*, void>
+struct cell_interpret_handler : public unary_function<formula_cell*, void>
 {
     cell_interpret_handler(iface::model_context& cxt) :
         m_context(cxt) {}
 
-    void operator() (base_cell* p) const
+    void operator() (formula_cell* p) const
     {
-        assert(p->get_celltype() == celltype_formula);
-        static_cast<formula_cell*>(p)->interpret(m_context);
+        p->interpret(m_context);
     }
 private:
     iface::model_context& m_context;

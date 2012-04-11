@@ -40,7 +40,6 @@
 
 namespace ixion {
 
-class base_cell;
 class formula_cell;
 struct abs_address_t;
 struct abs_range_t;

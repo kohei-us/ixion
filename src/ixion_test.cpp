@@ -52,9 +52,6 @@ void test_size()
     cout << "double: " << sizeof(double) << endl;
     cout << "size_t: " << sizeof(size_t) << endl;
     cout << "celltype_t: " << sizeof(celltype_t) << endl;
-    cout << "base_cell: " << sizeof(base_cell) << endl;
-    cout << "string_cell: " << sizeof(string_cell) << endl;
-    cout << "numeric_cell: " << sizeof(numeric_cell) << endl;
     cout << "formula_cell: " << sizeof(formula_cell) << endl;
     cout << "formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
 }
