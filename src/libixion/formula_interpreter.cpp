@@ -194,15 +194,7 @@ void get_result_from_cell(const iface::model_context& cxt, const abs_address_t& 
             res.set_value(cxt.get_numeric_value(addr));
         break;
         case celltype_string:
-        {
-            const base_cell* p = cxt.get_cell(addr);
-            if (!p)
-                return;
-
-            const base_cell& cell = *p;
-            size_t str_id = cell.get_identifier();
-            res.set_string(str_id);
-        }
+            res.set_string(cxt.get_string_value(addr));
         break;
         case celltype_unknown:
         default:
@@ -339,8 +331,7 @@ bool pop_stack_value_or_string(const iface::model_context& cxt,
         case sv_single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
-            const base_cell* p = cxt.get_cell(addr);
-            if (!p)
+            if (cxt.is_empty(addr))
             {
                 // empty cell has a value of 0.
                 vt = sv_value;
@@ -348,18 +339,18 @@ bool pop_stack_value_or_string(const iface::model_context& cxt,
                 return true;
             }
 
-            switch (p->get_celltype())
+            switch (cxt.get_celltype(addr))
             {
                 case celltype_numeric:
                 {
                     vt = sv_value;
-                    val = p->get_value();
+                    val = cxt.get_numeric_value(addr);
                     return true;
                 }
                 case celltype_string:
                 {
                     vt = sv_string;
-                    size_t strid = p->get_identifier();
+                    size_t strid = cxt.get_string_value(addr);
                     const string* ps = cxt.get_string(strid);
                     if (!ps)
                         return false;
@@ -368,8 +359,12 @@ bool pop_stack_value_or_string(const iface::model_context& cxt,
                 }
                 case celltype_formula:
                 {
-                    const formula_cell* fc = static_cast<const formula_cell*>(p);
+                    const formula_cell* fc = cxt.get_formula_cell(addr);
+                    assert(fc);
                     const formula_result* res = fc->get_result_cache();
+                    if (!res)
+                        return false;
+
                     switch (res->get_type())
                     {
                         case formula_result::rt_value:
@@ -701,9 +696,8 @@ void formula_interpreter::single_ref()
 #if DEBUG_FORMULA_INTERPRETER
     __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
 #endif
-    const base_cell* pref = m_context.get_cell(abs_addr);
 
-    if (pref == m_parent_cell)
+    if (abs_addr == m_pos)
     {
         // self-referencing is not permitted.
         throw formula_error(fe_ref_result_not_available);

@@ -32,4 +32,6 @@ namespace ixion {
 const sheet_t global_scope = -1;
 const sheet_t invalid_sheet = -2;
 
+const size_t empty_string = 0;
+
 }
