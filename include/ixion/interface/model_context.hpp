@@ -80,26 +80,6 @@ public:
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
-    /**
-     * Get an iterator that iterates through non-empty cells in a given range.
-     *
-     * @param range range for which to retrieve the iterator instance.
-     *
-     * @return pointer to the iterator instance. Note that the caller is
-     *         responsible for deleting the instance.
-     */
-    virtual cells_in_range* get_cells_in_range(const abs_range_t& range) = 0;
-
-    /**
-     * Get a const iterator that iterates through non-empty cells in a given
-     * range.
-     *
-     * @param range range for which to retrieve the iterator instance.
-     *
-     * @return pointer to the const iterator instance. Note that the caller is
-     *         responsible for deleting the instance.
-     */
-    virtual const_cells_in_range* get_cells_in_range(const abs_range_t& range) const = 0;
     virtual ::std::string get_cell_name(const base_cell* p) const = 0;
     virtual abs_address_t get_cell_position(const base_cell* p) const= 0;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const = 0;

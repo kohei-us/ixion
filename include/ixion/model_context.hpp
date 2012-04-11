@@ -96,8 +96,6 @@ public:
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr);
 
-    virtual iface::cells_in_range* get_cells_in_range(const abs_range_t& range);
-    virtual iface::const_cells_in_range* get_cells_in_range(const abs_range_t& range) const;
     virtual ::std::string get_cell_name(const base_cell* p) const;
     virtual abs_address_t get_cell_position(const base_cell* p) const;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;

@@ -70,11 +70,19 @@ public:
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(m_origin);
-                boost::scoped_ptr<iface::cells_in_range> cells(m_context.get_cells_in_range(range));
-                for (base_cell* p = cells->first(); p; p = cells->next())
+                for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
-                    if (p->get_celltype() == celltype_formula)
-                        m_deps.push_back(static_cast<formula_cell*>(p));
+                    for (col_t col = range.first.column; col <= range.last.column; ++col)
+                    {
+                        for (row_t row = range.first.row; row <= range.last.row; ++row)
+                        {
+                            abs_address_t addr(sheet, row, col);
+                            if (m_context.is_empty(addr) || m_context.get_celltype(addr) != celltype_formula)
+                                continue;
+
+                            m_deps.push_back(m_context.get_formula_cell(addr));
+                        }
+                    }
                 }
             }
             break;

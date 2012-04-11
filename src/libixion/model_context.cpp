@@ -324,16 +324,6 @@ abs_address_t model_context::get_cell_position(const base_cell* p) const
     throw general_error("cell instance not found");
 }
 
-iface::cells_in_range* model_context::get_cells_in_range(const abs_range_t& range)
-{
-    return new cells_in_range(*this, range);
-}
-
-iface::const_cells_in_range* model_context::get_cells_in_range(const abs_range_t& range) const
-{
-    return new const_cells_in_range(*this, range);
-}
-
 matrix model_context::get_range_value(const abs_range_t& range) const
 {
     if (range.first.sheet != range.last.sheet)

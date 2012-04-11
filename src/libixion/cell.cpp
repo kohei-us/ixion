@@ -308,15 +308,20 @@ void formula_cell::check_circular(const iface::model_context& cxt)
             {
                 abs_address_t origin = cxt.get_cell_position(this);
                 abs_range_t range = itr->get_range_ref().to_abs(origin);
-                boost::scoped_ptr<iface::const_cells_in_range> cell_range(
-                    cxt.get_cells_in_range(range));
-                for (const base_cell* p = cell_range->first(); p; p = cell_range->next())
+                for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
-                    if (p->get_celltype() != celltype_formula)
-                        continue;
+                    for (col_t col = range.first.column; col <= range.last.column; ++col)
+                    {
+                        for (row_t row = range.first.row; row <= range.last.row; ++row)
+                        {
+                            abs_address_t addr(sheet, row, col);
+                            if (cxt.is_empty(addr) || cxt.get_celltype(addr) != celltype_formula)
+                                continue;
 
-                    if (!check_ref_for_circular_safety(static_cast<const formula_cell&>(*p)))
-                        return;
+                            if (!check_ref_for_circular_safety(*cxt.get_formula_cell(addr)))
+                                return;
+                        }
+                    }
                 }
             }
             default:
