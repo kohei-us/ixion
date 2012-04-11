@@ -452,7 +452,7 @@ const string value_stack_t::pop_string()
                 }
                 case celltype_string:
                 {
-                    const string* ps = m_context.get_string(m_context.get_string_value(addr));
+                    const string* ps = m_context.get_string(m_context.get_string_identifier(addr));
                     if (!ps)
                         throw formula_error(fe_stack_error);
                     return *ps;

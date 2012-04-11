@@ -194,7 +194,7 @@ void get_result_from_cell(const iface::model_context& cxt, const abs_address_t& 
             res.set_value(cxt.get_numeric_value(addr));
         break;
         case celltype_string:
-            res.set_string(cxt.get_string_value(addr));
+            res.set_string(cxt.get_string_identifier(addr));
         break;
         case celltype_unknown:
         default:
@@ -350,7 +350,7 @@ bool pop_stack_value_or_string(const iface::model_context& cxt,
                 case celltype_string:
                 {
                     vt = sv_string;
-                    size_t strid = cxt.get_string_value(addr);
+                    size_t strid = cxt.get_string_identifier(addr);
                     const string* ps = cxt.get_string(strid);
                     if (!ps)
                         return false;

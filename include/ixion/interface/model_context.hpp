@@ -76,7 +76,7 @@ public:
     virtual bool is_empty(const abs_address_t& addr) const = 0;
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;
     virtual double get_numeric_value(const abs_address_t& addr) const = 0;
-    virtual size_t get_string_value(const abs_address_t& addr) const = 0;
+    virtual size_t get_string_identifier(const abs_address_t& addr) const = 0;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 

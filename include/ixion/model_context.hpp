@@ -92,7 +92,7 @@ public:
     virtual bool is_empty(const abs_address_t& addr) const;
     virtual celltype_t get_celltype(const abs_address_t& addr) const;
     virtual double get_numeric_value(const abs_address_t& addr) const;
-    virtual size_t get_string_value(const abs_address_t& addr) const;
+    virtual size_t get_string_identifier(const abs_address_t& addr) const;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr);
 

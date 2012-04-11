@@ -257,7 +257,7 @@ double model_context::get_numeric_value(const abs_address_t& addr) const
     return it->second->get_value();
 }
 
-size_t model_context::get_string_value(const abs_address_t& addr) const
+size_t model_context::get_string_identifier(const abs_address_t& addr) const
 {
     cell_store_type::const_iterator it = m_cells.find(addr);
     if (it == m_cells.end())
