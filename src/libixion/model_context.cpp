@@ -261,11 +261,11 @@ size_t model_context::get_string_identifier(const abs_address_t& addr) const
     cell_store_type::const_iterator it = m_cells.find(addr);
     if (it == m_cells.end())
         // empty string for empty cell.
-        return 0;
+        return empty_string_id;
 
     const base_cell* p = it->second;
     assert(p);
-    return p->get_celltype() == celltype_string ? p->get_identifier() : 0;
+    return p->get_celltype() == celltype_string ? p->get_identifier() : empty_string_id;
 }
 
 const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const

@@ -40,7 +40,7 @@ typedef int sheet_t;
 IXION_DLLPUBLIC extern const sheet_t global_scope;
 IXION_DLLPUBLIC extern const sheet_t invalid_sheet;
 
-IXION_DLLPUBLIC extern const size_t empty_string;
+IXION_DLLPUBLIC extern const size_t empty_string_id;
 
 class formula_cell;
 
