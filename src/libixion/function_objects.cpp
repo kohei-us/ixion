@@ -32,7 +32,6 @@
 #include "ixion/formula_tokens.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/interface/model_context.hpp"
-#include "ixion/cells_in_range.hpp"
 
 #include <vector>
 #include <boost/scoped_ptr.hpp>

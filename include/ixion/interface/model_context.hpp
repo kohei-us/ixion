@@ -55,8 +55,6 @@ public:
 
 namespace iface {
 
-class cells_in_range;
-class const_cells_in_range;
 class session_handler;
 
 /**

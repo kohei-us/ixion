@@ -28,7 +28,6 @@
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
-#include "ixion/cells_in_range.hpp"
 #include "ixion/config.hpp"
 #include "ixion/session_handler.hpp"
 #include "ixion/cell_listener_tracker.hpp"

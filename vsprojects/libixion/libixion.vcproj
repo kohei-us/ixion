@@ -184,10 +184,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\cells_in_range.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\libixion\config.cpp"
 				>
 			</File>
@@ -283,14 +279,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\ixion\cell_queue_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\ixion\interface\cells_in_range.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\ixion\cells_in_range.hpp"
 				>
 			</File>
 			<File

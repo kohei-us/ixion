@@ -6,7 +6,6 @@ libixion_HEADERS = \
 	cell.hpp \
 	cell_listener_tracker.hpp \
 	cell_queue_manager.hpp \
-	cells_in_range.hpp \
 	config.hpp \
 	depends_tracker.hpp \
 	depth_first_search.hpp \

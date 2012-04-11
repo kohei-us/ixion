@@ -42,9 +42,6 @@
 
 namespace ixion {
 
-class cells_in_range;
-class cells_in_range_impl;
-class const_cells_in_range;
 class session_handler;
 struct abs_address_t;
 struct config;
@@ -59,8 +56,6 @@ class matrix;
  */
 class IXION_DLLPUBLIC model_context : public iface::model_context
 {
-    friend class cells_in_range_impl;
-
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;

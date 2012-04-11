@@ -31,7 +31,6 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/interface/model_context.hpp"
-#include "ixion/interface/cells_in_range.hpp"
 #include "ixion/interface/session_handler.hpp"
 
 #include <boost/shared_ptr.hpp>

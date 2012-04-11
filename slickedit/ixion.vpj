@@ -226,7 +226,6 @@
 					<F N="../include/ixion/hash_container/set.hpp"/>
 				</Folder>
 				<Folder Name="interface">
-					<F N="../include/ixion/interface/cells_in_range.hpp"/>
 					<F N="../include/ixion/interface/model_context.hpp"/>
 					<F N="../include/ixion/interface/session_handler.hpp"/>
 				</Folder>
@@ -234,7 +233,6 @@
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>
 				<F N="../include/ixion/cell_queue_manager.hpp"/>
-				<F N="../include/ixion/cells_in_range.hpp"/>
 				<F N="../include/ixion/config.hpp"/>
 				<F N="../include/ixion/depends_tracker.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
@@ -272,7 +270,6 @@
 				<F N="../src/libixion/cell.cpp"/>
 				<F N="../src/libixion/cell_listener_tracker.cpp"/>
 				<F N="../src/libixion/cell_queue_manager.cpp"/>
-				<F N="../src/libixion/cells_in_range.cpp"/>
 				<F N="../src/libixion/config.cpp"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>
 				<F N="../src/libixion/formula.cpp"/>
