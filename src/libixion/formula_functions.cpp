@@ -63,7 +63,7 @@ const builtin_func builtin_funcs[] = {
     { "SUM", func_sum },
     { "IF", func_if },
     { "LEN", func_len },
-    { "CONCATENAME", func_concatenate },
+    { "CONCATENATE", func_concatenate },
     { "NOW", func_now },
 };
 
