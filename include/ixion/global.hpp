@@ -135,7 +135,7 @@ enum stack_value_t {
 /**
  * Individual stack value storage.
  */
-class stack_value
+class stack_value : boost::noncopyable
 {
     stack_value_t m_type;
     union {

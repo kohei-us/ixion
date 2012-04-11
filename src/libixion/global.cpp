@@ -405,19 +405,18 @@ const string value_stack_t::pop_string()
         case sv_single_ref:
         {
             // reference to a single cell.
-            const abs_address_t& addr = v.get_address();
-            const base_cell* p = m_context.get_cell(addr);
+            abs_address_t addr = v.get_address();
             m_stack.pop_back();
 
-            if (!p)
+            if (m_context.is_empty(addr))
                 // empty cell.
                 return string();
 
-            switch (p->get_celltype())
+            switch (m_context.get_celltype(addr))
             {
                 case celltype_formula:
                 {
-                    const formula_cell* fc = static_cast<const formula_cell*>(p);
+                    const formula_cell* fc = m_context.get_formula_cell(addr);
                     const formula_result* res = fc->get_result_cache();
                     if (!res)
                         break;
@@ -448,12 +447,12 @@ const string value_stack_t::pop_string()
                 case celltype_numeric:
                 {
                     ostringstream os;
-                    os << p->get_value();
+                    os << m_context.get_numeric_value(addr);
                     return os.str();
                 }
                 case celltype_string:
                 {
-                    const string* ps = m_context.get_string(p->get_identifier());
+                    const string* ps = m_context.get_string(m_context.get_string_value(addr));
                     if (!ps)
                         throw formula_error(fe_stack_error);
                     return *ps;
