@@ -232,18 +232,6 @@ void model_context::set_formula_cell(const abs_address_t& addr, const char* p, s
     m_cells.insert(addr2, fcell.release());
 }
 
-const base_cell* model_context::get_cell(const abs_address_t& addr) const
-{
-    cell_store_type::const_iterator itr = m_cells.find(addr);
-    return itr == m_cells.end() ? NULL : itr->second;
-}
-
-base_cell* model_context::get_cell(const abs_address_t& addr)
-{
-    cell_store_type::iterator itr = m_cells.find(addr);
-    return itr == m_cells.end() ? NULL : itr->second;
-}
-
 bool model_context::is_empty(const abs_address_t& addr) const
 {
     cell_store_type::const_iterator it = m_cells.find(addr);

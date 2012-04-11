@@ -72,8 +72,6 @@ public:
     virtual const config& get_config() const = 0;
     virtual const formula_name_resolver& get_name_resolver() const = 0;
     virtual cell_listener_tracker& get_cell_listener_tracker() = 0;
-    virtual const base_cell* get_cell(const abs_address_t& addr) const = 0;
-    virtual base_cell* get_cell(const abs_address_t& addr) = 0;
 
     virtual bool is_empty(const abs_address_t& addr) const = 0;
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;
