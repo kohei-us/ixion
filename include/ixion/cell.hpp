@@ -58,12 +58,12 @@ class model_context;
 class base_cell : boost::noncopyable
 {
 public:
-    IXION_DLLPUBLIC static void delete_instance(const base_cell* p);
+    static void delete_instance(const base_cell* p);
 
-    IXION_DLLPUBLIC double get_value() const;
-    IXION_DLLPUBLIC size_t get_identifier() const;
-    IXION_DLLPUBLIC void set_identifier(size_t identifier);
-    IXION_DLLPUBLIC celltype_t get_celltype() const;
+    double get_value() const;
+    size_t get_identifier() const;
+    void set_identifier(size_t identifier);
+    celltype_t get_celltype() const;
 
 private:
     base_cell(); // disabled
@@ -91,14 +91,14 @@ protected:
     };
 };
 
-class IXION_DLLPUBLIC string_cell : public base_cell
+class string_cell : public base_cell
 {
     string_cell();
 public:
     string_cell(size_t identifier);
 };
 
-class IXION_DLLPUBLIC numeric_cell : public base_cell
+class numeric_cell : public base_cell
 {
     numeric_cell();
 public:
