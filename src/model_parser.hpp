@@ -87,7 +87,6 @@ private:
     void parse_result(const char*& p);
 
     void check();
-    const base_cell* get_cell_from_name(const ::std::string& name);
 
 private:
     model_context m_context;
