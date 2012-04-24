@@ -35,6 +35,8 @@
 
 #include <memory>
 
+#include <mdds/grid_map.hpp>
+
 #define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
@@ -143,6 +145,7 @@ bool set_shared_formula_tokens_to_cell(
 
 class model_context_impl
 {
+    typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
@@ -153,6 +156,7 @@ class model_context_impl
 
 public:
     model_context_impl(model_context& parent) :
+        m_parent(parent),
         mp_config(new config),
         mp_name_resolver(new formula_name_resolver_a1),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
@@ -200,6 +204,19 @@ public:
         mp_session_handler = handler;
     }
 
+    void erase_cell(const abs_address_t& addr);
+    void set_numeric_cell(const abs_address_t& addr, double val);
+    void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
+    bool is_empty(const abs_address_t& addr) const;
+    celltype_t get_celltype(const abs_address_t& addr) const;
+    double get_numeric_value(const abs_address_t& addr) const;
+    size_t get_string_identifier(const abs_address_t& addr) const;
+    const formula_cell* get_formula_cell(const abs_address_t& addr) const;
+    formula_cell* get_formula_cell(const abs_address_t& addr);
+    string get_cell_name(const base_cell* p) const;
+    abs_address_t get_cell_position(const base_cell* p) const;
+
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const string& name);
     const formula_cell* get_named_expression(const string& name) const;
@@ -219,6 +236,10 @@ public:
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
 
 private:
+    model_context& m_parent;
+
+    cell_store_type m_cells; // TODO: This storage needs to be optimized.
+
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
     cell_listener_tracker* mp_cell_listener_tracker;
@@ -398,6 +419,142 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
     m_shared_tokens.at(identifier).range = range;
 }
 
+void model_context_impl::erase_cell(const abs_address_t& addr)
+{
+    cell_store_type::iterator itr = m_cells.find(addr);
+    if (itr == m_cells.end())
+        return;
+
+    const base_cell& cell = *itr->second;
+    if (cell.get_celltype() == celltype_formula)
+        remove_formula_tokens(addr.sheet, cell.get_identifier());
+
+    m_cells.erase(itr);
+}
+
+void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
+{
+    erase_cell(addr);
+    abs_address_t addr2(addr);
+    m_cells.insert(addr2, new numeric_cell(val));
+}
+
+void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
+{
+    erase_cell(addr);
+    size_t str_id = add_string(p, n);
+    abs_address_t addr2(addr);
+    m_cells.insert(addr2, new string_cell(str_id));
+}
+
+void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
+{
+    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
+    parse_formula_string(m_parent, addr, p, n, *tokens);
+    unique_ptr<formula_cell> fcell(new formula_cell);
+    if (!set_shared_formula_tokens_to_cell(m_parent, addr, *fcell, *tokens))
+    {
+        size_t tkid = add_formula_tokens(0, tokens.release());
+        fcell->set_identifier(tkid);
+    }
+
+    erase_cell(addr);
+    abs_address_t addr2(addr);
+    m_cells.insert(addr2, fcell.release());
+}
+
+bool model_context_impl::is_empty(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    return it == m_cells.end();
+}
+
+celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        throw general_error("empty cell");
+
+    return it->second->get_celltype();
+}
+
+double model_context_impl::get_numeric_value(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty cell has a value of 0.0.
+        return 0.0;
+
+    return it->second->get_value();
+}
+
+size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty string for empty cell.
+        return empty_string_id;
+
+    const base_cell* p = it->second;
+    assert(p);
+    return p->get_celltype() == celltype_string ? p->get_identifier() : empty_string_id;
+}
+
+const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
+{
+    cell_store_type::const_iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty cell
+        return NULL;
+
+    const base_cell* p = it->second;
+    assert(p);
+    if (p->get_celltype() != celltype_formula)
+        return NULL;
+
+    return static_cast<const formula_cell*>(p);
+}
+
+formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
+{
+    cell_store_type::iterator it = m_cells.find(addr);
+    if (it == m_cells.end())
+        // empty cell
+        return NULL;
+
+    base_cell* p = it->second;
+    assert(p);
+    if (p->get_celltype() != celltype_formula)
+        return NULL;
+
+    return static_cast<formula_cell*>(p);
+}
+
+string model_context_impl::get_cell_name(const base_cell* p) const
+{
+    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->second == p)
+            return get_name_resolver().get_name(itr->first, abs_address_t(), false);
+    }
+
+    // Cell not found.  Return an empty string.
+    return string();
+}
+
+abs_address_t model_context_impl::get_cell_position(const base_cell* p) const
+{
+    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->second == p)
+            return itr->first;
+    }
+
+    throw general_error("cell instance not found");
+}
+
 model_context::shared_tokens::shared_tokens() : tokens(NULL) {}
 model_context::shared_tokens::shared_tokens(formula_tokens_t* _tokens) : tokens(_tokens) {}
 model_context::shared_tokens::shared_tokens(const shared_tokens& r) : tokens(r.tokens), range(r.range) {}
@@ -432,138 +589,62 @@ cell_listener_tracker& model_context::get_cell_listener_tracker()
 
 void model_context::erase_cell(const abs_address_t& addr)
 {
-    cell_store_type::iterator itr = m_cells.find(addr);
-    if (itr == m_cells.end())
-        return;
-
-    const base_cell& cell = *itr->second;
-    if (cell.get_celltype() == celltype_formula)
-        remove_formula_tokens(addr.sheet, cell.get_identifier());
-
-    m_cells.erase(itr);
+    mp_impl->erase_cell(addr);
 }
 
 void model_context::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    erase_cell(addr);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, new numeric_cell(val));
+    mp_impl->set_numeric_cell(addr, val);
 }
 
 void model_context::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
-    erase_cell(addr);
-    size_t str_id = add_string(p, n);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, new string_cell(str_id));
+    mp_impl->set_string_cell(addr, p, n);
 }
 
 void model_context::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
 {
-    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(*this, addr, p, n, *tokens);
-    unique_ptr<formula_cell> fcell(new formula_cell);
-    if (!set_shared_formula_tokens_to_cell(*this, addr, *fcell, *tokens))
-    {
-        size_t tkid = add_formula_tokens(0, tokens.release());
-        fcell->set_identifier(tkid);
-    }
-
-    erase_cell(addr);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, fcell.release());
+    mp_impl->set_formula_cell(addr, p, n);
 }
 
 bool model_context::is_empty(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
-    return it == m_cells.end();
+    return mp_impl->is_empty(addr);
 }
 
 celltype_t model_context::get_celltype(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        throw general_error("empty cell");
-
-    return it->second->get_celltype();
+    return mp_impl->get_celltype(addr);
 }
 
 double model_context::get_numeric_value(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty cell has a value of 0.0.
-        return 0.0;
-
-    return it->second->get_value();
+    return mp_impl->get_numeric_value(addr);
 }
 
 size_t model_context::get_string_identifier(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty string for empty cell.
-        return empty_string_id;
-
-    const base_cell* p = it->second;
-    assert(p);
-    return p->get_celltype() == celltype_string ? p->get_identifier() : empty_string_id;
+    return mp_impl->get_string_identifier(addr);
 }
 
 const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty cell
-        return NULL;
-
-    const base_cell* p = it->second;
-    assert(p);
-    if (p->get_celltype() != celltype_formula)
-        return NULL;
-
-    return static_cast<const formula_cell*>(p);
+    return mp_impl->get_formula_cell(addr);
 }
 
 formula_cell* model_context::get_formula_cell(const abs_address_t& addr)
 {
-    cell_store_type::iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty cell
-        return NULL;
-
-    base_cell* p = it->second;
-    assert(p);
-    if (p->get_celltype() != celltype_formula)
-        return NULL;
-
-    return static_cast<formula_cell*>(p);
+    return mp_impl->get_formula_cell(addr);
 }
 
 string model_context::get_cell_name(const base_cell* p) const
 {
-    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (itr->second == p)
-            return get_name_resolver().get_name(itr->first, abs_address_t(), false);
-    }
-
-    // Cell not found.  Return an empty string.
-    return string();
+    return mp_impl->get_cell_name(p);
 }
 
 abs_address_t model_context::get_cell_position(const base_cell* p) const
 {
-    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (itr->second == p)
-            return itr->first;
-    }
-
-    throw general_error("cell instance not found");
+    return mp_impl->get_cell_position(p);
 }
 
 matrix model_context::get_range_value(const abs_range_t& range) const

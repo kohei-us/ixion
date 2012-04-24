@@ -40,8 +40,6 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/unordered_map.hpp>
 
-#include <mdds/grid_map.hpp>
-
 namespace ixion {
 
 class session_handler;
@@ -59,8 +57,6 @@ class model_context_impl;
  */
 class IXION_DLLPUBLIC model_context : public iface::model_context
 {
-    typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
-
 public:
     struct shared_tokens
     {
@@ -131,7 +127,6 @@ public:
 
 private:
     model_context_impl* mp_impl;
-    cell_store_type m_cells; // TODO: This storage needs to be optimized.
 };
 
 }
