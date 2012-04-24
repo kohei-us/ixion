@@ -40,12 +40,15 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/unordered_map.hpp>
 
+#include <mdds/grid_map.hpp>
+
 namespace ixion {
 
 class session_handler;
 struct abs_address_t;
 struct config;
 class matrix;
+class model_context_impl;
 
 /**
  * This class stores all data relevant to current session.  You can think of
@@ -56,12 +59,7 @@ class matrix;
  */
 class IXION_DLLPUBLIC model_context : public iface::model_context
 {
-    typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
-    typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
-    typedef boost::ptr_vector<std::string> strings_type;
-    typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
-    typedef std::deque<abs_range_t> formula_token_range_type;
 
 public:
     struct shared_tokens
@@ -132,17 +130,8 @@ public:
     void set_session_handler(iface::session_handler* handler);
 
 private:
-    config* mp_config;
-    formula_name_resolver* mp_name_resolver;
-    cell_listener_tracker* mp_cell_listener_tracker;
-    iface::session_handler* mp_session_handler;
-    named_expressions_type m_named_expressions;
+    model_context_impl* mp_impl;
     cell_store_type m_cells; // TODO: This storage needs to be optimized.
-    formula_tokens_store_type m_tokens;
-    shared_tokens_type m_shared_tokens;
-    strings_type m_sheet_names; ///< index to sheet name map.
-    strings_type m_strings;
-    string_map_type m_string_map;
 };
 
 }

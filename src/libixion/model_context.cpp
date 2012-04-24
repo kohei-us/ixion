@@ -141,6 +141,263 @@ bool set_shared_formula_tokens_to_cell(
 
 }
 
+class model_context_impl
+{
+    typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
+    typedef boost::ptr_vector<std::string> strings_type;
+    typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
+    typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
+
+    typedef model_context::shared_tokens shared_tokens;
+    typedef model_context::shared_tokens_type shared_tokens_type;
+
+public:
+    model_context_impl(model_context& parent) :
+        mp_config(new config),
+        mp_name_resolver(new formula_name_resolver_a1),
+        mp_cell_listener_tracker(new cell_listener_tracker(parent)),
+        mp_session_handler(new session_handler(parent))
+    {
+        // For convenience, string ID of 0 is associated with an empty string.
+        m_strings.push_back(new std::string);
+        m_string_map.insert(string_map_type::value_type(mem_str_buf(), 0));
+    }
+
+    ~model_context_impl()
+    {
+        delete mp_config;
+        delete mp_name_resolver;
+        delete mp_cell_listener_tracker;
+        delete mp_session_handler;
+
+        for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
+        for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_shared_tokens());
+    }
+
+    const config& get_config() const
+    {
+        return *mp_config;
+    }
+
+    const formula_name_resolver& get_name_resolver() const
+    {
+        return *mp_name_resolver;
+    }
+
+    cell_listener_tracker& get_cell_listener_tracker()
+    {
+        return *mp_cell_listener_tracker;
+    }
+
+    iface::session_handler* get_session_handler() const
+    {
+        return mp_session_handler;
+    }
+
+    void set_session_handler(iface::session_handler* handler)
+    {
+        delete mp_session_handler;
+        mp_session_handler = handler;
+    }
+
+    void set_named_expression(const char* p, size_t n, formula_cell* cell);
+    formula_cell* get_named_expression(const string& name);
+    const formula_cell* get_named_expression(const string& name) const;
+    const string* get_named_expression_name(const formula_cell* expr) const;
+    sheet_t get_sheet_index(const char* p, size_t n) const;
+    std::string get_sheet_name(sheet_t sheet) const;
+    void append_sheet_name(const char* p, size_t n);
+
+    size_t add_string(const char* p, size_t n);
+    const std::string* get_string(size_t identifier) const;
+    const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
+    size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
+    void remove_formula_tokens(sheet_t sheet, size_t identifier);
+    const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
+    size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
+    abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
+    void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
+
+private:
+    config* mp_config;
+    formula_name_resolver* mp_name_resolver;
+    cell_listener_tracker* mp_cell_listener_tracker;
+    iface::session_handler* mp_session_handler;
+    named_expressions_type m_named_expressions;
+
+    formula_tokens_store_type m_tokens;
+    model_context::shared_tokens_type m_shared_tokens;
+    strings_type m_sheet_names; ///< index to sheet name map.
+    strings_type m_strings;
+    string_map_type m_string_map;
+};
+
+void model_context_impl::set_named_expression(const char* p, size_t n, formula_cell* cell)
+{
+    string name(p, n);
+    m_named_expressions.insert(name, cell);
+}
+
+formula_cell* model_context_impl::get_named_expression(const string& name)
+{
+    named_expressions_type::iterator itr = m_named_expressions.find(name);
+    return itr == m_named_expressions.end() ? NULL : itr->second;
+}
+
+const formula_cell* model_context_impl::get_named_expression(const string& name) const
+{
+    named_expressions_type::const_iterator itr = m_named_expressions.find(name);
+    return itr == m_named_expressions.end() ? NULL : itr->second;
+}
+
+const string* model_context_impl::get_named_expression_name(const formula_cell* expr) const
+{
+    named_expressions_type::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (itr->second == expr)
+            return &itr->first;
+    }
+    return NULL;
+}
+
+sheet_t model_context_impl::get_sheet_index(const char* p, size_t n) const
+{
+    strings_type::const_iterator itr_beg = m_sheet_names.begin(), itr_end = m_sheet_names.end();
+    for (strings_type::const_iterator itr = itr_beg; itr != itr_end; ++itr)
+    {
+        const std::string& s = *itr;
+        if (s.empty())
+            continue;
+
+        mem_str_buf s1(&s[0], s.size()), s2(p, n);
+        if (s1 == s2)
+            return static_cast<sheet_t>(std::distance(itr_beg, itr));
+    }
+    return invalid_sheet;
+}
+
+std::string model_context_impl::get_sheet_name(sheet_t sheet) const
+{
+    if (m_sheet_names.size() <= static_cast<size_t>(sheet))
+        return std::string();
+
+    return m_sheet_names[sheet];
+}
+
+void model_context_impl::append_sheet_name(const char* p, size_t n)
+{
+    m_sheet_names.push_back(new string(p, n));
+}
+
+size_t model_context_impl::add_string(const char* p, size_t n)
+{
+    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
+    if (itr != m_string_map.end())
+        return itr->second;
+
+    size_t str_id = m_strings.size();
+    std::auto_ptr<string> ps(new string(p, n));
+    p = &(*ps)[0];
+    mem_str_buf key(p, n);
+    m_strings.push_back(ps);
+    m_string_map.insert(string_map_type::value_type(key, str_id));
+    return str_id;
+}
+
+const std::string* model_context_impl::get_string(size_t identifier) const
+{
+    if (identifier >= m_strings.size())
+        return NULL;
+
+    return &m_strings[identifier];
+}
+
+const formula_tokens_t* model_context_impl::get_formula_tokens(sheet_t sheet, size_t identifier) const
+{
+    if (m_tokens.size() <= identifier)
+        return NULL;
+    return m_tokens[identifier];
+}
+
+size_t model_context_impl::add_formula_tokens(sheet_t sheet, formula_tokens_t* p)
+{
+    // First, search for a NULL spot.
+    formula_tokens_store_type::iterator itr = std::find(
+        m_tokens.begin(), m_tokens.end(), static_cast<formula_tokens_t*>(NULL));
+
+    if (itr != m_tokens.end())
+    {
+        // NULL spot found.
+        size_t pos = std::distance(m_tokens.begin(), itr);
+        m_tokens[pos] = p;
+        return pos;
+    }
+
+    size_t identifier = m_tokens.size();
+    m_tokens.push_back(p);
+    return identifier;
+}
+
+void model_context_impl::remove_formula_tokens(sheet_t sheet, size_t identifier)
+{
+    if (m_tokens.size() >= identifier)
+        return;
+
+    delete m_tokens[identifier];
+    m_tokens[identifier] = NULL;
+}
+
+const formula_tokens_t* model_context_impl::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
+{
+#if DEBUG_MODEL_CONTEXT
+    __IXION_DEBUG_OUT__ << "identifier: " << identifier << "  shared token count: " << m_shared_tokens.size() << endl;
+#endif
+    if (m_shared_tokens.size() <= identifier)
+        return NULL;
+
+#if DEBUG_MODEL_CONTEXT
+    __IXION_DEBUG_OUT__ << "tokens: " << m_shared_tokens[identifier].tokens << endl;
+#endif
+    return m_shared_tokens[identifier].tokens;
+}
+
+size_t model_context_impl::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
+{
+    assert(identifier < m_tokens.size());
+    formula_tokens_t* tokens = m_tokens.at(identifier);
+    assert(tokens);
+    m_tokens[identifier] = NULL;
+
+    // First, search for a NULL spot.
+    shared_tokens_type::iterator itr = std::find_if(
+        m_shared_tokens.begin(), m_shared_tokens.end(),
+        find_tokens_by_pointer(static_cast<const formula_tokens_t*>(NULL)));
+
+    if (itr != m_shared_tokens.end())
+    {
+        // NULL spot found.
+        size_t pos = std::distance(m_shared_tokens.begin(), itr);
+        m_shared_tokens[pos].tokens = tokens;
+        return pos;
+    }
+
+    size_t shared_identifier = m_shared_tokens.size();
+    m_shared_tokens.push_back(shared_tokens(tokens));
+    return shared_identifier;
+}
+
+abs_range_t model_context_impl::get_shared_formula_range(sheet_t sheet, size_t identifier) const
+{
+    assert(identifier < m_shared_tokens.size());
+    return m_shared_tokens.at(identifier).range;
+}
+
+void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
+{
+    m_shared_tokens.at(identifier).range = range;
+}
+
 model_context::shared_tokens::shared_tokens() : tokens(NULL) {}
 model_context::shared_tokens::shared_tokens(formula_tokens_t* _tokens) : tokens(_tokens) {}
 model_context::shared_tokens::shared_tokens(const shared_tokens& r) : tokens(r.tokens), range(r.range) {}
@@ -151,40 +408,26 @@ bool model_context::shared_tokens::operator== (const shared_tokens& r) const
 }
 
 model_context::model_context() :
-    mp_config(new config),
-    mp_name_resolver(new formula_name_resolver_a1),
-    mp_cell_listener_tracker(new cell_listener_tracker(*this)),
-    mp_session_handler(new session_handler(*this))
-{
-    // For convenience, string ID of 0 is associated with an empty string.
-    m_strings.push_back(new std::string);
-    m_string_map.insert(string_map_type::value_type(mem_str_buf(), 0));
-}
+    mp_impl(new model_context_impl(*this)) {}
 
 model_context::~model_context()
 {
-    delete mp_config;
-    delete mp_name_resolver;
-    delete mp_cell_listener_tracker;
-    delete mp_session_handler;
-
-    for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
-    for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_shared_tokens());
+    delete mp_impl;
 }
 
 const config& model_context::get_config() const
 {
-    return *mp_config;
+    return mp_impl->get_config();
 }
 
 const formula_name_resolver& model_context::get_name_resolver() const
 {
-    return *mp_name_resolver;
+    return mp_impl->get_name_resolver();
 }
 
 cell_listener_tracker& model_context::get_cell_listener_tracker()
 {
-    return *mp_cell_listener_tracker;
+    return mp_impl->get_cell_listener_tracker();
 }
 
 void model_context::erase_cell(const abs_address_t& addr)
@@ -349,179 +592,92 @@ matrix model_context::get_range_value(const abs_range_t& range) const
 
 iface::session_handler* model_context::get_session_handler() const
 {
-    return mp_session_handler;
+    return mp_impl->get_session_handler();
 }
 
 const formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier) const
 {
-    if (m_tokens.size() <= identifier)
-        return NULL;
-    return m_tokens[identifier];
+    return mp_impl->get_formula_tokens(sheet, identifier);
 }
 
 size_t model_context::add_formula_tokens(sheet_t sheet, formula_tokens_t* p)
 {
-    // First, search for a NULL spot.
-    formula_tokens_store_type::iterator itr = std::find(
-        m_tokens.begin(), m_tokens.end(), static_cast<formula_tokens_t*>(NULL));
-
-    if (itr != m_tokens.end())
-    {
-        // NULL spot found.
-        size_t pos = std::distance(m_tokens.begin(), itr);
-        m_tokens[pos] = p;
-        return pos;
-    }
-
-    size_t identifier = m_tokens.size();
-    m_tokens.push_back(p);
-    return identifier;
+    return mp_impl->add_formula_tokens(sheet, p);
 }
 
 void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
 {
-    if (m_tokens.size() >= identifier)
-        return;
-
-    delete m_tokens[identifier];
-    m_tokens[identifier] = NULL;
+    mp_impl->remove_formula_tokens(sheet, identifier);
 }
 
 const formula_tokens_t* model_context::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
 {
-#if DEBUG_MODEL_CONTEXT
-    __IXION_DEBUG_OUT__ << "identifier: " << identifier << "  shared token count: " << m_shared_tokens.size() << endl;
-#endif
-    if (m_shared_tokens.size() <= identifier)
-        return NULL;
-
-#if DEBUG_MODEL_CONTEXT
-    __IXION_DEBUG_OUT__ << "tokens: " << m_shared_tokens[identifier].tokens << endl;
-#endif
-    return m_shared_tokens[identifier].tokens;
+    return mp_impl->get_shared_formula_tokens(sheet, identifier);
 }
 
 size_t model_context::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
 {
-    assert(identifier < m_tokens.size());
-    formula_tokens_t* tokens = m_tokens.at(identifier);
-    assert(tokens);
-    m_tokens[identifier] = NULL;
-
-    // First, search for a NULL spot.
-    shared_tokens_type::iterator itr = std::find_if(
-        m_shared_tokens.begin(), m_shared_tokens.end(),
-        find_tokens_by_pointer(static_cast<const formula_tokens_t*>(NULL)));
-
-    if (itr != m_shared_tokens.end())
-    {
-        // NULL spot found.
-        size_t pos = std::distance(m_shared_tokens.begin(), itr);
-        m_shared_tokens[pos].tokens = tokens;
-        return pos;
-    }
-
-    size_t shared_identifier = m_shared_tokens.size();
-    m_shared_tokens.push_back(shared_tokens(tokens));
-    return shared_identifier;
+    return mp_impl->set_formula_tokens_shared(sheet, identifier);
 }
 
 abs_range_t model_context::get_shared_formula_range(sheet_t sheet, size_t identifier) const
 {
-    assert(identifier < m_shared_tokens.size());
-    return m_shared_tokens.at(identifier).range;
+    return mp_impl->get_shared_formula_range(sheet, identifier);
 }
 
 void model_context::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
 {
-    m_shared_tokens.at(identifier).range = range;
+    return mp_impl->set_shared_formula_range(sheet, identifier, range);
 }
 
 size_t model_context::add_string(const char* p, size_t n)
 {
-    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
-    if (itr != m_string_map.end())
-        return itr->second;
-
-    size_t str_id = m_strings.size();
-    std::auto_ptr<string> ps(new string(p, n));
-    p = &(*ps)[0];
-    mem_str_buf key(p, n);
-    m_strings.push_back(ps);
-    m_string_map.insert(string_map_type::value_type(key, str_id));
-    return str_id;
+    return mp_impl->add_string(p, n);
 }
 
 const std::string* model_context::get_string(size_t identifier) const
 {
-    if (identifier >= m_strings.size())
-        return NULL;
-
-    return &m_strings[identifier];
+    return mp_impl->get_string(identifier);
 }
 
 sheet_t model_context::get_sheet_index(const char* p, size_t n) const
 {
-    strings_type::const_iterator itr_beg = m_sheet_names.begin(), itr_end = m_sheet_names.end();
-    for (strings_type::const_iterator itr = itr_beg; itr != itr_end; ++itr)
-    {
-        const std::string& s = *itr;
-        if (s.empty())
-            continue;
-
-        mem_str_buf s1(&s[0], s.size()), s2(p, n);
-        if (s1 == s2)
-            return static_cast<sheet_t>(std::distance(itr_beg, itr));
-    }
-    return invalid_sheet;
+    return mp_impl->get_sheet_index(p, n);
 }
 
 std::string model_context::get_sheet_name(sheet_t sheet) const
 {
-    if (m_sheet_names.size() <= static_cast<size_t>(sheet))
-        return std::string();
-
-    return m_sheet_names[sheet];
+    return mp_impl->get_sheet_name(sheet);
 }
 
 void model_context::set_named_expression(const char* p, size_t n, formula_cell* cell)
 {
-    string name(p, n);
-    m_named_expressions.insert(name, cell);
+    mp_impl->set_named_expression(p, n, cell);
 }
 
 formula_cell* model_context::get_named_expression(const string& name)
 {
-    named_expressions_type::iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? NULL : itr->second;
+    return mp_impl->get_named_expression(name);
 }
 
 const formula_cell* model_context::get_named_expression(const string& name) const
 {
-    named_expressions_type::const_iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? NULL : itr->second;
+    return mp_impl->get_named_expression(name);
 }
 
 const string* model_context::get_named_expression_name(const formula_cell* expr) const
 {
-    named_expressions_type::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (itr->second == expr)
-            return &itr->first;
-    }
-    return NULL;
+    return mp_impl->get_named_expression_name(expr);
 }
 
 void model_context::append_sheet_name(const char* p, size_t n)
 {
-    m_sheet_names.push_back(new string(p, n));
+    mp_impl->append_sheet_name(p, n);
 }
 
 void model_context::set_session_handler(iface::session_handler* handler)
 {
-    delete mp_session_handler;
-    mp_session_handler = handler;
+    mp_impl->set_session_handler(handler);
 }
 
 }
