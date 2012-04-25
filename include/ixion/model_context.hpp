@@ -42,7 +42,6 @@
 
 namespace ixion {
 
-class session_handler;
 struct abs_address_t;
 struct config;
 class matrix;
