@@ -283,6 +283,7 @@
 				<F N="../src/libixion/formula_tokens.cpp"/>
 				<F N="../src/libixion/function_objects.cpp"/>
 				<F N="../src/libixion/global.cpp"/>
+				<F N="../src/libixion/grid_map_trait.hpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
 				<F
 					N="../src/libixion/Makefile.am"

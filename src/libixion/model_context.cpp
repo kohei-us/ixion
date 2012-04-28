@@ -33,6 +33,8 @@
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula.hpp"
 
+#include "grid_map_trait.hpp"
+
 #include <memory>
 
 #include <mdds/grid_map.hpp>
@@ -145,7 +147,8 @@ bool set_shared_formula_tokens_to_cell(
 
 class model_context_impl
 {
-    typedef boost::ptr_map<abs_address_t, base_cell> cell_store_type;
+    typedef mdds::grid_map<ixion::grid_map_trait> cell_store_type;
+    typedef boost::ptr_map<abs_address_t, base_cell> old_cell_store_type;
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
@@ -238,7 +241,7 @@ public:
 private:
     model_context& m_parent;
 
-    cell_store_type m_cells; // TODO: This storage needs to be optimized.
+    old_cell_store_type m_cells; // TODO: This storage needs to be optimized.
 
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
@@ -421,7 +424,7 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
 {
-    cell_store_type::iterator itr = m_cells.find(addr);
+    old_cell_store_type::iterator itr = m_cells.find(addr);
     if (itr == m_cells.end())
         return;
 
@@ -465,13 +468,13 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
 
 bool model_context_impl::is_empty(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
+    old_cell_store_type::const_iterator it = m_cells.find(addr);
     return it == m_cells.end();
 }
 
 celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
+    old_cell_store_type::const_iterator it = m_cells.find(addr);
     if (it == m_cells.end())
         throw general_error("empty cell");
 
@@ -480,7 +483,7 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
+    old_cell_store_type::const_iterator it = m_cells.find(addr);
     if (it == m_cells.end())
         // empty cell has a value of 0.0.
         return 0.0;
@@ -490,7 +493,7 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 
 size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
+    old_cell_store_type::const_iterator it = m_cells.find(addr);
     if (it == m_cells.end())
         // empty string for empty cell.
         return empty_string_id;
@@ -502,7 +505,7 @@ size_t model_context_impl::get_string_identifier(const abs_address_t& addr) cons
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
-    cell_store_type::const_iterator it = m_cells.find(addr);
+    old_cell_store_type::const_iterator it = m_cells.find(addr);
     if (it == m_cells.end())
         // empty cell
         return NULL;
@@ -517,7 +520,7 @@ const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& ad
 
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
-    cell_store_type::iterator it = m_cells.find(addr);
+    old_cell_store_type::iterator it = m_cells.find(addr);
     if (it == m_cells.end())
         // empty cell
         return NULL;
@@ -532,7 +535,7 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 
 string model_context_impl::get_cell_name(const base_cell* p) const
 {
-    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    old_cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
     for (; itr != itr_end; ++itr)
     {
         if (itr->second == p)
@@ -545,7 +548,7 @@ string model_context_impl::get_cell_name(const base_cell* p) const
 
 abs_address_t model_context_impl::get_cell_position(const base_cell* p) const
 {
-    cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
+    old_cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
     for (; itr != itr_end; ++itr)
     {
         if (itr->second == p)
