@@ -29,8 +29,79 @@
 #define __IXION_GRID_MAP_TRAIT_HPP__
 
 #include "ixion/types.hpp"
+#include "ixion/cell.hpp"
 
 #include <mdds/grid_map_trait.hpp>
+
+namespace mdds { namespace gridmap {
+
+const mdds::gridmap::cell_t celltype_formula = mdds::gridmap::celltype_user_start;
+
+typedef mdds::gridmap::managed_cell_block<celltype_formula, ixion::formula_cell> formula_cell_block;
+
+cell_t get_cell_type(const ixion::formula_cell*)
+{
+    return celltype_formula;
+}
+
+void set_value(base_cell_block& block, size_t pos, ixion::formula_cell* p)
+{
+    formula_cell_block::set_value(block, pos, p);
+}
+
+template<typename _Iter>
+void set_values(
+    base_cell_block& block, size_t pos, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+{
+    formula_cell_block::set_values(block, pos, it_begin, it_end);
+}
+
+void get_value(const base_cell_block& block, size_t pos, ixion::formula_cell*& val)
+{
+    formula_cell_block::get_value(block, pos, val);
+}
+
+void append_value(base_cell_block& block, ixion::formula_cell* val)
+{
+    formula_cell_block::append_value(block, val);
+}
+
+void prepend_value(base_cell_block& block, ixion::formula_cell* val)
+{
+    formula_cell_block::prepend_value(block, val);
+}
+
+template<typename _Iter>
+void append_values(mdds::gridmap::base_cell_block& block, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+{
+    formula_cell_block::append_values(block, it_begin, it_end);
+}
+
+template<typename _Iter>
+void prepend_values(mdds::gridmap::base_cell_block& block, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+{
+    formula_cell_block::prepend_values(block, it_begin, it_end);
+}
+
+template<typename _Iter>
+void assign_values(mdds::gridmap::base_cell_block& dest, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+{
+    formula_cell_block::assign_values(dest, it_begin, it_end);
+}
+
+template<typename _Iter>
+void insert_values(
+    mdds::gridmap::base_cell_block& block, size_t pos, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+{
+    formula_cell_block::insert_values(block, pos, it_begin, it_end);
+}
+
+void get_empty_value(ixion::formula_cell*& val)
+{
+    val = NULL;
+}
+
+}}
 
 namespace ixion {
 
