@@ -83,10 +83,18 @@ bool set_shared_formula_tokens_to_cell(
 
     abs_address_t test = addr;
     test.row -= 1;
+    if (cxt.is_empty(test))
+        // The neighboring cell is empty.
+        return false;
+
+    if (cxt.get_celltype(test) != celltype_formula)
+        // The neighboring cell is not a formula cell.
+        return false;
+
     formula_cell* test_cell = cxt.get_formula_cell(test);
     if (!test_cell)
         // The neighboring cell is not a formula cell.
-        return false;
+        throw general_error("formula cell doesn't exist but it should!");
 
     if (test_cell->is_shared())
     {
