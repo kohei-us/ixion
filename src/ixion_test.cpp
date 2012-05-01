@@ -264,6 +264,33 @@ formula_cell* insert_formula(model_context& cxt, const abs_address_t& pos, const
     return p;
 }
 
+void test_model_context_storage()
+{
+    cout << "test model context storage" << endl;
+    model_context cxt;
+    cxt.set_session_handler(NULL);
+
+    // Test storage of numeric values.
+    double val = 0.1;
+    for (col_t col = 0; col < 3; ++col)
+    {
+        for (row_t row = 0; row < 3; ++row)
+        {
+            abs_address_t pos(0, row, col);
+            cxt.set_numeric_cell(pos, val);
+            double test = cxt.get_numeric_value(pos);
+            assert(test == val);
+            val += 0.2;
+        }
+    }
+
+    // Test formula cells.
+    abs_address_t pos(0,3,0);
+    const char* exp = "SUM(1,2,3)";
+    cxt.set_formula_cell(pos, exp, strlen(exp));
+    formula_cell* p = cxt.get_formula_cell(pos);
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -344,6 +371,7 @@ int main()
     test_address();
     test_parse_and_print_expressions();
     test_function_name_resolution();
+    test_model_context_storage();
     test_volatile_function();
     return EXIT_SUCCESS;
 }
