@@ -148,7 +148,6 @@ bool set_shared_formula_tokens_to_cell(
 class model_context_impl
 {
     typedef mdds::grid_map<ixion::grid_map_trait> cell_store_type;
-    typedef boost::ptr_map<abs_address_t, base_cell> old_cell_store_type;
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
@@ -160,6 +159,7 @@ class model_context_impl
 public:
     model_context_impl(model_context& parent) :
         m_parent(parent),
+        m_sheets(3, 1048576, 1024),
         mp_config(new config),
         mp_name_resolver(new formula_name_resolver_a1),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
@@ -241,7 +241,7 @@ public:
 private:
     model_context& m_parent;
 
-    old_cell_store_type m_cells; // TODO: This storage needs to be optimized.
+    cell_store_type m_sheets;
 
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
@@ -424,30 +424,26 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
 {
-    old_cell_store_type::iterator itr = m_cells.find(addr);
-    if (itr == m_cells.end())
-        return;
+    mdds::gridmap::cell_t celltype = m_sheets.get_type(addr.sheet, addr.column, addr.row);
+    if (celltype == mdds::gridmap::celltype_formula)
+    {
+        const formula_cell* fcell = m_sheets.get_cell<formula_cell*>(addr.sheet, addr.column, addr.row);
+        assert(fcell);
+        remove_formula_tokens(addr.sheet, fcell->get_identifier());
+    }
 
-    const base_cell& cell = *itr->second;
-    if (cell.get_celltype() == celltype_formula)
-        remove_formula_tokens(addr.sheet, cell.get_identifier());
-
-    m_cells.erase(itr);
+    m_sheets.set_empty(addr.sheet, addr.column, addr.row, addr.row);
 }
 
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    erase_cell(addr);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, new numeric_cell(val));
+    m_sheets.set_cell(addr.sheet, addr.column, addr.row, val);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
-    erase_cell(addr);
     size_t str_id = add_string(p, n);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, new string_cell(str_id));
+    m_sheets.set_cell(addr.sheet, addr.column, addr.row, str_id);
 }
 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
@@ -461,101 +457,71 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
         fcell->set_identifier(tkid);
     }
 
-    erase_cell(addr);
-    abs_address_t addr2(addr);
-    m_cells.insert(addr2, fcell.release());
+    m_sheets.set_cell(addr.sheet, addr.column, addr.row, fcell.release());
 }
 
 bool model_context_impl::is_empty(const abs_address_t& addr) const
 {
-    old_cell_store_type::const_iterator it = m_cells.find(addr);
-    return it == m_cells.end();
+    return m_sheets.is_empty(addr.sheet, addr.column, addr.row);
 }
 
 celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
-    old_cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        throw general_error("empty cell");
+    mdds::gridmap::cell_t gmcell_type = m_sheets.get_type(addr.sheet, addr.column, addr.row);
+    switch (gmcell_type)
+    {
+        case mdds::gridmap::celltype_empty:
+            throw general_error("empty cell");
+        case mdds::gridmap::celltype_numeric:
+            return celltype_numeric;
+        case mdds::gridmap::celltype_index:
+            return celltype_string;
+        case mdds::gridmap::celltype_formula:
+            return celltype_formula;
+        default:
+            throw general_error("unknown cell type");
+    }
 
-    return it->second->get_celltype();
+    return celltype_unknown;
 }
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
-    old_cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty cell has a value of 0.0.
-        return 0.0;
-
-    return it->second->get_value();
+    return m_sheets.get_cell<double>(addr.sheet, addr.column, addr.row);
 }
 
 size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
-    old_cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty string for empty cell.
+    if (m_sheets.is_empty(addr.sheet, addr.column, addr.row))
         return empty_string_id;
 
-    const base_cell* p = it->second;
-    assert(p);
-    return p->get_celltype() == celltype_string ? p->get_identifier() : empty_string_id;
+    return m_sheets.get_cell<size_t>(addr.sheet, addr.column, addr.row);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
-    old_cell_store_type::const_iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty cell
+    if (m_sheets.is_empty(addr.sheet, addr.column, addr.row))
         return NULL;
 
-    const base_cell* p = it->second;
-    assert(p);
-    if (p->get_celltype() != celltype_formula)
-        return NULL;
-
-    return static_cast<const formula_cell*>(p);
+    return m_sheets.get_cell<formula_cell*>(addr.sheet, addr.column, addr.row);
 }
 
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
-    old_cell_store_type::iterator it = m_cells.find(addr);
-    if (it == m_cells.end())
-        // empty cell
+    if (m_sheets.is_empty(addr.sheet, addr.column, addr.row))
         return NULL;
 
-    base_cell* p = it->second;
-    assert(p);
-    if (p->get_celltype() != celltype_formula)
-        return NULL;
-
-    return static_cast<formula_cell*>(p);
+    return m_sheets.get_cell<formula_cell*>(addr.sheet, addr.column, addr.row);
 }
 
 string model_context_impl::get_cell_name(const base_cell* p) const
 {
-    old_cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (itr->second == p)
-            return get_name_resolver().get_name(itr->first, abs_address_t(), false);
-    }
-
-    // Cell not found.  Return an empty string.
-    return string();
+    return string("fix get_cell_name");
 }
 
 abs_address_t model_context_impl::get_cell_position(const base_cell* p) const
 {
-    old_cell_store_type::const_iterator itr = m_cells.begin(), itr_end = m_cells.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (itr->second == p)
-            return itr->first;
-    }
-
-    throw general_error("cell instance not found");
+    throw general_error("fix get_cell_position");
 }
 
 model_context::shared_tokens::shared_tokens() : tokens(NULL) {}

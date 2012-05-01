@@ -101,7 +101,7 @@ void get_empty_value(ixion::formula_cell*& val)
     val = NULL;
 }
 
-struct ixon_cell_block_func : public mdds::gridmap::cell_block_func_base
+struct ixion_cell_block_func : public mdds::gridmap::cell_block_func_base
 {
     template<typename T>
     static mdds::gridmap::cell_t get_cell_type(const T& cell)
@@ -346,7 +346,7 @@ struct grid_map_trait
     typedef row_t row_key_type;
     typedef col_t col_key_type;
 
-    typedef mdds::gridmap::cell_block_func cell_block_func;
+    typedef mdds::gridmap::ixion_cell_block_func cell_block_func;
 };
 
 }
