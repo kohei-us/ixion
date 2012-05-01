@@ -432,26 +432,30 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
 {
-    mdds::gridmap::cell_t celltype = m_sheets.get_type(addr.sheet, addr.column, addr.row);
+    cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+
+    mdds::gridmap::cell_t celltype = col_store.get_type(addr.row);
     if (celltype == mdds::gridmap::celltype_formula)
     {
-        const formula_cell* fcell = m_sheets.get_cell<formula_cell*>(addr.sheet, addr.column, addr.row);
+        const formula_cell* fcell = col_store.get_cell<formula_cell*>(addr.row);
         assert(fcell);
         remove_formula_tokens(addr.sheet, fcell->get_identifier());
     }
 
-    m_sheets.set_empty(addr.sheet, addr.column, addr.row, addr.row);
+    col_store.set_empty(addr.row, addr.row);
 }
 
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    m_sheets.set_cell(addr.sheet, addr.column, addr.row, val);
+    cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    col_store.set_cell(addr.row, val);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     size_t str_id = add_string(p, n);
-    m_sheets.set_cell(addr.sheet, addr.column, addr.row, str_id);
+    cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    col_store.set_cell(addr.row, str_id);
 }
 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
@@ -465,17 +469,20 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
         fcell->set_identifier(tkid);
     }
 
-    m_sheets.set_cell(addr.sheet, addr.column, addr.row, fcell.release());
+    cell_store_type::column_type& col_store =
+        m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    col_store.set_cell(addr.row, fcell.release());
 }
 
 bool model_context_impl::is_empty(const abs_address_t& addr) const
 {
-    return m_sheets.is_empty(addr.sheet, addr.column, addr.row);
+    return m_sheets.get_sheet(addr.sheet).get_column(addr.column).is_empty(addr.row);
 }
 
 celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
-    mdds::gridmap::cell_t gmcell_type = m_sheets.get_type(addr.sheet, addr.column, addr.row);
+    mdds::gridmap::cell_t gmcell_type =
+        m_sheets.get_sheet(addr.sheet).get_column(addr.column).get_type(addr.row);
     switch (gmcell_type)
     {
         case mdds::gridmap::celltype_empty:
@@ -495,31 +502,34 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
-    return m_sheets.get_cell<double>(addr.sheet, addr.column, addr.row);
+    return m_sheets.get_sheet(addr.sheet).get_column(addr.column).get_cell<double>(addr.row);
 }
 
 size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
-    if (m_sheets.is_empty(addr.sheet, addr.column, addr.row))
+    const cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    if (col_store.is_empty(addr.row))
         return empty_string_id;
 
-    return m_sheets.get_cell<size_t>(addr.sheet, addr.column, addr.row);
+    return col_store.get_cell<size_t>(addr.row);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
-    if (m_sheets.is_empty(addr.sheet, addr.column, addr.row))
+    const cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    if (col_store.is_empty(addr.row))
         return NULL;
 
-    return m_sheets.get_cell<formula_cell*>(addr.sheet, addr.column, addr.row);
+    return col_store.get_cell<formula_cell*>(addr.row);
 }
 
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
-    if (m_sheets.is_empty(addr.sheet, addr.column, addr.row))
+    cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    if (col_store.is_empty(addr.row))
         return NULL;
 
-    return m_sheets.get_cell<formula_cell*>(addr.sheet, addr.column, addr.row);
+    return col_store.get_cell<formula_cell*>(addr.row);
 }
 
 string model_context_impl::get_cell_name(const base_cell* p) const
