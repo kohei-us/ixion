@@ -28,8 +28,9 @@
 #ifndef __IXION_TYPES_HPP__
 #define __IXION_TYPES_HPP__
 
-#include "ixion/hash_container/set.hpp"
 #include "ixion/env.hpp"
+
+#include <cstdlib>
 
 namespace ixion {
 
@@ -41,14 +42,6 @@ IXION_DLLPUBLIC extern const sheet_t global_scope;
 IXION_DLLPUBLIC extern const sheet_t invalid_sheet;
 
 IXION_DLLPUBLIC extern const size_t empty_string_id;
-
-class formula_cell;
-
-/**
- * Dirty cells are those formula cells that have been modified or formula
- * cells that reference other modified cells.
- */
-typedef _ixion_unordered_set_type<formula_cell*> dirty_cells_t;
 
 enum celltype_t
 {

@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2010, 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,15 +39,16 @@
 
 namespace ixion {
 
-template<typename _ValueType, typename _CellHandlerType>
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
 class depth_first_search
 {
 public:
     typedef _ValueType          value_type;
     typedef _CellHandlerType    cell_handler_type;
+    typedef _ValueHashType      value_hash_type;
 
 private:
-    typedef _ixion_unordered_map_type<value_type, size_t> cell_index_map_type;
+    typedef _ixion_unordered_map_type<value_type, size_t, value_hash_type> cell_index_map_type;
 
     enum cell_color_type { white, gray, black };
 
@@ -105,7 +106,7 @@ public:
     };
 
     depth_first_search(
-        const ::std::vector<value_type>& cells, 
+        const ::std::vector<value_type>& cells,
         const precedent_map_type& precedent_map, cell_handler_type& handler);
 
     void init();
@@ -126,8 +127,8 @@ private:
     ::std::vector<node_data> m_cells;
 };
 
-template<typename _ValueType, typename _CellHandlerType>
-depth_first_search<_ValueType,_CellHandlerType>::depth_first_search(
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::depth_first_search(
     const ::std::vector<value_type>& cells,
     const precedent_map_type& precedent_map, cell_handler_type& handler) :
     m_precedent_map(precedent_map),
@@ -136,7 +137,7 @@ depth_first_search<_ValueType,_CellHandlerType>::depth_first_search(
     m_time_stamp(0),
     m_cells(m_cell_count)
 {
-    typename ::std::vector<value_type>::const_iterator 
+    typename ::std::vector<value_type>::const_iterator
         itr = cells.begin(), itr_end = cells.end();
 
     // Construct cell node to index mapping.
@@ -145,11 +146,11 @@ depth_first_search<_ValueType,_CellHandlerType>::depth_first_search(
             typename cell_index_map_type::value_type(*itr, index));
 }
 
-template<typename _ValueType, typename _CellHandlerType>
-void depth_first_search<_ValueType,_CellHandlerType>::init()
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::init()
 {
     ::std::vector<node_data> cells(m_cell_count);
-    typename cell_index_map_type::const_iterator 
+    typename cell_index_map_type::const_iterator
         itr = m_cell_indices.begin(), itr_end = m_cell_indices.end();
 
     // Now, construct index to cell node mapping.
@@ -159,8 +160,8 @@ void depth_first_search<_ValueType,_CellHandlerType>::init()
     m_time_stamp = 0;
 }
 
-template<typename _ValueType, typename _CellHandlerType>
-void depth_first_search<_ValueType,_CellHandlerType>::run()
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::run()
 {
     init();
     try
@@ -176,8 +177,8 @@ void depth_first_search<_ValueType,_CellHandlerType>::run()
     }
 }
 
-template<typename _ValueType, typename _CellHandlerType>
-void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_t cell_index)
 {
     value_type p = m_cells[cell_index].node;
     m_cells[cell_index].color = gray;
@@ -189,7 +190,7 @@ void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
         if (!depends)
             // No dependent cells.
             break;
-    
+
         typename precedent_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
         for (; itr != itr_end; ++itr)
         {
@@ -208,8 +209,8 @@ void depth_first_search<_ValueType,_CellHandlerType>::visit(size_t cell_index)
     m_handler(m_cells[cell_index].node);
 }
 
-template<typename _ValueType, typename _CellHandlerType>
-size_t depth_first_search<_ValueType,_CellHandlerType>::get_cell_index(value_type p) const
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+size_t depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_cell_index(value_type p) const
 {
     typename _ixion_unordered_map_type<value_type, size_t>::const_iterator itr = m_cell_indices.find(p);
     if (itr == m_cell_indices.end())
@@ -217,9 +218,9 @@ size_t depth_first_search<_ValueType,_CellHandlerType>::get_cell_index(value_typ
     return itr->second;
 }
 
-template<typename _ValueType, typename _CellHandlerType>
-const typename depth_first_search<_ValueType,_CellHandlerType>::precedent_cells_type*
-depth_first_search<_ValueType,_CellHandlerType>::get_precedent_cells(value_type cell)
+template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+const typename depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::precedent_cells_type*
+depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_precedent_cells(value_type cell)
 {
     typename precedent_map_type::const_iterator itr = m_precedent_map.find(cell);
     if (itr == m_precedent_map.end())

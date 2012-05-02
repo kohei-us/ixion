@@ -153,7 +153,7 @@ void model_parser::parse()
                 cout << get_formula_result_output_separator() << endl
                     << "recalculating" << endl;
 
-                get_all_dirty_cells(m_context, m_dirty_cell_addrs, m_dirty_cells);
+                get_all_dirty_cells(m_context, m_dirty_cells);
                 calculate_cells(m_context, m_dirty_cells, m_thread_count);
             }
             else if (buf_com.equals("check"))
@@ -181,7 +181,6 @@ void model_parser::parse()
             {
                 parse_mode = parse_mode_edit;
                 m_dirty_cells.clear();
-                m_dirty_cell_addrs.clear();
                 m_print_separator = true;
             }
             else
@@ -272,7 +271,7 @@ void model_parser::parse_init(const char*& p)
     }
 
     abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
-    m_dirty_cell_addrs.push_back(pos);
+//  m_dirty_cell_addrs.push_back(pos);
     unregister_formula_cell(m_context, pos);
 
     if (buf.empty())
@@ -294,7 +293,7 @@ void model_parser::parse_init(const char*& p)
             formula_cell* p = m_context.get_formula_cell(pos);
             assert(p);
             unregister_formula_cell(m_context, pos);
-            m_dirty_cells.insert(p);
+            m_dirty_cells.insert(pos);
             register_formula_cell(m_context, pos, p);
 #if DEBUG_MODEL_PARSER
             std::string s;

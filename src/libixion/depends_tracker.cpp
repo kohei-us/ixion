@@ -31,6 +31,7 @@
 #include "ixion/formula_interpreter.hpp"
 #include "ixion/cell_queue_manager.hpp"
 #include "ixion/hash_container/map.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 #include "ixion/interface/model_context.hpp"
 
@@ -46,14 +47,15 @@ namespace ixion {
 
 namespace {
 
-class cell_printer : public unary_function<const formula_cell*, void>
+class cell_printer : public unary_function<abs_address_t, void>
 {
 public:
     cell_printer(const iface::model_context& cxt) : m_cxt(cxt) {}
 
-    void operator() (const formula_cell* p) const
+    void operator() (const abs_address_t& cell) const
     {
-        __IXION_DEBUG_OUT__ << "  " << m_cxt.get_cell_name(p) << endl;
+        const ixion::formula_name_resolver& resolver = m_cxt.get_name_resolver();
+        __IXION_DEBUG_OUT__ << "  " << resolver.get_name(cell, false) << endl;
     }
 
 private:
@@ -64,41 +66,51 @@ private:
  * Function object to reset the status of formula cell to pre-interpretation
  * status.
  */
-struct cell_reset_handler : public unary_function<formula_cell*, void>
+class cell_reset_handler : public unary_function<abs_address_t, void>
 {
-    void operator() (formula_cell* p) const
+    iface::model_context& m_cxt;
+public:
+    cell_reset_handler(iface::model_context& cxt) : m_cxt(cxt) {}
+    void operator() (const abs_address_t& pos) const
     {
+        formula_cell* p = m_cxt.get_formula_cell(pos);
         p->reset();
     }
 };
 
-class circular_check_handler : public unary_function<formula_cell*, void>
+class circular_check_handler : public unary_function<abs_address_t, void>
 {
-    const iface::model_context& m_context;
+    iface::model_context& m_cxt;
 public:
-    circular_check_handler(const iface::model_context& cxt) : m_context(cxt) {}
+    circular_check_handler(iface::model_context& cxt) : m_cxt(cxt) {}
 
-    void operator() (formula_cell* p) const
+    void operator() (const abs_address_t& pos) const
     {
-        p->check_circular(m_context);
+        formula_cell* p = m_cxt.get_formula_cell(pos);
+        p->check_circular(m_cxt);
     }
 };
 
-struct thread_queue_handler : public unary_function<formula_cell*, void>
+class thread_queue_handler : public unary_function<abs_address_t, void>
 {
-    void operator() (formula_cell* p) const
+    iface::model_context& m_cxt;
+public:
+    thread_queue_handler(iface::model_context& cxt) : m_cxt(cxt) {}
+    void operator() (const abs_address_t& pos) const
     {
+        formula_cell* p = m_cxt.get_formula_cell(pos);
         cell_queue_manager::add_cell(p);
     }
 };
 
-struct cell_interpret_handler : public unary_function<formula_cell*, void>
+struct cell_interpret_handler : public unary_function<abs_address_t, void>
 {
     cell_interpret_handler(iface::model_context& cxt) :
         m_context(cxt) {}
 
-    void operator() (formula_cell* p) const
+    void operator() (const abs_address_t& pos) const
     {
+        formula_cell* p = m_context.get_formula_cell(pos);
         p->interpret(m_context);
     }
 private:
@@ -107,10 +119,10 @@ private:
 
 }
 
-dependency_tracker::cell_back_inserter::cell_back_inserter(vector<formula_cell*> & sorted_cells) :
+dependency_tracker::cell_back_inserter::cell_back_inserter(vector<abs_address_t> & sorted_cells) :
     m_sorted_cells(sorted_cells) {}
 
-void dependency_tracker::cell_back_inserter::operator() (formula_cell* cell)
+void dependency_tracker::cell_back_inserter::operator() (const abs_address_t& cell)
 {
     m_sorted_cells.push_back(cell);
 }
@@ -127,7 +139,7 @@ dependency_tracker::~dependency_tracker()
 {
 }
 
-void dependency_tracker::insert_depend(formula_cell* origin_cell, formula_cell* depend_cell)
+void dependency_tracker::insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell)
 {
 #if DEBUG_DEPENDS_TRACKER
     __IXION_DEBUG_OUT__ << m_context.get_cell_name(origin_cell) << "->" << m_context.get_cell_name(depend_cell) << endl;
@@ -137,7 +149,7 @@ void dependency_tracker::insert_depend(formula_cell* origin_cell, formula_cell* 
 
 void dependency_tracker::interpret_all_cells(size_t thread_count)
 {
-    vector<formula_cell*> sorted_cells;
+    vector<abs_address_t> sorted_cells;
     topo_sort_cells(sorted_cells);
 
 #if DEBUG_DEPENDS_TRACKER
@@ -149,7 +161,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
 #if DEBUG_DEPENDS_TRACKER
     __IXION_DEBUG_OUT__ << "Reset cell status ------------------------------------------" << endl;
 #endif
-    for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler());
+    for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler(m_context));
 
     // First, detect circular dependencies and mark those circular
     // dependent cells with appropriate error flags.
@@ -162,7 +174,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     {
         // Interpret cells in topological order using threads.
         cell_queue_manager::init(thread_count, m_context);
-        for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler());
+        for_each(sorted_cells.begin(), sorted_cells.end(), thread_queue_handler(m_context));
         cell_queue_manager::terminate();
     }
     else
@@ -172,10 +184,10 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     }
 }
 
-void dependency_tracker::topo_sort_cells(vector<formula_cell*>& sorted_cells) const
+void dependency_tracker::topo_sort_cells(vector<abs_address_t>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
-    vector<formula_cell*> all_cells;
+    vector<abs_address_t> all_cells;
     all_cells.reserve(m_dirty_cells.size());
     dirty_cells_t::const_iterator itr = m_dirty_cells.begin(), itr_end = m_dirty_cells.end();
     for (; itr != itr_end; ++itr)

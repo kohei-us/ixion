@@ -28,8 +28,8 @@
 #ifndef __IXION_FUNCTION_OBJECTS_HPP__
 #define __IXION_FUNCTION_OBJECTS_HPP__
 
-#include "ixion/types.hpp"
 #include "ixion/env.hpp"
+#include "ixion/address.hpp"
 
 #include <functional>
 
@@ -63,13 +63,13 @@ private:
     mode_t m_mode;
 };
 
-class cell_dependency_handler : public std::unary_function<formula_cell*, void>
+class cell_dependency_handler : public std::unary_function<abs_address_t, void>
 {
 public:
     explicit cell_dependency_handler(
         iface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells);
 
-    void operator() (formula_cell* fcell);
+    void operator() (const abs_address_t& fcell);
 
 private:
     iface::model_context& m_context;

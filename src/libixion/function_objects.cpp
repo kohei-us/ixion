@@ -51,7 +51,7 @@ namespace {
 class ref_cell_picker : public std::unary_function<const formula_token_base*, void>
 {
 public:
-    ref_cell_picker(iface::model_context& cxt, const abs_address_t& origin, std::vector<formula_cell*>& deps) :
+    ref_cell_picker(iface::model_context& cxt, const abs_address_t& origin, std::vector<abs_address_t>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
     void operator() (const formula_token_base* p)
@@ -61,9 +61,8 @@ public:
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(m_origin);
-                formula_cell* refcell = m_context.get_formula_cell(addr);
-                if (refcell)
-                    m_deps.push_back(refcell);
+                if (m_context.get_celltype(addr) == celltype_formula)
+                    m_deps.push_back(addr);
             }
             break;
             case fop_range_ref:
@@ -79,7 +78,7 @@ public:
                             if (m_context.is_empty(addr) || m_context.get_celltype(addr) != celltype_formula)
                                 continue;
 
-                            m_deps.push_back(m_context.get_formula_cell(addr));
+                            m_deps.push_back(addr);
                         }
                     }
                 }
@@ -93,26 +92,26 @@ public:
 private:
     iface::model_context& m_context;
     const abs_address_t& m_origin;
-    std::vector<formula_cell*>&  m_deps;
+    std::vector<abs_address_t>&  m_deps;
 };
 
-class depcell_inserter : public std::unary_function<formula_cell*, void>
+class depcell_inserter : public std::unary_function<abs_address_t, void>
 {
 public:
-    depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, formula_cell* fcell) :
+    depcell_inserter(dependency_tracker& tracker, const dirty_cells_t& dirty_cells, const abs_address_t& fcell) :
         m_tracker(tracker),
         m_dirty_cells(dirty_cells),
-        mp_fcell(fcell) {}
+        m_fcell(fcell) {}
 
-    void operator() (formula_cell* p)
+    void operator() (const abs_address_t& cell)
     {
-        if (m_dirty_cells.count(p) > 0)
-            m_tracker.insert_depend(mp_fcell, p);
+        if (m_dirty_cells.count(cell) > 0)
+            m_tracker.insert_depend(m_fcell, cell);
     }
 private:
     dependency_tracker& m_tracker;
     const dirty_cells_t& m_dirty_cells;
-    formula_cell* mp_fcell;
+    abs_address_t m_fcell;
 };
 
 }
@@ -171,7 +170,7 @@ cell_dependency_handler::cell_dependency_handler(
     iface::model_context& cxt, dependency_tracker& dep_tracker, dirty_cells_t& dirty_cells) :
     m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
 
-void cell_dependency_handler::operator() (formula_cell* fcell)
+void cell_dependency_handler::operator() (const abs_address_t& fcell)
 {
 #if DEBUG_FUNCTION_OBJECTS
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
@@ -179,7 +178,8 @@ void cell_dependency_handler::operator() (formula_cell* fcell)
 #endif
     // Register cell dependencies.
     std::vector<const formula_token_base*> ref_tokens;
-    fcell->get_ref_tokens(m_context, ref_tokens);
+    formula_cell* p = m_context.get_formula_cell(fcell);
+    p->get_ref_tokens(m_context, ref_tokens);
 
 #if DEBUG_FUNCTION_OBJECTS
     __IXION_DEBUG_OUT__ << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;
@@ -187,9 +187,8 @@ void cell_dependency_handler::operator() (formula_cell* fcell)
     // Pick up the referenced cells from the ref tokens.  I should
     // probably combine this with the above get_ref_tokens() call above
     // for efficiency.
-    std::vector<formula_cell*> deps;
-    abs_address_t cell_pos = m_context.get_cell_position(fcell);
-    for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, cell_pos, deps));
+    std::vector<abs_address_t> deps;
+    for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, fcell, deps));
 
 #if DEBUG_FUNCTION_OBJECTS
     __IXION_DEBUG_OUT__ << "number of precedent cells picked up: " << deps.size() << endl;

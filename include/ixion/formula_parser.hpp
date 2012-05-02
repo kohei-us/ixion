@@ -31,7 +31,6 @@
 #include "ixion/exceptions.hpp"
 #include "ixion/lexer_tokens.hpp"
 #include "ixion/formula_tokens.hpp"
-#include "ixion/hash_container/map.hpp"
 
 #include <string>
 #include <boost/noncopyable.hpp>

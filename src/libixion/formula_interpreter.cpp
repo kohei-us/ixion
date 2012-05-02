@@ -312,6 +312,8 @@ bool valid_expression_op(fopcode_t oc)
         case fop_greater:
         case fop_greater_equal:
             return true;
+        default:
+            ;
     }
     return false;
 }

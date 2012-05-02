@@ -54,7 +54,7 @@ class sort_input_parser
         ::std::vector<mem_str_buf>& m_sorted;
     };
 
-    typedef depth_first_search<mem_str_buf, cell_handler> dfs_type;
+    typedef depth_first_search<mem_str_buf, cell_handler, mem_str_buf::hash> dfs_type;
 
 public:
     sort_input_parser(const ::std::string& filepath);

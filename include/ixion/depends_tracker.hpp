@@ -53,16 +53,16 @@ class model_context;
  */
 class dependency_tracker
 {
-    class cell_back_inserter : public std::unary_function<formula_cell*, void>
+    class cell_back_inserter : public std::unary_function<abs_address_t, void>
     {
     public:
-        cell_back_inserter(std::vector<formula_cell*>& sorted_cells);
-        void operator() (formula_cell* cell);
+        cell_back_inserter(std::vector<abs_address_t>& sorted_cells);
+        void operator() (const abs_address_t& cell);
     private:
-        ::std::vector<formula_cell*>& m_sorted_cells;
+        ::std::vector<abs_address_t>& m_sorted_cells;
     };
 
-    typedef depth_first_search<formula_cell*, cell_back_inserter> dfs_type;
+    typedef depth_first_search<abs_address_t, cell_back_inserter, abs_address_t::hash> dfs_type;
 
 public:
     dependency_tracker(const dirty_cells_t& dirty_cells, iface::model_context& cxt);
@@ -74,7 +74,7 @@ public:
      * @param origin_cell* cell that depends on <code>depend_cell</code>.
      * @param depend_cell* cell that <code>origin_cell</code> depends on.
      */
-    void insert_depend(formula_cell* origin_cell, formula_cell* depend_cell);
+    void insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell);
 
     void interpret_all_cells(size_t thread_count);
 
@@ -82,7 +82,7 @@ public:
      * Perform topological sort on all cell instances, and returns an array of
      * cells that are sorted in order of dependency.
      */
-    void topo_sort_cells(std::vector<formula_cell*>& sorted_cells) const;
+    void topo_sort_cells(std::vector<abs_address_t>& sorted_cells) const;
 
 private:
     dfs_type::precedent_set m_deps;

@@ -29,9 +29,11 @@
 #define __IXION_ADDRESS_HPP__
 
 #include "ixion/global.hpp"
+#include "ixion/hash_container/set.hpp"
 
 #include <string>
 #include <vector>
+#include <set>
 
 namespace ixion {
 
@@ -132,6 +134,11 @@ struct IXION_DLLPUBLIC range_t
 bool operator==(const range_t& left, const range_t& right);
 bool operator!=(const range_t& left, const range_t& right);
 
+/**
+ * Dirty cells are those formula cells that have been modified or formula
+ * cells that reference other modified cells.
+ */
+typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> dirty_cells_t;
 typedef std::vector<abs_address_t> dirty_cell_addrs_t;
 
 }
