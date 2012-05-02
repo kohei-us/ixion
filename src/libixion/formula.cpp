@@ -173,7 +173,7 @@ void register_formula_cell(
     iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell)
 {
     std::vector<const formula_token_base*> ref_tokens;
-    cell->get_ref_tokens(cxt, ref_tokens);
+    cell->get_ref_tokens(cxt, pos, ref_tokens);
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_add));
@@ -200,7 +200,7 @@ void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos
     // itself as their listener.  This step is important
     // especially during partial re-calculation.
     std::vector<const formula_token_base*> ref_tokens;
-    fcell->get_ref_tokens(cxt, ref_tokens);
+    fcell->get_ref_tokens(cxt, pos, ref_tokens);
     for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_remove));

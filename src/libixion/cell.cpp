@@ -217,7 +217,7 @@ double formula_cell::get_value() const
     return m_interpret_status.result->get_value();
 }
 
-void formula_cell::interpret(iface::model_context& context)
+void formula_cell::interpret(iface::model_context& context, const abs_address_t& pos)
 {
 #if DEBUG_FORMULA_CELL
     __IXION_DEBUG_OUT__ << context.get_cell_name(this) << ": interpreting" << endl;
@@ -243,7 +243,7 @@ void formula_cell::interpret(iface::model_context& context)
         }
 
         formula_interpreter fin(this, context);
-        fin.set_origin(context.get_cell_position(this));
+        fin.set_origin(pos);
         m_interpret_status.result = new formula_result;
         if (fin.interpret())
         {
@@ -264,10 +264,9 @@ bool formula_cell::is_circular_safe() const
     return get_flag(FORMULA_CIRCULAR_SAFE);
 }
 
-void formula_cell::check_circular(const iface::model_context& cxt)
+void formula_cell::check_circular(const iface::model_context& cxt, const abs_address_t& pos)
 {
     // TODO: Check to make sure this is being run on the main thread only.
-    abs_address_t pos = cxt.get_cell_position(this);
     const formula_tokens_t* tokens = NULL;
     if (is_shared())
         tokens = cxt.get_shared_formula_tokens(pos.sheet, m_identifier);
@@ -292,8 +291,7 @@ void formula_cell::check_circular(const iface::model_context& cxt)
         {
             case fop_single_ref:
             {
-                abs_address_t origin = cxt.get_cell_position(this);
-                abs_address_t addr = itr->get_single_ref().to_abs(origin);
+                abs_address_t addr = itr->get_single_ref().to_abs(pos);
                 const formula_cell* ref = cxt.get_formula_cell(addr);
 
                 if (!ref)
@@ -305,8 +303,7 @@ void formula_cell::check_circular(const iface::model_context& cxt)
             break;
             case fop_range_ref:
             {
-                abs_address_t origin = cxt.get_cell_position(this);
-                abs_range_t range = itr->get_range_ref().to_abs(origin);
+                abs_range_t range = itr->get_range_ref().to_abs(pos);
                 for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
                     for (col_t col = range.first.column; col <= range.last.column; ++col)
@@ -364,9 +361,8 @@ void formula_cell::reset()
     reset_flag();
 }
 
-void formula_cell::get_ref_tokens(const iface::model_context& cxt, vector<const formula_token_base*>& tokens)
+void formula_cell::get_ref_tokens(const iface::model_context& cxt, const abs_address_t& pos, vector<const formula_token_base*>& tokens)
 {
-    abs_address_t pos = cxt.get_cell_position(this);
     const formula_tokens_t* this_tokens = NULL;
     if (is_shared())
         this_tokens = cxt.get_shared_formula_tokens(pos.sheet, m_identifier);

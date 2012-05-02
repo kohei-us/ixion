@@ -79,7 +79,6 @@ public:
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
     virtual ::std::string get_cell_name(const base_cell* p) const = 0;
-    virtual abs_address_t get_cell_position(const base_cell* p) const= 0;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const = 0;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const = 0;
 

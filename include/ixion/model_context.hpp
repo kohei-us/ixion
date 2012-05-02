@@ -85,7 +85,6 @@ public:
     virtual formula_cell* get_formula_cell(const abs_address_t& addr);
 
     virtual ::std::string get_cell_name(const base_cell* p) const;
-    virtual abs_address_t get_cell_position(const base_cell* p) const;
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;

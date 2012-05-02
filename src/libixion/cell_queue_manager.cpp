@@ -116,10 +116,12 @@ struct worker_thread_data
     {
         mutex mtx;
         condition_variable cond;
+        abs_address_t fcell;
         formula_cell* cell;
+        bool cell_active;
         bool terminate_requested;
 
-        action_data() : cell(NULL), terminate_requested(false) {}
+        action_data() : cell(NULL), cell_active(false), terminate_requested(false) {}
     };
 
     thread thr_main;
@@ -175,11 +177,12 @@ void worker_main(worker_thread_data* data, iface::model_context* context)
         }
         data->action.cond.wait(lock_cell);
 
-        if (!data->action.cell)
+        if (!data->action.cell_active)
             continue;
 
-        data->action.cell->interpret(*context);
-        data->action.cell = NULL;
+        formula_cell* p = context->get_formula_cell(data->action.fcell);
+        p->interpret(*context, data->action.fcell);
+        data->action.cell_active = false;
     }
 }
 
@@ -203,7 +206,7 @@ struct manage_queue_data
 
     mutex mtx_queue;
     condition_variable cond_queue;
-    queue<formula_cell*> cells;
+    queue<abs_address_t> cells;
     manage_queue_action_t action;
 
     manage_queue_data() :
@@ -267,10 +270,10 @@ void interpret_cell(worker_thread_data& wt)
 {
     mutex::scoped_lock lock(wt.action.mtx);
 
-    // When we obtain the lock, the cell pointer is expected to be NULL.
-    assert(!wt.action.cell);
+    // When we obtain the lock, the cell is expected to be inactive.
+    assert(!wt.action.cell_active);
 
-    wt.action.cell = data.cells.front();
+    wt.action.fcell = data.cells.front();
     data.cells.pop();
     wt.action.cond.notify_all();
 }
@@ -337,7 +340,7 @@ void manage_queue_main(size_t worker_count, iface::model_context* context)
     terminate_workers();
 }
 
-void add_cell_to_queue(formula_cell* p)
+void add_cell_to_queue(const abs_address_t& cell)
 {
 #if DEBUG_QUEUE_MANAGER
 //  ostringstream os;
@@ -346,7 +349,7 @@ void add_cell_to_queue(formula_cell* p)
 #endif
 
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
-    data.cells.push(p);
+    data.cells.push(cell);
     data.action = qm_cell_added_to_queue;
     data.cond_queue.notify_all();
 }
@@ -383,7 +386,7 @@ void cell_queue_manager::init(size_t thread_count, iface::model_context& context
     wait_init();
 }
 
-void cell_queue_manager::add_cell(formula_cell* cell)
+void cell_queue_manager::add_cell(const abs_address_t& cell)
 {
     add_cell_to_queue(cell);
 }

@@ -179,7 +179,7 @@ void cell_dependency_handler::operator() (const abs_address_t& fcell)
     // Register cell dependencies.
     std::vector<const formula_token_base*> ref_tokens;
     formula_cell* p = m_context.get_formula_cell(fcell);
-    p->get_ref_tokens(m_context, ref_tokens);
+    p->get_ref_tokens(m_context, fcell, ref_tokens);
 
 #if DEBUG_FUNCTION_OBJECTS
     __IXION_DEBUG_OUT__ << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;

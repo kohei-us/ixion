@@ -87,7 +87,7 @@ public:
     void operator() (const abs_address_t& pos) const
     {
         formula_cell* p = m_cxt.get_formula_cell(pos);
-        p->check_circular(m_cxt);
+        p->check_circular(m_cxt, pos);
     }
 };
 
@@ -98,8 +98,7 @@ public:
     thread_queue_handler(iface::model_context& cxt) : m_cxt(cxt) {}
     void operator() (const abs_address_t& pos) const
     {
-        formula_cell* p = m_cxt.get_formula_cell(pos);
-        cell_queue_manager::add_cell(p);
+        cell_queue_manager::add_cell(pos);
     }
 };
 
@@ -111,7 +110,7 @@ struct cell_interpret_handler : public unary_function<abs_address_t, void>
     void operator() (const abs_address_t& pos) const
     {
         formula_cell* p = m_context.get_formula_cell(pos);
-        p->interpret(m_context);
+        p->interpret(m_context, pos);
     }
 private:
     iface::model_context& m_context;

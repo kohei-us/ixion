@@ -34,7 +34,7 @@
 
 namespace ixion {
 
-class formula_cell;
+struct abs_address_t;
 
 namespace iface {
 
@@ -62,7 +62,7 @@ public:
      *
      * @param cell pointer to cell instance to interpret.
      */
-    static void add_cell(formula_cell* cell);
+    static void add_cell(const abs_address_t& cell);
 
     /**
      * Terminate the queue manager thread, along with all spawned worker
