@@ -38,7 +38,6 @@
 
 namespace ixion {
 
-class base_cell;
 class formula_cell;
 class formula_name_resolver;
 class cell_listener_tracker;

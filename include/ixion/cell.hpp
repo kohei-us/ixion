@@ -48,33 +48,7 @@ class model_context;
 
 }
 
-/**
- * This class itself cannot be directly instantiated; you always need to
- * instantiate its child classes.
- *
- * You can't delete a base_cell instance with the normal delete operator
- * either; call base_cell::delete_instance() to delete it instead.
- */
-class base_cell : boost::noncopyable
-{
-private:
-    base_cell(); // disabled
-
-protected:
-
-    union {
-        int m_raw_bits:32;
-        struct {
-            int flag:24;
-            int celltype:8;
-        } m_data;
-    };
-
-    base_cell(celltype_t celltype);
-    ~base_cell();
-};
-
-class formula_cell : public base_cell
+class formula_cell : boost::noncopyable
 {
     struct interpret_status : boost::noncopyable
     {
@@ -140,6 +114,14 @@ private:
     bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos);
 
 private:
+    union {
+        int m_raw_bits:32;
+        struct {
+            int flag:24;
+            int celltype:8;
+        } m_data;
+    };
+
     mutable interpret_status m_interpret_status;
     size_t m_identifier;
 };

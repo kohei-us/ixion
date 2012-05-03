@@ -89,13 +89,29 @@ private:
 
 }
 
-base_cell::base_cell(celltype_t celltype) :
-    m_raw_bits(0)
+formula_cell::interpret_status::interpret_status() :
+    result(NULL) {}
+
+formula_cell::interpret_status::~interpret_status()
 {
-    m_data.celltype = celltype;
+    delete result;
 }
 
-base_cell::~base_cell() {}
+formula_cell::formula_cell() :
+    m_raw_bits(0), m_identifier(0)
+{
+    m_data.celltype = celltype_formula;
+}
+
+formula_cell::formula_cell(size_t tokens_identifier) :
+    m_raw_bits(0), m_identifier(tokens_identifier)
+{
+    m_data.celltype = celltype_formula;
+}
+
+formula_cell::~formula_cell()
+{
+}
 
 void formula_cell::set_flag(int mask, bool value)
 {
@@ -123,30 +139,6 @@ size_t formula_cell::get_identifier() const
 void formula_cell::set_identifier(size_t identifier)
 {
     m_identifier = identifier;
-}
-
-formula_cell::interpret_status::interpret_status() :
-    result(NULL) {}
-
-formula_cell::interpret_status::~interpret_status()
-{
-    delete result;
-}
-
-// ============================================================================
-
-formula_cell::formula_cell() :
-    base_cell(celltype_formula), m_identifier(0)
-{
-}
-
-formula_cell::formula_cell(size_t tokens_identifier) :
-    base_cell(celltype_formula), m_identifier(tokens_identifier)
-{
-}
-
-formula_cell::~formula_cell()
-{
 }
 
 double formula_cell::get_value() const
