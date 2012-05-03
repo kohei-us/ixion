@@ -89,21 +89,6 @@ private:
 
 }
 
-void base_cell::delete_instance(const base_cell* p)
-{
-    if (!p)
-        return;
-
-    switch (p->get_celltype())
-    {
-        case celltype_formula:
-            delete static_cast<const formula_cell*>(p);
-        break;
-        default:
-            assert(!"unknown cell type instance attempted for deletion!");
-    }
-}
-
 base_cell::base_cell(celltype_t celltype, double value) :
     m_raw_bits(0),
     m_value(value)

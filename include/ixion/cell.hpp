@@ -58,8 +58,6 @@ class model_context;
 class base_cell : boost::noncopyable
 {
 public:
-    static void delete_instance(const base_cell* p);
-
     double get_value() const;
     size_t get_identifier() const;
     void set_identifier(size_t identifier);
@@ -152,32 +150,6 @@ private:
 private:
     mutable interpret_status m_interpret_status;
 };
-
-// ============================================================================
-
-inline base_cell* new_clone(const base_cell& r)
-{
-    // TODO: Implement cloning and make this function usable.
-    switch (r.get_celltype())
-    {
-        case celltype_formula:
-        case celltype_string:
-        case celltype_unknown:
-        default:
-            ;
-    }
-    return NULL;
-}
-
-inline void delete_clone(const base_cell* p)
-{
-    base_cell::delete_instance(p);
-}
-
-inline bool operator <(const base_cell& l, const base_cell& r)
-{
-    return &l < &r;
-}
 
 }
 
