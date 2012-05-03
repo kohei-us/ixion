@@ -91,20 +91,6 @@ protected:
     };
 };
 
-class string_cell : public base_cell
-{
-    string_cell();
-public:
-    string_cell(size_t identifier);
-};
-
-class numeric_cell : public base_cell
-{
-    numeric_cell();
-public:
-    numeric_cell(double value);
-};
-
 class formula_cell : public base_cell
 {
     struct interpret_status : boost::noncopyable

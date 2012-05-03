@@ -96,12 +96,6 @@ void base_cell::delete_instance(const base_cell* p)
 
     switch (p->get_celltype())
     {
-        case celltype_string:
-            delete static_cast<const string_cell*>(p);
-        break;
-        case celltype_numeric:
-            delete static_cast<const numeric_cell*>(p);
-        break;
         case celltype_formula:
             delete static_cast<const formula_cell*>(p);
         break;
@@ -173,12 +167,6 @@ celltype_t base_cell::get_celltype() const
 {
     return static_cast<celltype_t>(m_data.celltype & celltype_mask);
 }
-
-string_cell::string_cell(size_t identifier) :
-    base_cell(celltype_string, identifier) {}
-
-numeric_cell::numeric_cell(double value) :
-    base_cell(celltype_numeric, value) {}
 
 formula_cell::interpret_status::interpret_status() :
     result(NULL) {}
