@@ -42,6 +42,10 @@
 #include <iostream>
 
 #define DEBUG_FORMULA_CELL 0
+#if DEBUG_FORMULA_CELL
+#include "ixion/formula_name_resolver.hpp"
+#endif
+
 
 #define FORMULA_CIRCULAR_SAFE 0x000001
 #define FORMULA_SHARED_TOKENS 0x000002
@@ -220,7 +224,8 @@ double formula_cell::get_value() const
 void formula_cell::interpret(iface::model_context& context, const abs_address_t& pos)
 {
 #if DEBUG_FORMULA_CELL
-    __IXION_DEBUG_OUT__ << context.get_cell_name(this) << ": interpreting" << endl;
+    const formula_name_resolver& resolver = context.get_name_resolver();
+    __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
     {
         ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
@@ -297,7 +302,7 @@ void formula_cell::check_circular(const iface::model_context& cxt, const abs_add
                 if (!ref)
                     continue;
 
-                if (!check_ref_for_circular_safety(*ref))
+                if (!check_ref_for_circular_safety(*ref, addr))
                     return;
             }
             break;
@@ -314,7 +319,7 @@ void formula_cell::check_circular(const iface::model_context& cxt, const abs_add
                             if (cxt.is_empty(addr) || cxt.get_celltype(addr) != celltype_formula)
                                 continue;
 
-                            if (!check_ref_for_circular_safety(*cxt.get_formula_cell(addr)))
+                            if (!check_ref_for_circular_safety(*cxt.get_formula_cell(addr), addr))
                                 return;
                         }
                     }
@@ -335,16 +340,13 @@ void formula_cell::check_circular(const iface::model_context& cxt, const abs_add
     set_flag(FORMULA_CIRCULAR_SAFE, true);
 }
 
-bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref)
+bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos)
 {
     if (!ref.is_circular_safe())
     {
         // Circular dependency detected !!
 #if DEBUG_FORMULA_CELL
-        ostringstream os;
-        os << cxt.get_cell_name(this) << ": ";
-        os << "circular dependency detected !!" << endl;
-        __IXION_DEBUG_OUT__ << os.str();
+        __IXION_DEBUG_OUT__ << "circular dependency detected !!" << endl;
 #endif
         assert(!m_interpret_status.result);
         m_interpret_status.result = new formula_result(fe_ref_result_not_available);

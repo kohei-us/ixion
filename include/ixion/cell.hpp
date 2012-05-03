@@ -161,7 +161,7 @@ private:
      */
     bool is_circular_safe() const;
 
-    bool check_ref_for_circular_safety(const formula_cell& ref);
+    bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos);
 
 private:
     mutable interpret_status m_interpret_status;

@@ -254,7 +254,7 @@ void formula_functions::fnc_sum(value_stack_t& args) const
     args.push_value(ret);
 
 #if DEBUG_FORMULA_FUNCTIONS
-    __IXION_DEBUG_OUT__ << "function: sum end" << endl;
+    __IXION_DEBUG_OUT__ << "function: sum end (result=" << ret << ")" << endl;
 #endif
 }
 

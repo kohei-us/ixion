@@ -31,6 +31,7 @@
 #include "ixion/config.hpp"
 #include "ixion/session_handler.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/formula_result.hpp"
 #include "ixion/formula.hpp"
 
 #include "grid_map_trait.hpp"
@@ -502,10 +503,20 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
     const cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
-    if (col_store.get_type(addr.row) != mdds::gridmap::celltype_numeric)
-        return 0.0;
-
-    return col_store.get_cell<double>(addr.row);
+    switch (col_store.get_type(addr.row))
+    {
+        case mdds::gridmap::celltype_numeric:
+            return col_store.get_cell<double>(addr.row);
+        case mdds::gridmap::celltype_formula:
+        {
+            const formula_cell* p = col_store.get_cell<formula_cell*>(addr.row);
+            return p->get_result_cache()->get_value();
+        }
+        break;
+        default:
+            ;
+    }
+    return 0.0;
 }
 
 size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const

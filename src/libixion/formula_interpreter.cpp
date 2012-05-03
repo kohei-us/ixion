@@ -105,6 +105,9 @@ bool formula_interpreter::interpret()
         }
         pop_result();
 
+#if DEBUG_FORMULA_INTERPRETER
+        __IXION_DEBUG_OUT__ << "interpretation successfully finished" << endl;
+#endif
         return true;
     }
     catch (const invalid_expression& e)
@@ -226,6 +229,9 @@ void formula_interpreter::pop_result()
             m_result.set_string(res.get_string());
         break;
         case sv_value:
+#if DEBUG_FORMULA_INTERPRETER
+            __IXION_DEBUG_OUT__ << "result: " << res.get_value() << endl;
+#endif
             m_result.set_value(res.get_value());
         break;
         default:
@@ -796,6 +802,9 @@ void formula_interpreter::function()
 
     next();
 
+#if DEBUG_FORMULA_INTERPRETER
+    __IXION_DEBUG_OUT__ << "function: " << formula_functions::get_function_name(func_oc) << endl;
+#endif
     // Function call pops all stack values pushed onto the stack this far, and
     // pushes the result onto the stack.
     formula_functions(m_context).interpret(func_oc, m_stack);

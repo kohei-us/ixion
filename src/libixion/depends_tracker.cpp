@@ -141,7 +141,8 @@ dependency_tracker::~dependency_tracker()
 void dependency_tracker::insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell)
 {
 #if DEBUG_DEPENDS_TRACKER
-    __IXION_DEBUG_OUT__ << m_context.get_cell_name(origin_cell) << "->" << m_context.get_cell_name(depend_cell) << endl;
+    const formula_name_resolver& resolver = m_context.get_name_resolver();
+    __IXION_DEBUG_OUT__ << resolver.get_name(origin_cell, false) << "->" << resolver.get_name(depend_cell, false) << endl;
 #endif
     m_deps.insert(origin_cell, depend_cell);
 }
