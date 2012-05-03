@@ -78,7 +78,7 @@ bool formula_interpreter::interpret()
 {
     mp_handler = m_context.get_session_handler();
     if (mp_handler)
-        mp_handler->begin_cell_interpret(m_parent_cell);
+        mp_handler->begin_cell_interpret(m_pos);
 
     try
     {

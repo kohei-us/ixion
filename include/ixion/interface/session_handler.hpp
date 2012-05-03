@@ -48,7 +48,7 @@ class session_handler
 public:
     virtual ~session_handler() {}
 
-    virtual void begin_cell_interpret(const formula_cell* p) = 0;
+    virtual void begin_cell_interpret(const abs_address_t& pos) = 0;
     virtual void set_result(const formula_result& result) = 0;
     virtual void set_invalid_expression(const char* msg) = 0;
     virtual void set_formula_error(const char* msg) = 0;

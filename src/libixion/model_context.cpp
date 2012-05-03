@@ -226,7 +226,6 @@ public:
     size_t get_string_identifier(const abs_address_t& addr) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
-    string get_cell_name(const base_cell* p) const;
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const string& name);
@@ -546,11 +545,6 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
     return col_store.get_cell<formula_cell*>(addr.row);
 }
 
-string model_context_impl::get_cell_name(const base_cell* p) const
-{
-    return string("fix get_cell_name");
-}
-
 model_context::shared_tokens::shared_tokens() : tokens(NULL) {}
 model_context::shared_tokens::shared_tokens(formula_tokens_t* _tokens) : tokens(_tokens) {}
 model_context::shared_tokens::shared_tokens(const shared_tokens& r) : tokens(r.tokens), range(r.range) {}
@@ -631,11 +625,6 @@ const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) c
 formula_cell* model_context::get_formula_cell(const abs_address_t& addr)
 {
     return mp_impl->get_formula_cell(addr);
-}
-
-string model_context::get_cell_name(const base_cell* p) const
-{
-    return mp_impl->get_cell_name(p);
 }
 
 matrix model_context::get_range_value(const abs_range_t& range) const

@@ -239,7 +239,7 @@ void formula_cell::interpret(iface::model_context& context, const abs_address_t&
                 iface::session_handler* handler = context.get_session_handler();
                 if (handler)
                 {
-                    handler->begin_cell_interpret(this);
+                    handler->begin_cell_interpret(pos);
                     const char* msg = get_formula_error_name(m_interpret_status.result->get_error());
                     handler->set_formula_error(msg);
                 }

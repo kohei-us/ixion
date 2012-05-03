@@ -42,15 +42,10 @@ session_handler::session_handler(const model_context& cxt) :
 
 session_handler::~session_handler() {}
 
-void session_handler::begin_cell_interpret(const formula_cell *p)
+void session_handler::begin_cell_interpret(const abs_address_t& pos)
 {
-    m_cell_name = "<unknown cell>";
-    const string* name = m_context.get_named_expression_name(p);
-    if (name)
-        m_cell_name = *name;
-    else
-        m_cell_name = m_context.get_cell_name(p);
-
+    const formula_name_resolver& resolver = m_context.get_name_resolver();
+    m_cell_name = resolver.get_name(pos, false);
     cout << get_formula_result_output_separator() << endl;
     cout << m_cell_name << ": ";
 }
