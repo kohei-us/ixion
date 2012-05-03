@@ -62,8 +62,10 @@ public:
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(m_origin);
-                if (m_context.get_celltype(addr) == celltype_formula)
-                    m_deps.push_back(addr);
+                if (m_context.is_empty(addr) || m_context.get_celltype(addr) != celltype_formula)
+                    break;
+
+                m_deps.push_back(addr);
             }
             break;
             case fop_range_ref:
