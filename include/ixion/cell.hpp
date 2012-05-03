@@ -61,6 +61,8 @@ class formula_cell : boost::noncopyable
         ~interpret_status();
     };
 
+    void reset_flag();
+
 public:
     IXION_DLLPUBLIC formula_cell();
     IXION_DLLPUBLIC formula_cell(size_t tokens_identifier);
@@ -68,10 +70,6 @@ public:
 
     size_t get_identifier() const;
     void set_identifier(size_t identifier);
-
-    void set_flag(int mask, bool value);
-    bool get_flag(int mask) const;
-    void reset_flag();
 
     IXION_DLLPUBLIC double get_value() const;
     IXION_DLLPUBLIC void interpret(iface::model_context& context, const abs_address_t& pos);
@@ -114,16 +112,10 @@ private:
     bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos);
 
 private:
-    union {
-        int m_raw_bits:32;
-        struct {
-            int flag:24;
-            int celltype:8;
-        } m_data;
-    };
-
     mutable interpret_status m_interpret_status;
     size_t m_identifier;
+    bool m_shared_token:1;
+    bool m_circular_safe:1;
 };
 
 }

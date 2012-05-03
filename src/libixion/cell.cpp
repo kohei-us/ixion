@@ -47,8 +47,8 @@
 #endif
 
 
-#define FORMULA_CIRCULAR_SAFE 0x000001
-#define FORMULA_SHARED_TOKENS 0x000002
+#define FORMULA_CIRCULAR_SAFE 0x01
+#define FORMULA_SHARED_TOKENS 0x02
 
 using namespace std;
 
@@ -98,37 +98,22 @@ formula_cell::interpret_status::~interpret_status()
 }
 
 formula_cell::formula_cell() :
-    m_raw_bits(0), m_identifier(0)
+    m_identifier(0), m_shared_token(false), m_circular_safe(false)
 {
-    m_data.celltype = celltype_formula;
 }
 
 formula_cell::formula_cell(size_t tokens_identifier) :
-    m_raw_bits(0), m_identifier(tokens_identifier)
+    m_identifier(tokens_identifier), m_shared_token(false), m_circular_safe(false)
 {
-    m_data.celltype = celltype_formula;
 }
 
 formula_cell::~formula_cell()
 {
 }
 
-void formula_cell::set_flag(int mask, bool value)
-{
-    if (value)
-        m_data.flag |= mask;
-    else
-        m_data.flag &= ~mask;
-}
-
-bool formula_cell::get_flag(int mask) const
-{
-    return (m_data.flag & mask) != 0;
-}
-
 void formula_cell::reset_flag()
 {
-    m_data.flag &= ~FORMULA_CIRCULAR_SAFE;
+    m_circular_safe = false;
 }
 
 size_t formula_cell::get_identifier() const
@@ -203,7 +188,7 @@ void formula_cell::interpret(iface::model_context& context, const abs_address_t&
 
 bool formula_cell::is_circular_safe() const
 {
-    return get_flag(FORMULA_CIRCULAR_SAFE);
+    return m_circular_safe;
 }
 
 void formula_cell::check_circular(const iface::model_context& cxt, const abs_address_t& pos)
@@ -274,7 +259,7 @@ void formula_cell::check_circular(const iface::model_context& cxt, const abs_add
     }
 
     // No circular dependencies.  Good.
-    set_flag(FORMULA_CIRCULAR_SAFE, true);
+    m_circular_safe = true;
 }
 
 bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos)
@@ -323,12 +308,12 @@ const formula_result* formula_cell::get_result_cache() const
 
 bool formula_cell::is_shared() const
 {
-    return get_flag(FORMULA_SHARED_TOKENS);
+    return m_shared_token;
 }
 
 void formula_cell::set_shared(bool b)
 {
-    set_flag(FORMULA_SHARED_TOKENS, b);
+    m_shared_token = b;
 }
 
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
