@@ -319,6 +319,7 @@ void test_volatile_function()
     // Modify the value of A2.  This should flag A4 dirty.
     cxt.set_numeric_cell(abs_address_t(0,1,0), 10.0);
     dirty_cells.clear();
+    dirty_cells.insert(abs_address_t(0,1,0));
     get_all_dirty_cells(cxt, dirty_cells);
     assert(dirty_cells.size() == 1);
 
