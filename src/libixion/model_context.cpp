@@ -509,7 +509,7 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
         case mdds::gridmap::celltype_formula:
         {
             const formula_cell* p = col_store.get_cell<formula_cell*>(addr.row);
-            return p->get_result_cache()->get_value();
+            return p->get_value();
         }
         break;
         default:
