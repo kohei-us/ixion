@@ -89,23 +89,15 @@ private:
 
 }
 
-base_cell::base_cell(celltype_t celltype, double value) :
-    m_raw_bits(0),
-    m_value(value)
-{
-    m_data.celltype = celltype;
-}
-
-base_cell::base_cell(celltype_t celltype, size_t identifier) :
-    m_raw_bits(0),
-    m_identifier(identifier)
+base_cell::base_cell(celltype_t celltype) :
+    m_raw_bits(0)
 {
     m_data.celltype = celltype;
 }
 
 base_cell::~base_cell() {}
 
-void base_cell::set_flag(int mask, bool value)
+void formula_cell::set_flag(int mask, bool value)
 {
     if (value)
         m_data.flag |= mask;
@@ -113,44 +105,24 @@ void base_cell::set_flag(int mask, bool value)
         m_data.flag &= ~mask;
 }
 
-bool base_cell::get_flag(int mask) const
+bool formula_cell::get_flag(int mask) const
 {
     return (m_data.flag & mask) != 0;
 }
 
-void base_cell::reset_flag()
+void formula_cell::reset_flag()
 {
     m_data.flag &= ~FORMULA_CIRCULAR_SAFE;
 }
 
-double base_cell::get_value() const
+size_t formula_cell::get_identifier() const
 {
-    switch (get_celltype())
-    {
-        case celltype_formula:
-            return static_cast<const formula_cell*>(this)->get_value();
-        case celltype_numeric:
-            return m_value;
-        case celltype_string:
-        case celltype_unknown:
-        default:
-            return 0.0;
-    }
+    return m_identifier;
 }
 
-size_t base_cell::get_identifier() const
-{
-    return get_celltype() == celltype_numeric ? 0 : m_identifier;
-}
-
-void base_cell::set_identifier(size_t identifier)
+void formula_cell::set_identifier(size_t identifier)
 {
     m_identifier = identifier;
-}
-
-celltype_t base_cell::get_celltype() const
-{
-    return static_cast<celltype_t>(m_data.celltype & celltype_mask);
 }
 
 formula_cell::interpret_status::interpret_status() :
@@ -164,12 +136,12 @@ formula_cell::interpret_status::~interpret_status()
 // ============================================================================
 
 formula_cell::formula_cell() :
-    base_cell(celltype_formula, static_cast<size_t>(0))
+    base_cell(celltype_formula), m_identifier(0)
 {
 }
 
 formula_cell::formula_cell(size_t tokens_identifier) :
-    base_cell(celltype_formula, tokens_identifier)
+    base_cell(celltype_formula), m_identifier(tokens_identifier)
 {
 }
 

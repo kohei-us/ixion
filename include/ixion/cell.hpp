@@ -57,14 +57,10 @@ class model_context;
  */
 class base_cell : boost::noncopyable
 {
-public:
-    double get_value() const;
-    size_t get_identifier() const;
-    void set_identifier(size_t identifier);
-    celltype_t get_celltype() const;
-
 private:
     base_cell(); // disabled
+
+protected:
 
     union {
         int m_raw_bits:32;
@@ -74,19 +70,8 @@ private:
         } m_data;
     };
 
-protected:
-    base_cell(celltype_t celltype, double value);
-    base_cell(celltype_t celltype, size_t identifier);
+    base_cell(celltype_t celltype);
     ~base_cell();
-
-    void set_flag(int mask, bool value);
-    bool get_flag(int mask) const;
-    void reset_flag();
-
-    union {
-        double m_value;
-        size_t m_identifier;
-    };
 };
 
 class formula_cell : public base_cell
@@ -106,6 +91,13 @@ public:
     IXION_DLLPUBLIC formula_cell();
     IXION_DLLPUBLIC formula_cell(size_t tokens_identifier);
     IXION_DLLPUBLIC ~formula_cell();
+
+    size_t get_identifier() const;
+    void set_identifier(size_t identifier);
+
+    void set_flag(int mask, bool value);
+    bool get_flag(int mask) const;
+    void reset_flag();
 
     IXION_DLLPUBLIC double get_value() const;
     IXION_DLLPUBLIC void interpret(iface::model_context& context, const abs_address_t& pos);
@@ -149,6 +141,7 @@ private:
 
 private:
     mutable interpret_status m_interpret_status;
+    size_t m_identifier;
 };
 
 }
