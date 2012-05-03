@@ -48,7 +48,7 @@ class model_context;
 
 }
 
-class formula_cell : boost::noncopyable
+class formula_cell
 {
     struct interpret_status : boost::noncopyable
     {
@@ -63,6 +63,7 @@ class formula_cell : boost::noncopyable
 
     void reset_flag();
 
+    formula_cell(const formula_cell&); // disabled
 public:
     IXION_DLLPUBLIC formula_cell();
     IXION_DLLPUBLIC formula_cell(size_t tokens_identifier);
