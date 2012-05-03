@@ -267,28 +267,39 @@ formula_cell* insert_formula(model_context& cxt, const abs_address_t& pos, const
 void test_model_context_storage()
 {
     cout << "test model context storage" << endl;
-    model_context cxt;
-    cxt.set_session_handler(NULL);
-
-    // Test storage of numeric values.
-    double val = 0.1;
-    for (col_t col = 0; col < 3; ++col)
     {
-        for (row_t row = 0; row < 3; ++row)
+        model_context cxt;
+        cxt.set_session_handler(NULL);
+
+        // Test storage of numeric values.
+        double val = 0.1;
+        for (col_t col = 0; col < 3; ++col)
         {
-            abs_address_t pos(0, row, col);
-            cxt.set_numeric_cell(pos, val);
-            double test = cxt.get_numeric_value(pos);
-            assert(test == val);
-            val += 0.2;
+            for (row_t row = 0; row < 3; ++row)
+            {
+                abs_address_t pos(0, row, col);
+                cxt.set_numeric_cell(pos, val);
+                double test = cxt.get_numeric_value(pos);
+                assert(test == val);
+                val += 0.2;
+            }
         }
+
+        // Test formula cells.
+        abs_address_t pos(0,3,0);
+        const char* exp = "SUM(1,2,3)";
+        cxt.set_formula_cell(pos, exp, strlen(exp));
+        formula_cell* p = cxt.get_formula_cell(pos);
     }
 
-    // Test formula cells.
-    abs_address_t pos(0,3,0);
-    const char* exp = "SUM(1,2,3)";
-    cxt.set_formula_cell(pos, exp, strlen(exp));
-    formula_cell* p = cxt.get_formula_cell(pos);
+    {
+        model_context cxt;
+        cxt.set_session_handler(NULL);
+        string exp = "1";
+        cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size());
+        cxt.set_formula_cell(abs_address_t(0,2,0), &exp[0], exp.size());
+        cxt.set_formula_cell(abs_address_t(0,1,0), &exp[0], exp.size());
+    }
 }
 
 void test_volatile_function()
