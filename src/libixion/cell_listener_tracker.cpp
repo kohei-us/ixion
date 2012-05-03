@@ -210,7 +210,7 @@ void cell_listener_tracker::get_all_cell_listeners(
     for (; itr2 != itr2_end; ++itr2)
     {
         const abs_address_t& addr = *itr2; // listener cell address
-        if (m_context.get_celltype(addr) != celltype_formula)
+        if (m_context.is_empty(addr) || m_context.get_celltype(addr) != celltype_formula)
             // Referenced cell is empty or not a formula cell.  Ignore this.
             continue;
 
