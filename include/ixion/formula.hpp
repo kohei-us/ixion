@@ -95,7 +95,7 @@ void IXION_DLLPUBLIC unregister_formula_cell(
  *              function returns.
  */
 void IXION_DLLPUBLIC get_all_dirty_cells(
-    iface::model_context& cxt, dirty_cells_t& cells);
+    iface::model_context& cxt, dirty_cell_addrs_t& addrs, dirty_cells_t& cells);
 
 /**
  * Calculate all dirty cells in order of dependency.

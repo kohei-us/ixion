@@ -32,6 +32,7 @@
 #include "ixion/formula_tokens.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/interface/model_context.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 #include <vector>
 #include <boost/scoped_ptr.hpp>
@@ -173,12 +174,14 @@ cell_dependency_handler::cell_dependency_handler(
 void cell_dependency_handler::operator() (const abs_address_t& fcell)
 {
 #if DEBUG_FUNCTION_OBJECTS
+    const formula_name_resolver& resolver = m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
-    __IXION_DEBUG_OUT__ << "processing dependency of " << m_context.get_cell_name(fcell) << endl;
+    __IXION_DEBUG_OUT__ << "processing dependency of " << resolver.get_name(fcell, false) << endl;
 #endif
     // Register cell dependencies.
     std::vector<const formula_token_base*> ref_tokens;
     formula_cell* p = m_context.get_formula_cell(fcell);
+    assert(p);
     p->get_ref_tokens(m_context, fcell, ref_tokens);
 
 #if DEBUG_FUNCTION_OBJECTS

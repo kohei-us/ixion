@@ -206,10 +206,11 @@ void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos
                  pos, formula_cell_listener_handler::mode_remove));
 }
 
-void get_all_dirty_cells(iface::model_context& cxt, dirty_cells_t& cells)
+void get_all_dirty_cells(
+    iface::model_context& cxt, dirty_cell_addrs_t& addrs, dirty_cells_t& cells)
 {
 #if DEBUG_FORMULA_API
-    __IXION_DEBUG_OUT__ << "number of modified cells: " << cells.size() << endl;
+    __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
 #endif
 
     cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
@@ -223,12 +224,13 @@ void get_all_dirty_cells(iface::model_context& cxt, dirty_cells_t& cells)
             if (cxt.get_celltype(*itr) != celltype_formula)
                 continue;
 
+            addrs.push_back(*itr);
             cells.insert(*itr);
         }
     }
 
     {
-        dirty_cells_t::const_iterator itr = cells.begin(), itr_end = cells.end();
+        dirty_cell_addrs_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
         for (; itr != itr_end; ++itr)
         {
             tracker.get_all_range_listeners(*itr, cells);
