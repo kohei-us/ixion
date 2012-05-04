@@ -91,7 +91,7 @@ public:
     void remove_volatile(const abs_address_t& pos);
     const address_set_type& get_volatile_cells() const;
 
-    void get_all_cell_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
+    void get_all_cell_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
 
     /**
      * Given a modified cell (target), get all formula cells that need to be
@@ -100,13 +100,13 @@ public:
      * @param target
      * @param listeners
      */
-    void get_all_range_listeners(const abs_address_t& target, dirty_cells_t& listeners) const;
+    void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
 
     void print_cell_listeners(const abs_address_t& target) const;
 private:
     void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target,
-        dirty_cells_t& listeners, address_set_type& listeners_addr) const;
+        dirty_formula_cells_t& listeners, address_set_type& listeners_addr) const;
 
     iface::model_context& m_context;
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.

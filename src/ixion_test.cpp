@@ -309,8 +309,8 @@ void test_volatile_function()
     model_context cxt;
     cxt.set_session_handler(NULL);
 
-    dirty_cells_t dirty_cells;
-    dirty_cell_addrs_t dirty_addrs;
+    dirty_formula_cells_t dirty_cells;
+    modified_cells_t dirty_addrs;
 
     // Set values into A1:A3.
     cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);

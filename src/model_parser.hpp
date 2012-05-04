@@ -92,8 +92,8 @@ private:
     model_context m_context;
     std::string m_filepath;
     size_t m_thread_count;
-    dirty_cells_t m_dirty_cells;
-    dirty_cell_addrs_t m_dirty_cell_addrs;
+    dirty_formula_cells_t m_dirty_cells;
+    modified_cells_t m_dirty_cell_addrs;
     results_type m_formula_results;
     bool m_print_separator:1;
 };

@@ -134,11 +134,15 @@ bool operator==(const range_t& left, const range_t& right);
 bool operator!=(const range_t& left, const range_t& right);
 
 /**
- * Dirty cells are those formula cells that have been modified or formula
- * cells that reference other modified cells.
+ * Collection of formula cells that have been modified or formula cells that
+ * reference other modified cells either directly or indirectly.
  */
-typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> dirty_cells_t;
-typedef std::vector<abs_address_t> dirty_cell_addrs_t;
+typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> dirty_formula_cells_t;
+
+/**
+ * Collection of cells that have been modified.
+ */
+typedef std::vector<abs_address_t> modified_cells_t;
 
 }
 

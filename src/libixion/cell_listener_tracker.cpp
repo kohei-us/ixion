@@ -159,10 +159,10 @@ namespace {
 class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
 {
     iface::model_context& m_context;
-    dirty_cells_t& m_dirty_cells;
+    dirty_formula_cells_t& m_dirty_cells;
     cell_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(iface::model_context& cxt, dirty_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
+    dirty_cell_inserter(iface::model_context& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
     void operator() (const cell_listener_tracker::address_set_type* p)
@@ -196,7 +196,7 @@ public:
 }
 
 void cell_listener_tracker::get_all_cell_listeners(
-    const abs_address_t& target, dirty_cells_t& listeners) const
+    const abs_address_t& target, dirty_formula_cells_t& listeners) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     const formula_name_resolver& res = m_context.get_name_resolver();
@@ -227,7 +227,7 @@ void cell_listener_tracker::get_all_cell_listeners(
 }
 
 void cell_listener_tracker::get_all_range_listeners(
-    const abs_address_t& target, dirty_cells_t& listeners) const
+    const abs_address_t& target, dirty_formula_cells_t& listeners) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
@@ -254,7 +254,7 @@ void cell_listener_tracker::print_cell_listeners(const abs_address_t& target) co
 }
 
 void cell_listener_tracker::get_all_range_listeners_re(
-    const abs_address_t& origin_target, const abs_address_t& target, dirty_cells_t& listeners, address_set_type& listeners_addrs) const
+    const abs_address_t& origin_target, const abs_address_t& target, dirty_formula_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "--- begin: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
@@ -268,7 +268,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
         return;
     }
 
-    dirty_cells_t new_listeners;
+    dirty_formula_cells_t new_listeners;
     address_set_type new_listeners_addrs;
     range_query_set_type::search_result res = m_query_set.search(target.column, target.row);
 
