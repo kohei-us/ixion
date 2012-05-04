@@ -177,9 +177,6 @@ namespace {
 
 void get_result_from_cell(const iface::model_context& cxt, const abs_address_t& addr, formula_result& res)
 {
-    if (cxt.is_empty(addr))
-        return;
-
     switch (cxt.get_celltype(addr))
     {
         case celltype_formula:
@@ -339,16 +336,16 @@ bool pop_stack_value_or_string(const iface::model_context& cxt,
         case sv_single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
-            if (cxt.is_empty(addr))
-            {
-                // empty cell has a value of 0.
-                vt = sv_value;
-                val = 0.0;
-                return true;
-            }
 
             switch (cxt.get_celltype(addr))
             {
+                case celltype_empty:
+                {
+                    // empty cell has a value of 0.
+                    vt = sv_value;
+                    val = 0.0;
+                    return true;
+                }
                 case celltype_numeric:
                 {
                     vt = sv_value;

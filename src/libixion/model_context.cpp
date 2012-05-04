@@ -84,9 +84,6 @@ bool set_shared_formula_tokens_to_cell(
 
     abs_address_t test = addr;
     test.row -= 1;
-    if (cxt.is_empty(test))
-        // The neighboring cell is empty.
-        return false;
 
     if (cxt.get_celltype(test) != celltype_formula)
         // The neighboring cell is not a formula cell.
@@ -485,7 +482,7 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
     switch (gmcell_type)
     {
         case mdds::gridmap::celltype_empty:
-            throw general_error("model_context_impl::get_celltype: empty cell");
+            return celltype_empty;
         case mdds::gridmap::celltype_numeric:
             return celltype_numeric;
         case mdds::gridmap::celltype_index:

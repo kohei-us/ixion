@@ -45,11 +45,11 @@ IXION_DLLPUBLIC extern const size_t empty_string_id;
 
 enum celltype_t
 {
-    celltype_unknown = 0x0000,
-    celltype_string  = 0x0001,
-    celltype_numeric = 0x0002,
-    celltype_formula = 0x0003,
-    celltype_mask    = 0x000F
+    celltype_unknown = 0,
+    celltype_string,
+    celltype_numeric,
+    celltype_formula,
+    celltype_empty
 };
 
 }

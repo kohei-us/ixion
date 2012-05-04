@@ -408,12 +408,10 @@ const string value_stack_t::pop_string()
             abs_address_t addr = v.get_address();
             m_stack.pop_back();
 
-            if (m_context.is_empty(addr))
-                // empty cell.
-                return string();
-
             switch (m_context.get_celltype(addr))
             {
+                case celltype_empty:
+                    return string();
                 case celltype_formula:
                 {
                     const formula_cell* fc = m_context.get_formula_cell(addr);
