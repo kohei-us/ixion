@@ -216,7 +216,10 @@ public:
     void erase_cell(const abs_address_t& addr);
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_string_cell(const abs_address_t& addr, size_t identifier);
     void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
+
     bool is_empty(const abs_address_t& addr) const;
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
@@ -454,6 +457,12 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, const char* 
     col_store.set_cell(addr.row, str_id);
 }
 
+void model_context_impl::set_string_cell(const abs_address_t& addr, size_t identifier)
+{
+    cell_store_type::column_type& col_store = m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    col_store.set_cell(addr.row, identifier);
+}
+
 void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
@@ -465,6 +474,16 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
         fcell->set_identifier(tkid);
     }
 
+    cell_store_type::column_type& col_store =
+        m_sheets.get_sheet(addr.sheet).get_column(addr.column);
+    col_store.set_cell(addr.row, fcell.release());
+}
+
+void model_context_impl::set_formula_cell(
+    const abs_address_t& addr, size_t identifier, bool shared)
+{
+    unique_ptr<formula_cell> fcell(new formula_cell(identifier));
+    fcell->set_shared(shared);
     cell_store_type::column_type& col_store =
         m_sheets.get_sheet(addr.sheet).get_column(addr.column);
     col_store.set_cell(addr.row, fcell.release());
@@ -589,9 +608,20 @@ void model_context::set_string_cell(const abs_address_t& addr, const char* p, si
     mp_impl->set_string_cell(addr, p, n);
 }
 
+void model_context::set_string_cell(const abs_address_t& addr, size_t identifier)
+{
+    mp_impl->set_string_cell(addr, identifier);
+}
+
 void model_context::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     mp_impl->set_formula_cell(addr, p, n);
+}
+
+void model_context::set_formula_cell(
+    const abs_address_t& addr, size_t identifier, bool shared)
+{
+    mp_impl->set_formula_cell(addr, identifier, shared);
 }
 
 bool model_context::is_empty(const abs_address_t& addr) const
