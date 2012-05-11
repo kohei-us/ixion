@@ -108,6 +108,8 @@ public:
     void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
 
+    abs_range_t get_data_range(sheet_t sheet) const;
+
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);
 

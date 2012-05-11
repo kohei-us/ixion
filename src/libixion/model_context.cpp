@@ -154,6 +154,9 @@ bool set_shared_formula_tokens_to_cell(
 class model_context_impl
 {
     typedef mdds::grid_map<ixion::grid_map_trait> cell_store_type;
+    typedef cell_store_type::sheet_type sheet_type;
+    typedef sheet_type::column_type column_type;
+
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
@@ -165,6 +168,8 @@ class model_context_impl
 public:
     model_context_impl(model_context& parent) :
         m_parent(parent),
+        m_max_row_size(1048576),
+        m_max_col_size(1024),
         m_sheets(3, 1048576, 1024),
         mp_config(new config),
         mp_name_resolver(new formula_name_resolver_a1),
@@ -220,6 +225,8 @@ public:
     void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
 
+    abs_range_t get_data_range(sheet_t sheet) const;
+
     bool is_empty(const abs_address_t& addr) const;
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
@@ -246,6 +253,8 @@ public:
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
 
 private:
+    row_t m_max_row_size;
+    col_t m_max_col_size;
     model_context& m_parent;
 
     cell_store_type m_sheets;
@@ -489,6 +498,123 @@ void model_context_impl::set_formula_cell(
     col_store.set_cell(addr.row, fcell.release());
 }
 
+abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
+{
+    if (m_max_col_size <= 0 || m_max_row_size <= 0)
+        return abs_range_t();
+
+    const sheet_type& cols = m_sheets.get_sheet(sheet);
+    size_t col_size = cols.size();
+    if (!col_size)
+        abs_range_t();
+
+    size_t col1 = 0;
+    size_t col2 = 0;
+
+    bool found = false;
+    for (size_t i = 0; i < col_size; ++i)
+    {
+        const column_type& col = cols[i];
+        if (!col.empty())
+        {
+            column_type::const_iterator it = col.begin();
+            if (it->type != mdds::gridmap::celltype_empty)
+            {
+                col1 = i;
+                found = true;
+                break;
+            }
+        }
+    }
+
+    if (!found)
+        return abs_range_t();
+
+    for (size_t i = col_size; i > 0; --i)
+    {
+        const column_type& col = cols[i-1];
+        if (!col.empty())
+        {
+            column_type::const_iterator it = col.begin();
+            if (it->type != mdds::gridmap::celltype_empty)
+            {
+                col2 = i;
+                break;
+            }
+        }
+    }
+
+    abs_range_t range;
+    range.first.column = col1;
+    range.first.row = m_max_row_size;
+    range.first.sheet = sheet;
+    range.last.column = col2;
+    range.last.row = 0;
+    range.last.sheet = sheet;
+
+    for (size_t i = col1; i <= col2; ++i)
+    {
+        const column_type& col = cols[i];
+        if (col.empty())
+            continue;
+
+        if (range.first.row > 0)
+        {
+            // First non-empty row.
+
+            column_type::const_iterator it = col.begin(), it_end = col.end();
+            assert(it != it_end);
+            if (it->type == mdds::gridmap::celltype_empty)
+            {
+                // First block is empty.
+                row_t offset = it->size;
+                ++it;
+                if (it == it_end)
+                {
+                    // The whole column is empty.
+                    continue;
+                }
+
+                assert(it->type != mdds::gridmap::celltype_empty);
+                if (range.first.row > offset)
+                    range.first.row = offset;
+            }
+            else
+                // Set the first row to 0, and lock it.
+                range.first.row = 0;
+        }
+
+        if (range.last.row < (m_max_row_size-1))
+        {
+            // Last non-empty row.
+
+            column_type::const_reverse_iterator it = col.rbegin(), it_end = col.rend();
+            assert(it != it_end);
+            if (it->type == mdds::gridmap::celltype_empty)
+            {
+                // Last block is empty.
+                size_t size_last_block = it->size;
+                ++it;
+                if (it == it_end)
+                {
+                    // The whole column is empty.
+                    continue;
+                }
+
+                assert(it->type != mdds::gridmap::celltype_empty);
+                row_t last_data_row = static_cast<row_t>(col.size() - size_last_block - 1);
+                if (range.last.row < last_data_row)
+                    range.first.row = last_data_row;
+            }
+            else
+                // Last block is not empty.
+                range.last.row = m_max_row_size - 1;
+        }
+
+    }
+    return range;
+}
+
 bool model_context_impl::is_empty(const abs_address_t& addr) const
 {
     return m_sheets.get_sheet(addr.sheet).get_column(addr.column).is_empty(addr.row);
@@ -622,6 +748,11 @@ void model_context::set_formula_cell(
     const abs_address_t& addr, size_t identifier, bool shared)
 {
     mp_impl->set_formula_cell(addr, identifier, shared);
+}
+
+abs_range_t model_context::get_data_range(sheet_t sheet) const
+{
+    mp_impl->get_data_range(sheet);
 }
 
 bool model_context::is_empty(const abs_address_t& addr) const
