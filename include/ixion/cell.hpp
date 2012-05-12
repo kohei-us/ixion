@@ -69,7 +69,7 @@ public:
     IXION_DLLPUBLIC formula_cell(size_t tokens_identifier);
     IXION_DLLPUBLIC ~formula_cell();
 
-    size_t get_identifier() const;
+    IXION_DLLPUBLIC size_t get_identifier() const;
     void set_identifier(size_t identifier);
 
     IXION_DLLPUBLIC double get_value() const;
