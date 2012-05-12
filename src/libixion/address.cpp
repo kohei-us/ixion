@@ -226,4 +226,16 @@ bool operator!=(const range_t& left, const range_t& right)
     return !operator==(left, right);
 }
 
+std::ostream& operator<<(std::ostream& os, abs_address_t& addr)
+{
+    os << "(sheet:" << addr.sheet << ",row:" << addr.row << ",column:" << addr.column << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, abs_range_t& range)
+{
+    os << range.first << "-" << range.last;
+    return os;
+}
+
 }

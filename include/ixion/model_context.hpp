@@ -71,6 +71,7 @@ public:
     typedef std::vector<shared_tokens> shared_tokens_type;
 
     model_context();
+    model_context(sheet_t init_sheet_size, row_t max_row_size, col_t max_col_size);
     virtual ~model_context();
 
     virtual const config& get_config() const;

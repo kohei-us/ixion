@@ -33,6 +33,7 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 
 namespace ixion {
 
@@ -130,8 +131,11 @@ struct IXION_DLLPUBLIC range_t
     abs_range_t to_abs(const abs_address_t& origin) const;
 };
 
-bool operator==(const range_t& left, const range_t& right);
-bool operator!=(const range_t& left, const range_t& right);
+IXION_DLLPUBLIC bool operator==(const range_t& left, const range_t& right);
+IXION_DLLPUBLIC bool operator!=(const range_t& left, const range_t& right);
+
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, abs_address_t& addr);
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, abs_range_t& range);
 
 /**
  * Collection of formula cells that have been modified or formula cells that

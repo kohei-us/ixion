@@ -271,12 +271,6 @@ void test_model_context_storage()
         model_context cxt;
         cxt.set_session_handler(NULL);
 
-        abs_range_t area = cxt.get_data_range(0);
-        assert(area.first == area.last);
-        assert(area.first.sheet == 0);
-        assert(area.first.row == 0);
-        assert(area.first.column == 0);
-
         // Test storage of numeric values.
         double val = 0.1;
         for (col_t col = 0; col < 3; ++col)
@@ -305,6 +299,33 @@ void test_model_context_storage()
         cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size());
         cxt.set_formula_cell(abs_address_t(0,2,0), &exp[0], exp.size());
         cxt.set_formula_cell(abs_address_t(0,1,0), &exp[0], exp.size());
+    }
+
+    {
+        // Test data area.
+        model_context cxt(1, 10, 10);
+
+        abs_range_t area = cxt.get_data_range(0);
+        assert(area.first == area.last);
+        assert(area.first.sheet == 0);
+        assert(area.first.row == 0);
+        assert(area.first.column == 0);
+
+        cxt.set_numeric_cell(abs_address_t(0, 8, 5), 1.1);
+        area = cxt.get_data_range(0);
+        assert(area.first == area.last);
+        assert(area.first.sheet == 0);
+        assert(area.first.row == 8);
+        assert(area.first.column == 5);
+
+        cxt.set_numeric_cell(abs_address_t(0, 2, 3), 1.1);
+        area = cxt.get_data_range(0);
+        assert(area.first.sheet == 0);
+        assert(area.first.row == 2);
+        assert(area.first.column == 3);
+        assert(area.last.sheet == 0);
+        assert(area.last.row == 8);
+        assert(area.last.column == 5);
     }
 }
 

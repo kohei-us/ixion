@@ -181,6 +181,21 @@ public:
         m_string_map.insert(string_map_type::value_type(mem_str_buf(), 0));
     }
 
+    model_context_impl(model_context& parent, sheet_t init_sheet_size, row_t max_row_size, col_t max_col_size) :
+        m_parent(parent),
+        m_max_row_size(max_row_size),
+        m_max_col_size(max_col_size),
+        m_sheets(init_sheet_size, max_row_size, max_col_size),
+        mp_config(new config),
+        mp_name_resolver(new formula_name_resolver_a1),
+        mp_cell_listener_tracker(new cell_listener_tracker(parent)),
+        mp_session_handler(new session_handler(parent))
+    {
+        // For convenience, string ID of 0 is associated with an empty string.
+        m_strings.push_back(new std::string);
+        m_string_map.insert(string_map_type::value_type(mem_str_buf(), 0));
+    }
+
     ~model_context_impl()
     {
         delete mp_config;
@@ -578,7 +593,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                 assert(it->type != mdds::gridmap::celltype_empty);
                 row_t last_data_row = static_cast<row_t>(col.size() - size_last_block - 1);
                 if (range.last.row < last_data_row)
-                    range.first.row = last_data_row;
+                    range.last.row = last_data_row;
             }
             else
                 // Last block is not empty.
@@ -679,6 +694,9 @@ bool model_context::shared_tokens::operator== (const shared_tokens& r) const
 
 model_context::model_context() :
     mp_impl(new model_context_impl(*this)) {}
+
+model_context::model_context(sheet_t init_sheet_size, row_t max_row_size, col_t max_col_size) :
+    mp_impl(new model_context_impl(*this, init_sheet_size, max_row_size, max_col_size)) {}
 
 model_context::~model_context()
 {
