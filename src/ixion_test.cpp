@@ -314,10 +314,7 @@ void test_model_context_storage()
         model_context cxt(1, 10, 10);
 
         abs_range_t area = cxt.get_data_range(0);
-        assert(area.first == area.last);
-        assert(area.first.sheet == 0);
-        assert(area.first.row == 0);
-        assert(area.first.column == 0);
+        assert(!area.valid());
 
         cxt.set_numeric_cell(abs_address_t(0, 6, 5), 1.1);
         area = cxt.get_data_range(0);

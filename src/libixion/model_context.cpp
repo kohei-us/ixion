@@ -516,12 +516,12 @@ void model_context_impl::set_formula_cell(
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 {
     if (m_max_col_size <= 0 || m_max_row_size <= 0)
-        return abs_range_t();
+        return abs_range_t(abs_range_t::invalid);
 
     const sheet_type& cols = m_sheets.get_sheet(sheet);
     size_t col_size = cols.size();
     if (!col_size)
-        return abs_range_t();
+        return abs_range_t(abs_range_t::invalid);
 
     abs_range_t range;
     range.first.column = 0;
@@ -606,7 +606,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
     if (range.last.column < 0)
         // No data column found.  The whole sheet is empty.
-        return abs_range_t();
+        return abs_range_t(abs_range_t::invalid);
 
     return range;
 }
