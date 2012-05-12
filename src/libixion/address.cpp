@@ -33,14 +33,19 @@ using namespace std;
 
 namespace ixion {
 
-abs_address_t::abs_address_t() :
-    sheet(0), row(0), column(0) {}
+abs_address_t::abs_address_t() : sheet(0), row(0), column(0) {}
+abs_address_t::abs_address_t(init_invalid) : sheet(-1), row(-1), column(-1) {}
 
 abs_address_t::abs_address_t(sheet_t _sheet, row_t _row, col_t _column) :
     sheet(_sheet), row(_row), column(_column) {}
 
 abs_address_t::abs_address_t(const abs_address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column) {}
+
+bool abs_address_t::valid() const
+{
+    return sheet >= 0 && row >= 0 && column >= 0;
+}
 
 string abs_address_t::get_name() const
 {
@@ -173,11 +178,18 @@ bool operator< (const address_t& left, const address_t& right)
 }
 
 abs_range_t::abs_range_t() {}
+abs_range_t::abs_range_t(init_invalid) :
+    first(abs_address_t::invalid), last(abs_address_t::invalid) {}
 
 size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 {
     abs_address_t::hash adr_hash;
     return adr_hash(range.first) + 65536*adr_hash(range.last);
+}
+
+bool abs_range_t::valid() const
+{
+    return first.valid() && last.valid();
 }
 
 bool abs_range_t::contains(const abs_address_t& addr) const

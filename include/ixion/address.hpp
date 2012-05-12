@@ -42,13 +42,18 @@ namespace ixion {
  */
 struct IXION_DLLPUBLIC abs_address_t
 {
+    enum init_invalid { invalid };
+
     sheet_t sheet;
     row_t   row;
     col_t   column;
+
     abs_address_t();
+    abs_address_t(init_invalid);
     abs_address_t(sheet_t _sheet, row_t _row, col_t _column);
     abs_address_t(const abs_address_t& r);
 
+    bool valid() const;
     ::std::string get_name() const;
 
     struct hash
@@ -97,15 +102,20 @@ IXION_DLLPUBLIC bool operator<(const address_t& left, const address_t& right);
  */
 struct IXION_DLLPUBLIC abs_range_t
 {
+    enum init_invalid { invalid };
+
     abs_address_t first;
     abs_address_t last;
 
     abs_range_t();
+    abs_range_t(init_invalid);
 
     struct hash
     {
         size_t operator() (const abs_range_t& range) const;
     };
+
+    bool valid() const;
 
     /**
      * Check whether or not a given address is contained within this range.

@@ -177,6 +177,14 @@ void test_address()
     abs_address_t pos(1, 0, 0);
     abs_address_t abs_addr = addr.to_abs(pos);
     assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
+
+    // Default constructor makes valid address.
+    assert(abs_address_t().valid());
+    assert(abs_range_t().valid());
+
+    // These are invalid addresses.
+    assert(!abs_address_t(abs_address_t::invalid).valid());
+    assert(!abs_range_t(abs_range_t::invalid).valid());
 }
 
 bool check_formula_expression(model_context& cxt, const char* p)
