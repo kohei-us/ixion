@@ -311,11 +311,11 @@ void test_model_context_storage()
         assert(area.first.row == 0);
         assert(area.first.column == 0);
 
-        cxt.set_numeric_cell(abs_address_t(0, 8, 5), 1.1);
+        cxt.set_numeric_cell(abs_address_t(0, 6, 5), 1.1);
         area = cxt.get_data_range(0);
         assert(area.first == area.last);
         assert(area.first.sheet == 0);
-        assert(area.first.row == 8);
+        assert(area.first.row == 6);
         assert(area.first.column == 5);
 
         cxt.set_numeric_cell(abs_address_t(0, 2, 3), 1.1);
@@ -324,8 +324,22 @@ void test_model_context_storage()
         assert(area.first.row == 2);
         assert(area.first.column == 3);
         assert(area.last.sheet == 0);
-        assert(area.last.row == 8);
+        assert(area.last.row == 6);
         assert(area.last.column == 5);
+
+        cxt.set_numeric_cell(abs_address_t(0, 7, 1), 1.1);
+        area = cxt.get_data_range(0);
+        assert(area.first.sheet == 0);
+        assert(area.first.row == 2);
+        assert(area.first.column == 1);
+        assert(area.last.sheet == 0);
+        assert(area.last.row == 7);
+        assert(area.last.column == 5);
+
+        // This shouldn't change the data range.
+        cxt.set_numeric_cell(abs_address_t(0, 5, 5), 1.1);
+        abs_range_t test = cxt.get_data_range(0);
+        assert(test == area);
     }
 }
 
