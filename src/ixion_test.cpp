@@ -271,6 +271,9 @@ void test_model_context_storage()
         model_context cxt;
         cxt.set_session_handler(NULL);
 
+        abs_range_t area = cxt.get_data_range(0);
+        assert(area.first == area.last && area.first.sheet == 0 && area.first.row == 0 && area.first.column == 0);
+
         // Test storage of numeric values.
         double val = 0.1;
         for (col_t col = 0; col < 3; ++col)

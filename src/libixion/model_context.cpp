@@ -506,7 +506,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
     const sheet_type& cols = m_sheets.get_sheet(sheet);
     size_t col_size = cols.size();
     if (!col_size)
-        abs_range_t();
+        return abs_range_t();
 
     size_t col1 = 0;
     size_t col2 = 0;
@@ -546,7 +546,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
     abs_range_t range;
     range.first.column = col1;
-    range.first.row = m_max_row_size;
+    range.first.row = m_max_row_size-1;
     range.first.sheet = sheet;
     range.last.column = col2;
     range.last.row = 0;
@@ -752,7 +752,7 @@ void model_context::set_formula_cell(
 
 abs_range_t model_context::get_data_range(sheet_t sheet) const
 {
-    mp_impl->get_data_range(sheet);
+    return mp_impl->get_data_range(sheet);
 }
 
 bool model_context::is_empty(const abs_address_t& addr) const

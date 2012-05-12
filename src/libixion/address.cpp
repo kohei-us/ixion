@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * Copyright (c) 2011 Kohei Yoshida
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -33,13 +33,13 @@ using namespace std;
 
 namespace ixion {
 
-abs_address_t::abs_address_t() : 
+abs_address_t::abs_address_t() :
     sheet(0), row(0), column(0) {}
 
-abs_address_t::abs_address_t(sheet_t _sheet, row_t _row, col_t _column) : 
+abs_address_t::abs_address_t(sheet_t _sheet, row_t _row, col_t _column) :
     sheet(_sheet), row(_row), column(_column) {}
 
-abs_address_t::abs_address_t(const abs_address_t& r) : 
+abs_address_t::abs_address_t(const abs_address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column) {}
 
 string abs_address_t::get_name() const
@@ -56,8 +56,8 @@ size_t abs_address_t::hash::operator()(const abs_address_t& addr) const
 
 bool operator== (const abs_address_t& left, const abs_address_t& right)
 {
-    return left.sheet == right.sheet && 
-        left.row == right.row && 
+    return left.sheet == right.sheet &&
+        left.row == right.row &&
         left.column == right.column;
 }
 
@@ -77,18 +77,18 @@ bool operator< (const abs_address_t& left, const abs_address_t& right)
     return left.column < right.column;
 }
 
-address_t::address_t() : 
+address_t::address_t() :
     sheet(0), row(0), column(0), abs_sheet(true), abs_row(true), abs_column(true) {}
 
-address_t::address_t(sheet_t _sheet, row_t _row, col_t _column, bool _abs_sheet, bool _abs_row, bool _abs_column) : 
-    sheet(_sheet), row(_row), column(_column), 
+address_t::address_t(sheet_t _sheet, row_t _row, col_t _column, bool _abs_sheet, bool _abs_row, bool _abs_column) :
+    sheet(_sheet), row(_row), column(_column),
     abs_sheet(_abs_sheet), abs_row(_abs_row), abs_column(_abs_column) {}
 
-address_t::address_t(const address_t& r) : 
+address_t::address_t(const address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column),
     abs_sheet(r.abs_sheet), abs_row(r.abs_row), abs_column(r.abs_column) {}
 
-address_t::address_t(const abs_address_t& r) : 
+address_t::address_t(const abs_address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column),
     abs_sheet(true), abs_row(true), abs_column(true) {}
 
@@ -135,11 +135,11 @@ size_t address_t::hash::operator()(const address_t& addr) const
 
 bool operator== (const address_t& left, const address_t& right)
 {
-    return left.sheet == right.sheet && 
-        left.row == right.row && 
+    return left.sheet == right.sheet &&
+        left.row == right.row &&
         left.column == right.column &&
-        left.abs_sheet == right.abs_sheet && 
-        left.abs_row == right.abs_row && 
+        left.abs_sheet == right.abs_sheet &&
+        left.abs_row == right.abs_row &&
         left.abs_column == right.abs_column;
 }
 
