@@ -508,55 +508,23 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
     if (!col_size)
         return abs_range_t();
 
-    size_t col1 = 0;
-    size_t col2 = 0;
-
-    bool found = false;
-    for (size_t i = 0; i < col_size; ++i)
-    {
-        const column_type& col = cols[i];
-        if (!col.empty())
-        {
-            column_type::const_iterator it = col.begin();
-            if (it->type != mdds::gridmap::celltype_empty)
-            {
-                col1 = i;
-                found = true;
-                break;
-            }
-        }
-    }
-
-    if (!found)
-        return abs_range_t();
-
-    for (size_t i = col_size; i > 0; --i)
-    {
-        const column_type& col = cols[i-1];
-        if (!col.empty())
-        {
-            column_type::const_iterator it = col.begin();
-            if (it->type != mdds::gridmap::celltype_empty)
-            {
-                col2 = i;
-                break;
-            }
-        }
-    }
-
     abs_range_t range;
-    range.first.column = col1;
+    range.first.column = 0;
     range.first.row = m_max_row_size-1;
     range.first.sheet = sheet;
-    range.last.column = col2;
+    range.last.column = -1; // if this stays -1 all columns are empty.
     range.last.row = 0;
     range.last.sheet = sheet;
 
-    for (size_t i = col1; i <= col2; ++i)
+    for (size_t i = 0; i < col_size; ++i)
     {
         const column_type& col = cols[i];
         if (col.empty())
+        {
+            if (range.last.column < 0)
+                ++range.first.column;
             continue;
+        }
 
         if (range.first.row > 0)
         {
@@ -572,6 +540,8 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                 if (it == it_end)
                 {
                     // The whole column is empty.
+                    if (range.last.column < 0)
+                        ++range.first.column;
                     continue;
                 }
 
@@ -582,6 +552,8 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
             else
                 // Set the first row to 0, and lock it.
                 range.first.row = 0;
+
+            range.last.column = i;
         }
 
         if (range.last.row < (m_max_row_size-1))
@@ -598,6 +570,8 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                 if (it == it_end)
                 {
                     // The whole column is empty.
+                    if (range.last.column < 0)
+                        ++range.first.column;
                     continue;
                 }
 
@@ -609,9 +583,16 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
             else
                 // Last block is not empty.
                 range.last.row = m_max_row_size - 1;
+
+            range.last.column = i;
         }
 
     }
+
+    if (range.last.column < 0)
+        // No data column found.  The whole sheet is empty.
+        return abs_range_t();
+
     return range;
 }
 
