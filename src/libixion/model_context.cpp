@@ -259,6 +259,8 @@ public:
 
     size_t add_string(const char* p, size_t n);
     const std::string* get_string(size_t identifier) const;
+    size_t get_string_count() const;
+
     const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     void remove_formula_tokens(sheet_t sheet, size_t identifier);
@@ -366,6 +368,11 @@ const std::string* model_context_impl::get_string(size_t identifier) const
         return NULL;
 
     return &m_strings[identifier];
+}
+
+size_t model_context_impl::get_string_count() const
+{
+    return m_strings.size();
 }
 
 const formula_tokens_t* model_context_impl::get_formula_tokens(sheet_t sheet, size_t identifier) const
@@ -896,6 +903,11 @@ void model_context::append_sheet_name(const char* p, size_t n)
 void model_context::set_session_handler(iface::session_handler* handler)
 {
     mp_impl->set_session_handler(handler);
+}
+
+size_t model_context::get_string_count() const
+{
+    return mp_impl->get_string_count();
 }
 
 }

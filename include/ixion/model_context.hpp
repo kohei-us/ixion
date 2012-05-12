@@ -127,6 +127,8 @@ public:
      */
     void set_session_handler(iface::session_handler* handler);
 
+    size_t get_string_count() const;
+
 private:
     model_context_impl* mp_impl;
 };
