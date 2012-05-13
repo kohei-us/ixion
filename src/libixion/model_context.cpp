@@ -188,9 +188,6 @@ public:
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {
-        // For convenience, string ID of 0 is associated with an empty string.
-        m_strings.push_back(new std::string);
-        m_string_map.insert(string_map_type::value_type(mem_str_buf(), 0));
     }
 
     ~model_context_impl()
