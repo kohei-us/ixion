@@ -101,6 +101,11 @@ public:
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
     size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
     void remove_formula_tokens(sheet_t sheet, size_t identifier);
+
+    void set_shared_formula(
+        const abs_address_t& addr, size_t si,
+        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range);
+
     void erase_cell(const abs_address_t& addr);
 
     void set_numeric_cell(const abs_address_t& addr, double val);

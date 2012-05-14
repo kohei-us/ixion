@@ -66,10 +66,9 @@ void IXION_DLLPUBLIC print_formula_tokens(
  *
  * @param cxt model context.
  * @param pos address of the cell being registered.
- * @param cell instance of the cell being registered.
  */
 void IXION_DLLPUBLIC register_formula_cell(
-    iface::model_context& cxt, const abs_address_t& pos, formula_cell* cell);
+    iface::model_context& cxt, const abs_address_t& pos);
 
 /**
  * Unregister a formula cell with cell dependency tracker if a formula cell

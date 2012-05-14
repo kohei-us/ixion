@@ -290,12 +290,12 @@ void model_parser::parse_init(const char*& p)
 #if DEBUG_MODEL_PARSER
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
 #endif
+            unregister_formula_cell(m_context, pos);
             m_context.set_formula_cell(pos, buf.get(), buf.size());
             formula_cell* p = m_context.get_formula_cell(pos);
             assert(p);
-            unregister_formula_cell(m_context, pos);
             m_dirty_cells.insert(pos);
-            register_formula_cell(m_context, pos, p);
+            register_formula_cell(m_context, pos);
 #if DEBUG_MODEL_PARSER
             std::string s;
             print_formula_tokens(m_context, pos, *tokens, s);
