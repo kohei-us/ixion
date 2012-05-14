@@ -80,10 +80,10 @@ void test_name_resolver()
     cout << "test name resolver" << endl;
 
     model_context cxt;
-    cxt.append_sheet_name(IXION_ASCII("One"));
-    cxt.append_sheet_name(IXION_ASCII("Two"));
-    cxt.append_sheet_name(IXION_ASCII("Three"));
-    cxt.append_sheet_name(IXION_ASCII("A B C")); // name with space
+    cxt.append_sheet(IXION_ASCII("One"));
+    cxt.append_sheet(IXION_ASCII("Two"));
+    cxt.append_sheet(IXION_ASCII("Three"));
+    cxt.append_sheet(IXION_ASCII("A B C")); // name with space
     formula_name_resolver_a1 resolver(&cxt);
 
     // Parse single cell addresses.
@@ -277,6 +277,7 @@ void test_model_context_storage()
     cout << "test model context storage" << endl;
     {
         model_context cxt;
+        cxt.append_sheet(IXION_ASCII("test"));
         cxt.set_session_handler(NULL);
 
         // Test storage of numeric values.
@@ -302,6 +303,7 @@ void test_model_context_storage()
 
     {
         model_context cxt;
+        cxt.append_sheet(IXION_ASCII("test"));
         cxt.set_session_handler(NULL);
         string exp = "1";
         cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size());
@@ -311,7 +313,8 @@ void test_model_context_storage()
 
     {
         // Test data area.
-        model_context cxt(1, 10, 10);
+        model_context cxt(10, 10);
+        cxt.append_sheet(IXION_ASCII("test"));
 
         abs_range_t area = cxt.get_data_range(0);
         assert(!area.valid());
@@ -353,6 +356,7 @@ void test_volatile_function()
     cout << "test volatile function" << endl;
 
     model_context cxt;
+    cxt.append_sheet(IXION_ASCII("test"));
     cxt.set_session_handler(NULL);
 
     dirty_formula_cells_t dirty_cells;

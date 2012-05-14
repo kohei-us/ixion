@@ -71,7 +71,7 @@ public:
     typedef std::vector<shared_tokens> shared_tokens_type;
 
     model_context();
-    model_context(sheet_t init_sheet_size, row_t max_row_size, col_t max_col_size);
+    model_context(row_t max_row_size, col_t max_col_size);
     virtual ~model_context();
 
     virtual const config& get_config() const;
@@ -119,7 +119,7 @@ public:
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);
 
-    void append_sheet_name(const char* p, size_t n);
+    void append_sheet(const char* p, size_t n);
 
     /**
      * Set new session handler instance.  The client code needs to allocate

@@ -170,7 +170,6 @@ public:
         m_parent(parent),
         m_max_row_size(1048576),
         m_max_col_size(1024),
-        m_sheets(3, 1048576, 1024),
         mp_config(new config),
         mp_name_resolver(new formula_name_resolver_a1),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
@@ -178,11 +177,10 @@ public:
     {
     }
 
-    model_context_impl(model_context& parent, sheet_t init_sheet_size, row_t max_row_size, col_t max_col_size) :
+    model_context_impl(model_context& parent, row_t max_row_size, col_t max_col_size) :
         m_parent(parent),
         m_max_row_size(max_row_size),
         m_max_col_size(max_col_size),
-        m_sheets(init_sheet_size, max_row_size, max_col_size),
         mp_config(new config),
         mp_name_resolver(new formula_name_resolver_a1),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
@@ -249,7 +247,7 @@ public:
     const string* get_named_expression_name(const formula_cell* expr) const;
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
-    void append_sheet_name(const char* p, size_t n);
+    void append_sheet(const char* p, size_t n);
 
     size_t add_string(const char* p, size_t n);
     const std::string* get_string(size_t identifier) const;
@@ -343,9 +341,10 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
     return m_sheet_names[sheet];
 }
 
-void model_context_impl::append_sheet_name(const char* p, size_t n)
+void model_context_impl::append_sheet(const char* p, size_t n)
 {
     m_sheet_names.push_back(new string(p, n));
+    m_sheets.push_back(m_max_row_size, m_max_col_size);
 }
 
 size_t model_context_impl::add_string(const char* p, size_t n)
@@ -744,8 +743,8 @@ bool model_context::shared_tokens::operator== (const shared_tokens& r) const
 model_context::model_context() :
     mp_impl(new model_context_impl(*this)) {}
 
-model_context::model_context(sheet_t init_sheet_size, row_t max_row_size, col_t max_col_size) :
-    mp_impl(new model_context_impl(*this, init_sheet_size, max_row_size, max_col_size)) {}
+model_context::model_context(row_t max_row_size, col_t max_col_size) :
+    mp_impl(new model_context_impl(*this, max_row_size, max_col_size)) {}
 
 model_context::~model_context()
 {
@@ -944,9 +943,9 @@ const string* model_context::get_named_expression_name(const formula_cell* expr)
     return mp_impl->get_named_expression_name(expr);
 }
 
-void model_context::append_sheet_name(const char* p, size_t n)
+void model_context::append_sheet(const char* p, size_t n)
 {
-    mp_impl->append_sheet_name(p, n);
+    mp_impl->append_sheet(p, n);
 }
 
 void model_context::set_session_handler(iface::session_handler* handler)
