@@ -566,7 +566,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
     if (m_max_col_size <= 0 || m_max_row_size <= 0)
         return abs_range_t(abs_range_t::invalid);
 
-    const sheet_type& cols = m_sheets.get_sheet(sheet);
+    const sheet_type& cols = m_sheets.at(sheet);
     size_t col_size = cols.size();
     if (!col_size)
         return abs_range_t(abs_range_t::invalid);
@@ -661,13 +661,13 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
 bool model_context_impl::is_empty(const abs_address_t& addr) const
 {
-    return m_sheets.get_sheet(addr.sheet).get_column(addr.column).is_empty(addr.row);
+    return m_sheets.at(addr.sheet).at(addr.column).is_empty(addr.row);
 }
 
 celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
     mdds::gridmap::cell_t gmcell_type =
-        m_sheets.get_sheet(addr.sheet).get_column(addr.column).get_type(addr.row);
+        m_sheets.at(addr.sheet).at(addr.column).get_type(addr.row);
     switch (gmcell_type)
     {
         case mdds::gridmap::celltype_empty:
