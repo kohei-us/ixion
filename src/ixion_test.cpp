@@ -209,6 +209,7 @@ void test_parse_and_print_expressions()
 {
     cout << "test public formula api" << endl;
     const char* exps[] = {
+        "H:H",
         "1/3*1.4",
         "2.3*(1+2)/(34*(3-2))",
         "SUM(1,2,3)",

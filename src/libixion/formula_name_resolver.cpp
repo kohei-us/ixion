@@ -368,7 +368,7 @@ formula_name_resolver_a1::~formula_name_resolver_a1() {}
 formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, const abs_address_t& pos) const
 {
 #if DEBUG_NAME_RESOLVER
-    __IXION_DEBUG_OUT__ << "name=" << name << "; origin=" << pos.get_name() << endl;
+    __IXION_DEBUG_OUT__ << "name=" << string(p,n) << "; origin=" << pos.get_name() << endl;
 #endif
     formula_name_type ret;
     if (resolve_function(p, n, ret))
@@ -401,7 +401,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
 #if DEBUG_NAME_RESOLVER
         string abs_row_s = abs_row ? "abs" : "rel";
         string abs_col_s = abs_col ? "abs" : "rel";
-        cout << "resolve: " << name << "=(row=" << row << " [" << abs_row_s << "]; column=" << col << " [" << abs_col_s << "])" << endl;
+        cout << "resolve: " << string(p,n) << "=(row=" << row << " [" << abs_row_s << "]; column=" << col << " [" << abs_col_s << "])" << endl;
 #endif
         ret.type = formula_name_type::cell_reference;
         ret.address.sheet = sheet;
