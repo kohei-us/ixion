@@ -31,6 +31,7 @@
 #include "ixion/env.hpp"
 
 #include <string>
+#include <ostream>
 
 namespace ixion {
 
@@ -72,6 +73,8 @@ private:
 
 IXION_DLLPUBLIC bool operator<  (const mem_str_buf& left, const mem_str_buf& right);
 IXION_DLLPUBLIC bool operator>  (const mem_str_buf& left, const mem_str_buf& right);
+
+IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const mem_str_buf& str);
 
 }
 

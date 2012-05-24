@@ -146,4 +146,10 @@ bool operator> (const mem_str_buf& left, const mem_str_buf& right)
     return left.str() > right.str();
 }
 
+std::ostream& operator<< (std::ostream& os, const mem_str_buf& str)
+{
+    os << str.str();
+    return os;
+}
+
 }
