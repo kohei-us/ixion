@@ -32,7 +32,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_NAME_RESOLVER 1
+#define DEBUG_NAME_RESOLVER 0
 
 using namespace std;
 
@@ -168,18 +168,17 @@ void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, co
 }
 
 parse_address_result parse_address(
-    const ixion::iface::model_context* cxt,
-    const char*& p, const char* p_last, sheet_t& sheet, row_t& row, col_t& col, bool& abs_sheet, bool& abs_row, bool& abs_col)
+    const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
-    row = 0;
-    col = 0;
-    abs_sheet = false;
-    abs_row = false;
-    abs_col = false;
+    addr.row = 0;
+    addr.column = 0;
+    addr.abs_sheet = false;
+    addr.abs_row = false;
+    addr.abs_column = false;
 
     if (cxt)
         // Overwrite the sheet index *only when* sheet name is parsed successfully.
-        parse_sheet_name(*cxt, '!', p, p_last, sheet);
+        parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
 
     resolver_parse_mode mode = resolver_parse_column;
 
@@ -198,9 +197,9 @@ parse_address_result parse_address(
             if (mode != resolver_parse_column)
                 return invalid;
 
-            if (col)
-                col *= 26;
-            col += static_cast<col_t>(c - 'A' + 1);
+            if (addr.column)
+                addr.column *= 26;
+            addr.column += static_cast<col_t>(c - 'A' + 1);
         }
         else if ('0' <= c && c <= '9')
         {
@@ -214,17 +213,17 @@ parse_address_result parse_address(
                 mode = resolver_parse_row;
             }
 
-            if (row)
-                row *= 10;
+            if (addr.row)
+                addr.row *= 10;
 
-            row += static_cast<row_t>(c - '0');
+            addr.row += static_cast<row_t>(c - '0');
         }
         else if (c == ':')
         {
             if (mode == resolver_parse_row)
             {
-                --row;
-                --col;
+                --addr.row;
+                --addr.column;
                 return range_expected;
             }
             else
@@ -239,8 +238,8 @@ parse_address_result parse_address(
         ++p;
     }
 
-    --row;
-    --col;
+    --addr.row;
+    --addr.column;
     return valid_address;
 }
 
@@ -275,14 +274,14 @@ string _to_string(const formula_name_type::address_type& addr)
     return os.str();
 }
 
-void to_relative_address(sheet_t& sheet, row_t& row, col_t& col, bool abs_sheet, bool abs_row, bool abs_col, const abs_address_t& pos)
+void to_relative_address(address_t& addr, const abs_address_t& pos)
 {
-    if (!abs_sheet)
-        sheet -= pos.sheet;
-    if (!abs_row)
-        row -= pos.row;
-    if (!abs_col)
-        col -= pos.column;
+    if (!addr.abs_sheet)
+        addr.sheet -= pos.sheet;
+    if (!addr.abs_row)
+        addr.row -= pos.row;
+    if (!addr.abs_column)
+        addr.column -= pos.column;
 }
 
 } // anonymous namespace
@@ -379,15 +378,16 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
 
     const char* p_last = p;
     std::advance(p_last, n -1);
-    col_t col = 0;
-    row_t row = 0;
-    sheet_t sheet = pos.sheet; // Use the sheet where the cell is unless sheet name is explicitly given.
-    bool abs_col = false;
-    bool abs_row = false;
-    bool abs_sheet = false;
 
-    parse_address_result parse_res =
-        parse_address(mp_cxt, p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
+    address_t parsed_addr;
+    parsed_addr.column = 0;
+    parsed_addr.row = 0;
+    parsed_addr.sheet = pos.sheet;  // Use the sheet where the cell is unless sheet name is explicitly given.
+    parsed_addr.abs_column = false;
+    parsed_addr.abs_row = false;
+    parsed_addr.abs_sheet = false;
+
+    parse_address_result parse_res = parse_address(mp_cxt, p, p_last, parsed_addr);
 
 #if DEBUG_NAME_RESOLVER
     __IXION_DEBUG_OUT__ << "parse address result: " << _to_string(parse_res) << endl;
@@ -396,20 +396,21 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
     if (parse_res == valid_address)
     {
         // This is a single cell address.
-        to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
+        to_relative_address(parsed_addr, pos);
 
 #if DEBUG_NAME_RESOLVER
-        string abs_row_s = abs_row ? "abs" : "rel";
-        string abs_col_s = abs_col ? "abs" : "rel";
-        cout << "resolve: " << string(p,n) << "=(row=" << row << " [" << abs_row_s << "]; column=" << col << " [" << abs_col_s << "])" << endl;
+        string abs_row_s = parsed_addr.abs_row ? "abs" : "rel";
+        string abs_col_s = parsed_addr.abs_column ? "abs" : "rel";
+        cout << "resolve: " << string(p,n) << "=(row=" << parsed_addr.row
+            << " [" << abs_row_s << "]; column=" << parsed_addr.column << " [" << abs_col_s << "])" << endl;
 #endif
         ret.type = formula_name_type::cell_reference;
-        ret.address.sheet = sheet;
-        ret.address.row = row;
-        ret.address.col = col;
-        ret.address.abs_sheet = abs_sheet;
-        ret.address.abs_row = abs_row;
-        ret.address.abs_col = abs_col;
+        ret.address.sheet = parsed_addr.sheet;
+        ret.address.row = parsed_addr.row;
+        ret.address.col = parsed_addr.column;
+        ret.address.abs_sheet = parsed_addr.abs_sheet;
+        ret.address.abs_row = parsed_addr.abs_row;
+        ret.address.abs_col = parsed_addr.abs_column;
         return ret;
     }
 
@@ -421,30 +422,30 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
 
         ++p; // skip ':'
 
-        to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
+        to_relative_address(parsed_addr, pos);
 
-        ret.range.first.sheet = sheet;
-        ret.range.first.row = row;
-        ret.range.first.col = col;
-        ret.range.first.abs_sheet = abs_sheet;
-        ret.range.first.abs_row = abs_row;
-        ret.range.first.abs_col = abs_col;
+        ret.range.first.sheet = parsed_addr.sheet;
+        ret.range.first.row = parsed_addr.row;
+        ret.range.first.col = parsed_addr.column;
+        ret.range.first.abs_sheet = parsed_addr.abs_sheet;
+        ret.range.first.abs_row = parsed_addr.abs_row;
+        ret.range.first.abs_col = parsed_addr.abs_column;
 
         // For now, we assume the sheet index of the end address is identical
         // to that of the begin address.
-        parse_res = parse_address(NULL, p, p_last, sheet, row, col, abs_sheet, abs_row, abs_col);
+        parse_res = parse_address(NULL, p, p_last, parsed_addr);
         if (parse_res != valid_address)
             // The 2nd part after the ':' is not valid.
             return ret;
 
-        to_relative_address(sheet, row, col, abs_sheet, abs_row, abs_col, pos);
+        to_relative_address(parsed_addr, pos);
 
         ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
-        ret.range.last.row = row;
-        ret.range.last.col = col;
-        ret.range.last.abs_sheet = abs_sheet;
-        ret.range.last.abs_row = abs_row;
-        ret.range.last.abs_col = abs_col;
+        ret.range.last.row = parsed_addr.row;
+        ret.range.last.col = parsed_addr.column;
+        ret.range.last.abs_sheet = parsed_addr.abs_sheet;
+        ret.range.last.abs_row = parsed_addr.abs_row;
+        ret.range.last.abs_col = parsed_addr.abs_column;
         ret.type = formula_name_type::range_reference;
         return ret;
     }
