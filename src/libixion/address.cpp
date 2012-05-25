@@ -34,17 +34,14 @@ using namespace std;
 
 namespace ixion {
 
-namespace {
+static const row_t row_max = numeric_limits<row_t>::max();
+static const col_t column_max = numeric_limits<col_t>::max();
 
-const row_t row_max = numeric_limits<row_t>::max();
 const row_t row_unset = row_max - 9;
 const row_t row_upper_bound = row_max - 10;
 
-const col_t col_max = numeric_limits<col_t>::max();
-const col_t col_unset = col_max - 9;
-const col_t col_upper_bound = col_max - 10;
-
-}
+const col_t column_unset = column_max - 9;
+const col_t column_upper_bound = column_max - 10;
 
 abs_address_t::abs_address_t() : sheet(0), row(0), column(0) {}
 abs_address_t::abs_address_t(init_invalid) : sheet(-1), row(-1), column(-1) {}
@@ -57,7 +54,7 @@ abs_address_t::abs_address_t(const abs_address_t& r) :
 
 bool abs_address_t::valid() const
 {
-    return sheet >= 0 && row >= 0 && column >= 0 && row <= row_unset && column <= col_unset;
+    return sheet >= 0 && row >= 0 && column >= 0 && row <= row_unset && column <= column_unset;
 }
 
 string abs_address_t::get_name() const
@@ -132,7 +129,7 @@ bool address_t::valid() const
             return false;
     }
 
-    if (column > col_unset)
+    if (column > column_unset)
         return false;
 
     if (abs_column)
@@ -142,7 +139,7 @@ bool address_t::valid() const
     }
     else
     {
-        if (column < -col_upper_bound)
+        if (column < -column_upper_bound)
             return false;
     }
 
@@ -246,8 +243,8 @@ bool abs_range_t::valid() const
 
 void abs_range_t::set_whole_column()
 {
-    first.column = col_unset;
-    last.column = col_unset;
+    first.column = column_unset;
+    last.column = column_unset;
 }
 
 void abs_range_t::set_whole_row()
@@ -258,7 +255,7 @@ void abs_range_t::set_whole_row()
 
 bool abs_range_t::whole_column() const
 {
-    return first.column == col_unset && last.column == col_unset;
+    return first.column == column_unset && last.column == column_unset;
 }
 
 bool abs_range_t::whole_row() const
@@ -301,8 +298,8 @@ bool range_t::valid() const
 
 void range_t::set_whole_column()
 {
-    first.column = col_unset;
-    last.column = col_unset;
+    first.column = column_unset;
+    last.column = column_unset;
 }
 
 void range_t::set_whole_row()
@@ -313,7 +310,7 @@ void range_t::set_whole_row()
 
 bool range_t::whole_column() const
 {
-    return first.column == col_unset && last.column == col_unset;
+    return first.column == column_unset && last.column == column_unset;
 }
 
 bool range_t::whole_row() const
