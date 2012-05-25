@@ -28,10 +28,23 @@
 #include "ixion/address.hpp"
 
 #include <sstream>
+#include <limits>
 
 using namespace std;
 
 namespace ixion {
+
+namespace {
+
+const row_t row_max = numeric_limits<row_t>::max();
+const row_t row_unset = row_max - 9;
+const row_t row_upper_bound = row_max - 10;
+
+const col_t col_max = numeric_limits<col_t>::max();
+const col_t col_unset = col_max - 9;
+const col_t col_upper_bound = col_max - 10;
+
+}
 
 abs_address_t::abs_address_t() : sheet(0), row(0), column(0) {}
 abs_address_t::abs_address_t(init_invalid) : sheet(-1), row(-1), column(-1) {}
@@ -44,7 +57,7 @@ abs_address_t::abs_address_t(const abs_address_t& r) :
 
 bool abs_address_t::valid() const
 {
-    return sheet >= 0 && row >= 0 && column >= 0;
+    return sheet >= 0 && row >= 0 && column >= 0 && row <= row_unset && column <= col_unset;
 }
 
 string abs_address_t::get_name() const
@@ -96,6 +109,45 @@ address_t::address_t(const address_t& r) :
 address_t::address_t(const abs_address_t& r) :
     sheet(r.sheet), row(r.row), column(r.column),
     abs_sheet(true), abs_row(true), abs_column(true) {}
+
+bool address_t::valid() const
+{
+    if (abs_sheet)
+    {
+        if (sheet < 0)
+            return false;
+    }
+
+    if (row > row_unset)
+        return false;
+
+    if (abs_row)
+    {
+        if (row < 0)
+            return false;
+    }
+    else
+    {
+        if (row < -row_upper_bound)
+            return false;
+    }
+
+    if (column > col_unset)
+        return false;
+
+    if (abs_column)
+    {
+        if (column < 0)
+            return false;
+    }
+    else
+    {
+        if (column < -col_upper_bound)
+            return false;
+    }
+
+    return true;
+}
 
 abs_address_t address_t::to_abs(const abs_address_t& origin) const
 {
@@ -192,6 +244,28 @@ bool abs_range_t::valid() const
     return first.valid() && last.valid();
 }
 
+void abs_range_t::set_whole_column()
+{
+    first.column = col_unset;
+    last.column = col_unset;
+}
+
+void abs_range_t::set_whole_row()
+{
+    first.row = row_unset;
+    last.row = row_unset;
+}
+
+bool abs_range_t::whole_column() const
+{
+    return first.column == col_unset && last.column == col_unset;
+}
+
+bool abs_range_t::whole_row() const
+{
+    return first.row == row_unset && last.row == row_unset;
+}
+
 bool abs_range_t::contains(const abs_address_t& addr) const
 {
     return first.sheet <= addr.sheet && addr.sheet <= last.sheet &&
@@ -219,6 +293,33 @@ bool operator<(const abs_range_t& left, const abs_range_t& right)
 range_t::range_t() {}
 range_t::range_t(const address_t& _first, const address_t& _last) :
     first(_first), last(_last) {}
+
+bool range_t::valid() const
+{
+    return first.valid() && last.valid();
+}
+
+void range_t::set_whole_column()
+{
+    first.column = col_unset;
+    last.column = col_unset;
+}
+
+void range_t::set_whole_row()
+{
+    first.row = row_unset;
+    last.row = row_unset;
+}
+
+bool range_t::whole_column() const
+{
+    return first.column == col_unset && last.column == col_unset;
+}
+
+bool range_t::whole_row() const
+{
+    return first.row == row_unset && last.row == row_unset;
+}
 
 abs_range_t range_t::to_abs(const abs_address_t& origin) const
 {

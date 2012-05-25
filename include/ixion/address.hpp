@@ -84,6 +84,7 @@ struct IXION_DLLPUBLIC address_t
     address_t(const address_t& r);
     address_t(const abs_address_t& r);
 
+    bool valid() const;
     abs_address_t to_abs(const abs_address_t& origin) const;
     ::std::string get_name() const;
 
@@ -116,6 +117,10 @@ struct IXION_DLLPUBLIC abs_range_t
     };
 
     bool valid() const;
+    void set_whole_column();
+    void set_whole_row();
+    bool whole_column() const;
+    bool whole_row() const;
 
     /**
      * Check whether or not a given address is contained within this range.
@@ -137,6 +142,12 @@ struct IXION_DLLPUBLIC range_t
 
     range_t();
     range_t(const address_t& _first, const address_t& _last);
+
+    bool valid() const;
+    void set_whole_column();
+    void set_whole_row();
+    bool whole_column() const;
+    bool whole_row() const;
 
     abs_range_t to_abs(const abs_address_t& origin) const;
 };

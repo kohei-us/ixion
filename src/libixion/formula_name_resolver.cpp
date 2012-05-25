@@ -32,7 +32,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_NAME_RESOLVER 0
+#define DEBUG_NAME_RESOLVER 1
 
 using namespace std;
 

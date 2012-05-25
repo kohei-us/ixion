@@ -209,7 +209,6 @@ void test_parse_and_print_expressions()
 {
     cout << "test public formula api" << endl;
     const char* exps[] = {
-        "H:H",
         "1/3*1.4",
         "2.3*(1+2)/(34*(3-2))",
         "SUM(1,2,3)",
@@ -217,7 +216,8 @@ void test_parse_and_print_expressions()
         "B10",
         "XFD1048576",
         "C10:D20",
-        "A1:XFD1048576"
+        "A1:XFD1048576",
+        "H:H"
     };
     size_t num_exps = sizeof(exps) / sizeof(exps[0]);
     model_context cxt;
