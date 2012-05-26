@@ -226,6 +226,13 @@ parse_address_result parse_address(
                 --addr.column;
                 return range_expected;
             }
+            else if (mode == resolver_parse_column)
+            {
+                // row number is not given.
+                --addr.column;
+                addr.row = row_unset;
+                return range_expected;
+            }
             else
                 return invalid;
         }
@@ -238,8 +245,17 @@ parse_address_result parse_address(
         ++p;
     }
 
-    --addr.row;
-    --addr.column;
+    if (mode == resolver_parse_row)
+    {
+        --addr.row;
+        --addr.column;
+    }
+    else if (mode == resolver_parse_column)
+    {
+        // row number is not given.
+        --addr.column;
+        addr.row = row_unset;
+    }
     return valid_address;
 }
 
@@ -538,14 +554,21 @@ string formula_name_resolver_a1::get_name(const abs_range_t& range, bool sheet_n
 
     col_t col = range.first.column;
     row_t row = range.first.row;
-    append_column_name_a1(os, col);
-    os << (row + 1);
+
+    if (col != column_unset)
+        append_column_name_a1(os, col);
+    if (row != row_unset)
+        os << (row + 1);
     os << ":";
 
     col = range.last.column;
     row = range.last.row;
-    append_column_name_a1(os, col);
-    os << (row + 1);
+
+    if (col != column_unset)
+        append_column_name_a1(os, col);
+    if (row != row_unset)
+        os << (row + 1);
+
     return os.str();
 }
 
