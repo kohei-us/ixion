@@ -218,7 +218,11 @@ void test_parse_and_print_expressions()
         "C10:D20",
         "A1:XFD1048576",
         "H:H",
-        "B:D"
+        "B:D",
+        "AB:AD",
+        "2:2",
+        "3:5",
+        "34:36"
     };
     size_t num_exps = sizeof(exps) / sizeof(exps[0]);
     model_context cxt;

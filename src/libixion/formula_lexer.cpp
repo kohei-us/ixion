@@ -52,7 +52,9 @@ public:
         mp_first(p),
         mp_char(NULL),
         m_size(n),
-        m_pos(0)
+        m_pos(0),
+        mp_char_stored(NULL),
+        m_pos_stored(0)
     {
     }
 
@@ -74,6 +76,8 @@ private:
 
     bool has_char() const;
     void next();
+    void push_pos();
+    void pop_pos();
 
 private:
     lexer_tokens_t& m_tokens;
@@ -85,6 +89,9 @@ private:
     const char* mp_char;
     const size_t m_size;
     size_t m_pos;
+
+    const char* mp_char_stored;
+    size_t m_pos_stored;
 };
 
 void tokenizer::init()
@@ -202,14 +209,25 @@ bool tokenizer::is_op(char c) const
 void tokenizer::numeral()
 {
     const char* p = mp_char;
+    push_pos();
+
     size_t len = 1;
     size_t sep_count = 0;
     for (next(); has_char(); next(), ++len)
     {
+        if (*mp_char == ':')
+        {
+            // Treat this as a name.  This may be a part of a row-only range (e.g. 3:3).
+            pop_pos();
+            name();
+            return;
+        }
+
         if (is_digit(*mp_char))
             continue;
         if (is_decimal_sep(*mp_char) && ++sep_count <= 1)
             continue;
+
         break;
     }
 
@@ -267,6 +285,21 @@ void tokenizer::next()
 {
     ++mp_char;
     ++m_pos;
+}
+
+void tokenizer::push_pos()
+{
+    mp_char_stored = mp_char;
+    m_pos_stored = m_pos;
+}
+
+void tokenizer::pop_pos()
+{
+    mp_char = mp_char_stored;
+    m_pos = m_pos_stored;
+
+    mp_char_stored = NULL;
+    m_pos_stored = 0;
 }
 
 bool tokenizer::has_char() const

@@ -170,6 +170,10 @@ void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, co
 parse_address_result parse_address(
     const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
+    // NOTE: Row and column IDs are 1-based during parsing, while 0 is used as
+    // the state of a value-not-set.  They are subtracted by one before
+    // returning.
+
     addr.row = 0;
     addr.column = 0;
     addr.abs_sheet = false;
