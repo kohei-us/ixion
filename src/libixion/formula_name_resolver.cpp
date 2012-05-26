@@ -222,14 +222,27 @@ parse_address_result parse_address(
         {
             if (mode == resolver_parse_row)
             {
+                if (!addr.row)
+                    return invalid;
+
                 --addr.row;
-                --addr.column;
+
+                if (addr.column)
+                    --addr.column;
+                else
+                    addr.column = column_unset;
+
                 return range_expected;
             }
             else if (mode == resolver_parse_column)
             {
                 // row number is not given.
-                --addr.column;
+                if (addr.column)
+                    --addr.column;
+                else
+                    // neither row number nor column number is given.
+                    return invalid;
+
                 addr.row = row_unset;
                 return range_expected;
             }
@@ -247,13 +260,25 @@ parse_address_result parse_address(
 
     if (mode == resolver_parse_row)
     {
+        if (!addr.row)
+            return invalid;
+
         --addr.row;
-        --addr.column;
+
+        if (addr.column)
+            --addr.column;
+        else
+            addr.column = column_unset;
     }
     else if (mode == resolver_parse_column)
     {
         // row number is not given.
-        --addr.column;
+        if (addr.column)
+            --addr.column;
+        else
+            // neither row number nor column number is given.
+            return invalid;
+
         addr.row = row_unset;
     }
     return valid_address;
