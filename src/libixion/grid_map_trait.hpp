@@ -31,322 +31,242 @@
 #include "ixion/types.hpp"
 #include "ixion/cell.hpp"
 
-#include <mdds/grid_map_trait.hpp>
+#include <mdds/multi_type_vector_trait.hpp>
+#include <mdds/multi_type_vector_types.hpp>
 
-namespace mdds { namespace gridmap {
+namespace ixion {
 
-const mdds::gridmap::cell_t celltype_formula = mdds::gridmap::celltype_user_start;
+class formula_cell;
 
-typedef mdds::gridmap::noncopyable_managed_cell_block<celltype_formula, ixion::formula_cell> formula_cell_block;
+const mdds::mtv::element_t element_type_formula = mdds::mtv::element_type_user_start;
 
-cell_t get_cell_type(const ixion::formula_cell*)
+typedef mdds::mtv::noncopyable_managed_element_block<
+    element_type_formula, ixion::formula_cell> formula_element_block;
+
+inline mdds::mtv::element_t mdds_mtv_get_element_type(const formula_cell*)
 {
-    return celltype_formula;
+    return element_type_formula;
 }
 
-void set_value(base_cell_block& block, size_t pos, ixion::formula_cell* p)
+inline void mdds_mtv_set_value(mdds::mtv::base_element_block& block, size_t pos, formula_cell* val)
 {
-    formula_cell_block::set_value(block, pos, p);
+    formula_element_block::set_value(block, pos, val);
 }
 
-template<typename _Iter>
-void set_values(
-    base_cell_block& block, size_t pos, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+inline void mdds_mtv_get_value(const mdds::mtv::base_element_block& block, size_t pos, formula_cell*& val)
 {
-    formula_cell_block::set_values(block, pos, it_begin, it_end);
-}
-
-void get_value(const base_cell_block& block, size_t pos, ixion::formula_cell*& val)
-{
-    formula_cell_block::get_value(block, pos, val);
-}
-
-void append_value(base_cell_block& block, ixion::formula_cell* val)
-{
-    formula_cell_block::append_value(block, val);
-}
-
-void prepend_value(base_cell_block& block, ixion::formula_cell* val)
-{
-    formula_cell_block::prepend_value(block, val);
+    formula_element_block::get_value(block, pos, val);
 }
 
 template<typename _Iter>
-void append_values(mdds::gridmap::base_cell_block& block, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+inline void mdds_mtv_set_values(
+    mdds::mtv::base_element_block& block, size_t pos, const formula_cell*&, const _Iter& it_begin, const _Iter& it_end)
 {
-    formula_cell_block::append_values(block, it_begin, it_end);
+    formula_element_block::set_values(block, pos, it_begin, it_end);
+}
+
+inline void mdds_mtv_append_value(mdds::mtv::base_element_block& block, formula_cell* val)
+{
+    formula_element_block::append_value(block, val);
+}
+
+inline void mdds_mtv_prepend_value(mdds::mtv::base_element_block& block, formula_cell* val)
+{
+    formula_element_block::prepend_value(block, val);
 }
 
 template<typename _Iter>
-void prepend_values(mdds::gridmap::base_cell_block& block, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+void mdds_mtv_prepend_values(mdds::mtv::base_element_block& block, const formula_cell*, const _Iter& it_begin, const _Iter& it_end)
 {
-    formula_cell_block::prepend_values(block, it_begin, it_end);
+    formula_element_block::prepend_values(block, it_begin, it_end);
 }
 
 template<typename _Iter>
-void assign_values(mdds::gridmap::base_cell_block& dest, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+void mdds_mtv_append_values(mdds::mtv::base_element_block& block, const formula_cell*, const _Iter& it_begin, const _Iter& it_end)
 {
-    formula_cell_block::assign_values(dest, it_begin, it_end);
+    formula_element_block::append_values(block, it_begin, it_end);
 }
 
 template<typename _Iter>
-void insert_values(
-    mdds::gridmap::base_cell_block& block, size_t pos, ixion::formula_cell*, const _Iter& it_begin, const _Iter& it_end)
+void mdds_mtv_assign_values(mdds::mtv::base_element_block& dest, const formula_cell*, const _Iter& it_begin, const _Iter& it_end)
 {
-    formula_cell_block::insert_values(block, pos, it_begin, it_end);
+    formula_element_block::assign_values(dest, it_begin, it_end);
 }
 
-void get_empty_value(ixion::formula_cell*& val)
+inline void mdds_mtv_get_empty_value(formula_cell*& val)
 {
     val = NULL;
 }
 
-struct ixion_cell_block_func : public mdds::gridmap::cell_block_func_base
+template<typename _Iter>
+void mdds_mtv_insert_values(
+    mdds::mtv::base_element_block& block, size_t pos, const formula_cell*&, const _Iter& it_begin, const _Iter& it_end)
 {
-    template<typename T>
-    static mdds::gridmap::cell_t get_cell_type(const T& cell)
-    {
-        return mdds::gridmap::get_cell_type(cell);
-    }
+    formula_element_block::insert_values(block, pos, it_begin, it_end);
+}
 
-    template<typename T>
-    static void set_value(mdds::gridmap::base_cell_block& block, size_t pos, const T& val)
-    {
-        mdds::gridmap::set_value(block, pos, val);
-    }
+inline mdds::mtv::base_element_block* mdds_mtv_create_new_block(size_t init_size, formula_cell* val)
+{
+    assert(init_size <= 1);
+    return formula_element_block::create_block_with_value(init_size, val);
+}
 
-    template<typename T>
-    static void set_values(mdds::gridmap::base_cell_block& block, size_t pos, const T& it_begin, const T& it_end)
-    {
-        assert(it_begin != it_end);
-        mdds::gridmap::set_values(block, pos, *it_begin, it_begin, it_end);
-    }
-
-    template<typename T>
-    static void get_value(const mdds::gridmap::base_cell_block& block, size_t pos, T& val)
-    {
-        mdds::gridmap::get_value(block, pos, val);
-    }
-
-    template<typename T>
-    static void append_value(mdds::gridmap::base_cell_block& block, const T& val)
-    {
-        mdds::gridmap::append_value(block, val);
-    }
-
-    template<typename T>
-    static void insert_values(
-        mdds::gridmap::base_cell_block& block, size_t pos, const T& it_begin, const T& it_end)
-    {
-        assert(it_begin != it_end);
-        mdds::gridmap::insert_values(block, pos, *it_begin, it_begin, it_end);
-    }
-
-    template<typename T>
-    static void append_values(mdds::gridmap::base_cell_block& block, const T& it_begin, const T& it_end)
-    {
-        assert(it_begin != it_end);
-        mdds::gridmap::append_values(block, *it_begin, it_begin, it_end);
-    }
-
-    template<typename T>
-    static void assign_values(mdds::gridmap::base_cell_block& dest, const T& it_begin, const T& it_end)
-    {
-        assert(it_begin != it_end);
-        mdds::gridmap::assign_values(dest, *it_begin, it_begin, it_end);
-    }
-
-    template<typename T>
-    static void prepend_value(mdds::gridmap::base_cell_block& block, const T& val)
-    {
-        mdds::gridmap::prepend_value(block, val);
-    }
-
-    template<typename T>
-    static void prepend_values(mdds::gridmap::base_cell_block& block, const T& it_begin, const T& it_end)
-    {
-        assert(it_begin != it_end);
-        mdds::gridmap::prepend_values(block, *it_begin, it_begin, it_end);
-    }
-
-    template<typename T>
-    static void get_empty_value(T& val)
-    {
-        mdds::gridmap::get_empty_value(val);
-    }
-
-    static mdds::gridmap::base_cell_block* create_new_block(
-        mdds::gridmap::cell_t type, size_t init_size)
+struct ixion_element_block_func
+{
+    inline static mdds::mtv::base_element_block* create_new_block(
+        mdds::mtv::element_t type, size_t init_size)
     {
         switch (type)
         {
-            case celltype_formula:
-                return formula_cell_block::create_block(init_size);
+            case element_type_formula:
+                return formula_element_block::create_block(init_size);
             default:
-                ;
+                return mdds::mtv::element_block_func::create_new_block(type, init_size);
         }
-
-        return cell_block_func_base::create_new_block(type, init_size);
     }
 
-    static mdds::gridmap::base_cell_block* clone_block(const mdds::gridmap::base_cell_block& block)
+    inline static mdds::mtv::base_element_block* clone_block(const mdds::mtv::base_element_block& block)
     {
-        switch (gridmap::get_block_type(block))
+        switch (mdds::mtv::get_block_type(block))
         {
-            case celltype_formula:
-                // This call throws; formula cell block is non-copyable.
-                return formula_cell_block::clone_block(block);
+            case element_type_formula:
+                return formula_element_block::clone_block(block);
             default:
-                ;
+                return mdds::mtv::element_block_func::clone_block(block);
         }
-
-        return cell_block_func_base::clone_block(block);
     }
 
-    static void delete_block(mdds::gridmap::base_cell_block* p)
+    inline static void delete_block(mdds::mtv::base_element_block* p)
     {
         if (!p)
             return;
 
-        switch (gridmap::get_block_type(*p))
+        switch (mdds::mtv::get_block_type(*p))
         {
-            case celltype_formula:
-                formula_cell_block::delete_block(p);
+            case element_type_formula:
+                formula_element_block::delete_block(p);
             break;
             default:
-                cell_block_func_base::delete_block(p);
+                mdds::mtv::element_block_func::delete_block(p);
         }
     }
 
-    static void resize_block(mdds::gridmap::base_cell_block& block, size_t new_size)
+    inline static void resize_block(mdds::mtv::base_element_block& block, size_t new_size)
     {
-        switch (gridmap::get_block_type(block))
+        switch (mdds::mtv::get_block_type(block))
         {
-            case celltype_formula:
-                formula_cell_block::resize_block(block, new_size);
+            case element_type_formula:
+                formula_element_block::resize_block(block, new_size);
             break;
             default:
-                cell_block_func_base::resize_block(block, new_size);
+                mdds::mtv::element_block_func::resize_block(block, new_size);
         }
     }
 
-    static void print_block(const mdds::gridmap::base_cell_block& block)
+    inline static void print_block(const mdds::mtv::base_element_block& block)
     {
-        switch (gridmap::get_block_type(block))
+        switch (mdds::mtv::get_block_type(block))
         {
-            case celltype_formula:
-                formula_cell_block::print_block(block);
+            case element_type_formula:
+                formula_element_block::print_block(block);
             break;
             default:
-                cell_block_func_base::print_block(block);
+                mdds::mtv::element_block_func::print_block(block);
         }
     }
 
-    static void erase(mdds::gridmap::base_cell_block& block, size_t pos)
+    inline static void erase(mdds::mtv::base_element_block& block, size_t pos)
     {
-        switch (gridmap::get_block_type(block))
+        switch (mdds::mtv::get_block_type(block))
         {
-            case celltype_formula:
-                formula_cell_block::erase_block(block, pos);
+            case element_type_formula:
+                formula_element_block::erase_block(block, pos);
             break;
             default:
-                cell_block_func_base::erase(block, pos);
+                mdds::mtv::element_block_func::erase(block, pos);
         }
     }
 
-    static void erase(mdds::gridmap::base_cell_block& block, size_t pos, size_t size)
+    inline static void erase(mdds::mtv::base_element_block& block, size_t pos, size_t size)
     {
-        switch (gridmap::get_block_type(block))
+        switch (mdds::mtv::get_block_type(block))
         {
-            case celltype_formula:
-                formula_cell_block::erase_block(block, pos, size);
+            case element_type_formula:
+                formula_element_block::erase_block(block, pos, size);
             break;
             default:
-                cell_block_func_base::erase(block, pos, size);
+                mdds::mtv::element_block_func::erase(block, pos, size);
         }
     }
 
-    static void append_values_from_block(
-        mdds::gridmap::base_cell_block& dest, const mdds::gridmap::base_cell_block& src)
+    inline static void append_values_from_block(
+        mdds::mtv::base_element_block& dest, const mdds::mtv::base_element_block& src)
     {
-        switch (gridmap::get_block_type(dest))
+        switch (mdds::mtv::get_block_type(dest))
         {
-            case celltype_formula:
-                formula_cell_block::append_values_from_block(dest, src);
+            case element_type_formula:
+                formula_element_block::append_values_from_block(dest, src);
             break;
             default:
-                cell_block_func_base::append_values_from_block(dest, src);
+                mdds::mtv::element_block_func::append_values_from_block(dest, src);
         }
     }
 
-    static void append_values_from_block(
-        mdds::gridmap::base_cell_block& dest, const mdds::gridmap::base_cell_block& src,
+    inline static void append_values_from_block(
+        mdds::mtv::base_element_block& dest, const mdds::mtv::base_element_block& src,
         size_t begin_pos, size_t len)
     {
-        switch (gridmap::get_block_type(dest))
+        switch (mdds::mtv::get_block_type(dest))
         {
-            case celltype_formula:
-                formula_cell_block::append_values_from_block(dest, src, begin_pos, len);
+            case element_type_formula:
+                formula_element_block::append_values_from_block(dest, src, begin_pos, len);
             break;
             default:
-                cell_block_func_base::append_values_from_block(dest, src, begin_pos, len);
+                mdds::mtv::element_block_func::append_values_from_block(dest, src, begin_pos, len);
         }
     }
 
-    static void assign_values_from_block(
-        mdds::gridmap::base_cell_block& dest, const mdds::gridmap::base_cell_block& src,
+    inline static void assign_values_from_block(
+        mdds::mtv::base_element_block& dest, const mdds::mtv::base_element_block& src,
         size_t begin_pos, size_t len)
     {
-        switch (gridmap::get_block_type(dest))
+        switch (mdds::mtv::get_block_type(dest))
         {
-            case celltype_formula:
-                formula_cell_block::assign_values_from_block(dest, src, begin_pos, len);
+            case element_type_formula:
+                formula_element_block::assign_values_from_block(dest, src, begin_pos, len);
             break;
             default:
-                cell_block_func_base::assign_values_from_block(dest, src, begin_pos, len);
+                mdds::mtv::element_block_func::assign_values_from_block(dest, src, begin_pos, len);
         }
     }
 
-    static bool equal_block(
-        const mdds::gridmap::base_cell_block& left, const mdds::gridmap::base_cell_block& right)
+    inline static bool equal_block(
+        const mdds::mtv::base_element_block& left, const mdds::mtv::base_element_block& right)
     {
-        if (gridmap::get_block_type(left) == celltype_formula)
+        if (mdds::mtv::get_block_type(left) == element_type_formula)
         {
-            if (gridmap::get_block_type(right) != celltype_formula)
+            if (mdds::mtv::get_block_type(right) != element_type_formula)
                 return false;
 
-            return formula_cell_block::get(left) == formula_cell_block::get(right);
+            return formula_element_block::get(left) == formula_element_block::get(right);
         }
-        else if (gridmap::get_block_type(right) == celltype_formula)
+        else if (mdds::mtv::get_block_type(right) == element_type_formula)
             return false;
 
-        return cell_block_func_base::equal_block(left, right);
+        return mdds::mtv::element_block_func::equal_block(left, right);
     }
 
-    static void overwrite_cells(mdds::gridmap::base_cell_block& block, size_t pos, size_t len)
+    inline static void overwrite_values(mdds::mtv::base_element_block& block, size_t pos, size_t len)
     {
-        switch (gridmap::get_block_type(block))
+        switch (mdds::mtv::get_block_type(block))
         {
-            case celltype_formula:
-                formula_cell_block::overwrite_cells(block, pos, len);
+            case element_type_formula:
+                // Do nothing.  The client code manages the life cycle of these cells.
             break;
             default:
-                cell_block_func_base::overwrite_cells(block, pos, len);
+                mdds::mtv::element_block_func::overwrite_values(block, pos, len);
         }
     }
-};
-
-}}
-
-namespace ixion {
-
-struct grid_map_trait
-{
-    typedef sheet_t sheet_key_type;
-    typedef row_t row_key_type;
-    typedef col_t col_key_type;
-
-    typedef mdds::gridmap::ixion_cell_block_func cell_block_func;
 };
 
 }

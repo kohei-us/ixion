@@ -25,7 +25,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_context.cpp \
 	cell_listener_tracker.cpp \
 	session_handler.cpp \
-	types.cpp
+	types.cpp \
+	workbook.cpp
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 

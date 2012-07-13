@@ -34,11 +34,9 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/formula.hpp"
 
-#include "grid_map_trait.hpp"
+#include "workbook.hpp"
 
 #include <memory>
-
-#include <mdds/grid_map.hpp>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -153,9 +151,7 @@ bool set_shared_formula_tokens_to_cell(
 
 class model_context_impl
 {
-    typedef mdds::grid_map<ixion::grid_map_trait> cell_store_type;
-    typedef cell_store_type::sheet_type sheet_type;
-    typedef sheet_type::column_type column_type;
+    typedef worksheet::column_type column_type;
 
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
@@ -273,7 +269,7 @@ private:
     col_t m_max_col_size;
     model_context& m_parent;
 
-    cell_store_type m_sheets;
+    workbook m_sheets;
 
     config* mp_config;
     formula_name_resolver* mp_name_resolver;
@@ -503,12 +499,12 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
 {
-    cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
 
-    mdds::gridmap::cell_t celltype = col_store.get_type(addr.row);
-    if (celltype == mdds::gridmap::celltype_formula)
+    mdds::mtv::element_t celltype = col_store.get_type(addr.row);
+    if (celltype == element_type_formula)
     {
-        const formula_cell* fcell = col_store.get_cell<formula_cell*>(addr.row);
+        const formula_cell* fcell = col_store.get<formula_cell*>(addr.row);
         assert(fcell);
         remove_formula_tokens(addr.sheet, fcell->get_identifier());
     }
@@ -518,21 +514,21 @@ void model_context_impl::erase_cell(const abs_address_t& addr)
 
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    col_store.set_cell(addr.row, val);
+    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    col_store.set(addr.row, val);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     size_t str_id = add_string(p, n);
-    cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    col_store.set_cell(addr.row, str_id);
+    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    col_store.set(addr.row, str_id);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, size_t identifier)
 {
-    cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    col_store.set_cell(addr.row, identifier);
+    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    col_store.set(addr.row, identifier);
 }
 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
@@ -546,9 +542,9 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
         fcell->set_identifier(tkid);
     }
 
-    cell_store_type::column_type& col_store =
+    worksheet::column_type& col_store =
         m_sheets.at(addr.sheet).at(addr.column);
-    col_store.set_cell(addr.row, fcell.release());
+    col_store.set(addr.row, fcell.release());
 }
 
 void model_context_impl::set_formula_cell(
@@ -556,9 +552,9 @@ void model_context_impl::set_formula_cell(
 {
     unique_ptr<formula_cell> fcell(new formula_cell(identifier));
     fcell->set_shared(shared);
-    cell_store_type::column_type& col_store =
+    worksheet::column_type& col_store =
         m_sheets.at(addr.sheet).at(addr.column);
-    col_store.set_cell(addr.row, fcell.release());
+    col_store.set(addr.row, fcell.release());
 }
 
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
@@ -566,7 +562,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
     if (m_max_col_size <= 0 || m_max_row_size <= 0)
         return abs_range_t(abs_range_t::invalid);
 
-    const sheet_type& cols = m_sheets.at(sheet);
+    const worksheet& cols = m_sheets.at(sheet);
     size_t col_size = cols.size();
     if (!col_size)
         return abs_range_t(abs_range_t::invalid);
@@ -595,7 +591,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
             column_type::const_iterator it = col.begin(), it_end = col.end();
             assert(it != it_end);
-            if (it->type == mdds::gridmap::celltype_empty)
+            if (it->type == mdds::mtv::element_type_empty)
             {
                 // First block is empty.
                 row_t offset = it->size;
@@ -608,7 +604,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                     continue;
                 }
 
-                assert(it->type != mdds::gridmap::celltype_empty);
+                assert(it->type != mdds::mtv::element_type_empty);
                 if (range.first.row > offset)
                     range.first.row = offset;
             }
@@ -625,7 +621,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
             column_type::const_reverse_iterator it = col.rbegin(), it_end = col.rend();
             assert(it != it_end);
-            if (it->type == mdds::gridmap::celltype_empty)
+            if (it->type == mdds::mtv::element_type_empty)
             {
                 // Last block is empty.
                 size_t size_last_block = it->size;
@@ -638,7 +634,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                     continue;
                 }
 
-                assert(it->type != mdds::gridmap::celltype_empty);
+                assert(it->type != mdds::mtv::element_type_empty);
                 row_t last_data_row = static_cast<row_t>(col.size() - size_last_block - 1);
                 if (range.last.row < last_data_row)
                     range.last.row = last_data_row;
@@ -666,17 +662,17 @@ bool model_context_impl::is_empty(const abs_address_t& addr) const
 
 celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
-    mdds::gridmap::cell_t gmcell_type =
+    mdds::mtv::element_t gmcell_type =
         m_sheets.at(addr.sheet).at(addr.column).get_type(addr.row);
     switch (gmcell_type)
     {
-        case mdds::gridmap::celltype_empty:
+        case mdds::mtv::element_type_empty:
             return celltype_empty;
-        case mdds::gridmap::celltype_numeric:
+        case mdds::mtv::element_type_numeric:
             return celltype_numeric;
-        case mdds::gridmap::celltype_index:
+        case mdds::mtv::element_type_index:
             return celltype_string;
-        case mdds::gridmap::celltype_formula:
+        case element_type_formula:
             return celltype_formula;
         default:
             throw general_error("unknown cell type");
@@ -687,14 +683,14 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
-    const cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
     switch (col_store.get_type(addr.row))
     {
-        case mdds::gridmap::celltype_numeric:
-            return col_store.get_cell<double>(addr.row);
-        case mdds::gridmap::celltype_formula:
+        case mdds::mtv::element_type_numeric:
+            return col_store.get<double>(addr.row);
+        case element_type_formula:
         {
-            const formula_cell* p = col_store.get_cell<formula_cell*>(addr.row);
+            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
             return p->get_value();
         }
         break;
@@ -706,29 +702,29 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 
 size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
-    const cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != mdds::gridmap::celltype_index)
+    const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    if (col_store.get_type(addr.row) != mdds::mtv::element_type_index)
         return empty_string_id;
 
-    return col_store.get_cell<size_t>(addr.row);
+    return col_store.get<size_t>(addr.row);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
-    const cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != mdds::gridmap::celltype_formula)
+    const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    if (col_store.get_type(addr.row) != element_type_formula)
         return NULL;
 
-    return col_store.get_cell<formula_cell*>(addr.row);
+    return col_store.get<formula_cell*>(addr.row);
 }
 
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
-    cell_store_type::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != mdds::gridmap::celltype_formula)
+    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    if (col_store.get_type(addr.row) != element_type_formula)
         return NULL;
 
-    return col_store.get_cell<formula_cell*>(addr.row);
+    return col_store.get<formula_cell*>(addr.row);
 }
 
 model_context::shared_tokens::shared_tokens() : tokens(NULL) {}

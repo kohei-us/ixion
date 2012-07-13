@@ -229,6 +229,9 @@
 					<F N="../include/ixion/interface/model_context.hpp"/>
 					<F N="../include/ixion/interface/session_handler.hpp"/>
 				</Folder>
+				<F
+					N="../include/ixion/Makefile.am"
+					Type="Makefile"/>
 				<F N="../include/ixion/address.hpp"/>
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>
@@ -253,9 +256,6 @@
 				<F N="../include/ixion/global.hpp"/>
 				<F N="../include/ixion/lexer_tokens.hpp"/>
 				<F N="../include/ixion/macros.hpp"/>
-				<F
-					N="../include/ixion/Makefile.am"
-					Type="Makefile"/>
 				<F N="../include/ixion/matrix.hpp"/>
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
@@ -266,6 +266,9 @@
 		</Folder>
 		<Folder Name="../src">
 			<Folder Name="libixion">
+				<F
+					N="../src/libixion/Makefile.am"
+					Type="Makefile"/>
 				<F N="../src/libixion/address.cpp"/>
 				<F N="../src/libixion/cell.cpp"/>
 				<F N="../src/libixion/cell_listener_tracker.cpp"/>
@@ -285,21 +288,20 @@
 				<F N="../src/libixion/global.cpp"/>
 				<F N="../src/libixion/grid_map_trait.hpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
-				<F
-					N="../src/libixion/Makefile.am"
-					Type="Makefile"/>
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
 				<F N="../src/libixion/session_handler.cpp"/>
 				<F N="../src/libixion/types.cpp"/>
+				<F N="../src/libixion/workbook.cpp"/>
+				<F N="../src/libixion/workbook.hpp"/>
 			</Folder>
-			<F N="../src/ixion_parser.cpp"/>
-			<F N="../src/ixion_sorter.cpp"/>
-			<F N="../src/ixion_test.cpp"/>
 			<F
 				N="../src/Makefile.am"
 				Type="Makefile"/>
+			<F N="../src/ixion_parser.cpp"/>
+			<F N="../src/ixion_sorter.cpp"/>
+			<F N="../src/ixion_test.cpp"/>
 			<F N="../src/model_parser.cpp"/>
 			<F N="../src/model_parser.hpp"/>
 			<F N="../src/sort_input_parser.cpp"/>
