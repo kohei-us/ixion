@@ -286,11 +286,11 @@
 				<F N="../src/libixion/formula_tokens.cpp"/>
 				<F N="../src/libixion/function_objects.cpp"/>
 				<F N="../src/libixion/global.cpp"/>
-				<F N="../src/libixion/grid_map_trait.hpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
+				<F N="../src/libixion/multi_type_vector_trait.hpp"/>
 				<F N="../src/libixion/session_handler.cpp"/>
 				<F N="../src/libixion/types.cpp"/>
 				<F N="../src/libixion/workbook.cpp"/>

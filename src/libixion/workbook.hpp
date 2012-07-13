@@ -28,7 +28,7 @@
 #ifndef __IXION_WORKBOOK_HPP__
 #define __IXION_WORKBOOK_HPP__
 
-#include "grid_map_trait.hpp"
+#include "multi_type_vector_trait.hpp"
 
 #include <mdds/multi_type_vector.hpp>
 #include <mdds/multi_type_vector_trait.hpp>
