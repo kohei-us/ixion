@@ -59,7 +59,7 @@ inline void mdds_mtv_get_value(const mdds::mtv::base_element_block& block, size_
 }
 
 template<typename _Iter>
-inline void mdds_mtv_set_values(
+void mdds_mtv_set_values(
     mdds::mtv::base_element_block& block, size_t pos, const formula_cell*&, const _Iter& it_begin, const _Iter& it_end)
 {
     formula_element_block::set_values(block, pos, it_begin, it_end);
