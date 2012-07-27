@@ -155,7 +155,7 @@ class model_context_impl
 
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
-    typedef boost::unordered_map<mem_str_buf, size_t, mem_str_buf::hash> string_map_type;
+    typedef boost::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
 
     typedef model_context::shared_tokens shared_tokens;
@@ -224,7 +224,7 @@ public:
     void erase_cell(const abs_address_t& addr);
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
-    void set_string_cell(const abs_address_t& addr, size_t identifier);
+    void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
 
@@ -233,7 +233,7 @@ public:
     bool is_empty(const abs_address_t& addr) const;
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
-    size_t get_string_identifier(const abs_address_t& addr) const;
+    string_id_t get_string_identifier(const abs_address_t& addr) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
@@ -245,8 +245,8 @@ public:
     std::string get_sheet_name(sheet_t sheet) const;
     void append_sheet(const char* p, size_t n);
 
-    size_t add_string(const char* p, size_t n);
-    const std::string* get_string(size_t identifier) const;
+    string_id_t add_string(const char* p, size_t n);
+    const std::string* get_string(string_id_t identifier) const;
     size_t get_string_count() const;
 
     const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
@@ -343,13 +343,13 @@ void model_context_impl::append_sheet(const char* p, size_t n)
     m_sheets.push_back(m_max_row_size, m_max_col_size);
 }
 
-size_t model_context_impl::add_string(const char* p, size_t n)
+string_id_t model_context_impl::add_string(const char* p, size_t n)
 {
     string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
     if (itr != m_string_map.end())
         return itr->second;
 
-    size_t str_id = m_strings.size();
+    string_id_t str_id = m_strings.size();
     std::auto_ptr<string> ps(new string(p, n));
     p = &(*ps)[0];
     mem_str_buf key(p, n);
@@ -358,7 +358,7 @@ size_t model_context_impl::add_string(const char* p, size_t n)
     return str_id;
 }
 
-const std::string* model_context_impl::get_string(size_t identifier) const
+const std::string* model_context_impl::get_string(string_id_t identifier) const
 {
     if (identifier >= m_strings.size())
         return NULL;
@@ -525,7 +525,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, const char* 
     col_store.set(addr.row, str_id);
 }
 
-void model_context_impl::set_string_cell(const abs_address_t& addr, size_t identifier)
+void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
     worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
     col_store.set(addr.row, identifier);
@@ -670,7 +670,7 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
             return celltype_empty;
         case mdds::mtv::element_type_numeric:
             return celltype_numeric;
-        case mdds::mtv::element_type_index:
+        case mdds::mtv::element_type_ulong:
             return celltype_string;
         case element_type_formula:
             return celltype_formula;
@@ -700,13 +700,13 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
     return 0.0;
 }
 
-size_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
+string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
     const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != mdds::mtv::element_type_index)
+    if (col_store.get_type(addr.row) != mdds::mtv::element_type_ulong)
         return empty_string_id;
 
-    return col_store.get<size_t>(addr.row);
+    return col_store.get<string_id_t>(addr.row);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
@@ -777,7 +777,7 @@ void model_context::set_string_cell(const abs_address_t& addr, const char* p, si
     mp_impl->set_string_cell(addr, p, n);
 }
 
-void model_context::set_string_cell(const abs_address_t& addr, size_t identifier)
+void model_context::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
     mp_impl->set_string_cell(addr, identifier);
 }
@@ -813,7 +813,7 @@ double model_context::get_numeric_value(const abs_address_t& addr) const
     return mp_impl->get_numeric_value(addr);
 }
 
-size_t model_context::get_string_identifier(const abs_address_t& addr) const
+string_id_t model_context::get_string_identifier(const abs_address_t& addr) const
 {
     return mp_impl->get_string_identifier(addr);
 }
@@ -899,12 +899,12 @@ void model_context::set_shared_formula_range(sheet_t sheet, size_t identifier, c
     return mp_impl->set_shared_formula_range(sheet, identifier, range);
 }
 
-size_t model_context::add_string(const char* p, size_t n)
+string_id_t model_context::add_string(const char* p, size_t n)
 {
     return mp_impl->add_string(p, n);
 }
 
-const std::string* model_context::get_string(size_t identifier) const
+const std::string* model_context::get_string(string_id_t identifier) const
 {
     return mp_impl->get_string(identifier);
 }

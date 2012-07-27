@@ -37,11 +37,12 @@ namespace ixion {
 typedef int col_t;
 typedef int row_t;
 typedef int sheet_t;
+typedef unsigned long string_id_t;
 
 IXION_DLLPUBLIC extern const sheet_t global_scope;
 IXION_DLLPUBLIC extern const sheet_t invalid_sheet;
 
-IXION_DLLPUBLIC extern const size_t empty_string_id;
+IXION_DLLPUBLIC extern const string_id_t empty_string_id;
 
 enum celltype_t
 {
