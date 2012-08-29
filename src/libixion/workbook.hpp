@@ -41,7 +41,7 @@ class worksheet
 {
 public:
     typedef mdds::multi_type_vector<ixion_element_block_func> column_type;
-    typedef typename column_type::size_type size_type;
+    typedef column_type::size_type size_type;
 
     worksheet();
     worksheet(size_type row_size, size_type col_size);

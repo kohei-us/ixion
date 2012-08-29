@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252" ?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="libixion"
 	ProjectGUID="{409ADA92-17CA-4901-9CD8-D835D7446C08}"
 	RootNamespace="libixion"
-	TargetFrameworkVersion="196613"
-	>
+	TargetFrameworkVersion="196613">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -20,70 +18,52 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCMIDLTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="C:\Users\Kohei\Workspace\ixion\include;C:\dev\boost_1_47_0;C:\Users\Kohei\Workspace\multidimalgorithm\include"
-				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST;BUILDING_DLL"
+				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST;__IXION_BUILDING_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				DebugInformationFormat="4"
-			/>
+				DebugInformationFormat="4"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalLibraryDirectories="C:\dev\boost_1_47_0\stage\lib"
 				GenerateDebugInformation="true"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManifestTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCAppVerifierTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
@@ -91,72 +71,54 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
-			>
+			WholeProgramOptimization="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCMIDLTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="C:\Users\Kohei\Workspace\ixion\include;C:\dev\boost_1_47_0;C:\Users\Kohei\Workspace\multidimalgorithm\include"
-				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST;BUILDING_DLL"
+				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST;__IXION_BUILDING_DLL"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalLibraryDirectories="C:\dev\boost_1_47_0\stage\lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManifestTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCAppVerifierTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -165,244 +127,194 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\src\libixion\address.cpp"
-				>
+				RelativePath="..\..\src\libixion\address.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\cell.cpp"
-				>
+				RelativePath="..\..\src\libixion\cell.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\cell_listener_tracker.cpp"
-				>
+				RelativePath="..\..\src\libixion\cell_listener_tracker.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\cell_queue_manager.cpp"
-				>
+				RelativePath="..\..\src\libixion\cell_queue_manager.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\config.cpp"
-				>
+				RelativePath="..\..\src\libixion\config.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\depends_tracker.cpp"
-				>
+				RelativePath="..\..\src\libixion\depends_tracker.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\exceptions.cpp"
-				>
+				RelativePath="..\..\src\libixion\exceptions.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_functions.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_function_opcode.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_interpreter.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_functions.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_lexer.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_interpreter.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_name_resolver.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_lexer.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_parser.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_name_resolver.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_result.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_parser.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\formula_tokens.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_result.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\function_objects.cpp"
-				>
+				RelativePath="..\..\src\libixion\formula_tokens.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\global.cpp"
-				>
+				RelativePath="..\..\src\libixion\function_objects.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\lexer_tokens.cpp"
-				>
+				RelativePath="..\..\src\libixion\global.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\matrix.cpp"
-				>
+				RelativePath="..\..\src\libixion\lexer_tokens.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\mem_str_buf.cpp"
-				>
+				RelativePath="..\..\src\libixion\matrix.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\model_context.cpp"
-				>
+				RelativePath="..\..\src\libixion\mem_str_buf.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\session_handler.cpp"
-				>
+				RelativePath="..\..\src\libixion\model_context.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\libixion\types.cpp"
-				>
+				RelativePath="..\..\src\libixion\session_handler.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\libixion\types.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\libixion\workbook.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\..\include\ixion\address.hpp"
-				>
+				RelativePath="..\..\include\ixion\address.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\cell.hpp"
-				>
+				RelativePath="..\..\include\ixion\cell.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\cell_listener_tracker.hpp"
-				>
+				RelativePath="..\..\include\ixion\cell_listener_tracker.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\cell_queue_manager.hpp"
-				>
+				RelativePath="..\..\include\ixion\cell_queue_manager.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\config.hpp"
-				>
+				RelativePath="..\..\include\ixion\config.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\depends_tracker.hpp"
-				>
+				RelativePath="..\..\include\ixion\depends_tracker.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\depth_first_search.hpp"
-				>
+				RelativePath="..\..\include\ixion\depth_first_search.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\env.hpp"
-				>
+				RelativePath="..\..\include\ixion\env.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\exceptions.hpp"
-				>
+				RelativePath="..\..\include\ixion\exceptions.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_function_opcode.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_function_opcode.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_functions.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_functions.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_interpreter.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_interpreter.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_lexer.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_lexer.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_name_resolver.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_name_resolver.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_opcode.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_opcode.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_parser.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_parser.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_result.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_result.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_tokens.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_tokens.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\formula_tokens_fwd.hpp"
-				>
+				RelativePath="..\..\include\ixion\formula_tokens_fwd.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\function_objects.hpp"
-				>
+				RelativePath="..\..\include\ixion\function_objects.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\global.hpp"
-				>
+				RelativePath="..\..\include\ixion\global.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\lexer_tokens.hpp"
-				>
+				RelativePath="..\..\include\ixion\lexer_tokens.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\hash_container\map.hpp"
-				>
+				RelativePath="..\..\include\ixion\hash_container\map.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\matrix.hpp"
-				>
+				RelativePath="..\..\include\ixion\matrix.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\mem_str_buf.hpp"
-				>
+				RelativePath="..\..\include\ixion\mem_str_buf.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\model_context.hpp"
-				>
+				RelativePath="..\..\include\ixion\model_context.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\interface\model_context.hpp"
-				>
+				RelativePath="..\..\include\ixion\interface\model_context.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\interface\session_handler.hpp"
-				>
+				RelativePath="..\..\include\ixion\session_handler.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\session_handler.hpp"
-				>
+				RelativePath="..\..\include\ixion\interface\session_handler.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\hash_container\set.hpp"
-				>
+				RelativePath="..\..\include\ixion\hash_container\set.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\thread.hpp"
-				>
+				RelativePath="..\..\include\ixion\thread.hpp">
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\types.hpp"
-				>
+				RelativePath="..\..\include\ixion\types.hpp">
+			</File>
+			<File
+				RelativePath="..\..\src\libixion\workbook.hpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 		</Filter>
 	</Files>
 	<Globals>

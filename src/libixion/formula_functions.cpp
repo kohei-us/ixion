@@ -281,7 +281,7 @@ void formula_functions::fnc_if(value_stack_t& args) const
 
     value_stack_t ret(m_context);
     value_stack_t::iterator pos = args.begin();
-    bool eval = args.get_value(0);
+    bool eval = args.get_value(0) != 0.0;
     if (eval)
         std::advance(pos, 1);
     else

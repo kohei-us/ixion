@@ -64,7 +64,7 @@ struct IXION_DLLPUBLIC abs_address_t
 
     struct hash
     {
-        size_t operator() (const abs_address_t& addr) const;
+        IXION_DLLPUBLIC size_t operator() (const abs_address_t& addr) const;
     };
 };
 
