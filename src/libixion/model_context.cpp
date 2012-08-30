@@ -520,7 +520,7 @@ void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
-    size_t str_id = add_string(p, n);
+    string_id_t str_id = add_string(p, n);
     worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
     col_store.set(addr.row, str_id);
 }
