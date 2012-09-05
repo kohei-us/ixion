@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ixion-parser"
 	ProjectGUID="{228C5572-D5D8-49C8-AFDC-585BF8264D15}"
 	RootNamespace="ixionparser"
@@ -20,6 +20,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="..\DefaultConfig.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -40,8 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Users\Kohei\Workspace\ixion\include;C:\dev\boost_1_47_0;C:\Users\Kohei\Workspace\multidimalgorithm\include"
-				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST"
+				AdditionalIncludeDirectories=""
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories="C:\dev\boost_1_47_0\stage\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -90,6 +90,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="..\DefaultConfig.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -112,8 +113,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\Users\Kohei\Workspace\ixion\include;C:\dev\boost_1_47_0;C:\Users\Kohei\Workspace\multidimalgorithm\include"
-				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST"
+				AdditionalIncludeDirectories=""
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -130,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories="C:\dev\boost_1_47_0\stage\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

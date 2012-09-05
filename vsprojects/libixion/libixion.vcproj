@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libixion"
 	ProjectGUID="{409ADA92-17CA-4901-9CD8-D835D7446C08}"
 	RootNamespace="libixion"
@@ -20,6 +20,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
+			InheritedPropertySheets="..\DefaultConfig.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Users\Kohei\Workspace\ixion\include;C:\dev\boost_1_47_0;C:\Users\Kohei\Workspace\multidimalgorithm\include"
-				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST;__IXION_BUILDING_DLL"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="__IXION_BUILDING_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,7 +61,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\ixion.dll"
-				AdditionalLibraryDirectories="C:\dev\boost_1_47_0\stage\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -91,6 +92,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
+			InheritedPropertySheets="..\DefaultConfig.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -113,8 +115,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\Users\Kohei\Workspace\ixion\include;C:\dev\boost_1_47_0;C:\Users\Kohei\Workspace\multidimalgorithm\include"
-				PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST;__IXION_BUILDING_DLL"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="__IXION_BUILDING_DLL"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -132,7 +134,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\ixion.dll"
-				AdditionalLibraryDirectories="C:\dev\boost_1_47_0\stage\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -388,11 +390,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\interface\session_handler.hpp"
+				RelativePath="..\..\include\ixion\session_handler.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\ixion\session_handler.hpp"
+				RelativePath="..\..\include\ixion\interface\session_handler.hpp"
 				>
 			</File>
 			<File
