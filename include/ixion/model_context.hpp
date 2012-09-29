@@ -105,6 +105,9 @@ public:
     void set_shared_formula(
         const abs_address_t& addr, size_t si,
         const char* p_formula, size_t n_formula, const char* p_range, size_t n_range);
+    void set_shared_formula(
+        const abs_address_t& addr, size_t si,
+        const char* p_formula, size_t n_formula);
 
     void erase_cell(const abs_address_t& addr);
 
