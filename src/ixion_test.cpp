@@ -91,9 +91,15 @@ void test_name_resolver()
         const char* name; bool sheet_name;
     } names[] = {
         { "A1", false },
+        { "$A1", false },
+        { "A$1", false },
+        { "$A$1", false },
         { "Z1", false },
         { "AA23", false },
         { "AB23", false },
+        { "$AB23", false },
+        { "AB$23", false },
+        { "$AB$23", false },
         { "BA1", false },
         { "AAA2", false },
         { "ABA1", false },
@@ -102,6 +108,9 @@ void test_name_resolver()
         { "One!A1", true },
         { "One!XFD1048576", true },
         { "Two!B10", true },
+        { "Two!$B10", true },
+        { "Two!B$10", true },
+        { "Two!$B$10", true },
         { "Three!CFD234", true },
         { "'A B C'!Z12", true },
         { 0, false }
@@ -117,14 +126,19 @@ void test_name_resolver()
             cerr << "failed to resolve cell address: " << name_a1 << endl;
             assert(false);
         }
+
         address_t addr;
         addr.sheet = res.address.sheet;
+        addr.abs_sheet = res.address.abs_sheet;
         addr.row = res.address.row;
+        addr.abs_row = res.address.abs_row;
         addr.column = res.address.col;
+        addr.abs_column = res.address.abs_col;
+
         string test_name = resolver.get_name(addr, abs_address_t(), names[i].sheet_name);
         if (name_a1 != test_name)
         {
-            cerr << "failed to compile name from address: " << name_a1 << endl;
+            cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
             assert(false);
         }
     }

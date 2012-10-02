@@ -181,7 +181,7 @@ parse_address_result parse_address(
     addr.abs_column = false;
 
     if (cxt)
-        // Overwrite the sheet index *only when* sheet name is parsed successfully.
+        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
         parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
 
     resolver_parse_mode mode = resolver_parse_column;
@@ -249,6 +249,26 @@ parse_address_result parse_address(
 
                 addr.row = row_unset;
                 return range_expected;
+            }
+            else
+                return invalid;
+        }
+        else if (c == '$')
+        {
+            // Absolute position.
+            if (mode == resolver_parse_column)
+            {
+                if (addr.column)
+                {
+                    // Column position has been already parsed.
+                    mode = resolver_parse_row;
+                    addr.abs_row = true;
+                }
+                else
+                {
+                    // Column position has not yet been parsed.
+                    addr.abs_column = true;
+                }
             }
             else
                 return invalid;
@@ -524,7 +544,12 @@ string formula_name_resolver_a1::get_name(const address_t& addr, const abs_addre
         os << '!';
     }
 
+    if (addr.abs_column)
+        os << '$';
     append_column_name_a1(os, col);
+
+    if (addr.abs_row)
+        os << '$';
     os << (row + 1);
     return os.str();
 }
