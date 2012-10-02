@@ -261,6 +261,10 @@ public:
         const abs_address_t& addr, size_t si,
         const char* p_formula, size_t n_formula, const char* p_range, size_t n_range);
 
+    void set_shared_formula(
+        const abs_address_t& addr, size_t si,
+        const char* p_formula, size_t n_formula, const abs_range_t& range);
+
     void set_shared_formula(const abs_address_t& addr, size_t si);
 
     const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
@@ -414,9 +418,6 @@ void model_context_impl::set_shared_formula(
         const abs_address_t& addr, size_t si,
         const char* p_formula, size_t n_formula, const char* p_range, size_t n_range)
 {
-    // Tokenize the formula string and store it.
-    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(m_parent, addr, p_formula, n_formula, *tokens);
     formula_name_type name_type = mp_name_resolver->resolve(p_range, n_range, abs_address_t());
     abs_range_t range;
     switch (name_type.type)
@@ -444,6 +445,17 @@ void model_context_impl::set_shared_formula(
         }
     }
 
+    set_shared_formula(addr, si, p_formula, n_formula, range);
+}
+
+void model_context_impl::set_shared_formula(
+        const abs_address_t& addr, size_t si,
+        const char* p_formula, size_t n_formula, const abs_range_t& range)
+{
+    // Tokenize the formula string and store it.
+    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
+    parse_formula_string(m_parent, addr, p_formula, n_formula, *tokens);
+
     if (si >= m_shared_tokens.size())
         m_shared_tokens.resize(si+1);
 
@@ -455,18 +467,10 @@ void model_context_impl::set_shared_formula(
         const abs_address_t& addr, size_t si,
         const char* p_formula, size_t n_formula)
 {
-    // Tokenize the formula string and store it.
-    unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(m_parent, addr, p_formula, n_formula, *tokens);
     abs_range_t range;
     range.first = addr;
     range.last = range.first;
-
-    if (si >= m_shared_tokens.size())
-        m_shared_tokens.resize(si+1);
-
-    m_shared_tokens[si].tokens = tokens.release();
-    m_shared_tokens[si].range = range;
+    set_shared_formula(addr, si, p_formula, n_formula, range);
 }
 
 const formula_tokens_t* model_context_impl::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
