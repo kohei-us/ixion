@@ -171,6 +171,7 @@ public:
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {
+        m_strings.push_back(new string()); // Insert an empty string which has an ID of 0.
     }
 
     model_context_impl(model_context& parent, row_t max_row_size, col_t max_col_size) :
@@ -182,6 +183,7 @@ public:
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {
+        m_strings.push_back(new string()); // Insert an empty string which has an ID of 0.
     }
 
     ~model_context_impl()
