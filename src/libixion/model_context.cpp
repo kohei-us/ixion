@@ -171,7 +171,6 @@ public:
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {
-        m_strings.push_back(new string()); // Insert an empty string which has an ID of 0.
     }
 
     model_context_impl(model_context& parent, row_t max_row_size, col_t max_col_size) :
@@ -183,7 +182,6 @@ public:
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {
-        m_strings.push_back(new string()); // Insert an empty string which has an ID of 0.
     }
 
     ~model_context_impl()
@@ -292,6 +290,7 @@ private:
     strings_type m_sheet_names; ///< index to sheet name map.
     strings_type m_strings;
     string_map_type m_string_map;
+    string m_empty_string;
 };
 
 void model_context_impl::set_named_expression(const char* p, size_t n, formula_cell* cell)
@@ -370,6 +369,9 @@ string_id_t model_context_impl::add_string(const char* p, size_t n)
 
 const std::string* model_context_impl::get_string(string_id_t identifier) const
 {
+    if (identifier == empty_string_id)
+        return &m_empty_string;
+
     if (identifier >= m_strings.size())
         return NULL;
 
