@@ -60,7 +60,7 @@ public:
         {
             cerr << e.what() << endl;
             cerr << "failed to parse " << fpath << endl;
-            throw e;
+            throw;
         }
 
         cout << get_formula_result_output_separator() << endl;
