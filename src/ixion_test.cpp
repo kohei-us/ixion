@@ -182,6 +182,24 @@ void test_name_resolver()
     assert(res.range.last.sheet == 0);
     assert(res.range.last.row == 3);
     assert(res.range.last.col == -2);
+
+    // Parse name without row index.
+    struct {
+        const char* name; formula_name_type::name_type type;
+    } name_tests[] = {
+        { "H:H", formula_name_type::range_reference },
+        { "ABC", formula_name_type::named_expression },
+        { "H", formula_name_type::named_expression },
+        { "MAX", formula_name_type::function },
+        { 0, formula_name_type::invalid }
+    };
+
+    for (size_t i = 0; name_tests[i].name; ++i)
+    {
+        string name_a1(name_tests[i].name);
+        formula_name_type res = resolver.resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        assert(res.type == name_tests[i].type);
+    }
 }
 
 void test_address()
