@@ -53,16 +53,18 @@ using ::boost::ptr_vector;
 
 namespace {
 
+#if DEBUG_QUEUE_MANAGER
 mutex tprintf_mtx;
 
 void tprintf(const string& s)
 {
-#if DEBUG_QUEUE_MANAGER
-    mutex::scoped_lock(tprintf_mtx);
+    mutex::scoped_lock lock(tprintf_mtx);
     cout << s << endl;
     cout.flush();
-#endif
 }
+#else
+void tprintf(const string&) {} // no-op
+#endif
 
 class StackPrinter
 {
