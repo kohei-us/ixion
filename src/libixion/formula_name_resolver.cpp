@@ -458,7 +458,8 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
     __IXION_DEBUG_OUT__ << "parse address result: " << _to_string(parse_res) << endl;
 #endif
 
-    if (parse_res == valid_address)
+    // prevent for example H to be recognized as column address
+    if (parse_res == valid_address && parsed_addr.row != row_unset)
     {
         // This is a single cell address.
         to_relative_address(parsed_addr, pos);
