@@ -129,6 +129,9 @@ public:
                     m_os << *p;
             }
             break;
+            case fop_equal:
+                m_os << "=";
+            break;
             case fop_err_no_ref:
             case fop_named_expression:
             case fop_unknown:
