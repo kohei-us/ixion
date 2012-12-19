@@ -89,7 +89,9 @@ public:
 
 private:
     ::std::string msMsg;
+#if DEBUG_QUEUE_MANAGER
     double mfStartTime;
+#endif
 };
 
 }
