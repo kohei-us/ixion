@@ -66,33 +66,33 @@ void tprintf(const string& s)
 void tprintf(const string&) {} // no-op
 #endif
 
-class StackPrinter
+class stack_printer
 {
 public:
-    explicit StackPrinter(const char* msg) :
-        msMsg(msg)
+    explicit stack_printer(const char* msg) :
+        m_msg(msg)
     {
 #if DEBUG_QUEUE_MANAGER
         string s = msg + string(": --begin");
         tprintf(s);
-        mfStartTime = getTime();
+        m_start_time = getTime();
 #endif
     }
 
-    ~StackPrinter()
+    ~stack_printer()
     {
 #if DEBUG_QUEUE_MANAGER
-        double fEndTime = global::get_current_time();
+        double end_time = global::get_current_time();
         ostringstream os;
-        os << msMsg << ": --end (durtion: " << (fEndTime-mfStartTime) << " sec)";
+        os << m_msg << ": --end (durtion: " << (end_time-m_start_time) << " sec)";
         tprintf(os.str());
 #endif
     }
 
 private:
-    ::std::string msMsg;
+    std::string m_msg;
 #if DEBUG_QUEUE_MANAGER
-    double mfStartTime;
+    double m_start_time;
 #endif
 };
 
@@ -160,7 +160,7 @@ worker_thread_status wts;
  */
 void worker_main(worker_thread_data* data, iface::model_context* context)
 {
-    StackPrinter __stack_printer__("manage_queue::worker_main");
+    stack_printer __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->action.mtx);
     {
         mutex::scoped_lock lock_ready(data->init_status.mtx);
@@ -287,7 +287,7 @@ void interpret_cell(worker_thread_data& wt)
  */
 void manage_queue_main(size_t worker_count, iface::model_context* context)
 {
-    StackPrinter __stack_printer__("::manage_queue_main");
+    stack_printer __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
     {
         mutex::scoped_lock lock(data.mtx_thread_ready);
