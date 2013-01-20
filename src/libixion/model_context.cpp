@@ -223,6 +223,7 @@ public:
 
     void erase_cell(const abs_address_t& addr);
     void set_numeric_cell(const abs_address_t& addr, double val);
+    void set_boolean_cell(const abs_address_t& addr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
@@ -548,6 +549,12 @@ void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
     col_store.set(addr.row, val);
 }
 
+void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
+{
+    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    col_store.set(addr.row, val);
+}
+
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     string_id_t str_id = add_string(p, n);
@@ -800,6 +807,11 @@ void model_context::erase_cell(const abs_address_t& addr)
 void model_context::set_numeric_cell(const abs_address_t& addr, double val)
 {
     mp_impl->set_numeric_cell(addr, val);
+}
+
+void model_context::set_boolean_cell(const abs_address_t& addr, bool val)
+{
+    mp_impl->set_boolean_cell(addr, val);
 }
 
 void model_context::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
