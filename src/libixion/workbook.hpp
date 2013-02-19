@@ -53,6 +53,8 @@ public:
     column_type& at(size_type n) { return *m_columns.at(n); }
     const column_type& at(size_type n) const { return *m_columns.at(n); }
 
+    column_type::iterator& get_pos_hint(size_type n) { return m_pos_hints.at(n); }
+
     /**
      * Return the number of columns.
      *
@@ -62,6 +64,7 @@ public:
 
 private:
     std::vector<column_type*> m_columns;
+    std::vector<column_type::iterator> m_pos_hints;
 };
 
 class workbook
