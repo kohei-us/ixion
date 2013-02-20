@@ -530,8 +530,9 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
 {
-    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint = m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
 
     mdds::mtv::element_t celltype = col_store.get_type(addr.row);
     if (celltype == element_type_formula)
@@ -547,30 +548,34 @@ void model_context_impl::erase_cell(const abs_address_t& addr)
 
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint = m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
 void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 {
-    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint = m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
+    worksheet& sheet = m_sheets.at(addr.sheet);
     string_id_t str_id = add_string(p, n);
-    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint = m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, str_id);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
-    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint = m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, identifier);
 }
 
@@ -585,10 +590,9 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
         fcell->set_identifier(tkid);
     }
 
-    worksheet::column_type& col_store =
-        m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint =
-        m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
 }
 
@@ -597,10 +601,10 @@ void model_context_impl::set_formula_cell(
 {
     unique_ptr<formula_cell> fcell(new formula_cell(identifier));
     fcell->set_shared(shared);
-    worksheet::column_type& col_store =
-        m_sheets.at(addr.sheet).at(addr.column);
-    worksheet::column_type::iterator& pos_hint =
-        m_sheets.at(addr.sheet).get_pos_hint(addr.column);
+
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    worksheet::column_type& col_store = sheet.at(addr.column);
+    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
 }
 
