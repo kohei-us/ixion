@@ -4,7 +4,7 @@ INCLUDES = -I$(top_srcdir)/include
 
 bin_PROGRAMS = ixion-parser ixion-sorter
 
-test_PROGRAMS = ixion-test
+EXTRA_PROGRAMS = ixion-test
 
 ixion_parser_SOURCES = \
 	ixion_parser.cpp \
