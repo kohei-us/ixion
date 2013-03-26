@@ -23,9 +23,11 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	matrix.cpp \
 	mem_str_buf.cpp \
 	model_context.cpp \
+	multi_type_vector_trait.hpp \
 	cell_listener_tracker.cpp \
 	session_handler.cpp \
 	types.cpp \
+	workbook.hpp \
 	workbook.cpp
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined

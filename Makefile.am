@@ -8,8 +8,44 @@ libixion-@IXION_API_VERSION@.pc: libixion.pc
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
+bin_data = \
+	bin/ixion-test-mem.sh \
+	bin/ixion-test-gdb.sh \
+	bin/ixion-test.sh \
+	bin/ixion-parser-mem.sh \
+	bin/ixion-parser.sh \
+	bin/ixion-parser-gdb.sh
+
+test_data = \
+	test/01-simple-arithmetic.txt \
+	test/02-circular-01.txt \
+	test/02-circular-02.txt \
+	test/03-expression.txt \
+	test/04-function-logical.txt \
+	test/04-function-single.txt \
+	test/05-range-reference.txt \
+	test/06-range-reference-basic-01.txt \
+	test/06-range-reference-basic-02.txt \
+	test/06-range-reference-circular-01.txt \
+	test/07-fraction-numbers.txt \
+	test/08-numeric-cells.txt \
+	test/09-string-cells.txt \
+	test/10-shared-formulas-01.txt \
+	test/11-reference-to-numeric-cell-01.txt \
+	test/12-inline-string-01.txt \
+	test/13-relational-operators-01.txt \
+	test/13-relational-operators-02.txt \
+	test/13-relational-operators-03.txt \
+	test/ixion-parser-test.sh \
+	test/thread/function-parallel.txt \
+	test/thread/function-wait-simple.txt
+
+
 EXTRA_DIST = \
-	libixion.pc.in
+	libixion.pc.in \
+	autogen.sh \
+	$(bin_data) \
+	$(test_data)
 
 dist-hook:
 	@if test -d "$(srcdir)/.git"; \
