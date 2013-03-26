@@ -13,7 +13,7 @@ m4_define([ixion_api_version],
 
 AC_PREREQ([2.63])
 AC_INIT([ixion], [ixion_version])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 
 AC_ARG_WITH(hash-container-compat,
 [
