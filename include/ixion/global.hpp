@@ -35,6 +35,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/interprocess/smart_ptr/unique_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 #define __IXION_DEBUG_OUT__ ::std::cout << __FILE__ << "#" << __LINE__ << ": "
 
