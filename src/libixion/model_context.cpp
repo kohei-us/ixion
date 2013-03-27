@@ -274,9 +274,10 @@ public:
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
 
 private:
+    model_context& m_parent;
+
     row_t m_max_row_size;
     col_t m_max_col_size;
-    model_context& m_parent;
 
     workbook m_sheets;
 
