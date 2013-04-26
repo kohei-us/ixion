@@ -30,8 +30,9 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	workbook.hpp \
 	workbook.cpp
 
-libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 
+libixion_@IXION_API_VERSION@_la_CXXFLAGS = $(MDDS_CFLAGS)
+libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 libixion_@IXION_API_VERSION@_la_LIBADD = $(BOOST_THREAD_LIBS)
 
 EXTRA_DIST = makefile.mk
