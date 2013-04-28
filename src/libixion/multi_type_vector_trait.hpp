@@ -25,11 +25,10 @@
  *
  ************************************************************************/
 
-#ifndef __IXION_GRID_MAP_TRAIT_HPP__
-#define __IXION_GRID_MAP_TRAIT_HPP__
+#ifndef IXION_MULTI_TYPE_VECTOR_TRAIT_HPP
+#define IXION_MULTI_TYPE_VECTOR_TRAIT_HPP
 
 #include "ixion/types.hpp"
-#include "ixion/cell.hpp"
 
 #include <mdds/multi_type_vector_trait.hpp>
 #include <mdds/multi_type_vector_types.hpp>
