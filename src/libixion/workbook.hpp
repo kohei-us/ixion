@@ -28,10 +28,7 @@
 #ifndef __IXION_WORKBOOK_HPP__
 #define __IXION_WORKBOOK_HPP__
 
-#include "multi_type_vector_trait.hpp"
-
-#include <mdds/multi_type_vector.hpp>
-#include <mdds/multi_type_vector_trait.hpp>
+#include "ixion/column_store_type.hpp"
 
 #include <vector>
 
@@ -40,20 +37,19 @@ namespace ixion {
 class worksheet
 {
 public:
-    typedef mdds::multi_type_vector<ixion_element_block_func> column_type;
-    typedef column_type::size_type size_type;
+    typedef column_store_t::size_type size_type;
 
     worksheet();
     worksheet(size_type row_size, size_type col_size);
     ~worksheet();
 
-    column_type& operator[](size_type n) { return *m_columns[n]; }
-    const column_type& operator[](size_type n) const { return *m_columns[n]; }
+    column_store_t& operator[](size_type n) { return *m_columns[n]; }
+    const column_store_t& operator[](size_type n) const { return *m_columns[n]; }
 
-    column_type& at(size_type n) { return *m_columns.at(n); }
-    const column_type& at(size_type n) const { return *m_columns.at(n); }
+    column_store_t& at(size_type n) { return *m_columns.at(n); }
+    const column_store_t& at(size_type n) const { return *m_columns.at(n); }
 
-    column_type::iterator& get_pos_hint(size_type n) { return m_pos_hints.at(n); }
+    column_store_t::iterator& get_pos_hint(size_type n) { return m_pos_hints.at(n); }
 
     /**
      * Return the number of columns.
@@ -63,8 +59,8 @@ public:
     size_type size() const { return m_columns.size(); }
 
 private:
-    std::vector<column_type*> m_columns;
-    std::vector<column_type::iterator> m_pos_hints;
+    std::vector<column_store_t*> m_columns;
+    std::vector<column_store_t::iterator> m_pos_hints;
 };
 
 class workbook

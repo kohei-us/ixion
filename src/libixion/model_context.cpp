@@ -151,8 +151,6 @@ bool set_shared_formula_tokens_to_cell(
 
 class model_context_impl
 {
-    typedef worksheet::column_type column_type;
-
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef boost::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
@@ -532,8 +530,8 @@ void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifi
 void model_context_impl::erase_cell(const abs_address_t& addr)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
 
     mdds::mtv::element_t celltype = col_store.get_type(addr.row);
     if (celltype == element_type_formula)
@@ -550,16 +548,16 @@ void model_context_impl::erase_cell(const abs_address_t& addr)
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
 void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
@@ -567,16 +565,16 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, const char* 
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
     string_id_t str_id = add_string(p, n);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, str_id);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, identifier);
 }
 
@@ -592,8 +590,8 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, const char*
     }
 
     worksheet& sheet = m_sheets.at(addr.sheet);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
 }
 
@@ -604,8 +602,8 @@ void model_context_impl::set_formula_cell(
     fcell->set_shared(shared);
 
     worksheet& sheet = m_sheets.at(addr.sheet);
-    worksheet::column_type& col_store = sheet.at(addr.column);
-    worksheet::column_type::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
 }
 
@@ -629,7 +627,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
     for (size_t i = 0; i < col_size; ++i)
     {
-        const column_type& col = cols[i];
+        const column_store_t& col = cols[i];
         if (col.empty())
         {
             if (range.last.column < 0)
@@ -641,7 +639,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
         {
             // First non-empty row.
 
-            column_type::const_iterator it = col.begin(), it_end = col.end();
+            column_store_t::const_iterator it = col.begin(), it_end = col.end();
             assert(it != it_end);
             if (it->type == mdds::mtv::element_type_empty)
             {
@@ -671,7 +669,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
         {
             // Last non-empty row.
 
-            column_type::const_reverse_iterator it = col.rbegin(), it_end = col.rend();
+            column_store_t::const_reverse_iterator it = col.rbegin(), it_end = col.rend();
             assert(it != it_end);
             if (it->type == mdds::mtv::element_type_empty)
             {
@@ -735,7 +733,7 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
-    const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     switch (col_store.get_type(addr.row))
     {
         case mdds::mtv::element_type_numeric:
@@ -754,7 +752,7 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
-    const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     if (col_store.get_type(addr.row) != mdds::mtv::element_type_ulong)
         return empty_string_id;
 
@@ -763,7 +761,7 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
-    const worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     if (col_store.get_type(addr.row) != element_type_formula)
         return NULL;
 
@@ -772,7 +770,7 @@ const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& ad
 
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
-    worksheet::column_type& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     if (col_store.get_type(addr.row) != element_type_formula)
         return NULL;
 

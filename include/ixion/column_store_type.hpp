@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * Copyright (c) 2012 Kohei Yoshida
+ * Copyright (c) 2013 Kohei Yoshida
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,17 +25,17 @@
  *
  ************************************************************************/
 
-#ifndef IXION_MULTI_TYPE_VECTOR_TRAIT_HPP
-#define IXION_MULTI_TYPE_VECTOR_TRAIT_HPP
+#ifndef IXION_COLUMN_STORE_TYPE_HPP
+#define IXION_COLUMN_STORE_TYPE_HPP
 
 #include "ixion/types.hpp"
+#include "ixion/cell.hpp"
 
 #include <mdds/multi_type_vector_trait.hpp>
 #include <mdds/multi_type_vector_types.hpp>
+#include <mdds/multi_type_vector.hpp>
 
 namespace ixion {
-
-class formula_cell;
 
 const mdds::mtv::element_t element_type_formula = mdds::mtv::element_type_user_start;
 
@@ -267,6 +267,8 @@ struct ixion_element_block_func
         }
     }
 };
+
+typedef mdds::multi_type_vector<ixion_element_block_func> column_store_t;
 
 }
 

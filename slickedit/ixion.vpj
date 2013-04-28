@@ -236,6 +236,7 @@
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>
 				<F N="../include/ixion/cell_queue_manager.hpp"/>
+				<F N="../include/ixion/column_store_type.hpp"/>
 				<F N="../include/ixion/config.hpp"/>
 				<F N="../include/ixion/depends_tracker.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
@@ -290,7 +291,6 @@
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
-				<F N="../src/libixion/multi_type_vector_trait.hpp"/>
 				<F N="../src/libixion/session_handler.cpp"/>
 				<F N="../src/libixion/types.cpp"/>
 				<F N="../src/libixion/workbook.cpp"/>

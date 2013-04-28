@@ -39,14 +39,14 @@ worksheet::worksheet(size_t row_size, size_t col_size)
     m_pos_hints.reserve(col_size);
     for (size_t i = 0; i < col_size; ++i)
     {
-        m_columns.push_back(new column_type(row_size));
+        m_columns.push_back(new column_store_t(row_size));
         m_pos_hints.push_back(m_columns.back()->begin());
     }
 }
 
 worksheet::~worksheet()
 {
-    std::for_each(m_columns.begin(), m_columns.end(), default_deleter<column_type>());
+    std::for_each(m_columns.begin(), m_columns.end(), default_deleter<column_store_t>());
 }
 
 workbook::workbook() {}
