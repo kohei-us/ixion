@@ -28,7 +28,7 @@
 #ifndef __IXION_MODEL_CONTEXT_HPP__
 #define __IXION_MODEL_CONTEXT_HPP__
 
-#include "ixion/cell.hpp"
+#include "ixion/column_store_type.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/env.hpp"
@@ -137,6 +137,17 @@ public:
     void set_session_handler(iface::session_handler* handler);
 
     size_t get_string_count() const;
+
+    /**
+     * Get column storage.
+     *
+     * @param sheet sheet index.
+     * @param col column index.
+     *
+     * @return const pointer to column storage, or NULL in case sheet index or
+     *         column index is out of bound.
+     */
+    const column_store_t* get_column(sheet_t sheet, col_t col) const;
 
 private:
     model_context_impl* mp_impl;
