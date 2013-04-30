@@ -37,7 +37,19 @@
 
 namespace ixion {
 
+// Element types
+
+const mdds::mtv::element_t element_type_empty = mdds::mtv::element_type_empty;
+const mdds::mtv::element_t element_type_boolean = mdds::mtv::element_type_boolean;
+const mdds::mtv::element_t element_type_numeric = mdds::mtv::element_type_numeric;
+const mdds::mtv::element_t element_type_string = mdds::mtv::element_type_ulong;
 const mdds::mtv::element_t element_type_formula = mdds::mtv::element_type_user_start;
+
+// Element block types
+
+typedef mdds::mtv::boolean_element_block boolean_element_block;
+typedef mdds::mtv::numeric_element_block numeric_element_block;
+typedef mdds::mtv::ulong_element_block string_element_block;
 
 typedef mdds::mtv::noncopyable_managed_element_block<
     element_type_formula, ixion::formula_cell> formula_element_block;
