@@ -42,7 +42,7 @@ namespace ixion {
 class IXION_DLLPUBLIC mem_str_buf
 {
 public:
-    struct hash
+    struct IXION_DLLPUBLIC hash
     {
         size_t operator() (const mem_str_buf& s) const;
     };
