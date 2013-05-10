@@ -105,7 +105,7 @@ enum formula_error_t
     fe_general_error,
 };
 
-const char* get_formula_error_name(formula_error_t fe);
+IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
 
 // ============================================================================
 
