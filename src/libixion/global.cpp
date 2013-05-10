@@ -158,6 +158,7 @@ double global::to_double(const char* p, size_t n)
 
 const char* get_formula_error_name(formula_error_t fe)
 {
+    static const char* default_err_name = "#ERR!";
     static const char* names[] = {
         "",        // no error
         "#REF!",   // result not available
@@ -168,7 +169,7 @@ const char* get_formula_error_name(formula_error_t fe)
     if (static_cast<size_t>(fe) < name_size)
         return names[fe];
 
-    return "#ERR!";
+    return default_err_name;
 }
 
 // ============================================================================
