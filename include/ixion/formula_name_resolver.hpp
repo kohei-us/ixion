@@ -93,23 +93,6 @@ public:
     virtual ::std::string get_name(const abs_range_t& range, bool sheet_name) const = 0;
 };
 
-/**
- * Resolve formula expression names by name only.  In other words, all
- * expressions are named expressions, i.e. no expressions are addressable by
- * cell address syntax.
- */
-class formula_name_resolver_simple : public formula_name_resolver
-{
-public:
-    formula_name_resolver_simple();
-    virtual ~formula_name_resolver_simple();
-    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const;
-    virtual ::std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const;
-    virtual ::std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const;
-    virtual ::std::string get_name(const abs_address_t& addr, bool sheet_name) const;
-    virtual ::std::string get_name(const abs_range_t& range, bool sheet_name) const;
-};
-
 class IXION_DLLPUBLIC formula_name_resolver_a1 : public formula_name_resolver
 {
 public:

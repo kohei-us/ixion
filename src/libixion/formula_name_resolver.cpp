@@ -385,42 +385,6 @@ string formula_name_type::to_string() const
 formula_name_resolver::formula_name_resolver() {}
 formula_name_resolver::~formula_name_resolver() {}
 
-formula_name_resolver_simple::formula_name_resolver_simple() :
-    formula_name_resolver() {}
-
-formula_name_resolver_simple::~formula_name_resolver_simple() {}
-
-formula_name_type formula_name_resolver_simple::resolve(
-    const char* p, size_t n, const abs_address_t& pos) const
-{
-    formula_name_type ret;
-    resolve_function_or_name(p, n, ret);
-    return ret;
-}
-
-string formula_name_resolver_simple::get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
-{
-    return addr.get_name();
-}
-
-string formula_name_resolver_simple::get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
-{
-    // TODO: to be implemented.
-    return string();
-}
-
-string formula_name_resolver_simple::get_name(const abs_address_t& addr, bool sheet_name) const
-{
-    // TODO: to be implemented.
-    return string();
-}
-
-string formula_name_resolver_simple::get_name(const abs_range_t& range, bool sheet_name) const
-{
-    // TODO: to be implemented.
-    return string();
-}
-
 formula_name_resolver_a1::formula_name_resolver_a1() :
     formula_name_resolver(), mp_cxt(NULL) {}
 
