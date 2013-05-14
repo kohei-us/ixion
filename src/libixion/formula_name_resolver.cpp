@@ -591,4 +591,11 @@ string formula_name_resolver_a1::get_name(const abs_range_t& range, bool sheet_n
     return os.str();
 }
 
+string formula_name_resolver_a1::get_column_name(col_t col) const
+{
+    ostringstream os;
+    append_column_name_a1(os, col);
+    return os.str();
+}
+
 }
