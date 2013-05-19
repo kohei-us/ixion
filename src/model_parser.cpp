@@ -115,7 +115,7 @@ model_parser::check_error::check_error(const string& msg) :
 model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_filepath(filepath), m_thread_count(thread_count), m_print_separator(true)
 {
-    m_context.append_sheet(IXION_ASCII("sheet"));
+    m_context.append_sheet(IXION_ASCII("sheet"), 1048576, 1024);
 }
 
 model_parser::~model_parser() {}

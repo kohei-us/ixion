@@ -162,19 +162,6 @@ class model_context_impl
 public:
     model_context_impl(model_context& parent) :
         m_parent(parent),
-        m_max_row_size(1048576),
-        m_max_col_size(1024),
-        mp_config(new config),
-        mp_name_resolver(new formula_name_resolver_a1),
-        mp_cell_listener_tracker(new cell_listener_tracker(parent)),
-        mp_session_handler(new session_handler(parent))
-    {
-    }
-
-    model_context_impl(model_context& parent, row_t max_row_size, col_t max_col_size) :
-        m_parent(parent),
-        m_max_row_size(max_row_size),
-        m_max_col_size(max_col_size),
         mp_config(new config),
         mp_name_resolver(new formula_name_resolver_a1),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
@@ -242,7 +229,7 @@ public:
     const string* get_named_expression_name(const formula_cell* expr) const;
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
-    void append_sheet(const char* p, size_t n);
+    void append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
     string_id_t add_string(const char* p, size_t n);
     const std::string* get_string(string_id_t identifier) const;
@@ -274,9 +261,6 @@ public:
 
 private:
     model_context& m_parent;
-
-    row_t m_max_row_size;
-    col_t m_max_col_size;
 
     workbook m_sheets;
 
@@ -347,10 +331,10 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
     return m_sheet_names[sheet];
 }
 
-void model_context_impl::append_sheet(const char* p, size_t n)
+void model_context_impl::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
 {
     m_sheet_names.push_back(new string(p, n));
-    m_sheets.push_back(m_max_row_size, m_max_col_size);
+    m_sheets.push_back(row_size, col_size);
 }
 
 string_id_t model_context_impl::add_string(const char* p, size_t n)
@@ -623,17 +607,18 @@ void model_context_impl::set_formula_cell(
 
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 {
-    if (m_max_col_size <= 0 || m_max_row_size <= 0)
-        return abs_range_t(abs_range_t::invalid);
-
     const worksheet& cols = m_sheets.at(sheet);
     size_t col_size = cols.size();
     if (!col_size)
         return abs_range_t(abs_range_t::invalid);
 
+    size_t row_size = cols[0].size();
+    if (!row_size)
+        return abs_range_t(abs_range_t::invalid);
+
     abs_range_t range;
     range.first.column = 0;
-    range.first.row = m_max_row_size-1;
+    range.first.row = row_size-1;
     range.first.sheet = sheet;
     range.last.column = -1; // if this stays -1 all columns are empty.
     range.last.row = 0;
@@ -679,7 +664,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
             range.last.column = i;
         }
 
-        if (range.last.row < (m_max_row_size-1))
+        if (range.last.row < (row_size-1))
         {
             // Last non-empty row.
 
@@ -705,7 +690,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
             }
             else
                 // Last block is not empty.
-                range.last.row = m_max_row_size - 1;
+                range.last.row = row_size - 1;
 
             range.last.column = i;
         }
@@ -802,9 +787,6 @@ bool model_context::shared_tokens::operator== (const shared_tokens& r) const
 
 model_context::model_context() :
     mp_impl(new model_context_impl(*this)) {}
-
-model_context::model_context(row_t max_row_size, col_t max_col_size) :
-    mp_impl(new model_context_impl(*this, max_row_size, max_col_size)) {}
 
 model_context::~model_context()
 {
@@ -1015,9 +997,9 @@ const string* model_context::get_named_expression_name(const formula_cell* expr)
     return mp_impl->get_named_expression_name(expr);
 }
 
-void model_context::append_sheet(const char* p, size_t n)
+void model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
 {
-    mp_impl->append_sheet(p, n);
+    mp_impl->append_sheet(p, n, row_size, col_size);
 }
 
 void model_context::set_session_handler(iface::session_handler* handler)
