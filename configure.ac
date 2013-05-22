@@ -13,7 +13,9 @@ m4_define([ixion_api_version],
 
 AC_PREREQ([2.63])
 AC_INIT([libixion], [ixion_version])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_ARG_WITH(hash-container-compat,
 [
@@ -39,7 +41,8 @@ done
 
 # Checks for programs.
 AC_PROG_CXX
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll disable-static pic-only])
+AC_CANONICAL_HOST
 
 # Checks for libraries.
 
@@ -56,7 +59,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-CPPFLAGS="-D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST -D__IXION_BUILDING_DLL"
+CPPFLAGS="-D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST"
 
 AC_MSG_CHECKING([whether to turn on hash container compatibility])
 if test "z$with_hash_container_compat" = "zno"; then

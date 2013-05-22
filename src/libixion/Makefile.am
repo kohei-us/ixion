@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS)
 
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
@@ -30,7 +30,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	workbook.cpp
 
 
-libixion_@IXION_API_VERSION@_la_CXXFLAGS = $(MDDS_CFLAGS)
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 libixion_@IXION_API_VERSION@_la_LIBADD = $(BOOST_THREAD_LIBS)
 

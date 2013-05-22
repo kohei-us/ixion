@@ -28,29 +28,29 @@
 #ifndef __IXION_ENV_HPP__
 #define __IXION_ENV_HPP__
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef __IXION_BUILDING_DLL
-    #ifdef __GNUC__
-      #define IXION_DLLPUBLIC __attribute__ ((dllexport))
-    #else
-      #define IXION_DLLPUBLIC __declspec(dllexport)
-    #endif
+#ifdef _WIN32
+  #ifdef IXION_BUILD
+     #ifdef DLL_EXPORT
+       #define IXION_DLLPUBLIC __declspec(dllexport)
+       #define IXION_DLLPUBLIC_VAR extern __declspec(dllexport)
+     #else
+       #define IXION_DLLPUBLIC
+       #define IXION_DLLPUBLIC_VAR extern
+     #endif
   #else
-    #ifdef __GNUC__
-      #define IXION_DLLPUBLIC __attribute__ ((dllimport))
-    #else
-      #define IXION_DLLPUBLIC __declspec(dllimport)
-    #endif
+     #define IXION_DLLPUBLIC
+     #define IXION_DLLPUBLIC_VAR extern __declspec(dllimport)
   #endif
   #define IXION_DLLLOCAL
 #else
-  #if __GNUC__ >= 4
+  #if defined __GNUC__ && __GNUC__ >= 4
     #define IXION_DLLPUBLIC __attribute__ ((visibility ("default")))
     #define IXION_DLLLOCAL  __attribute__ ((visibility ("hidden")))
   #else
     #define IXION_DLLPUBLIC
     #define IXION_DLLLOCAL
   #endif
+  #define IXION_DLLPUBLIC_VAR IXION_DLLPUBLIC extern
 #endif
 
 #endif
