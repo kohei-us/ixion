@@ -2,6 +2,8 @@ aclocal.m4
 autom4te.cache
 configure
 config.guess
+config.h
+config.h.in
 config.log
 config.status
 config.sub
@@ -19,9 +21,15 @@ missing
 *.o
 *.la
 *.lo
+*.cache
 .libs
+stamp-h1
 tags
+test-driver
 ChangeLog
+misc/libixion.spec
 src/ixion-parser
+src/ixion-parser.exe
 src/ixion-sorter
-ixion-*.*.*.tar.gz
+src/ixion-sorter.exe
+libixion-*.*.*.tar.*

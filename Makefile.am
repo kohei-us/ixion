@@ -2,8 +2,6 @@ SUBDIRS = src include
 ACLOCAL_AMFLAGS = -I m4
 
 pcfiles = libixion-@IXION_API_VERSION@.pc
-libixion-@IXION_API_VERSION@.pc: libixion.pc
-	@cp -f $< $@
 
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
@@ -46,6 +44,9 @@ EXTRA_DIST = \
 	autogen.sh \
 	$(bin_data) \
 	$(test_data)
+
+distclean-local:
+	rm -rf *.pc
 
 dist-hook:
 	@if test -d "$(srcdir)/.git"; \

@@ -80,8 +80,7 @@ BOOST_THREADS
 BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile
-                 libixion.pc
-                 VERSION
+                 libixion-$IXION_API_VERSION.pc:libixion.pc.in
                  include/Makefile
                  include/ixion/Makefile
                  include/ixion/hash_container/Makefile
