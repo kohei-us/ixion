@@ -3,7 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libixion
+Name: libixion-@IXION_API_VERSION@
 Description: Generic formula computation library
 Version: @VERSION@
 Libs: -L${libdir} -lixion-@IXION_API_VERSION@
