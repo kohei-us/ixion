@@ -58,7 +58,7 @@ typedef mdds::mtv::noncopyable_managed_element_block<
 
 MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(formula_cell, element_type_formula, NULL, formula_element_block)
 
-typedef mdds::mtv::custom_block_func1<element_type_formula, formula_element_block> ixion_element_block_func;
+typedef mdds::mtv::custom_block_func1<formula_element_block> ixion_element_block_func;
 typedef mdds::multi_type_vector<ixion_element_block_func> column_store_t;
 
 }
