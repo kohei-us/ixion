@@ -106,7 +106,7 @@ public:
             {
                 const std::string* p = m_cxt.get_string(token.get_index());
                 if (p)
-                    m_os << *p;
+                    m_os << "\"" << *p << "\"";
             }
             break;
             case fop_equal:
