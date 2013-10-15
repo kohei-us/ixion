@@ -211,6 +211,7 @@ public:
     std::string get_sheet_name(sheet_t sheet) const;
     void append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
+    string_id_t append_string(const char* p, size_t n);
     string_id_t add_string(const char* p, size_t n);
     const std::string* get_string(string_id_t identifier) const;
     size_t get_string_count() const;
@@ -317,12 +318,8 @@ void model_context_impl::append_sheet(const char* p, size_t n, row_t row_size, c
     m_sheets.push_back(row_size, col_size);
 }
 
-string_id_t model_context_impl::add_string(const char* p, size_t n)
+string_id_t model_context_impl::append_string(const char* p, size_t n)
 {
-    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
-    if (itr != m_string_map.end())
-        return itr->second;
-
     string_id_t str_id = m_strings.size();
     std::auto_ptr<string> ps(new string(p, n));
     p = &(*ps)[0];
@@ -330,6 +327,15 @@ string_id_t model_context_impl::add_string(const char* p, size_t n)
     m_strings.push_back(ps);
     m_string_map.insert(string_map_type::value_type(key, str_id));
     return str_id;
+}
+
+string_id_t model_context_impl::add_string(const char* p, size_t n)
+{
+    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
+    if (itr != m_string_map.end())
+        return itr->second;
+
+    append_string(p, n);
 }
 
 const std::string* model_context_impl::get_string(string_id_t identifier) const
@@ -935,6 +941,11 @@ abs_range_t model_context::get_shared_formula_range(sheet_t sheet, size_t identi
 void model_context::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
 {
     return mp_impl->set_shared_formula_range(sheet, identifier, range);
+}
+
+string_id_t model_context::append_string(const char* p, size_t n)
+{
+    return mp_impl->append_string(p, n);
 }
 
 string_id_t model_context::add_string(const char* p, size_t n)

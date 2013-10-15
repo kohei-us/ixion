@@ -71,6 +71,8 @@ public:
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
+
+    virtual string_id_t append_string(const char* p, size_t n);
     virtual string_id_t add_string(const char* p, size_t n);
     virtual const std::string* get_string(string_id_t identifier) const;
     virtual sheet_t get_sheet_index(const char* p, size_t n) const;
