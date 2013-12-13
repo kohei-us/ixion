@@ -356,12 +356,12 @@ size_t model_context_impl::get_string_count() const
 
 const column_store_t* model_context_impl::get_column(sheet_t sheet, col_t col) const
 {
-    if (sheet >= m_sheets.size())
+    if (static_cast<size_t>(sheet) >= m_sheets.size())
         return NULL;
 
     const worksheet& sh = m_sheets[sheet];
 
-    if (col >= sh.size())
+    if (static_cast<size_t>(col) >= sh.size())
         return NULL;
 
     return &sh[col];
