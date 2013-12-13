@@ -335,7 +335,7 @@ string_id_t model_context_impl::add_string(const char* p, size_t n)
     if (itr != m_string_map.end())
         return itr->second;
 
-    append_string(p, n);
+    return append_string(p, n);
 }
 
 const std::string* model_context_impl::get_string(string_id_t identifier) const
