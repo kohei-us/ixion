@@ -598,7 +598,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
     if (!col_size)
         return abs_range_t(abs_range_t::invalid);
 
-    size_t row_size = cols[0].size();
+    row_t row_size = cols[0].size();
     if (!row_size)
         return abs_range_t(abs_range_t::invalid);
 
