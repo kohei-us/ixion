@@ -72,7 +72,7 @@ else
 fi
 
 # Check for mdds.
-PKG_CHECK_MODULES([MDDS],[mdds >= 0.7.1])
+PKG_CHECK_MODULES([MDDS],[mdds >= 0.9.0])
 
 CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
 
