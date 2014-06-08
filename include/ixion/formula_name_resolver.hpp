@@ -62,6 +62,7 @@ struct formula_name_type
 };
 
 IXION_DLLPUBLIC address_t to_address(const formula_name_type::address_type& src);
+IXION_DLLPUBLIC range_t to_range(const formula_name_type::range_type& src);
 
 class formula_name_resolver
 {

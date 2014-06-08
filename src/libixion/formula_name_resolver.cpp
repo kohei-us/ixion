@@ -466,6 +466,15 @@ address_t to_address(const formula_name_type::address_type& src)
     return addr;
 }
 
+range_t to_range(const formula_name_type::range_type& src)
+{
+    range_t range;
+    range.first = to_address(src.first);
+    range.last = to_address(src.last);
+
+    return range;
+}
+
 formula_name_resolver::formula_name_resolver() {}
 formula_name_resolver::~formula_name_resolver() {}
 
@@ -737,7 +746,25 @@ public:
 
     virtual string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
-        return string();
+        ostringstream os;
+        os << '[';
+
+        if (sheet_name)
+        {
+            append_address_a1(os, mp_cxt, range.first, pos, '.');
+            os << ':';
+            append_address_a1(os, mp_cxt, range.last, pos, '.');
+        }
+        else
+        {
+            os << '.';
+            append_address_a1(os, NULL, range.first, pos, 0);
+            os << ":.";
+            append_address_a1(os, NULL, range.last, pos, 0);
+        }
+
+        os << ']';
+        return os.str();
     }
 
     virtual string get_name(const abs_address_t& addr, bool sheet_name) const

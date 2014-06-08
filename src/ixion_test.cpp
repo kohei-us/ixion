@@ -57,7 +57,7 @@ void test_string_to_double()
     }
 }
 
-struct single_ref_name_entry
+struct ref_name_entry
 {
     const char* name;
     bool sheet_name;
@@ -77,7 +77,7 @@ void test_name_resolver_excel_a1()
     assert(resolver);
 
     // Parse single cell addresses.
-    single_ref_name_entry names[] =
+    ref_name_entry names[] =
     {
         { "A1", false },
         { "$A1", false },
@@ -200,7 +200,7 @@ void test_name_resolver_odff()
     assert(resolver);
 
     // Parse single cell addresses.
-    single_ref_name_entry names[] =
+    ref_name_entry single_ref_names[] =
     {
         { "[.A1]",   false },
         { "[.$A1]",  false },
@@ -209,9 +209,9 @@ void test_name_resolver_odff()
         { 0, false }
     };
 
-    for (size_t i = 0; names[i].name; ++i)
+    for (size_t i = 0; single_ref_names[i].name; ++i)
     {
-        const char* p = names[i].name;
+        const char* p = single_ref_names[i].name;
         string name_a1(p);
         formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         if (res.type != formula_name_type::cell_reference)
@@ -221,11 +221,40 @@ void test_name_resolver_odff()
         }
 
         address_t addr = to_address(res.address);
-        string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
+        string test_name = resolver->get_name(addr, abs_address_t(), single_ref_names[i].sheet_name);
 
         if (name_a1 != test_name)
         {
             cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
+
+    // Parse cell range addresses.
+    ref_name_entry range_ref_names[] =
+    {
+        { "[.A1:.A3]", false },
+        { "[.$B5:.$D10]", false },
+        { 0, false }
+    };
+
+    for (size_t i = 0; range_ref_names[i].name; ++i)
+    {
+        const char* p = range_ref_names[i].name;
+        string name_a1(p);
+        formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        if (res.type != formula_name_type::range_reference)
+        {
+            cerr << "failed to resolve range address: " << name_a1 << endl;
+            assert(false);
+        }
+
+        range_t range = to_range(res.range);
+        string test_name = resolver->get_name(range, abs_address_t(), range_ref_names[i].sheet_name);
+
+        if (name_a1 != test_name)
+        {
+            cerr << "failed to compile name from range: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
             assert(false);
         }
     }
