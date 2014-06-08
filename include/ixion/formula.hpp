@@ -21,13 +21,15 @@ namespace ixion {
  *
  * @param cxt model context.
  * @param pos address of the cell that has the formula expression.
+ * @param name_type name resolver type.
  * @param p pointer to the first character of raw formula expression string.
  * @param n size of the raw formula expression string.
  * @param tokens formula tokens representing the parsed formula expression.
  */
 void IXION_DLLPUBLIC parse_formula_string(
     iface::model_context& cxt, const abs_address_t& pos,
-    const char* p, size_t n, formula_tokens_t& tokens);
+    formula_name_resolver_t name_type, const char* p, size_t n,
+    formula_tokens_t& tokens);
 
 /**
  * Convert formula tokens into a human-readable string representation.

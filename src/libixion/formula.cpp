@@ -15,29 +15,56 @@
 #include "ixion/cell.hpp"
 #include "ixion/depends_tracker.hpp"
 #include "ixion/cell_listener_tracker.hpp"
+#include "ixion/types.hpp"
 
 #define DEBUG_FORMULA_API 0
 
 #include <sstream>
+#include <boost/scoped_ptr.hpp>
 
 #if DEBUG_FORMULA_API
 #include <iostream>
 using namespace std;
 #endif
 
-
 namespace ixion {
 
-void parse_formula_string(
-    iface::model_context& cxt, const abs_address_t& pos, const char* p, size_t n,
-    formula_tokens_t& tokens)
+namespace {
+
+formula_name_resolver* get_name_resolver(formula_name_resolver_t type, const iface::model_context* cxt)
 {
+    switch (type)
+    {
+        case formula_name_resolver_excel_a1:
+            return new formula_name_resolver_a1(cxt);
+        case formula_name_resolver_calc_a1:
+        case formula_name_resolver_excel_r1c1:
+        case formula_name_resolver_odff:
+        case formula_name_resolver_unknown:
+        default:
+            ;
+    }
+    return NULL;
+}
+
+}
+
+void parse_formula_string(
+    iface::model_context& cxt, const abs_address_t& pos, formula_name_resolver_t name_type,
+    const char* p, size_t n, formula_tokens_t& tokens)
+{
+    boost::scoped_ptr<formula_name_resolver> resolver(get_name_resolver(name_type, &cxt));
+    if (!resolver)
+        // No name resolver available.  Don't go further.
+        return;
+
     lexer_tokens_t lxr_tokens;
     formula_lexer lexer(p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
     formula_parser parser(lxr_tokens, cxt);
+    parser.set_name_resolver(resolver.get());
     parser.set_origin(pos);
     parser.parse();
     parser.get_tokens().swap(tokens);

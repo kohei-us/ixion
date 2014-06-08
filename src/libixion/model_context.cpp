@@ -442,7 +442,7 @@ void model_context_impl::set_shared_formula(
 {
     // Tokenize the formula string and store it.
     unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(m_parent, addr, p_formula, n_formula, *tokens);
+    parse_formula_string(m_parent, addr, formula_name_resolver_excel_a1, p_formula, n_formula, *tokens);
 
     if (si >= m_shared_tokens.size())
         m_shared_tokens.resize(si+1);
@@ -565,7 +565,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(m_parent, addr, p, n, *tokens);
+    parse_formula_string(m_parent, addr, formula_name_resolver_excel_a1, p, n, *tokens);
     unique_ptr<formula_cell> fcell(new formula_cell);
     if (!set_shared_formula_tokens_to_cell(m_parent, addr, *fcell, *tokens))
     {

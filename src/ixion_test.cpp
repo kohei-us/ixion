@@ -204,7 +204,7 @@ bool check_formula_expression(model_context& cxt, const char* p)
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;
     formula_tokens_t tokens;
-    parse_formula_string(cxt, abs_address_t(), p, n, tokens);
+    parse_formula_string(cxt, abs_address_t(), formula_name_resolver_excel_a1, p, n, tokens);
     std::string str;
     print_formula_tokens(cxt, abs_address_t(), tokens, str);
     int res = strcmp(p, str.c_str());

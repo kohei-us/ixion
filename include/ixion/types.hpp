@@ -33,6 +33,18 @@ enum celltype_t
     celltype_empty
 };
 
+/**
+ * Formula name resolver type specifies how name tokens are resolved.
+ */
+enum formula_name_resolver_t
+{
+    formula_name_resolver_unknown = 0,
+    formula_name_resolver_excel_a1,
+    formula_name_resolver_calc_a1,
+    formula_name_resolver_excel_r1c1,
+    formula_name_resolver_odff
+};
+
 }
 
 #endif

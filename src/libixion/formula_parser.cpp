@@ -120,12 +120,18 @@ formula_parser::formula_parser(const lexer_tokens_t& tokens, iface::model_contex
     m_itr_cur(tokens.end()),
     m_itr_end(tokens.end()),
     m_tokens(tokens),
-    m_context(cxt)
+    m_context(cxt),
+    m_resolver(NULL)
 {
 }
 
 formula_parser::~formula_parser()
 {
+}
+
+void formula_parser::set_name_resolver(const formula_name_resolver* resolver)
+{
+    m_resolver = resolver;
 }
 
 void formula_parser::set_origin(const abs_address_t& pos)
@@ -240,8 +246,13 @@ void formula_parser::primitive(lexer_opcode_t oc)
 
 void formula_parser::name(const lexer_token_base& t)
 {
+    const formula_name_resolver* res = m_resolver;
+    if (!res)
+        res = &m_context.get_name_resolver();
+
     mem_str_buf name = t.get_string();
-    formula_name_type fn = m_context.get_name_resolver().resolve(name.get(), name.size(), m_pos);
+
+    formula_name_type fn = res->resolve(name.get(), name.size(), m_pos);
 #if DEBUG_FORMULA_PARSER
             __IXION_DEBUG_OUT__ << "name = '" << name << "' - " << fn.to_string() << endl;
 #endif

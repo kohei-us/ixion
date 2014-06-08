@@ -19,6 +19,8 @@ namespace ixion {
 
 namespace iface { class model_context; }
 
+class formula_name_resolver;
+
 /**
  * Class formula_parser parses a series of primitive (or lexer) tokens
  * passed on from the lexer, and turn them into a series of formula tokens.
@@ -36,6 +38,7 @@ public:
     formula_parser(const lexer_tokens_t& tokens, iface::model_context& cxt);
     ~formula_parser();
 
+    void set_name_resolver(const formula_name_resolver* resolver);
     void set_origin(const abs_address_t& pos);
     void parse();
     void print_tokens() const;
@@ -66,6 +69,8 @@ private:
     iface::model_context&   m_context;
     formula_tokens_t        m_formula_tokens;
     abs_address_t           m_pos;    // reference position (usually current cell). always absolute.
+
+    const formula_name_resolver* m_resolver;
 };
 
 }
