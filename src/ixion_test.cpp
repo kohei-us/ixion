@@ -57,7 +57,7 @@ void test_string_to_double()
     }
 }
 
-void test_name_resolver()
+void test_name_resolver_excel_a1()
 {
     cout << "test name resolver" << endl;
 
@@ -450,7 +450,7 @@ int main()
 {
     test_size();
     test_string_to_double();
-    test_name_resolver();
+    test_name_resolver_excel_a1();
     test_address();
     test_parse_and_print_expressions();
     test_function_name_resolution();
