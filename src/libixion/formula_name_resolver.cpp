@@ -75,6 +75,41 @@ void append_column_name_a1(ostringstream& os, col_t col)
     os << col_name;
 }
 
+void append_address_a1(
+    ostringstream& os, const ixion::iface::model_context* cxt,
+    const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
+{
+    col_t col = addr.column;
+    row_t row = addr.row;
+    sheet_t sheet = addr.sheet;
+    if (!addr.abs_column)
+        col += pos.column;
+    if (!addr.abs_row)
+        row += pos.row;
+    if (!addr.abs_sheet)
+        sheet += pos.sheet;
+
+    if (sheet_name_sep && cxt)
+    {
+        string sheet_name = cxt->get_sheet_name(sheet);
+        bool quote = sheet_name.find_first_of(' ') != string::npos;
+        if (quote)
+            os << '\'';
+        os << cxt->get_sheet_name(sheet);
+        if (quote)
+            os << '\'';
+        os << sheet_name_sep;
+    }
+
+    if (addr.abs_column)
+        os << '$';
+    append_column_name_a1(os, col);
+
+    if (addr.abs_row)
+        os << '$';
+    os << (row + 1);
+}
+
 enum parse_address_result
 {
     invalid,
@@ -147,22 +182,22 @@ void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, co
     p = p_old;
 }
 
-parse_address_result parse_address(
-    const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+/**
+ * Parse A1-style single cell address.
+ *
+ * @param p it must point to the first character of a cell address.
+ * @param p_last it must point to the last character of a whole string
+ *               sequence.  It doesn't have to be the last character of a
+ *               cell address.
+ * @param addr resolved cell address.
+ *
+ * @return parsing result.
+ */
+parse_address_result parse_address_a1(const char*& p, const char* p_last, address_t& addr)
 {
     // NOTE: Row and column IDs are 1-based during parsing, while 0 is used as
     // the state of a value-not-set.  They are subtracted by one before
     // returning.
-
-    addr.row = 0;
-    addr.column = 0;
-    addr.abs_sheet = false;
-    addr.abs_row = false;
-    addr.abs_column = false;
-
-    if (cxt)
-        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
 
     resolver_parse_mode mode = resolver_parse_column;
 
@@ -288,6 +323,45 @@ parse_address_result parse_address(
     return valid_address;
 }
 
+parse_address_result parse_address_excel_a1(
+    const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+{
+    addr.row = 0;
+    addr.column = 0;
+    addr.abs_sheet = false;
+    addr.abs_row = false;
+    addr.abs_column = false;
+
+    if (cxt)
+        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
+        parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
+
+    return parse_address_a1(p, p_last, addr);
+}
+
+parse_address_result parse_address_odff(
+    const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+{
+    addr.row = 0;
+    addr.column = 0;
+    addr.abs_sheet = false;
+    addr.abs_row = false;
+    addr.abs_column = false;
+
+    if (*p == '.')
+    {
+        // This address doesn't contain sheet name.
+        ++p;
+    }
+    else if (cxt)
+    {
+        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
+        parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
+    }
+
+    return parse_address_a1(p, p_last, addr);
+}
+
 string abs_or_rel(bool _abs)
 {
     return _abs ? "(abs)" : "(rel)";
@@ -367,6 +441,13 @@ formula_name_resolver::~formula_name_resolver() {}
 
 namespace {
 
+string get_column_name_a1(col_t col)
+{
+    ostringstream os;
+    append_column_name_a1(os, col);
+    return os.str();
+}
+
 class excel_a1 : public formula_name_resolver
 {
 public:
@@ -396,7 +477,7 @@ public:
         parsed_addr.abs_row = false;
         parsed_addr.abs_sheet = false;
 
-        parse_address_result parse_res = parse_address(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
 
 #if DEBUG_NAME_RESOLVER
         __IXION_DEBUG_OUT__ << "parse address result: " << _to_string(parse_res) << endl;
@@ -443,7 +524,7 @@ public:
 
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
-            parse_res = parse_address(NULL, p, p_last, parsed_addr);
+            parse_res = parse_address_excel_a1(NULL, p, p_last, parsed_addr);
             if (parse_res != valid_address)
                 // The 2nd part after the ':' is not valid.
                 return ret;
@@ -464,42 +545,15 @@ public:
         return ret;
     }
 
-    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+    virtual string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
         ostringstream os;
-        col_t col = addr.column;
-        row_t row = addr.row;
-        sheet_t sheet = addr.sheet;
-        if (!addr.abs_column)
-            col += pos.column;
-        if (!addr.abs_row)
-            row += pos.row;
-        if (!addr.abs_sheet)
-            sheet += pos.sheet;
-
-        if (sheet_name && mp_cxt)
-        {
-            string sheet_name = mp_cxt->get_sheet_name(sheet);
-            bool quote = sheet_name.find_first_of(' ') != string::npos;
-            if (quote)
-                os << '\'';
-            os << mp_cxt->get_sheet_name(sheet);
-            if (quote)
-                os << '\'';
-            os << '!';
-        }
-
-        if (addr.abs_column)
-            os << '$';
-        append_column_name_a1(os, col);
-
-        if (addr.abs_row)
-            os << '$';
-        os << (row + 1);
+        char sheet_name_sep = sheet_name ? '!' : 0;
+        append_address_a1(os, mp_cxt, addr, pos, sheet_name_sep);
         return os.str();
     }
 
-    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
+    virtual string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
         // For now, sheet index of the end-range address is ignored.
 
@@ -532,7 +586,7 @@ public:
         return os.str();
     }
 
-    virtual std::string get_name(const abs_address_t& addr, bool sheet_name) const
+    virtual string get_name(const abs_address_t& addr, bool sheet_name) const
     {
         ostringstream os;
         if (sheet_name && mp_cxt)
@@ -543,7 +597,7 @@ public:
         return os.str();
     }
 
-    virtual std::string get_name(const abs_range_t& range, bool sheet_name) const
+    virtual string get_name(const abs_range_t& range, bool sheet_name) const
     {
         // For now, sheet index of the end-range address is ignored.
 
@@ -571,11 +625,9 @@ public:
         return os.str();
     }
 
-    virtual std::string get_column_name(col_t col) const
+    virtual string get_column_name(col_t col) const
     {
-        ostringstream os;
-        append_column_name_a1(os, col);
-        return os.str();
+        return get_column_name_a1(col);
     }
 
 private:
@@ -595,32 +647,127 @@ public:
     {
         formula_name_type ret;
 
+        if (resolve_function(p, n, ret))
+            return ret;
+
+        if (!n)
+            // Empty string.
+            return ret;
+
+        // First character must be '['.
+        if (*p != '[')
+            return ret;
+
+        ++p;
+        const char* p_last = p;
+        std::advance(p_last, n-2);
+
+        // Last character must be ']'.
+        if (*p_last != ']')
+            return ret;
+
+        --p_last;
+
+        address_t parsed_addr;
+        parsed_addr.column = 0;
+        parsed_addr.row = 0;
+        parsed_addr.sheet = pos.sheet;  // Use the sheet where the cell is unless sheet name is explicitly given.
+        parsed_addr.abs_column = false;
+        parsed_addr.abs_row = false;
+        parsed_addr.abs_sheet = false;
+
+        parse_address_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
+
+        // prevent for example H to be recognized as column address
+        if (parse_res == valid_address && parsed_addr.row != row_unset)
+        {
+            // This is a single cell address.
+            to_relative_address(parsed_addr, pos);
+
+            ret.type = formula_name_type::cell_reference;
+            ret.address.sheet = parsed_addr.sheet;
+            ret.address.row = parsed_addr.row;
+            ret.address.col = parsed_addr.column;
+            ret.address.abs_sheet = parsed_addr.abs_sheet;
+            ret.address.abs_row = parsed_addr.abs_row;
+            ret.address.abs_col = parsed_addr.abs_column;
+            return ret;
+        }
+
+        if (parse_res == range_expected)
+        {
+            if (p == p_last)
+                // ':' occurs as the last character.  This is not allowed.
+                return ret;
+
+            ++p; // skip ':'
+
+            to_relative_address(parsed_addr, pos);
+
+            ret.range.first.sheet = parsed_addr.sheet;
+            ret.range.first.row = parsed_addr.row;
+            ret.range.first.col = parsed_addr.column;
+            ret.range.first.abs_sheet = parsed_addr.abs_sheet;
+            ret.range.first.abs_row = parsed_addr.abs_row;
+            ret.range.first.abs_col = parsed_addr.abs_column;
+
+            // For now, we assume the sheet index of the end address is identical
+            // to that of the begin address.
+            parse_res = parse_address_odff(NULL, p, p_last, parsed_addr);
+            if (parse_res != valid_address)
+                // The 2nd part after the ':' is not valid.
+                return ret;
+
+            to_relative_address(parsed_addr, pos);
+
+            ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
+            ret.range.last.row = parsed_addr.row;
+            ret.range.last.col = parsed_addr.column;
+            ret.range.last.abs_sheet = parsed_addr.abs_sheet;
+            ret.range.last.abs_row = parsed_addr.abs_row;
+            ret.range.last.abs_col = parsed_addr.abs_column;
+            ret.type = formula_name_type::range_reference;
+            return ret;
+        }
+
+        resolve_function_or_name(p, n, ret);
+
         return ret;
     }
 
-    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+    virtual string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
-        return std::string();
+        ostringstream os;
+        os << '[';
+        if (sheet_name)
+            append_address_a1(os, mp_cxt, addr, pos, '.');
+        else
+        {
+            os << '.';
+            append_address_a1(os, NULL, addr, pos, 0);
+        }
+        os << ']';
+        return os.str();
     }
 
-    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
+    virtual string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
-        return std::string();
+        return string();
     }
 
-    virtual std::string get_name(const abs_address_t& addr, bool sheet_name) const
+    virtual string get_name(const abs_address_t& addr, bool sheet_name) const
     {
-        return std::string();
+        return string();
     }
 
-    virtual std::string get_name(const abs_range_t& range, bool sheet_name) const
+    virtual string get_name(const abs_range_t& range, bool sheet_name) const
     {
-        return std::string();
+        return string();
     }
 
-    virtual std::string get_column_name(col_t col) const
+    virtual string get_column_name(col_t col) const
     {
-        return std::string();
+        return get_column_name_a1(col);
     }
 
 private:

@@ -57,6 +57,12 @@ void test_string_to_double()
     }
 }
 
+struct single_ref_name_entry
+{
+    const char* name;
+    bool sheet_name;
+};
+
 void test_name_resolver_excel_a1()
 {
     cout << "test name resolver excel a1" << endl;
@@ -71,9 +77,8 @@ void test_name_resolver_excel_a1()
     assert(resolver);
 
     // Parse single cell addresses.
-    struct {
-        const char* name; bool sheet_name;
-    } names[] = {
+    single_ref_name_entry names[] =
+    {
         { "A1", false },
         { "$A1", false },
         { "A$1", false },
@@ -193,13 +198,49 @@ void test_name_resolver_odff()
     model_context cxt;
     cxt.append_sheet(IXION_ASCII("One"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
-    cxt.append_sheet(IXION_ASCII("Three"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
+    cxt.append_sheet(IXION_ASCII("80's Music"), 1048576, 1024);
 
     boost::scoped_ptr<formula_name_resolver> resolver(
         formula_name_resolver::get(formula_name_resolver_odff, &cxt));
     assert(resolver);
 
+    // Parse single cell addresses.
+    single_ref_name_entry names[] =
+    {
+        { "[.A1]",   false },
+        { "[.$A1]",  false },
+        { "[.A$1]",  false },
+        { "[.$A$1]", false },
+        { 0, false }
+    };
+
+    for (size_t i = 0; names[i].name; ++i)
+    {
+        const char* p = names[i].name;
+        string name_a1(p);
+        formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        if (res.type != formula_name_type::cell_reference)
+        {
+            cerr << "failed to resolve cell address: " << name_a1 << endl;
+            assert(false);
+        }
+
+        address_t addr;
+        addr.sheet = res.address.sheet;
+        addr.abs_sheet = res.address.abs_sheet;
+        addr.row = res.address.row;
+        addr.abs_row = res.address.abs_row;
+        addr.column = res.address.col;
+        addr.abs_column = res.address.abs_col;
+
+        string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
+        if (name_a1 != test_name)
+        {
+            cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
 }
 
 void test_address()
