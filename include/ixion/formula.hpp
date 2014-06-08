@@ -38,7 +38,7 @@ void IXION_DLLPUBLIC parse_formula_string(
  *
  * @param cxt model context.
  * @param pos address of the cell that has the formula tokens.
- * @param resolver name resolver object used to resolve name tokens.
+ * @param resolver name resolver object used to print name tokens.
  * @param tokens formula tokens.
  * @param str string representation of the formula tokens.
  */
