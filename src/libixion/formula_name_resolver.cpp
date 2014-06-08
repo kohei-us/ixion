@@ -49,6 +49,22 @@ void resolve_function_or_name(const char* p, size_t n, formula_name_type& ret)
     ret.type = formula_name_type::named_expression;
 }
 
+void set_address(formula_name_type::address_type& dest, const address_t& addr)
+{
+    dest.sheet = addr.sheet;
+    dest.row = addr.row;
+    dest.col = addr.column;
+    dest.abs_sheet = addr.abs_sheet;
+    dest.abs_row = addr.abs_row;
+    dest.abs_col = addr.abs_column;
+}
+
+void set_cell_reference(formula_name_type& ret, const address_t& addr)
+{
+    ret.type = formula_name_type::cell_reference;
+    set_address(ret.address, addr);
+}
+
 enum resolver_parse_mode {
     resolver_parse_column,
     resolver_parse_row
@@ -469,13 +485,8 @@ public:
         const char* p_last = p;
         std::advance(p_last, n -1);
 
-        address_t parsed_addr;
-        parsed_addr.column = 0;
-        parsed_addr.row = 0;
-        parsed_addr.sheet = pos.sheet;  // Use the sheet where the cell is unless sheet name is explicitly given.
-        parsed_addr.abs_column = false;
-        parsed_addr.abs_row = false;
-        parsed_addr.abs_sheet = false;
+        // Use the sheet where the cell is unless sheet name is explicitly given.
+        address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
         parse_address_result parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
 
@@ -488,6 +499,7 @@ public:
         {
             // This is a single cell address.
             to_relative_address(parsed_addr, pos);
+            set_cell_reference(ret, parsed_addr);
 
 #if DEBUG_NAME_RESOLVER
             string abs_row_s = parsed_addr.abs_row ? "abs" : "rel";
@@ -495,13 +507,6 @@ public:
             cout << "resolve: " << string(p,n) << "=(row=" << parsed_addr.row
                 << " [" << abs_row_s << "]; column=" << parsed_addr.column << " [" << abs_col_s << "])" << endl;
 #endif
-            ret.type = formula_name_type::cell_reference;
-            ret.address.sheet = parsed_addr.sheet;
-            ret.address.row = parsed_addr.row;
-            ret.address.col = parsed_addr.column;
-            ret.address.abs_sheet = parsed_addr.abs_sheet;
-            ret.address.abs_row = parsed_addr.abs_row;
-            ret.address.abs_col = parsed_addr.abs_column;
             return ret;
         }
 
@@ -514,13 +519,7 @@ public:
             ++p; // skip ':'
 
             to_relative_address(parsed_addr, pos);
-
-            ret.range.first.sheet = parsed_addr.sheet;
-            ret.range.first.row = parsed_addr.row;
-            ret.range.first.col = parsed_addr.column;
-            ret.range.first.abs_sheet = parsed_addr.abs_sheet;
-            ret.range.first.abs_row = parsed_addr.abs_row;
-            ret.range.first.abs_col = parsed_addr.abs_column;
+            set_address(ret.range.first, parsed_addr);
 
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
@@ -530,13 +529,8 @@ public:
                 return ret;
 
             to_relative_address(parsed_addr, pos);
-
+            set_address(ret.range.last, parsed_addr);
             ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
-            ret.range.last.row = parsed_addr.row;
-            ret.range.last.col = parsed_addr.column;
-            ret.range.last.abs_sheet = parsed_addr.abs_sheet;
-            ret.range.last.abs_row = parsed_addr.abs_row;
-            ret.range.last.abs_col = parsed_addr.abs_column;
             ret.type = formula_name_type::range_reference;
             return ret;
         }
@@ -668,13 +662,8 @@ public:
 
         --p_last;
 
-        address_t parsed_addr;
-        parsed_addr.column = 0;
-        parsed_addr.row = 0;
-        parsed_addr.sheet = pos.sheet;  // Use the sheet where the cell is unless sheet name is explicitly given.
-        parsed_addr.abs_column = false;
-        parsed_addr.abs_row = false;
-        parsed_addr.abs_sheet = false;
+        // Use the sheet where the cell is unless sheet name is explicitly given.
+        address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
         parse_address_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
 
@@ -683,14 +672,7 @@ public:
         {
             // This is a single cell address.
             to_relative_address(parsed_addr, pos);
-
-            ret.type = formula_name_type::cell_reference;
-            ret.address.sheet = parsed_addr.sheet;
-            ret.address.row = parsed_addr.row;
-            ret.address.col = parsed_addr.column;
-            ret.address.abs_sheet = parsed_addr.abs_sheet;
-            ret.address.abs_row = parsed_addr.abs_row;
-            ret.address.abs_col = parsed_addr.abs_column;
+            set_cell_reference(ret, parsed_addr);
             return ret;
         }
 
@@ -703,13 +685,7 @@ public:
             ++p; // skip ':'
 
             to_relative_address(parsed_addr, pos);
-
-            ret.range.first.sheet = parsed_addr.sheet;
-            ret.range.first.row = parsed_addr.row;
-            ret.range.first.col = parsed_addr.column;
-            ret.range.first.abs_sheet = parsed_addr.abs_sheet;
-            ret.range.first.abs_row = parsed_addr.abs_row;
-            ret.range.first.abs_col = parsed_addr.abs_column;
+            set_address(ret.range.first, parsed_addr);
 
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
@@ -719,13 +695,8 @@ public:
                 return ret;
 
             to_relative_address(parsed_addr, pos);
-
+            set_address(ret.range.last, parsed_addr);
             ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
-            ret.range.last.row = parsed_addr.row;
-            ret.range.last.col = parsed_addr.column;
-            ret.range.last.abs_sheet = parsed_addr.abs_sheet;
-            ret.range.last.abs_row = parsed_addr.abs_row;
-            ret.range.last.abs_col = parsed_addr.abs_column;
             ret.type = formula_name_type::range_reference;
             return ret;
         }
