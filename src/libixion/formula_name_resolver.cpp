@@ -452,6 +452,20 @@ string formula_name_type::to_string() const
     return os.str();
 }
 
+address_t to_address(const formula_name_type::address_type& src)
+{
+    address_t addr;
+
+    addr.sheet      = src.sheet;
+    addr.abs_sheet  = src.abs_sheet;
+    addr.row        = src.row;
+    addr.abs_row    = src.abs_row;
+    addr.column     = src.col;
+    addr.abs_column = src.abs_col;
+
+    return addr;
+}
+
 formula_name_resolver::formula_name_resolver() {}
 formula_name_resolver::~formula_name_resolver() {}
 

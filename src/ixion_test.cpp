@@ -116,15 +116,9 @@ void test_name_resolver_excel_a1()
             assert(false);
         }
 
-        address_t addr;
-        addr.sheet = res.address.sheet;
-        addr.abs_sheet = res.address.abs_sheet;
-        addr.row = res.address.row;
-        addr.abs_row = res.address.abs_row;
-        addr.column = res.address.col;
-        addr.abs_column = res.address.abs_col;
-
+        address_t addr = to_address(res.address);
         string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
+
         if (name_a1 != test_name)
         {
             cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
@@ -226,15 +220,9 @@ void test_name_resolver_odff()
             assert(false);
         }
 
-        address_t addr;
-        addr.sheet = res.address.sheet;
-        addr.abs_sheet = res.address.abs_sheet;
-        addr.row = res.address.row;
-        addr.abs_row = res.address.abs_row;
-        addr.column = res.address.col;
-        addr.abs_column = res.address.abs_col;
-
+        address_t addr = to_address(res.address);
         string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
+
         if (name_a1 != test_name)
         {
             cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;

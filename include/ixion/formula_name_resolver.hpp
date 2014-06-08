@@ -61,6 +61,8 @@ struct formula_name_type
     ::std::string to_string() const;
 };
 
+IXION_DLLPUBLIC address_t to_address(const formula_name_type::address_type& src);
+
 class formula_name_resolver
 {
 public:
