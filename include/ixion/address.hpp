@@ -128,6 +128,8 @@ struct IXION_DLLPUBLIC range_t
 
     range_t();
     range_t(const address_t& _first, const address_t& _last);
+    range_t(const range_t& r);
+    range_t(const abs_range_t& r);
 
     bool valid() const;
     void set_whole_column();

@@ -578,68 +578,56 @@ public:
         col_t col = range.first.column;
         row_t row = range.first.row;
         sheet_t sheet = range.first.sheet;
-        if (!range.first.abs_column)
-            col += pos.column;
-        if (!range.first.abs_row)
-            row += pos.row;
+
         if (!range.first.abs_sheet)
             sheet += pos.sheet;
 
         if (sheet_name && mp_cxt)
             os << mp_cxt->get_sheet_name(sheet) << '!';
 
-        append_column_name_a1(os, col);
-        os << (row + 1);
-        os << ":";
+        if (col != column_unset)
+        {
+            if (!range.first.abs_column)
+                col += pos.column;
+            append_column_name_a1(os, col);
+        }
 
+        if (row != row_unset)
+        {
+            if (!range.first.abs_row)
+                row += pos.row;
+            os << (row + 1);
+        }
+
+        os << ":";
         col = range.last.column;
         row = range.last.row;
-        if (!range.last.abs_column)
-            col += pos.column;
-        if (!range.last.abs_row)
-            row += pos.row;
-        append_column_name_a1(os, col);
-        os << (row + 1);
+
+        if (col != column_unset)
+        {
+            if (!range.last.abs_column)
+                col += pos.column;
+            append_column_name_a1(os, col);
+        }
+
+        if (row != row_unset)
+        {
+            if (!range.last.abs_row)
+                row += pos.row;
+            os << (row + 1);
+        }
+
         return os.str();
     }
 
     virtual string get_name(const abs_address_t& addr, bool sheet_name) const
     {
-        ostringstream os;
-        if (sheet_name && mp_cxt)
-            os << mp_cxt->get_sheet_name(addr.sheet) << '!';
-
-        append_column_name_a1(os, addr.column);
-        os << (addr.row + 1);
-        return os.str();
+        return get_name(addr, abs_address_t(), sheet_name);
     }
 
     virtual string get_name(const abs_range_t& range, bool sheet_name) const
     {
-        // For now, sheet index of the end-range address is ignored.
-
-        ostringstream os;
-        if (sheet_name && mp_cxt)
-            os << mp_cxt->get_sheet_name(range.first.sheet) << '!';
-
-        col_t col = range.first.column;
-        row_t row = range.first.row;
-
-        if (col != column_unset)
-            append_column_name_a1(os, col);
-        if (row != row_unset)
-            os << (row + 1);
-        os << ":";
-
-        col = range.last.column;
-        row = range.last.row;
-
-        if (col != column_unset)
-            append_column_name_a1(os, col);
-        if (row != row_unset)
-            os << (row + 1);
-
-        return os.str();
+        return get_name(range, abs_address_t(), sheet_name);
     }
 
     virtual string get_column_name(col_t col) const
@@ -769,12 +757,12 @@ public:
 
     virtual string get_name(const abs_address_t& addr, bool sheet_name) const
     {
-        return string();
+        return get_name(address_t(addr), abs_address_t(), sheet_name);
     }
 
     virtual string get_name(const abs_range_t& range, bool sheet_name) const
     {
-        return string();
+        return get_name(range_t(range), abs_address_t(), sheet_name);
     }
 
     virtual string get_column_name(col_t col) const

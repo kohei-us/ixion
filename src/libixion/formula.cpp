@@ -97,16 +97,16 @@ public:
             break;
             case fop_single_ref:
             {
-                abs_address_t addr = token.get_single_ref().to_abs(m_pos);
+                address_t addr = token.get_single_ref();
                 const formula_name_resolver& resolver = m_cxt.get_name_resolver();
-                m_os << resolver.get_name(addr, false);
+                m_os << resolver.get_name(addr, m_pos, false);
             }
             break;
             case fop_range_ref:
             {
-                abs_range_t range = token.get_range_ref().to_abs(m_pos);
+                range_t range = token.get_range_ref();
                 const formula_name_resolver& resolver = m_cxt.get_name_resolver();
-                m_os << resolver.get_name(range, false);
+                m_os << resolver.get_name(range, m_pos, false);
             }
             break;
             case fop_string:

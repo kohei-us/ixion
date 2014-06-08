@@ -271,6 +271,9 @@ range_t::range_t() {}
 range_t::range_t(const address_t& _first, const address_t& _last) :
     first(_first), last(_last) {}
 
+range_t::range_t(const range_t& r) : first(r.first), last(r.last) {}
+range_t::range_t(const abs_range_t& r) : first(r.first), last(r.last) {}
+
 bool range_t::valid() const
 {
     return first.valid() && last.valid();
