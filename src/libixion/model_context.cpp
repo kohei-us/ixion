@@ -143,7 +143,7 @@ public:
     model_context_impl(model_context& parent) :
         m_parent(parent),
         mp_config(new config),
-        mp_name_resolver(new formula_name_resolver_a1),
+        mp_name_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &parent)),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {

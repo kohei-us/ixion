@@ -19,6 +19,8 @@
 #include <cstring>
 #include <sstream>
 
+#include <boost/scoped_ptr.hpp>
+
 using namespace std;
 using namespace ixion;
 
@@ -64,7 +66,8 @@ void test_name_resolver()
     cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("Three"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
-    formula_name_resolver_a1 resolver(&cxt);
+    boost::scoped_ptr<formula_name_resolver> resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+    assert(resolver);
 
     // Parse single cell addresses.
     struct {
@@ -100,7 +103,7 @@ void test_name_resolver()
     {
         const char* p = names[i].name;
         string name_a1(p);
-        formula_name_type res = resolver.resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         if (res.type != formula_name_type::cell_reference)
         {
             cerr << "failed to resolve cell address: " << name_a1 << endl;
@@ -115,7 +118,7 @@ void test_name_resolver()
         addr.column = res.address.col;
         addr.abs_column = res.address.abs_col;
 
-        string test_name = resolver.get_name(addr, abs_address_t(), names[i].sheet_name);
+        string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
         if (name_a1 != test_name)
         {
             cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
@@ -138,7 +141,7 @@ void test_name_resolver()
     for (size_t i = 0; range_tests[i].name; ++i)
     {
         string name_a1(range_tests[i].name);
-        formula_name_type res = resolver.resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         assert(res.type == formula_name_type::range_reference);
         assert(res.range.first.sheet == range_tests[i].sheet1);
         assert(res.range.first.row == range_tests[i].row1);
@@ -148,13 +151,13 @@ void test_name_resolver()
         assert(res.range.last.col == range_tests[i].col2);
     }
 
-    formula_name_type res = resolver.resolve("B1", 2, abs_address_t(0,1,1));
+    formula_name_type res = resolver->resolve("B1", 2, abs_address_t(0,1,1));
     assert(res.type == formula_name_type::cell_reference);
     assert(res.address.sheet == 0);
     assert(res.address.row == -1);
     assert(res.address.col == 0);
 
-    res = resolver.resolve("B2:B4", 5, abs_address_t(0,0,3));
+    res = resolver->resolve("B2:B4", 5, abs_address_t(0,0,3));
     assert(res.type == formula_name_type::range_reference);
     assert(res.range.first.sheet == 0);
     assert(res.range.first.row == 1);
@@ -177,7 +180,7 @@ void test_name_resolver()
     for (size_t i = 0; name_tests[i].name; ++i)
     {
         string name_a1(name_tests[i].name);
-        formula_name_type res = resolver.resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         assert(res.type == name_tests[i].type);
     }
 }

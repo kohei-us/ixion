@@ -365,6 +365,25 @@ string formula_name_type::to_string() const
 formula_name_resolver::formula_name_resolver() {}
 formula_name_resolver::~formula_name_resolver() {}
 
+namespace {
+
+class formula_name_resolver_a1 : public formula_name_resolver
+{
+public:
+    formula_name_resolver_a1();
+    formula_name_resolver_a1(const iface::model_context* cxt);
+    virtual ~formula_name_resolver_a1();
+    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const;
+    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const;
+    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const;
+    virtual std::string get_name(const abs_address_t& addr, bool sheet_name) const;
+    virtual std::string get_name(const abs_range_t& range, bool sheet_name) const;
+
+    virtual std::string get_column_name(col_t col) const;
+private:
+    const iface::model_context* mp_cxt;
+};
+
 formula_name_resolver_a1::formula_name_resolver_a1() :
     formula_name_resolver(), mp_cxt(NULL) {}
 
@@ -576,6 +595,26 @@ string formula_name_resolver_a1::get_column_name(col_t col) const
     ostringstream os;
     append_column_name_a1(os, col);
     return os.str();
+}
+
+}
+
+formula_name_resolver* formula_name_resolver::get(
+    formula_name_resolver_t type, const iface::model_context* cxt)
+{
+
+    switch (type)
+    {
+        case formula_name_resolver_excel_a1:
+            return new formula_name_resolver_a1(cxt);
+        case formula_name_resolver_calc_a1:
+        case formula_name_resolver_excel_r1c1:
+        case formula_name_resolver_odff:
+        case formula_name_resolver_unknown:
+        default:
+            ;
+    }
+    return NULL;
 }
 
 }
