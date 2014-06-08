@@ -367,12 +367,11 @@ formula_name_resolver::~formula_name_resolver() {}
 
 namespace {
 
-class formula_name_resolver_a1 : public formula_name_resolver
+class excel_a1 : public formula_name_resolver
 {
 public:
-    formula_name_resolver_a1();
-    formula_name_resolver_a1(const iface::model_context* cxt);
-    virtual ~formula_name_resolver_a1();
+    excel_a1(const iface::model_context* cxt);
+    virtual ~excel_a1();
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const;
@@ -384,15 +383,11 @@ private:
     const iface::model_context* mp_cxt;
 };
 
-formula_name_resolver_a1::formula_name_resolver_a1() :
-    formula_name_resolver(), mp_cxt(NULL) {}
+excel_a1::excel_a1(const iface::model_context* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
 
-formula_name_resolver_a1::formula_name_resolver_a1(const iface::model_context* cxt) :
-    formula_name_resolver(), mp_cxt(cxt) {}
+excel_a1::~excel_a1() {}
 
-formula_name_resolver_a1::~formula_name_resolver_a1() {}
-
-formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, const abs_address_t& pos) const
+formula_name_type excel_a1::resolve(const char* p, size_t n, const abs_address_t& pos) const
 {
 #if DEBUG_NAME_RESOLVER
     __IXION_DEBUG_OUT__ << "name=" << string(p,n) << "; origin=" << pos.get_name() << endl;
@@ -483,7 +478,7 @@ formula_name_type formula_name_resolver_a1::resolve(const char* p, size_t n, con
     return ret;
 }
 
-string formula_name_resolver_a1::get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+string excel_a1::get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
 {
     ostringstream os;
     col_t col = addr.column;
@@ -518,7 +513,7 @@ string formula_name_resolver_a1::get_name(const address_t& addr, const abs_addre
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
+string excel_a1::get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
 {
     // For now, sheet index of the end-range address is ignored.
 
@@ -551,7 +546,7 @@ string formula_name_resolver_a1::get_name(const range_t& range, const abs_addres
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const abs_address_t& addr, bool sheet_name) const
+string excel_a1::get_name(const abs_address_t& addr, bool sheet_name) const
 {
     ostringstream os;
     if (sheet_name && mp_cxt)
@@ -562,7 +557,7 @@ string formula_name_resolver_a1::get_name(const abs_address_t& addr, bool sheet_
     return os.str();
 }
 
-string formula_name_resolver_a1::get_name(const abs_range_t& range, bool sheet_name) const
+string excel_a1::get_name(const abs_range_t& range, bool sheet_name) const
 {
     // For now, sheet index of the end-range address is ignored.
 
@@ -590,7 +585,7 @@ string formula_name_resolver_a1::get_name(const abs_range_t& range, bool sheet_n
     return os.str();
 }
 
-string formula_name_resolver_a1::get_column_name(col_t col) const
+string excel_a1::get_column_name(col_t col) const
 {
     ostringstream os;
     append_column_name_a1(os, col);
@@ -606,7 +601,7 @@ formula_name_resolver* formula_name_resolver::get(
     switch (type)
     {
         case formula_name_resolver_excel_a1:
-            return new formula_name_resolver_a1(cxt);
+            return new excel_a1(cxt);
         case formula_name_resolver_calc_a1:
         case formula_name_resolver_excel_r1c1:
         case formula_name_resolver_odff:
