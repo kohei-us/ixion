@@ -30,21 +30,17 @@ using namespace std;
 namespace ixion {
 
 void parse_formula_string(
-    iface::model_context& cxt, const abs_address_t& pos, formula_name_resolver_t name_type,
+    iface::model_context& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver,
     const char* p, size_t n, formula_tokens_t& tokens)
 {
-    boost::scoped_ptr<formula_name_resolver> resolver(formula_name_resolver::get(name_type, &cxt));
-    if (!resolver)
-        // No name resolver available.  Don't go further.
-        return;
-
     lexer_tokens_t lxr_tokens;
     formula_lexer lexer(p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
     formula_parser parser(lxr_tokens, cxt);
-    parser.set_name_resolver(resolver.get());
+    parser.set_name_resolver(&resolver);
     parser.set_origin(pos);
     parser.parse();
     parser.get_tokens().swap(tokens);
@@ -56,10 +52,16 @@ class print_formula_token : std::unary_function<formula_token_base, void>
 {
     const iface::model_context& m_cxt;
     const abs_address_t& m_pos;
+    const formula_name_resolver& m_resolver;
     std::ostringstream& m_os;
 public:
-    print_formula_token(const iface::model_context& cxt, const abs_address_t& pos, std::ostringstream& os) :
-        m_cxt(cxt), m_pos(pos), m_os(os) {}
+    print_formula_token(
+        const iface::model_context& cxt, const abs_address_t& pos,
+        const formula_name_resolver& resolver, std::ostringstream& os) :
+        m_cxt(cxt),
+        m_pos(pos),
+        m_resolver(resolver),
+        m_os(os) {}
 
     void operator() (const formula_token_base& token)
     {
@@ -98,15 +100,13 @@ public:
             case fop_single_ref:
             {
                 address_t addr = token.get_single_ref();
-                const formula_name_resolver& resolver = m_cxt.get_name_resolver();
-                m_os << resolver.get_name(addr, m_pos, false);
+                m_os << m_resolver.get_name(addr, m_pos, false);
             }
             break;
             case fop_range_ref:
             {
                 range_t range = token.get_range_ref();
-                const formula_name_resolver& resolver = m_cxt.get_name_resolver();
-                m_os << resolver.get_name(range, m_pos, false);
+                m_os << m_resolver.get_name(range, m_pos, false);
             }
             break;
             case fop_string:
@@ -132,10 +132,11 @@ public:
 
 void print_formula_tokens(
     const iface::model_context& cxt, const abs_address_t& pos,
-    const formula_tokens_t& tokens, std::string& str)
+    const formula_name_resolver& resolver, const formula_tokens_t& tokens,
+    std::string& str)
 {
     std::ostringstream os;
-    std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, pos, os));
+    std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, pos, resolver, os));
     str = os.str();
 }
 

@@ -277,14 +277,15 @@ void test_address()
     assert(!abs_range_t(abs_range_t::invalid).valid());
 }
 
-bool check_formula_expression(model_context& cxt, const char* p)
+bool check_formula_expression(
+    model_context& cxt, const formula_name_resolver& resolver, const char* p)
 {
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;
     formula_tokens_t tokens;
-    parse_formula_string(cxt, abs_address_t(), formula_name_resolver_excel_a1, p, n, tokens);
+    parse_formula_string(cxt, abs_address_t(), resolver, p, n, tokens);
     std::string str;
-    print_formula_tokens(cxt, abs_address_t(), tokens, str);
+    print_formula_tokens(cxt, abs_address_t(), resolver, tokens, str);
     int res = strcmp(p, str.c_str());
     if (res)
         cout << "formula expressions differ: '" << p << "' (before) -> '" << str << "' (after)" << endl;
@@ -316,9 +317,13 @@ void test_parse_and_print_expressions()
     };
     size_t num_exps = sizeof(exps) / sizeof(exps[0]);
     model_context cxt;
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+    assert(resolver);
+
     for (size_t i = 0; i < num_exps; ++i)
     {
-        bool result = check_formula_expression(cxt, exps[i]);
+        bool result = check_formula_expression(cxt, *resolver, exps[i]);
         assert(result);
     }
 }

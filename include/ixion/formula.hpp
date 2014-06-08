@@ -16,19 +16,21 @@
 
 namespace ixion {
 
+class formula_name_resolver;
+
 /**
  * Parse a raw formula expression string into formula tokens.
  *
  * @param cxt model context.
  * @param pos address of the cell that has the formula expression.
- * @param name_type name resolver type.
+ * @param resolver name resolver object used to resolve name tokens.
  * @param p pointer to the first character of raw formula expression string.
  * @param n size of the raw formula expression string.
  * @param tokens formula tokens representing the parsed formula expression.
  */
 void IXION_DLLPUBLIC parse_formula_string(
     iface::model_context& cxt, const abs_address_t& pos,
-    formula_name_resolver_t name_type, const char* p, size_t n,
+    const formula_name_resolver& resolver, const char* p, size_t n,
     formula_tokens_t& tokens);
 
 /**
@@ -36,12 +38,14 @@ void IXION_DLLPUBLIC parse_formula_string(
  *
  * @param cxt model context.
  * @param pos address of the cell that has the formula tokens.
+ * @param resolver name resolver object used to resolve name tokens.
  * @param tokens formula tokens.
  * @param str string representation of the formula tokens.
  */
 void IXION_DLLPUBLIC print_formula_tokens(
     const iface::model_context& cxt, const abs_address_t& pos,
-    const formula_tokens_t& tokens, std::string& str);
+    const formula_name_resolver& resolver, const formula_tokens_t& tokens,
+    std::string& str);
 
 /**
  * Regisiter a formula cell with cell dependency tracker.
