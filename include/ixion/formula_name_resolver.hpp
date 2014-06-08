@@ -82,6 +82,17 @@ public:
      */
     virtual std::string get_column_name(col_t col) const = 0;
 
+    /**
+     * Create a formula name resolver instance according to the requested
+     * type.
+     *
+     * @param type type formula name resolver being requested.
+     * @param cxt document model context for resolving sheet names, or NULL in
+     *            case names being resolved don't contain sheet names.
+     *
+     * @return formula name resolver instance created on the heap.  The caller
+     *         is responsible for managing its life cycle.
+     */
     IXION_DLLPUBLIC static formula_name_resolver*
         get(formula_name_resolver_t type, const iface::model_context* cxt);
 };

@@ -59,14 +59,15 @@ void test_string_to_double()
 
 void test_name_resolver_excel_a1()
 {
-    cout << "test name resolver" << endl;
+    cout << "test name resolver excel a1" << endl;
 
     model_context cxt;
     cxt.append_sheet(IXION_ASCII("One"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("Three"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
-    boost::scoped_ptr<formula_name_resolver> resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
     assert(resolver);
 
     // Parse single cell addresses.
@@ -183,6 +184,22 @@ void test_name_resolver_excel_a1()
         formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         assert(res.type == name_tests[i].type);
     }
+}
+
+void test_name_resolver_odff()
+{
+    cout << "test name resolver odff" << endl;
+
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("One"), 1048576, 1024);
+    cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
+    cxt.append_sheet(IXION_ASCII("Three"), 1048576, 1024);
+    cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
+
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(formula_name_resolver_odff, &cxt));
+    assert(resolver);
+
 }
 
 void test_address()
@@ -451,6 +468,7 @@ int main()
     test_size();
     test_string_to_double();
     test_name_resolver_excel_a1();
+    test_name_resolver_odff();
     test_address();
     test_parse_and_print_expressions();
     test_function_name_resolution();
