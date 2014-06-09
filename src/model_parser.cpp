@@ -93,7 +93,11 @@ model_parser::check_error::check_error(const string& msg) :
 // ============================================================================
 
 model_parser::model_parser(const string& filepath, size_t thread_count) :
-    m_filepath(filepath), m_thread_count(thread_count), m_print_separator(true)
+    m_context(),
+    mp_name_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &m_context)),
+    m_filepath(filepath),
+    m_thread_count(thread_count),
+    m_print_separator(true)
 {
     m_context.append_sheet(IXION_ASCII("sheet"), 1048576, 1024);
 }
@@ -246,8 +250,7 @@ void model_parser::parse_init(const char*& p)
         throw model_parser::parse_error("separator is missing");
     }
 
-    const formula_name_resolver& resolver = m_context.get_name_resolver();
-    formula_name_type ret = resolver.resolve(name.get(), name.size(), abs_address_t());
+    formula_name_type ret = mp_name_resolver->resolve(name.get(), name.size(), abs_address_t());
     if (ret.type != formula_name_type::cell_reference)
     {
         ostringstream os;
@@ -275,7 +278,7 @@ void model_parser::parse_init(const char*& p)
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
 #endif
             unregister_formula_cell(m_context, pos);
-            m_context.set_formula_cell(pos, buf.get(), buf.size());
+            m_context.set_formula_cell(pos, buf.get(), buf.size(), *mp_name_resolver);
             formula_cell* p = m_context.get_formula_cell(pos);
             assert(p);
             m_dirty_cells.insert(pos);
@@ -314,7 +317,7 @@ void model_parser::parse_init(const char*& p)
                 m_print_separator = false;
                 cout << get_formula_result_output_separator() << endl;
             }
-            cout << resolver.get_name(pos, false) << ": (n) " << value << endl;
+            cout << mp_name_resolver->get_name(pos, false) << ": (n) " << value << endl;
         }
         break;
         default:
@@ -384,8 +387,7 @@ void model_parser::check()
         const formula_result& res = itr->second;
         cout << name << " : " << res.str(m_context) << endl;
 
-        const formula_name_resolver& resolver = m_context.get_name_resolver();
-        formula_name_type name_type = resolver.resolve(&name[0], name.size(), abs_address_t());
+        formula_name_type name_type = mp_name_resolver->resolve(&name[0], name.size(), abs_address_t());
         switch (name_type.type)
         {
             case formula_name_type::cell_reference:

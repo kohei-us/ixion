@@ -344,13 +344,13 @@ void test_function_name_resolution()
     };
 
     model_context cxt;
-    const formula_name_resolver& resolver = cxt.get_name_resolver();
+    boost::scoped_ptr<formula_name_resolver> resolver(formula_name_resolver::get(ixion::formula_name_resolver_excel_a1, &cxt));
     size_t n = IXION_N_ELEMENTS(valid_names);
     for (size_t i = 0; i < n; ++i)
     {
         const char* name = valid_names[i];
         cout << "valid name: " << name << endl;
-        formula_name_type t = resolver.resolve(name, strlen(name), abs_address_t());
+        formula_name_type t = resolver->resolve(name, strlen(name), abs_address_t());
         assert(t.type == formula_name_type::function);
     }
 
@@ -359,14 +359,16 @@ void test_function_name_resolution()
     {
         const char* name = invalid_names[i];
         cout << "invalid name: " << name << endl;
-        formula_name_type t = resolver.resolve(name, strlen(name), abs_address_t());
+        formula_name_type t = resolver->resolve(name, strlen(name), abs_address_t());
         assert(t.type != formula_name_type::function);
     }
 }
 
-formula_cell* insert_formula(model_context& cxt, const abs_address_t& pos, const char* exp)
+formula_cell* insert_formula(
+    model_context& cxt, const abs_address_t& pos, const char* exp,
+    const formula_name_resolver& resolver)
 {
-    cxt.set_formula_cell(pos, exp, strlen(exp));
+    cxt.set_formula_cell(pos, exp, strlen(exp), resolver);
     register_formula_cell(cxt, pos);
     formula_cell* p = cxt.get_formula_cell(pos);
     assert(p);
@@ -378,6 +380,10 @@ void test_model_context_storage()
     cout << "test model context storage" << endl;
     {
         model_context cxt;
+        boost::scoped_ptr<formula_name_resolver> resolver(
+            formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+        assert(resolver);
+
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
         cxt.set_session_handler(NULL);
 
@@ -398,19 +404,23 @@ void test_model_context_storage()
         // Test formula cells.
         abs_address_t pos(0,3,0);
         const char* exp = "SUM(1,2,3)";
-        cxt.set_formula_cell(pos, exp, strlen(exp));
+        cxt.set_formula_cell(pos, exp, strlen(exp), *resolver);
         formula_cell* p = cxt.get_formula_cell(pos);
         assert(p);
     }
 
     {
         model_context cxt;
+        boost::scoped_ptr<formula_name_resolver> resolver(
+            formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+        assert(resolver);
+
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
         cxt.set_session_handler(NULL);
         string exp = "1";
-        cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size());
-        cxt.set_formula_cell(abs_address_t(0,2,0), &exp[0], exp.size());
-        cxt.set_formula_cell(abs_address_t(0,1,0), &exp[0], exp.size());
+        cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size(), *resolver);
+        cxt.set_formula_cell(abs_address_t(0,2,0), &exp[0], exp.size(), *resolver);
+        cxt.set_formula_cell(abs_address_t(0,1,0), &exp[0], exp.size(), *resolver);
     }
 
     {
@@ -458,6 +468,10 @@ void test_volatile_function()
     cout << "test volatile function" << endl;
 
     model_context cxt;
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+    assert(resolver);
+
     cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
     cxt.set_session_handler(NULL);
 
@@ -470,7 +484,7 @@ void test_volatile_function()
     cxt.set_numeric_cell(abs_address_t(0,2,0), 3.0);
 
     // Set formula in A4 that references A1:A3.
-    formula_cell* p = insert_formula(cxt, abs_address_t(0,3,0), "SUM(A1:A3)");
+    formula_cell* p = insert_formula(cxt, abs_address_t(0,3,0), "SUM(A1:A3)", *resolver);
     assert(p);
     dirty_cells.insert(abs_address_t(0,3,0));
 
@@ -495,7 +509,7 @@ void test_volatile_function()
     // Insert a volatile cell into B1.  At this point B1 should be the only dirty cell.
     dirty_cells.clear();
     dirty_addrs.clear();
-    p = insert_formula(cxt, abs_address_t(0,0,1), "NOW()");
+    p = insert_formula(cxt, abs_address_t(0,0,1), "NOW()", *resolver);
     assert(p);
     dirty_cells.insert(abs_address_t(0,0,1));
     dirty_addrs.push_back(abs_address_t(0,0,1));

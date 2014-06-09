@@ -12,6 +12,7 @@
 #include "ixion/model_context.hpp"
 
 #include <string>
+#include <boost/scoped_ptr.hpp>
 
 namespace ixion {
 
@@ -35,6 +36,7 @@ public:
 
 private:
     const model_context& m_context;
+    boost::scoped_ptr<formula_name_resolver> mp_resolver;
     std::string m_cell_name;
 };
 

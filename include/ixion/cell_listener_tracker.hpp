@@ -17,8 +17,12 @@
 
 namespace ixion {
 
+class formula_name_resolver;
+
 namespace iface {
-    class model_context;
+
+class model_context;
+
 }
 
 /**
@@ -82,7 +86,7 @@ public:
      */
     void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
 
-    void print_cell_listeners(const abs_address_t& target) const;
+    void print_cell_listeners(const abs_address_t& target, const formula_name_resolver& resolver) const;
 private:
     void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target,

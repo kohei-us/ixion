@@ -39,8 +39,7 @@ void parse_formula_string(
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
-    formula_parser parser(lxr_tokens, cxt);
-    parser.set_name_resolver(&resolver);
+    formula_parser parser(lxr_tokens, cxt, resolver);
     parser.set_origin(pos);
     parser.parse();
     parser.get_tokens().swap(tokens);

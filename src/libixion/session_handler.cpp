@@ -18,14 +18,14 @@ using namespace std;
 namespace ixion {
 
 session_handler::session_handler(const model_context& cxt) :
-    m_context(cxt) {}
+    m_context(cxt),
+    mp_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt)) {}
 
 session_handler::~session_handler() {}
 
 void session_handler::begin_cell_interpret(const abs_address_t& pos)
 {
-    const formula_name_resolver& resolver = m_context.get_name_resolver();
-    m_cell_name = resolver.get_name(pos, false);
+    m_cell_name = mp_resolver->get_name(pos, false);
     cout << get_formula_result_output_separator() << endl;
     cout << m_cell_name << ": ";
 }
@@ -68,12 +68,12 @@ void session_handler::push_string(size_t sid)
 
 void session_handler::push_single_ref(const address_t& addr, const abs_address_t& pos)
 {
-    cout << m_context.get_name_resolver().get_name(addr, pos, false);
+    cout << mp_resolver->get_name(addr, pos, false);
 }
 
 void session_handler::push_range_ref(const range_t& range, const abs_address_t& pos)
 {
-    cout << m_context.get_name_resolver().get_name(range, pos, false);
+    cout << mp_resolver->get_name(range, pos, false);
 }
 
 void session_handler::push_function(formula_function_t foc)

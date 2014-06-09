@@ -18,6 +18,7 @@
 #include <vector>
 
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace ixion {
 
@@ -70,6 +71,7 @@ private:
 
 private:
     model_context m_context;
+    boost::scoped_ptr<formula_name_resolver> mp_name_resolver;
     std::string m_filepath;
     size_t m_thread_count;
     dirty_formula_cells_t m_dirty_cells;

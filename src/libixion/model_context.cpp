@@ -143,7 +143,6 @@ public:
     model_context_impl(model_context& parent) :
         m_parent(parent),
         mp_config(new config),
-        mp_name_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &parent)),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_session_handler(new session_handler(parent))
     {
@@ -152,7 +151,6 @@ public:
     ~model_context_impl()
     {
         delete mp_config;
-        delete mp_name_resolver;
         delete mp_cell_listener_tracker;
         delete mp_session_handler;
 
@@ -163,11 +161,6 @@ public:
     const config& get_config() const
     {
         return *mp_config;
-    }
-
-    const formula_name_resolver& get_name_resolver() const
-    {
-        return *mp_name_resolver;
     }
 
     cell_listener_tracker& get_cell_listener_tracker()
@@ -191,7 +184,7 @@ public:
     void set_boolean_cell(const abs_address_t& addr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
-    void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_formula_cell(const abs_address_t& addr, const char* p, size_t n, const formula_name_resolver& resolver);
     void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
 
     abs_range_t get_data_range(sheet_t sheet) const;
@@ -223,15 +216,18 @@ public:
 
     void set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula);
+        const char* p_formula, size_t n_formula,
+        const formula_name_resolver& resolver);
 
     void set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range);
+        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
+        const formula_name_resolver& resolver);
 
     void set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const abs_range_t& range);
+        const char* p_formula, size_t n_formula, const abs_range_t& range,
+        const formula_name_resolver& resolver);
 
     void set_shared_formula(const abs_address_t& addr, size_t si);
 
@@ -246,7 +242,6 @@ private:
     workbook m_sheets;
 
     config* mp_config;
-    formula_name_resolver* mp_name_resolver;
     cell_listener_tracker* mp_cell_listener_tracker;
     iface::session_handler* mp_session_handler;
     named_expressions_type m_named_expressions;
@@ -404,9 +399,10 @@ void model_context_impl::remove_formula_tokens(sheet_t sheet, size_t identifier)
 
 void model_context_impl::set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range)
+        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
+        const formula_name_resolver& resolver)
 {
-    formula_name_type name_type = mp_name_resolver->resolve(p_range, n_range, abs_address_t());
+    formula_name_type name_type = resolver.resolve(p_range, n_range, abs_address_t());
     abs_range_t range;
     switch (name_type.type)
     {
@@ -433,16 +429,17 @@ void model_context_impl::set_shared_formula(
         }
     }
 
-    set_shared_formula(addr, si, p_formula, n_formula, range);
+    set_shared_formula(addr, si, p_formula, n_formula, range, resolver);
 }
 
 void model_context_impl::set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const abs_range_t& range)
+        const char* p_formula, size_t n_formula, const abs_range_t& range,
+        const formula_name_resolver& resolver)
 {
     // Tokenize the formula string and store it.
     unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(m_parent, addr, *mp_name_resolver, p_formula, n_formula, *tokens);
+    parse_formula_string(m_parent, addr, resolver, p_formula, n_formula, *tokens);
 
     if (si >= m_shared_tokens.size())
         m_shared_tokens.resize(si+1);
@@ -453,12 +450,13 @@ void model_context_impl::set_shared_formula(
 
 void model_context_impl::set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula)
+        const char* p_formula, size_t n_formula,
+        const formula_name_resolver& resolver)
 {
     abs_range_t range;
     range.first = addr;
     range.last = range.first;
-    set_shared_formula(addr, si, p_formula, n_formula, range);
+    set_shared_formula(addr, si, p_formula, n_formula, range, resolver);
 }
 
 const formula_tokens_t* model_context_impl::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
@@ -562,10 +560,11 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
     pos_hint = col_store.set(pos_hint, addr.row, identifier);
 }
 
-void model_context_impl::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
+void model_context_impl::set_formula_cell(
+    const abs_address_t& addr, const char* p, size_t n, const formula_name_resolver& resolver)
 {
     unique_ptr<formula_tokens_t> tokens(new formula_tokens_t);
-    parse_formula_string(m_parent, addr, *mp_name_resolver, p, n, *tokens);
+    parse_formula_string(m_parent, addr, resolver, p, n, *tokens);
     unique_ptr<formula_cell> fcell(new formula_cell);
     if (!set_shared_formula_tokens_to_cell(m_parent, addr, *fcell, *tokens))
     {
@@ -784,11 +783,6 @@ const config& model_context::get_config() const
     return mp_impl->get_config();
 }
 
-const formula_name_resolver& model_context::get_name_resolver() const
-{
-    return mp_impl->get_name_resolver();
-}
-
 cell_listener_tracker& model_context::get_cell_listener_tracker()
 {
     return mp_impl->get_cell_listener_tracker();
@@ -819,9 +813,10 @@ void model_context::set_string_cell(const abs_address_t& addr, string_id_t ident
     mp_impl->set_string_cell(addr, identifier);
 }
 
-void model_context::set_formula_cell(const abs_address_t& addr, const char* p, size_t n)
+void model_context::set_formula_cell(
+    const abs_address_t& addr, const char* p, size_t n, const formula_name_resolver& resolver)
 {
-    mp_impl->set_formula_cell(addr, p, n);
+    mp_impl->set_formula_cell(addr, p, n, resolver);
 }
 
 void model_context::set_formula_cell(
@@ -911,16 +906,18 @@ void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
 
 void model_context::set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range)
+        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
+        const formula_name_resolver& resolver)
 {
-    mp_impl->set_shared_formula(addr, si, p_formula, n_formula, p_range, n_range);
+    mp_impl->set_shared_formula(addr, si, p_formula, n_formula, p_range, n_range, resolver);
 }
 
 void model_context::set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula)
+        const char* p_formula, size_t n_formula,
+        const formula_name_resolver& resolver)
 {
-    mp_impl->set_shared_formula(addr, si, p_formula, n_formula);
+    mp_impl->set_shared_formula(addr, si, p_formula, n_formula, resolver);
 }
 
 const formula_tokens_t* model_context::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const

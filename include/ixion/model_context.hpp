@@ -54,7 +54,6 @@ public:
     virtual ~model_context();
 
     virtual const config& get_config() const;
-    virtual const formula_name_resolver& get_name_resolver() const;
     virtual cell_listener_tracker& get_cell_listener_tracker();
 
     virtual bool is_empty(const abs_address_t& addr) const;
@@ -85,10 +84,11 @@ public:
 
     void set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range);
+        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
+        const formula_name_resolver& resolver);
     void set_shared_formula(
         const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula);
+        const char* p_formula, size_t n_formula, const formula_name_resolver& resolver);
 
     void erase_cell(const abs_address_t& addr);
 
@@ -96,7 +96,7 @@ public:
     void set_boolean_cell(const abs_address_t& adr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
-    void set_formula_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_formula_cell(const abs_address_t& addr, const char* p, size_t n, const formula_name_resolver& resolver);
     void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
 
     abs_range_t get_data_range(sheet_t sheet) const;

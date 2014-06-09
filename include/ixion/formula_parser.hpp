@@ -35,10 +35,9 @@ public:
         parse_error(const ::std::string& msg);
     };
 
-    formula_parser(const lexer_tokens_t& tokens, iface::model_context& cxt);
+    formula_parser(const lexer_tokens_t& tokens, iface::model_context& cxt, const formula_name_resolver& resolver);
     ~formula_parser();
 
-    void set_name_resolver(const formula_name_resolver* resolver);
     void set_origin(const abs_address_t& pos);
     void parse();
     void print_tokens() const;
@@ -70,7 +69,7 @@ private:
     formula_tokens_t        m_formula_tokens;
     abs_address_t           m_pos;    // reference position (usually current cell). always absolute.
 
-    const formula_name_resolver* m_resolver;
+    const formula_name_resolver& m_resolver;
 };
 
 }

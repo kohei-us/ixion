@@ -218,9 +218,9 @@ void cell_listener_tracker::get_all_range_listeners(
     get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
-void cell_listener_tracker::print_cell_listeners(const abs_address_t& target) const
+void cell_listener_tracker::print_cell_listeners(
+    const abs_address_t& target, const formula_name_resolver& resolver) const
 {
-    const formula_name_resolver& resolver = m_context.get_name_resolver();
     cout << "The following cells listen to cell " << resolver.get_name(target, false) << endl;
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
     if (itr == m_cell_listeners.end())

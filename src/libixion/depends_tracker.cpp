@@ -27,6 +27,7 @@ namespace ixion {
 
 namespace {
 
+#if DEBUG_DEPENDS_TRACKER
 class cell_printer : public unary_function<abs_address_t, void>
 {
 public:
@@ -41,6 +42,7 @@ public:
 private:
     const iface::model_context& m_cxt;
 };
+#endif
 
 /**
  * Function object to reset the status of formula cell to pre-interpretation
