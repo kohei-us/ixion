@@ -217,7 +217,6 @@ void formula_functions::fnc_sum(value_stack_t& args) const
     double ret = 0;
     while (!args.empty())
     {
-
         switch (args.get_type())
         {
             case sv_range_ref:
@@ -247,8 +246,32 @@ void formula_functions::fnc_average(value_stack_t& args) const
     double count = 0.0;
     while (!args.empty())
     {
-        ret += args.pop_value();
-        ++count;
+        switch (args.get_type())
+        {
+            case sv_range_ref:
+            {
+                matrix mx = args.pop_range_value();
+                matrix::size_pair_type sp = mx.size();
+                for (size_t r = 0; r < sp.first; ++r)
+                {
+                    for (size_t c = 0; c < sp.second; ++c)
+                    {
+                        if (!mx.is_numeric(r, c))
+                            continue;
+
+                        ret += mx.get_numeric(r, c);
+                        ++count;
+                    }
+                }
+            }
+            break;
+            case sv_single_ref:
+            case sv_string:
+            case sv_value:
+            default:
+                ret += args.pop_value();
+                ++count;
+        }
     }
 
     args.push_value(ret/count);

@@ -17,6 +17,20 @@ matrix::matrix(const matrix& other) :
 
 matrix::~matrix() {}
 
+bool matrix::is_numeric(size_t row, size_t col) const
+{
+    switch (m_data.get_type(row, col))
+    {
+        case mdds::element_numeric:
+        case mdds::element_boolean:
+            return true;
+        default:
+            ;
+    }
+
+    return false;
+}
+
 double matrix::get_numeric(size_t row, size_t col) const
 {
     return m_data.get_numeric(row, col);

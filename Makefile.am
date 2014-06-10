@@ -21,6 +21,7 @@ test_data = \
 	test/03-expression.txt \
 	test/04-function-logical.txt \
 	test/04-function-single.txt \
+	test/04-function-average.txt \
 	test/05-range-reference.txt \
 	test/06-range-reference-basic-01.txt \
 	test/06-range-reference-basic-02.txt \

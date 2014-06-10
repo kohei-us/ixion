@@ -1,0 +1,13 @@
+%% Test for AVERAGE function.
+%mode init
+A1=2
+A2=4
+A3=9
+A4=AVERAGE(A1:A3)
+A5=AVERAGE(A1,A2,A3)
+%calc
+%mode result
+A4=5
+A5=5
+%check
+

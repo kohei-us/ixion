@@ -30,6 +30,7 @@ public:
     matrix(const matrix& other);
     ~matrix();
 
+    bool is_numeric(size_t row, size_t col) const;
     double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
     size_pair_type size() const;
