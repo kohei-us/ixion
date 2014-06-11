@@ -332,7 +332,21 @@ std::ostream& operator<<(std::ostream& os, const abs_address_t& addr)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const address_t& addr)
+{
+    os << "(sheet:" << addr.sheet << " " << (addr.abs_sheet?"abs":"rel")
+        << ",row:" << addr.row << " " << (addr.abs_row?"abs":"rel")
+        <<",column:" << addr.column << " " << (addr.abs_column?"abs":"rel") << ")";
+    return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const abs_range_t& range)
+{
+    os << range.first << "-" << range.last;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const range_t& range)
 {
     os << range.first << "-" << range.last;
     return os;
