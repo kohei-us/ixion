@@ -169,7 +169,9 @@ public:
     cell_addr_printer(const formula_name_resolver& resolver) : m_resolver(resolver) {}
     void operator() (const abs_address_t& addr) const
     {
-        cout << m_resolver.get_name(addr, false) << " ";
+        address_t pos_display(addr);
+        pos_display.set_absolute(false);
+        cout << m_resolver.get_name(pos_display, abs_address_t(), false) << " ";
     }
 };
 
@@ -221,7 +223,13 @@ void cell_listener_tracker::get_all_range_listeners(
 void cell_listener_tracker::print_cell_listeners(
     const abs_address_t& target, const formula_name_resolver& resolver) const
 {
-    cout << "The following cells listen to cell " << resolver.get_name(target, false) << endl;
+    {
+        address_t pos_display(target);
+        pos_display.set_absolute(false);
+        cout << "The following cells listen to cell "
+            << resolver.get_name(pos_display, abs_address_t(), false) << endl;
+    }
+
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
     if (itr == m_cell_listeners.end())
         // No one listens to this target.
@@ -230,7 +238,11 @@ void cell_listener_tracker::print_cell_listeners(
     const address_set_type& addrs = *itr->second;
     address_set_type::iterator itr2 = addrs.begin(), itr2_end = addrs.end();
     for (; itr2 != itr2_end; ++itr2)
-        cout << "  cell " << resolver.get_name(*itr2, false) << endl;
+    {
+        address_t pos_display(*itr2);
+        pos_display.set_absolute(false);
+        cout << "  cell " << resolver.get_name(pos_display, abs_address_t(), false) << endl;
+    }
 }
 
 void cell_listener_tracker::get_all_range_listeners_re(

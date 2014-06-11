@@ -72,8 +72,6 @@ public:
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
-    virtual std::string get_name(const abs_address_t& addr, bool sheet_name) const = 0;
-    virtual std::string get_name(const abs_range_t& range, bool sheet_name) const = 0;
 
     /**
      * Given a numerical representation of column position, return its

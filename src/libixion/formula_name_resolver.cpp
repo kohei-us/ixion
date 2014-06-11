@@ -620,16 +620,6 @@ public:
         return os.str();
     }
 
-    virtual string get_name(const abs_address_t& addr, bool sheet_name) const
-    {
-        return get_name(addr, abs_address_t(), sheet_name);
-    }
-
-    virtual string get_name(const abs_range_t& range, bool sheet_name) const
-    {
-        return get_name(range, abs_address_t(), sheet_name);
-    }
-
     virtual string get_column_name(col_t col) const
     {
         return get_column_name_a1(col);
@@ -753,16 +743,6 @@ public:
 
         os << ']';
         return os.str();
-    }
-
-    virtual string get_name(const abs_address_t& addr, bool sheet_name) const
-    {
-        return get_name(address_t(addr), abs_address_t(), sheet_name);
-    }
-
-    virtual string get_name(const abs_range_t& range, bool sheet_name) const
-    {
-        return get_name(range_t(range), abs_address_t(), sheet_name);
     }
 
     virtual string get_column_name(col_t col) const
