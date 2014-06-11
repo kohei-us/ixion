@@ -11,7 +11,8 @@
 #include "ixion/env.hpp"
 
 #include <cstdlib>
-#include <mdds/mixed_type_matrix.hpp>
+
+#include <mdds/multi_type_matrix.hpp>
 
 namespace ixion {
 
@@ -22,11 +23,11 @@ namespace ixion {
  */
 class IXION_DLLPUBLIC matrix
 {
-    typedef ::mdds::mixed_type_matrix< ::std::string, unsigned char> store_type;
+    typedef mdds::multi_type_matrix<mdds::mtm::std_string_trait> store_type;
 public:
     typedef store_type::size_pair_type size_pair_type;
 
-    matrix(size_t rows, size_t cols, ::mdds::matrix_density_t density_type = ::mdds::matrix_density_sparse_empty);
+    matrix(size_t rows, size_t cols);
     matrix(const matrix& other);
     ~matrix();
 

@@ -9,8 +9,8 @@
 
 namespace ixion {
 
-matrix::matrix(size_t rows, size_t cols, ::mdds::matrix_density_t density_type) : 
-    m_data(rows, cols, density_type) {}
+matrix::matrix(size_t rows, size_t cols) :
+    m_data(rows, cols) {}
 
 matrix::matrix(const matrix& other) :
     m_data(other.m_data) {}
@@ -21,8 +21,8 @@ bool matrix::is_numeric(size_t row, size_t col) const
 {
     switch (m_data.get_type(row, col))
     {
-        case mdds::element_numeric:
-        case mdds::element_boolean:
+        case mdds::mtm::element_numeric:
+        case mdds::mtm::element_boolean:
             return true;
         default:
             ;

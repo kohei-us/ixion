@@ -58,8 +58,8 @@ double sum_matrix_elements(const matrix& mx)
 {
     double sum = 0.0;
     matrix::size_pair_type sz = mx.size();
-    for (size_t row = 0; row < sz.first; ++row)
-        for (size_t col = 0; col < sz.second; ++col)
+    for (size_t row = 0; row < sz.row; ++row)
+        for (size_t col = 0; col < sz.column; ++col)
             sum += mx.get_numeric(row, col);
 
     return sum;
@@ -252,9 +252,9 @@ void formula_functions::fnc_average(value_stack_t& args) const
             {
                 matrix mx = args.pop_range_value();
                 matrix::size_pair_type sp = mx.size();
-                for (size_t r = 0; r < sp.first; ++r)
+                for (size_t r = 0; r < sp.row; ++r)
                 {
-                    for (size_t c = 0; c < sp.second; ++c)
+                    for (size_t c = 0; c < sp.column; ++c)
                     {
                         if (!mx.is_numeric(r, c))
                             continue;
