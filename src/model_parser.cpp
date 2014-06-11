@@ -317,7 +317,10 @@ void model_parser::parse_init(const char*& p)
                 m_print_separator = false;
                 cout << get_formula_result_output_separator() << endl;
             }
-            cout << mp_name_resolver->get_name(pos, false) << ": (n) " << value << endl;
+
+            address_t pos_display(pos);
+            pos_display.set_absolute(false);
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << value << endl;
         }
         break;
         default:

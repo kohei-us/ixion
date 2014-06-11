@@ -25,7 +25,11 @@ session_handler::~session_handler() {}
 
 void session_handler::begin_cell_interpret(const abs_address_t& pos)
 {
-    m_cell_name = mp_resolver->get_name(pos, false);
+    // Convert absolute to relative address, which looks better when printed.
+    address_t pos_display(pos);
+    pos_display.set_absolute(false);
+    m_cell_name = mp_resolver->get_name(pos_display, abs_address_t(), false);
+
     cout << get_formula_result_output_separator() << endl;
     cout << m_cell_name << ": ";
 }

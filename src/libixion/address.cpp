@@ -162,6 +162,13 @@ string address_t::get_name() const
     return os.str();
 }
 
+void address_t::set_absolute(bool abs)
+{
+    abs_sheet = abs;
+    abs_row = abs;
+    abs_column = abs;
+}
+
 size_t address_t::hash::operator()(const address_t& addr) const
 {
     return 0;

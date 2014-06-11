@@ -74,6 +74,8 @@ struct IXION_DLLPUBLIC address_t
     abs_address_t to_abs(const abs_address_t& origin) const;
     ::std::string get_name() const;
 
+    void set_absolute(bool abs);
+
     struct hash
     {
         size_t operator() (const address_t& addr) const;
