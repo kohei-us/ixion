@@ -10,6 +10,7 @@
 
 #include "ixion/formula_opcode.hpp"
 #include "ixion/formula_function_opcode.hpp"
+#include "../env.hpp"
 
 #include <cstdlib>
 
@@ -26,7 +27,7 @@ namespace iface {
 class session_handler
 {
 public:
-    virtual ~session_handler() {}
+    virtual IXION_DLLPUBLIC ~session_handler();
 
     virtual void begin_cell_interpret(const abs_address_t& pos) = 0;
     virtual void set_result(const formula_result& result) = 0;

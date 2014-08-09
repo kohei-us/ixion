@@ -27,7 +27,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	session_handler.cpp \
 	types.cpp \
 	workbook.hpp \
-	workbook.cpp
+	workbook.cpp \
+	interface.cpp
 
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined

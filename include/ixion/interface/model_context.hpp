@@ -11,6 +11,7 @@
 #include "ixion/formula_tokens_fwd.hpp"
 #include "ixion/types.hpp"
 #include "ixion/exceptions.hpp"
+#include "../env.hpp"
 
 #include <string>
 #include <vector>
@@ -44,7 +45,7 @@ class session_handler;
 class model_context : boost::noncopyable
 {
 public:
-    virtual ~model_context() {}
+    virtual IXION_DLLPUBLIC ~model_context();
 
     virtual const config& get_config() const = 0;
     virtual cell_listener_tracker& get_cell_listener_tracker() = 0;

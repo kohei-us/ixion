@@ -228,6 +228,7 @@
 				<Folder Name="interface">
 					<F N="../include/ixion/interface/model_context.hpp"/>
 					<F N="../include/ixion/interface/session_handler.hpp"/>
+					<F N="../include/ixion/interface/table.hpp"/>
 				</Folder>
 				<F
 					N="../include/ixion/Makefile.am"
@@ -287,6 +288,7 @@
 				<F N="../src/libixion/formula_tokens.cpp"/>
 				<F N="../src/libixion/function_objects.cpp"/>
 				<F N="../src/libixion/global.cpp"/>
+				<F N="../src/libixion/interface.cpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
