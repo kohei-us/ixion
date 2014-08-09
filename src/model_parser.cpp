@@ -16,7 +16,6 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/cell_listener_tracker.hpp"
-#include "ixion/function_objects.hpp"
 #include "ixion/macros.hpp"
 
 #include <sstream>

@@ -11,11 +11,12 @@
 #include "ixion/formula_parser.hpp"
 #include "ixion/formula_functions.hpp"
 #include "ixion/formula_function_opcode.hpp"
-#include "ixion/function_objects.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/depends_tracker.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/types.hpp"
+
+#include "function_objects.hpp"
 
 #define DEBUG_FORMULA_API 0
 

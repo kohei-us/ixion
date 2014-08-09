@@ -22,6 +22,11 @@ session_handler* model_context::get_session_handler()
     return NULL;
 }
 
+table* model_context::get_table()
+{
+    return NULL;
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

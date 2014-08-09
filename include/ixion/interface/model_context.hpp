@@ -36,6 +36,7 @@ public:
 namespace iface {
 
 class session_handler;
+class table;
 
 /**
  * Interface for model context.  The client code needs to provide concrete
@@ -82,6 +83,18 @@ public:
      *         handler, otherwise a NULL pointer is returned.
      */
     virtual session_handler* get_session_handler();
+
+    /**
+     * Table interface provides access to all table ranges stored in the
+     * document model.  A table is a 2-dimensional range of cells that include
+     * named columns.  It is used when resolving a table reference that refers
+     * to a cell or a range of cells by the table name and/or column name.
+     *
+     * @return non-NULL pointer to the table storage inside the model, or NULL
+     *         if no table is present or supported by the model
+     *         implementation.
+     */
+    virtual table* get_table();
 
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
