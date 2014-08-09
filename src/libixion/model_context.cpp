@@ -168,7 +168,7 @@ public:
         return *mp_cell_listener_tracker;
     }
 
-    iface::session_handler* get_session_handler() const
+    iface::session_handler* get_session_handler()
     {
         return mp_session_handler;
     }
@@ -884,7 +884,7 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     return ret;
 }
 
-iface::session_handler* model_context::get_session_handler() const
+iface::session_handler* model_context::get_session_handler()
 {
     return mp_impl->get_session_handler();
 }

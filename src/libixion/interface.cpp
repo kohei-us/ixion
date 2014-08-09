@@ -17,7 +17,7 @@ session_handler::~session_handler() {}
 
 model_context::~model_context() {}
 
-session_handler* model_context::get_session_handler() const
+session_handler* model_context::get_session_handler()
 {
     return NULL;
 }

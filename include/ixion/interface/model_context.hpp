@@ -81,7 +81,7 @@ public:
      * @return non-NULL pointer of the model context provides a session
      *         handler, otherwise a NULL pointer is returned.
      */
-    virtual session_handler* get_session_handler() const;
+    virtual session_handler* get_session_handler();
 
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
