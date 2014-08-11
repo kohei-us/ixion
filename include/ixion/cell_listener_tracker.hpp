@@ -10,7 +10,6 @@
 
 #include "ixion/global.hpp"
 #include "ixion/address.hpp"
-#include "ixion/hash_container/map.hpp"
 #include "ixion/hash_container/set.hpp"
 
 #include <mdds/rectangle_set.hpp>
@@ -31,14 +30,15 @@ class model_context;
  */
 class IXION_DLLPUBLIC cell_listener_tracker
 {
+    struct impl;
+
+    impl* mp_impl;
+
     cell_listener_tracker(); // disabled
 public:
     cell_listener_tracker(iface::model_context& cxt);
 
     typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
-    typedef ::mdds::rectangle_set<row_t, address_set_type> range_query_set_type;
-    typedef _ixion_unordered_map_type<abs_address_t, address_set_type*, abs_address_t::hash> cell_store_type;
-    typedef _ixion_unordered_map_type<abs_range_t, address_set_type*, abs_range_t::hash> range_store_type;
 
     ~cell_listener_tracker();
 
@@ -91,12 +91,6 @@ private:
     void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target,
         dirty_formula_cells_t& listeners, address_set_type& listeners_addr) const;
-
-    iface::model_context& m_context;
-    mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
-    cell_store_type m_cell_listeners;         ///< store listeners for single cells.
-    range_store_type m_range_listeners;       ///< store listeners for ranges.
-    address_set_type m_volatile_cells;
 };
 
 }

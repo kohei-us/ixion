@@ -9,6 +9,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/hash_container/map.hpp"
 
 #include <boost/scoped_ptr.hpp>
 
@@ -22,29 +23,55 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+typedef mdds::rectangle_set<row_t, cell_listener_tracker::address_set_type> range_query_set_type;
+typedef _ixion_unordered_map_type<abs_address_t, cell_listener_tracker::address_set_type*, abs_address_t::hash> cell_store_type;
+typedef _ixion_unordered_map_type<abs_range_t, cell_listener_tracker::address_set_type*, abs_range_t::hash> range_store_type;
+
+}
+
+struct cell_listener_tracker::impl
+{
+
+    iface::model_context& m_context;
+
+    mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
+    cell_store_type m_cell_listeners;         ///< store listeners for single cells.
+    range_store_type m_range_listeners;       ///< store listeners for ranges.
+    cell_listener_tracker::address_set_type m_volatile_cells;
+
+    impl(iface::model_context& cxt) : m_context(cxt) {}
+
+    ~impl()
+    {
+        // Delete all the listener set instances.
+        for_each(m_range_listeners.begin(), m_range_listeners.end(), delete_map_value<range_store_type>());
+        for_each(m_cell_listeners.begin(), m_cell_listeners.end(), delete_map_value<cell_store_type>());
+    }
+};
+
 cell_listener_tracker::cell_listener_tracker(iface::model_context& cxt) :
-    m_context(cxt) {}
+    mp_impl(new impl(cxt)) {}
 
 cell_listener_tracker::~cell_listener_tracker()
 {
-    // Delete all the listener set instances.
-    for_each(m_range_listeners.begin(), m_range_listeners.end(), delete_map_value<range_store_type>());
-    for_each(m_cell_listeners.begin(), m_cell_listeners.end(), delete_map_value<cell_store_type>());
+    delete mp_impl;
 }
 
 void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    const formula_name_resolver& res = m_context.get_name_resolver();
+    const formula_name_resolver& res = mp_impl->m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "adding - cell src: " << res.get_name(src, false)
         << "  cell dest: " << res.get_name(dest, false) << endl;
 #endif
-    cell_store_type::iterator itr = m_cell_listeners.find(dest);
-    if (itr == m_cell_listeners.end())
+    cell_store_type::iterator itr = mp_impl->m_cell_listeners.find(dest);
+    if (itr == mp_impl->m_cell_listeners.end())
     {
         // No container for this src cell yet.  Create one.
         pair<cell_store_type::iterator, bool> r =
-            m_cell_listeners.insert(cell_store_type::value_type(dest, new address_set_type));
+            mp_impl->m_cell_listeners.insert(cell_store_type::value_type(dest, new address_set_type));
         if (!r.second)
             throw general_error("failed to insert new address set to cell listener tracker.");
         itr = r.first;
@@ -55,16 +82,16 @@ void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& d
 void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    const formula_name_resolver& res = m_context.get_name_resolver();
+    const formula_name_resolver& res = mp_impl->m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "adding - cell: " << res.get_name(cell, false)
         << "  range: " << res.get_name(range, false) << endl;
 #endif
-    range_store_type::iterator itr = m_range_listeners.find(range);
-    if (itr == m_range_listeners.end())
+    range_store_type::iterator itr = mp_impl->m_range_listeners.find(range);
+    if (itr == mp_impl->m_range_listeners.end())
     {
         // No container for this range yet.  Create one.
         pair<range_store_type::iterator, bool> r =
-            m_range_listeners.insert(range_store_type::value_type(range, new address_set_type));
+            mp_impl->m_range_listeners.insert(range_store_type::value_type(range, new address_set_type));
         if (!r.second)
             throw general_error("failed to insert new address set to range listener tracker.");
         itr = r.first;
@@ -74,7 +101,7 @@ void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& ra
         cout << "x1=" << range.first.column << ",y1=" << range.first.row
             << ",x2=" << (range.last.column+1) << ",y2=" << (range.last.row+1) << ",p=" << itr->second << endl;
 #endif
-        m_query_set.insert(
+        mp_impl->m_query_set.insert(
             range.first.column, range.first.row, range.last.column+1, range.last.row+1, itr->second);
     }
     itr->second->insert(cell);
@@ -82,8 +109,8 @@ void cell_listener_tracker::add(const abs_address_t& cell, const abs_range_t& ra
 
 void cell_listener_tracker::remove(const abs_address_t& src, const abs_address_t& dest)
 {
-    cell_store_type::iterator itr = m_cell_listeners.find(dest);
-    if (itr == m_cell_listeners.end())
+    cell_store_type::iterator itr = mp_impl->m_cell_listeners.find(dest);
+    if (itr == mp_impl->m_cell_listeners.end())
         // No listeners for this cell.  Bail out.
         return;
 
@@ -92,7 +119,7 @@ void cell_listener_tracker::remove(const abs_address_t& src, const abs_address_t
     if (p->empty())
     {
         // This list is empty.  Remove it from the containers and destroy the instance.
-        m_cell_listeners.erase(itr);
+        mp_impl->m_cell_listeners.erase(itr);
         delete p;
     }
 }
@@ -100,11 +127,11 @@ void cell_listener_tracker::remove(const abs_address_t& src, const abs_address_t
 void cell_listener_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    const formula_name_resolver& res = m_context.get_name_resolver();
+    const formula_name_resolver& res = mp_impl->m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "removing - cell: " << res.get_name(cell, false) << "  range: " << res.get_name(range, false) << endl;
 #endif
-    range_store_type::iterator itr = m_range_listeners.find(range);
-    if (itr == m_range_listeners.end())
+    range_store_type::iterator itr = mp_impl->m_range_listeners.find(range);
+    if (itr == mp_impl->m_range_listeners.end())
         // No listeners for this range.  Bail out.
         return;
 
@@ -113,25 +140,25 @@ void cell_listener_tracker::remove(const abs_address_t& cell, const abs_range_t&
     if (p->empty())
     {
         // This list is empty.  Remove it from the containers and destroy the instance.
-        m_range_listeners.erase(itr);
-        m_query_set.remove(p);
+        mp_impl->m_range_listeners.erase(itr);
+        mp_impl->m_query_set.remove(p);
         delete p;
     }
 }
 
 void cell_listener_tracker::add_volatile(const abs_address_t& pos)
 {
-    m_volatile_cells.insert(pos);
+    mp_impl->m_volatile_cells.insert(pos);
 }
 
 void cell_listener_tracker::remove_volatile(const abs_address_t& pos)
 {
-    m_volatile_cells.erase(pos);
+    mp_impl->m_volatile_cells.erase(pos);
 }
 
 const cell_listener_tracker::address_set_type& cell_listener_tracker::get_volatile_cells() const
 {
-    return m_volatile_cells;
+    return mp_impl->m_volatile_cells;
 }
 
 namespace {
@@ -181,11 +208,11 @@ void cell_listener_tracker::get_all_cell_listeners(
     const abs_address_t& target, dirty_formula_cells_t& listeners) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    const formula_name_resolver& res = m_context.get_name_resolver();
+    const formula_name_resolver& res = mp_impl->m_context.get_name_resolver();
     __IXION_DEBUG_OUT__ << "target cell: " << res.get_name(target, false) << endl;
 #endif
-    cell_store_type::const_iterator itr = m_cell_listeners.find(target);
-    if (itr == m_cell_listeners.end())
+    cell_store_type::const_iterator itr = mp_impl->m_cell_listeners.find(target);
+    if (itr == mp_impl->m_cell_listeners.end())
         // This target cell has no listeners.
         return;
 
@@ -194,7 +221,7 @@ void cell_listener_tracker::get_all_cell_listeners(
     for (; itr2 != itr2_end; ++itr2)
     {
         const abs_address_t& addr = *itr2; // listener cell address
-        if (m_context.get_celltype(addr) != celltype_formula)
+        if (mp_impl->m_context.get_celltype(addr) != celltype_formula)
             // Referenced cell is empty or not a formula cell.  Ignore this.
             continue;
 
@@ -213,7 +240,7 @@ void cell_listener_tracker::get_all_range_listeners(
 {
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
-    __IXION_DEBUG_OUT__ << "get all range listeners for target " << m_context.get_name_resolver().get_name(target, false) << endl;
+    __IXION_DEBUG_OUT__ << "get all range listeners for target " << mp_impl->m_context.get_name_resolver().get_name(target, false) << endl;
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
@@ -230,8 +257,8 @@ void cell_listener_tracker::print_cell_listeners(
             << resolver.get_name(pos_display, abs_address_t(), false) << endl;
     }
 
-    cell_store_type::const_iterator itr = m_cell_listeners.find(target);
-    if (itr == m_cell_listeners.end())
+    cell_store_type::const_iterator itr = mp_impl->m_cell_listeners.find(target);
+    if (itr == mp_impl->m_cell_listeners.end())
         // No one listens to this target.
         return;
 
@@ -249,7 +276,7 @@ void cell_listener_tracker::get_all_range_listeners_re(
     const abs_address_t& origin_target, const abs_address_t& target, dirty_formula_cells_t& listeners, address_set_type& listeners_addrs) const
 {
 #if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "--- begin: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
+    __IXION_DEBUG_OUT__ << "--- begin: target address: " << mp_impl->m_context.get_name_resolver().get_name(target, false) << endl;
 #endif
     if (listeners_addrs.count(target))
     {
@@ -262,14 +289,14 @@ void cell_listener_tracker::get_all_range_listeners_re(
 
     dirty_formula_cells_t new_listeners;
     address_set_type new_listeners_addrs;
-    range_query_set_type::search_result res = m_query_set.search(target.column, target.row);
+    range_query_set_type::search_result res = mp_impl->m_query_set.search(target.column, target.row);
 
 #if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "query set count: " << m_query_set.size() << "  search result count: " << res.size() << endl;
+    __IXION_DEBUG_OUT__ << "query set count: " << mp_impl->m_query_set.size() << "  search result count: " << res.size() << endl;
 #endif
 
     std::for_each(
-        res.begin(), res.end(), dirty_cell_inserter(m_context, new_listeners, new_listeners_addrs));
+        res.begin(), res.end(), dirty_cell_inserter(mp_impl->m_context, new_listeners, new_listeners_addrs));
     assert(new_listeners.size() == new_listeners_addrs.size());
 
 #if DEBUG_CELL_LISTENER_TRACKER
@@ -296,9 +323,9 @@ void cell_listener_tracker::get_all_range_listeners_re(
 #if DEBUG_CELL_LISTENER_TRACKER
     __IXION_DEBUG_OUT__ << "new listeners: ";
     std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(),
-                  cell_addr_printer(m_context.get_name_resolver()));
+                  cell_addr_printer(mp_impl->m_context.get_name_resolver()));
     cout << endl;
-    __IXION_DEBUG_OUT__ << "--- end: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
+    __IXION_DEBUG_OUT__ << "--- end: target address: " << mp_impl->m_context.get_name_resolver().get_name(target, false) << endl;
 #endif
 }
 
