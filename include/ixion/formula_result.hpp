@@ -26,17 +26,17 @@ public:
     formula_result();
     formula_result(const formula_result& r);
     formula_result(double v);
-    formula_result(size_t strid);
+    formula_result(string_id_t strid);
     formula_result(formula_error_t e);
     ~formula_result();
 
     void reset();
     void set_value(double v);
-    void set_string(size_t strid);
+    void set_string(string_id_t strid);
     void set_error(formula_error_t e);
 
     double get_value() const;
-    size_t get_string() const;
+    string_id_t get_string() const;
     formula_error_t get_error() const;
 
     result_type get_type() const;
@@ -60,7 +60,7 @@ private:
 private:
     result_type m_type;
     union {
-        size_t m_str_identifier;
+        string_id_t m_str_identifier;
         double m_value;
         formula_error_t m_error;
     };

@@ -47,7 +47,7 @@ formula_result::formula_result(const formula_result& r) :
 formula_result::formula_result(double v) :
     m_type(rt_value), m_value(v) {}
 
-formula_result::formula_result(size_t strid) :
+formula_result::formula_result(string_id_t strid) :
     m_type(rt_string), m_str_identifier(strid) {}
 
 formula_result::formula_result(formula_error_t e) :
@@ -67,7 +67,7 @@ void formula_result::set_value(double v)
     m_value = v;
 }
 
-void formula_result::set_string(size_t strid)
+void formula_result::set_string(string_id_t strid)
 {
     m_type = rt_string;
     m_str_identifier = strid;
@@ -85,7 +85,7 @@ double formula_result::get_value() const
     return m_value;
 }
 
-size_t formula_result::get_string() const
+string_id_t formula_result::get_string() const
 {
     assert(m_type == rt_string);
     return m_str_identifier;

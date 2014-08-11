@@ -427,7 +427,7 @@ void model_parser::check()
                     break;
                     case celltype_string:
                     {
-                        size_t str_id = m_context.get_string_identifier(addr);
+                        string_id_t str_id = m_context.get_string_identifier(addr);
 
                         if (str_id != res.get_string())
                         {
