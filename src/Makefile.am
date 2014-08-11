@@ -7,7 +7,9 @@ bin_PROGRAMS = ixion-parser ixion-sorter
 ixion_parser_SOURCES = \
 	ixion_parser.cpp \
 	model_parser.hpp \
-	model_parser.cpp
+	model_parser.cpp \
+	session_handler.hpp \
+	session_handler.cpp
 
 ixion_parser_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
 					 $(BOOST_THREAD_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)

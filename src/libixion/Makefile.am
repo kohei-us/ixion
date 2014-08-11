@@ -30,7 +30,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	mem_str_buf.cpp \
 	model_context.cpp \
 	cell_listener_tracker.cpp \
-	session_handler.cpp \
 	types.cpp \
 	workbook.hpp \
 	workbook.cpp \

@@ -9,7 +9,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/config.hpp"
-#include "ixion/session_handler.hpp"
+#include "ixion/interface/session_handler.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula.hpp"
@@ -144,7 +144,7 @@ public:
         m_parent(parent),
         mp_config(new config),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
-        mp_session_handler(new session_handler(parent))
+        mp_session_handler(NULL)
     {
     }
 

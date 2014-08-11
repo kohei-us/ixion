@@ -26,7 +26,7 @@ namespace ixion {
  */
 const char* get_opcode_name(fopcode_t oc);
 
-const char* get_formula_opcode_string(fopcode_t oc);
+IXION_DLLPUBLIC const char* get_formula_opcode_string(fopcode_t oc);
 
 // ============================================================================
 

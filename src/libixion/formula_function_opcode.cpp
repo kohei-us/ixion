@@ -7,6 +7,8 @@
 
 #include "ixion/formula_function_opcode.hpp"
 
+#include "formula_functions.hpp"
+
 namespace ixion {
 
 bool is_volatile(formula_function_t func)
@@ -19,6 +21,11 @@ bool is_volatile(formula_function_t func)
             ;
     }
     return false;
+}
+
+const char* get_formula_function_name(formula_function_t func)
+{
+    return formula_functions::get_function_name(func);
 }
 
 }

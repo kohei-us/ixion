@@ -5,11 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/session_handler.hpp"
+#include "session_handler.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
-
-#include "formula_functions.hpp"
+#include "ixion/formula_tokens.hpp"
 
 #include <string>
 #include <iostream>
@@ -83,7 +82,7 @@ void session_handler::push_range_ref(const range_t& range, const abs_address_t& 
 
 void session_handler::push_function(formula_function_t foc)
 {
-    cout << formula_functions::get_function_name(foc);
+    cout << get_formula_function_name(foc);
 }
 
 }

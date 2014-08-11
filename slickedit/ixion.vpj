@@ -257,7 +257,6 @@
 				<F N="../include/ixion/matrix.hpp"/>
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
-				<F N="../include/ixion/session_handler.hpp"/>
 				<F N="../include/ixion/thread.hpp"/>
 				<F N="../include/ixion/types.hpp"/>
 			</Folder>
@@ -294,7 +293,6 @@
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
-				<F N="../src/libixion/session_handler.cpp"/>
 				<F N="../src/libixion/types.cpp"/>
 				<F N="../src/libixion/workbook.cpp"/>
 				<F N="../src/libixion/workbook.hpp"/>
@@ -306,6 +304,8 @@
 			<F N="../src/ixion_sorter.cpp"/>
 			<F N="../src/model_parser.cpp"/>
 			<F N="../src/model_parser.hpp"/>
+			<F N="../src/session_handler.cpp"/>
+			<F N="../src/session_handler.hpp"/>
 			<F N="../src/sort_input_parser.cpp"/>
 			<F N="../src/sort_input_parser.hpp"/>
 		</Folder>

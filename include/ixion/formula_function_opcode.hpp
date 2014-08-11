@@ -8,6 +8,8 @@
 #ifndef __IXION_FORMULA_FUNCTION_OPCODE_HPP__
 #define __IXION_FORMULA_FUNCTION_OPCODE_HPP__
 
+#include "ixion/env.hpp"
+
 namespace ixion {
 
 enum formula_function_t
@@ -36,6 +38,8 @@ enum formula_function_t
 };
 
 bool is_volatile(formula_function_t func);
+
+IXION_DLLPUBLIC const char* get_formula_function_name(formula_function_t func);
 
 }
 
