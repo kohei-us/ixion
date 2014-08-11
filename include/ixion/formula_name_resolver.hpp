@@ -10,8 +10,8 @@
 
 #include <string>
 
-#include "ixion/formula_functions.hpp"
 #include "ixion/address.hpp"
+#include "ixion/formula_function_opcode.hpp"
 
 namespace ixion {
 

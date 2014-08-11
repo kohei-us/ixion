@@ -6,8 +6,9 @@
  */
 
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula_functions.hpp"
 #include "ixion/interface/model_context.hpp"
+
+#include "formula_functions.hpp"
 
 #include <iostream>
 #include <sstream>

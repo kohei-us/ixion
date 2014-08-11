@@ -13,7 +13,6 @@ libixion_HEADERS = \
 	env.hpp \
 	exceptions.hpp \
 	formula_function_opcode.hpp \
-	formula_functions.hpp \
 	formula.hpp \
 	formula_interpreter.hpp \
 	formula_lexer.hpp \

@@ -10,7 +10,11 @@
 
 #include "../env.hpp"
 
-namespace ixion { namespace iface {
+namespace ixion {
+
+struct abs_range_t;
+
+namespace iface {
 
 class table
 {

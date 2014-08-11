@@ -5,7 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_functions.hpp"
+#include "formula_functions.hpp"
+
 #include "ixion/formula_tokens.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/mem_str_buf.hpp"

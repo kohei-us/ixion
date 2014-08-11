@@ -7,8 +7,9 @@
 
 #include "ixion/session_handler.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula_functions.hpp"
 #include "ixion/formula_result.hpp"
+
+#include "formula_functions.hpp"
 
 #include <string>
 #include <iostream>

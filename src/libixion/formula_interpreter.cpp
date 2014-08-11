@@ -8,10 +8,11 @@
 #include "ixion/formula_interpreter.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/global.hpp"
-#include "ixion/formula_functions.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/interface/session_handler.hpp"
+
+#include "formula_functions.hpp"
 
 #include <string>
 #include <iostream>

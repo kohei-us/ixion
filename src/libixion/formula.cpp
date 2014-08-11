@@ -9,7 +9,6 @@
 #include "ixion/formula_lexer.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_parser.hpp"
-#include "ixion/formula_functions.hpp"
 #include "ixion/formula_function_opcode.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/depends_tracker.hpp"
@@ -17,6 +16,7 @@
 #include "ixion/types.hpp"
 
 #include "function_objects.hpp"
+#include "formula_functions.hpp"
 
 #define DEBUG_FORMULA_API 0
 
