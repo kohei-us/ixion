@@ -7,14 +7,9 @@
 
 #include "model_parser.hpp"
 
-#include "ixion/cell.hpp"
 #include "ixion/formula.hpp"
-#include "ixion/formula_parser.hpp"
-#include "ixion/depends_tracker.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
-#include "ixion/mem_str_buf.hpp"
-#include "ixion/cell_listener_tracker.hpp"
 #include "ixion/macros.hpp"
 
 #include <sstream>
