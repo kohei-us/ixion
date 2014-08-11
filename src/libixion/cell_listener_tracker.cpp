@@ -30,6 +30,32 @@ typedef mdds::rectangle_set<row_t, cell_listener_tracker::address_set_type> rang
 typedef _ixion_unordered_map_type<abs_address_t, cell_listener_tracker::address_set_type*, abs_address_t::hash> cell_store_type;
 typedef _ixion_unordered_map_type<abs_range_t, cell_listener_tracker::address_set_type*, abs_range_t::hash> range_store_type;
 
+class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
+{
+    iface::model_context& m_context;
+    dirty_formula_cells_t& m_dirty_cells;
+    cell_listener_tracker::address_set_type& m_addrs;
+public:
+    dirty_cell_inserter(iface::model_context& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
+        m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
+
+    void operator() (const cell_listener_tracker::address_set_type* p)
+    {
+        // Add all addresses in this set to the dirty cells list.
+        cell_listener_tracker::address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
+        for (; itr != itr_end; ++itr)
+        {
+            const abs_address_t& addr = *itr;
+            if (m_context.get_celltype(addr) != celltype_formula)
+                continue;
+
+            // Formula cell exists at this address.
+            m_dirty_cells.insert(addr);
+            m_addrs.insert(addr);
+        }
+    }
+};
+
 }
 
 struct cell_listener_tracker::impl
@@ -50,7 +76,68 @@ struct cell_listener_tracker::impl
         for_each(m_range_listeners.begin(), m_range_listeners.end(), delete_map_value<range_store_type>());
         for_each(m_cell_listeners.begin(), m_cell_listeners.end(), delete_map_value<cell_store_type>());
     }
+
+    void get_all_range_listeners_re(
+        const abs_address_t& origin_target, const abs_address_t& target,
+        dirty_formula_cells_t& listeners, address_set_type& listeners_addr) const;
 };
+
+void cell_listener_tracker::impl::get_all_range_listeners_re(
+    const abs_address_t& origin_target, const abs_address_t& target, dirty_formula_cells_t& listeners, address_set_type& listeners_addrs) const
+{
+#if DEBUG_CELL_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << "--- begin: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
+#endif
+    if (listeners_addrs.count(target))
+    {
+        // Target is included in the listener list.  No need to scan twice.
+#if DEBUG_CELL_LISTENER_TRACKER
+        __IXION_DEBUG_OUT__ << "listeners for this target has already been retrieved." << endl;
+#endif
+        return;
+    }
+
+    dirty_formula_cells_t new_listeners;
+    address_set_type new_listeners_addrs;
+    range_query_set_type::search_result res = m_query_set.search(target.column, target.row);
+
+#if DEBUG_CELL_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << "query set count: " << m_query_set.size() << "  search result count: " << res.size() << endl;
+#endif
+
+    std::for_each(
+        res.begin(), res.end(), dirty_cell_inserter(m_context, new_listeners, new_listeners_addrs));
+    assert(new_listeners.size() == new_listeners_addrs.size());
+
+#if DEBUG_CELL_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << "new listener count: " << new_listeners.size() << endl;
+#endif
+
+    // Go through the new listeners and get their listeners as well.
+    address_set_type::const_iterator itr = new_listeners_addrs.begin(), itr_end = new_listeners_addrs.end();
+    for (; itr != itr_end; ++itr)
+    {
+        if (*itr == origin_target)
+        {
+#if DEBUG_CELL_LISTENER_TRACKER
+         __IXION_DEBUG_OUT__ << "this equals origin target.  skipping." << endl;
+#endif
+            continue;
+        }
+        get_all_range_listeners_re(origin_target, *itr, listeners, listeners_addrs);
+    }
+
+    // Add new listeners to the caller's list.
+    listeners.insert(new_listeners.begin(), new_listeners.end());
+    listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
+#if DEBUG_CELL_LISTENER_TRACKER
+    __IXION_DEBUG_OUT__ << "new listeners: ";
+    std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(),
+                  cell_addr_printer(m_context.get_name_resolver()));
+    cout << endl;
+    __IXION_DEBUG_OUT__ << "--- end: target address: " << m_context.get_name_resolver().get_name(target, false) << endl;
+#endif
+}
 
 cell_listener_tracker::cell_listener_tracker(iface::model_context& cxt) :
     mp_impl(new impl(cxt)) {}
@@ -164,32 +251,6 @@ const cell_listener_tracker::address_set_type& cell_listener_tracker::get_volati
 
 namespace {
 
-class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
-{
-    iface::model_context& m_context;
-    dirty_formula_cells_t& m_dirty_cells;
-    cell_listener_tracker::address_set_type& m_addrs;
-public:
-    dirty_cell_inserter(iface::model_context& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
-        m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
-
-    void operator() (const cell_listener_tracker::address_set_type* p)
-    {
-        // Add all addresses in this set to the dirty cells list.
-        cell_listener_tracker::address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
-        for (; itr != itr_end; ++itr)
-        {
-            const abs_address_t& addr = *itr;
-            if (m_context.get_celltype(addr) != celltype_formula)
-                continue;
-
-            // Formula cell exists at this address.
-            m_dirty_cells.insert(addr);
-            m_addrs.insert(addr);
-        }
-    }
-};
-
 class cell_addr_printer : public std::unary_function<abs_address_t, void>
 {
     const formula_name_resolver& m_resolver;
@@ -245,7 +306,7 @@ void cell_listener_tracker::get_all_range_listeners(
 #endif
 
     address_set_type listeners_addrs; // to keep track of circular references.
-    get_all_range_listeners_re(target, target, listeners, listeners_addrs);
+    mp_impl->get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
 void cell_listener_tracker::print_cell_listeners(
@@ -271,63 +332,6 @@ void cell_listener_tracker::print_cell_listeners(
         pos_display.set_absolute(false);
         cout << "  cell " << resolver.get_name(pos_display, abs_address_t(), false) << endl;
     }
-}
-
-void cell_listener_tracker::get_all_range_listeners_re(
-    const abs_address_t& origin_target, const abs_address_t& target, dirty_formula_cells_t& listeners, address_set_type& listeners_addrs) const
-{
-#if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "--- begin: target address: " << mp_impl->m_context.get_name_resolver().get_name(target, false) << endl;
-#endif
-    if (listeners_addrs.count(target))
-    {
-        // Target is included in the listener list.  No need to scan twice.
-#if DEBUG_CELL_LISTENER_TRACKER
-        __IXION_DEBUG_OUT__ << "listeners for this target has already been retrieved." << endl;
-#endif
-        return;
-    }
-
-    dirty_formula_cells_t new_listeners;
-    address_set_type new_listeners_addrs;
-    range_query_set_type::search_result res = mp_impl->m_query_set.search(target.column, target.row);
-
-#if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "query set count: " << mp_impl->m_query_set.size() << "  search result count: " << res.size() << endl;
-#endif
-
-    std::for_each(
-        res.begin(), res.end(), dirty_cell_inserter(mp_impl->m_context, new_listeners, new_listeners_addrs));
-    assert(new_listeners.size() == new_listeners_addrs.size());
-
-#if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "new listener count: " << new_listeners.size() << endl;
-#endif
-
-    // Go through the new listeners and get their listeners as well.
-    address_set_type::const_iterator itr = new_listeners_addrs.begin(), itr_end = new_listeners_addrs.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (*itr == origin_target)
-        {
-#if DEBUG_CELL_LISTENER_TRACKER
-         __IXION_DEBUG_OUT__ << "this equals origin target.  skipping." << endl;
-#endif
-            continue;
-        }
-        get_all_range_listeners_re(origin_target, *itr, listeners, listeners_addrs);
-    }
-
-    // Add new listeners to the caller's list.
-    listeners.insert(new_listeners.begin(), new_listeners.end());
-    listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
-#if DEBUG_CELL_LISTENER_TRACKER
-    __IXION_DEBUG_OUT__ << "new listeners: ";
-    std::for_each(new_listeners_addrs.begin(), new_listeners_addrs.end(),
-                  cell_addr_printer(mp_impl->m_context.get_name_resolver()));
-    cout << endl;
-    __IXION_DEBUG_OUT__ << "--- end: target address: " << mp_impl->m_context.get_name_resolver().get_name(target, false) << endl;
-#endif
 }
 
 }
