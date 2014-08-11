@@ -1,5 +1,7 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS)
 
+EXTRA_PROGRAMS = ixion-test
+
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
 	address.cpp \
@@ -39,3 +41,8 @@ libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 libixion_@IXION_API_VERSION@_la_LIBADD = $(BOOST_THREAD_LIBS)
 
 EXTRA_DIST = makefile.mk
+
+ixion_test_SOURCES = ixion_test.cpp
+ixion_test_LDADD = libixion-@IXION_API_VERSION@.la
+
+TESTS = ixion-test

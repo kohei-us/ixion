@@ -289,6 +289,7 @@
 				<F N="../src/libixion/function_objects.hpp"/>
 				<F N="../src/libixion/global.cpp"/>
 				<F N="../src/libixion/interface.cpp"/>
+				<F N="../src/libixion/ixion_test.cpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
@@ -303,7 +304,6 @@
 				Type="Makefile"/>
 			<F N="../src/ixion_parser.cpp"/>
 			<F N="../src/ixion_sorter.cpp"/>
-			<F N="../src/ixion_test.cpp"/>
 			<F N="../src/model_parser.cpp"/>
 			<F N="../src/model_parser.hpp"/>
 			<F N="../src/sort_input_parser.cpp"/>
