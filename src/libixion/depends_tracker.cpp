@@ -5,7 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/depends_tracker.hpp"
+#include "depends_tracker.hpp"
+
 #include "ixion/global.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/cell_queue_manager.hpp"

@@ -6,10 +6,10 @@
  */
 
 #include "function_objects.hpp"
+#include "depends_tracker.hpp"
 
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/address.hpp"
-#include "ixion/depends_tracker.hpp"
 #include "ixion/formula_tokens.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/interface/model_context.hpp"

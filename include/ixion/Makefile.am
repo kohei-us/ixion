@@ -8,7 +8,6 @@ libixion_HEADERS = \
 	cell_queue_manager.hpp \
 	column_store_type.hpp \
 	config.hpp \
-	depends_tracker.hpp \
 	depth_first_search.hpp \
 	env.hpp \
 	exceptions.hpp \
