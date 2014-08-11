@@ -14,7 +14,6 @@ libixion_HEADERS = \
 	exceptions.hpp \
 	formula_function_opcode.hpp \
 	formula.hpp \
-	formula_interpreter.hpp \
 	formula_lexer.hpp \
 	formula_name_resolver.hpp \
 	formula_opcode.hpp \

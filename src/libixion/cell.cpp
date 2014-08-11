@@ -7,11 +7,12 @@
 
 #include "ixion/cell.hpp"
 #include "ixion/exceptions.hpp"
-#include "ixion/formula_interpreter.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/interface/session_handler.hpp"
+
+#include "formula_interpreter.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>

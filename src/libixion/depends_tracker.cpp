@@ -8,7 +8,6 @@
 #include "ixion/depends_tracker.hpp"
 #include "ixion/global.hpp"
 #include "ixion/cell.hpp"
-#include "ixion/formula_interpreter.hpp"
 #include "ixion/cell_queue_manager.hpp"
 #include "ixion/hash_container/map.hpp"
 #include "ixion/formula_name_resolver.hpp"

@@ -5,14 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_interpreter.hpp"
+#include "formula_interpreter.hpp"
+#include "formula_functions.hpp"
+
 #include "ixion/cell.hpp"
 #include "ixion/global.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/interface/session_handler.hpp"
 
-#include "formula_functions.hpp"
 
 #include <string>
 #include <iostream>

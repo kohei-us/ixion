@@ -11,7 +11,6 @@
 #include "ixion/formula.hpp"
 #include "ixion/formula_parser.hpp"
 #include "ixion/depends_tracker.hpp"
-#include "ixion/formula_interpreter.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/mem_str_buf.hpp"
