@@ -10,9 +10,8 @@
 
 #include "ixion/global.hpp"
 #include "ixion/address.hpp"
-#include "ixion/hash_container/set.hpp"
 
-#include <mdds/rectangle_set.hpp>
+#include <boost/unordered_set.hpp>
 
 namespace ixion {
 
@@ -38,7 +37,7 @@ class IXION_DLLPUBLIC cell_listener_tracker
 public:
     cell_listener_tracker(iface::model_context& cxt);
 
-    typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> address_set_type;
+    typedef boost::unordered_set<abs_address_t, abs_address_t::hash> address_set_type;
 
     ~cell_listener_tracker();
 

@@ -11,6 +11,7 @@
 #include "ixion/cell.hpp"
 #include "ixion/hash_container/map.hpp"
 
+#include <mdds/rectangle_set.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #define DEBUG_CELL_LISTENER_TRACKER 0
