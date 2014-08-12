@@ -5,25 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef IXION_INTERFACE_TABLE_HANDLER_HPP
-#define IXION_INTERFACE_TABLE_HANDLER_HPP
-
-#include "ixion/env.hpp"
+#include "table_handler.hpp"
 
 namespace ixion {
 
-struct abs_range_t;
+table_handler::~table_handler() {}
 
-namespace iface {
-
-class IXION_DLLPUBLIC table_handler
-{
-public:
-    virtual ~table_handler();
-};
-
-}}
-
-#endif
+}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

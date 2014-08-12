@@ -10,6 +10,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/config.hpp"
 #include "ixion/interface/session_handler.hpp"
+#include "ixion/interface/table_handler.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula.hpp"
@@ -17,6 +18,7 @@
 #include "workbook.hpp"
 
 #include <memory>
+#include <boost/scoped_ptr.hpp>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -129,7 +131,7 @@ bool set_shared_formula_tokens_to_cell(
 
 }
 
-class model_context_impl
+class model_context_impl : boost::noncopyable
 {
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
@@ -177,6 +179,16 @@ public:
     {
         delete mp_session_handler;
         mp_session_handler = handler;
+    }
+
+    iface::table_handler* get_table_handler()
+    {
+        return mp_table_handler.get();
+    }
+
+    void set_table_handler(iface::table_handler* handler)
+    {
+        mp_table_handler.reset(handler);
     }
 
     void erase_cell(const abs_address_t& addr);
@@ -244,6 +256,7 @@ private:
     config* mp_config;
     cell_listener_tracker* mp_cell_listener_tracker;
     iface::session_handler* mp_session_handler;
+    boost::scoped_ptr<iface::table_handler> mp_table_handler;
     named_expressions_type m_named_expressions;
 
     formula_tokens_store_type m_tokens;
@@ -889,6 +902,11 @@ iface::session_handler* model_context::get_session_handler()
     return mp_impl->get_session_handler();
 }
 
+iface::table_handler* model_context::get_table_handler()
+{
+    return mp_impl->get_table_handler();
+}
+
 const formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier) const
 {
     return mp_impl->get_formula_tokens(sheet, identifier);
@@ -993,6 +1011,11 @@ void model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t 
 void model_context::set_session_handler(iface::session_handler* handler)
 {
     mp_impl->set_session_handler(handler);
+}
+
+void model_context::set_table_handler(iface::table_handler* handler)
+{
+    mp_impl->set_table_handler(handler);
 }
 
 size_t model_context::get_string_count() const

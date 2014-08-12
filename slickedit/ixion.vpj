@@ -308,6 +308,8 @@
 			<F N="../src/session_handler.hpp"/>
 			<F N="../src/sort_input_parser.cpp"/>
 			<F N="../src/sort_input_parser.hpp"/>
+			<F N="../src/table_handler.cpp"/>
+			<F N="../src/table_handler.hpp"/>
 		</Folder>
 	</Files>
 </Project>

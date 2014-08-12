@@ -67,6 +67,7 @@ public:
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual iface::session_handler* get_session_handler();
+    virtual iface::table_handler* get_table_handler();
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
@@ -116,6 +117,8 @@ public:
      * @param handler pointer to the new session handler instance.
      */
     void set_session_handler(iface::session_handler* handler);
+
+    void set_table_handler(iface::table_handler* handler);
 
     size_t get_string_count() const;
 

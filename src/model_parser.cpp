@@ -7,6 +7,7 @@
 
 #include "model_parser.hpp"
 #include "session_handler.hpp"
+#include "table_handler.hpp"
 
 #include "ixion/formula.hpp"
 #include "ixion/formula_name_resolver.hpp"
@@ -94,6 +95,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_print_separator(true)
 {
     m_context.set_session_handler(new session_handler(m_context));
+    m_context.set_table_handler(new table_handler);
     m_context.append_sheet(IXION_ASCII("sheet"), 1048576, 1024);
 }
 
