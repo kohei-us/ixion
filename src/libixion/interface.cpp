@@ -5,13 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/interface/table.hpp"
+#include "ixion/interface/table_handler.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/model_context.hpp"
 
 namespace ixion { namespace iface {
 
-table::~table() {}
+table_handler::~table_handler() {}
 
 session_handler::~session_handler() {}
 
@@ -22,7 +22,7 @@ session_handler* model_context::get_session_handler()
     return NULL;
 }
 
-table* model_context::get_table()
+table_handler* model_context::get_table_handler()
 {
     return NULL;
 }

@@ -36,7 +36,7 @@ public:
 namespace iface {
 
 class session_handler;
-class table;
+class table_handler;
 
 /**
  * Interface for model context.  The client code needs to provide concrete
@@ -94,7 +94,7 @@ public:
      *         if no table is present or supported by the model
      *         implementation.
      */
-    virtual table* get_table();
+    virtual table_handler* get_table_handler();
 
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const = 0;

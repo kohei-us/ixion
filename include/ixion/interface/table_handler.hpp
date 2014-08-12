@@ -5,10 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef IXION_INTERFACE_TABLE_HPP
-#define IXION_INTERFACE_TABLE_HPP
+#ifndef IXION_INTERFACE_TABLE_HANDLER_HPP
+#define IXION_INTERFACE_TABLE_HANDLER_HPP
 
-#include "../env.hpp"
+#include "ixion/env.hpp"
 
 namespace ixion {
 
@@ -16,10 +16,10 @@ struct abs_range_t;
 
 namespace iface {
 
-class table
+class table_handler
 {
 public:
-    virtual IXION_DLLPUBLIC ~table();
+    virtual IXION_DLLPUBLIC ~table_handler();
 };
 
 }}
