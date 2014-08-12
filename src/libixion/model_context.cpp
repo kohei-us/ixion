@@ -18,7 +18,6 @@
 #include "workbook.hpp"
 
 #include <memory>
-#include <boost/scoped_ptr.hpp>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -146,7 +145,8 @@ public:
         m_parent(parent),
         mp_config(new config),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
-        mp_session_handler(NULL)
+        mp_session_handler(NULL),
+        mp_table_handler(NULL)
     {
     }
 
@@ -154,7 +154,6 @@ public:
     {
         delete mp_config;
         delete mp_cell_listener_tracker;
-        delete mp_session_handler;
 
         for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
         for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_shared_tokens());
@@ -177,18 +176,17 @@ public:
 
     void set_session_handler(iface::session_handler* handler)
     {
-        delete mp_session_handler;
         mp_session_handler = handler;
     }
 
     iface::table_handler* get_table_handler()
     {
-        return mp_table_handler.get();
+        return mp_table_handler;
     }
 
     void set_table_handler(iface::table_handler* handler)
     {
-        mp_table_handler.reset(handler);
+        mp_table_handler = handler;
     }
 
     void erase_cell(const abs_address_t& addr);
@@ -256,7 +254,7 @@ private:
     config* mp_config;
     cell_listener_tracker* mp_cell_listener_tracker;
     iface::session_handler* mp_session_handler;
-    boost::scoped_ptr<iface::table_handler> mp_table_handler;
+    iface::table_handler* mp_table_handler;
     named_expressions_type m_named_expressions;
 
     formula_tokens_store_type m_tokens;

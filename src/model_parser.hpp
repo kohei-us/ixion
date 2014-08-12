@@ -12,6 +12,9 @@
 #include "ixion/model_context.hpp"
 #include "ixion/hash_container/map.hpp"
 
+#include "session_handler.hpp"
+#include "table_handler.hpp"
+
 #include <string>
 #include <exception>
 #include <vector>
@@ -70,6 +73,8 @@ private:
 
 private:
     model_context m_context;
+    session_handler m_session_handler;
+    table_handler m_table_handler;
     boost::scoped_ptr<formula_name_resolver> mp_name_resolver;
     std::string m_filepath;
     size_t m_thread_count;
