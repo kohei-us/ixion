@@ -33,7 +33,8 @@ enum parse_mode_t
     parse_mode_unknown = 0,
     parse_mode_init,
     parse_mode_result,
-    parse_mode_edit
+    parse_mode_edit,
+    parse_mode_table
 };
 
 bool is_separator(char c)
@@ -89,6 +90,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_context(),
     m_session_handler(m_context),
     m_table_handler(),
+    mp_table_entry(NULL),
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &m_context)),
     m_filepath(filepath),
     m_thread_count(thread_count),
@@ -124,17 +126,11 @@ void model_parser::parse()
             }
             else if (buf_com.equals("calc"))
             {
-                if (parse_mode != parse_mode_init)
-                    throw parse_error("'calc' command must be used in the init mode.");
-
                 // Perform full calculation on currently stored cells.
                 calculate_cells(m_context, m_dirty_cells, m_thread_count);
             }
             else if (buf_com.equals("recalc"))
             {
-                if (parse_mode != parse_mode_edit)
-                    throw parse_error("'recalc' command must be used in the edit mode.");
-
                 cout << get_formula_result_output_separator() << endl
                     << "recalculating" << endl;
 
@@ -150,6 +146,17 @@ void model_parser::parse()
             {
                 // Exit the loop.
                 return;
+            }
+            else if (buf_com.equals("push"))
+            {
+                switch (parse_mode)
+                {
+                    case parse_mode_table:
+                        push_table();
+                    break;
+                    default:
+                        throw parse_error("push command was used for wrong mode!");
+                }
             }
             else if (buf_com.equals("mode init"))
             {
@@ -168,6 +175,12 @@ void model_parser::parse()
                 m_dirty_cells.clear();
                 m_dirty_cell_addrs.clear();
                 m_print_separator = true;
+            }
+            else if (buf_com.equals("mode table"))
+            {
+                parse_mode = parse_mode_table;
+                m_print_separator = true;
+                mp_table_entry.reset(new table_handler::entry);
             }
             else
             {
@@ -188,6 +201,9 @@ void model_parser::parse()
             break;
             case parse_mode_result:
                 parse_result(p);
+            break;
+            case parse_mode_table:
+                parse_table(p);
             break;
             default:
                 throw parse_error("unknown parse mode");
@@ -369,6 +385,85 @@ void model_parser::parse_result(const char*& p)
     }
     else
         itr->second = res;
+}
+
+void model_parser::parse_table(const char*& p)
+{
+    assert(mp_table_entry);
+
+    // In table mode, each line must be attribute=value.
+
+    // Parse to get name and value strings.
+    mem_str_buf buf, name, value;
+    for (; *p != '\n'; ++p)
+    {
+        if (*p == '=')
+        {
+            if (buf.empty())
+                throw model_parser::parse_error("left hand side is empty");
+
+            name = buf;
+            buf.clear();
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(p);
+            else
+                buf.inc();
+        }
+    }
+
+    if (!buf.empty())
+    {
+        if (name.empty())
+            throw model_parser::parse_error("'=' is missing");
+
+        value = buf;
+    }
+
+    table_handler::entry& entry = *mp_table_entry;
+
+    if (name == "name")
+        entry.name = m_context.add_string(value.get(), value.size());
+    else if (name == "range")
+    {
+        if (!mp_name_resolver)
+            return;
+
+        abs_address_t pos(0,0,0);
+        formula_name_type ret = mp_name_resolver->resolve(value.get(), value.size(), pos);
+        if (ret.type != formula_name_type::range_reference)
+            throw parse_error("range of a table is expected to be given as a range reference.");
+
+        entry.range = to_range(ret.range).to_abs(pos);
+    }
+    else if (name == "columns")
+    {
+        // TODO : parse column names.
+    }
+    else if (name == "totals-row-count")
+        entry.totals_row_count = global::to_double(value.get(), value.size());
+}
+
+void model_parser::push_table()
+{
+    cout << get_formula_result_output_separator() << endl;
+
+    if (!mp_table_entry)
+        return;
+
+    table_handler::entry& entry = *mp_table_entry;
+
+    const string* ps = m_context.get_string(entry.name);
+    if (ps)
+        cout << "name: " << *ps << endl;
+
+    if (mp_name_resolver)
+        cout << "range: " << mp_name_resolver->get_name(entry.range, abs_address_t(0,0,0), false) << endl;
+
+    cout << "totals row count: " << mp_table_entry->totals_row_count << endl;
+    m_table_handler.insert(mp_table_entry.release());
 }
 
 void model_parser::check()

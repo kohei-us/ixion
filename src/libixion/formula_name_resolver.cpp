@@ -588,14 +588,18 @@ public:
 
         if (col != column_unset)
         {
-            if (!range.first.abs_column)
+            if (range.first.abs_column)
+                os << '$';
+            else
                 col += pos.column;
             append_column_name_a1(os, col);
         }
 
         if (row != row_unset)
         {
-            if (!range.first.abs_row)
+            if (range.first.abs_row)
+                os << '$';
+            else
                 row += pos.row;
             os << (row + 1);
         }
@@ -606,14 +610,18 @@ public:
 
         if (col != column_unset)
         {
-            if (!range.last.abs_column)
+            if (range.last.abs_column)
+                os << '$';
+            else
                 col += pos.column;
             append_column_name_a1(os, col);
         }
 
         if (row != row_unset)
         {
-            if (!range.last.abs_row)
+            if (range.last.abs_row)
+                os << '$';
+            else
                 row += pos.row;
             os << (row + 1);
         }

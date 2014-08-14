@@ -1,0 +1,26 @@
+%% Basic table reference test.  Set C3:D9 to be a table range with 2 columns
+%% 'Category' and 'Value'.
+%mode init
+C3@Category
+C4@A
+C5@B
+C6@C
+C7@D
+C8@E
+C9@Total
+D3@Value
+D4:1
+D5:2
+D6:3
+D7:4
+D8:5
+D9=SUBTOTAL(109,[Value])
+%mode table
+name=Table1
+range=C3:D9
+columns=Category,Value
+totals-row-count=1
+%push
+%calc
+%exit
+

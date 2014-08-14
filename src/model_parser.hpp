@@ -68,19 +68,25 @@ private:
 
     void parse_init(const char*& p);
     void parse_result(const char*& p);
+    void parse_table(const char*& p);
+    void push_table();
 
     void check();
 
 private:
+
     model_context m_context;
     session_handler m_session_handler;
     table_handler m_table_handler;
+    unique_ptr<table_handler::entry> mp_table_entry;
+
     boost::scoped_ptr<formula_name_resolver> mp_name_resolver;
     std::string m_filepath;
     size_t m_thread_count;
     dirty_formula_cells_t m_dirty_cells;
     modified_cells_t m_dirty_cell_addrs;
     results_type m_formula_results;
+
     bool m_print_separator:1;
 };
 

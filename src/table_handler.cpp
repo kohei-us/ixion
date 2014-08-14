@@ -9,7 +9,20 @@
 
 namespace ixion {
 
+table_handler::entry::entry() :
+    name(empty_string_id), range(abs_range_t::invalid), totals_row_count(0) {}
+
 table_handler::~table_handler() {}
+
+void table_handler::insert(entry* p)
+{
+    if (!p)
+        return;
+
+    unique_ptr<entry> px(p);
+    string_id_t name = p->name;
+    m_entries.insert(name, px.release());
+}
 
 }
 
