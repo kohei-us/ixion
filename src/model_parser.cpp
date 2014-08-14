@@ -59,6 +59,29 @@ void parse_command(const char*& p, mem_str_buf& com)
     _com.swap(com);
 }
 
+class string_printer : public std::unary_function<string_id_t, void>
+{
+    const model_context& m_cxt;
+    char m_sep;
+    bool m_first;
+
+public:
+    string_printer(const model_context& cxt, char sep) :
+        m_cxt(cxt), m_sep(sep), m_first(true) {}
+
+    void operator() (string_id_t sid)
+    {
+        if (m_first)
+            m_first = false;
+        else
+            cout << m_sep;
+
+        const std::string* p = m_cxt.get_string(sid);
+        if (p)
+            cout << *p;
+    }
+};
+
 }
 
 // ============================================================================
@@ -439,9 +462,7 @@ void model_parser::parse_table(const char*& p)
         entry.range = to_range(ret.range).to_abs(pos);
     }
     else if (name == "columns")
-    {
-        // TODO : parse column names.
-    }
+        parse_table_columns(value);
     else if (name == "totals-row-count")
         entry.totals_row_count = global::to_double(value.get(), value.size());
 }
@@ -462,8 +483,48 @@ void model_parser::push_table()
     if (mp_name_resolver)
         cout << "range: " << mp_name_resolver->get_name(entry.range, abs_address_t(0,0,0), false) << endl;
 
+    cout << "columns: ";
+    std::for_each(entry.columns.begin(), entry.columns.end(), string_printer(m_context, ','));
+    cout << endl;
+
     cout << "totals row count: " << mp_table_entry->totals_row_count << endl;
     m_table_handler.insert(mp_table_entry.release());
+}
+
+void model_parser::parse_table_columns(const mem_str_buf& str)
+{
+    assert(mp_table_entry);
+    table_handler::entry& entry = *mp_table_entry;
+
+    const char* p = str.get();
+    const char* pend = p + str.size();
+    mem_str_buf buf;
+    for (; p != pend; ++p)
+    {
+        if (*p == ',')
+        {
+            // Flush the current column name buffer.
+            string_id_t col_name = empty_string_id;
+            if (!buf.empty())
+                col_name = m_context.add_string(buf.get(), buf.size());
+
+            entry.columns.push_back(col_name);
+            buf.clear();
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(p);
+            else
+                buf.inc();
+        }
+    }
+
+    string_id_t col_name = empty_string_id;
+    if (!buf.empty())
+        col_name = m_context.add_string(buf.get(), buf.size());
+
+    entry.columns.push_back(col_name);
 }
 
 void model_parser::check()

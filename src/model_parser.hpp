@@ -71,6 +71,8 @@ private:
     void parse_table(const char*& p);
     void push_table();
 
+    void parse_table_columns(const mem_str_buf& str);
+
     void check();
 
 private:
