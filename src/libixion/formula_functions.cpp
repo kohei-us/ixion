@@ -46,6 +46,7 @@ const builtin_func builtin_funcs[] = {
     { "LEN", func_len },
     { "CONCATENATE", func_concatenate },
     { "NOW", func_now },
+    { "SUBTOTAL", func_subtotal },
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -170,6 +171,9 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
             break;
         case func_now:
             fnc_now(args);
+            break;
+        case func_subtotal:
+            fnc_subtotal(args);
             break;
         case func_unknown:
         default:
@@ -331,6 +335,13 @@ void formula_functions::fnc_wait(value_stack_t& args) const
     global::sleep(1000);
     args.clear();
     args.push_value(1);
+}
+
+void formula_functions::fnc_subtotal(value_stack_t& args) const
+{
+    // TODO : Implement this correctly.
+    args.clear();
+    args.push_value(123);
 }
 
 }

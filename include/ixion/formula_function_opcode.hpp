@@ -32,6 +32,9 @@ enum formula_function_t
     // date & time functions
     func_now,
 
+    // other
+    func_subtotal,
+
     func_wait // dummy function used only for testing.
 
     // TODO: more functions to come...

@@ -64,6 +64,8 @@ private:
 
     void fnc_wait(value_stack_t& args) const;
 
+    void fnc_subtotal(value_stack_t& args) const;
+
 private:
     iface::model_context& m_context;
 };
