@@ -7,6 +7,8 @@
 
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/model_context.hpp"
+#include "ixion/mem_str_buf.hpp"
+#include "ixion/table.hpp"
 
 #include "formula_functions.hpp"
 
@@ -32,6 +34,119 @@ bool resolve_function(const char* p, size_t n, formula_name_type& ret)
         return true;
     }
     return false;
+}
+
+/**
+ * Table reference can be either one of:
+ *
+ * <ul>
+ * <li>Table[Column]</li>
+ * <li>[Column]</li>
+ * <li>Table[[#Area],[Column]]</li>
+ * </ul>
+ */
+bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, formula_name_type& ret)
+{
+    if (!cxt)
+        return false;
+
+    const iface::table_handler* table_hdl = cxt->get_table_handler();
+    if (!table_hdl)
+        return false;
+
+    short scope = 0;
+    short pos = 0;
+    mem_str_buf buf;
+    mem_str_buf table_name;
+    mem_str_buf names[2];
+
+    bool table_detected = false;
+
+    const char* p_end = p + n;
+    for (; p != p_end; ++p)
+    {
+        switch (*p)
+        {
+            case '[':
+            {
+                if (scope >= 2)
+                    return false;
+
+                table_detected = true;
+                if (!buf.empty())
+                {
+                    if (scope != 0)
+                        return false;
+
+                    table_name = buf;
+                    buf.clear();
+                }
+
+                ++scope;
+            }
+            break;
+            case ']':
+            {
+                if (scope <= 0)
+                    // non-matching brace.
+                    return false;
+
+                if (!buf.empty())
+                {
+                    if (pos > 1)
+                        return false;
+
+                    names[pos] = buf;
+                    buf.clear();
+                }
+
+                if (!scope)
+                    // Non-matching brace detected.  Bail out.
+                    return false;
+
+                --scope;
+            }
+            break;
+            case ',':
+            {
+                if (!buf.empty())
+                    return false;
+
+                ++pos;
+            }
+            break;
+            default:
+                if (buf.empty())
+                    buf.set_start(p);
+                else
+                    buf.inc();
+        }
+    }
+
+    if (!buf.empty())
+        return false;
+
+    if (!table_detected)
+        return false;
+
+    ret.table.area = table_area_unknown;
+    ret.type = formula_name_type::table_reference;
+    ret.table.name = table_name.empty() ? empty_string_id : cxt->get_string_identifier(table_name.get(), table_name.size());
+    if (names[1].empty())
+    {
+        // No explicit area type given.  It's a data area.
+        if (names[0].empty())
+            return false;
+
+        ret.table.area = table_area_data;
+        ret.table.column = cxt->get_string_identifier(names[0].get(), names[0].size());
+    }
+    else
+    {
+        assert(!"not implemented yet");
+    }
+
+    return true;
 }
 
 /**
@@ -127,12 +242,30 @@ void append_address_a1(
     os << (row + 1);
 }
 
+void append_name_string(ostringstream& os, const iface::model_context* cxt, string_id_t sid)
+{
+    if (!cxt)
+        return;
+
+    const string* p = cxt->get_string(sid);
+    if (p)
+        os << *p;
+}
+
 enum parse_address_result
 {
-    invalid,
+    invalid = 0,
     valid_address,
     range_expected
 };
+
+#if DEBUG_NAME_RESOLVER
+const char* parse_address_result_names[] = {
+    "invalid",
+    "valid address",
+    "range expected"
+};
+#endif
 
 void parse_sheet_name_quoted(const ixion::iface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
@@ -384,22 +517,6 @@ string abs_or_rel(bool _abs)
     return _abs ? "(abs)" : "(rel)";
 }
 
-string _to_string(parse_address_result res)
-{
-    switch (res)
-    {
-        case invalid:
-            return "invalid";
-        case range_expected:
-            return "range expected";
-        case valid_address:
-            return "valid address";
-        default:
-            ;
-    }
-    return "unknown parse address result";
-}
-
 string _to_string(const formula_name_type::address_type& addr)
 {
     std::ostringstream os;
@@ -445,6 +562,9 @@ string formula_name_type::to_string() const
         case range_reference:
             os << "range raference: first: " << _to_string(range.first) << "  last: "
                 << _to_string(range.last) << endl;
+            break;
+        case table_reference:
+            os << "table reference";
             break;
         default:
             os << "unknown foromula name type";
@@ -500,14 +620,17 @@ public:
         __IXION_DEBUG_OUT__ << "name=" << string(p,n) << "; origin=" << pos.get_name() << endl;
 #endif
         formula_name_type ret;
-        if (resolve_function(p, n, ret))
-            return ret;
-
         if (!n)
             return ret;
 
+        if (resolve_function(p, n, ret))
+            return ret;
+
+        if (resolve_table(mp_cxt, p, n, ret))
+            return ret;
+
         const char* p_last = p;
-        std::advance(p_last, n -1);
+        std::advance(p_last, n-1);
 
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
@@ -515,7 +638,7 @@ public:
         parse_address_result parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
 
 #if DEBUG_NAME_RESOLVER
-        __IXION_DEBUG_OUT__ << "parse address result: " << _to_string(parse_res) << endl;
+        __IXION_DEBUG_OUT__ << "parse address result: " << parse_address_result_names[parse_res] << endl;
 #endif
 
         // prevent for example H to be recognized as column address
@@ -626,6 +749,16 @@ public:
             os << (row + 1);
         }
 
+        return os.str();
+    }
+
+    virtual string get_name(const table_t& table) const
+    {
+        ostringstream os;
+        append_name_string(os, mp_cxt, table.name);
+        os << '[';
+        append_name_string(os, mp_cxt, table.column);
+        os << ']';
         return os.str();
     }
 
@@ -752,6 +885,12 @@ public:
 
         os << ']';
         return os.str();
+    }
+
+    virtual string get_name(const table_t& table) const
+    {
+        // TODO : ODF doesn't support table reference yet.
+        return string();
     }
 
     virtual string get_column_name(col_t col) const

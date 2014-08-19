@@ -267,6 +267,15 @@ void formula_parser::name(const lexer_token_base& t)
                 new range_ref_token(range_t(first, last)));
         }
         break;
+        case formula_name_type::table_reference:
+        {
+            table_t table;
+            table.name = fn.table.name;
+            table.column = fn.table.column;
+            table.area = fn.table.area;
+            m_formula_tokens.push_back(new table_ref_token(table));
+        }
+        break;
         case formula_name_type::function:
             m_formula_tokens.push_back(new function_token(static_cast<size_t>(fn.func_oc)));
         break;

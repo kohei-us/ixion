@@ -11,6 +11,7 @@
 #include "ixion/model_context.hpp"
 #include "ixion/global.hpp"
 #include "ixion/macros.hpp"
+#include "ixion/interface/table_handler.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -181,6 +182,62 @@ void test_name_resolver_excel_a1()
         string name_a1(name_tests[i].name);
         formula_name_type res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         assert(res.type == name_tests[i].type);
+    }
+}
+
+void test_name_resolver_table_excel_a1()
+{
+    /**
+     * name : Table1
+     * range : B2:C10
+     * columns : Category, Value
+     * totals row count : 1
+     */
+    class test_table_handler : public iface::table_handler
+    {
+    public:
+
+    } table_hdl;
+
+    cout << "Testing the Excel A1 name resolver for parsing table references." << endl;
+    model_context cxt;
+    cxt.set_table_handler(&table_hdl);
+    cxt.append_sheet(IXION_ASCII("Sheet"), 1048576, 1024);
+    string_id_t s_table1 = cxt.append_string(IXION_ASCII("Table1"));
+    string_id_t s_table2 = cxt.append_string(IXION_ASCII("Table2"));
+    string_id_t s_cat = cxt.append_string(IXION_ASCII("Category"));
+    string_id_t s_val = cxt.append_string(IXION_ASCII("Value"));
+
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
+    assert(resolver);
+
+    struct {
+        const char* exp;
+        size_t len;
+        sheet_t sheet;
+        row_t row;
+        col_t col;
+        string_id_t table_name;
+        string_id_t column_name;
+        table_area_t area;
+    } tests[] = {
+        { IXION_ASCII("[Value]"), 0, 9, 2, empty_string_id, s_val, table_area_data },
+        { IXION_ASCII("Table1[Category]"), 0, 9, 2, s_table1, s_cat, table_area_data },
+        { IXION_ASCII("Table1[Value]"), 0, 9, 2, s_table1, s_val, table_area_data },
+    };
+
+    for (size_t i = 0, n = IXION_N_ELEMENTS(tests); i < n; ++i)
+    {
+        abs_address_t pos(tests[i].sheet, tests[i].row, tests[i].col);
+        formula_name_type res = resolver->resolve(tests[i].exp, tests[i].len, pos);
+        if (res.type != formula_name_type::table_reference)
+            assert(!"table reference expected.");
+
+        formula_name_type::table_type table = res.table;
+        assert(table.name == tests[i].table_name);
+        assert(table.column == tests[i].column_name);
+        assert(table.area == tests[i].area);
     }
 }
 
@@ -544,6 +601,7 @@ int main()
     test_size();
     test_string_to_double();
     test_name_resolver_excel_a1();
+    test_name_resolver_table_excel_a1();
     test_name_resolver_odff();
     test_address();
     test_parse_and_print_expressions();

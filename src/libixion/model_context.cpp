@@ -184,6 +184,11 @@ public:
         return mp_table_handler;
     }
 
+    const iface::table_handler* get_table_handler() const
+    {
+        return mp_table_handler;
+    }
+
     void set_table_handler(iface::table_handler* handler)
     {
         mp_table_handler = handler;
@@ -203,6 +208,7 @@ public:
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const abs_address_t& addr) const;
+    string_id_t get_string_identifier(const char* p, size_t n) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
@@ -754,6 +760,12 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
     return col_store.get<string_id_t>(addr.row);
 }
 
+string_id_t model_context_impl::get_string_identifier(const char* p, size_t n) const
+{
+    string_map_type::const_iterator it = m_string_map.find(mem_str_buf(p, n));
+    return it == m_string_map.end() ? empty_string_id : it->second;
+}
+
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
@@ -861,6 +873,11 @@ string_id_t model_context::get_string_identifier(const abs_address_t& addr) cons
     return mp_impl->get_string_identifier(addr);
 }
 
+string_id_t model_context::get_string_identifier(const char* p, size_t n) const
+{
+    return mp_impl->get_string_identifier(p, n);
+}
+
 const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const
 {
     return mp_impl->get_formula_cell(addr);
@@ -901,6 +918,11 @@ iface::session_handler* model_context::get_session_handler()
 }
 
 iface::table_handler* model_context::get_table_handler()
+{
+    return mp_impl->get_table_handler();
+}
+
+const iface::table_handler* model_context::get_table_handler() const
 {
     return mp_impl->get_table_handler();
 }

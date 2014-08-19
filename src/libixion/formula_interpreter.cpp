@@ -270,6 +270,7 @@ void formula_interpreter::next()
 
 const formula_token_base& formula_interpreter::token() const
 {
+    assert(m_cur_token_itr != m_end_token_pos);
     return *(*m_cur_token_itr);
 }
 
@@ -637,6 +638,9 @@ void formula_interpreter::factor()
         case fop_range_ref:
             range_ref();
             return;
+        case fop_table_ref:
+            table_ref();
+            return;
         case fop_function:
             function();
             return;
@@ -718,6 +722,20 @@ void formula_interpreter::range_ref()
     }
 
     m_stack.push_range_ref(abs_range);
+    next();
+}
+
+void formula_interpreter::table_ref()
+{
+    table_t table = token().get_table_ref();
+
+    if (mp_handler)
+        mp_handler->push_table_ref(table);
+
+    // TODO : Handle table reference correctly.
+
+    abs_range_t range;
+    m_stack.push_range_ref(range);
     next();
 }
 

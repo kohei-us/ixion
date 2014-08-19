@@ -21,17 +21,22 @@ class model_context;
 
 }
 
+struct table_t;
+
 struct formula_name_type
 {
-    enum name_type {
+    enum name_type
+    {
         cell_reference,
         range_reference,
+        table_reference,
         named_expression,
         function,
         invalid
     };
 
-    struct address_type {
+    struct address_type
+    {
         sheet_t sheet;
         row_t row;
         col_t col;
@@ -40,15 +45,26 @@ struct formula_name_type
         bool abs_col:1;
     };
 
-    struct range_type {
+    struct range_type
+    {
         address_type first;
         address_type last;
     };
 
+    struct table_type
+    {
+        string_id_t name;
+        string_id_t column;
+        table_area_t area;
+    };
+
     name_type type;
-    union {
+
+    union
+    {
         address_type address;
         range_type range;
+        table_type table;
         formula_function_t func_oc; // function opcode
     };
 
@@ -72,6 +88,7 @@ public:
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
+    virtual std::string get_name(const table_t& table) const = 0;
 
     /**
      * Given a numerical representation of column position, return its

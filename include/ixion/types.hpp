@@ -33,6 +33,14 @@ enum celltype_t
     celltype_empty
 };
 
+enum table_area_t
+{
+    table_area_unknown = 0,
+    table_area_data,
+    table_area_header,
+    table_area_total
+};
+
 /**
  * Formula name resolver type specifies how name tokens are resolved.
  */

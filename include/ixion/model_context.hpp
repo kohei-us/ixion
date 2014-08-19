@@ -60,6 +60,7 @@ public:
     virtual celltype_t get_celltype(const abs_address_t& addr) const;
     virtual double get_numeric_value(const abs_address_t& addr) const;
     virtual string_id_t get_string_identifier(const abs_address_t& addr) const;
+    virtual string_id_t get_string_identifier(const char* p, size_t n) const;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr);
 
@@ -68,6 +69,7 @@ public:
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual iface::session_handler* get_session_handler();
     virtual iface::table_handler* get_table_handler();
+    virtual const iface::table_handler* get_table_handler() const;
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
     virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;

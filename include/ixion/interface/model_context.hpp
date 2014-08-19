@@ -55,6 +55,7 @@ public:
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;
     virtual double get_numeric_value(const abs_address_t& addr) const = 0;
     virtual string_id_t get_string_identifier(const abs_address_t& addr) const = 0;
+    virtual string_id_t get_string_identifier(const char* p, size_t n) const = 0;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
@@ -95,6 +96,8 @@ public:
      *         implementation.
      */
     virtual table_handler* get_table_handler();
+
+    virtual const table_handler* get_table_handler() const;
 
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const = 0;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const = 0;

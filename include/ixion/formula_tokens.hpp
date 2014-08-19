@@ -12,6 +12,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include "ixion/address.hpp"
+#include "ixion/table.hpp"
 #include "ixion/formula_tokens_fwd.hpp"
 #include "ixion/formula_opcode.hpp"
 
@@ -44,6 +45,7 @@ public:
 
     virtual address_t get_single_ref() const;
     virtual range_t get_range_ref() const;
+    virtual table_t get_table_ref() const;
     virtual double get_value() const;
     virtual size_t get_index() const;
     virtual std::string get_name() const;
@@ -124,6 +126,19 @@ public:
 
 private:
     range_t m_range;
+};
+
+class table_ref_token : public formula_token_base
+{
+public:
+    table_ref_token(const table_t& table);
+    table_ref_token(const table_ref_token& r);
+    virtual ~table_ref_token();
+
+    virtual table_t get_table_ref() const;
+
+private:
+    table_t m_table;
 };
 
 // ============================================================================

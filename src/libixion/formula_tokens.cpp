@@ -162,6 +162,11 @@ range_t formula_token_base::get_range_ref() const
     return range_t();
 }
 
+table_t formula_token_base::get_table_ref() const
+{
+    return table_t();
+}
+
 double formula_token_base::get_value() const
 {
     return 0.0;
@@ -267,7 +272,20 @@ range_t range_ref_token::get_range_ref() const
     return m_range;
 }
 
-// ============================================================================
+table_ref_token::table_ref_token(const table_t& table) :
+    formula_token_base(fop_table_ref),
+    m_table(table) {}
+
+table_ref_token::table_ref_token(const table_ref_token& r) :
+    formula_token_base(r),
+    m_table(r.m_table) {}
+
+table_ref_token::~table_ref_token() {}
+
+table_t table_ref_token::get_table_ref() const
+{
+    return m_table;
+}
 
 named_exp_token::named_exp_token(const char* p, size_t n) :
     formula_token_base(fop_named_expression),

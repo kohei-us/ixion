@@ -27,6 +27,11 @@ table_handler* model_context::get_table_handler()
     return NULL;
 }
 
+const table_handler* model_context::get_table_handler() const
+{
+    return NULL;
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -80,6 +80,11 @@ void session_handler::push_range_ref(const range_t& range, const abs_address_t& 
     cout << mp_resolver->get_name(range, pos, false);
 }
 
+void session_handler::push_table_ref(const table_t& table)
+{
+    cout << mp_resolver->get_name(table);
+}
+
 void session_handler::push_function(formula_function_t foc)
 {
     cout << get_formula_function_name(foc);

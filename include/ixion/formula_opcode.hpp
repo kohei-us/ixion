@@ -15,6 +15,7 @@ enum fopcode_t {
     // data types
     fop_single_ref,
     fop_range_ref,
+    fop_table_ref,
     fop_named_expression,
     fop_string,
     fop_value,

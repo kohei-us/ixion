@@ -85,6 +85,7 @@ private:
     void paren();
     void single_ref();
     void range_ref();
+    void table_ref();
     void constant();
     void literal();
     void function();
