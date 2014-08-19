@@ -27,4 +27,5 @@ libixion_HEADERS = \
 	mem_str_buf.hpp \
 	model_context.hpp \
 	thread.hpp \
+	table.hpp \
 	types.hpp
