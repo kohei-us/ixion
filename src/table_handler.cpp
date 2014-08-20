@@ -14,6 +14,37 @@ table_handler::entry::entry() :
 
 table_handler::~table_handler() {}
 
+abs_range_t table_handler::get_range(const abs_address_t& pos, string_id_t column) const
+{
+    entries_type::const_iterator it = m_entries.begin(), it_end = m_entries.end();
+    for (; it != it_end; ++it)
+    {
+        const entry& e = *it->second;
+        if (!e.range.contains(pos))
+            continue;
+
+        // Right table entry found.  Determine the column offset.
+        for (size_t i = 0, n = e.columns.size(); i < n; ++i)
+        {
+            if (e.columns[i] == column)
+            {
+                // Matching column name found.
+                abs_range_t ret = e.range;
+                col_t col = e.range.first.column + i;
+                ret.first.column = col;
+                ret.first.row += 1;
+                ret.last.column = col;
+                ret.last.row -= 1;
+                return ret;
+            }
+        }
+
+        break; // failed.
+    }
+
+    return abs_range_t(abs_range_t::invalid);
+}
+
 void table_handler::insert(entry* p)
 {
     if (!p)

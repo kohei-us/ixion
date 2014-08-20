@@ -36,6 +36,8 @@ public:
 
     virtual ~table_handler();
 
+    virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const;
+
     void insert(entry* p);
 
 private:

@@ -339,10 +339,25 @@ void formula_functions::fnc_wait(value_stack_t& args) const
 
 void formula_functions::fnc_subtotal(value_stack_t& args) const
 {
-    // TODO : Implement this correctly.
-    args.clear();
-    args.push_value(123);
+    if (args.size() != 2)
+        throw formula_functions::invalid_arg("SUBTOTAL requires exactly 2 arguments.");
+
+    abs_range_t range = args.pop_range_ref();
+    int subtype = args.pop_value();
+    switch (subtype)
+    {
+        case 109:
+        {
+            // SUM
+            matrix mx = m_context.get_range_value(range);
+            args.push_value(sum_matrix_elements(mx));
+        }
+        break;
+        default:
+            throw formula_functions::invalid_arg("not implemented yet");
+    }
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

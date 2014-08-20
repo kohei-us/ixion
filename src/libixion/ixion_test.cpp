@@ -196,6 +196,10 @@ void test_name_resolver_table_excel_a1()
     class test_table_handler : public iface::table_handler
     {
     public:
+        virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const
+        {
+            return abs_range_t();
+        }
 
     } table_hdl;
 

@@ -9,9 +9,11 @@
 #define IXION_INTERFACE_TABLE_HANDLER_HPP
 
 #include "ixion/env.hpp"
+#include "ixion/types.hpp"
 
 namespace ixion {
 
+struct abs_address_t;
 struct abs_range_t;
 
 namespace iface {
@@ -20,6 +22,17 @@ class IXION_DLLPUBLIC table_handler
 {
 public:
     virtual ~table_handler();
+
+    /**
+     * Get the data range associated with a given column name.  The current
+     * position is used to infer which table to use.
+     *
+     * @param pos current cell position.
+     * @param column column name within the table.
+     *
+     * @return data range associated with the column name.
+     */
+    virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const = 0;
 };
 
 }}

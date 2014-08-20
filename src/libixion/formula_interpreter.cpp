@@ -13,7 +13,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/model_context.hpp"
 #include "ixion/interface/session_handler.hpp"
-
+#include "ixion/interface/table_handler.hpp"
 
 #include <string>
 #include <iostream>
@@ -727,15 +727,32 @@ void formula_interpreter::range_ref()
 
 void formula_interpreter::table_ref()
 {
+    const iface::table_handler* table_hdl = m_context.get_table_handler();
+    if (!table_hdl)
+        throw formula_error(fe_ref_result_not_available);
+
     table_t table = token().get_table_ref();
+
+    if (table.column == empty_string_id)
+        // Column name must exist.
+        throw formula_error(fe_ref_result_not_available);
 
     if (mp_handler)
         mp_handler->push_table_ref(table);
 
-    // TODO : Handle table reference correctly.
+    if (table.name != empty_string_id)
+    {
+        // TODO : Implement this.
+        throw formula_error(fe_general_error);
+    }
+    else
+    {
+        // Table name is not given.  Use the current cell position to infer
+        // which table to use.
+        abs_range_t range = table_hdl->get_range(m_pos, table.column);
+        m_stack.push_range_ref(range);
+    }
 
-    abs_range_t range;
-    m_stack.push_range_ref(range);
     next();
 }
 

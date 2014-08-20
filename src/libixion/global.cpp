@@ -462,6 +462,20 @@ abs_address_t value_stack_t::pop_single_ref()
     return addr;
 }
 
+abs_range_t value_stack_t::pop_range_ref()
+{
+    if (m_stack.empty())
+        throw formula_error(fe_stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() != sv_range_ref)
+        throw formula_error(fe_stack_error);
+
+    abs_range_t range = v.get_range();
+    m_stack.pop_back();
+    return range;
+}
+
 matrix value_stack_t::pop_range_value()
 {
     if (m_stack.empty())
