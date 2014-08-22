@@ -222,8 +222,10 @@ void test_name_resolver_table_excel_a1()
             assert(!"table reference expected.");
 
         formula_name_type::table_type table = res.table;
-        assert(table.name == tests[i].table_name);
-        assert(table.column == tests[i].column_name);
+        string_id_t table_name = cxt.get_string_identifier(table.name, table.name_length);
+        string_id_t column_name = cxt.get_string_identifier(table.column, table.column_length);
+        assert(table_name == tests[i].table_name);
+        assert(column_name == tests[i].column_name);
         assert(table.area == tests[i].area);
     }
 }

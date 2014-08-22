@@ -127,7 +127,8 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
 
     ret.table.area = table_area_unknown;
     ret.type = formula_name_type::table_reference;
-    ret.table.name = table_name.empty() ? empty_string_id : cxt->get_string_identifier(table_name.get(), table_name.size());
+    ret.table.name = table_name.get();
+    ret.table.name_length = table_name.size();
     if (names[1].empty())
     {
         // No explicit area type given.  It's a data area.
@@ -135,7 +136,8 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
             return false;
 
         ret.table.area = table_area_data;
-        ret.table.column = cxt->get_string_identifier(names[0].get(), names[0].size());
+        ret.table.column = names[0].get();
+        ret.table.column_length = names[0].size();
     }
     else
     {

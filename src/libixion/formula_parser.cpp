@@ -270,8 +270,8 @@ void formula_parser::name(const lexer_token_base& t)
         case formula_name_type::table_reference:
         {
             table_t table;
-            table.name = fn.table.name;
-            table.column = fn.table.column;
+            table.name = m_context.add_string(fn.table.name, fn.table.name_length);
+            table.column = m_context.add_string(fn.table.column, fn.table.column_length);
             table.area = fn.table.area;
             m_formula_tokens.push_back(new table_ref_token(table));
         }
@@ -294,7 +294,7 @@ void formula_parser::name(const lexer_token_base& t)
 void formula_parser::literal(const lexer_token_base& t)
 {
     mem_str_buf s = t.get_string();
-    size_t sid = m_context.add_string(s.get(), s.size());
+    string_id_t sid = m_context.add_string(s.get(), s.size());
     m_formula_tokens.push_back(new string_token(sid));
 }
 

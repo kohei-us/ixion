@@ -53,8 +53,10 @@ struct formula_name_type
 
     struct table_type
     {
-        string_id_t name;
-        string_id_t column;
+        const char* name;
+        size_t name_length;
+        const char* column;
+        size_t column_length;
         table_area_t area;
     };
 
@@ -85,6 +87,7 @@ class formula_name_resolver
 public:
     formula_name_resolver();
     virtual ~formula_name_resolver() = 0;
+
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;

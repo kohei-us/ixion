@@ -332,6 +332,10 @@ void model_context_impl::append_sheet(const char* p, size_t n, row_t row_size, c
 
 string_id_t model_context_impl::append_string(const char* p, size_t n)
 {
+    if (!p || !n)
+        // Never add an empty or invalid string.
+        return empty_string_id;
+
     string_id_t str_id = m_strings.size();
     std::auto_ptr<string> ps(new string(p, n));
     p = &(*ps)[0];
