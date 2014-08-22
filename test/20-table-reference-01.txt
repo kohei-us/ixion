@@ -22,5 +22,7 @@ columns=Category,Value
 totals-row-count=1
 %push
 %calc
-%exit
+%mode result
+D9=15
+%check
 
