@@ -33,6 +33,16 @@ public:
      * @return data range associated with the column name.
      */
     virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const = 0;
+
+    /**
+     * Get the data range associated with given table and column names.
+     *
+     * @param table string identifier representing the table name.
+     * @param column string identifier representing the column name.
+     *
+     * @return data range associated with the table and column names.
+     */
+    virtual abs_range_t get_range(string_id_t table, string_id_t column) const = 0;
 };
 
 }}

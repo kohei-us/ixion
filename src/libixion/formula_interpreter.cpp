@@ -740,19 +740,19 @@ void formula_interpreter::table_ref()
     if (mp_handler)
         mp_handler->push_table_ref(table);
 
+    abs_range_t range(abs_range_t::invalid);
     if (table.name != empty_string_id)
     {
-        // TODO : Implement this.
-        throw formula_error(fe_general_error);
+        range = table_hdl->get_range(table.name, table.column);
     }
     else
     {
         // Table name is not given.  Use the current cell position to infer
         // which table to use.
-        abs_range_t range = table_hdl->get_range(m_pos, table.column);
-        m_stack.push_range_ref(range);
+        range = table_hdl->get_range(m_pos, table.column);
     }
 
+    m_stack.push_range_ref(range);
     next();
 }
 

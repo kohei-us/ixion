@@ -15,6 +15,7 @@ D6:3
 D7:4
 D8:5
 D9=SUBTOTAL(109,[Value])
+E1=SUM(Table1[Value])
 %mode table
 name=Table1
 range=C3:D9
@@ -24,5 +25,6 @@ totals-row-count=1
 %calc
 %mode result
 D9=15
+E1=15
 %check
 

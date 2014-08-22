@@ -37,10 +37,13 @@ public:
     virtual ~table_handler();
 
     virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const;
+    virtual abs_range_t get_range(string_id_t table, string_id_t column) const;
 
     void insert(entry* p);
 
 private:
+    abs_range_t get_column_range(const entry& e, string_id_t column) const;
+
     entries_type m_entries;
 };
 
