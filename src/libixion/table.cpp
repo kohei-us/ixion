@@ -12,7 +12,7 @@ namespace ixion {
 table_t::table_t() :
     name(empty_string_id),
     column(empty_string_id),
-    area(table_area_unknown) {}
+    areas(table_area_none) {}
 
 }
 

@@ -207,7 +207,7 @@ void test_name_resolver_table_excel_a1()
         col_t col;
         string_id_t table_name;
         string_id_t column_name;
-        table_area_t area;
+        table_areas_t areas;
     } tests[] = {
         { IXION_ASCII("[Value]"), 0, 9, 2, empty_string_id, s_val, table_area_data },
         { IXION_ASCII("Table1[Category]"), 0, 9, 2, s_table1, s_cat, table_area_data },
@@ -226,7 +226,7 @@ void test_name_resolver_table_excel_a1()
         string_id_t column_name = cxt.get_string_identifier(table.column, table.column_length);
         assert(table_name == tests[i].table_name);
         assert(column_name == tests[i].column_name);
-        assert(table.area == tests[i].area);
+        assert(table.areas == tests[i].areas);
     }
 }
 

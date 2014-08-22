@@ -272,7 +272,7 @@ void formula_parser::name(const lexer_token_base& t)
             table_t table;
             table.name = m_context.add_string(fn.table.name, fn.table.name_length);
             table.column = m_context.add_string(fn.table.column, fn.table.column_length);
-            table.area = fn.table.area;
+            table.areas = fn.table.areas;
             m_formula_tokens.push_back(new table_ref_token(table));
         }
         break;

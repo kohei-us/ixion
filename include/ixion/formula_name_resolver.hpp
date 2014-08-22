@@ -57,7 +57,7 @@ struct formula_name_type
         size_t name_length;
         const char* column;
         size_t column_length;
-        table_area_t area;
+        table_areas_t areas;
     };
 
     name_type type;

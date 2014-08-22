@@ -43,6 +43,16 @@ bool resolve_function(const char* p, size_t n, formula_name_type& ret)
  * <li>Table[Column]</li>
  * <li>[Column]</li>
  * <li>Table[[#Area],[Column]]</li>
+ * <li>Table[[#Area1],[#Area2],[Column]]</li>
+ * </ul>
+ *
+ * where the #Area can be one or more of
+ *
+ * <ul>
+ * <li>#Header</li>
+ * <li>#Data</li>
+ * <li>#Totals</li>
+ * <li>#All</li>
  * </ul>
  */
 bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, formula_name_type& ret)
@@ -125,7 +135,7 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
     if (!table_detected)
         return false;
 
-    ret.table.area = table_area_unknown;
+    ret.table.areas = table_area_none;
     ret.type = formula_name_type::table_reference;
     ret.table.name = table_name.get();
     ret.table.name_length = table_name.size();
@@ -135,7 +145,7 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
         if (names[0].empty())
             return false;
 
-        ret.table.area = table_area_data;
+        ret.table.areas = table_area_data;
         ret.table.column = names[0].get();
         ret.table.column_length = names[0].size();
     }
