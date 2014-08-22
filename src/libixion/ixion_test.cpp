@@ -187,25 +187,8 @@ void test_name_resolver_excel_a1()
 
 void test_name_resolver_table_excel_a1()
 {
-    /**
-     * name : Table1
-     * range : B2:C10
-     * columns : Category, Value
-     * totals row count : 1
-     */
-    class test_table_handler : public iface::table_handler
-    {
-    public:
-        virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const
-        {
-            return abs_range_t();
-        }
-
-    } table_hdl;
-
     cout << "Testing the Excel A1 name resolver for parsing table references." << endl;
     model_context cxt;
-    cxt.set_table_handler(&table_hdl);
     cxt.append_sheet(IXION_ASCII("Sheet"), 1048576, 1024);
     string_id_t s_table1 = cxt.append_string(IXION_ASCII("Table1"));
     string_id_t s_table2 = cxt.append_string(IXION_ASCII("Table2"));

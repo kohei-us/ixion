@@ -50,10 +50,6 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
     if (!cxt)
         return false;
 
-    const iface::table_handler* table_hdl = cxt->get_table_handler();
-    if (!table_hdl)
-        return false;
-
     short scope = 0;
     short pos = 0;
     mem_str_buf buf;
