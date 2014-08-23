@@ -34,6 +34,7 @@ public:
     void append(const char* p);
     void set_start(const char* p);
     void inc();
+    void pop_front();
     bool empty() const;
     size_t size() const;
     const char* get() const;

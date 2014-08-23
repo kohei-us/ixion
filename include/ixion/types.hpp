@@ -35,10 +35,11 @@ enum celltype_t
 
 enum table_area_t
 {
-    table_area_none = 0,
-    table_area_data = 0x01,
+    table_area_none   = 0x00,
+    table_area_data   = 0x01,
     table_area_header = 0x02,
-    table_area_totals = 0x04
+    table_area_totals = 0x04,
+    table_area_all    = 0x07
 };
 
 /** type that stores a mixture of {@link table_area_t} values. */

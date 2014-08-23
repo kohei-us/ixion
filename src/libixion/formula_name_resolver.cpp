@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #define DEBUG_NAME_RESOLVER 0
 
@@ -46,7 +47,7 @@ bool resolve_function(const char* p, size_t n, formula_name_type& ret)
  * <li>Table[[#Area1],[#Area2],[Column]]</li>
  * </ul>
  *
- * where the #Area can be one or more of
+ * where the #Area (area specifier) can be one or more of
  *
  * <ul>
  * <li>#Header</li>
@@ -61,10 +62,9 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
         return false;
 
     short scope = 0;
-    short pos = 0;
     mem_str_buf buf;
     mem_str_buf table_name;
-    mem_str_buf names[2];
+    vector<mem_str_buf> names;
 
     bool table_detected = false;
 
@@ -99,10 +99,7 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
 
                 if (!buf.empty())
                 {
-                    if (pos > 1)
-                        return false;
-
-                    names[pos] = buf;
+                    names.push_back(buf);
                     buf.clear();
                 }
 
@@ -117,8 +114,6 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
             {
                 if (!buf.empty())
                     return false;
-
-                ++pos;
             }
             break;
             default:
@@ -135,11 +130,15 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
     if (!table_detected)
         return false;
 
+    if (names.empty())
+        return false;
+
     ret.table.areas = table_area_none;
     ret.type = formula_name_type::table_reference;
     ret.table.name = table_name.get();
     ret.table.name_length = table_name.size();
-    if (names[1].empty())
+
+    if (names.size() == 1)
     {
         // No explicit area type given.  It's a data area.
         if (names[0].empty())
@@ -148,10 +147,33 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
         ret.table.areas = table_area_data;
         ret.table.column = names[0].get();
         ret.table.column_length = names[0].size();
+
+        return true;
     }
-    else
+
+    // Names other than the last one are area specifiers.
+    assert(names.size() > 1);
+
+    vector<mem_str_buf>::reverse_iterator it = names.rbegin(), it_end = names.rend();
+    buf = *it;
+    ret.table.column = buf.get();
+    ret.table.column_length = buf.size();
+    for (++it; it != it_end; ++it)
     {
-        assert(!"not implemented yet");
+        // Area specifier must start with a '#'.
+        buf = *it;
+        if (buf.empty() || buf[0] != '#')
+            return false;
+
+        buf.pop_front();
+        if (buf.equals("Header"))
+            ret.table.areas |= table_area_header;
+        else if (buf.equals("Data"))
+            ret.table.areas |= table_area_data;
+        else if (buf.equals("Totals"))
+            ret.table.areas |= table_area_totals;
+        else if (buf.equals("All"))
+            ret.table.areas = table_area_all;
     }
 
     return true;

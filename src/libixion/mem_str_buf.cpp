@@ -53,6 +53,12 @@ void mem_str_buf::inc()
     ++m_size;
 }
 
+void mem_str_buf::pop_front()
+{
+    ++mp_buf;
+    --m_size;
+}
+
 bool mem_str_buf::empty() const
 {
     return m_size == 0;
@@ -82,6 +88,9 @@ void mem_str_buf::swap(mem_str_buf& r)
 
 bool mem_str_buf::equals(const char* s) const
 {
+    if (strlen(s) != m_size)
+        return false;
+
     return ::std::strncmp(mp_buf, s, m_size) == 0;
 }
 
