@@ -15,6 +15,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <limits>
 
 #define DEBUG_NAME_RESOLVER 0
 
@@ -62,6 +63,7 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
         return false;
 
     short scope = 0;
+    size_t last_column_pos = std::numeric_limits<size_t>::max();
     mem_str_buf buf;
     mem_str_buf table_name;
     vector<mem_str_buf> names;
@@ -116,6 +118,21 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
                     return false;
             }
             break;
+            case ':':
+            {
+                if (scope != 1)
+                    // allowed only inside the first scope.
+                    return false;
+
+                if (!buf.empty())
+                    return false;
+
+                if (names.empty())
+                    return false;
+
+                last_column_pos = names.size();
+            }
+            break;
             default:
                 if (buf.empty())
                     buf.set_start(p);
@@ -160,13 +177,22 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
             else if (buf.equals("All"))
                 ret.table.areas = table_area_all;
         }
-        else
+        else if (ret.table.column_first_length)
         {
-            // column name.
-            if (ret.table.column_first_length)
-                // This is a second column name, which is not allowed.
+            // This is a second column name.
+            if (ret.table.column_last_length)
                 return false;
 
+            size_t dist = std::distance(names.begin(), it);
+            if (dist != last_column_pos)
+                return false;
+
+            ret.table.column_last = buf.get();
+            ret.table.column_last_length = buf.size();
+        }
+        else
+        {
+            // first column name.
             if (!ret.table.areas)
                 ret.table.areas = table_area_data;
 

@@ -29,13 +29,13 @@ namespace {
 void test_size()
 {
     cout << "test size" << endl;
-    cout << "int: " << sizeof(int) << endl;
-    cout << "long: " << sizeof(long) << endl;
-    cout << "double: " << sizeof(double) << endl;
-    cout << "size_t: " << sizeof(size_t) << endl;
-    cout << "celltype_t: " << sizeof(celltype_t) << endl;
-    cout << "formula_cell: " << sizeof(formula_cell) << endl;
-    cout << "formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
+    cout << "* int: " << sizeof(int) << endl;
+    cout << "* long: " << sizeof(long) << endl;
+    cout << "* double: " << sizeof(double) << endl;
+    cout << "* size_t: " << sizeof(size_t) << endl;
+    cout << "* celltype_t: " << sizeof(celltype_t) << endl;
+    cout << "* formula_cell: " << sizeof(formula_cell) << endl;
+    cout << "* formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
 }
 
 void test_string_to_double()
@@ -220,11 +220,13 @@ void test_name_resolver_table_excel_a1()
         { IXION_ASCII("Table1[[#Data],[#Totals],[Value]]"), 0, 9, 2, s_table1, s_val, empty_string_id, table_area_data | table_area_totals },
         { IXION_ASCII("Table1[#All]"), 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_all },
         { IXION_ASCII("Table1[[#Headers],[#Data]]"), 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_headers | table_area_data },
+        { IXION_ASCII("Table1[[#Totals],[Category]:[Value]]"), 0, 9, 2, s_table1, s_cat, s_val, table_area_totals },
+        { IXION_ASCII("Table1[[#Data],[#Totals],[Category]:[Value]]"), 0, 9, 2, s_table1, s_cat, s_val, table_area_data | table_area_totals },
     };
 
     for (size_t i = 0, n = IXION_N_ELEMENTS(tests); i < n; ++i)
     {
-        cout << "reference: " << tests[i].exp << endl;
+        cout << "* table reference: " << tests[i].exp << endl;
         abs_address_t pos(tests[i].sheet, tests[i].row, tests[i].col);
         formula_name_type res = resolver->resolve(tests[i].exp, tests[i].len, pos);
         if (res.type != formula_name_type::table_reference)
@@ -233,8 +235,10 @@ void test_name_resolver_table_excel_a1()
         formula_name_type::table_type table = res.table;
         string_id_t table_name = cxt.get_string_identifier(table.name, table.name_length);
         string_id_t column_first = cxt.get_string_identifier(table.column_first, table.column_first_length);
+        string_id_t column_last = cxt.get_string_identifier(table.column_last, table.column_last_length);
         assert(table_name == tests[i].table_name);
         assert(column_first == tests[i].column_first);
+        assert(column_last == tests[i].column_last);
         assert(table.areas == tests[i].areas);
     }
 }
