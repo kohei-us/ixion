@@ -166,8 +166,8 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
             return false;
 
         buf.pop_front();
-        if (buf.equals("Header"))
-            ret.table.areas |= table_area_header;
+        if (buf.equals("Headers"))
+            ret.table.areas |= table_area_headers;
         else if (buf.equals("Data"))
             ret.table.areas |= table_area_data;
         else if (buf.equals("Totals"))
