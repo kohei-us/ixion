@@ -217,10 +217,13 @@ void test_name_resolver_table_excel_a1()
         { IXION_ASCII("Table1[[#All],[Category]]"), 0, 9, 2, s_table1, s_cat, table_area_all },
         { IXION_ASCII("Table1[[#Totals],[Category]]"), 0, 9, 2, s_table1, s_cat, table_area_totals },
         { IXION_ASCII("Table1[[#Data],[#Totals],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_data | table_area_totals },
+        { IXION_ASCII("Table1[#All]"), 0, 9, 2, s_table1, empty_string_id, table_area_all },
+        { IXION_ASCII("Table1[[#Headers],[#Data]]"), 0, 9, 2, s_table1, empty_string_id, table_area_headers | table_area_data },
     };
 
     for (size_t i = 0, n = IXION_N_ELEMENTS(tests); i < n; ++i)
     {
+        cout << "reference: " << tests[i].exp << endl;
         abs_address_t pos(tests[i].sheet, tests[i].row, tests[i].col);
         formula_name_type res = resolver->resolve(tests[i].exp, tests[i].len, pos);
         if (res.type != formula_name_type::table_reference)

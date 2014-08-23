@@ -137,43 +137,40 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
     ret.type = formula_name_type::table_reference;
     ret.table.name = table_name.get();
     ret.table.name_length = table_name.size();
+    ret.table.column = NULL;
+    ret.table.column_length = 0;
 
-    if (names.size() == 1)
+    vector<mem_str_buf>::iterator it = names.begin(), it_end = names.end();
+    for (; it != it_end; ++it)
     {
-        // No explicit area type given.  It's a data area.
-        if (names[0].empty())
-            return false;
-
-        ret.table.areas = table_area_data;
-        ret.table.column = names[0].get();
-        ret.table.column_length = names[0].size();
-
-        return true;
-    }
-
-    // Names other than the last one are area specifiers.
-    assert(names.size() > 1);
-
-    vector<mem_str_buf>::reverse_iterator it = names.rbegin(), it_end = names.rend();
-    buf = *it;
-    ret.table.column = buf.get();
-    ret.table.column_length = buf.size();
-    for (++it; it != it_end; ++it)
-    {
-        // Area specifier must start with a '#'.
         buf = *it;
-        if (buf.empty() || buf[0] != '#')
-            return false;
+        assert(!buf.empty());
+        if (buf[0] == '#')
+        {
+            // area specifier.
+            buf.pop_front();
+            if (buf.equals("Headers"))
+                ret.table.areas |= table_area_headers;
+            else if (buf.equals("Data"))
+                ret.table.areas |= table_area_data;
+            else if (buf.equals("Totals"))
+                ret.table.areas |= table_area_totals;
+            else if (buf.equals("All"))
+                ret.table.areas = table_area_all;
+        }
+        else
+        {
+            // column name.
+            if (ret.table.column_length)
+                // This is a second column name, which is not allowed.
+                return false;
 
-        buf.pop_front();
-        if (buf.equals("Headers"))
-            ret.table.areas |= table_area_headers;
-        else if (buf.equals("Data"))
-            ret.table.areas |= table_area_data;
-        else if (buf.equals("Totals"))
-            ret.table.areas |= table_area_totals;
-        else if (buf.equals("All"))
-            ret.table.areas = table_area_all;
+            if (!ret.table.areas)
+                ret.table.areas = table_area_data;
+
+            ret.table.column = buf.get();
+            ret.table.column_length = buf.size();
+        }
     }
 
     return true;
