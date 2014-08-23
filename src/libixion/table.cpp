@@ -11,7 +11,8 @@ namespace ixion {
 
 table_t::table_t() :
     name(empty_string_id),
-    column(empty_string_id),
+    column_first(empty_string_id),
+    column_last(empty_string_id),
     areas(table_area_none) {}
 
 }

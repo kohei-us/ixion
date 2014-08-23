@@ -733,7 +733,7 @@ void formula_interpreter::table_ref()
 
     table_t table = token().get_table_ref();
 
-    if (table.column == empty_string_id)
+    if (table.column_first == empty_string_id)
         // Column name must exist.
         throw formula_error(fe_ref_result_not_available);
 
@@ -743,13 +743,13 @@ void formula_interpreter::table_ref()
     abs_range_t range(abs_range_t::invalid);
     if (table.name != empty_string_id)
     {
-        range = table_hdl->get_range(table.name, table.column);
+        range = table_hdl->get_range(table.name, table.column_first);
     }
     else
     {
         // Table name is not given.  Use the current cell position to infer
         // which table to use.
-        range = table_hdl->get_range(m_pos, table.column);
+        range = table_hdl->get_range(m_pos, table.column_first);
     }
 
     m_stack.push_range_ref(range);

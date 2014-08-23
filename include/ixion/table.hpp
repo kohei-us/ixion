@@ -16,7 +16,8 @@ namespace ixion {
 struct IXION_DLLPUBLIC table_t
 {
     string_id_t name;
-    string_id_t column;
+    string_id_t column_first;
+    string_id_t column_last;
     table_areas_t areas;
 
     table_t();

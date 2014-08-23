@@ -137,8 +137,10 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
     ret.type = formula_name_type::table_reference;
     ret.table.name = table_name.get();
     ret.table.name_length = table_name.size();
-    ret.table.column = NULL;
-    ret.table.column_length = 0;
+    ret.table.column_first = NULL;
+    ret.table.column_first_length = 0;
+    ret.table.column_last = NULL;
+    ret.table.column_last_length = 0;
 
     vector<mem_str_buf>::iterator it = names.begin(), it_end = names.end();
     for (; it != it_end; ++it)
@@ -161,15 +163,15 @@ bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, for
         else
         {
             // column name.
-            if (ret.table.column_length)
+            if (ret.table.column_first_length)
                 // This is a second column name, which is not allowed.
                 return false;
 
             if (!ret.table.areas)
                 ret.table.areas = table_area_data;
 
-            ret.table.column = buf.get();
-            ret.table.column_length = buf.size();
+            ret.table.column_first = buf.get();
+            ret.table.column_first_length = buf.size();
         }
     }
 
@@ -784,7 +786,7 @@ public:
         ostringstream os;
         append_name_string(os, mp_cxt, table.name);
         os << '[';
-        append_name_string(os, mp_cxt, table.column);
+        append_name_string(os, mp_cxt, table.column_first);
         os << ']';
         return os.str();
     }

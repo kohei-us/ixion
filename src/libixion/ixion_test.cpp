@@ -206,19 +206,20 @@ void test_name_resolver_table_excel_a1()
         row_t row;
         col_t col;
         string_id_t table_name;
-        string_id_t column_name;
+        string_id_t column_first;
+        string_id_t column_last;
         table_areas_t areas;
     } tests[] = {
-        { IXION_ASCII("[Value]"), 0, 9, 2, empty_string_id, s_val, table_area_data },
-        { IXION_ASCII("Table1[Category]"), 0, 9, 2, s_table1, s_cat, table_area_data },
-        { IXION_ASCII("Table1[Value]"), 0, 9, 2, s_table1, s_val, table_area_data },
-        { IXION_ASCII("Table1[[#Headers],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_headers },
-        { IXION_ASCII("Table1[[#Headers],[#Data],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_headers | table_area_data },
-        { IXION_ASCII("Table1[[#All],[Category]]"), 0, 9, 2, s_table1, s_cat, table_area_all },
-        { IXION_ASCII("Table1[[#Totals],[Category]]"), 0, 9, 2, s_table1, s_cat, table_area_totals },
-        { IXION_ASCII("Table1[[#Data],[#Totals],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_data | table_area_totals },
-        { IXION_ASCII("Table1[#All]"), 0, 9, 2, s_table1, empty_string_id, table_area_all },
-        { IXION_ASCII("Table1[[#Headers],[#Data]]"), 0, 9, 2, s_table1, empty_string_id, table_area_headers | table_area_data },
+        { IXION_ASCII("[Value]"), 0, 9, 2, empty_string_id, s_val, empty_string_id, table_area_data },
+        { IXION_ASCII("Table1[Category]"), 0, 9, 2, s_table1, s_cat, empty_string_id, table_area_data },
+        { IXION_ASCII("Table1[Value]"), 0, 9, 2, s_table1, s_val, empty_string_id, table_area_data },
+        { IXION_ASCII("Table1[[#Headers],[Value]]"), 0, 9, 2, s_table1, s_val, empty_string_id, table_area_headers },
+        { IXION_ASCII("Table1[[#Headers],[#Data],[Value]]"), 0, 9, 2, s_table1, s_val, empty_string_id, table_area_headers | table_area_data },
+        { IXION_ASCII("Table1[[#All],[Category]]"), 0, 9, 2, s_table1, s_cat, empty_string_id, table_area_all },
+        { IXION_ASCII("Table1[[#Totals],[Category]]"), 0, 9, 2, s_table1, s_cat, empty_string_id, table_area_totals },
+        { IXION_ASCII("Table1[[#Data],[#Totals],[Value]]"), 0, 9, 2, s_table1, s_val, empty_string_id, table_area_data | table_area_totals },
+        { IXION_ASCII("Table1[#All]"), 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_all },
+        { IXION_ASCII("Table1[[#Headers],[#Data]]"), 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_headers | table_area_data },
     };
 
     for (size_t i = 0, n = IXION_N_ELEMENTS(tests); i < n; ++i)
@@ -231,9 +232,9 @@ void test_name_resolver_table_excel_a1()
 
         formula_name_type::table_type table = res.table;
         string_id_t table_name = cxt.get_string_identifier(table.name, table.name_length);
-        string_id_t column_name = cxt.get_string_identifier(table.column, table.column_length);
+        string_id_t column_first = cxt.get_string_identifier(table.column_first, table.column_first_length);
         assert(table_name == tests[i].table_name);
-        assert(column_name == tests[i].column_name);
+        assert(column_first == tests[i].column_first);
         assert(table.areas == tests[i].areas);
     }
 }
