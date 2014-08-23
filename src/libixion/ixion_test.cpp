@@ -213,6 +213,10 @@ void test_name_resolver_table_excel_a1()
         { IXION_ASCII("Table1[Category]"), 0, 9, 2, s_table1, s_cat, table_area_data },
         { IXION_ASCII("Table1[Value]"), 0, 9, 2, s_table1, s_val, table_area_data },
         { IXION_ASCII("Table1[[#Header],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_header },
+        { IXION_ASCII("Table1[[#Header],[#Data],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_header | table_area_data },
+        { IXION_ASCII("Table1[[#All],[Category]]"), 0, 9, 2, s_table1, s_cat, table_area_all },
+        { IXION_ASCII("Table1[[#Totals],[Category]]"), 0, 9, 2, s_table1, s_cat, table_area_totals },
+        { IXION_ASCII("Table1[[#Data],[#Totals],[Value]]"), 0, 9, 2, s_table1, s_val, table_area_data | table_area_totals },
     };
 
     for (size_t i = 0, n = IXION_N_ELEMENTS(tests); i < n; ++i)
