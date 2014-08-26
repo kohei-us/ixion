@@ -743,13 +743,13 @@ void formula_interpreter::table_ref()
     abs_range_t range(abs_range_t::invalid);
     if (table.name != empty_string_id)
     {
-        range = table_hdl->get_range(table.name, table.column_first);
+        range = table_hdl->get_range(table.name, table.column_first, table.column_last, table.areas);
     }
     else
     {
         // Table name is not given.  Use the current cell position to infer
         // which table to use.
-        range = table_hdl->get_range(m_pos, table.column_first);
+        range = table_hdl->get_range(m_pos, table.column_first, table.column_last, table.areas);
     }
 
     m_stack.push_range_ref(range);

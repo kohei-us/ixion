@@ -14,7 +14,9 @@ table_handler::entry::entry() :
 
 table_handler::~table_handler() {}
 
-abs_range_t table_handler::get_range(const abs_address_t& pos, string_id_t column) const
+abs_range_t table_handler::get_range(
+    const abs_address_t& pos, string_id_t column_first, string_id_t column_last,
+    table_areas_t areas) const
 {
     entries_type::const_iterator it = m_entries.begin(), it_end = m_entries.end();
     for (; it != it_end; ++it)
@@ -23,13 +25,15 @@ abs_range_t table_handler::get_range(const abs_address_t& pos, string_id_t colum
         if (!e.range.contains(pos))
             continue;
 
-        return get_column_range(e, column);
+        return get_column_range(e, column_first);
     }
 
     return abs_range_t(abs_range_t::invalid);
 }
 
-abs_range_t table_handler::get_range(string_id_t table, string_id_t column) const
+abs_range_t table_handler::get_range(
+    string_id_t table, string_id_t column_first, string_id_t column_last,
+    table_areas_t areas) const
 {
     entries_type::const_iterator it = m_entries.find(table);
     if (it == m_entries.end())
@@ -37,7 +41,7 @@ abs_range_t table_handler::get_range(string_id_t table, string_id_t column) cons
         return abs_range_t(abs_range_t::invalid);
 
     const entry& e = *it->second;
-    return get_column_range(e, column);
+    return get_column_range(e, column_first);
 }
 
 void table_handler::insert(entry* p)

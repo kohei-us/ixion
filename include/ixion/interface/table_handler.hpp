@@ -28,21 +28,33 @@ public:
      * position is used to infer which table to use.
      *
      * @param pos current cell position.
-     * @param column column name within the table.
+     * @param column_first name of the starting column within the table.
+     * @param column_last name of the ending column within the table, or
+     *                    {@link empty_string_id} if it's a single column.
+     * @param areas area specifiter value, which may consist of one or more
+     *              values of {@link table_area_t}.
      *
-     * @return data range associated with the column name.
+     * @return referenced data range.
      */
-    virtual abs_range_t get_range(const abs_address_t& pos, string_id_t column) const = 0;
+    virtual abs_range_t get_range(
+        const abs_address_t& pos, string_id_t column_first, string_id_t column_last,
+        table_areas_t areas) const = 0;
 
     /**
      * Get the data range associated with given table and column names.
      *
      * @param table string identifier representing the table name.
-     * @param column string identifier representing the column name.
+     * @param column_first name of the starting column within the table.
+     * @param column_last name of the ending column within the table, or
+     *                    {@link empty_string_id} if it's a single column.
+     * @param areas area specifiter value, which may consist of one or more
+     *              values of {@link table_area_t}.
      *
-     * @return data range associated with the table and column names.
+     * @return referenced data range.
      */
-    virtual abs_range_t get_range(string_id_t table, string_id_t column) const = 0;
+    virtual abs_range_t get_range(
+        string_id_t table, string_id_t column_first, string_id_t column_last,
+        table_areas_t areas) const = 0;
 };
 
 }}

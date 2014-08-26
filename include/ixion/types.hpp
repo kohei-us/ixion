@@ -22,6 +22,7 @@ typedef unsigned long string_id_t;
 IXION_DLLPUBLIC_VAR const sheet_t global_scope;
 IXION_DLLPUBLIC_VAR const sheet_t invalid_sheet;
 
+/** Global string ID representing an empty string. */
 IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 
 enum celltype_t
@@ -33,6 +34,7 @@ enum celltype_t
     celltype_empty
 };
 
+/** Value that specifies the area inside a table. */
 enum table_area_t
 {
     table_area_none    = 0x00,
