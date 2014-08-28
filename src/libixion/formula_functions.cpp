@@ -42,6 +42,7 @@ const builtin_func builtin_funcs[] = {
     { "AVERAGE", func_average },
     { "WAIT", func_wait },
     { "SUM", func_sum },
+    { "COUNTA", func_counta },
     { "IF", func_if },
     { "LEN", func_len },
     { "CONCATENATE", func_concatenate },
@@ -160,6 +161,9 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
         case func_sum:
             fnc_sum(args);
             break;
+        case func_counta:
+            fnc_counta(args);
+            break;
         case func_if:
             fnc_if(args);
             break;
@@ -240,6 +244,44 @@ void formula_functions::fnc_sum(value_stack_t& args) const
 #if DEBUG_FORMULA_FUNCTIONS
     __IXION_DEBUG_OUT__ << "function: sum end (result=" << ret << ")" << endl;
 #endif
+}
+
+void formula_functions::fnc_counta(value_stack_t& args) const
+{
+    if (args.empty())
+        throw formula_functions::invalid_arg("COUNTA requires one or more arguments.");
+
+    double ret = 0;
+    while (!args.empty())
+    {
+        switch (args.get_type())
+        {
+            case sv_string:
+            case sv_value:
+                args.pop_value();
+                ++ret;
+            break;
+            case sv_range_ref:
+            {
+                abs_range_t range = args.pop_range_ref();
+                ret += m_context.count_range(range, value_numeric | value_string);
+            }
+            break;
+            case sv_single_ref:
+            {
+                abs_address_t pos = args.pop_single_ref();
+                abs_range_t range;
+                range.first = range.last = pos;
+                ret += m_context.count_range(range, value_numeric | value_string);
+            }
+            break;
+            default:
+                args.pop_value();
+        }
+
+    }
+
+    args.push_value(ret);
 }
 
 void formula_functions::fnc_average(value_stack_t& args) const

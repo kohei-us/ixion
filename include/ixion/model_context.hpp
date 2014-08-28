@@ -66,6 +66,7 @@ public:
 
     virtual const formula_cell* get_named_expression(const ::std::string& name) const;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
+    virtual double count_range(const abs_range_t& range, const values_t& values_type) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
     virtual iface::session_handler* get_session_handler();
     virtual iface::table_handler* get_table_handler();

@@ -1,0 +1,36 @@
+%% Test for COUNTA function.
+%mode init
+A1:1
+A2:2
+A3:3
+B1@A
+B2@B
+B3@C
+C1=COUNTA(A1:B6)
+%calc
+%mode result
+C1=6
+%check
+%mode edit
+A2@Two
+A4@Four
+%recalc
+%mode result
+C1=7
+%check
+%mode edit
+B6:10
+B7:11
+%recalc
+%mode result
+C1=8
+%check
+%mode edit
+A6=18+3
+A7=2/3
+%recalc
+%mode result
+A6=21
+C1=9
+%check
+

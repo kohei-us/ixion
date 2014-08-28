@@ -21,6 +21,7 @@ enum formula_function_t
     func_min,
     func_average,
     func_sum,
+    func_counta,
 
     // logical functions
     func_if,

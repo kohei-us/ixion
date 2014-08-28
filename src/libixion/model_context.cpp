@@ -252,6 +252,8 @@ public:
     abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
 
+    double count_range(const abs_range_t& range, const values_t& values_type) const;
+
 private:
     model_context& m_parent;
 
@@ -528,6 +530,115 @@ abs_range_t model_context_impl::get_shared_formula_range(sheet_t sheet, size_t i
 void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
 {
     m_shared_tokens.at(identifier).range = range;
+}
+
+namespace {
+
+double count_formula_block(
+    const column_store_t::const_iterator& itb, size_t offset, size_t len, const values_t& vt)
+{
+    double ret = 0.0;
+
+    // Inspect each formula cell individually.
+    formula_cell** pp = &formula_element_block::at(*itb->data, offset);
+    formula_cell** pp_end = pp + len;
+    for (; pp != pp_end; ++pp)
+    {
+        const formula_cell& fc = **pp;
+        const formula_result* res = fc.get_result_cache();
+        if (!res)
+            continue;
+
+        switch (res->get_type())
+        {
+            case formula_result::rt_value:
+                if (vt.is_numeric())
+                    ++ret;
+            break;
+            case formula_result::rt_string:
+                if (vt.is_string())
+                    ++ret;
+            case formula_result::rt_error:
+                // TODO : how do we handle error formula cells?
+            break;
+        }
+    }
+
+    return ret;
+}
+
+}
+
+double model_context_impl::count_range(const abs_range_t& range, const values_t& values_type) const
+{
+    if (m_sheets.empty())
+        return 0.0;
+
+    double ret = 0.0;
+    sheet_t last_sheet = range.last.sheet;
+    if (last_sheet >= m_sheets.size())
+        last_sheet = m_sheets.size() - 1;
+
+    for (sheet_t sheet = range.first.sheet; sheet <= last_sheet; ++sheet)
+    {
+        const worksheet& ws = m_sheets.at(sheet);
+        for (col_t col = range.first.column; col <= range.last.column; ++col)
+        {
+            const column_store_t& cs = ws.at(col);
+            row_t cur_row = range.first.row;
+            column_store_t::const_position_type pos = cs.position(cur_row);
+            column_store_t::const_iterator itb = pos.first; // block iterator
+            column_store_t::const_iterator itb_end = cs.end();
+            size_t offset = pos.second;
+            if (itb == itb_end)
+                continue;
+
+            bool cont = true;
+            while (cont)
+            {
+                // remaining length of current block.
+                size_t len = itb->size - offset;
+                row_t last_row = cur_row + len - 1;
+
+                if (last_row >= range.last.row)
+                {
+                    last_row = range.last.row;
+                    len = last_row - cur_row + 1;
+                    cont = false;
+                }
+
+                bool match = false;
+
+                switch (itb->type)
+                {
+                    case element_type_numeric:
+                        match = values_type.is_numeric();
+                    break;
+                    case element_type_string:
+                        match = values_type.is_string();
+                    break;
+                    case element_type_empty:
+                        match = values_type.is_empty();
+                    break;
+                    case element_type_formula:
+                        ret += count_formula_block(itb, offset, len, values_type);
+                    break;
+                }
+
+                if (match)
+                    ret += len;
+
+                // Move to the next block.
+                cur_row = last_row + 1;
+                ++itb;
+                offset = 0;
+                if (itb == itb_end)
+                    cont = false;
+            }
+        }
+    }
+
+    return ret;
 }
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
@@ -890,6 +1001,11 @@ const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) c
 formula_cell* model_context::get_formula_cell(const abs_address_t& addr)
 {
     return mp_impl->get_formula_cell(addr);
+}
+
+double model_context::count_range(const abs_range_t& range, const values_t& values_type) const
+{
+    return mp_impl->count_range(range, values_type);
 }
 
 matrix model_context::get_range_value(const abs_range_t& range) const

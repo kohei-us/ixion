@@ -34,6 +34,25 @@ enum celltype_t
     celltype_empty
 };
 
+enum value_t
+{
+    value_none    = 0x00,
+    value_string  = 0x01,
+    value_numeric = 0x02,
+    value_empty   = 0x04
+};
+
+/** type that stores a mixture of {@link value_t} values. */
+class values_t
+{
+    int m_val;
+public:
+    values_t(int val) : m_val(val) {}
+    bool is_numeric() const { return (m_val & value_numeric) == value_numeric; }
+    bool is_string() const { return (m_val & value_string) == value_string; }
+    bool is_empty() const { return (m_val & value_empty) == value_empty; }
+};
+
 /** Value that specifies the area inside a table. */
 enum table_area_t
 {

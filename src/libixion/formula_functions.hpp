@@ -53,6 +53,7 @@ private:
     void fnc_max(value_stack_t& args) const;
     void fnc_min(value_stack_t& args) const;
     void fnc_sum(value_stack_t& args) const;
+    void fnc_counta(value_stack_t& args) const;
     void fnc_average(value_stack_t& args) const;
 
     void fnc_if(value_stack_t& args) const;

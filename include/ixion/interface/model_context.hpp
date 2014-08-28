@@ -62,6 +62,8 @@ public:
     virtual const formula_cell* get_named_expression(const ::std::string& name) const = 0;
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const = 0;
 
+    virtual double count_range(const abs_range_t& range, const values_t& values_type) const = 0;
+
     /**
      * Obtain range value in matrix form.  Multi-sheet ranges are not
      * supported.  If the specified range consists of multiple sheets, it

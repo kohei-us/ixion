@@ -58,7 +58,8 @@ public:
 
     void push_back(size_t row_size, size_t col_size);
 
-    size_t size() const { return m_sheets.size(); }
+    size_t size() const;
+    bool empty() const;
 
 private:
     std::vector<worksheet*> m_sheets;

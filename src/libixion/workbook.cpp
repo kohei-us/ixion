@@ -47,5 +47,15 @@ void workbook::push_back(size_t row_size, size_t col_size)
     m_sheets.push_back(new worksheet(row_size, col_size));
 }
 
+size_t workbook::size() const
+{
+    return m_sheets.size();
+}
+
+bool workbook::empty() const
+{
+    return m_sheets.empty();
+}
+
 }
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
