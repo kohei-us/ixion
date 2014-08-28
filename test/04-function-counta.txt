@@ -33,4 +33,11 @@ A7=2/3
 A6=21
 C1=9
 %check
+%mode edit
+C2=COUNTA(A3:B3)
+%recalc
+%mode result
+C1=9
+C2=2
+%check
 
