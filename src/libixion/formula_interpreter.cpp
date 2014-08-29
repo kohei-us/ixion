@@ -733,10 +733,6 @@ void formula_interpreter::table_ref()
 
     table_t table = token().get_table_ref();
 
-    if (table.column_first == empty_string_id)
-        // Column name must exist.
-        throw formula_error(fe_ref_result_not_available);
-
     if (mp_handler)
         mp_handler->push_table_ref(table);
 

@@ -307,6 +307,44 @@ void append_name_string(ostringstream& os, const iface::model_context* cxt, stri
         os << *p;
 }
 
+char append_table_areas(ostringstream& os, const table_t& table)
+{
+    if (table.areas == table_area_all)
+    {
+        os << "[#All]";
+        return 1;
+    }
+
+    bool headers = (table.areas & table_area_headers);
+    bool data = (table.areas & table_area_data);
+    bool totals = (table.areas & table_area_totals);
+
+    char count = 0;
+    if (headers)
+    {
+        os << "[#Headers]";
+        ++count;
+    }
+
+    if (data)
+    {
+        if (count > 0)
+            os << ',';
+        os << "[#Data]";
+        ++count;
+    }
+
+    if (totals)
+    {
+        if (count > 0)
+            os << ',';
+        os << "[#Totals]";
+        ++count;
+    }
+
+    return count;
+}
+
 enum parse_address_result
 {
     invalid = 0,
@@ -811,9 +849,74 @@ public:
     {
         ostringstream os;
         append_name_string(os, mp_cxt, table.name);
-        os << '[';
-        append_name_string(os, mp_cxt, table.column_first);
-        os << ']';
+
+        if (table.column_first == empty_string_id)
+        {
+            // Area specifier(s) only.
+            bool headers = (table.areas & table_area_headers);
+            bool data = (table.areas & table_area_data);
+            bool totals = (table.areas & table_area_totals);
+
+            short count = 0;
+            if (headers)
+                ++count;
+            if (data)
+                ++count;
+            if (totals)
+                ++count;
+
+            bool multiple = count == 2;
+            if (multiple)
+                os << '[';
+
+            append_table_areas(os, table);
+
+            if (multiple)
+                os << ']';
+        }
+        else if (table.column_last == empty_string_id)
+        {
+            // single column.
+            os << '[';
+
+            bool multiple = false;
+            if (table.areas && table.areas != table_area_data)
+            {
+                if (append_table_areas(os, table))
+                {
+                    os << ',';
+                    multiple = true;
+                }
+            }
+
+            if (multiple)
+                os << '[';
+
+            append_name_string(os, mp_cxt, table.column_first);
+
+            if (multiple)
+                os << ']';
+
+            os << ']';
+        }
+        else
+        {
+            // column range.
+            os << '[';
+
+            if (table.areas && table.areas != table_area_data)
+            {
+                if (append_table_areas(os, table))
+                    os << ',';
+            }
+
+            os << '[';
+            append_name_string(os, mp_cxt, table.column_first);
+            os << "]:[";
+            append_name_string(os, mp_cxt, table.column_last);
+            os << "]]";
+        }
+
         return os.str();
     }
 

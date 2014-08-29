@@ -243,6 +243,18 @@ void test_name_resolver_table_excel_a1()
         assert(column_first == tests[i].column_first);
         assert(column_last == tests[i].column_last);
         assert(table.areas == tests[i].areas);
+
+        // Make sure we get the same name back.
+        table_t tb;
+        tb.name = table_name;
+        tb.column_first = column_first;
+        tb.column_last = column_last;
+        tb.areas = table.areas;
+        string original(tests[i].exp, tests[i].len);
+        string returned = resolver->get_name(tb);
+        cout << "  original: " << original << endl;
+        cout << "  returned: " << returned << endl;
+        assert(original == returned);
     }
 }
 
