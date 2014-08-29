@@ -25,7 +25,7 @@ abs_range_t table_handler::get_range(
         if (!e.range.contains(pos))
             continue;
 
-        return get_column_range(e, column_first);
+        return get_column_range(e, column_first, column_last, areas);
     }
 
     return abs_range_t(abs_range_t::invalid);
@@ -41,7 +41,7 @@ abs_range_t table_handler::get_range(
         return abs_range_t(abs_range_t::invalid);
 
     const entry& e = *it->second;
-    return get_column_range(e, column_first);
+    return get_column_range(e, column_first, column_last, areas);
 }
 
 void table_handler::insert(entry* p)
@@ -54,11 +54,66 @@ void table_handler::insert(entry* p)
     m_entries.insert(name, px.release());
 }
 
-abs_range_t table_handler::get_column_range(const entry& e, string_id_t column) const
+abs_range_t table_handler::get_column_range(
+    const entry& e, string_id_t column_first, string_id_t column_last, table_areas_t areas) const
 {
+    if (column_first == empty_string_id)
+    {
+        // Area specifiers only.
+        bool headers = (areas & table_area_headers);
+        bool data = (areas & table_area_data);
+        bool totals = (areas & table_area_totals);
+
+        if (headers)
+        {
+            if (data)
+            {
+                if (totals)
+                {
+                    // All areas.
+                    return e.range;
+                }
+
+                // Headers + data areas
+                abs_range_t ret = e.range;
+                ret.last.row -= e.totals_row_count;
+                return ret;
+            }
+
+            // Headers only.
+            abs_range_t ret = e.range;
+            ret.last.row = ret.first.row;
+            return ret;
+        }
+
+        abs_range_t ret = e.range;
+        --ret.first.row;
+
+        if (data)
+        {
+            if (totals)
+            {
+                // Data + totals areas
+                return ret;
+            }
+
+            // Data area only.
+            ret.last.row -= e.totals_row_count;
+            return ret;
+        }
+
+        // Totals area only.
+        if (e.totals_row_count <= 0)
+            return abs_range_t(abs_range_t::invalid);
+
+        ret.first.row = ret.last.row;
+        ret.first.row -= e.totals_row_count - 1;
+        return ret;
+    }
+
     for (size_t i = 0, n = e.columns.size(); i < n; ++i)
     {
-        if (e.columns[i] == column)
+        if (e.columns[i] == column_first)
         {
             // Matching column name found.
             abs_range_t ret = e.range;

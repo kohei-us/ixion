@@ -44,7 +44,9 @@ public:
     void insert(entry* p);
 
 private:
-    abs_range_t get_column_range(const entry& e, string_id_t column) const;
+    abs_range_t get_column_range(
+        const entry& e, string_id_t column_first, string_id_t column_last,
+        table_areas_t areas) const;
 
     entries_type m_entries;
 };
