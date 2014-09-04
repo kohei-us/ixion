@@ -386,10 +386,17 @@ void test_parse_and_print_expressions()
         "AB:AD",
         "2:2",
         "3:5",
-        "34:36"
+        "34:36",
+        "Table1[Category]",
+        "Table1[Value]",
+        "Table1[#Headers]",
+//      "Table1[[#Headers],[Category]:[Value]]"
     };
     size_t num_exps = sizeof(exps) / sizeof(exps[0]);
     model_context cxt;
+    cxt.append_string(IXION_ASCII("Table1"));
+    cxt.append_string(IXION_ASCII("Category"));
+    cxt.append_string(IXION_ASCII("Value"));
     boost::scoped_ptr<formula_name_resolver> resolver(
         formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt));
     assert(resolver);

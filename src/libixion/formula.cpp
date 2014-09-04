@@ -109,6 +109,12 @@ public:
                 m_os << m_resolver.get_name(range, m_pos, false);
             }
             break;
+            case fop_table_ref:
+            {
+                table_t tbl = token.get_table_ref();
+                m_os << m_resolver.get_name(tbl);
+            }
+            break;
             case fop_string:
             {
                 const std::string* p = m_cxt.get_string(token.get_index());
