@@ -34,7 +34,8 @@ public:
         m_size(n),
         m_pos(0),
         mp_char_stored(NULL),
-        m_pos_stored(0)
+        m_pos_stored(0),
+        m_scope(0)
     {
     }
 
@@ -72,6 +73,7 @@ private:
 
     const char* mp_char_stored;
     size_t m_pos_stored;
+    size_t m_scope;
 };
 
 void tokenizer::init()
@@ -165,7 +167,7 @@ bool tokenizer::is_decimal_sep(char c) const
 
 bool tokenizer::is_op(char c) const
 {
-    if (is_arg_sep(c))
+    if (m_scope == 0 && is_arg_sep(c))
         return true;
 
     switch (*mp_char)
@@ -229,11 +231,35 @@ void tokenizer::space()
 
 void tokenizer::name()
 {
+    assert(m_scope == 0);
+
     const char* p = mp_char;
+    char c = *mp_char;
+    if (c == '[')
+        ++m_scope;
+    else if (c == ']')
+    {
+        m_tokens.push_back(new lexer_name_token(p, 1));
+        next();
+        return;
+    }
+
     size_t len = 1;
     for (next(); has_char(); next(), ++len)
     {
-        if (is_op(*mp_char))
+        c = *mp_char;
+        if (c == '[')
+        {
+            ++m_scope;
+        }
+        else if (c == ']')
+        {
+            if (!m_scope)
+                break;
+
+            --m_scope;
+        }
+        else if (is_op(c))
             break;
     }
 

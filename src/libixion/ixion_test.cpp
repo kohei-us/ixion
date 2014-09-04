@@ -390,7 +390,8 @@ void test_parse_and_print_expressions()
         "Table1[Category]",
         "Table1[Value]",
         "Table1[#Headers]",
-//      "Table1[[#Headers],[Category]:[Value]]"
+        "Table1[[#Headers],[Category]:[Value]]",
+        "Table1[[#Headers],[#Data],[Category]:[Value]]",
     };
     size_t num_exps = sizeof(exps) / sizeof(exps[0]);
     model_context cxt;
