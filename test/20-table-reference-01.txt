@@ -17,6 +17,8 @@ D8:5
 D9=SUBTOTAL(109,[Value])
 E1=SUM(Table1[Value])
 E2=COUNTA(Table1[#Headers])
+E3=COUNTA(Table1[[#Headers],[Category]])
+E4=COUNTA(Table1[[#Headers],[#Data],[Category]])
 %mode table
 name=Table1
 range=C3:D9
@@ -28,5 +30,7 @@ totals-row-count=1
 D9=15
 E1=15
 E2=2
+E3=1
+E4=6
 %check
 
