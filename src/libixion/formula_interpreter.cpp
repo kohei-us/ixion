@@ -729,7 +729,12 @@ void formula_interpreter::table_ref()
 {
     const iface::table_handler* table_hdl = m_context.get_table_handler();
     if (!table_hdl)
+    {
+#if DEBUG_FORMULA_INTERPRETER
+        __IXION_DEBUG_OUT__ << "formula_interpreter::table_ref: failed to get a table_handler instance." << endl;
+#endif
         throw formula_error(fe_ref_result_not_available);
+    }
 
     table_t table = token().get_table_ref();
 
