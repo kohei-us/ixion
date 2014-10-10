@@ -43,6 +43,7 @@ libixion_@IXION_API_VERSION@_la_LIBADD = $(BOOST_THREAD_LIBS)
 EXTRA_DIST = makefile.mk
 
 ixion_test_SOURCES = ixion_test.cpp
-ixion_test_LDADD = libixion-@IXION_API_VERSION@.la
+ixion_test_LDADD = libixion-@IXION_API_VERSION@.la \
+					 $(BOOST_THREAD_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
 TESTS = ixion-test

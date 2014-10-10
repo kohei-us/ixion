@@ -24,4 +24,4 @@ ixion_sorter_SOURCES = \
 ixion_sorter_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
 					 $(BOOST_THREAD_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
-TESTS = $(top_srcdir)/test/ixion-parser-test.sh
+TESTS = ../test/ixion-parser-test.sh
