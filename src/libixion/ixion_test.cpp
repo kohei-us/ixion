@@ -469,7 +469,7 @@ void test_model_context_storage()
         cxt.set_session_handler(NULL);
 
         // Test storage of numeric values.
-        double val = 0.1;
+        volatile double val = 0.1;
         for (col_t col = 0; col < 3; ++col)
         {
             for (row_t row = 0; row < 3; ++row)
