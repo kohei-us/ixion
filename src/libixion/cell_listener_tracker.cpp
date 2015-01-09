@@ -26,7 +26,7 @@ namespace ixion {
 
 namespace {
 
-typedef mdds::rectangle_set<row_t, cell_listener_tracker::address_set_type> range_query_set_type;
+typedef mdds::rectangle_set<row_t, cell_listener_tracker::address_set_type*> range_query_set_type;
 typedef _ixion_unordered_map_type<abs_address_t, cell_listener_tracker::address_set_type*, abs_address_t::hash> cell_store_type;
 typedef _ixion_unordered_map_type<abs_range_t, cell_listener_tracker::address_set_type*, abs_range_t::hash> range_store_type;
 
