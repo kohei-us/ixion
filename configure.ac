@@ -15,6 +15,7 @@ AC_PREREQ([2.63])
 AC_INIT([libixion], [ixion_version])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
+AM_PATH_PYTHON(2.7.0)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_ARG_WITH(hash-container-compat,
@@ -74,6 +75,9 @@ fi
 # Check for mdds.
 PKG_CHECK_MODULES([MDDS],[mdds >= 0.9.0])
 
+# Check for python.
+PKG_CHECK_MODULES([PYTHON], [python >= 0.27.1])
+
 CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
 
 BOOST_THREADS
@@ -87,5 +91,6 @@ AC_CONFIG_FILES([Makefile
                  include/ixion/interface/Makefile
                  misc/libixion.spec
                  src/Makefile
-                 src/libixion/Makefile])
+                 src/libixion/Makefile
+                 src/python/Makefile])
 AC_OUTPUT
