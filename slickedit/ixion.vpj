@@ -252,6 +252,7 @@
 				<F N="../include/ixion/formula_tokens.hpp"/>
 				<F N="../include/ixion/formula_tokens_fwd.hpp"/>
 				<F N="../include/ixion/global.hpp"/>
+				<F N="../include/ixion/info.hpp"/>
 				<F N="../include/ixion/lexer_tokens.hpp"/>
 				<F N="../include/ixion/macros.hpp"/>
 				<F N="../include/ixion/matrix.hpp"/>
@@ -288,6 +289,7 @@
 				<F N="../src/libixion/function_objects.cpp"/>
 				<F N="../src/libixion/function_objects.hpp"/>
 				<F N="../src/libixion/global.cpp"/>
+				<F N="../src/libixion/info.cpp"/>
 				<F N="../src/libixion/interface.cpp"/>
 				<F N="../src/libixion/ixion_test.cpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>

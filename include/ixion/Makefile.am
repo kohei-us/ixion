@@ -21,6 +21,7 @@ libixion_HEADERS = \
 	formula_tokens_fwd.hpp \
 	formula_tokens.hpp \
 	global.hpp \
+	info.hpp \
 	lexer_tokens.hpp \
 	macros.hpp \
 	matrix.hpp \

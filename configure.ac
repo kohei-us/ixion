@@ -29,7 +29,13 @@ AC_ARG_WITH(mdds-include-path,
 ,)
 
 IXION_API_VERSION=ixion_api_version
+IXION_MAJOR_VERSION=ixion_major_version
+IXION_MINOR_VERSION=ixion_minor_version
+IXION_MICRO_VERSION=ixion_micro_version
 AC_SUBST(IXION_API_VERSION)
+AC_SUBST(IXION_MAJOR_VERSION)
+AC_SUBST(IXION_MINOR_VERSION)
+AC_SUBST(IXION_MICRO_VERSION)
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -92,5 +98,6 @@ AC_CONFIG_FILES([Makefile
                  misc/libixion.spec
                  src/Makefile
                  src/libixion/Makefile
+                 src/libixion/constants.inl
                  src/python/Makefile])
 AC_OUTPUT

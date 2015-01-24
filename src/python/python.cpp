@@ -8,6 +8,7 @@
 #include <Python.h>
 
 #include "ixion/env.hpp"
+#include "ixion/info.hpp"
 
 #include <iostream>
 
@@ -17,7 +18,10 @@ namespace {
 
 PyObject* py_ixion_info(PyObject*, PyObject*)
 {
-    cout << "ixion version: unknown" << endl;
+    cout << "ixion version: "
+        << ixion::get_version_major() << '.'
+        << ixion::get_version_minor() << '.'
+        << ixion::get_version_micro() << endl;
     return Py_None;
 }
 
