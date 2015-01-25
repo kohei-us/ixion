@@ -302,6 +302,8 @@
 				<F N="../src/libixion/workbook.hpp"/>
 			</Folder>
 			<Folder Name="python">
+				<F N="../src/python/document.cpp"/>
+				<F N="../src/python/document.hpp"/>
 				<F N="../src/python/python.cpp"/>
 			</Folder>
 			<F
