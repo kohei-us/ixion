@@ -305,6 +305,8 @@
 				<F N="../src/python/document.cpp"/>
 				<F N="../src/python/document.hpp"/>
 				<F N="../src/python/python.cpp"/>
+				<F N="../src/python/sheet.cpp"/>
+				<F N="../src/python/sheet.hpp"/>
 			</Folder>
 			<F
 				N="../src/Makefile.am"

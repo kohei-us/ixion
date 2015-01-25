@@ -6,6 +6,7 @@
  */
 
 #include "document.hpp"
+#include "sheet.hpp"
 
 #include "ixion/env.hpp"
 #include "ixion/info.hpp"
@@ -63,10 +64,17 @@ initixion()
     if (PyType_Ready(doc_type) < 0)
         return;
 
+    PyTypeObject* sheet_type = ixion::python::get_sheet_type();
+    if (PyType_Ready(sheet_type) < 0)
+        return;
+
     PyObject* m = Py_InitModule("ixion", ixion::python::ixion_methods);
 
     Py_INCREF(doc_type);
     PyModule_AddObject(m, "Document", reinterpret_cast<PyObject*>(doc_type));
+
+    Py_INCREF(sheet_type);
+    PyModule_AddObject(m, "Sheet", reinterpret_cast<PyObject*>(sheet_type));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -25,3 +25,8 @@ class MyDoc(ixion.Document):
 doc = MyDoc()
 print(doc)
 
+class MySheet(ixion.Sheet):
+    pass
+
+sheet = MySheet()
+print(sheet)
