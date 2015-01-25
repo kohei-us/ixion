@@ -6,6 +6,7 @@
  */
 
 #include "document.hpp"
+#include "sheet.hpp"
 
 #include <iostream>
 
@@ -48,7 +49,11 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     assert(sheet_name);
     cout << "sheet name: " << sheet_name << endl;
 
-    return Py_None;
+    PyTypeObject* sheet_type = get_sheet_type();
+    if (!sheet_type)
+        return Py_None;
+
+    return sheet_type->tp_new(sheet_type, NULL, NULL);
 }
 
 PyMethodDef document_methods[] =
