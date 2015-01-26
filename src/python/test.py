@@ -10,8 +10,10 @@ doc = ixion.Document()
 print(doc)
 sheet1 = doc.append_sheet("Sheet1")
 print(sheet1)
+print("sheet name: {}".format(sheet1.name))
 sheet2 = doc.append_sheet("Sheet2")
 print(sheet2)
+print("sheet name: {}".format(sheet2.name))
 
 #sheet1.set_numeric_cell(row=1, column=8, value=10.2)
 #sheet1.set_formula_cell(row=2, column=8, value="A1+A2")
@@ -28,5 +30,6 @@ print(doc)
 class MySheet(ixion.Sheet):
     pass
 
-sheet = MySheet()
+sheet = MySheet("my sheet")
 print(sheet)
+print(sheet.name)

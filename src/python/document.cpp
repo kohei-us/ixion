@@ -47,13 +47,19 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     }
 
     assert(sheet_name);
-    cout << "sheet name: " << sheet_name << endl;
 
     PyTypeObject* sheet_type = get_sheet_type();
     if (!sheet_type)
         return Py_None;
 
-    return sheet_type->tp_new(sheet_type, NULL, NULL);
+    PyObject* obj_sheet = sheet_type->tp_new(sheet_type, args, kwargs);
+    if (!obj_sheet)
+        return Py_None;
+
+    if (sheet_type->tp_init(obj_sheet, args, kwargs) < 0)
+        return Py_None;
+
+    return obj_sheet;
 }
 
 PyMethodDef document_methods[] =

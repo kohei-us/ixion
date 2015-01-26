@@ -6,6 +6,7 @@
  */
 
 #include "sheet.hpp"
+#include <structmember.h>
 
 namespace ixion { namespace python {
 
@@ -14,26 +15,56 @@ namespace {
 struct sheet
 {
     PyObject_HEAD
+    PyObject* name; // sheet name
 };
 
 void sheet_dealloc(sheet* self)
 {
+    Py_XDECREF(self->name);
     self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
 PyObject* sheet_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/)
 {
     sheet* self = (sheet*)type->tp_alloc(type, 0);
+    if (!self)
+        return NULL;
+
+    self->name = PyString_FromString("");
+    if (!self->name)
+    {
+        Py_DECREF(self);
+        return NULL;
+    }
     return reinterpret_cast<PyObject*>(self);
 }
 
-int sheet_init(sheet* self, PyObject* /*args*/, PyObject* /*kwargs*/)
+int sheet_init(sheet* self, PyObject* args, PyObject* kwargs)
 {
+    PyObject* name = NULL;
+    static const char* kwlist[] = { "name", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", (char**)kwlist, &name))
+        return -1;
+
+    if (name)
+    {
+        PyObject* tmp = self->name;
+        Py_INCREF(name);
+        self->name = name;
+        Py_XDECREF(tmp);
+    }
+
     return 0;
 }
 
 PyMethodDef sheet_methods[] =
 {
+    { NULL }
+};
+
+PyMemberDef sheet_members[] =
+{
+    { (char*)"name", T_OBJECT_EX, offsetof(sheet, name), 0, (char*)"sheet name" },
     { NULL }
 };
 
@@ -68,7 +99,7 @@ PyTypeObject sheet_type =
     0,		                                  // tp_iter
     0,		                                  // tp_iternext
     sheet_methods,                            // tp_methods
-    0,                                        // tp_members
+    sheet_members,                            // tp_members
     0,                                        // tp_getset
     0,                                        // tp_base
     0,                                        // tp_dict
