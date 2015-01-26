@@ -64,7 +64,7 @@ PyMethodDef sheet_methods[] =
 
 PyMemberDef sheet_members[] =
 {
-    { (char*)"name", T_OBJECT_EX, offsetof(sheet, name), 0, (char*)"sheet name" },
+    { (char*)"name", T_OBJECT_EX, offsetof(sheet, name), READONLY, (char*)"sheet name" },
     { NULL }
 };
 
