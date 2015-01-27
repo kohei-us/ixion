@@ -56,8 +56,7 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     if (!obj_sheet)
         return Py_None;
 
-    if (sheet_type->tp_init(obj_sheet, args, kwargs) < 0)
-        return Py_None;
+    sheet_type->tp_init(obj_sheet, args, kwargs);
 
     return obj_sheet;
 }
