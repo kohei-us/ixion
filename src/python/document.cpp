@@ -9,6 +9,8 @@
 #include "sheet.hpp"
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -19,10 +21,20 @@ namespace {
 struct document
 {
     PyObject_HEAD
+    vector<PyObject*> sheets;
+};
+
+struct free_pyobj
+{
+    void operator() (PyObject* p)
+    {
+        Py_XDECREF(p);
+    }
 };
 
 void document_dealloc(document* self)
 {
+    for_each(self->sheets.begin(), self->sheets.end(), free_pyobj());
     self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
@@ -57,6 +69,10 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
         return Py_None;
 
     sheet_type->tp_init(obj_sheet, args, kwargs);
+
+    // Append this sheet instance to the document.
+    Py_INCREF(obj_sheet);
+    self->sheets.push_back(obj_sheet);
 
     return obj_sheet;
 }
