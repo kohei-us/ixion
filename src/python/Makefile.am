@@ -1,3 +1,4 @@
+AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS)
 
 pyexec_LTLIBRARIES = ixion.la
 ixion_la_SOURCES = \

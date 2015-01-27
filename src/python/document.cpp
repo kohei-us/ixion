@@ -8,6 +8,8 @@
 #include "document.hpp"
 #include "sheet.hpp"
 
+#include "ixion/model_context.hpp"
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -18,10 +20,18 @@ namespace ixion { namespace python {
 
 namespace {
 
+/** non-python part of the document data */
+struct document_data
+{
+    ixion::model_context m_cxt;
+};
+
 struct document
 {
     PyObject_HEAD
     vector<PyObject*> sheets;
+
+    document_data* m_data;
 };
 
 struct free_pyobj
@@ -35,12 +45,14 @@ struct free_pyobj
 void document_dealloc(document* self)
 {
     for_each(self->sheets.begin(), self->sheets.end(), free_pyobj());
+    delete self->m_data;
     self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
 PyObject* document_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/)
 {
     document* self = (document*)type->tp_alloc(type, 0);
+    self->m_data = new document_data;
     return reinterpret_cast<PyObject*>(self);
 }
 

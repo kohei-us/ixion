@@ -66,7 +66,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-CPPFLAGS="-D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST"
+CPPFLAGS="$CPPFLAGS -D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST"
 
 AC_MSG_CHECKING([whether to turn on hash container compatibility])
 if test "z$with_hash_container_compat" = "zno"; then
