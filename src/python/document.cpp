@@ -24,14 +24,9 @@ namespace {
 struct document_data
 {
     ixion::model_context m_cxt;
-};
+    vector<PyObject*> m_sheets;
 
-struct document
-{
-    PyObject_HEAD
-    vector<PyObject*> sheets;
-
-    document_data* m_data;
+    ~document_data();
 };
 
 struct free_pyobj
@@ -42,9 +37,20 @@ struct free_pyobj
     }
 };
 
+document_data::~document_data()
+{
+    for_each(m_sheets.begin(), m_sheets.end(), free_pyobj());
+}
+
+struct document
+{
+    PyObject_HEAD
+
+    document_data* m_data;
+};
+
 void document_dealloc(document* self)
 {
-    for_each(self->sheets.begin(), self->sheets.end(), free_pyobj());
     delete self->m_data;
     self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
@@ -84,7 +90,7 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
 
     // Append this sheet instance to the document.
     Py_INCREF(obj_sheet);
-    self->sheets.push_back(obj_sheet);
+    self->m_data->m_sheets.push_back(obj_sheet);
 
     return obj_sheet;
 }
