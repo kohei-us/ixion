@@ -88,6 +88,9 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
 
     sheet_type->tp_init(obj_sheet, args, kwargs);
 
+    // Pass model_context to the sheet object.
+    get_sheet_data(obj_sheet)->m_cxt = &self->m_data->m_cxt;
+
     // Append this sheet instance to the document.
     Py_INCREF(obj_sheet);
     self->m_data->m_sheets.push_back(obj_sheet);

@@ -10,9 +10,22 @@
 
 #include <Python.h>
 
+namespace ixion {
+
+class model_context;
+
+}
+
 namespace ixion { namespace python {
 
+struct sheet_data
+{
+    ixion::model_context* m_cxt;
+};
+
 PyTypeObject* get_sheet_type();
+
+sheet_data* get_sheet_data(PyObject* obj);
 
 }}
 

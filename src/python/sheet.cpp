@@ -16,10 +16,14 @@ struct sheet
 {
     PyObject_HEAD
     PyObject* name; // sheet name
+
+    sheet_data* m_data;
 };
 
 void sheet_dealloc(sheet* self)
 {
+    delete self->m_data;
+
     Py_XDECREF(self->name);
     self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
@@ -29,6 +33,8 @@ PyObject* sheet_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/
     sheet* self = (sheet*)type->tp_alloc(type, 0);
     if (!self)
         return NULL;
+
+    self->m_data = new sheet_data;
 
     self->name = PyString_FromString("");
     if (!self->name)
@@ -116,6 +122,11 @@ PyTypeObject sheet_type =
 PyTypeObject* get_sheet_type()
 {
     return &sheet_type;
+}
+
+sheet_data* get_sheet_data(PyObject* obj)
+{
+    return reinterpret_cast<sheet*>(obj)->m_data;
 }
 
 }}
