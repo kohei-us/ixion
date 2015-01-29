@@ -84,9 +84,27 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
     return Py_None;
 }
 
+PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+
+    static char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
+        return Py_None;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_cxt);
+    ixion::model_context& cxt = *sd->m_cxt;
+    double val = cxt.get_numeric_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
+
+    return PyFloat_FromDouble(val);
+}
+
 PyMethodDef sheet_methods[] =
 {
-    { "set_numeric_cell", (PyCFunction)sheet_set_numeric_cell, METH_KEYWORDS, "set numeric value to specified cell" },
+    { "set_numeric_cell",  (PyCFunction)sheet_set_numeric_cell,  METH_KEYWORDS, "set numeric value to specified cell" },
+    { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_KEYWORDS, "get numeric value from specified cell" },
     { NULL }
 };
 
