@@ -6,6 +6,9 @@
  */
 
 #include "sheet.hpp"
+
+#include "ixion/model_context.hpp"
+
 #include <structmember.h>
 
 namespace ixion { namespace python {
@@ -63,8 +66,27 @@ int sheet_init(sheet* self, PyObject* args, PyObject* kwargs)
     return 0;
 }
 
+PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+    double val = 0.0;
+
+    static char* kwlist[] = { "row", "column", "value", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iid", kwlist, &row, &col, &val))
+        return Py_None;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_cxt);
+    ixion::model_context& cxt = *sd->m_cxt;
+    cxt.set_numeric_cell(ixion::abs_address_t(sd->m_sheet_index, row, col), val);
+
+    return Py_None;
+}
+
 PyMethodDef sheet_methods[] =
 {
+    { "set_numeric_cell", (PyCFunction)sheet_set_numeric_cell, METH_KEYWORDS, "set numeric value to specified cell" },
     { NULL }
 };
 

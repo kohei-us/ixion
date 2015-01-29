@@ -89,7 +89,10 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     sheet_type->tp_init(obj_sheet, args, kwargs);
 
     // Pass model_context to the sheet object.
-    get_sheet_data(obj_sheet)->m_cxt = &self->m_data->m_cxt;
+    sheet_data* sd = get_sheet_data(obj_sheet);
+    sd->m_cxt = &self->m_data->m_cxt;
+    ixion::model_context& cxt = *sd->m_cxt;
+    sd->m_sheet_index = cxt.append_sheet(sheet_name, strlen(sheet_name), 1048576, 1024);
 
     // Append this sheet instance to the document.
     Py_INCREF(obj_sheet);

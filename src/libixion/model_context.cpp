@@ -218,7 +218,7 @@ public:
     const string* get_named_expression_name(const formula_cell* expr) const;
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
-    void append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
+    sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
     string_id_t append_string(const char* p, size_t n);
     string_id_t add_string(const char* p, size_t n);
@@ -326,10 +326,14 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
     return m_sheet_names[sheet];
 }
 
-void model_context_impl::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
+sheet_t model_context_impl::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
 {
+    // index of the new sheet.
+    sheet_t sheet_index = m_sheets.size();
+
     m_sheet_names.push_back(new string(p, n));
     m_sheets.push_back(row_size, col_size);
+    return sheet_index;
 }
 
 string_id_t model_context_impl::append_string(const char* p, size_t n)
@@ -1143,9 +1147,9 @@ const string* model_context::get_named_expression_name(const formula_cell* expr)
     return mp_impl->get_named_expression_name(expr);
 }
 
-void model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
+sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
 {
-    mp_impl->append_sheet(p, n, row_size, col_size);
+    return mp_impl->append_sheet(p, n, row_size, col_size);
 }
 
 void model_context::set_session_handler(iface::session_handler* handler)

@@ -108,7 +108,18 @@ public:
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const ::std::string& name);
 
-    void append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
+    /**
+     * Append new sheet to the model.
+     *
+     * @param p pointer to the char array storing the name of the inserted
+     *          sheet.
+     * @param n size of the sheet name char array.
+     * @param row_size number of rows in the inserted sheet.
+     * @param col_size number of columns in the inserted sheet.
+     *
+     * @return sheet index of the inserted sheet.
+     */
+    sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
     /**
      * Set new session handler instance.  The client code needs to allocate
