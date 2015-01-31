@@ -44,6 +44,7 @@ PyObject* info(PyObject*, PyObject*)
         << ixion::get_version_minor() << '.'
         << ixion::get_version_micro() << endl;
 
+    Py_INCREF(Py_None);
     return Py_None;
 }
 

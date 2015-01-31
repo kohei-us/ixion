@@ -23,7 +23,6 @@ namespace {
 struct document_data
 {
     document_global m_global;
-    ixion::model_context m_cxt;
     vector<PyObject*> m_sheets;
 
     ~document_data();
@@ -73,7 +72,7 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     if (!PyArg_ParseTuple(args, "s", &sheet_name))
     {
         PyErr_SetString(PyExc_TypeError, "The method must be given a sheet name string");
-        return Py_None;
+        return NULL;
     }
 
     assert(sheet_name);
@@ -101,9 +100,18 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     return obj_sheet;
 }
 
+PyObject* document_calculate(document* self, PyObject*, PyObject*)
+{
+    model_context& cxt = self->m_data->m_global.m_cxt;
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 PyMethodDef document_methods[] =
 {
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
+    { "calculate", (PyCFunction)document_calculate, 0, "calculate formula cells" },
     { NULL }
 };
 
