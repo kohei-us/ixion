@@ -5,28 +5,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_PYTHON_SHEET_HPP
-#define INCLUDED_IXION_PYTHON_SHEET_HPP
+#ifndef INCLUDED_IXION_PYTHON_GLOBAL_HPP
+#define INCLUDED_IXION_PYTHON_GLOBAL_HPP
 
-#include <Python.h>
+#include "ixion/model_context.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
-#include "ixion/types.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace ixion { namespace python {
 
-struct document_global;
-
-struct sheet_data
+struct document_global
 {
-    document_global* m_global;
-    ixion::sheet_t m_sheet_index;
+    ixion::model_context m_cxt;
+    boost::scoped_ptr<ixion::formula_name_resolver> m_resolver;
 
-    sheet_data();
+    document_global();
 };
-
-PyTypeObject* get_sheet_type();
-
-sheet_data* get_sheet_data(PyObject* obj);
 
 }}
 

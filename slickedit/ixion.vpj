@@ -304,6 +304,8 @@
 			<Folder Name="python">
 				<F N="../src/python/document.cpp"/>
 				<F N="../src/python/document.hpp"/>
+				<F N="../src/python/global.cpp"/>
+				<F N="../src/python/global.hpp"/>
 				<F N="../src/python/python.cpp"/>
 				<F N="../src/python/sheet.cpp"/>
 				<F N="../src/python/sheet.hpp"/>

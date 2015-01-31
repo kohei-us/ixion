@@ -7,8 +7,7 @@
 
 #include "document.hpp"
 #include "sheet.hpp"
-
-#include "ixion/model_context.hpp"
+#include "global.hpp"
 
 #include <iostream>
 #include <vector>
@@ -23,6 +22,7 @@ namespace {
 /** non-python part of the document data */
 struct document_data
 {
+    document_global m_global;
     ixion::model_context m_cxt;
     vector<PyObject*> m_sheets;
 
@@ -90,8 +90,8 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
 
     // Pass model_context to the sheet object.
     sheet_data* sd = get_sheet_data(obj_sheet);
-    sd->m_cxt = &self->m_data->m_cxt;
-    ixion::model_context& cxt = *sd->m_cxt;
+    sd->m_global = &self->m_data->m_global;
+    ixion::model_context& cxt = sd->m_global->m_cxt;
     sd->m_sheet_index = cxt.append_sheet(sheet_name, strlen(sheet_name), 1048576, 1024);
 
     // Append this sheet instance to the document.

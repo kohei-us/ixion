@@ -5,31 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_PYTHON_SHEET_HPP
-#define INCLUDED_IXION_PYTHON_SHEET_HPP
-
-#include <Python.h>
-
-#include "ixion/types.hpp"
+#include "global.hpp"
 
 namespace ixion { namespace python {
 
-struct document_global;
-
-struct sheet_data
-{
-    document_global* m_global;
-    ixion::sheet_t m_sheet_index;
-
-    sheet_data();
-};
-
-PyTypeObject* get_sheet_type();
-
-sheet_data* get_sheet_data(PyObject* obj);
+document_global::document_global() :
+    m_cxt(),
+    m_resolver(ixion::formula_name_resolver::get(formula_name_resolver_excel_a1, &m_cxt))
+{}
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

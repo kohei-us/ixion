@@ -6,6 +6,7 @@
  */
 
 #include "sheet.hpp"
+#include "global.hpp"
 
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
@@ -19,6 +20,8 @@
 using namespace std;
 
 namespace ixion { namespace python {
+
+sheet_data::sheet_data() : m_global(NULL), m_sheet_index(-1) {}
 
 namespace {
 
@@ -84,8 +87,8 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
         return Py_None;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_cxt);
-    ixion::model_context& cxt = *sd->m_cxt;
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
     cxt.set_numeric_cell(ixion::abs_address_t(sd->m_sheet_index, row, col), val);
 
     return Py_None;
@@ -102,16 +105,11 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
         return Py_None;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_cxt);
-    ixion::model_context& cxt = *sd->m_cxt;
-
-    // TODO : Store this resolver instance in a central place to avoid
-    // creating one each time.
-    boost::scoped_ptr<formula_name_resolver> resolver(
-        formula_name_resolver::get(ixion::formula_name_resolver_excel_a1, &cxt));
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
 
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
-    cxt.set_formula_cell(pos, formula, strlen(formula), *resolver);
+    cxt.set_formula_cell(pos, formula, strlen(formula), *sd->m_global->m_resolver);
 
     // Put this formula cell in a dependency chain.
     ixion::register_formula_cell(cxt, pos);
@@ -129,8 +127,8 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
         return Py_None;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_cxt);
-    ixion::model_context& cxt = *sd->m_cxt;
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
     double val = cxt.get_numeric_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
 
     return PyFloat_FromDouble(val);
@@ -146,8 +144,8 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
         return Py_None;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_cxt);
-    ixion::model_context& cxt = *sd->m_cxt;
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
     const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
 
@@ -159,13 +157,8 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     if (!ft)
         return Py_None;
 
-    // TODO : Store this resolver instance in a central place to avoid
-    // creating one each time.
-    boost::scoped_ptr<formula_name_resolver> resolver(
-        formula_name_resolver::get(ixion::formula_name_resolver_excel_a1, &cxt));
-
     string str;
-    ixion::print_formula_tokens(cxt, pos, *resolver, *ft, str);
+    ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft, str);
     if (str.empty())
         return PyString_FromString("");
 

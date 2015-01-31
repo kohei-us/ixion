@@ -4,6 +4,8 @@ pyexec_LTLIBRARIES = ixion.la
 ixion_la_SOURCES = \
 	document.hpp \
 	document.cpp \
+	global.hpp \
+	global.cpp \
 	python.cpp \
 	sheet.hpp \
 	sheet.cpp
