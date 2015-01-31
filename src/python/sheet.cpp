@@ -8,8 +8,15 @@
 #include "sheet.hpp"
 
 #include "ixion/model_context.hpp"
+#include "ixion/formula_name_resolver.hpp"
+#include "ixion/formula.hpp"
 
 #include <structmember.h>
+#include <boost/scoped_ptr.hpp>
+
+#include <iostream>
+
+using namespace std;
 
 namespace ixion { namespace python {
 
@@ -84,6 +91,34 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
     return Py_None;
 }
 
+PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+    char* formula = NULL;
+
+    static char* kwlist[] = { "row", "column", "value", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", kwlist, &row, &col, &formula))
+        return Py_None;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_cxt);
+    ixion::model_context& cxt = *sd->m_cxt;
+
+    // TODO : Store this resolver instance in a central place to avoid
+    // creating one each time.
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(ixion::formula_name_resolver_excel_a1, &cxt));
+
+    ixion::abs_address_t pos(sd->m_sheet_index, row, col);
+    cxt.set_formula_cell(pos, formula, strlen(formula), *resolver);
+
+    // Put this formula cell in a dependency chain.
+    ixion::register_formula_cell(cxt, pos);
+
+    return Py_None;
+}
+
 PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
 {
     long col = -1;
@@ -101,10 +136,48 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     return PyFloat_FromDouble(val);
 }
 
+PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+
+    static char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
+        return Py_None;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_cxt);
+    ixion::model_context& cxt = *sd->m_cxt;
+    ixion::abs_address_t pos(sd->m_sheet_index, row, col);
+    const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
+
+    if (!fc)
+        return Py_None;
+
+    size_t tid = fc->get_identifier();
+    const formula_tokens_t* ft = cxt.get_formula_tokens(sd->m_sheet_index, tid);
+    if (!ft)
+        return Py_None;
+
+    // TODO : Store this resolver instance in a central place to avoid
+    // creating one each time.
+    boost::scoped_ptr<formula_name_resolver> resolver(
+        formula_name_resolver::get(ixion::formula_name_resolver_excel_a1, &cxt));
+
+    string str;
+    ixion::print_formula_tokens(cxt, pos, *resolver, *ft, str);
+    if (str.empty())
+        return PyString_FromString("");
+
+    return PyString_FromStringAndSize(str.data(), str.size());
+}
+
 PyMethodDef sheet_methods[] =
 {
     { "set_numeric_cell",  (PyCFunction)sheet_set_numeric_cell,  METH_KEYWORDS, "set numeric value to specified cell" },
+    { "set_formula_cell",  (PyCFunction)sheet_set_formula_cell,  METH_KEYWORDS, "set formula to specified cell" },
     { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_KEYWORDS, "get numeric value from specified cell" },
+    { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_KEYWORDS, "get formula expression string from specified cell position" },
     { NULL }
 };
 
