@@ -26,9 +26,12 @@ for row in xrange(0, 3):
 
 sheet1.set_formula_cell(row=3, column=1, value="SUM(B1:B3)")
 s = sheet1.get_formula_expression(row=3, column=1)
-print("(row={_row},col={_col}) = {_formula}".format(_row=3, _col=1, _formula=s))
+print("(row=3,col=1) = {}".format(s))
 
-#sheet1.set_string_cell(row=0, column=1, value="Test")
+col = 2
+sheet1.set_string_cell(row=0, column=col, value="Test")
+s = sheet1.get_string_value(row=0, column=col)
+print("(row=0,col={}) = {}".format(col, s))
 
 #doc.calculate()
 
@@ -44,3 +47,5 @@ class MySheet(ixion.Sheet):
 sheet = MySheet("my sheet")
 print(sheet)
 print(sheet.name)
+
+print("end of script")

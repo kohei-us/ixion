@@ -80,11 +80,11 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
 
     PyTypeObject* sheet_type = get_sheet_type();
     if (!sheet_type)
-        return Py_None;
+        return NULL;
 
     PyObject* obj_sheet = sheet_type->tp_new(sheet_type, args, kwargs);
     if (!obj_sheet)
-        return Py_None;
+        return NULL;
 
     sheet_type->tp_init(obj_sheet, args, kwargs);
 

@@ -84,13 +84,33 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
     static char* kwlist[] = { "row", "column", "value", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iid", kwlist, &row, &col, &val))
-        return Py_None;
+        return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
     ixion::model_context& cxt = sd->m_global->m_cxt;
     cxt.set_numeric_cell(ixion::abs_address_t(sd->m_sheet_index, row, col), val);
 
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+    char* val = NULL;
+
+    static char* kwlist[] = { "row", "column", "value", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", kwlist, &row, &col, &val))
+        return NULL;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
+    cxt.set_string_cell(ixion::abs_address_t(sd->m_sheet_index, row, col), val, strlen(val));
+
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -102,7 +122,7 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
     static char* kwlist[] = { "row", "column", "value", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", kwlist, &row, &col, &formula))
-        return Py_None;
+        return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
@@ -114,6 +134,7 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     // Put this formula cell in a dependency chain.
     ixion::register_formula_cell(cxt, pos);
 
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -124,7 +145,7 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
 
     static char* kwlist[] = { "row", "column", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
-        return Py_None;
+        return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
@@ -134,6 +155,26 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     return PyFloat_FromDouble(val);
 }
 
+PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+
+    static char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
+        return NULL;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
+    string_id_t sid = cxt.get_string_identifier(ixion::abs_address_t(sd->m_sheet_index, row, col));
+    const std::string* ps = cxt.get_string(sid);
+    if (!ps)
+        return NULL;
+
+    return PyString_FromStringAndSize(ps->data(), ps->size());
+}
+
 PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kwargs)
 {
     long col = -1;
@@ -141,7 +182,7 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
 
     static char* kwlist[] = { "row", "column", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
-        return Py_None;
+        return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
@@ -150,12 +191,12 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
 
     if (!fc)
-        return Py_None;
+        return NULL;
 
     size_t tid = fc->get_identifier();
     const formula_tokens_t* ft = cxt.get_formula_tokens(sd->m_sheet_index, tid);
     if (!ft)
-        return Py_None;
+        return NULL;
 
     string str;
     ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft, str);
@@ -169,7 +210,9 @@ PyMethodDef sheet_methods[] =
 {
     { "set_numeric_cell",  (PyCFunction)sheet_set_numeric_cell,  METH_KEYWORDS, "set numeric value to specified cell" },
     { "set_formula_cell",  (PyCFunction)sheet_set_formula_cell,  METH_KEYWORDS, "set formula to specified cell" },
+    { "set_string_cell",   (PyCFunction)sheet_set_string_cell,   METH_KEYWORDS, "set string to specified cell" },
     { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_KEYWORDS, "get numeric value from specified cell" },
+    { "get_string_value",  (PyCFunction)sheet_get_string_value,  METH_KEYWORDS, "get string value from specified cell" },
     { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_KEYWORDS, "get formula expression string from specified cell position" },
     { NULL }
 };
