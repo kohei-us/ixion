@@ -254,6 +254,8 @@ public:
 
     double count_range(const abs_range_t& range, const values_t& values_type) const;
 
+    void get_all_formula_cells(dirty_formula_cells_t& cells) const;
+
 private:
     model_context& m_parent;
 
@@ -643,6 +645,30 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
     }
 
     return ret;
+}
+
+void model_context_impl::get_all_formula_cells(dirty_formula_cells_t& cells) const
+{
+    for (size_t sid = 0; sid < m_sheets.size(); ++sid)
+    {
+        const worksheet& sh = m_sheets[sid];
+        for (size_t cid = 0; cid < sh.size(); ++cid)
+        {
+            const column_store_t& col = sh[cid];
+            column_store_t::const_iterator it = col.begin();
+            column_store_t::const_iterator ite = col.end();
+            for (; it != ite; ++it)
+            {
+                if (it->type != ixion::element_type_formula)
+                    continue;
+
+                row_t row_id = it->position;
+                abs_address_t pos(sid, row_id, cid);
+                for (size_t i = 0; i < it->size; ++i, ++pos.row)
+                    cells.insert(pos);
+            }
+        }
+    }
 }
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
@@ -1170,6 +1196,11 @@ size_t model_context::get_string_count() const
 const column_store_t* model_context::get_column(sheet_t sheet, col_t col) const
 {
     return mp_impl->get_column(sheet, col);
+}
+
+void model_context::get_all_formula_cells(dirty_formula_cells_t& cells) const
+{
+    mp_impl->get_all_formula_cells(cells);
 }
 
 }

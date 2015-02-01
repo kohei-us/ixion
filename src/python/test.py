@@ -35,6 +35,9 @@ print("(row=0,col={}) = {}".format(col, s))
 
 doc.calculate()
 
+val = sheet1.get_numeric_value(3, 1)
+print("(row=3,col=1) = {}".format(val))
+
 class MyDoc(ixion.Document):
     pass
 

@@ -147,6 +147,8 @@ public:
      */
     const column_store_t* get_column(sheet_t sheet, col_t col) const;
 
+    void get_all_formula_cells(dirty_formula_cells_t& cells) const;
+
 private:
     model_context_impl* mp_impl;
 };

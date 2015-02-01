@@ -9,6 +9,8 @@
 #include "sheet.hpp"
 #include "global.hpp"
 
+#include "ixion/formula.hpp"
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -103,6 +105,10 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
 PyObject* document_calculate(document* self, PyObject*, PyObject*)
 {
     model_context& cxt = self->m_data->m_global.m_cxt;
+
+    dirty_formula_cells_t cells;
+    cxt.get_all_formula_cells(cells);
+    calculate_cells(cxt, cells, 0);
 
     Py_INCREF(Py_None);
     return Py_None;
