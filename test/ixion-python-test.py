@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import sys
+import os.path
 import unittest
 import itertools
 
-sys.path.append(".libs")
+dirname = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(dirname + "/../src/python/.libs")
 import ixion
 
 class Test(unittest.TestCase):
@@ -44,7 +46,9 @@ class Test(unittest.TestCase):
         tests = (
             # row, column, value
             (3, 1, 11.2),
-            (4, 1, 12.0)
+            (4, 1, 12.0),
+            (6, 2, -12.0),
+            (6, 3, 0.0)
         )
 
         for test in tests:
