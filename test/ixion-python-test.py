@@ -28,6 +28,12 @@ class Test(unittest.TestCase):
         for test, sheet in itertools.izip(tests, sheets):
             self.assertEqual(test, sheet.name)
 
+        try:
+            sheets[0].name = "Try to change sheet name"
+            self.assertTrue(False, "sheet name attribute should not be writable.")
+        except TypeError:
+            pass # TypeError is expected when attempting to overwrite sheet name attribute.
+
     def test_numeric_cell_input(self):
         sh1 = self.doc.append_sheet("Data")
 
