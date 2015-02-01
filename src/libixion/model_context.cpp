@@ -899,7 +899,7 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != mdds::mtv::element_type_ulong)
+    if (col_store.get_type(addr.row) != ixion::element_type_string)
         return empty_string_id;
 
     return col_store.get<string_id_t>(addr.row);
