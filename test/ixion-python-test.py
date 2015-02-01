@@ -2,6 +2,7 @@
 
 import sys
 import unittest
+import itertools
 
 sys.path.append(".libs")
 import ixion
@@ -10,6 +11,22 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         self.doc = ixion.Document()
+
+    def test_append_sheets(self):
+        tests = (
+            "Normal",      # normal name
+            "First Sheet", # white space
+            "Laura's",     # single quote
+            '"Quoted"'     # double quote
+        )
+
+        sheets = []
+        for test in tests:
+            sh = self.doc.append_sheet(test)
+            sheets.append(sh)
+
+        for test, sheet in itertools.izip(tests, sheets):
+            self.assertEqual(test, sheet.name)
 
     def test_numeric_cell_input(self):
         sh1 = self.doc.append_sheet("Data")
