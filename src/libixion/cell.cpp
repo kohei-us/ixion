@@ -111,23 +111,17 @@ double formula_cell::get_value() const
 {
     ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
     wait_for_interpreted_result(lock);
-
-    if (!m_interpret_status.result)
-        // Result not cached yet.  Reference error.
-        throw formula_error(fe_ref_result_not_available);
-
-    if (m_interpret_status.result->get_type() == formula_result::rt_error)
-        // Error condition.
-        throw formula_error(m_interpret_status.result->get_error());
-
-    assert(m_interpret_status.result->get_type() == formula_result::rt_value);
-    return m_interpret_status.result->get_value();
+    return fetch_value_from_result();
 }
 
 double formula_cell::get_value_nowait() const
 {
     boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+    return fetch_value_from_result();
+}
 
+double formula_cell::fetch_value_from_result() const
+{
     if (!m_interpret_status.result)
         // Result not cached yet.  Reference error.
         throw formula_error(fe_ref_result_not_available);

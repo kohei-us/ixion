@@ -93,6 +93,8 @@ private:
 
     bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos);
 
+    double fetch_value_from_result() const;
+
 private:
     mutable interpret_status m_interpret_status;
     size_t m_identifier;
