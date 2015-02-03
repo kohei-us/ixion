@@ -33,6 +33,12 @@ sheet1.set_string_cell(row=0, column=col, value="Test")
 s = sheet1.get_string_value(row=0, column=col)
 print("(row=0,col={}) = {}".format(col, s))
 
+try:
+    # Try to get formula result before it is available.
+    val = sheet1.get_numeric_value(3, 1)
+except TypeError as e:
+    print(e)
+
 doc.calculate()
 
 val = sheet1.get_numeric_value(3, 1)

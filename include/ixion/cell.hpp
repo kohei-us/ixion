@@ -53,6 +53,7 @@ public:
     void set_identifier(size_t identifier);
 
     IXION_DLLPUBLIC double get_value() const;
+    IXION_DLLPUBLIC double get_value_nowait() const;
     IXION_DLLPUBLIC void interpret(iface::model_context& context, const abs_address_t& pos);
 
     /**

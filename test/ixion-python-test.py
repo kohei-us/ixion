@@ -77,6 +77,21 @@ class Test(unittest.TestCase):
             check_val = sh1.get_string_value(column=test[1], row=test[0]) # swap row and column
             self.assertEqual(test[2], check_val)
 
+    def test_formula_cell_input(self):
+        sh1 = self.doc.append_sheet("Data")
+        sh1.set_formula_cell(0, 0, "12*3")
+        try:
+            val = sh1.get_numeric_value(0, 0)
+            self.assertTrue(False, "TypeError should have been raised")
+        except TypeError:
+            # TypeError is expected when trying to fetch numeric value from
+            # formula cell before it is calculated.
+            pass
+
+        self.doc.calculate()
+        val = sh1.get_numeric_value(0, 0)
+        self.assertEqual(12*3, val)
+
 
 if __name__ == '__main__':
     unittest.main()

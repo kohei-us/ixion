@@ -150,7 +150,16 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    double val = cxt.get_numeric_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
+    double val = 0.0;
+    try
+    {
+        val = cxt.get_numeric_value_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
+    }
+    catch (const formula_error&)
+    {
+        PyErr_SetString(PyExc_TypeError, "The formula cell has yet to be calculated");
+        return NULL;
+    }
 
     return PyFloat_FromDouble(val);
 }

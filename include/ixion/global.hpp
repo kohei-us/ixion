@@ -89,7 +89,7 @@ IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
 
 // ============================================================================
 
-class formula_error : public ::std::exception
+class IXION_DLLPUBLIC formula_error : public std::exception
 {
 public:
     explicit formula_error(formula_error_t fe);

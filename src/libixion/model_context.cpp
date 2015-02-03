@@ -207,6 +207,7 @@ public:
     bool is_empty(const abs_address_t& addr) const;
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
+    double get_numeric_value_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const char* p, size_t n) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
@@ -896,6 +897,25 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
     return 0.0;
 }
 
+double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) const
+{
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    switch (col_store.get_type(addr.row))
+    {
+        case element_type_numeric:
+            return col_store.get<double>(addr.row);
+        case element_type_formula:
+        {
+            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
+            return p->get_value_nowait();
+        }
+        break;
+        default:
+            ;
+    }
+    return 0.0;
+}
+
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
@@ -1011,6 +1031,11 @@ celltype_t model_context::get_celltype(const abs_address_t& addr) const
 double model_context::get_numeric_value(const abs_address_t& addr) const
 {
     return mp_impl->get_numeric_value(addr);
+}
+
+double model_context::get_numeric_value_nowait(const abs_address_t& addr) const
+{
+    return mp_impl->get_numeric_value_nowait(addr);
 }
 
 string_id_t model_context::get_string_identifier(const abs_address_t& addr) const
