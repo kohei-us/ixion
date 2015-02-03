@@ -53,6 +53,17 @@ public:
 
     virtual bool is_empty(const abs_address_t& addr) const = 0;
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;
+
+    /**
+     * Get a numeric representation of the cell value at specified position.
+     * If the cell at the specified position is a formula cell and its result
+     * has not yet been computed, it will block until the result becomes
+     * available.  Call this only during formula (re-)calculation.
+     *
+     * @param addr position of the cell.
+     *
+     * @return numeric representation of the cell value.
+     */
     virtual double get_numeric_value(const abs_address_t& addr) const = 0;
     virtual string_id_t get_string_identifier(const abs_address_t& addr) const = 0;
     virtual string_id_t get_string_identifier(const char* p, size_t n) const = 0;
