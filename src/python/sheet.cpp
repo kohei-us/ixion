@@ -82,8 +82,8 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
     long row = -1;
     double val = 0.0;
 
-    static char* kwlist[] = { "row", "column", "value", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iid", kwlist, &row, &col, &val))
+    static const char* kwlist[] = { "row", "column", "value", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iid", const_cast<char**>(kwlist), &row, &col, &val))
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
@@ -103,8 +103,8 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
     long row = -1;
     char* val = NULL;
 
-    static char* kwlist[] = { "row", "column", "value", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", kwlist, &row, &col, &val))
+    static const char* kwlist[] = { "row", "column", "value", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", const_cast<char**>(kwlist), &row, &col, &val))
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
@@ -124,8 +124,8 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     long row = -1;
     char* formula = NULL;
 
-    static char* kwlist[] = { "row", "column", "value", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", kwlist, &row, &col, &formula))
+    static const char* kwlist[] = { "row", "column", "value", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", const_cast<char**>(kwlist), &row, &col, &formula))
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
@@ -149,8 +149,8 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     long col = -1;
     long row = -1;
 
-    static char* kwlist[] = { "row", "column", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
+    static const char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
@@ -175,8 +175,8 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     long col = -1;
     long row = -1;
 
-    static char* kwlist[] = { "row", "column", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
+    static const char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
@@ -195,8 +195,8 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     long col = -1;
     long row = -1;
 
-    static char* kwlist[] = { "row", "column", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", kwlist, &row, &col))
+    static const char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
