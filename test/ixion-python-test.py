@@ -92,6 +92,33 @@ class Test(unittest.TestCase):
         val = sh1.get_numeric_value(0, 0)
         self.assertEqual(12*3, val)
 
+    def test_formula_cell_recalc(self):
+        sh1 = self.doc.append_sheet("Data")
+        sh1.set_numeric_cell(0, 0, 1.0)
+        sh1.set_numeric_cell(1, 0, 2.0)
+        sh1.set_numeric_cell(2, 0, 4.0)
+        sh1.set_formula_cell(3, 0, "SUM(A1:A3)")
+
+        # initial calculation
+        self.doc.calculate()
+        val = sh1.get_numeric_value(3, 0)
+        self.assertEqual(7.0, val)
+
+        # recalculation
+        sh1.set_numeric_cell(1, 0, 8.0)
+        self.doc.calculate()
+        val = sh1.get_numeric_value(3, 0)
+        self.assertEqual(13.0, val)
+
+        # add another formula cell and recalc.
+        sh1.set_formula_cell(0, 1, "A1+15")
+        sh1.set_numeric_cell(0, 0, 0.0)
+        self.doc.calculate()
+        val = sh1.get_numeric_value(0, 1)
+        self.assertEqual(15.0, val)
+        val = sh1.get_numeric_value(3, 0)
+        self.assertEqual(12.0, val)
+
 
 if __name__ == '__main__':
     unittest.main()
