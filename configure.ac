@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 m4_define([ixion_major_version], [0])
-m4_define([ixion_minor_version], [7])
+m4_define([ixion_minor_version], [9])
 m4_define([ixion_micro_version], [0])
 m4_define([ixion_version],
                     [ixion_major_version.ixion_minor_version.ixion_micro_version])
