@@ -105,10 +105,13 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
 PyObject* document_calculate(document* self, PyObject*, PyObject*)
 {
     model_context& cxt = self->m_data->m_global.m_cxt;
+    modified_cells_t& mod_cells = self->m_data->m_global.m_modified_cells;
+    dirty_formula_cells_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
 
-    dirty_formula_cells_t cells;
-    cxt.get_all_formula_cells(cells);
-    calculate_cells(cxt, cells, 0);
+    ixion::get_all_dirty_cells(cxt, mod_cells, dirty_fcells);
+    calculate_cells(cxt, dirty_fcells, 0);
+    mod_cells.clear();
+    dirty_fcells.clear();
 
     Py_INCREF(Py_None);
     return Py_None;

@@ -89,7 +89,9 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    cxt.set_numeric_cell(ixion::abs_address_t(sd->m_sheet_index, row, col), val);
+    ixion::abs_address_t pos(sd->m_sheet_index, row, col);
+    sd->m_global->m_modified_cells.push_back(pos);
+    cxt.set_numeric_cell(pos, val);
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -108,7 +110,9 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    cxt.set_string_cell(ixion::abs_address_t(sd->m_sheet_index, row, col), val, strlen(val));
+    ixion::abs_address_t pos(sd->m_sheet_index, row, col);
+    sd->m_global->m_modified_cells.push_back(pos);
+    cxt.set_string_cell(pos, val, strlen(val));
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -129,6 +133,8 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     ixion::model_context& cxt = sd->m_global->m_cxt;
 
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
+    sd->m_global->m_modified_cells.push_back(pos);
+    sd->m_global->m_dirty_formula_cells.insert(pos);
     cxt.set_formula_cell(pos, formula, strlen(formula), *sd->m_global->m_resolver);
 
     // Put this formula cell in a dependency chain.

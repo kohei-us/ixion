@@ -10,6 +10,7 @@
 
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/address.hpp"
 
 #include <boost/scoped_ptr.hpp>
 
@@ -17,8 +18,18 @@ namespace ixion { namespace python {
 
 struct document_global
 {
-    ixion::model_context m_cxt;
-    boost::scoped_ptr<ixion::formula_name_resolver> m_resolver;
+    model_context m_cxt;
+
+    /**
+     * positions of all modified cells (formula and non-formula cells) since
+     * last calculation.
+     */
+    modified_cells_t m_modified_cells;
+
+    /** positions of all dirty formula cells since last calculation. */
+    dirty_formula_cells_t m_dirty_formula_cells;
+
+    boost::scoped_ptr<formula_name_resolver> m_resolver;
 
     document_global();
 };

@@ -230,6 +230,10 @@ void get_all_dirty_cells(
         }
     }
 
+    // Remove duplicate entries.
+    std::sort(addrs.begin(), addrs.end());
+    addrs.erase(std::unique(addrs.begin(), addrs.end()), addrs.end());
+
     {
         modified_cells_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
         for (; itr != itr_end; ++itr)
