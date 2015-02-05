@@ -221,6 +221,26 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     return PyString_FromStringAndSize(str.data(), str.size());
 }
 
+PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
+{
+    long col = -1;
+    long row = -1;
+
+    static const char* kwlist[] = { "row", "column", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
+        return NULL;
+
+    sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
+    assert(sd->m_global);
+    ixion::model_context& cxt = sd->m_global->m_cxt;
+    abs_address_t pos(sd->m_sheet_index, row, col);
+    sd->m_global->m_modified_cells.push_back(pos);
+    cxt.erase_cell(pos);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 PyMethodDef sheet_methods[] =
 {
     { "set_numeric_cell",  (PyCFunction)sheet_set_numeric_cell,  METH_KEYWORDS, "set numeric value to specified cell" },
@@ -229,6 +249,7 @@ PyMethodDef sheet_methods[] =
     { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_KEYWORDS, "get numeric value from specified cell" },
     { "get_string_value",  (PyCFunction)sheet_get_string_value,  METH_KEYWORDS, "get string value from specified cell" },
     { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_KEYWORDS, "get formula expression string from specified cell position" },
+    { "erase_cell", (PyCFunction)sheet_erase_cell, METH_KEYWORDS, "erase cell at specified position" },
     { NULL }
 };
 
