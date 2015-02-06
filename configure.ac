@@ -79,7 +79,7 @@ else
 fi
 
 # Check for mdds.
-PKG_CHECK_MODULES([MDDS],[mdds >= 0.9.0])
+PKG_CHECK_MODULES([MDDS],[mdds >= 0.12.0])
 
 # Check for python.
 PKG_CHECK_MODULES([PYTHON], [python >= 0.27.1])
