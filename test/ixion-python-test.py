@@ -35,6 +35,8 @@ class Test(unittest.TestCase):
             self.assertTrue(False, "sheet name attribute should not be writable.")
         except TypeError:
             pass # TypeError is expected when attempting to overwrite sheet name attribute.
+        except:
+            self.assertTrue(False, "Wrong exception has been raised")
 
     def test_numeric_cell_input(self):
         sh1 = self.doc.append_sheet("Data")
@@ -142,7 +144,6 @@ class Test(unittest.TestCase):
         self.assertEqual(0.0, val)
         val = sh1.get_numeric_value(6, 1)
         self.assertEqual(10.0, val)
-
 
 
 if __name__ == '__main__':
