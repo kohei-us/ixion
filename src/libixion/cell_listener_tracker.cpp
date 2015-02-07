@@ -7,7 +7,7 @@
 
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/hash_container/map.hpp"
 

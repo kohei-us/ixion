@@ -7,7 +7,7 @@
 
 #include "ixion/interface/table_handler.hpp"
 #include "ixion/interface/session_handler.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 
 namespace ixion { namespace iface {
 

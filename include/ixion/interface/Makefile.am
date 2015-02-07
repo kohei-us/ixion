@@ -2,6 +2,6 @@
 libixiondir = $(includedir)/libixion-@IXION_API_VERSION@/ixion/interface
 
 libixion_HEADERS = \
-	model_context.hpp \
+	formula_model_access.hpp \
 	session_handler.hpp \
 	table_handler.hpp

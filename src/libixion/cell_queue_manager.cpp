@@ -8,7 +8,7 @@
 #include "ixion/cell_queue_manager.hpp"
 #include "ixion/cell.hpp"
 
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>

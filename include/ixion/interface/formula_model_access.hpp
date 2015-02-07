@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_INTERFACE_MODEL_CONTEXT_HPP__
-#define __IXION_INTERFACE_MODEL_CONTEXT_HPP__
+#ifndef INCLUDED_IXION_INTERFACE_MODEL_CONTEXT_HPP
+#define INCLUDED_IXION_INTERFACE_MODEL_CONTEXT_HPP
 
 #include "ixion/formula_tokens_fwd.hpp"
 #include "ixion/types.hpp"

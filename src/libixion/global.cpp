@@ -12,7 +12,7 @@
 #include "ixion/cell.hpp"
 #include "ixion/exceptions.hpp"
 #include "ixion/formula_result.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 
 #include <iostream>
 #include <cstdlib>

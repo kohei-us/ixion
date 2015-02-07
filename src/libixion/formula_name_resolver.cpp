@@ -6,7 +6,7 @@
  */
 
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/table.hpp"
 

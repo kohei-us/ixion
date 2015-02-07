@@ -10,7 +10,7 @@
 #include "ixion/formula_tokens.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/mem_str_buf.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 
 #ifdef max
 #undef max

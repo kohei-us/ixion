@@ -7,7 +7,7 @@
 
 #include "ixion/formula_parser.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 
 #include "ixion/hash_container/map.hpp"
 

@@ -9,7 +9,7 @@
 #define __IXION_FORMULA_HPP__
 
 #include "ixion/formula_tokens.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/env.hpp"
 
 #include <string>

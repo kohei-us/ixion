@@ -10,7 +10,7 @@
 
 #include "ixion/column_store_type.hpp"
 #include "ixion/mem_str_buf.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/env.hpp"
 
 #include <string>

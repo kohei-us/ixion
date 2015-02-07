@@ -12,7 +12,7 @@
 #include "ixion/address.hpp"
 #include "ixion/formula_tokens.hpp"
 #include "ixion/cell.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
 #include <vector>

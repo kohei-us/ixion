@@ -11,7 +11,7 @@
 #include "ixion/cell.hpp"
 #include "ixion/global.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/table_handler.hpp"
 

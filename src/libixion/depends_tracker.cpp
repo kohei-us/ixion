@@ -13,7 +13,7 @@
 #include "ixion/hash_container/map.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
-#include "ixion/interface/model_context.hpp"
+#include "ixion/interface/formula_model_access.hpp"
 
 #include <vector>
 #include <iostream>
