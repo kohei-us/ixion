@@ -39,9 +39,10 @@ class session_handler;
 class table_handler;
 
 /**
- * Interface for model context.  The client code needs to provide concrete
- * implementation of this interface in order to provide access to its
- * content.
+ * Interface for allowing access to the model mostly from ixion's formula
+ * interpreter and its related classes. The client code needs to provide
+ * concrete implementation of this interface in order to provide access to
+ * its content.
  */
 class formula_model_access : boost::noncopyable
 {
