@@ -22,7 +22,7 @@ class formula_cell;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -45,7 +45,7 @@ class dependency_tracker
     typedef depth_first_search<abs_address_t, cell_back_inserter, abs_address_t::hash> dfs_type;
 
 public:
-    dependency_tracker(const dirty_formula_cells_t& dirty_cells, iface::model_context& cxt);
+    dependency_tracker(const dirty_formula_cells_t& dirty_cells, iface::formula_model_access& cxt);
     ~dependency_tracker();
 
     /**
@@ -67,7 +67,7 @@ public:
 private:
     dfs_type::precedent_set m_deps;
     const dirty_formula_cells_t& m_dirty_cells;
-    iface::model_context& m_context;
+    iface::formula_model_access& m_context;
 };
 
 }

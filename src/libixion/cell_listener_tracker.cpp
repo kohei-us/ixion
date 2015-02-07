@@ -32,11 +32,11 @@ typedef _ixion_unordered_map_type<abs_range_t, cell_listener_tracker::address_se
 
 class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
 {
-    iface::model_context& m_context;
+    iface::formula_model_access& m_context;
     dirty_formula_cells_t& m_dirty_cells;
     cell_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(iface::model_context& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
+    dirty_cell_inserter(iface::formula_model_access& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
     void operator() (const cell_listener_tracker::address_set_type* p)
@@ -61,14 +61,14 @@ public:
 struct cell_listener_tracker::impl
 {
 
-    iface::model_context& m_context;
+    iface::formula_model_access& m_context;
 
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
     cell_store_type m_cell_listeners;         ///< store listeners for single cells.
     range_store_type m_range_listeners;       ///< store listeners for ranges.
     cell_listener_tracker::address_set_type m_volatile_cells;
 
-    impl(iface::model_context& cxt) : m_context(cxt) {}
+    impl(iface::formula_model_access& cxt) : m_context(cxt) {}
 
     ~impl()
     {
@@ -139,7 +139,7 @@ void cell_listener_tracker::impl::get_all_range_listeners_re(
 #endif
 }
 
-cell_listener_tracker::cell_listener_tracker(iface::model_context& cxt) :
+cell_listener_tracker::cell_listener_tracker(iface::formula_model_access& cxt) :
     mp_impl(new impl(cxt)) {}
 
 cell_listener_tracker::~cell_listener_tracker()

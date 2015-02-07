@@ -38,7 +38,7 @@ opcode_token paren_close = opcode_token(fop_close);
 
 }
 
-formula_interpreter::formula_interpreter(const formula_cell* cell, iface::model_context& cxt) :
+formula_interpreter::formula_interpreter(const formula_cell* cell, iface::formula_model_access& cxt) :
     m_parent_cell(cell),
     m_context(cxt),
     mp_handler(NULL),
@@ -157,7 +157,7 @@ void formula_interpreter::init_tokens()
 
 namespace {
 
-void get_result_from_cell(const iface::model_context& cxt, const abs_address_t& addr, formula_result& res)
+void get_result_from_cell(const iface::formula_model_access& cxt, const abs_address_t& addr, formula_result& res)
 {
     switch (cxt.get_celltype(addr))
     {
@@ -304,7 +304,7 @@ bool valid_expression_op(fopcode_t oc)
     return false;
 }
 
-bool pop_stack_value_or_string(const iface::model_context& cxt,
+bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
     value_stack_t& stack, stack_value_t& vt, double& val, string& str)
 {
     vt = stack.get_type();

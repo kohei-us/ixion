@@ -138,7 +138,7 @@ worker_thread_status wts;
 /**
  * Main worker thread routine.
  */
-void worker_main(worker_thread_data* data, iface::model_context* context)
+void worker_main(worker_thread_data* data, iface::formula_model_access* context)
 {
     stack_printer __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->action.mtx);
@@ -208,7 +208,7 @@ struct manage_queue_data
 
 manage_queue_data data;
 
-void init_workers(size_t worker_count, iface::model_context* context)
+void init_workers(size_t worker_count, iface::formula_model_access* context)
 {
     // Create specified number of worker threads.
     for (size_t i = 0; i < worker_count; ++i)
@@ -265,7 +265,7 @@ void interpret_cell(worker_thread_data& wt)
 /**
  * Main queue manager thread routine.
  */
-void manage_queue_main(size_t worker_count, iface::model_context* context)
+void manage_queue_main(size_t worker_count, iface::formula_model_access* context)
 {
     stack_printer __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
@@ -359,7 +359,7 @@ thread thr_queue;
 
 } // anonymous namespace
 
-void cell_queue_manager::init(size_t thread_count, iface::model_context& context)
+void cell_queue_manager::init(size_t thread_count, iface::formula_model_access& context)
 {
     // Don't forget to reset the global data.
     data.reset();

@@ -19,7 +19,7 @@ class formula_name_resolver;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -35,7 +35,7 @@ class IXION_DLLPUBLIC cell_listener_tracker
 
     cell_listener_tracker(); // disabled
 public:
-    cell_listener_tracker(iface::model_context& cxt);
+    cell_listener_tracker(iface::formula_model_access& cxt);
 
     typedef boost::unordered_set<abs_address_t, abs_address_t::hash> address_set_type;
 

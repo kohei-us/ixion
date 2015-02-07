@@ -102,7 +102,7 @@ formula_result::result_type formula_result::get_type() const
     return m_type;
 }
 
-string formula_result::str(const iface::model_context& cxt) const
+string formula_result::str(const iface::formula_model_access& cxt) const
 {
     switch (m_type)
     {
@@ -125,7 +125,7 @@ string formula_result::str(const iface::model_context& cxt) const
     return string();
 }
 
-void formula_result::parse(iface::model_context& cxt, const char* p, size_t n)
+void formula_result::parse(iface::formula_model_access& cxt, const char* p, size_t n)
 {
     if (!n)
         return;
@@ -232,7 +232,7 @@ void formula_result::parse_error(const char* p, size_t n)
     throw general_error(os.str());
 }
 
-void formula_result::parse_string(iface::model_context& cxt, const char* p, size_t n)
+void formula_result::parse_string(iface::formula_model_access& cxt, const char* p, size_t n)
 {
     if (n <= 1)
         return;

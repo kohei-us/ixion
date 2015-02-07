@@ -29,7 +29,7 @@ class formula_name_resolver;
  * @param tokens formula tokens representing the parsed formula expression.
  */
 void IXION_DLLPUBLIC parse_formula_string(
-    iface::model_context& cxt, const abs_address_t& pos,
+    iface::formula_model_access& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const char* p, size_t n,
     formula_tokens_t& tokens);
 
@@ -43,7 +43,7 @@ void IXION_DLLPUBLIC parse_formula_string(
  * @param str string representation of the formula tokens.
  */
 void IXION_DLLPUBLIC print_formula_tokens(
-    const iface::model_context& cxt, const abs_address_t& pos,
+    const iface::formula_model_access& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_tokens_t& tokens,
     std::string& str);
 
@@ -54,7 +54,7 @@ void IXION_DLLPUBLIC print_formula_tokens(
  * @param pos address of the cell being registered.
  */
 void IXION_DLLPUBLIC register_formula_cell(
-    iface::model_context& cxt, const abs_address_t& pos);
+    iface::formula_model_access& cxt, const abs_address_t& pos);
 
 /**
  * Unregister a formula cell with cell dependency tracker if a formula cell
@@ -66,7 +66,7 @@ void IXION_DLLPUBLIC register_formula_cell(
  * @param pos address of the cell being unregistered.
  */
 void IXION_DLLPUBLIC unregister_formula_cell(
-    iface::model_context& cxt, const abs_address_t& pos);
+    iface::formula_model_access& cxt, const abs_address_t& pos);
 
 /**
  * Get all cells that directly or indirectly depend on known modified cells.
@@ -80,7 +80,7 @@ void IXION_DLLPUBLIC unregister_formula_cell(
  *              function returns.
  */
 void IXION_DLLPUBLIC get_all_dirty_cells(
-    iface::model_context& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells);
+    iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells);
 
 /**
  * Calculate all dirty cells in order of dependency.
@@ -95,7 +95,7 @@ void IXION_DLLPUBLIC get_all_dirty_cells(
  *                     manage the calculation threads.
  */
 void IXION_DLLPUBLIC calculate_cells(
-    iface::model_context& cxt, dirty_formula_cells_t& cells, size_t thread_count);
+    iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count);
 
 }
 

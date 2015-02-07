@@ -175,7 +175,7 @@ formula_error_t formula_error::get_error() const
 
 namespace {
 
-double get_numeric_value(const iface::model_context& cxt, const stack_value& v)
+double get_numeric_value(const iface::formula_model_access& cxt, const stack_value& v)
 {
     double ret = 0.0;
     switch (v.get_type())
@@ -260,7 +260,7 @@ const abs_range_t& stack_value::get_range() const
     return *m_range;
 }
 
-value_stack_t::value_stack_t(const iface::model_context& cxt) : m_context(cxt) {}
+value_stack_t::value_stack_t(const iface::formula_model_access& cxt) : m_context(cxt) {}
 
 value_stack_t::iterator value_stack_t::begin()
 {

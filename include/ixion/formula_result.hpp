@@ -41,13 +41,13 @@ public:
 
     result_type get_type() const;
 
-    std::string str(const iface::model_context& cxt) const;
+    std::string str(const iface::formula_model_access& cxt) const;
 
     /**
      * Parse a textural representation of a formula result, and set result
      * value of appropriate type.
      */
-    void parse(iface::model_context& cxt, const char* p, size_t n);
+    void parse(iface::formula_model_access& cxt, const char* p, size_t n);
 
     formula_result& operator= (const formula_result& r);
     bool operator== (const formula_result& r) const;
@@ -55,7 +55,7 @@ public:
 
 private:
     void parse_error(const char* p, size_t n);
-    void parse_string(iface::model_context& cxt, const char* p, size_t n);
+    void parse_string(iface::formula_model_access& cxt, const char* p, size_t n);
 
 private:
     result_type m_type;

@@ -18,7 +18,7 @@ struct abs_address_t;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -35,7 +35,7 @@ public:
      *
      * @param thread_count desired number of worker threads.
      */
-    static void init(size_t thread_count, iface::model_context& context);
+    static void init(size_t thread_count, iface::formula_model_access& context);
 
     /**
      * Add new cell to queue to interpret.

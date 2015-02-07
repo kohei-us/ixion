@@ -24,7 +24,7 @@ class formula_cell;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 class session_handler;
 
 }
@@ -49,7 +49,7 @@ class formula_interpreter : public ::boost::noncopyable
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
 
-    formula_interpreter(const formula_cell* cell, iface::model_context& cxt);
+    formula_interpreter(const formula_cell* cell, iface::formula_model_access& cxt);
     ~formula_interpreter();
 
     void set_origin(const abs_address_t& pos);
@@ -92,7 +92,7 @@ private:
 
 private:
     const formula_cell* m_parent_cell;
-    iface::model_context& m_context;
+    iface::formula_model_access& m_context;
     iface::session_handler* mp_handler;
     abs_address_t m_pos;
 

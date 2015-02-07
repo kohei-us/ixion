@@ -34,7 +34,7 @@ class model_context_impl;
  * the interface; this explains why accessors for the most part only have
  * the 'get' method not paired with its 'set' counterpart.
  */
-class IXION_DLLPUBLIC model_context : public iface::model_context
+class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 {
 public:
     struct shared_tokens

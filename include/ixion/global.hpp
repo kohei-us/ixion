@@ -28,7 +28,7 @@ class matrix;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -143,11 +143,11 @@ class value_stack_t
 {
     typedef ::boost::ptr_vector<stack_value> store_type;
     store_type m_stack;
-    const iface::model_context& m_context;
+    const iface::formula_model_access& m_context;
 
     value_stack_t(); // disabled
 public:
-    explicit value_stack_t(const iface::model_context& cxt);
+    explicit value_stack_t(const iface::formula_model_access& cxt);
 
     typedef store_type::auto_type auto_type;
     typedef store_type::iterator iterator;

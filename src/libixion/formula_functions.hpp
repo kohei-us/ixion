@@ -21,7 +21,7 @@ class formula_token_base;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -40,7 +40,7 @@ public:
         invalid_arg(const ::std::string& msg);
     };
 
-    formula_functions(iface::model_context& cxt);
+    formula_functions(iface::formula_model_access& cxt);
     ~formula_functions();
 
     static formula_function_t get_function_opcode(const formula_token_base& token);
@@ -68,7 +68,7 @@ private:
     void fnc_subtotal(value_stack_t& args) const;
 
 private:
-    iface::model_context& m_context;
+    iface::formula_model_access& m_context;
 };
 
 }

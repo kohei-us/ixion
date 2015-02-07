@@ -31,7 +31,7 @@ namespace {
 class cell_printer : public unary_function<abs_address_t, void>
 {
 public:
-    cell_printer(const iface::model_context& cxt) : m_cxt(cxt) {}
+    cell_printer(const iface::formula_model_access& cxt) : m_cxt(cxt) {}
 
     void operator() (const abs_address_t& cell) const
     {
@@ -40,7 +40,7 @@ public:
     }
 
 private:
-    const iface::model_context& m_cxt;
+    const iface::formula_model_access& m_cxt;
 };
 #endif
 
@@ -50,9 +50,9 @@ private:
  */
 class cell_reset_handler : public unary_function<abs_address_t, void>
 {
-    iface::model_context& m_cxt;
+    iface::formula_model_access& m_cxt;
 public:
-    cell_reset_handler(iface::model_context& cxt) : m_cxt(cxt) {}
+    cell_reset_handler(iface::formula_model_access& cxt) : m_cxt(cxt) {}
     void operator() (const abs_address_t& pos) const
     {
         formula_cell* p = m_cxt.get_formula_cell(pos);
@@ -62,9 +62,9 @@ public:
 
 class circular_check_handler : public unary_function<abs_address_t, void>
 {
-    iface::model_context& m_cxt;
+    iface::formula_model_access& m_cxt;
 public:
-    circular_check_handler(iface::model_context& cxt) : m_cxt(cxt) {}
+    circular_check_handler(iface::formula_model_access& cxt) : m_cxt(cxt) {}
 
     void operator() (const abs_address_t& pos) const
     {
@@ -75,9 +75,9 @@ public:
 
 class thread_queue_handler : public unary_function<abs_address_t, void>
 {
-    iface::model_context& m_cxt;
+    iface::formula_model_access& m_cxt;
 public:
-    thread_queue_handler(iface::model_context& cxt) : m_cxt(cxt) {}
+    thread_queue_handler(iface::formula_model_access& cxt) : m_cxt(cxt) {}
     void operator() (const abs_address_t& pos) const
     {
         cell_queue_manager::add_cell(pos);
@@ -86,7 +86,7 @@ public:
 
 struct cell_interpret_handler : public unary_function<abs_address_t, void>
 {
-    cell_interpret_handler(iface::model_context& cxt) :
+    cell_interpret_handler(iface::formula_model_access& cxt) :
         m_context(cxt) {}
 
     void operator() (const abs_address_t& pos) const
@@ -95,7 +95,7 @@ struct cell_interpret_handler : public unary_function<abs_address_t, void>
         p->interpret(m_context, pos);
     }
 private:
-    iface::model_context& m_context;
+    iface::formula_model_access& m_context;
 };
 
 }
@@ -111,7 +111,7 @@ void dependency_tracker::cell_back_inserter::operator() (const abs_address_t& ce
 // ============================================================================
 
 dependency_tracker::dependency_tracker(
-    const dirty_formula_cells_t& dirty_cells, iface::model_context& cxt) :
+    const dirty_formula_cells_t& dirty_cells, iface::formula_model_access& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }

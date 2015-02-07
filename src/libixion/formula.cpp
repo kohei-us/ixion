@@ -31,7 +31,7 @@ using namespace std;
 namespace ixion {
 
 void parse_formula_string(
-    iface::model_context& cxt, const abs_address_t& pos,
+    iface::formula_model_access& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver,
     const char* p, size_t n, formula_tokens_t& tokens)
 {
@@ -50,13 +50,13 @@ namespace {
 
 class print_formula_token : std::unary_function<formula_token_base, void>
 {
-    const iface::model_context& m_cxt;
+    const iface::formula_model_access& m_cxt;
     const abs_address_t& m_pos;
     const formula_name_resolver& m_resolver;
     std::ostringstream& m_os;
 public:
     print_formula_token(
-        const iface::model_context& cxt, const abs_address_t& pos,
+        const iface::formula_model_access& cxt, const abs_address_t& pos,
         const formula_name_resolver& resolver, std::ostringstream& os) :
         m_cxt(cxt),
         m_pos(pos),
@@ -137,7 +137,7 @@ public:
 }
 
 void print_formula_tokens(
-    const iface::model_context& cxt, const abs_address_t& pos,
+    const iface::formula_model_access& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_tokens_t& tokens,
     std::string& str)
 {
@@ -166,7 +166,7 @@ bool has_volatile(const formula_tokens_t& tokens)
 
 }
 
-void register_formula_cell(iface::model_context& cxt, const abs_address_t& pos)
+void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)
 {
     formula_cell* cell = cxt.get_formula_cell(pos);
     if (!cell)
@@ -185,7 +185,7 @@ void register_formula_cell(iface::model_context& cxt, const abs_address_t& pos)
         cxt.get_cell_listener_tracker().add_volatile(pos);
 }
 
-void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos)
+void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)
 {
     // When there is a formula cell at this position, unregister it from
     // the dependency tree.
@@ -208,7 +208,7 @@ void unregister_formula_cell(iface::model_context& cxt, const abs_address_t& pos
 }
 
 void get_all_dirty_cells(
-    iface::model_context& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells)
+    iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells)
 {
 #if DEBUG_FORMULA_API
     __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
@@ -244,7 +244,7 @@ void get_all_dirty_cells(
     }
 }
 
-void calculate_cells(iface::model_context& cxt, dirty_formula_cells_t& cells, size_t thread_count)
+void calculate_cells(iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count)
 {
     dependency_tracker deptracker(cells, cxt);
     std::for_each(cells.begin(), cells.end(),

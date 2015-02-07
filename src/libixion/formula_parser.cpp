@@ -118,7 +118,7 @@ formula_parser::parse_error::parse_error(const string& msg) :
 // ----------------------------------------------------------------------------
 
 formula_parser::formula_parser(
-    const lexer_tokens_t& tokens, iface::model_context& cxt, const formula_name_resolver& resolver) :
+    const lexer_tokens_t& tokens, iface::formula_model_access& cxt, const formula_name_resolver& resolver) :
     m_itr_cur(tokens.end()),
     m_itr_end(tokens.end()),
     m_tokens(tokens),

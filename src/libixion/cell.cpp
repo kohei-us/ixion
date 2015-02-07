@@ -134,7 +134,7 @@ double formula_cell::fetch_value_from_result() const
     return m_interpret_status.result->get_value();
 }
 
-void formula_cell::interpret(iface::model_context& context, const abs_address_t& pos)
+void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
 {
 #if DEBUG_FORMULA_CELL
     const formula_name_resolver& resolver = context.get_name_resolver();
@@ -182,7 +182,7 @@ bool formula_cell::is_circular_safe() const
     return m_circular_safe;
 }
 
-void formula_cell::check_circular(const iface::model_context& cxt, const abs_address_t& pos)
+void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
 {
     // TODO: Check to make sure this is being run on the main thread only.
     const formula_tokens_t* tokens = NULL;
@@ -276,7 +276,7 @@ void formula_cell::reset()
     reset_flag();
 }
 
-void formula_cell::get_ref_tokens(const iface::model_context& cxt, const abs_address_t& pos, vector<const formula_token_base*>& tokens)
+void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const abs_address_t& pos, vector<const formula_token_base*>& tokens)
 {
     const formula_tokens_t* this_tokens = NULL;
     if (is_shared())

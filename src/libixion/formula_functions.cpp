@@ -133,7 +133,7 @@ const char* formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-formula_functions::formula_functions(iface::model_context& cxt) :
+formula_functions::formula_functions(iface::formula_model_access& cxt) :
     m_context(cxt)
 {
 }

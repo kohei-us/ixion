@@ -24,7 +24,7 @@ class formula_cell;
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -54,13 +54,13 @@ public:
 
     IXION_DLLPUBLIC double get_value() const;
     IXION_DLLPUBLIC double get_value_nowait() const;
-    IXION_DLLPUBLIC void interpret(iface::model_context& context, const abs_address_t& pos);
+    IXION_DLLPUBLIC void interpret(iface::formula_model_access& context, const abs_address_t& pos);
 
     /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
      */
-    void check_circular(const iface::model_context& cxt, const abs_address_t& pos);
+    void check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos);
 
     /**
      * Reset cell's internal state.
@@ -68,7 +68,7 @@ public:
     IXION_DLLPUBLIC void reset();
 
     IXION_DLLPUBLIC void get_ref_tokens(
-        const iface::model_context& cxt, const abs_address_t& pos, std::vector<const formula_token_base*>& tokens);
+        const iface::formula_model_access& cxt, const abs_address_t& pos, std::vector<const formula_token_base*>& tokens);
 
     IXION_DLLPUBLIC const formula_result* get_result_cache() const;
 

@@ -43,10 +43,10 @@ class table_handler;
  * implementation of this interface in order to provide access to its
  * content.
  */
-class model_context : boost::noncopyable
+class formula_model_access : boost::noncopyable
 {
 public:
-    virtual IXION_DLLPUBLIC ~model_context();
+    virtual IXION_DLLPUBLIC ~formula_model_access();
 
     virtual const config& get_config() const = 0;
     virtual cell_listener_tracker& get_cell_listener_tracker() = 0;

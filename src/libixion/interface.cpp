@@ -15,19 +15,19 @@ table_handler::~table_handler() {}
 
 session_handler::~session_handler() {}
 
-model_context::~model_context() {}
+formula_model_access::~formula_model_access() {}
 
-session_handler* model_context::get_session_handler()
+session_handler* formula_model_access::get_session_handler()
 {
     return NULL;
 }
 
-table_handler* model_context::get_table_handler()
+table_handler* formula_model_access::get_table_handler()
 {
     return NULL;
 }
 
-const table_handler* model_context::get_table_handler() const
+const table_handler* formula_model_access::get_table_handler() const
 {
     return NULL;
 }

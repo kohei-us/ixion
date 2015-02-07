@@ -17,7 +17,7 @@ namespace ixion {
 
 namespace iface {
 
-class model_context;
+class formula_model_access;
 
 }
 
@@ -117,7 +117,7 @@ public:
      *         is responsible for managing its life cycle.
      */
     IXION_DLLPUBLIC static formula_name_resolver*
-        get(formula_name_resolver_t type, const iface::model_context* cxt);
+        get(formula_name_resolver_t type, const iface::formula_model_access* cxt);
 };
 
 }

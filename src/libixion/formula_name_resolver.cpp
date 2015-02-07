@@ -57,7 +57,7 @@ bool resolve_function(const char* p, size_t n, formula_name_type& ret)
  * <li>#All</li>
  * </ul>
  */
-bool resolve_table(const iface::model_context* cxt, const char* p, size_t n, formula_name_type& ret)
+bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t n, formula_name_type& ret)
 {
     if (!cxt)
         return false;
@@ -263,7 +263,7 @@ void append_column_name_a1(ostringstream& os, col_t col)
 }
 
 void append_address_a1(
-    ostringstream& os, const ixion::iface::model_context* cxt,
+    ostringstream& os, const ixion::iface::formula_model_access* cxt,
     const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
 {
     col_t col = addr.column;
@@ -297,7 +297,7 @@ void append_address_a1(
     os << (row + 1);
 }
 
-void append_name_string(ostringstream& os, const iface::model_context* cxt, string_id_t sid)
+void append_name_string(ostringstream& os, const iface::formula_model_access* cxt, string_id_t sid)
 {
     if (!cxt)
         return;
@@ -360,7 +360,7 @@ const char* parse_address_result_names[] = {
 };
 #endif
 
-void parse_sheet_name_quoted(const ixion::iface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+void parse_sheet_name_quoted(const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     const char* p_old = p;
     ++p; // skip the open quote.
@@ -393,7 +393,7 @@ void parse_sheet_name_quoted(const ixion::iface::model_context& cxt, const char 
     p = p_old;
 }
 
-void parse_sheet_name(const ixion::iface::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     if (*p == '\'')
     {
@@ -567,7 +567,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
 }
 
 parse_address_result parse_address_excel_a1(
-    const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
@@ -583,7 +583,7 @@ parse_address_result parse_address_excel_a1(
 }
 
 parse_address_result parse_address_odff(
-    const ixion::iface::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
@@ -704,7 +704,7 @@ string get_column_name_a1(col_t col)
 class excel_a1 : public formula_name_resolver
 {
 public:
-    excel_a1(const iface::model_context* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
+    excel_a1(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~excel_a1() {}
 
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
@@ -926,7 +926,7 @@ public:
     }
 
 private:
-    const iface::model_context* mp_cxt;
+    const iface::formula_model_access* mp_cxt;
 };
 
 /**
@@ -935,7 +935,7 @@ private:
 class odff_resolver : public formula_name_resolver
 {
 public:
-    odff_resolver(const iface::model_context* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
+    odff_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~odff_resolver() {}
 
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
@@ -1057,13 +1057,13 @@ public:
     }
 
 private:
-    const iface::model_context* mp_cxt;
+    const iface::formula_model_access* mp_cxt;
 };
 
 }
 
 formula_name_resolver* formula_name_resolver::get(
-    formula_name_resolver_t type, const iface::model_context* cxt)
+    formula_name_resolver_t type, const iface::formula_model_access* cxt)
 {
 
     switch (type)
