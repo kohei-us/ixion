@@ -58,9 +58,9 @@ Let's insert a formula expression next.
     >>> sh1.set_formula_cell(0, 1, "A1*100")  # B1
     >>> sh1.set_formula_cell(1, 1, "A2")      # B2
 
-When setting a formula expression to a cell, you don't need to start your
-formula expression with a '=' like you would when you are entering a formula
-in a spreadsheet application.
+.. note:: When setting a formula expression to a cell, you don't need to start
+          your formula expression with a '=' like you would when you are
+          entering a formula in a spreadsheet application.
 
 Now, the formula cells don't get calculated automatically as you enter them;
 you need to explicitly tell the document to calculate the formula cells via
