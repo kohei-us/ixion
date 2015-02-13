@@ -18,6 +18,10 @@ Since your newly-created document has no sheet at all, you need to insert one.
 
     sheet1 = doc.append_sheet("MySheet1")
 
+The append_sheet method takes a sheet name string as an argument (which in
+this case is "MySheet1") and returns an object representing the sheet that has
+just been inserted.  This sheet object has a
+
 
 
 
