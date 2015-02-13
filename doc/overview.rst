@@ -27,8 +27,8 @@ name via its ``name`` attribute.
     >>> print(sheet1.name)
     'MySheet1'
 
-Note that this attribute is read-only; you'll get a :exc:`TypeError` raised if
-you attempt to assign a new value to it.
+.. warning:: Note that this attribute is read-only; you'll get a :exc:`TypeError`
+             if you attempt to assign a new value to it.
 
 Now that you have a sheet object, let's go over how to put new cell values into
 the sheet.  The sheet object provides several methods to set new cell values
@@ -36,11 +36,11 @@ and also to retrieve them afterward.
 
 ::
 
-    >>> sh1.set_numeric_cell(0, 0, 12.3)  # Set 12.3 to cell A1.
-    >>> sh1.get_numeric_value(0, 0)
+    >>> sheet1.set_numeric_cell(0, 0, 12.3)  # Set 12.3 to cell A1.
+    >>> sheet1.get_numeric_value(0, 0)
     12.3
-    >>> sh1.set_string_cell(1, 0, "My string") # Set "My string" to cell A2.
-    >>> sh1.get_string_value(1, 0)
+    >>> sheet1.set_string_cell(1, 0, "My string") # Set "My string" to cell A2.
+    >>> sheet1.get_string_value(1, 0)
     'My string'
 
 The setters take 3 arguments: the first one is a 0-based row index, the second
@@ -49,14 +49,14 @@ You can also pass these arguments by name as follows:
 
 ::
 
-    >>> sh1.set_string_cell(row=1, column=0, value="My string")
+    >>> sheet1.set_string_cell(row=1, column=0, value="My string")
 
 Let's insert a formula expression next.
 
 ::
 
-    >>> sh1.set_formula_cell(0, 1, "A1*100")  # B1
-    >>> sh1.set_formula_cell(1, 1, "A2")      # B2
+    >>> sheet1.set_formula_cell(0, 1, "A1*100")  # B1
+    >>> sheet1.set_formula_cell(1, 1, "A2")      # B2
 
 .. note:: When setting a formula expression to a cell, you don't need to start
           your formula expression with a '=' like you would when you are
