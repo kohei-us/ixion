@@ -39,7 +39,7 @@ and also to retrieve them afterward.
     >>> sheet1.set_numeric_cell(0, 0, 12.3)  # Set 12.3 to cell A1.
     >>> sheet1.get_numeric_value(0, 0)
     12.3
-    >>> sheet1.set_string_cell(1, 0, "My string") # Set "My string" to cell A2.
+    >>> sheet1.set_string_cell(1, 0, "My string")  # Set "My string" to cell A2.
     >>> sheet1.get_string_value(1, 0)
     'My string'
 
