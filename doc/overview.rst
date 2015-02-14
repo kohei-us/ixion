@@ -27,8 +27,8 @@ name via its ``name`` attribute.
     >>> print(sheet1.name)
     'MySheet1'
 
-.. warning:: Note that this attribute is read-only; you'll get a :exc:`TypeError`
-             if you attempt to assign a new value to it.
+.. warning:: This attribute is read-only; you'll get a :exc:`TypeError` if you
+             attempt to assign a new value to it.
 
 Now that you have a sheet object, let's go over how to put new cell values into
 the sheet.  The sheet object provides several methods to set new cell values
