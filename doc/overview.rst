@@ -27,8 +27,8 @@ name via its ``name`` attribute.
     >>> print(sheet1.name)
     'MySheet1'
 
-.. warning:: This attribute is read-only; you'll get a :exc:`TypeError` if you
-             attempt to assign a new value to it.
+.. note:: This attribute is read-only; you'll get a :exc:`TypeError` if you
+          attempt to assign a new value to it.
 
 Now that you have a sheet object, let's go over how to put new cell values into
 the sheet.  The sheet object provides several methods to set new cell values
@@ -62,7 +62,7 @@ Let's insert a formula expression next.
           your formula expression with a '=' like you would when you are
           entering a formula in a spreadsheet application.
 
-Now, the formula cells don't get calculated automatically as you enter them;
+The formula cells don't get calculated automatically as you enter them;
 you need to explicitly tell the document to calculate the formula cells via
 its :meth:`calculate` method.
 
@@ -70,18 +70,14 @@ its :meth:`calculate` method.
 
     >>> doc.calculate()
 
-Now all the formula cells in this document have been calculated.
+Now all the formula cells in this document have been calculated.  Let's retrieve
+the results of the formula cells.
 
+::
 
+   >>> sheet1.get_numeric_value(0, 1)
+   1230.0
+   >>> sheet1.get_string_value(1, 1)
+   'My string'
 
-
-
-
-
-
-
-
-
-
-
-
+That's all there is to it!
