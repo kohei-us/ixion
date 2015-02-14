@@ -182,7 +182,7 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     assert(sd->m_global);
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    string_id_t sid = cxt.get_string_identifier(ixion::abs_address_t(sd->m_sheet_index, row, col));
+    string_id_t sid = cxt.get_string_identifier_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
     const std::string* ps = cxt.get_string(sid);
     if (!ps)
         return NULL;

@@ -145,6 +145,16 @@ class Test(unittest.TestCase):
         val = sh1.get_numeric_value(6, 1)
         self.assertEqual(10.0, val)
 
+    def test_formula_cell_string(self):
+        sh1 = self.doc.append_sheet("MyData")
+        sh1.set_string_cell(1, 1, "My precious string")  # B2
+        sh1.set_formula_cell(1, 2, "B2")  # C2
+        sh1.set_formula_cell(2, 2, "concatenate(B2, \" is here\")")  # C3
+        self.doc.calculate()
+        self.assertEqual("My precious string", sh1.get_string_value(1, 1))
+        self.assertEqual("My precious string", sh1.get_string_value(1, 2))
+        self.assertEqual("My precious string is here", sh1.get_string_value(2, 2))
+
 
 if __name__ == '__main__':
     unittest.main()

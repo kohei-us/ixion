@@ -82,6 +82,7 @@ public:
     virtual std::string get_sheet_name(sheet_t sheet) const;
 
     double get_numeric_value_nowait(const abs_address_t& addr) const;
+    string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
 
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);

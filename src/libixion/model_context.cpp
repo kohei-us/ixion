@@ -209,6 +209,7 @@ public:
     double get_numeric_value(const abs_address_t& addr) const;
     double get_numeric_value_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const abs_address_t& addr) const;
+    string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const char* p, size_t n) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
@@ -919,10 +920,41 @@ double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) c
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != ixion::element_type_string)
-        return empty_string_id;
+    switch (col_store.get_type(addr.row))
+    {
+        case ixion::element_type_string:
+            return col_store.get<string_id_t>(addr.row);
+        default:
+            ;
+    }
+    return empty_string_id;
+}
 
-    return col_store.get<string_id_t>(addr.row);
+string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t& addr) const
+{
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    switch (col_store.get_type(addr.row))
+    {
+        case ixion::element_type_string:
+            return col_store.get<string_id_t>(addr.row);
+        case ixion::element_type_formula:
+        {
+            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
+            const formula_result* res_cache = p->get_result_cache();
+            switch (res_cache->get_type())
+            {
+                case formula_result::rt_string:
+                    return res_cache->get_string();
+                case formula_result::rt_error:
+                    // TODO : perhaps we should return the error string here.
+                default:
+                    ;
+            }
+        }
+        default:
+            ;
+    }
+    return empty_string_id;
 }
 
 string_id_t model_context_impl::get_string_identifier(const char* p, size_t n) const
@@ -1041,6 +1073,11 @@ double model_context::get_numeric_value_nowait(const abs_address_t& addr) const
 string_id_t model_context::get_string_identifier(const abs_address_t& addr) const
 {
     return mp_impl->get_string_identifier(addr);
+}
+
+string_id_t model_context::get_string_identifier_nowait(const abs_address_t& addr) const
+{
+    return mp_impl->get_string_identifier_nowait(addr);
 }
 
 string_id_t model_context::get_string_identifier(const char* p, size_t n) const
