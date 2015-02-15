@@ -4,11 +4,17 @@ Sheet
 
 .. class:: Sheet()
 
-   Class :class:`Sheet` represents a single sheet that stores cells in a 2-dimensional grid scheme.
+   Class :class:`Sheet` represents a single sheet that stores cells in a 2-dimensional grid address space.
 
 The set_numeric_cell() method
 -----------------------------
 .. method:: Sheet.set_numeric_cell(row, column, value)
+
+   Set numeric value to a cell at position specified.
+
+   * row - 0-based vertical offset from the top-most row.
+   * column - 0-based horizontal offset from the left-most column.
+   * value - numeric value to assign to the cell.
 
 The set_string_cell() method
 ----------------------------
