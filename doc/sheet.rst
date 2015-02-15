@@ -6,8 +6,11 @@ Sheet
 
    Class :class:`Sheet` represents a single sheet that stores cells in a 2-dimensional grid address space.
 
-The set_numeric_cell() method
------------------------------
+.. attribute:: Sheet.name
+
+   A string representing the name of the sheet object.  This is a read-only
+   attribute.
+
 .. method:: Sheet.set_numeric_cell(row, column, value)
 
    Set numeric value to a cell at specified position.
@@ -16,8 +19,6 @@ The set_numeric_cell() method
    * column - 0-based horizontal offset from the left-most column.
    * value - numeric value to assign to the cell.
 
-The set_string_cell() method
-----------------------------
 .. method:: Sheet.set_string_cell(row, column, value)
 
    Set string value to a cell at specified position.
@@ -26,8 +27,6 @@ The set_string_cell() method
    * column - 0-based horizontal offset from the left-most column.
    * value - string value to assign to the cell.
 
-The set_formula_cell() method
------------------------------
 .. method:: Sheet.set_formula_cell(row, column, value)
 
    Set formula expression to a cell at specified position.
@@ -36,8 +35,6 @@ The set_formula_cell() method
    * column - 0-based horizontal offset from the left-most column.
    * value - formula expression to assign to the cell.
 
-The get_numeric_value() method
-------------------------------
 .. method:: Sheet.get_numeric_value(row, column)
 
    Get a numeric value representing the content of a cell at specified
@@ -48,8 +45,6 @@ The get_numeric_value() method
    * row - 0-based vertical offset from the top-most row.
    * column - 0-based horizontal offset from the left-most column.
 
-The get_string_value() method
------------------------------
 .. method:: Sheet.get_string_value(row, column)
 
    Get a string value representing the content of a cell at specified
@@ -60,8 +55,6 @@ The get_string_value() method
    * row - 0-based vertical offset from the top-most row.
    * column - 0-based horizontal offset from the left-most column.
 
-The get_formula_expression() method
------------------------------------
 .. method:: Sheet.get_formula_expression(row, column)
 
    Given a formula cell at specified position, get the formula expression
@@ -70,8 +63,6 @@ The get_formula_expression() method
    * row - 0-based vertical offset from the top-most row.
    * column - 0-based horizontal offset from the left-most column.
 
-The erase_cell() method
------------------------
 .. method:: Sheet.erase_cell(row, column)
 
    Erase the cell at specified position.  The slot at the specified position
