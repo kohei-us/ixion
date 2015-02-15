@@ -87,7 +87,13 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
     sd->m_global->m_modified_cells.push_back(pos);
@@ -108,7 +114,13 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
     sd->m_global->m_modified_cells.push_back(pos);
@@ -129,7 +141,13 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
 
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
@@ -154,7 +172,13 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
     double val = 0.0;
     try
@@ -180,7 +204,13 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
     string_id_t sid = cxt.get_string_identifier_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
     const std::string* ps = cxt.get_string(sid);
@@ -200,7 +230,13 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
     const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
@@ -231,7 +267,13 @@ PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
-    assert(sd->m_global);
+    if (!sd->m_global)
+    {
+        PyErr_SetString(get_python_sheet_error(),
+            "This Sheet object does not belong to a Document object.");
+        return NULL;
+    }
+
     ixion::model_context& cxt = sd->m_global->m_cxt;
     abs_address_t pos(sd->m_sheet_index, row, col);
     sd->m_global->m_modified_cells.push_back(pos);

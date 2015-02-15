@@ -7,6 +7,7 @@
 
 #include "document.hpp"
 #include "sheet.hpp"
+#include "global.hpp"
 
 #include "ixion/env.hpp"
 #include "ixion/info.hpp"
@@ -76,6 +77,9 @@ initixion()
 
     Py_INCREF(sheet_type);
     PyModule_AddObject(m, "Sheet", reinterpret_cast<PyObject*>(sheet_type));
+
+    PyModule_AddObject(
+        m, "SheetError", ixion::python::get_python_sheet_error());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

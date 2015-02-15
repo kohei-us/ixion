@@ -8,6 +8,8 @@
 #ifndef INCLUDED_IXION_PYTHON_GLOBAL_HPP
 #define INCLUDED_IXION_PYTHON_GLOBAL_HPP
 
+#include <Python.h>
+
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/address.hpp"
@@ -33,6 +35,8 @@ struct document_global
 
     document_global();
 };
+
+PyObject* get_python_sheet_error();
 
 }}
 

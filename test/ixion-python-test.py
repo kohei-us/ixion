@@ -155,6 +155,52 @@ class Test(unittest.TestCase):
         self.assertEqual("My precious string", sh1.get_string_value(1, 2))
         self.assertEqual("My precious string is here", sh1.get_string_value(2, 2))
 
+    def test_detached_sheet(self):
+        # You can't set values to a detached sheet that doesn't belong to a
+        # Document object.
+        sh = ixion.Sheet()
+        try:
+            sh.set_numeric_cell(1, 1, 12)
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
+        try:
+            sh.set_string_cell(2, 2, "String")
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
+        try:
+            sh.set_formula_cell(2, 2, "A1")
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
+        try:
+            sh.erase_cell(2, 1)
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
+        try:
+            val = sh.get_numeric_value(2, 1)
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
+        try:
+            s = sh.get_string_value(2, 1)
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
+        try:
+            expr = sh.get_formula_expression(2, 1)
+            self.assertTrue(False, "failed to raise a SheetError.")
+        except ixion.SheetError:
+            pass # expected
+
 
 if __name__ == '__main__':
     unittest.main()

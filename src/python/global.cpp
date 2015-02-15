@@ -14,6 +14,12 @@ document_global::document_global() :
     m_resolver(ixion::formula_name_resolver::get(formula_name_resolver_excel_a1, &m_cxt))
 {}
 
+PyObject* get_python_sheet_error()
+{
+    static PyObject* p = PyErr_NewException(const_cast<char*>("ixion.SheetError"), NULL, NULL);
+    return p;
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
