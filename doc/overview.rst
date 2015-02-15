@@ -4,7 +4,7 @@ Overview
 
 Let's go over very quickly how to create a document and populate some cells inside spreadsheet.
 
-First, you need to import ixion module and create a new document.
+First, you need to import ixion module and create a new :class:`Document` object.
 
 ::
 

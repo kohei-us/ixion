@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 2
 
    overview.rst
+   document.rst
+   sheet.rst
 
 Indices and tables
 ==================
