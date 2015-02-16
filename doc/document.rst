@@ -19,7 +19,7 @@ Document
 
    Get a tuple of string objects that represent the names of the sheets that
    belong to the document.  The order of the sheet names represents the order
-   of the sheets.
+   of the sheets in the document.
 
 .. method:: Document.get_sheet(arg)
 
