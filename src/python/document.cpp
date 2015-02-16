@@ -14,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -167,6 +168,9 @@ PyObject* document_get_sheet(document* self, PyObject* args, PyObject*)
         }
     }
 
+    ostringstream os;
+    os << "No sheet named '" << name << "' found";
+    PyErr_SetString(PyExc_IndexError, os.str().c_str());
     return NULL;
 }
 

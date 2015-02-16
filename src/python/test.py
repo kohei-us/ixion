@@ -15,6 +15,8 @@ sheet2 = doc.append_sheet("Sheet2")
 print(sheet2)
 print("sheet name: {}".format(sheet2.name))
 
+sheet = doc.get_sheet("Foo")
+
 col = 1
 sheet1.set_numeric_cell(row=1, column=col, value=10.2)
 sheet1.set_numeric_cell(column=col, row=0, value=11)
