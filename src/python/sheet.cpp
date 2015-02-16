@@ -356,6 +356,11 @@ sheet_data* get_sheet_data(PyObject* obj)
     return reinterpret_cast<sheet*>(obj)->m_data;
 }
 
+PyObject* get_sheet_name(PyObject* obj)
+{
+    return reinterpret_cast<sheet*>(obj)->name;
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

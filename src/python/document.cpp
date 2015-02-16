@@ -123,20 +123,51 @@ PyObject* document_get_sheet(document* self, PyObject* args, PyObject*)
     if (!PyArg_ParseTuple(args, "O", &arg))
         return NULL;
 
-    long index = PyInt_AsLong(arg);
-    if (index == -1 && PyErr_Occurred())
-        return NULL;
-
     const vector<PyObject*>& sheets = self->m_data->m_sheets;
-    if (index < 0 || index >= sheets.size())
+    if (PyInt_Check(arg))
     {
-        PyErr_SetString(PyExc_IndexError, "Out-of-bound sheet index");
-        return NULL;
+        long index = PyInt_AsLong(arg);
+        if (index == -1 && PyErr_Occurred())
+            return NULL;
+
+        if (index < 0 || index >= sheets.size())
+        {
+            PyErr_SetString(PyExc_IndexError, "Out-of-bound sheet index");
+            return NULL;
+        }
+
+        PyObject* sheet_obj = sheets[index];
+        Py_INCREF(sheet_obj);
+        return sheet_obj;
     }
 
-    PyObject* sheet_obj = sheets[index];
-    Py_INCREF(sheet_obj);
-    return sheet_obj;
+    // Not a python int object.  See if it's a string object.
+    const char* name = PyString_AsString(arg);
+    if (!name)
+        return NULL;
+
+    // Iterate through all sheets to find a match.
+    // TODO : Use string hash to speed up the lookup.
+    vector<PyObject*>::const_iterator i = sheets.begin(), ie = sheets.end();
+    for (; i != ie; ++i)
+    {
+        PyObject* sh = *i;
+        PyObject* obj = get_sheet_name(sh);
+        if (!obj)
+            continue;
+
+        const char* this_name = PyString_AsString(obj);
+        if (!this_name)
+            continue;
+
+        if (!strcmp(name, this_name))
+        {
+            Py_INCREF(sh);
+            return sh;
+        }
+    }
+
+    return NULL;
 }
 
 PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)

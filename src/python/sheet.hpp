@@ -28,6 +28,15 @@ PyTypeObject* get_sheet_type();
 
 sheet_data* get_sheet_data(PyObject* obj);
 
+/**
+ * Get the sheet name of a python sheet object.
+ *
+ * @param obj python sheet object.
+ *
+ * @return python string object storing the sheet name.
+ */
+PyObject* get_sheet_name(PyObject* obj);
+
 }}
 
 #endif

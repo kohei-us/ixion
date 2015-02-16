@@ -37,6 +37,11 @@ class Test(unittest.TestCase):
             sh = self.doc.get_sheet(i)
             self.assertEqual(test, sh.name)
 
+        for test in tests:
+            # get sheet by name.
+            sh = self.doc.get_sheet(test)
+            self.assertEqual(test, sh.name)
+
         try:
             sheets[0].name = "Try to change sheet name"
             self.assertTrue(False, "sheet name attribute should not be writable.")
