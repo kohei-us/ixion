@@ -117,10 +117,27 @@ PyObject* document_calculate(document* self, PyObject*, PyObject*)
     return Py_None;
 }
 
+PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)
+{
+    model_context& cxt = self->m_data->m_global.m_cxt;
+    const vector<PyObject*>& sheets = self->m_data->m_sheets;
+    size_t n = sheets.size();
+    PyObject* t = PyTuple_New(n);
+    for (size_t i = 0; i < n; ++i)
+    {
+        std::string name = cxt.get_sheet_name(i);
+        PyObject* o = PyString_FromString(name.c_str());
+        PyTuple_SetItem(t, i, o);
+    }
+
+    return t;
+}
+
 PyMethodDef document_methods[] =
 {
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
     { "calculate", (PyCFunction)document_calculate, 0, "calculate formula cells" },
+    { "get_sheet_names", (PyCFunction)document_get_sheet_names, 0, "get a tuple of sheet names" },
     { NULL }
 };
 

@@ -30,6 +30,8 @@ class Test(unittest.TestCase):
         for test, sheet in itertools.izip(tests, sheets):
             self.assertEqual(test, sheet.name)
 
+        self.assertEqual(tests, self.doc.get_sheet_names())
+
         try:
             sheets[0].name = "Try to change sheet name"
             self.assertTrue(False, "sheet name attribute should not be writable.")
