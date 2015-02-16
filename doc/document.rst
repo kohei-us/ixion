@@ -10,10 +10,9 @@ Document
 .. method:: Document.append_sheet(sheet name)
 
    Append a new sheet to the document object and return the newly created :class:`Sheet` object.
-
-   * sheet name - name to assign to the sheet object.  Each :class:`Sheet`
-     object must have a name associated with it.  The name must be unique within
-     the document it belongs to.
+   The *sheet name* will become the name of the sheet object being appended.
+   Each :class:`Sheet` object must have a name, and the name must be unique
+   within the document.
 
 .. method:: Document.get_sheet_names()
 
