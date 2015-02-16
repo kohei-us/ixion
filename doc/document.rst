@@ -15,6 +15,12 @@ Document
      object must have a name associated with it.  The name must be unique within
      the document it belongs to.
 
+.. method:: Document.get_sheet_names()
+
+   Get a tuple of string objects that represent the names of the sheets that
+   belong to the document.  The order of the sheet names represents the order
+   of the sheets.
+
 .. method:: Document.calculate()
 
    Calculate all formula cells within the document that are marked "dirty" i.e. either those formula cells whose direct 
