@@ -21,6 +21,12 @@ Document
    belong to the document.  The order of the sheet names represents the order
    of the sheets.
 
+.. method:: Document.get_sheet(arg)
+
+   Get a sheet object either by the position or by the name.  When the *arg* is
+   an integer, it returns the sheet object at specified position (0-based).  When
+   the *arg* is a string, it returns the sheet object whose name matches that string.
+
 .. method:: Document.calculate()
 
    Calculate all formula cells within the document that are marked "dirty" i.e. either those formula cells whose direct 
