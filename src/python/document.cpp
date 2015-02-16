@@ -117,6 +117,28 @@ PyObject* document_calculate(document* self, PyObject*, PyObject*)
     return Py_None;
 }
 
+PyObject* document_get_sheet(document* self, PyObject* args, PyObject*)
+{
+    PyObject* arg = NULL;
+    if (!PyArg_ParseTuple(args, "O", &arg))
+        return NULL;
+
+    long index = PyInt_AsLong(arg);
+    if (index == -1 && PyErr_Occurred())
+        return NULL;
+
+    const vector<PyObject*>& sheets = self->m_data->m_sheets;
+    if (index < 0 || index >= sheets.size())
+    {
+        PyErr_SetString(PyExc_IndexError, "Out-of-bound sheet index");
+        return NULL;
+    }
+
+    PyObject* sheet_obj = sheets[index];
+    Py_INCREF(sheet_obj);
+    return sheet_obj;
+}
+
 PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)
 {
     model_context& cxt = self->m_data->m_global.m_cxt;
@@ -138,6 +160,7 @@ PyMethodDef document_methods[] =
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
     { "calculate", (PyCFunction)document_calculate, 0, "calculate formula cells" },
     { "get_sheet_names", (PyCFunction)document_get_sheet_names, 0, "get a tuple of sheet names" },
+    { "get_sheet", (PyCFunction)document_get_sheet, METH_KEYWORDS, "get a sheet object either by index or name" },
     { NULL }
 };
 
