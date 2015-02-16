@@ -27,6 +27,11 @@ Document
    an integer, it returns the sheet object at specified position (0-based).  When
    the *arg* is a string, it returns the sheet object whose name matches that string.
 
+.. warning:: Prefer passing a sheet index to :meth:`get_sheet` than passing a
+             sheet name.  When passing a sheet name as an argument, the current
+             :meth:`get_sheet` implementation has to iterate through the sheet
+             objects in the document to find a matching one.
+
 .. method:: Document.calculate()
 
    Calculate all formula cells within the document that are marked "dirty" i.e. either those formula cells whose direct 
