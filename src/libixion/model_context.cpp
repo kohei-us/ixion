@@ -18,6 +18,7 @@
 #include "workbook.hpp"
 
 #include <memory>
+#include <sstream>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -330,8 +331,21 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
     return m_sheet_names[sheet];
 }
 
-sheet_t model_context_impl::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
+sheet_t model_context_impl::append_sheet(
+    const char* p, size_t n, row_t row_size, col_t col_size)
 {
+    // Check if the new sheet name already exists.
+    string new_name(p, n);
+    strings_type::const_iterator it =
+        std::find(m_sheet_names.begin(), m_sheet_names.end(), new_name);
+    if (it != m_sheet_names.end())
+    {
+        // This sheet name is already taken.
+        ostringstream os;
+        os << "Sheet name '" << new_name << "' already exists.";
+        throw model_context_error(os.str(), model_context_error::sheet_name_conflict);
+    }
+
     // index of the new sheet.
     sheet_t sheet_index = m_sheets.size();
 

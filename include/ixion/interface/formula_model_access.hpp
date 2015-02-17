@@ -27,12 +27,6 @@ struct abs_address_t;
 struct abs_range_t;
 struct config;
 
-class model_context_error : public general_error
-{
-public:
-    model_context_error(const std::string& msg) : general_error(msg) {}
-};
-
 namespace iface {
 
 class session_handler;

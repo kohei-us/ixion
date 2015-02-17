@@ -199,7 +199,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
         else
             os << "failed to retrieve formula tokens from formula cell's identifier. ";
         os << "(identifier=" << m_identifier << ")";
-        throw model_context_error(os.str());
+        throw model_context_error(os.str(), model_context_error::circular_dependency);
     }
 
     formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();

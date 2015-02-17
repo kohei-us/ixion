@@ -79,6 +79,8 @@ initixion()
     PyModule_AddObject(m, "Sheet", reinterpret_cast<PyObject*>(sheet_type));
 
     PyModule_AddObject(
+        m, "DocumentError", ixion::python::get_python_document_error());
+    PyModule_AddObject(
         m, "SheetError", ixion::python::get_python_sheet_error());
 }
 

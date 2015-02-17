@@ -94,7 +94,26 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     sheet_data* sd = get_sheet_data(obj_sheet);
     sd->m_global = &self->m_data->m_global;
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    sd->m_sheet_index = cxt.append_sheet(sheet_name, strlen(sheet_name), 1048576, 1024);
+    try
+    {
+        sd->m_sheet_index = cxt.append_sheet(sheet_name, strlen(sheet_name), 1048576, 1024);
+    }
+    catch (const model_context_error& e)
+    {
+        // Most likely the sheet name already exists in this document.
+        Py_XDECREF(obj_sheet);
+        switch (e.get_error_type())
+        {
+            case model_context_error::sheet_name_conflict:
+                PyErr_SetString(get_python_document_error(),
+                    "The sheet name already exists in this document.");
+            break;
+            default:
+                PyErr_SetString(get_python_document_error(),
+                    "Sheet insertion failed for unknown reason.");
+        }
+        return NULL;
+    }
 
     // Append this sheet instance to the document.
     Py_INCREF(obj_sheet);

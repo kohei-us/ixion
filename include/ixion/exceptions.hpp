@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_EXCEPTIONS_HPP__
-#define __IXION_EXCEPTIONS_HPP__
+#ifndef INCLUDED_IXION_EXCEPTIONS_HPP
+#define INCLUDED_IXION_EXCEPTIONS_HPP
 
 #include "env.hpp"
 
@@ -33,6 +33,26 @@ public:
     virtual const char* what() const throw();
 private:
     std::string m_fpath;
+};
+
+/**
+ * This exception is thrown typically from the {@link model_context} class.
+ */
+class IXION_DLLPUBLIC model_context_error: public general_error
+{
+public:
+    enum error_type
+    {
+        circular_dependency,
+        sheet_name_conflict
+    };
+
+    explicit model_context_error(const std::string& msg, error_type type);
+
+    error_type get_error_type() const;
+
+private:
+    error_type m_type;
 };
 
 }

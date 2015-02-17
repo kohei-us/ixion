@@ -50,6 +50,14 @@ class Test(unittest.TestCase):
         except:
             self.assertTrue(False, "Wrong exception has been raised")
 
+        # Trying to insert a new sheet with an existing name should fail.
+        try:
+            sh = self.doc.append_sheet(tests[0])
+            self.assertTrue(False, "Trying to insert a new sheet with an existing sheet name should fail")
+        except ixion.DocumentError:
+            # This is expected.
+            pass
+
     def test_numeric_cell_input(self):
         sh1 = self.doc.append_sheet("Data")
 

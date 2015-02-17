@@ -112,7 +112,10 @@ public:
     formula_cell* get_named_expression(const ::std::string& name);
 
     /**
-     * Append new sheet to the model.
+     * Append a new sheet to the model.  The caller must ensure that the name
+     * of the new sheet is unique within the model context.  When the name
+     * being used for the new sheet already exists, it throws a {@link
+     * model_context_error} exception.
      *
      * @param p pointer to the char array storing the name of the inserted
      *          sheet.
