@@ -228,9 +228,6 @@
 					<F N="../include/ixion/interface/session_handler.hpp"/>
 					<F N="../include/ixion/interface/table_handler.hpp"/>
 				</Folder>
-				<F
-					N="../include/ixion/Makefile.am"
-					Type="Makefile"/>
 				<F N="../include/ixion/address.hpp"/>
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>
@@ -253,6 +250,9 @@
 				<F N="../include/ixion/info.hpp"/>
 				<F N="../include/ixion/lexer_tokens.hpp"/>
 				<F N="../include/ixion/macros.hpp"/>
+				<F
+					N="../include/ixion/Makefile.am"
+					Type="Makefile"/>
 				<F N="../include/ixion/matrix.hpp"/>
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
@@ -263,9 +263,6 @@
 		</Folder>
 		<Folder Name="../src">
 			<Folder Name="libixion">
-				<F
-					N="../src/libixion/Makefile.am"
-					Type="Makefile"/>
 				<F N="../src/libixion/address.cpp"/>
 				<F N="../src/libixion/cell.cpp"/>
 				<F N="../src/libixion/cell_listener_tracker.cpp"/>
@@ -273,6 +270,7 @@
 				<F N="../src/libixion/config.cpp"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>
 				<F N="../src/libixion/depends_tracker.hpp"/>
+				<F N="../src/libixion/exceptions.cpp"/>
 				<F N="../src/libixion/formula.cpp"/>
 				<F N="../src/libixion/formula_function_opcode.cpp"/>
 				<F N="../src/libixion/formula_functions.cpp"/>
@@ -291,6 +289,9 @@
 				<F N="../src/libixion/interface.cpp"/>
 				<F N="../src/libixion/ixion_test.cpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
+				<F
+					N="../src/libixion/Makefile.am"
+					Type="Makefile"/>
 				<F N="../src/libixion/matrix.cpp"/>
 				<F N="../src/libixion/mem_str_buf.cpp"/>
 				<F N="../src/libixion/model_context.cpp"/>
@@ -308,11 +309,11 @@
 				<F N="../src/python/sheet.cpp"/>
 				<F N="../src/python/sheet.hpp"/>
 			</Folder>
+			<F N="../src/ixion_parser.cpp"/>
+			<F N="../src/ixion_sorter.cpp"/>
 			<F
 				N="../src/Makefile.am"
 				Type="Makefile"/>
-			<F N="../src/ixion_parser.cpp"/>
-			<F N="../src/ixion_sorter.cpp"/>
 			<F N="../src/model_parser.cpp"/>
 			<F N="../src/model_parser.hpp"/>
 			<F N="../src/session_handler.cpp"/>
