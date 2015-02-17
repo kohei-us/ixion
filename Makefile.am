@@ -63,3 +63,7 @@ dist-hook:
 		echo A git clone is required to generate a ChangeLog >&2; \
 	fi
 
+python-doc:
+	@echo "Building Python doc..."
+	sphinx-build -b html ./doc/ ./doc/_build
+
