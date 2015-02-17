@@ -17,10 +17,10 @@ Since your newly-created document has no sheet at all, you need to insert one.
 
     >>> sheet1 = doc.append_sheet("MySheet1")
 
-The :meth:`append_sheet` method takes a sheet name string as an argument (which in
+The :meth:`Document.append_sheet` method takes a sheet name string as an argument (which in
 this case is "MySheet1") and returns an object representing the sheet that has
 just been inserted.  This sheet object allows access to the sheet
-name via its ``name`` attribute.
+name via the :attr:`Sheet.name` attribute.
 
 ::
 
@@ -64,7 +64,7 @@ Let's insert a formula expression next.
 
 The formula cells don't get calculated automatically as you enter them;
 you need to explicitly tell the document to calculate the formula cells via
-its :meth:`calculate` method.
+the :meth:`Document.calculate` method.
 
 ::
 
