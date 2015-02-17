@@ -39,12 +39,19 @@ test_data = \
 	test/thread/function-parallel.txt \
 	test/thread/function-wait-simple.txt
 
+doc_data = \
+	doc/conf.py \
+	doc/index.rst \
+	doc/overview.rst \
+	doc/document.rst \
+	doc/sheet.rst
 
 EXTRA_DIST = \
 	libixion.pc.in \
 	autogen.sh \
 	$(bin_data) \
-	$(test_data)
+	$(test_data) \
+	$(doc_data)
 
 distclean-local:
 	rm -rf *.pc
