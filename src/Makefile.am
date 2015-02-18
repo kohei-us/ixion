@@ -24,4 +24,6 @@ ixion_sorter_SOURCES = \
 ixion_sorter_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
 					 $(BOOST_THREAD_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
+AM_TESTS_ENVIRONMENT = PATH=.libs$${PATH:+:$${PATH}}; epxort PATH; \
+	LD_LIBRARY_PATH=libixion/.libs$${LD_LIBRARY_PATH:+:$${LD_LIBRARY_PATH}}; export LD_LIBRARY_PATH;
 TESTS = ../test/ixion-parser-test.sh

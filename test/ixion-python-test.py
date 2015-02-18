@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-import sys
-import os.path
 import unittest
 import itertools
 
-dirname = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(dirname + "/../src/python/.libs")
 import ixion
 
 class Test(unittest.TestCase):

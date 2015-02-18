@@ -16,4 +16,5 @@ ixion_la_LIBADD = \
 	../libixion/libixion-@IXION_API_VERSION@.la \
 	$(PYTHON_LIBS)
 
+AM_TESTS_ENVIRONMENT = PYTHONPATH=.libs$${PYTHONPATH:+:$${PYTHONPATH}}; export PYTHONPATH;
 TESTS = ../../test/ixion-python-test.py

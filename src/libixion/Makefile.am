@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS)
 
-EXTRA_PROGRAMS = ixion-test
+check_PROGRAMS = ixion-test
 
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
