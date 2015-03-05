@@ -12,6 +12,7 @@
 
 #include "formula_functions.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <vector>

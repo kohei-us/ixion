@@ -21,6 +21,7 @@
 
 #define DEBUG_FORMULA_FUNCTIONS 0
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 

@@ -15,6 +15,7 @@
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
+#include <cassert>
 #include <vector>
 #include <boost/scoped_ptr.hpp>
 

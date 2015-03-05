@@ -15,6 +15,7 @@
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/table_handler.hpp"
 
+#include <cassert>
 #include <string>
 #include <iostream>
 #include <sstream>

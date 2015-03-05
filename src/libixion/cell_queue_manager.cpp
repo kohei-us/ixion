@@ -15,6 +15,7 @@
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <cassert>
 #include <iostream>
 #include <queue>
 #include <string>

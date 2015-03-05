@@ -18,6 +18,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 
+#include <cassert>
 #include <string>
 #include <sstream>
 #include <iostream>

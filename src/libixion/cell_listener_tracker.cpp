@@ -16,6 +16,8 @@
 
 #define DEBUG_CELL_LISTENER_TRACKER 0
 
+#include <cassert>
+
 #if DEBUG_CELL_LISTENER_TRACKER
 #include <iostream>
 #endif

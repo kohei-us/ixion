@@ -10,6 +10,7 @@
 #include "ixion/exceptions.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 
+#include <cassert>
 #include <sstream>
 
 #define DEBUG_FORMULA_RESULT 0

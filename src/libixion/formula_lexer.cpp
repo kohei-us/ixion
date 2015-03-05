@@ -8,6 +8,7 @@
 #include "ixion/formula_lexer.hpp"
 #include "ixion/global.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 
