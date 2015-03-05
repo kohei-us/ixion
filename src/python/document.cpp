@@ -69,7 +69,7 @@ int document_init(document* self, PyObject* /*args*/, PyObject* /*kwargs*/)
     return 0;
 }
 
-PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs)
+PyObject* document_append_sheet(document* self, PyObject* args)
 {
     char* sheet_name = NULL;
     if (!PyArg_ParseTuple(args, "s", &sheet_name))
@@ -84,11 +84,11 @@ PyObject* document_append_sheet(document* self, PyObject* args, PyObject* kwargs
     if (!sheet_type)
         return NULL;
 
-    PyObject* obj_sheet = sheet_type->tp_new(sheet_type, args, kwargs);
+    PyObject* obj_sheet = sheet_type->tp_new(sheet_type, args, 0);
     if (!obj_sheet)
         return NULL;
 
-    sheet_type->tp_init(obj_sheet, args, kwargs);
+    sheet_type->tp_init(obj_sheet, args, 0);
 
     // Pass model_context to the sheet object.
     sheet_data* sd = get_sheet_data(obj_sheet);
