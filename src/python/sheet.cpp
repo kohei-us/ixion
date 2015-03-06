@@ -78,8 +78,8 @@ int sheet_init(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
     double val = 0.0;
 
     static const char* kwlist[] = { "row", "column", "value", NULL };
@@ -105,8 +105,8 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
     char* val = NULL;
 
     static const char* kwlist[] = { "row", "column", "value", NULL };
@@ -132,8 +132,8 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
     char* formula = NULL;
 
     static const char* kwlist[] = { "row", "column", "value", NULL };
@@ -164,8 +164,8 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
 
     static const char* kwlist[] = { "row", "column", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
@@ -196,8 +196,8 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
 
     static const char* kwlist[] = { "row", "column", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
@@ -222,8 +222,8 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
 
     static const char* kwlist[] = { "row", "column", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
@@ -259,8 +259,8 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
 
 PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    long col = -1;
-    long row = -1;
+    int col = -1;
+    int row = -1;
 
     static const char* kwlist[] = { "row", "column", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
