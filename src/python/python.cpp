@@ -51,7 +51,7 @@ PyObject* info(PyObject*, PyObject*)
 
 PyMethodDef ixion_methods[] =
 {
-    { "info", info, METH_NOARGS, "Print ixion module information." },
+    { "info", (PyCFunction)info, METH_NOARGS, "Print ixion module information." },
     { NULL, NULL, 0, NULL }
 };
 
