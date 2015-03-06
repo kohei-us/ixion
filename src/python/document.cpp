@@ -137,12 +137,8 @@ PyObject* document_calculate(document* self, PyObject*, PyObject*)
     return Py_None;
 }
 
-PyObject* document_get_sheet(document* self, PyObject* args, PyObject*)
+PyObject* document_get_sheet(document* self, PyObject* arg)
 {
-    PyObject* arg = NULL;
-    if (!PyArg_ParseTuple(args, "O", &arg))
-        return NULL;
-
     const vector<PyObject*>& sheets = self->m_data->m_sheets;
     if (PyInt_Check(arg))
     {
@@ -214,7 +210,7 @@ PyMethodDef document_methods[] =
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
     { "calculate", (PyCFunction)document_calculate, METH_NOARGS, "calculate formula cells" },
     { "get_sheet_names", (PyCFunction)document_get_sheet_names, METH_NOARGS, "get a tuple of sheet names" },
-    { "get_sheet", (PyCFunction)document_get_sheet, METH_KEYWORDS, "get a sheet object either by index or name" },
+    { "get_sheet", (PyCFunction)document_get_sheet, METH_O, "get a sheet object either by index or name" },
     { NULL }
 };
 
