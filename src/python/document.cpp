@@ -212,8 +212,8 @@ PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)
 PyMethodDef document_methods[] =
 {
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
-    { "calculate", (PyCFunction)document_calculate, 0, "calculate formula cells" },
-    { "get_sheet_names", (PyCFunction)document_get_sheet_names, 0, "get a tuple of sheet names" },
+    { "calculate", (PyCFunction)document_calculate, METH_NOARGS, "calculate formula cells" },
+    { "get_sheet_names", (PyCFunction)document_get_sheet_names, METH_NOARGS, "get a tuple of sheet names" },
     { "get_sheet", (PyCFunction)document_get_sheet, METH_KEYWORDS, "get a sheet object either by index or name" },
     { NULL }
 };
