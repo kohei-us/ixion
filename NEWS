@@ -1,0 +1,5 @@
+libixion 0.9.1
+
+- Include python bindings test in the tarball.
+- Fix various portability problems in python bindings.
+- Several minor build fixes.
