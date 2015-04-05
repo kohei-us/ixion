@@ -1,6 +1,7 @@
 #!/bin/sh
 
 touch ChangeLog
+cp README.md README
 
 TESTLIBTOOLIZE="glibtoolize libtoolize"
 
