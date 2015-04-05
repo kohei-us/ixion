@@ -56,6 +56,11 @@ for both full and partial calculation modes.
 
 ## Download
 
+### 0.9.1 [libixion-0.9.1.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.1.tar.xz)
+  * release date: 2015-04-05
+  * md5sum: d292f6d62847f2305178459390842eac
+  * sha1sum: 8ae071e7e89784933caadeffc16ed7b0764350a9
+  
 ### 0.9.0 [libixion-0.9.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.0.tar.xz)
   * release date: 2015-02-16
   * md5sum: 26f293e708513dea5e6e25e9232a7400
