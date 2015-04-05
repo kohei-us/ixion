@@ -1,7 +1,9 @@
 #!/bin/sh
 
-touch ChangeLog
-cp README.md README
+if [ -d .git ]; then
+    touch ChangeLog
+    cp README.md README
+fi
 
 TESTLIBTOOLIZE="glibtoolize libtoolize"
 
