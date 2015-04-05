@@ -55,7 +55,26 @@ for both full and partial calculation modes.
 * Support for external references.
 
 ## Download
-Please refer to the [[Download]] page for source packages.
+
+* 0.9.0 [libixion-0.9.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.0.tar.xz)
+  release date: 2015-02-16
+  md5sum: 26f293e708513dea5e6e25e9232a7400
+  sha1sum: 4f97682546236aee686e86293f9890d79f25cf23
+
+* 0.7.0 [libixion-0.7.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.7.0.tar.bz2)
+  release date: 2013-12-13
+  md5sum: 000157117801f9507f34b26ba998c4d1
+  sha1sum: 99b8f9f49078ef7e15280f5c73dff639a6e9472c
+
+* 0.5.0 [libixion-0.5.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.5.0.tar.bz2)
+  release date: 2013-03-27
+  md5sum: ebaeab9ffe1e6bd68b2a20bfa430b3af
+  sha1sum: 99290ed5aa2ab2338ba04737210256c48885107c
+
+* 0.3.0 [libixion_0.3.0.tar.bz2](http://kohei.us/files/ixion/src/libixion_0.3.0.tar.bz2)
+  release date: 2011-11-01
+  md5sum: 96a36a0016f968a5a7c4b167eeb1643b
+  sha1sum: ac1fa915303ed8492ac50d6f0aa4d974e8405954
 
 ## Python binding
 Starting with version 0.9.0, Ixion provides Python binding for those who wish
