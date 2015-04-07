@@ -21,18 +21,18 @@ public:
     explicit general_error(const std::string& msg);
     ~general_error() throw();
     virtual const char* what() const throw();
+
+protected:
+    void set_message(const std::string& msg);
+
 private:
     std::string m_msg;
 };
 
-class IXION_DLLPUBLIC file_not_found : public std::exception
+class IXION_DLLPUBLIC file_not_found : public general_error
 {
 public:
     explicit file_not_found(const std::string& fpath);
-    ~file_not_found() throw();
-    virtual const char* what() const throw();
-private:
-    std::string m_fpath;
 };
 
 /**

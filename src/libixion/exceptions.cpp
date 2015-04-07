@@ -21,20 +21,17 @@ const char* general_error::what() const throw()
     return m_msg.c_str();
 }
 
+void general_error::set_message(const std::string& msg)
+{
+    m_msg = msg;
+}
+
 file_not_found::file_not_found(const std::string& fpath) :
-    m_fpath(fpath)
+    general_error(fpath)
 {
-}
-
-file_not_found::~file_not_found() throw()
-{
-}
-
-const char* file_not_found::what() const throw()
-{
-    std::ostringstream oss;
-    oss << "specified file not found: " << m_fpath;
-    return oss.str().c_str();
+    std::ostringstream os;
+    os << "specified file not found: " << fpath;
+    set_message(os.str());
 }
 
 model_context_error::model_context_error(const std::string& msg, error_type type) :
