@@ -16,6 +16,7 @@
 #include <string>
 
 #define IXION_DEBUG_PYTHON 0
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
 
 using namespace std;
 
@@ -55,22 +56,52 @@ PyMethodDef ixion_methods[] =
     { NULL, NULL, 0, NULL }
 };
 
+struct module_state {
+    PyObject* error;
+};
+
+int ixion_traverse(PyObject* m, visitproc visit, void* arg)
+{
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
 }
+
+int ixion_clear(PyObject* m)
+{
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+}
+
+struct PyModuleDef moduledef =
+{
+    PyModuleDef_HEAD_INIT,
+    "ixion",
+    NULL,
+    sizeof(struct module_state),
+    ixion_methods,
+    NULL,
+    ixion_traverse,
+    ixion_clear,
+    NULL
+};
 
 }}
 
-PyMODINIT_FUNC IXION_DLLPUBLIC
-initixion()
+extern "C" {
+
+IXION_DLLPUBLIC PyObject* PyInit_ixion()
 {
     PyTypeObject* doc_type = ixion::python::get_document_type();
     if (PyType_Ready(doc_type) < 0)
-        return;
+        return NULL;
 
     PyTypeObject* sheet_type = ixion::python::get_sheet_type();
     if (PyType_Ready(sheet_type) < 0)
-        return;
+        return NULL;
 
-    PyObject* m = Py_InitModule("ixion", ixion::python::ixion_methods);
+    PyObject* m = PyModule_Create(&ixion::python::moduledef);
 
     Py_INCREF(doc_type);
     PyModule_AddObject(m, "Document", reinterpret_cast<PyObject*>(doc_type));
@@ -82,6 +113,10 @@ initixion()
         m, "DocumentError", ixion::python::get_python_document_error());
     PyModule_AddObject(
         m, "SheetError", ixion::python::get_python_sheet_error());
+
+    return m;
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -15,7 +15,7 @@ AC_PREREQ([2.63])
 AC_INIT([libixion], [ixion_version])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
-AM_PATH_PYTHON(2.7.0)
+AM_PATH_PYTHON(3)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_ARG_WITH(hash-container-compat,
@@ -82,7 +82,7 @@ fi
 PKG_CHECK_MODULES([MDDS],[mdds >= 0.12.0])
 
 # Check for python.
-PKG_CHECK_MODULES([PYTHON], [python >= 0.27.1])
+PKG_CHECK_MODULES([PYTHON], [python3 >= 0.28])
 
 CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
 

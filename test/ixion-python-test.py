@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import unittest
-import itertools
-
 import ixion
+
 
 class Test(unittest.TestCase):
 
@@ -23,7 +22,7 @@ class Test(unittest.TestCase):
             sh = self.doc.append_sheet(test)
             sheets.append(sh)
 
-        for test, sheet in itertools.izip(tests, sheets):
+        for test, sheet in zip(tests, sheets):
             self.assertEqual(test, sheet.name)
 
         self.assertEqual(tests, self.doc.get_sheet_names())
@@ -41,8 +40,8 @@ class Test(unittest.TestCase):
         try:
             sheets[0].name = "Try to change sheet name"
             self.assertTrue(False, "sheet name attribute should not be writable.")
-        except TypeError:
-            pass # TypeError is expected when attempting to overwrite sheet name attribute.
+        except AttributeError:
+            pass # AttributeError is expected when attempting to overwrite sheet name attribute.
         except:
             self.assertTrue(False, "Wrong exception has been raised")
 

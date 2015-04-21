@@ -38,7 +38,7 @@ void sheet_dealloc(sheet* self)
     delete self->m_data;
 
     Py_XDECREF(self->name);
-    self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
+    Py_TYPE(self)->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
 PyObject* sheet_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/)
@@ -49,7 +49,7 @@ PyObject* sheet_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/
 
     self->m_data = new sheet_data;
 
-    self->name = PyString_FromString("");
+    self->name = PyUnicode_FromString("");
     if (!self->name)
     {
         Py_DECREF(self);
@@ -217,7 +217,7 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     if (!ps)
         return NULL;
 
-    return PyString_FromStringAndSize(ps->data(), ps->size());
+    return PyUnicode_FromStringAndSize(ps->data(), ps->size());
 }
 
 PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kwargs)
@@ -252,9 +252,9 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     string str;
     ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft, str);
     if (str.empty())
-        return PyString_FromString("");
+        return PyUnicode_FromString("");
 
-    return PyString_FromStringAndSize(str.data(), str.size());
+    return PyUnicode_FromStringAndSize(str.data(), str.size());
 }
 
 PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
@@ -303,8 +303,7 @@ PyMemberDef sheet_members[] =
 
 PyTypeObject sheet_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,                                        // ob_size
+    PyVarObject_HEAD_INIT(NULL, 0)
     "ixion.Sheet",                            // tp_name
     sizeof(sheet),                            // tp_basicsize
     0,                                        // tp_itemsize

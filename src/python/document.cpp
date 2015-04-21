@@ -54,7 +54,7 @@ struct document
 void document_dealloc(document* self)
 {
     delete self->m_data;
-    self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
+    Py_TYPE(self)->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
 PyObject* document_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/)
@@ -140,9 +140,9 @@ PyObject* document_calculate(document* self, PyObject*, PyObject*)
 PyObject* document_get_sheet(document* self, PyObject* arg)
 {
     const vector<PyObject*>& sheets = self->m_data->m_sheets;
-    if (PyInt_Check(arg))
+    if (PyLong_Check(arg))
     {
-        long index = PyInt_AsLong(arg);
+        long index = PyLong_AsLong(arg);
         if (index == -1 && PyErr_Occurred())
             return NULL;
 
@@ -158,7 +158,7 @@ PyObject* document_get_sheet(document* self, PyObject* arg)
     }
 
     // Not a python int object.  See if it's a string object.
-    const char* name = PyString_AsString(arg);
+    const char* name = PyUnicode_AsUTF8(arg);
     if (!name)
         return NULL;
 
@@ -172,7 +172,7 @@ PyObject* document_get_sheet(document* self, PyObject* arg)
         if (!obj)
             continue;
 
-        const char* this_name = PyString_AsString(obj);
+        const char* this_name = PyUnicode_AsUTF8(obj);
         if (!this_name)
             continue;
 
@@ -198,7 +198,7 @@ PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)
     for (size_t i = 0; i < n; ++i)
     {
         std::string name = cxt.get_sheet_name(i);
-        PyObject* o = PyString_FromString(name.c_str());
+        PyObject* o = PyUnicode_FromString(name.c_str());
         PyTuple_SetItem(t, i, o);
     }
 
@@ -216,8 +216,7 @@ PyMethodDef document_methods[] =
 
 PyTypeObject document_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,                                        // ob_size
+    PyVarObject_HEAD_INIT(NULL, 0)
     "ixion.Document",                         // tp_name
     sizeof(document),                         // tp_basicsize
     0,                                        // tp_itemsize
