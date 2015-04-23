@@ -285,13 +285,13 @@ PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
 PyMethodDef sheet_methods[] =
 {
-    { "set_numeric_cell",  (PyCFunction)sheet_set_numeric_cell,  METH_KEYWORDS, "set numeric value to specified cell" },
-    { "set_formula_cell",  (PyCFunction)sheet_set_formula_cell,  METH_KEYWORDS, "set formula to specified cell" },
-    { "set_string_cell",   (PyCFunction)sheet_set_string_cell,   METH_KEYWORDS, "set string to specified cell" },
-    { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_KEYWORDS, "get numeric value from specified cell" },
-    { "get_string_value",  (PyCFunction)sheet_get_string_value,  METH_KEYWORDS, "get string value from specified cell" },
-    { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_KEYWORDS, "get formula expression string from specified cell position" },
-    { "erase_cell", (PyCFunction)sheet_erase_cell, METH_KEYWORDS, "erase cell at specified position" },
+    { "set_numeric_cell",  (PyCFunction)sheet_set_numeric_cell,  METH_VARARGS | METH_KEYWORDS, "set numeric value to specified cell" },
+    { "set_formula_cell",  (PyCFunction)sheet_set_formula_cell,  METH_VARARGS | METH_KEYWORDS, "set formula to specified cell" },
+    { "set_string_cell",   (PyCFunction)sheet_set_string_cell,   METH_VARARGS | METH_KEYWORDS, "set string to specified cell" },
+    { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_VARARGS | METH_KEYWORDS, "get numeric value from specified cell" },
+    { "get_string_value",  (PyCFunction)sheet_get_string_value,  METH_VARARGS | METH_KEYWORDS, "get string value from specified cell" },
+    { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_VARARGS | METH_KEYWORDS, "get formula expression string from specified cell position" },
+    { "erase_cell", (PyCFunction)sheet_erase_cell, METH_VARARGS | METH_KEYWORDS, "erase cell at specified position" },
     { NULL }
 };
 
