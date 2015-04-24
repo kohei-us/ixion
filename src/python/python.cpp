@@ -50,13 +50,50 @@ PyObject* info(PyObject*, PyObject*)
     return Py_None;
 }
 
+PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
+{
+    int start;
+    int stop;
+    static const char* kwlist[] = { "start", "stop", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &start, &stop))
+        return NULL;
+
+    if (start >= stop)
+    {
+        PyErr_SetString(
+            PyExc_IndexError,
+            "Start position is larger or equal to the stop position.");
+        return NULL;
+    }
+
+    formula_name_resolver* resolver =
+        formula_name_resolver::get(formula_name_resolver_excel_a1, NULL);
+    if (!resolver)
+        return NULL;
+
+    int size = stop - start;
+    PyObject* t = PyTuple_New(size);
+
+    for (int i = start; i < stop; ++i)
+    {
+        string s = resolver->get_column_name(i);
+        PyObject* o = PyUnicode_FromString(s.c_str());
+        PyTuple_SetItem(t, i-start, o);
+    }
+
+    return t;
+}
+
 PyMethodDef ixion_methods[] =
 {
     { "info", (PyCFunction)info, METH_NOARGS, "Print ixion module information." },
+    { "column_label", (PyCFunction)column_label, METH_VARARGS | METH_KEYWORDS,
+      "Return a list of column label strings based on specified column range values." },
     { NULL, NULL, 0, NULL }
 };
 
-struct module_state {
+struct module_state
+{
     PyObject* error;
 };
 
