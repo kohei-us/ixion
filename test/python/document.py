@@ -4,7 +4,7 @@ import unittest
 import ixion
 
 
-class Test(unittest.TestCase):
+class DocumentTest(unittest.TestCase):
 
     def setUp(self):
         self.doc = ixion.Document()

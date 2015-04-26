@@ -66,6 +66,14 @@ PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
         return NULL;
     }
 
+    if (start < 0)
+    {
+        PyErr_SetString(
+            PyExc_IndexError,
+            "Start position should be larger than or equal to 0.");
+        return NULL;
+    }
+
     formula_name_resolver* resolver =
         formula_name_resolver::get(formula_name_resolver_excel_a1, NULL);
     if (!resolver)

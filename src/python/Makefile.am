@@ -15,4 +15,6 @@ ixion_la_LIBADD = \
 	$(PYTHON_LIBS)
 
 AM_TESTS_ENVIRONMENT = PYTHONPATH=.libs$${PYTHONPATH:+:$${PYTHONPATH}}; export PYTHONPATH;
-TESTS = ../../test/python/document.py
+TESTS = \
+	../../test/python/document.py \
+	../../test/python/module.py
