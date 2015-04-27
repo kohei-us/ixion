@@ -17,6 +17,7 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 AM_PATH_PYTHON(3)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AX_CXX_COMPILE_STDCXX_11
 
 AC_ARG_WITH(hash-container-compat,
 [
