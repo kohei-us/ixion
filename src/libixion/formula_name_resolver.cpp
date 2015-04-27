@@ -930,6 +930,38 @@ private:
     const iface::formula_model_access* mp_cxt;
 };
 
+class excel_r1c1 : public formula_name_resolver
+{
+    const iface::formula_model_access* mp_cxt;
+public:
+    excel_r1c1(const iface::formula_model_access* cxt) : mp_cxt(cxt) {}
+
+    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
+    {
+        return formula_name_type();
+    }
+
+    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+    {
+        return std::string();
+    }
+
+    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
+    {
+        return std::string();
+    }
+
+    virtual std::string get_name(const table_t& table) const
+    {
+        return std::string();
+    }
+
+    virtual std::string get_column_name(col_t col) const
+    {
+        return std::string();
+    }
+};
+
 /**
  * Name resolver for ODFF formula expressions.
  */
@@ -1071,10 +1103,11 @@ formula_name_resolver* formula_name_resolver::get(
     {
         case formula_name_resolver_excel_a1:
             return new excel_a1(cxt);
+        case formula_name_resolver_excel_r1c1:
+            return new excel_r1c1(cxt);
         case formula_name_resolver_odff:
             return new odff_resolver(cxt);
         case formula_name_resolver_calc_a1:
-        case formula_name_resolver_excel_r1c1:
         case formula_name_resolver_unknown:
         default:
             ;
