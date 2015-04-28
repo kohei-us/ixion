@@ -14,8 +14,6 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/address.hpp"
 
-#include <boost/scoped_ptr.hpp>
-
 namespace ixion { namespace python {
 
 struct document_global
@@ -31,7 +29,7 @@ struct document_global
     /** positions of all dirty formula cells since last calculation. */
     dirty_formula_cells_t m_dirty_formula_cells;
 
-    boost::scoped_ptr<formula_name_resolver> m_resolver;
+    std::unique_ptr<formula_name_resolver> m_resolver;
 
     document_global();
 };

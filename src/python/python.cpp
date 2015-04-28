@@ -74,8 +74,7 @@ PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
         return NULL;
     }
 
-    formula_name_resolver* resolver =
-        formula_name_resolver::get(formula_name_resolver_excel_a1, NULL);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, NULL);
     if (!resolver)
         return NULL;
 

@@ -11,6 +11,7 @@
 #include "ixion/types.hpp"
 #include "ixion/env.hpp"
 
+#include <memory>
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -215,6 +216,12 @@ class unique_ptr : public boost::interprocess::unique_ptr<_T, default_deleter<_T
 public:
     unique_ptr(_T* p) : boost::interprocess::unique_ptr<_T, default_deleter<_T> >(p) {}
 };
+
+template<typename T, typename ...Args>
+std::unique_ptr<T> make_unique(Args&& ...args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 }
 

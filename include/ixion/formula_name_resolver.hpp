@@ -9,6 +9,7 @@
 #define __IXION_FORMULA_NAME_RESOLVER_HPP__
 
 #include <string>
+#include <memory>
 
 #include "ixion/address.hpp"
 #include "ixion/formula_function_opcode.hpp"
@@ -116,7 +117,7 @@ public:
      * @return formula name resolver instance created on the heap.  The caller
      *         is responsible for managing its life cycle.
      */
-    IXION_DLLPUBLIC static formula_name_resolver*
+    IXION_DLLPUBLIC static std::unique_ptr<formula_name_resolver>
         get(formula_name_resolver_t type, const iface::formula_model_access* cxt);
 };
 

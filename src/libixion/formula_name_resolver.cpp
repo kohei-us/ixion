@@ -1095,24 +1095,25 @@ private:
 
 }
 
-formula_name_resolver* formula_name_resolver::get(
+std::unique_ptr<formula_name_resolver> formula_name_resolver::get(
     formula_name_resolver_t type, const iface::formula_model_access* cxt)
 {
 
     switch (type)
     {
         case formula_name_resolver_excel_a1:
-            return new excel_a1(cxt);
+            return std::unique_ptr<formula_name_resolver>(new excel_a1(cxt));
         case formula_name_resolver_excel_r1c1:
-            return new excel_r1c1(cxt);
+            return std::unique_ptr<formula_name_resolver>(new excel_r1c1(cxt));
         case formula_name_resolver_odff:
-            return new odff_resolver(cxt);
+            return std::unique_ptr<formula_name_resolver>(new odff_resolver(cxt));
         case formula_name_resolver_calc_a1:
         case formula_name_resolver_unknown:
         default:
             ;
     }
-    return NULL;
+
+    return std::unique_ptr<formula_name_resolver>();
 }
 
 }
