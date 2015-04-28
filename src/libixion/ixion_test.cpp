@@ -256,6 +256,49 @@ void test_name_resolver_table_excel_a1()
     }
 }
 
+void test_name_resolver_excel_r1c1()
+{
+    cout << "test name resolver excel r1c1" << endl;
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("One"), 1048576, 1024);
+    cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
+    cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
+    cxt.append_sheet(IXION_ASCII("80's Music"), 1048576, 1024);
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_r1c1, &cxt);
+    assert(resolver);
+
+    // Parse single cell addresses.
+    ref_name_entry single_ref_names[] =
+    {
+        { "R1C1",   false },
+        { "R[1]C2", false },
+        { 0, false }
+    };
+
+    for (size_t i = 0; single_ref_names[i].name; ++i)
+    {
+        const char* p = single_ref_names[i].name;
+        string name_r1c1(p);
+        formula_name_type res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
+        if (res.type != formula_name_type::cell_reference)
+        {
+            cerr << "failed to resolve cell address: " << name_r1c1 << endl;
+            assert(false);
+        }
+
+        address_t addr = to_address(res.address);
+        string test_name = resolver->get_name(addr, abs_address_t(), single_ref_names[i].sheet_name);
+
+        if (name_r1c1 != test_name)
+        {
+            cerr << "failed to compile name from address: (name expected: "
+                << name_r1c1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
+}
+
 void test_name_resolver_odff()
 {
     cout << "test name resolver odff" << endl;
@@ -620,6 +663,7 @@ int main()
     test_string_to_double();
     test_name_resolver_excel_a1();
     test_name_resolver_table_excel_a1();
+    test_name_resolver_excel_r1c1();
     test_name_resolver_odff();
     test_address();
     test_parse_and_print_expressions();
