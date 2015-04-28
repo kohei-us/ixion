@@ -17,7 +17,6 @@
 
 #include <cassert>
 #include <vector>
-#include <boost/scoped_ptr.hpp>
 
 #define DEBUG_FUNCTION_OBJECTS 0
 

@@ -13,7 +13,6 @@
 #include "ixion/formula.hpp"
 
 #include <structmember.h>
-#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 

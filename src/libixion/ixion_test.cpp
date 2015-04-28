@@ -19,8 +19,6 @@
 #include <cstring>
 #include <sstream>
 
-#include <boost/scoped_ptr.hpp>
-
 using namespace std;
 using namespace ixion;
 

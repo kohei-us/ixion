@@ -21,7 +21,6 @@
 #define DEBUG_FORMULA_API 0
 
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
 
 #if DEBUG_FORMULA_API
 #include <iostream>
