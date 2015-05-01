@@ -17,11 +17,11 @@
 
 namespace ixion {
 
-IXION_DLLPUBLIC extern const row_t row_unset;
-IXION_DLLPUBLIC extern const row_t row_upper_bound;
+IXION_DLLPUBLIC_VAR const row_t row_unset;
+IXION_DLLPUBLIC_VAR const row_t row_upper_bound;
 
-IXION_DLLPUBLIC extern const col_t column_unset;
-IXION_DLLPUBLIC extern const col_t column_upper_bound;
+IXION_DLLPUBLIC_VAR const col_t column_unset;
+IXION_DLLPUBLIC_VAR const col_t column_upper_bound;
 
 /**
  * Stores absolute address, and absolute address only.

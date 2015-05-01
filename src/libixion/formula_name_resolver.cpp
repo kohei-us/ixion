@@ -237,10 +237,7 @@ void set_cell_reference(formula_name_type& ret, const address_t& addr)
     set_address(ret.address, addr);
 }
 
-enum resolver_parse_mode {
-    resolver_parse_column,
-    resolver_parse_row
-};
+enum resolver_parse_mode { column, row };
 
 void append_column_name_a1(ostringstream& os, col_t col)
 {
@@ -350,7 +347,7 @@ enum parse_address_result
 {
     invalid = 0,
     valid_address,
-    range_expected
+    range_expected /// valid address followed by a ':'.
 };
 
 #if DEBUG_NAME_RESOLVER
@@ -427,6 +424,43 @@ void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char 
 }
 
 /**
+ * If there is no number to parse, it returns 0 and the p will not
+ * increment.  If it's a number followed by a non-number, the p will point
+ * to the first non-numeric character when the call returns.  If it's a
+ * number and there is nothing following it, the p will point to the last
+ * digit of the number when the call returns.
+ */
+template<typename T>
+T parse_number(const char*&p, const char* p_last)
+{
+    T num = 0;
+
+    bool sign = false;
+    if (*p == '+')
+        ++p;
+    else if (*p == '-')
+    {
+        ++p;
+        sign = true;
+    }
+
+    while (is_digit(*p))
+    {
+        // Parse number.
+        num *= 10;
+        num += *p - '0';
+        if (p == p_last)
+            break;
+        ++p;
+    }
+
+    if (sign)
+        num *= -1;
+
+    return num;
+}
+
+/**
  * Parse A1-style single cell address.
  *
  * @param p it must point to the first character of a cell address.
@@ -443,7 +477,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
     // the state of a value-not-set.  They are subtracted by one before
     // returning.
 
-    resolver_parse_mode mode = resolver_parse_column;
+    resolver_parse_mode mode = resolver_parse_mode::column;
 
     while (true)
     {
@@ -457,23 +491,23 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
         if ('A' <= c && c <= 'Z')
         {
             // Column digit
-            if (mode != resolver_parse_column)
+            if (mode != resolver_parse_mode::column)
                 return invalid;
 
             if (addr.column)
                 addr.column *= 26;
             addr.column += static_cast<col_t>(c - 'A' + 1);
         }
-        else if ('0' <= c && c <= '9')
+        else if (is_digit(c))
         {
-            if (mode == resolver_parse_column)
+            if (mode == resolver_parse_mode::column)
             {
                 // First digit of a row.
                 if (c == '0')
                     // Leading zeros not allowed.
                     return invalid;
 
-                mode = resolver_parse_row;
+                mode = resolver_parse_mode::row;
             }
 
             if (addr.row)
@@ -483,7 +517,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
         }
         else if (c == ':')
         {
-            if (mode == resolver_parse_row)
+            if (mode == resolver_parse_mode::row)
             {
                 if (!addr.row)
                     return invalid;
@@ -497,7 +531,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
 
                 return range_expected;
             }
-            else if (mode == resolver_parse_column)
+            else if (mode == resolver_parse_mode::column)
             {
                 // row number is not given.
                 if (addr.column)
@@ -515,12 +549,12 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
         else if (c == '$')
         {
             // Absolute position.
-            if (mode == resolver_parse_column)
+            if (mode == resolver_parse_mode::column)
             {
                 if (addr.column)
                 {
                     // Column position has been already parsed.
-                    mode = resolver_parse_row;
+                    mode = resolver_parse_mode::row;
                     addr.abs_row = true;
                 }
                 else
@@ -541,7 +575,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
         ++p;
     }
 
-    if (mode == resolver_parse_row)
+    if (mode == resolver_parse_mode::row)
     {
         if (!addr.row)
             return invalid;
@@ -553,7 +587,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
         else
             addr.column = column_unset;
     }
-    else if (mode == resolver_parse_column)
+    else if (mode == resolver_parse_mode::column)
     {
         // row number is not given.
         if (addr.column)
@@ -565,6 +599,82 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
         addr.row = row_unset;
     }
     return valid_address;
+}
+
+parse_address_result parse_address_r1c1(const char*& p, const char* p_last, address_t& addr)
+{
+    addr.row = row_unset;
+    addr.column = column_unset;
+
+    if (*p == 'R')
+    {
+        addr.row = 0;
+        addr.abs_row = false;
+
+        if (p == p_last)
+            // Just 'R'.  Not sure if this is valid or invalid, but let's call it invalid for now.
+            return parse_address_result::invalid;
+
+        ++p;
+        addr.abs_row = (*p != '[');
+        if (!addr.abs_row)
+        {
+            // Relative row address.
+            ++p;
+            if (!is_digit(*p) && *p != '-' && *p != '+')
+                return parse_address_result::invalid;
+
+            addr.row = parse_number<row_t>(p, p_last);
+            if (p == p_last)
+                return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
+            ++p;
+        }
+        else
+        {
+            // Absolute row address.
+            if (is_digit(*p) && *p != '-' && *p != '+')
+                addr.row = parse_number<row_t>(p, p_last);
+
+            if (p == p_last)
+                // 'R' followed by a number without 'C' is valid.
+                return parse_address_result::valid_address;
+        }
+    }
+
+    if (*p == 'C')
+    {
+        addr.column = 0;
+        addr.abs_column = false;
+
+        if (p == p_last)
+            return (addr.row == row_unset) ? parse_address_result::invalid : parse_address_result::valid_address;
+
+        ++p;
+        addr.abs_column = (*p != '[');
+        if (!addr.abs_column)
+        {
+            // Relative column address.
+            ++p;
+            if (!is_digit(*p) && *p != '-' && *p != '+')
+                return parse_address_result::invalid;
+
+            addr.column = parse_number<col_t>(p, p_last);
+            if (p == p_last)
+                return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
+            ++p;
+        }
+        else
+        {
+            // Absolute column address.
+            if (is_digit(*p) && *p != '-' && *p != '+')
+                addr.column = parse_number<col_t>(p, p_last);
+
+            if (p == p_last)
+                return parse_address_result::valid_address;
+        }
+    }
+
+    return parse_address_result::invalid;
 }
 
 parse_address_result parse_address_excel_a1(
@@ -581,6 +691,22 @@ parse_address_result parse_address_excel_a1(
         parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
 
     return parse_address_a1(p, p_last, addr);
+}
+
+parse_address_result parse_address_excel_r1c1(
+    const iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+{
+    addr.row = 0;
+    addr.column = 0;
+    addr.abs_sheet = false;
+    addr.abs_row = false;
+    addr.abs_column = false;
+
+    if (cxt)
+        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
+        parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
+
+    return parse_address_r1c1(p, p_last, addr);
 }
 
 parse_address_result parse_address_odff(
@@ -938,12 +1064,62 @@ public:
 
     virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
     {
-        return formula_name_type();
+        formula_name_type ret;
+        if (!n)
+            return ret;
+
+        if (resolve_function(p, n, ret))
+            return ret;
+
+        const char* p_last = p;
+        std::advance(p_last, n-1);
+
+        // Use the sheet where the cell is unless sheet name is explicitly given.
+        address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
+
+        parse_address_result parse_res = parse_address_excel_r1c1(mp_cxt, p, p_last, parsed_addr);
+        switch (parse_res)
+        {
+            case parse_address_result::valid_address:
+            {
+                set_cell_reference(ret, parsed_addr);
+                return ret;
+            }
+            break;
+        }
+
+        return ret;
     }
 
-    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+    virtual std::string get_name(const address_t& addr, const abs_address_t& /*pos*/, bool sheet_name) const
     {
-        return std::string();
+        ostringstream os;
+        if (addr.row != row_unset)
+        {
+            os << 'R';
+            if (addr.abs_row)
+                os << addr.row;
+            else if (addr.row)
+            {
+                os << '[';
+                os << addr.row;
+                os << ']';
+            }
+        }
+        if (addr.column != column_unset)
+        {
+            os << 'C';
+            if (addr.abs_column)
+                os << addr.column;
+            else if (addr.column)
+            {
+                os << '[';
+                os << addr.column;
+                os << ']';
+            }
+        }
+
+        return os.str();
     }
 
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const

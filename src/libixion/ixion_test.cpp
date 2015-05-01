@@ -269,6 +269,12 @@ void test_name_resolver_excel_r1c1()
     // Parse single cell addresses.
     ref_name_entry single_ref_names[] =
     {
+        { "R2", false },
+        { "R[3]", false },
+        { "R[-10]", false },
+        { "C2", false },
+        { "C[3]", false },
+        { "C[-10]", false },
         { "R1C1",   false },
         { "R[1]C2", false },
         { 0, false }
@@ -295,6 +301,10 @@ void test_name_resolver_excel_r1c1()
             assert(false);
         }
     }
+
+    // invalid address
+    // F
+    // RR
 }
 
 void test_name_resolver_odff()

@@ -43,7 +43,6 @@ public:
     void run();
 
 private:
-    static bool is_digit(char c);
     bool is_arg_sep(char c) const;
     bool is_decimal_sep(char c) const;
     bool is_op(char c) const;
@@ -149,11 +148,6 @@ void tokenizer::run()
                 break;
         }
     }
-}
-
-bool tokenizer::is_digit(char c)
-{
-    return ('0' <= c && c <= '9');
 }
 
 bool tokenizer::is_arg_sep(char c) const
