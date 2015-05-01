@@ -17,10 +17,28 @@
 
 namespace ixion {
 
+/**
+ * Row address not specified. This is used to reference an entire column
+ * when a specific column address is given.
+ */
 IXION_DLLPUBLIC_VAR const row_t row_unset;
+
+/**
+ * Highest number that can be used to reference a row address. Numbers
+ * higher than this number are all used as special indices.
+ */
 IXION_DLLPUBLIC_VAR const row_t row_upper_bound;
 
+/**
+ * Column address not specified. This is used to reference an entire row
+ * when a specific row address is given.
+ */
 IXION_DLLPUBLIC_VAR const col_t column_unset;
+
+/**
+ * Highest number that can be used to reference a column address. Numbers
+ * higher than this number are all used as special indices.
+ */
 IXION_DLLPUBLIC_VAR const col_t column_upper_bound;
 
 /**

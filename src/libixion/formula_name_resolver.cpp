@@ -425,10 +425,8 @@ void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char 
 
 /**
  * If there is no number to parse, it returns 0 and the p will not
- * increment.  If it's a number followed by a non-number, the p will point
- * to the first non-numeric character when the call returns.  If it's a
- * number and there is nothing following it, the p will point to the last
- * digit of the number when the call returns.
+ * increment. Otherwise, p will point to the last digit of the number when
+ * the call returns.
  */
 template<typename T>
 T parse_number(const char*&p, const char* p_last)
@@ -444,15 +442,22 @@ T parse_number(const char*&p, const char* p_last)
         sign = true;
     }
 
+    bool all_digits = false;
     while (is_digit(*p))
     {
         // Parse number.
         num *= 10;
         num += *p - '0';
         if (p == p_last)
+        {
+            all_digits = true;
             break;
+        }
         ++p;
     }
+
+    if (!all_digits)
+        --p;
 
     if (sign)
         num *= -1;
@@ -616,28 +621,31 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
             return parse_address_result::invalid;
 
         ++p;
-        addr.abs_row = (*p != '[');
-        if (!addr.abs_row)
+        if (*p != 'C')
         {
-            // Relative row address.
-            ++p;
-            if (!is_digit(*p) && *p != '-' && *p != '+')
-                return parse_address_result::invalid;
+            addr.abs_row = (*p != '[');
+            if (!addr.abs_row)
+            {
+                // Relative row address.
+                ++p;
+                if (!is_digit(*p) && *p != '-' && *p != '+')
+                    return parse_address_result::invalid;
 
-            addr.row = parse_number<row_t>(p, p_last);
-            if (p == p_last)
-                return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
-            ++p;
-        }
-        else
-        {
-            // Absolute row address.
-            if (is_digit(*p) && *p != '-' && *p != '+')
                 addr.row = parse_number<row_t>(p, p_last);
-
-            if (p == p_last)
-                // 'R' followed by a number without 'C' is valid.
-                return parse_address_result::valid_address;
+                ++p;
+                if (p == p_last)
+                    return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
+                ++p;
+            }
+            else if (is_digit(*p))
+            {
+                // Absolute row address.
+                addr.row = parse_number<row_t>(p, p_last);
+                if (p == p_last && is_digit(*p))
+                    // 'R' followed by a number without 'C' is valid.
+                    return parse_address_result::valid_address;
+                ++p;
+            }
         }
     }
 
@@ -659,16 +667,15 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
                 return parse_address_result::invalid;
 
             addr.column = parse_number<col_t>(p, p_last);
+            ++p;
             if (p == p_last)
                 return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
             ++p;
         }
-        else
+        else if (is_digit(*p))
         {
             // Absolute column address.
-            if (is_digit(*p) && *p != '-' && *p != '+')
-                addr.column = parse_number<col_t>(p, p_last);
-
+            addr.column = parse_number<col_t>(p, p_last);
             if (p == p_last)
                 return parse_address_result::valid_address;
         }
@@ -1098,13 +1105,16 @@ public:
         {
             os << 'R';
             if (addr.abs_row)
+                // absolute row address.
                 os << addr.row;
             else if (addr.row)
             {
+                // relative row address different from origin.
                 os << '[';
                 os << addr.row;
                 os << ']';
             }
+
         }
         if (addr.column != column_unset)
         {
