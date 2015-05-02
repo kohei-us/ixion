@@ -266,20 +266,24 @@ void test_name_resolver_excel_r1c1()
     auto resolver = formula_name_resolver::get(formula_name_resolver_excel_r1c1, &cxt);
     assert(resolver);
 
-    // Parse single cell addresses.
+    // Parse single cell addresses for round-tripping.
     ref_name_entry single_ref_names[] =
     {
-        { "R2",     false },
-        { "R[3]",   false },
+        { "R2", false },
+        { "R[3]", false },
         { "R[-10]", false },
-        { "C2",     false },
-        { "C[3]",   false },
+        { "C2", false },
+        { "C[3]", false },
         { "C[-10]", false },
-        { "R1C1",   false },
+        { "R1C1", false },
         { "R[1]C2", false },
+        { "R2C[-2]", false },
         { "R1C", false },
         { "RC2", false },
-        { 0,        false }
+        { "One!R10C", true },
+        { "Two!C[-2]", true },
+        { "'A B C'!R100", true },
+        { 0, false }
     };
 
     for (size_t i = 0; single_ref_names[i].name; ++i)

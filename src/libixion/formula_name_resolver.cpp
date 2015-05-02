@@ -239,6 +239,20 @@ void set_cell_reference(formula_name_type& ret, const address_t& addr)
 
 enum resolver_parse_mode { column, row };
 
+void write_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
+{
+    string sheet_name = cxt.get_sheet_name(sheet);
+    bool quote = sheet_name.find_first_of(' ') != string::npos;
+
+    if (quote)
+        os << '\'';
+
+    os << sheet_name;
+
+    if (quote)
+        os << '\'';
+}
+
 void append_column_name_a1(ostringstream& os, col_t col)
 {
     const col_t div = 26;
@@ -276,13 +290,7 @@ void append_address_a1(
 
     if (sheet_name_sep && cxt)
     {
-        string sheet_name = cxt->get_sheet_name(sheet);
-        bool quote = sheet_name.find_first_of(' ') != string::npos;
-        if (quote)
-            os << '\'';
-        os << cxt->get_sheet_name(sheet);
-        if (quote)
-            os << '\'';
+        write_sheet_name(os, *cxt, sheet);
         os << sheet_name_sep;
     }
 
@@ -934,7 +942,10 @@ public:
             sheet += pos.sheet;
 
         if (sheet_name && mp_cxt)
-            os << mp_cxt->get_sheet_name(sheet) << '!';
+        {
+            write_sheet_name(os, *mp_cxt, sheet);
+            os << '!';
+        }
 
         if (col != column_unset)
         {
@@ -1098,9 +1109,20 @@ public:
         return ret;
     }
 
-    virtual std::string get_name(const address_t& addr, const abs_address_t& /*pos*/, bool sheet_name) const
+    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
         ostringstream os;
+
+        if (sheet_name && mp_cxt)
+        {
+            sheet_t sheet = addr.sheet;
+            if (!addr.abs_sheet)
+                sheet += pos.sheet;
+
+            write_sheet_name(os, *mp_cxt, sheet);
+            os << '!';
+        }
+
         if (addr.row != row_unset)
         {
             os << 'R';
