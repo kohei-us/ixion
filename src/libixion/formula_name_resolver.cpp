@@ -649,6 +649,12 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
             {
                 // Absolute row address.
                 addr.row = parse_number<row_t>(p, p_last);
+                if (addr.row <= 0)
+                    // absolute address with 0 or negative value is invalid.
+                    return parse_address_result::invalid;
+
+                --addr.row; // 1-based to 0-based.
+
                 if (p == p_last && is_digit(*p))
                     // 'R' followed by a number without 'C' is valid.
                     return parse_address_result::valid_address;
@@ -663,7 +669,17 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
         addr.abs_column = false;
 
         if (p == p_last)
-            return (addr.row == row_unset) ? parse_address_result::invalid : parse_address_result::valid_address;
+        {
+            if (addr.row == row_unset)
+                // Just 'C'.  Row must be set.
+                return parse_address_result::invalid;
+
+            if (!addr.abs_row && addr.row == 0)
+                // 'RC' is invalid as it references itself.
+                return parse_address_result::invalid;
+
+            return parse_address_result::valid_address;
+        }
 
         ++p;
         addr.abs_column = (*p != '[');
@@ -684,6 +700,12 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
         {
             // Absolute column address.
             addr.column = parse_number<col_t>(p, p_last);
+            if (addr.column <= 0)
+                // absolute address with 0 or negative value is invalid.
+                return parse_address_result::invalid;
+
+            --addr.column; // 1-based to 0-based.
+
             if (p == p_last)
                 return parse_address_result::valid_address;
         }
@@ -1128,7 +1150,7 @@ public:
             os << 'R';
             if (addr.abs_row)
                 // absolute row address.
-                os << addr.row;
+                os << (addr.row+1);
             else if (addr.row)
             {
                 // relative row address different from origin.
@@ -1142,7 +1164,7 @@ public:
         {
             os << 'C';
             if (addr.abs_column)
-                os << addr.column;
+                os << (addr.column+1);
             else if (addr.column)
             {
                 os << '[';

@@ -290,7 +290,7 @@ void test_name_resolver_excel_r1c1()
     {
         const char* p = single_ref_names[i].name;
         string name_r1c1(p);
-        formula_name_type res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
+        formula_name_type res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
         if (res.type != formula_name_type::cell_reference)
         {
             cerr << "failed to resolve cell address: " << name_r1c1 << endl;
@@ -308,12 +308,28 @@ void test_name_resolver_excel_r1c1()
         }
     }
 
-    // invalid address
-    // F
-    // RR
-    // RC
-    // R
-    // C
+    // These are supposed to be all invalid.
+    const char* invalid_address[] = {
+        "F",
+        "RR",
+        "RC",
+        "R",
+        "C",
+        "R0C1",
+        0
+    };
+
+    for (size_t i = 0; invalid_address[i]; ++i)
+    {
+        const char* p = invalid_address[i];
+        string name_r1c1(p);
+        formula_name_type res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
+        if (res.type != formula_name_type::invalid)
+        {
+            cerr << "address " << name_r1c1 << " is expected to be invalid." << endl;
+            assert(false);
+        }
+    }
 }
 
 void test_name_resolver_odff()
