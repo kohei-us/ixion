@@ -316,6 +316,7 @@ void test_name_resolver_excel_r1c1()
         "R",
         "C",
         "R0C1",
+        "R[-2]C-1",
         0
     };
 
