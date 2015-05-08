@@ -381,6 +381,8 @@ void test_name_resolver_excel_r1c1()
         { "R[2]:R[4]", 0, 2, column_unset, 0, 4, column_unset, true, false, false, true, false, false },
         { "C3:C6", 0, row_unset, 2, 0, row_unset, 5, true, false, true, true, false, true },
         { "C[3]:C[6]", 0, row_unset, 3, 0, row_unset, 6, true, false, false, true, false, false },
+        { "Two!R2C2:R2C[100]", 1, 1, 1, 1, 1, 100, true, true, true, true, true, false },
+        { "'A B C'!R[2]:R[4]", 2, 2, column_unset, 2, 4, column_unset, true, false, false, true, false, false },
         { 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false }
     };
 
