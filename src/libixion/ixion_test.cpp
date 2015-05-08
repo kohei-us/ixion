@@ -376,12 +376,18 @@ void test_name_resolver_excel_r1c1()
         bool abs_col2;
     } range_tests[] = {
         { "R1C1:R2C2", 0, 0, 0, 0, 1, 1, true, true, true, true, true, true },
+        { "R[-3]C[2]:R[1]C[4]", 0, -3, 2, 0, 1, 4, true, false, false, true, false, false },
+        { "R2:R4", 0, 1, column_unset, 0, 3, column_unset, true, true, false, true, true, false },
+        { "R[2]:R[4]", 0, 2, column_unset, 0, 4, column_unset, true, false, false, true, false, false },
+        { "C3:C6", 0, row_unset, 2, 0, row_unset, 5, true, false, true, true, false, true },
+        { "C[3]:C[6]", 0, row_unset, 3, 0, row_unset, 6, true, false, false, true, false, false },
         { 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false }
     };
 
     for (size_t i = 0; range_tests[i].name; ++i)
     {
         string name_r1c1(range_tests[i].name);
+        cout << "Parsing " << name_r1c1 << endl;
         formula_name_type res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
 
         assert(res.type == formula_name_type::range_reference);
@@ -390,15 +396,21 @@ void test_name_resolver_excel_r1c1()
         assert(res.range.first.row == range_tests[i].row1);
         assert(res.range.first.col == range_tests[i].col1);
         assert(res.range.first.abs_sheet == range_tests[i].abs_sheet1);
-        assert(res.range.first.abs_row == range_tests[i].abs_row1);
-        assert(res.range.first.abs_col == range_tests[i].abs_col1);
+        if (res.range.first.row != row_unset)
+            // When row is unset, whether it's relative or absolute is not relevant.
+            assert(res.range.first.abs_row == range_tests[i].abs_row1);
+        if (res.range.first.col != column_unset)
+            // Same with unset column.
+            assert(res.range.first.abs_col == range_tests[i].abs_col1);
 
         assert(res.range.last.sheet == range_tests[i].sheet2);
         assert(res.range.last.row == range_tests[i].row2);
         assert(res.range.last.col == range_tests[i].col2);
         assert(res.range.last.abs_sheet == range_tests[i].abs_sheet2);
-        assert(res.range.last.abs_row == range_tests[i].abs_row2);
-        assert(res.range.last.abs_col == range_tests[i].abs_col2);
+        if (res.range.last.row != row_unset)
+            assert(res.range.last.abs_row == range_tests[i].abs_row2);
+        if (res.range.last.col != column_unset)
+            assert(res.range.last.abs_col == range_tests[i].abs_col2);
     }
 }
 

@@ -717,6 +717,8 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
                 return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
         }
     }
+    else if (*p == ':')
+        return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
 
     return parse_address_result::invalid;
 }
