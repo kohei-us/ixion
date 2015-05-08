@@ -239,7 +239,7 @@ void set_cell_reference(formula_name_type& ret, const address_t& addr)
 
 enum resolver_parse_mode { column, row };
 
-void write_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
+void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
 {
     string sheet_name = cxt.get_sheet_name(sheet);
     bool quote = sheet_name.find_first_of(' ') != string::npos;
@@ -290,7 +290,7 @@ void append_address_a1(
 
     if (sheet_name_sep && cxt)
     {
-        write_sheet_name(os, *cxt, sheet);
+        append_sheet_name(os, *cxt, sheet);
         os << sheet_name_sep;
     }
 
@@ -974,7 +974,7 @@ public:
 
         if (sheet_name && mp_cxt)
         {
-            write_sheet_name(os, *mp_cxt, sheet);
+            append_sheet_name(os, *mp_cxt, sheet);
             os << '!';
         }
 
@@ -1169,7 +1169,7 @@ public:
             if (!addr.abs_sheet)
                 sheet += pos.sheet;
 
-            write_sheet_name(os, *mp_cxt, sheet);
+            append_sheet_name(os, *mp_cxt, sheet);
             os << '!';
         }
 
