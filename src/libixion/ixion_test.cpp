@@ -317,6 +317,13 @@ void test_name_resolver_excel_r1c1()
         "C",
         "R0C1",
         "R[-2]C-1",
+        "R1C2:",
+        "R:",
+        "R2:",
+        "R[-3]:",
+        "C:",
+        "C3:",
+        "C[-4]:",
         0
     };
 
@@ -350,6 +357,48 @@ void test_name_resolver_excel_r1c1()
             cerr << "address " << name_r1c1 << " is expected to be valid." << endl;
             assert(false);
         }
+    }
+
+    // Parse range addresses.
+    struct {
+        const char* name;
+        sheet_t sheet1;
+        row_t row1;
+        col_t col1;
+        sheet_t sheet2;
+        row_t row2;
+        col_t col2;
+        bool abs_sheet1;
+        bool abs_row1;
+        bool abs_col1;
+        bool abs_sheet2;
+        bool abs_row2;
+        bool abs_col2;
+    } range_tests[] = {
+        { "R1C1:R2C2", 0, 0, 0, 0, 1, 1, true, true, true, true, true, true },
+        { 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false }
+    };
+
+    for (size_t i = 0; range_tests[i].name; ++i)
+    {
+        string name_r1c1(range_tests[i].name);
+        formula_name_type res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
+
+        assert(res.type == formula_name_type::range_reference);
+
+        assert(res.range.first.sheet == range_tests[i].sheet1);
+        assert(res.range.first.row == range_tests[i].row1);
+        assert(res.range.first.col == range_tests[i].col1);
+        assert(res.range.first.abs_sheet == range_tests[i].abs_sheet1);
+        assert(res.range.first.abs_row == range_tests[i].abs_row1);
+        assert(res.range.first.abs_col == range_tests[i].abs_col1);
+
+        assert(res.range.last.sheet == range_tests[i].sheet2);
+        assert(res.range.last.row == range_tests[i].row2);
+        assert(res.range.last.col == range_tests[i].col2);
+        assert(res.range.last.abs_sheet == range_tests[i].abs_sheet2);
+        assert(res.range.last.abs_row == range_tests[i].abs_row2);
+        assert(res.range.last.abs_col == range_tests[i].abs_col2);
     }
 }
 

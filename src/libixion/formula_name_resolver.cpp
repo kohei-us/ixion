@@ -694,7 +694,10 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
             ++p;
             if (p == p_last)
                 return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
+
             ++p;
+            if (*p == ':')
+                return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
         }
         else if (is_digit(*p))
         {
@@ -708,6 +711,10 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
 
             if (p == p_last)
                 return parse_address_result::valid_address;
+
+            ++p;
+            if (*p == ':')
+                return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
         }
     }
 
@@ -719,7 +726,7 @@ parse_address_result parse_address_excel_a1(
 {
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = false;
+    addr.abs_sheet = true; // Excel's sheet position is always absolute.
     addr.abs_row = false;
     addr.abs_column = false;
 
@@ -735,7 +742,7 @@ parse_address_result parse_address_excel_r1c1(
 {
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = false;
+    addr.abs_sheet = true; // Excel's sheet position is always absolute.
     addr.abs_row = false;
     addr.abs_column = false;
 
@@ -1115,7 +1122,7 @@ public:
         std::advance(p_last, n-1);
 
         // Use the sheet where the cell is unless sheet name is explicitly given.
-        address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
+        address_t parsed_addr(pos.sheet, 0, 0);
 
         parse_address_result parse_res = parse_address_excel_r1c1(mp_cxt, p, p_last, parsed_addr);
         switch (parse_res)
@@ -1126,6 +1133,25 @@ public:
                 return ret;
             }
             break;
+            case parse_address_result::range_expected:
+            {
+                ++p; // skip ':'
+                address_t parsed_addr2(0, 0, 0);
+                parse_address_result parse_res2 = parse_address_excel_r1c1(nullptr, p, p_last, parsed_addr2);
+                if (parse_res2 != parse_address_result::valid_address)
+                    return ret;
+
+                // For now, we assume the sheet index of the end address is identical
+                // to that of the begin address.
+                parsed_addr2.sheet = parsed_addr.sheet;
+
+                set_address(ret.range.first, parsed_addr);
+                set_address(ret.range.last, parsed_addr2);
+                ret.type = formula_name_type::range_reference;
+            }
+            break;
+            default:
+                ;
         }
 
         return ret;
