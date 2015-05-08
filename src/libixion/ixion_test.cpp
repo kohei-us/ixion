@@ -414,6 +414,34 @@ void test_name_resolver_excel_r1c1()
         if (res.range.last.col != column_unset)
             assert(res.range.last.abs_col == range_tests[i].abs_col2);
     }
+
+    ref_name_entry range_ref_names[] =
+    {
+        { "R2C2:R3C3", false },
+        { "R[-3]C2:R[-1]C3", false },
+        { 0, false },
+    };
+
+    for (size_t i = 0; range_ref_names[i].name; ++i)
+    {
+        const char* p = range_ref_names[i].name;
+        string name_r1c1(p);
+        formula_name_type res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
+        if (res.type != formula_name_type::range_reference)
+        {
+            cerr << "failed to resolve range address: " << name_r1c1 << endl;
+            assert(false);
+        }
+
+        range_t range = to_range(res.range);
+        string test_name = resolver->get_name(range, abs_address_t(), range_ref_names[i].sheet_name);
+
+        if (name_r1c1 != test_name)
+        {
+            cerr << "failed to compile name from range: (name expected: " << name_r1c1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
 }
 
 void test_name_resolver_odff()

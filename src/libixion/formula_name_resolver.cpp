@@ -303,6 +303,38 @@ void append_address_a1(
     os << (row + 1);
 }
 
+void append_address_r1c1(
+    ostringstream& os, const address_t& addr, const abs_address_t& pos)
+{
+    if (addr.row != row_unset)
+    {
+        os << 'R';
+        if (addr.abs_row)
+            // absolute row address.
+            os << (addr.row+1);
+        else if (addr.row)
+        {
+            // relative row address different from origin.
+            os << '[';
+            os << addr.row;
+            os << ']';
+        }
+
+    }
+    if (addr.column != column_unset)
+    {
+        os << 'C';
+        if (addr.abs_column)
+            os << (addr.column+1);
+        else if (addr.column)
+        {
+            os << '[';
+            os << addr.column;
+            os << ']';
+        }
+    }
+}
+
 void append_name_string(ostringstream& os, const iface::formula_model_access* cxt, string_id_t sid)
 {
     if (!cxt)
@@ -1108,6 +1140,20 @@ private:
 class excel_r1c1 : public formula_name_resolver
 {
     const iface::formula_model_access* mp_cxt;
+
+    void write_sheet_name(ostringstream& os, const address_t& addr, const abs_address_t& pos) const
+    {
+        if (mp_cxt)
+        {
+            sheet_t sheet = addr.sheet;
+            if (!addr.abs_sheet)
+                sheet += pos.sheet;
+
+            append_sheet_name(os, *mp_cxt, sheet);
+            os << '!';
+        }
+    }
+
 public:
     excel_r1c1(const iface::formula_model_access* cxt) : mp_cxt(cxt) {}
 
@@ -1163,50 +1209,24 @@ public:
     {
         ostringstream os;
 
-        if (sheet_name && mp_cxt)
-        {
-            sheet_t sheet = addr.sheet;
-            if (!addr.abs_sheet)
-                sheet += pos.sheet;
+        if (sheet_name)
+            write_sheet_name(os, addr, pos);
 
-            append_sheet_name(os, *mp_cxt, sheet);
-            os << '!';
-        }
-
-        if (addr.row != row_unset)
-        {
-            os << 'R';
-            if (addr.abs_row)
-                // absolute row address.
-                os << (addr.row+1);
-            else if (addr.row)
-            {
-                // relative row address different from origin.
-                os << '[';
-                os << addr.row;
-                os << ']';
-            }
-
-        }
-        if (addr.column != column_unset)
-        {
-            os << 'C';
-            if (addr.abs_column)
-                os << (addr.column+1);
-            else if (addr.column)
-            {
-                os << '[';
-                os << addr.column;
-                os << ']';
-            }
-        }
-
+        append_address_r1c1(os, addr, pos);
         return os.str();
     }
 
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
-        return std::string();
+        ostringstream os;
+
+        if (sheet_name)
+            write_sheet_name(os, range.first, pos);
+
+        append_address_r1c1(os, range.first, pos);
+        os << ':';
+        append_address_r1c1(os, range.last, pos);
+        return os.str();
     }
 
     virtual std::string get_name(const table_t& table) const
