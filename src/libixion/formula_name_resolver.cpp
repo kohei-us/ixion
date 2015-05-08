@@ -619,7 +619,7 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
     addr.row = row_unset;
     addr.column = column_unset;
 
-    if (*p == 'R')
+    if (*p == 'R' || *p == 'r')
     {
         addr.row = 0;
         addr.abs_row = false;
@@ -629,7 +629,7 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
             return parse_address_result::invalid;
 
         ++p;
-        if (*p != 'C')
+        if (*p != 'C' && *p != 'c')
         {
             addr.abs_row = (*p != '[');
             if (!addr.abs_row)
@@ -663,7 +663,7 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
         }
     }
 
-    if (*p == 'C')
+    if (*p == 'C' || *p == 'c')
     {
         addr.column = 0;
         addr.abs_column = false;

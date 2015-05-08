@@ -331,6 +331,26 @@ void test_name_resolver_excel_r1c1()
             assert(false);
         }
     }
+
+    // These are supposed to be all valid.
+    const char* valid_address[] = {
+        "r1c2",
+        "r[-2]",
+        "c10",
+        0
+    };
+
+    for (size_t i = 0; valid_address[i]; ++i)
+    {
+        const char* p = valid_address[i];
+        string name_r1c1(p);
+        formula_name_type res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
+        if (res.type != formula_name_type::cell_reference)
+        {
+            cerr << "address " << name_r1c1 << " is expected to be valid." << endl;
+            assert(false);
+        }
+    }
 }
 
 void test_name_resolver_odff()
