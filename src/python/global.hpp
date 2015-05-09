@@ -36,6 +36,7 @@ struct document_global
 
 PyObject* get_python_document_error();
 PyObject* get_python_sheet_error();
+PyObject* get_python_formula_error();
 
 }}
 

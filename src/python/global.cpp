@@ -26,6 +26,12 @@ PyObject* get_python_sheet_error()
     return p;
 }
 
+PyObject* get_python_formula_error()
+{
+    static PyObject* p = PyErr_NewException(const_cast<char*>("ixion.FormulaError"), NULL, NULL);
+    return p;
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

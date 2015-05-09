@@ -31,6 +31,9 @@ class ModuleTest(unittest.TestCase):
         labels = ixion.column_label(start=2, stop=4)
         self.assertEqual(labels, ('C','D'))
 
+        # Get labels in R1C1.
+        labels = ixion.column_label(5, 10, 2)
+        self.assertEqual(labels, ('6','7','8','9','10'))
 
 
 if __name__ == '__main__':

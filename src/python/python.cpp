@@ -54,8 +54,9 @@ PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
 {
     int start;
     int stop;
-    static const char* kwlist[] = { "start", "stop", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &start, &stop))
+    int resolver_index = 1; // Excel A1 by default
+    static const char* kwlist[] = { "start", "stop", "resolver", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|i", const_cast<char**>(kwlist), &start, &stop, &resolver_index))
         return NULL;
 
     if (start >= stop)
@@ -74,9 +75,14 @@ PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
         return NULL;
     }
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, NULL);
+    auto resolver = formula_name_resolver::get(
+        static_cast<formula_name_resolver_t>(resolver_index), NULL);
     if (!resolver)
+    {
+        PyErr_SetString(
+            get_python_formula_error(), "Specified resolver type is invalid.");
         return NULL;
+    }
 
     int size = stop - start;
     PyObject* t = PyTuple_New(size);
@@ -157,6 +163,8 @@ IXION_DLLPUBLIC PyObject* PyInit_ixion()
         m, "DocumentError", ixion::python::get_python_document_error());
     PyModule_AddObject(
         m, "SheetError", ixion::python::get_python_sheet_error());
+    PyModule_AddObject(
+        m, "FormulaError", ixion::python::get_python_formula_error());
 
     return m;
 }

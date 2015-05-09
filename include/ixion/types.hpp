@@ -71,11 +71,11 @@ typedef int table_areas_t;
  */
 enum formula_name_resolver_t
 {
-    formula_name_resolver_unknown = 0,
-    formula_name_resolver_excel_a1,
-    formula_name_resolver_excel_r1c1,
-    formula_name_resolver_calc_a1,
-    formula_name_resolver_odff
+    formula_name_resolver_unknown    = 0,
+    formula_name_resolver_excel_a1   = 1,
+    formula_name_resolver_excel_r1c1 = 2,
+    formula_name_resolver_calc_a1    = 3,
+    formula_name_resolver_odff       = 4
 };
 
 }
