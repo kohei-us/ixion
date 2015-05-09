@@ -444,6 +444,26 @@ void test_name_resolver_excel_r1c1()
             assert(false);
         }
     }
+
+    struct {
+        col_t col;
+        string name;
+    } colnames[] = {
+        {   0,   "1" },
+        {   1,   "2" },
+        {  10,  "11" },
+        { 123, "124" },
+    };
+
+    for (size_t i = 0, n = IXION_N_ELEMENTS(colnames); i < n; ++i)
+    {
+        string colname = resolver->get_column_name(colnames[i].col);
+        if (colname != colnames[i].name)
+        {
+            cerr << "column name: expected='" << colnames[i].name << "', actual='" << colname << "'" << endl;
+            assert(false);
+        }
+    }
 }
 
 void test_name_resolver_odff()

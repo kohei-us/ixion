@@ -894,6 +894,81 @@ void to_relative_address(address_t& addr, const abs_address_t& pos)
         addr.column -= pos.column;
 }
 
+string to_string(const iface::formula_model_access* cxt, const table_t& table)
+{
+    ostringstream os;
+    append_name_string(os, cxt, table.name);
+
+    if (table.column_first == empty_string_id)
+    {
+        // Area specifier(s) only.
+        bool headers = (table.areas & table_area_headers);
+        bool data = (table.areas & table_area_data);
+        bool totals = (table.areas & table_area_totals);
+
+        short count = 0;
+        if (headers)
+            ++count;
+        if (data)
+            ++count;
+        if (totals)
+            ++count;
+
+        bool multiple = count == 2;
+        if (multiple)
+            os << '[';
+
+        append_table_areas(os, table);
+
+        if (multiple)
+            os << ']';
+    }
+    else if (table.column_last == empty_string_id)
+    {
+        // single column.
+        os << '[';
+
+        bool multiple = false;
+        if (table.areas && table.areas != table_area_data)
+        {
+            if (append_table_areas(os, table))
+            {
+                os << ',';
+                multiple = true;
+            }
+        }
+
+        if (multiple)
+            os << '[';
+
+        append_name_string(os, cxt, table.column_first);
+
+        if (multiple)
+            os << ']';
+
+        os << ']';
+    }
+    else
+    {
+        // column range.
+        os << '[';
+
+        if (table.areas && table.areas != table_area_data)
+        {
+            if (append_table_areas(os, table))
+                os << ',';
+        }
+
+        os << '[';
+        append_name_string(os, cxt, table.column_first);
+        os << "]:[";
+        append_name_string(os, cxt, table.column_last);
+        os << "]]";
+    }
+
+    return os.str();
+}
+
 } // anonymous namespace
 
 formula_name_type::formula_name_type() : type(invalid) {}
@@ -1114,77 +1189,7 @@ public:
 
     virtual string get_name(const table_t& table) const
     {
-        ostringstream os;
-        append_name_string(os, mp_cxt, table.name);
-
-        if (table.column_first == empty_string_id)
-        {
-            // Area specifier(s) only.
-            bool headers = (table.areas & table_area_headers);
-            bool data = (table.areas & table_area_data);
-            bool totals = (table.areas & table_area_totals);
-
-            short count = 0;
-            if (headers)
-                ++count;
-            if (data)
-                ++count;
-            if (totals)
-                ++count;
-
-            bool multiple = count == 2;
-            if (multiple)
-                os << '[';
-
-            append_table_areas(os, table);
-
-            if (multiple)
-                os << ']';
-        }
-        else if (table.column_last == empty_string_id)
-        {
-            // single column.
-            os << '[';
-
-            bool multiple = false;
-            if (table.areas && table.areas != table_area_data)
-            {
-                if (append_table_areas(os, table))
-                {
-                    os << ',';
-                    multiple = true;
-                }
-            }
-
-            if (multiple)
-                os << '[';
-
-            append_name_string(os, mp_cxt, table.column_first);
-
-            if (multiple)
-                os << ']';
-
-            os << ']';
-        }
-        else
-        {
-            // column range.
-            os << '[';
-
-            if (table.areas && table.areas != table_area_data)
-            {
-                if (append_table_areas(os, table))
-                    os << ',';
-            }
-
-            os << '[';
-            append_name_string(os, mp_cxt, table.column_first);
-            os << "]:[";
-            append_name_string(os, mp_cxt, table.column_last);
-            os << "]]";
-        }
-
-        return os.str();
+        return to_string(mp_cxt, table);
     }
 
     virtual string get_column_name(col_t col) const
@@ -1290,12 +1295,14 @@ public:
 
     virtual std::string get_name(const table_t& table) const
     {
-        return std::string();
+        return to_string(mp_cxt, table);
     }
 
     virtual std::string get_column_name(col_t col) const
     {
-        return std::string();
+        ostringstream os;
+        os << (col+1);
+        return os.str();
     }
 };
 
