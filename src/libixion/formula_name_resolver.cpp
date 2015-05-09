@@ -242,12 +242,44 @@ enum resolver_parse_mode { column, row };
 void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
 {
     string sheet_name = cxt.get_sheet_name(sheet);
-    bool quote = sheet_name.find_first_of(' ') != string::npos;
+    string buffer; // used only when the sheet name contains at least one single quote.
+
+    const char* p = sheet_name.data();
+    const char* p_end = p + sheet_name.size();
+
+    bool quote = false;
+    const char* p0 = nullptr;
+
+    for (; p != p_end; ++p)
+    {
+        if (!p0)
+            p0 = p;
+
+        switch (*p)
+        {
+            case ' ':
+                quote = true;
+            break;
+            case '\'':
+                quote = true;
+                buffer += string(p0, p-p0);
+                buffer.push_back(*p);
+                buffer.push_back(*p);
+                p0 = nullptr;
+            break;
+        }
+    }
 
     if (quote)
         os << '\'';
 
-    os << sheet_name;
+    if (buffer.empty())
+        os << sheet_name;
+    else
+    {
+        buffer += string(p0, p-p0);
+        os << buffer;
+    }
 
     if (quote)
         os << '\'';
@@ -398,23 +430,50 @@ const char* parse_address_result_names[] = {
 };
 #endif
 
-void parse_sheet_name_quoted(const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+void parse_sheet_name_quoted(
+    const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     const char* p_old = p;
     ++p; // skip the open quote.
     size_t len = 0;
+    string buffer; // used only when the name contains at least one single quote.
+    const char* p1 = p;
 
     // parse until the closing quote is reached.
     while (true)
     {
         if (*p == '\'')
         {
-            if (p == p_last || *(p+1) != sep)
+            if (p == p_last)
+                break;
+
+            if (*(p+1) == '\'')
+            {
+                // next character is a quote too.  Store the parsed string
+                // segment to the buffer and move on.
+                ++p;
+                ++len;
+                buffer += string(p1, len);
+                ++p;
+                ++len;
+                p1 = p;
+                len = 0;
+                continue;
+            }
+
+            if (*(p+1) != sep)
                 // the next char must be the separator.  Parse failed.
                 break;
 
-            const char* p1 = p_old + 1;
-            sheet = cxt.get_sheet_index(p1, len);
+            if (buffer.empty())
+                // Name contains no single quotes.
+                sheet = cxt.get_sheet_index(p1, len);
+            else
+            {
+                buffer += string(p1, len);
+                sheet = cxt.get_sheet_index(buffer.data(), buffer.size());
+            }
+
             ++p; // skip the closing quote.
             if (p != p_last)
                 ++p; // skip the separator.

@@ -419,6 +419,8 @@ void test_name_resolver_excel_r1c1()
     {
         { "R2C2:R3C3", false },
         { "R[-3]C2:R[-1]C3", false },
+        { "'A B C'!R2:R4", true },
+        { "'80''s Music'!C[2]:C[4]", true },
         { 0, false },
     };
 
