@@ -553,7 +553,7 @@ void model_parser::check()
 
                 switch (m_context.get_celltype(addr))
                 {
-                    case celltype_formula:
+                    case celltype_t::formula:
                     {
                         const formula_cell* fcell = m_context.get_formula_cell(addr);
                         const formula_result* res_cell = fcell->get_result_cache();
@@ -568,7 +568,7 @@ void model_parser::check()
                         }
                     }
                     break;
-                    case celltype_numeric:
+                    case celltype_t::numeric:
                     {
                         double actual_val = m_context.get_numeric_value(addr);
                         if (actual_val != res.get_value())
@@ -579,7 +579,7 @@ void model_parser::check()
                         }
                     }
                     break;
-                    case celltype_string:
+                    case celltype_t::string:
                     {
                         string_id_t str_id = m_context.get_string_identifier(addr);
 

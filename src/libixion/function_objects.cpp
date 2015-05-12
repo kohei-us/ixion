@@ -43,7 +43,7 @@ public:
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(m_origin);
-                if (m_context.get_celltype(addr) != celltype_formula)
+                if (m_context.get_celltype(addr) != celltype_t::formula)
                     break;
 
                 m_deps.push_back(addr);
@@ -59,7 +59,7 @@ public:
                         for (row_t row = range.first.row; row <= range.last.row; ++row)
                         {
                             abs_address_t addr(sheet, row, col);
-                            if (m_context.get_celltype(addr) != celltype_formula)
+                            if (m_context.get_celltype(addr) != celltype_t::formula)
                                 continue;
 
                             m_deps.push_back(addr);

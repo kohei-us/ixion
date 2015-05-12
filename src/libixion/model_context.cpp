@@ -65,7 +65,7 @@ bool set_shared_formula_tokens_to_cell(
     abs_address_t test = addr;
     test.row -= 1;
 
-    if (cxt.get_celltype(test) != celltype_formula)
+    if (cxt.get_celltype(test) != celltype_t::formula)
         // The neighboring cell is not a formula cell.
         return false;
 
@@ -879,18 +879,18 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
     switch (gmcell_type)
     {
         case mdds::mtv::element_type_empty:
-            return celltype_empty;
+            return celltype_t::empty;
         case mdds::mtv::element_type_numeric:
-            return celltype_numeric;
+            return celltype_t::numeric;
         case mdds::mtv::element_type_ulong:
-            return celltype_string;
+            return celltype_t::string;
         case element_type_formula:
-            return celltype_formula;
+            return celltype_t::formula;
         default:
             throw general_error("unknown cell type");
     }
 
-    return celltype_unknown;
+    return celltype_t::unknown;
 }
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const

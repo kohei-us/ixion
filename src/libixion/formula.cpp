@@ -221,7 +221,7 @@ void get_all_dirty_cells(
         cell_listener_tracker::address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
         for (; itr != itr_end; ++itr)
         {
-            if (cxt.get_celltype(*itr) != celltype_formula)
+            if (cxt.get_celltype(*itr) != celltype_t::formula)
                 continue;
 
             addrs.push_back(*itr);

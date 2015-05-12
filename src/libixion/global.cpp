@@ -391,9 +391,9 @@ const string value_stack_t::pop_string()
 
             switch (m_context.get_celltype(addr))
             {
-                case celltype_empty:
+                case celltype_t::empty:
                     return string();
-                case celltype_formula:
+                case celltype_t::formula:
                 {
                     const formula_cell* fc = m_context.get_formula_cell(addr);
                     const formula_result* res = fc->get_result_cache();
@@ -423,13 +423,13 @@ const string value_stack_t::pop_string()
                     }
                 }
                 break;
-                case celltype_numeric:
+                case celltype_t::numeric:
                 {
                     ostringstream os;
                     os << m_context.get_numeric_value(addr);
                     return os.str();
                 }
-                case celltype_string:
+                case celltype_t::string:
                 {
                     const string* ps = m_context.get_string(m_context.get_string_identifier(addr));
                     if (!ps)

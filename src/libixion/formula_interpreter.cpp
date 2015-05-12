@@ -162,7 +162,7 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
 {
     switch (cxt.get_celltype(addr))
     {
-        case celltype_formula:
+        case celltype_t::formula:
         {
             const formula_cell* fcell = cxt.get_formula_cell(addr);
             if (!fcell)
@@ -173,13 +173,13 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
                 res = *fres;
         }
         break;
-        case celltype_numeric:
+        case celltype_t::numeric:
             res.set_value(cxt.get_numeric_value(addr));
         break;
-        case celltype_string:
+        case celltype_t::string:
             res.set_string(cxt.get_string_identifier(addr));
         break;
-        case celltype_unknown:
+        case celltype_t::unknown:
         default:
             ;
     }
@@ -323,20 +323,20 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
 
             switch (cxt.get_celltype(addr))
             {
-                case celltype_empty:
+                case celltype_t::empty:
                 {
                     // empty cell has a value of 0.
                     vt = sv_value;
                     val = 0.0;
                     return true;
                 }
-                case celltype_numeric:
+                case celltype_t::numeric:
                 {
                     vt = sv_value;
                     val = cxt.get_numeric_value(addr);
                     return true;
                 }
-                case celltype_string:
+                case celltype_t::string:
                 {
                     vt = sv_string;
                     size_t strid = cxt.get_string_identifier(addr);
@@ -346,7 +346,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                     str = *ps;
                     return true;
                 }
-                case celltype_formula:
+                case celltype_t::formula:
                 {
                     const formula_cell* fc = cxt.get_formula_cell(addr);
                     assert(fc);

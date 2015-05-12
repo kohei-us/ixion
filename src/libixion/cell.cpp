@@ -229,7 +229,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                         for (row_t row = range.first.row; row <= range.last.row; ++row)
                         {
                             abs_address_t addr(sheet, row, col);
-                            if (cxt.get_celltype(addr) != celltype_formula)
+                            if (cxt.get_celltype(addr) != celltype_t::formula)
                                 continue;
 
                             if (!check_ref_for_circular_safety(*cxt.get_formula_cell(addr), addr))

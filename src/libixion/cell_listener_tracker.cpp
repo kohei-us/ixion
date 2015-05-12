@@ -47,7 +47,7 @@ public:
         for (; itr != itr_end; ++itr)
         {
             const abs_address_t& addr = *itr;
-            if (m_context.get_celltype(addr) != celltype_formula)
+            if (m_context.get_celltype(addr) != celltype_t::formula)
                 continue;
 
             // Formula cell exists at this address.
@@ -284,7 +284,7 @@ void cell_listener_tracker::get_all_cell_listeners(
     for (; itr2 != itr2_end; ++itr2)
     {
         const abs_address_t& addr = *itr2; // listener cell address
-        if (mp_impl->m_context.get_celltype(addr) != celltype_formula)
+        if (mp_impl->m_context.get_celltype(addr) != celltype_t::formula)
             // Referenced cell is empty or not a formula cell.  Ignore this.
             continue;
 

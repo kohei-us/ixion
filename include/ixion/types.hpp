@@ -25,13 +25,13 @@ IXION_DLLPUBLIC_VAR const sheet_t invalid_sheet;
 /** Global string ID representing an empty string. */
 IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 
-enum celltype_t
+enum class celltype_t
 {
-    celltype_unknown = 0,
-    celltype_string,
-    celltype_numeric,
-    celltype_formula,
-    celltype_empty
+    unknown = 0,
+    string,
+    numeric,
+    formula,
+    empty
 };
 
 enum value_t
