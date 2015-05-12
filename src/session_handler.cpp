@@ -19,7 +19,7 @@ namespace ixion {
 
 session_handler::session_handler(const model_context& cxt) :
     m_context(cxt),
-    mp_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt)) {}
+    mp_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt)) {}
 
 session_handler::~session_handler() {}
 

@@ -11,7 +11,7 @@ namespace ixion { namespace python {
 
 document_global::document_global() :
     m_cxt(),
-    m_resolver(ixion::formula_name_resolver::get(formula_name_resolver_excel_a1, &m_cxt))
+    m_resolver(ixion::formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_cxt))
 {}
 
 PyObject* get_python_document_error()

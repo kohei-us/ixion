@@ -70,7 +70,7 @@ void test_name_resolver_excel_a1()
     cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("Three"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
-    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
     // Parse single cell addresses.
@@ -192,7 +192,7 @@ void test_name_resolver_table_excel_a1()
     string_id_t s_cat = cxt.append_string(IXION_ASCII("Category"));
     string_id_t s_val = cxt.append_string(IXION_ASCII("Value"));
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
     struct {
@@ -263,7 +263,7 @@ void test_name_resolver_excel_r1c1()
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
     cxt.append_sheet(IXION_ASCII("80's Music"), 1048576, 1024);
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_r1c1, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_r1c1, &cxt);
     assert(resolver);
 
     // Parse single cell addresses for round-tripping.
@@ -476,7 +476,7 @@ void test_name_resolver_odff()
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
     cxt.append_sheet(IXION_ASCII("80's Music"), 1048576, 1024);
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_odff, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::odff, &cxt);
     assert(resolver);
 
     // Parse single cell addresses.
@@ -605,7 +605,7 @@ void test_parse_and_print_expressions()
     cxt.append_string(IXION_ASCII("Table1"));
     cxt.append_string(IXION_ASCII("Category"));
     cxt.append_string(IXION_ASCII("Value"));
-    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
     for (size_t i = 0; i < num_exps; ++i)
@@ -631,7 +631,7 @@ void test_function_name_resolution()
     };
 
     model_context cxt;
-    auto resolver = formula_name_resolver::get(ixion::formula_name_resolver_excel_a1, &cxt);
+    auto resolver = formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     size_t n = IXION_N_ELEMENTS(valid_names);
     for (size_t i = 0; i < n; ++i)
     {
@@ -667,7 +667,7 @@ void test_model_context_storage()
     cout << "test model context storage" << endl;
     {
         model_context cxt;
-        auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt);
+        auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
         assert(resolver);
 
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
@@ -697,7 +697,7 @@ void test_model_context_storage()
 
     {
         model_context cxt;
-        auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt);
+        auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
         assert(resolver);
 
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
@@ -753,7 +753,7 @@ void test_volatile_function()
     cout << "test volatile function" << endl;
 
     model_context cxt;
-    auto resolver = formula_name_resolver::get(formula_name_resolver_excel_a1, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
     cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);

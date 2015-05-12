@@ -1445,14 +1445,14 @@ std::unique_ptr<formula_name_resolver> formula_name_resolver::get(
 
     switch (type)
     {
-        case formula_name_resolver_excel_a1:
+        case formula_name_resolver_t::excel_a1:
             return std::unique_ptr<formula_name_resolver>(new excel_a1(cxt));
-        case formula_name_resolver_excel_r1c1:
+        case formula_name_resolver_t::excel_r1c1:
             return std::unique_ptr<formula_name_resolver>(new excel_r1c1(cxt));
-        case formula_name_resolver_odff:
+        case formula_name_resolver_t::odff:
             return std::unique_ptr<formula_name_resolver>(new odff_resolver(cxt));
-        case formula_name_resolver_calc_a1:
-        case formula_name_resolver_unknown:
+        case formula_name_resolver_t::calc_a1:
+        case formula_name_resolver_t::unknown:
         default:
             ;
     }

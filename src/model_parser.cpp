@@ -114,7 +114,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_session_handler(m_context),
     m_table_handler(),
     mp_table_entry(NULL),
-    mp_name_resolver(formula_name_resolver::get(formula_name_resolver_excel_a1, &m_context)),
+    mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
     m_filepath(filepath),
     m_thread_count(thread_count),
     m_print_separator(true)

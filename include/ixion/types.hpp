@@ -69,13 +69,13 @@ typedef int table_areas_t;
 /**
  * Formula name resolver type specifies how name tokens are resolved.
  */
-enum formula_name_resolver_t
+enum class formula_name_resolver_t
 {
-    formula_name_resolver_unknown    = 0,
-    formula_name_resolver_excel_a1   = 1,
-    formula_name_resolver_excel_r1c1 = 2,
-    formula_name_resolver_calc_a1    = 3,
-    formula_name_resolver_odff       = 4
+    unknown    = 0,
+    excel_a1   = 1,
+    excel_r1c1 = 2,
+    calc_a1    = 3,
+    odff       = 4
 };
 
 }
