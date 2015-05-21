@@ -79,8 +79,7 @@ private:
     model_context m_context;
     session_handler m_session_handler;
     table_handler m_table_handler;
-    unique_ptr<table_handler::entry> mp_table_entry;
-
+    std::unique_ptr<table_handler::entry> mp_table_entry;
     std::unique_ptr<formula_name_resolver> mp_name_resolver;
     std::string m_filepath;
     size_t m_thread_count;

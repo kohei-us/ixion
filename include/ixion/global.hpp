@@ -15,7 +15,6 @@
 #include <string>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 #define __IXION_DEBUG_OUT__ ::std::cout << __FILE__ << "#" << __LINE__ << ": "
@@ -208,13 +207,6 @@ struct default_deleter
     {
         delete p;
     }
-};
-
-template<typename _T>
-class unique_ptr : public boost::interprocess::unique_ptr<_T, default_deleter<_T> >
-{
-public:
-    unique_ptr(_T* p) : boost::interprocess::unique_ptr<_T, default_deleter<_T> >(p) {}
 };
 
 template<typename T, typename ...Args>

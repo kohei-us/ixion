@@ -49,7 +49,7 @@ void table_handler::insert(entry* p)
     if (!p)
         return;
 
-    unique_ptr<entry> px(p);
+    std::unique_ptr<entry> px(p);
     string_id_t name = p->name;
     m_entries.insert(name, px.release());
 }
