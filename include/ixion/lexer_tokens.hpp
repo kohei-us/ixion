@@ -11,13 +11,14 @@
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/env.hpp"
 
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
+#include <memory>
 
 namespace ixion {
 
 class lexer_token_base;
 
-typedef ::boost::ptr_vector<lexer_token_base> lexer_tokens_t;
+typedef std::vector<std::unique_ptr<lexer_token_base>> lexer_tokens_t;
 
 std::string print_tokens(const lexer_tokens_t& tokens, bool verbose);
 

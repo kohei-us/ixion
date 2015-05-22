@@ -344,7 +344,7 @@ void formula_parser::greater(const lexer_token_base& t)
 
 const lexer_token_base& formula_parser::get_token() const
 {
-    return *m_itr_cur;
+    return **m_itr_cur;
 }
 
 bool formula_parser::has_token() const

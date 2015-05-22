@@ -215,7 +215,7 @@ void tokenizer::numeral()
         throw formula_lexer::tokenize_error(os.str());
     }
     double val = global::to_double(p, len);
-    m_tokens.push_back(new lexer_value_token(val));
+    m_tokens.push_back(make_unique<lexer_value_token>(val));
 }
 
 void tokenizer::space()
@@ -234,7 +234,7 @@ void tokenizer::name()
         ++m_scope;
     else if (c == ']')
     {
-        m_tokens.push_back(new lexer_name_token(p, 1));
+        m_tokens.push_back(make_unique<lexer_name_token>(p, 1));
         next();
         return;
     }
@@ -258,12 +258,12 @@ void tokenizer::name()
             break;
     }
 
-    m_tokens.push_back(new lexer_name_token(p, len));
+    m_tokens.push_back(make_unique<lexer_name_token>(p, len));
 }
 
 void tokenizer::op(lexer_opcode_t oc)
 {
-    m_tokens.push_back(new lexer_token(oc));
+    m_tokens.push_back(make_unique<lexer_token>(oc));
     next();
 }
 
@@ -276,7 +276,7 @@ void tokenizer::string()
         next();
 
     if (len)
-        m_tokens.push_back(new lexer_string_token(p, len));
+        m_tokens.push_back(make_unique<lexer_string_token>(p, len));
 
     if (*mp_char == '"')
         next();

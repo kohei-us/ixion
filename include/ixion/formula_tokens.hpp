@@ -5,11 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __FORMULA_TOKENS_HPP__
-#define __FORMULA_TOKENS_HPP__
+#ifndef INCLUDED_FORMULA_TOKENS_HPP
+#define INCLUDED_FORMULA_TOKENS_HPP
 
 #include <string>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 #include "ixion/address.hpp"
 #include "ixion/table.hpp"
