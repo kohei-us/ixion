@@ -14,7 +14,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
 

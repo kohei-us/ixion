@@ -13,7 +13,6 @@
 
 #include <memory>
 #include <string>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/noncopyable.hpp>
 

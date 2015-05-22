@@ -20,6 +20,8 @@
 #include <memory>
 #include <sstream>
 
+#include <boost/ptr_container/ptr_map.hpp>
+
 #define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
