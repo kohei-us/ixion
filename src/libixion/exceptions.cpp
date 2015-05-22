@@ -11,6 +11,8 @@
 
 namespace ixion {
 
+general_error::general_error() : m_msg() {}
+
 general_error::general_error(const std::string& msg) :
     m_msg(msg) {}
 

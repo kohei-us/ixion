@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_MODEL_PARSER_HPP__
-#define __IXION_MODEL_PARSER_HPP__
+#ifndef INCLUDED_IXION_MODEL_PARSER_HPP
+#define INCLUDED_IXION_MODEL_PARSER_HPP
 
 #include "ixion/exceptions.hpp"
 #include "ixion/model_context.hpp"
@@ -29,14 +29,10 @@ class model_parser : public ::boost::noncopyable
 public:
     typedef std::unordered_map< ::std::string, formula_result> results_type;
 
-    class parse_error : public ::std::exception
+    class parse_error : public general_error
     {
     public:
-        explicit parse_error(const ::std::string& msg);
-        ~parse_error() throw();
-        virtual const char* what() const throw();
-    private:
-        ::std::string m_msg;
+        explicit parse_error(const std::string& msg);
     };
 
     class check_error : public general_error

@@ -18,6 +18,7 @@ namespace ixion {
 class IXION_DLLPUBLIC general_error : public std::exception
 {
 public:
+    general_error();
     explicit general_error(const std::string& msg);
     ~general_error() throw();
     virtual const char* what() const throw();

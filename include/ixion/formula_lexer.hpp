@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_LEXER_HPP__
-#define __IXION_FORMULA_LEXER_HPP__
+#ifndef INCLUDED_IXION_FORMULA_LEXER_HPP
+#define INCLUDED_IXION_FORMULA_LEXER_HPP
 
 #include <string>
 #include <exception>
@@ -14,20 +14,17 @@
 
 #include "ixion/lexer_tokens.hpp"
 #include "ixion/mem_str_buf.hpp"
+#include "ixion/exceptions.hpp"
 
 namespace ixion {
 
 class formula_lexer : public ::boost::noncopyable
 {
 public:
-    class tokenize_error : public ::std::exception
+    class tokenize_error : public general_error
     {
     public:
-        tokenize_error(const ::std::string& msg);
-        virtual ~tokenize_error() throw();
-        virtual const char* what() const throw();
-    private:
-        ::std::string m_msg;
+        tokenize_error(const std::string& msg);
     };
 
     formula_lexer(const char* p, size_t n);

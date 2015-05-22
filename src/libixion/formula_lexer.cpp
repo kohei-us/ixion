@@ -310,19 +310,7 @@ bool tokenizer::has_char() const
 
 // ============================================================================
 
-formula_lexer::tokenize_error::tokenize_error(const string& msg) :
-    m_msg(msg)
-{
-}
-
-formula_lexer::tokenize_error::~tokenize_error() throw()
-{
-}
-
-const char* formula_lexer::tokenize_error::what() const throw()
-{
-    return m_msg.c_str();
-}
+formula_lexer::tokenize_error::tokenize_error(const string& msg) : general_error(msg) {}
 
 formula_lexer::formula_lexer(const char* p, size_t n) :
     mp_first(p), m_size(n) {}

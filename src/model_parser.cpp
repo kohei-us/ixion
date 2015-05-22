@@ -86,20 +86,11 @@ public:
 
 // ============================================================================
 
-model_parser::parse_error::parse_error(const string& msg)
+model_parser::parse_error::parse_error(const string& msg) : general_error()
 {
     ostringstream os;
     os << "parse error: " << msg;
-    m_msg = os.str();
-}
-
-model_parser::parse_error::~parse_error() throw()
-{
-}
-
-const char* model_parser::parse_error::what() const throw()
-{
-    return m_msg.c_str();
+    set_message(os.str());
 }
 
 // ============================================================================

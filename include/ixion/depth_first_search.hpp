@@ -5,8 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_DEPTH_FIRST_SEARCH_HPP__
-#define __IXION_DEPTH_FIRST_SEARCH_HPP__
+#ifndef INCLUDED_IXION_DEPTH_FIRST_SEARCH_HPP
+#define INCLUDED_IXION_DEPTH_FIRST_SEARCH_HPP
+
+#include "ixion/exceptions.hpp"
 
 #include <vector>
 #include <set>
@@ -31,18 +33,10 @@ private:
 
     enum cell_color_type { white, gray, black };
 
-    class dfs_error : public ::std::exception
+    class dfs_error : public general_error
     {
     public:
-        dfs_error(const ::std::string& msg) : m_msg(msg) {}
-        virtual ~dfs_error() throw() {}
-
-        virtual const char* what() const throw()
-        {
-            return m_msg.c_str();
-        }
-    private:
-        ::std::string m_msg;
+        dfs_error(const std::string& msg) : general_error(msg) {}
     };
 
     struct node_data
