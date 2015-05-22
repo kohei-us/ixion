@@ -10,7 +10,7 @@
 
 #include "ixion/exceptions.hpp"
 #include "ixion/model_context.hpp"
-#include "ixion/hash_container/map.hpp"
+#include "ixion/formula_result.hpp"
 
 #include "session_handler.hpp"
 #include "table_handler.hpp"
@@ -18,17 +18,16 @@
 #include <string>
 #include <exception>
 #include <vector>
+#include <unordered_map>
 
 #include <boost/noncopyable.hpp>
 
 namespace ixion {
 
-class formula_result;
-
 class model_parser : public ::boost::noncopyable
 {
 public:
-    typedef _ixion_unordered_map_type< ::std::string, formula_result> results_type;
+    typedef std::unordered_map< ::std::string, formula_result> results_type;
 
     class parse_error : public ::std::exception
     {

@@ -11,11 +11,11 @@
 #include "ixion/global.hpp"
 #include "ixion/formula_tokens.hpp"
 #include "ixion/formula_result.hpp"
-#include "ixion/hash_container/set.hpp"
 
 #include "formula_value_stack.hpp"
 
 #include <sstream>
+#include <unordered_set>
 
 #include <boost/noncopyable.hpp>
 
@@ -45,7 +45,7 @@ class session_handler;
  */
 class formula_interpreter : public ::boost::noncopyable
 {
-    typedef _ixion_unordered_set_type< ::std::string> name_set;
+    typedef std::unordered_set< ::std::string> name_set;
 
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;

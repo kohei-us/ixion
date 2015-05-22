@@ -10,7 +10,6 @@
 #include "ixion/global.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/cell_queue_manager.hpp"
-#include "ixion/hash_container/map.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
 #include "ixion/interface/formula_model_access.hpp"

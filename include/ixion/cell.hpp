@@ -10,7 +10,6 @@
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/address.hpp"
-#include "ixion/hash_container/set.hpp"
 #include "ixion/types.hpp"
 
 #include <boost/thread/condition_variable.hpp>

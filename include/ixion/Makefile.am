@@ -1,4 +1,4 @@
-SUBDIRS = hash_container interface
+SUBDIRS = interface
 
 libixiondir = $(includedir)/libixion-@IXION_API_VERSION@/ixion
 libixion_HEADERS = \

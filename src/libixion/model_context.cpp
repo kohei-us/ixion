@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <sstream>
+#include <unordered_map>
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -138,7 +139,7 @@ class model_context_impl : boost::noncopyable
 {
     typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
-    typedef boost::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
+    typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
 
     typedef model_context::shared_tokens shared_tokens;

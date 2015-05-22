@@ -9,8 +9,6 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 
-#include "ixion/hash_container/map.hpp"
-
 #include "formula_functions.hpp"
 
 #include <iostream>

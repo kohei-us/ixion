@@ -9,11 +9,11 @@
 #define __IXION_ADDRESS_HPP__
 
 #include "ixion/global.hpp"
-#include "ixion/hash_container/set.hpp"
 
 #include <string>
 #include <vector>
 #include <ostream>
+#include <unordered_set>
 
 namespace ixion {
 
@@ -172,7 +172,7 @@ IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range)
  * Collection of formula cells that have been modified or formula cells that
  * reference other modified cells either directly or indirectly.
  */
-typedef _ixion_unordered_set_type<abs_address_t, abs_address_t::hash> dirty_formula_cells_t;
+typedef std::unordered_set<abs_address_t, abs_address_t::hash> dirty_formula_cells_t;
 
 /**
  * Collection of cells that have been modified.

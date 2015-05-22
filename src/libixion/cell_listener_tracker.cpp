@@ -9,13 +9,13 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/cell.hpp"
-#include "ixion/hash_container/map.hpp"
 
 #include <mdds/rectangle_set.hpp>
 
 #define DEBUG_CELL_LISTENER_TRACKER 0
 
 #include <cassert>
+#include <unordered_map>
 
 #if DEBUG_CELL_LISTENER_TRACKER
 #include <iostream>
@@ -28,8 +28,8 @@ namespace ixion {
 namespace {
 
 typedef mdds::rectangle_set<row_t, cell_listener_tracker::address_set_type*> range_query_set_type;
-typedef _ixion_unordered_map_type<abs_address_t, cell_listener_tracker::address_set_type*, abs_address_t::hash> cell_store_type;
-typedef _ixion_unordered_map_type<abs_range_t, cell_listener_tracker::address_set_type*, abs_range_t::hash> range_store_type;
+typedef std::unordered_map<abs_address_t, cell_listener_tracker::address_set_type*, abs_address_t::hash> cell_store_type;
+typedef std::unordered_map<abs_range_t, cell_listener_tracker::address_set_type*, abs_range_t::hash> range_store_type;
 
 class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
 {
@@ -280,7 +280,7 @@ void cell_listener_tracker::get_all_cell_listeners(
         return;
 
     const address_set_type& addrs = *itr->second;
-    address_set_type::iterator itr2 = addrs.begin(), itr2_end = addrs.end();
+    address_set_type::const_iterator itr2 = addrs.begin(), itr2_end = addrs.end();
     for (; itr2 != itr2_end; ++itr2)
     {
         const abs_address_t& addr = *itr2; // listener cell address
@@ -326,7 +326,7 @@ void cell_listener_tracker::print_cell_listeners(
         return;
 
     const address_set_type& addrs = *itr->second;
-    address_set_type::iterator itr2 = addrs.begin(), itr2_end = addrs.end();
+    address_set_type::const_iterator itr2 = addrs.begin(), itr2_end = addrs.end();
     for (; itr2 != itr2_end; ++itr2)
     {
         address_t pos_display(*itr2);

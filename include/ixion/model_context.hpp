@@ -16,7 +16,6 @@
 #include <string>
 #include <deque>
 #include <memory>
-#include <boost/unordered_map.hpp>
 
 namespace ixion {
 
