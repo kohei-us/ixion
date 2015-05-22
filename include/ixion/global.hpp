@@ -104,11 +104,11 @@ private:
  * Type of stack value which can be used as intermediate value during
  * formula interpretation.
  */
-enum stack_value_t {
-    sv_value = 0,
-    sv_string,
-    sv_single_ref,
-    sv_range_ref,
+enum class stack_value_t {
+    value,
+    string,
+    single_ref,
+    range_ref
 };
 
 /**

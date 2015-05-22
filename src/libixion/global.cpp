@@ -180,10 +180,10 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
     double ret = 0.0;
     switch (v.get_type())
     {
-        case sv_value:
+        case stack_value_t::value:
             ret = v.get_value();
         break;
-        case sv_single_ref:
+        case stack_value_t::single_ref:
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
@@ -202,29 +202,29 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
 }
 
 stack_value::stack_value(double val) :
-    m_type(sv_value), m_value(val) {}
+    m_type(stack_value_t::value), m_value(val) {}
 
 stack_value::stack_value(size_t sid) :
-    m_type(sv_string), m_str_identifier(sid) {}
+    m_type(stack_value_t::string), m_str_identifier(sid) {}
 
 stack_value::stack_value(const abs_address_t& val) :
-    m_type(sv_single_ref), m_address(new abs_address_t(val)) {}
+    m_type(stack_value_t::single_ref), m_address(new abs_address_t(val)) {}
 
 stack_value::stack_value(const abs_range_t& val) :
-    m_type(sv_range_ref), m_range(new abs_range_t(val)) {}
+    m_type(stack_value_t::range_ref), m_range(new abs_range_t(val)) {}
 
 stack_value::~stack_value()
 {
     switch (m_type)
     {
-        case sv_range_ref:
+        case stack_value_t::range_ref:
             delete m_range;
             break;
-        case sv_single_ref:
+        case stack_value_t::single_ref:
             delete m_address;
             break;
-        case sv_string:
-        case sv_value:
+        case stack_value_t::string:
+        case stack_value_t::value:
         default:
             ; // do nothing
     }
@@ -237,7 +237,7 @@ stack_value_t stack_value::get_type() const
 
 double stack_value::get_value() const
 {
-    if (m_type == sv_value)
+    if (m_type == stack_value_t::value)
         return m_value;
 
     return 0.0;
@@ -245,7 +245,7 @@ double stack_value::get_value() const
 
 size_t stack_value::get_string() const
 {
-    if (m_type == sv_string)
+    if (m_type == stack_value_t::string)
         return m_str_identifier;
     return 0;
 }
@@ -368,14 +368,14 @@ const string value_stack_t::pop_string()
     const stack_value& v = m_stack.back();
     switch (v.get_type())
     {
-        case sv_string:
+        case stack_value_t::string:
         {
             const string* p = m_context.get_string(v.get_string());
             m_stack.pop_back();
             return p ? *p : string();
         }
         break;
-        case sv_value:
+        case stack_value_t::value:
         {
             ostringstream os;
             os << v.get_value();
@@ -383,7 +383,7 @@ const string value_stack_t::pop_string()
             return os.str();
         }
         break;
-        case sv_single_ref:
+        case stack_value_t::single_ref:
         {
             // reference to a single cell.
             abs_address_t addr = v.get_address();
@@ -454,7 +454,7 @@ abs_address_t value_stack_t::pop_single_ref()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.get_type() != sv_single_ref)
+    if (v.get_type() != stack_value_t::single_ref)
         throw formula_error(fe_stack_error);
 
     abs_address_t addr = v.get_address();
@@ -468,7 +468,7 @@ abs_range_t value_stack_t::pop_range_ref()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.get_type() != sv_range_ref)
+    if (v.get_type() != stack_value_t::range_ref)
         throw formula_error(fe_stack_error);
 
     abs_range_t range = v.get_range();
@@ -482,7 +482,7 @@ matrix value_stack_t::pop_range_value()
         throw formula_error(fe_stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.get_type() != sv_range_ref)
+    if (v.get_type() != stack_value_t::range_ref)
         throw formula_error(fe_stack_error);
 
     matrix ret = m_context.get_range_value(v.get_range());

@@ -229,12 +229,12 @@ void formula_functions::fnc_sum(value_stack_t& args) const
     {
         switch (args.get_type())
         {
-            case sv_range_ref:
+            case stack_value_t::range_ref:
                 ret += sum_matrix_elements(args.pop_range_value());
             break;
-            case sv_single_ref:
-            case sv_string:
-            case sv_value:
+            case stack_value_t::single_ref:
+            case stack_value_t::string:
+            case stack_value_t::value:
             default:
                 ret += args.pop_value();
         }
@@ -257,18 +257,18 @@ void formula_functions::fnc_counta(value_stack_t& args) const
     {
         switch (args.get_type())
         {
-            case sv_string:
-            case sv_value:
+            case stack_value_t::string:
+            case stack_value_t::value:
                 args.pop_value();
                 ++ret;
             break;
-            case sv_range_ref:
+            case stack_value_t::range_ref:
             {
                 abs_range_t range = args.pop_range_ref();
                 ret += m_context.count_range(range, value_numeric | value_string);
             }
             break;
-            case sv_single_ref:
+            case stack_value_t::single_ref:
             {
                 abs_address_t pos = args.pop_single_ref();
                 abs_range_t range;
@@ -296,7 +296,7 @@ void formula_functions::fnc_average(value_stack_t& args) const
     {
         switch (args.get_type())
         {
-            case sv_range_ref:
+            case stack_value_t::range_ref:
             {
                 matrix mx = args.pop_range_value();
                 matrix::size_pair_type sp = mx.size();
@@ -313,9 +313,9 @@ void formula_functions::fnc_average(value_stack_t& args) const
                 }
             }
             break;
-            case sv_single_ref:
-            case sv_string:
-            case sv_value:
+            case stack_value_t::single_ref:
+            case stack_value_t::string:
+            case stack_value_t::value:
             default:
                 ret += args.pop_value();
                 ++count;

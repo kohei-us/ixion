@@ -194,21 +194,21 @@ void formula_interpreter::pop_result()
     const stack_value& res = m_stack.back();
     switch (res.get_type())
     {
-        case sv_range_ref:
+        case stack_value_t::range_ref:
         {
             const abs_range_t& range = res.get_range();
             get_result_from_cell(m_context, range.first, m_result);
         }
         break;
-        case sv_single_ref:
+        case stack_value_t::single_ref:
         {
             get_result_from_cell(m_context, res.get_address(), m_result);
         }
         break;
-        case sv_string:
+        case stack_value_t::string:
             m_result.set_string(res.get_string());
         break;
-        case sv_value:
+        case stack_value_t::value:
 #if DEBUG_FORMULA_INTERPRETER
             __IXION_DEBUG_OUT__ << "result: " << res.get_value() << endl;
 #endif
@@ -311,13 +311,13 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
     vt = stack.get_type();
     switch (vt)
     {
-        case sv_value:
+        case stack_value_t::value:
             val = stack.pop_value();
         break;
-        case sv_string:
+        case stack_value_t::string:
             str = stack.pop_string();
         break;
-        case sv_single_ref:
+        case stack_value_t::single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
 
@@ -326,19 +326,19 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                 case celltype_t::empty:
                 {
                     // empty cell has a value of 0.
-                    vt = sv_value;
+                    vt = stack_value_t::value;
                     val = 0.0;
                     return true;
                 }
                 case celltype_t::numeric:
                 {
-                    vt = sv_value;
+                    vt = stack_value_t::value;
                     val = cxt.get_numeric_value(addr);
                     return true;
                 }
                 case celltype_t::string:
                 {
-                    vt = sv_string;
+                    vt = stack_value_t::string;
                     size_t strid = cxt.get_string_identifier(addr);
                     const string* ps = cxt.get_string(strid);
                     if (!ps)
@@ -358,13 +358,13 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                     {
                         case formula_result::rt_value:
                         {
-                            vt = sv_value;
+                            vt = stack_value_t::value;
                             val = res->get_value();
                             return true;
                         }
                         case formula_result::rt_string:
                         {
-                            vt = sv_string;
+                            vt = stack_value_t::string;
                             string_id_t strid = res->get_string();
                             const string* ps = cxt.get_string(strid);
                             if (!ps)
@@ -382,7 +382,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
             }
         }
         break;
-        case sv_range_ref:
+        case stack_value_t::range_ref:
         default:
             return false;
     }
@@ -533,7 +533,7 @@ void formula_interpreter::expression()
         stack_value_t vt;
         if (!pop_stack_value_or_string(m_context, m_stack, vt, val1, str1))
             throw formula_error(fe_general_error);
-        is_val1 = vt == sv_value;
+        is_val1 = vt == stack_value_t::value;
 
         if (mp_handler)
             mp_handler->push_token(oc);
@@ -543,7 +543,7 @@ void formula_interpreter::expression()
 
         if (!pop_stack_value_or_string(m_context, m_stack, vt, val2, str2))
             throw formula_error(fe_general_error);
-        is_val2 = vt == sv_value;
+        is_val2 = vt == stack_value_t::value;
 
         if (is_val1)
         {
