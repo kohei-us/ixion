@@ -13,6 +13,8 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/hash_container/set.hpp"
 
+#include "formula_value_stack.hpp"
+
 #include <sstream>
 
 #include <boost/noncopyable.hpp>

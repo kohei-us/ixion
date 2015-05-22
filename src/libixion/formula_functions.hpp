@@ -12,6 +12,8 @@
 #include "ixion/exceptions.hpp"
 #include "ixion/formula_function_opcode.hpp"
 
+#include "formula_value_stack.hpp"
+
 #include <string>
 #include <vector>
 

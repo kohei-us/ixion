@@ -22,6 +22,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	formula_parser.cpp \
 	formula_result.cpp \
 	formula_tokens.cpp \
+	formula_value_stack.hpp \
+	formula_value_stack.cpp \
 	function_objects.hpp \
 	function_objects.cpp \
 	global.cpp \

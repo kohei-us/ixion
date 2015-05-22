@@ -14,6 +14,12 @@
 
 namespace ixion {
 
+namespace iface {
+
+class formula_model_access;
+
+}
+
 /**
  * Store formula result which may be either numeric, textural, or error.  In
  * case the result is textural, it owns the instance of the string.
