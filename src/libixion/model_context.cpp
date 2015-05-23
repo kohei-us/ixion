@@ -21,8 +21,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <map>
-
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -138,7 +137,7 @@ bool set_shared_formula_tokens_to_cell(
 class model_context_impl : boost::noncopyable
 {
     typedef std::map<std::string, unique_ptr<formula_cell>> named_expressions_type;
-    typedef boost::ptr_vector<std::string> strings_type;
+    typedef std::vector<std::string> strings_type;
     typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
 
@@ -355,7 +354,7 @@ sheet_t model_context_impl::append_sheet(
     // index of the new sheet.
     sheet_t sheet_index = m_sheets.size();
 
-    m_sheet_names.push_back(new string(p, n));
+    m_sheet_names.emplace_back(p, n);
     m_sheets.push_back(row_size, col_size);
     return sheet_index;
 }
@@ -367,10 +366,9 @@ string_id_t model_context_impl::append_string(const char* p, size_t n)
         return empty_string_id;
 
     string_id_t str_id = m_strings.size();
-    std::auto_ptr<string> ps(new string(p, n));
-    p = &(*ps)[0];
+    m_strings.emplace_back(p, n);
+    p = m_strings.back().data();
     mem_str_buf key(p, n);
-    m_strings.push_back(ps);
     m_string_map.insert(string_map_type::value_type(key, str_id));
     return str_id;
 }
