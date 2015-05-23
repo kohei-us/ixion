@@ -12,11 +12,10 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include <exception>
 #include <iostream>
 #include <unordered_map>
-
-#include <boost/ptr_container/ptr_map.hpp>
 
 namespace ixion {
 
@@ -50,8 +49,8 @@ private:
     };
 
 public:
-    typedef ::std::set<value_type>                             precedent_cells_type;
-    typedef ::boost::ptr_map<value_type, precedent_cells_type>    precedent_map_type;
+    typedef std::set<value_type> precedent_cells_type;
+    typedef std::map<value_type, precedent_cells_type> precedent_map_type;
 
     class precedent_set
     {
@@ -62,14 +61,17 @@ public:
             if (itr == m_map.end())
             {
                 // First dependent for this cell.
-                ::std::pair<typename precedent_map_type::iterator, bool> r = m_map.insert(cell, new precedent_cells_type);
+                std::pair<typename precedent_map_type::iterator, bool> r =
+                    m_map.insert(
+                        typename precedent_map_type::value_type(cell, precedent_cells_type()));
+
                 if (!r.second)
                     throw dfs_error("failed to insert a new set instance");
 
                 itr = r.first;
             }
 
-            itr->second->insert(dep);
+            itr->second.insert(dep);
         }
 
         const precedent_map_type& get() const { return m_map; }
@@ -200,7 +202,7 @@ depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_precedent_ce
         // This cell has no dependent cells.
         return NULL;
 
-    return itr->second;
+    return &itr->second;
 }
 
 }
