@@ -44,14 +44,15 @@ abs_range_t table_handler::get_range(
     return get_column_range(e, column_first, column_last, areas);
 }
 
-void table_handler::insert(entry* p)
+void table_handler::insert(std::unique_ptr<entry>& p)
 {
     if (!p)
         return;
 
-    std::unique_ptr<entry> px(p);
     string_id_t name = p->name;
-    m_entries.insert(name, px.release());
+    m_entries.insert(
+        entries_type::value_type(
+            name, std::unique_ptr<entry>(p.release())));
 }
 
 void adjust_table_area(abs_range_t& range, const table_handler::entry& e, table_areas_t areas)

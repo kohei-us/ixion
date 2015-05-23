@@ -13,7 +13,7 @@
 #include "ixion/address.hpp"
 
 #include <vector>
-#include <boost/ptr_container/ptr_map.hpp>
+#include <map>
 
 namespace ixion {
 
@@ -32,7 +32,7 @@ public:
         entry();
     };
 
-    typedef boost::ptr_map<string_id_t, entry> entries_type;
+    typedef std::map<string_id_t, std::unique_ptr<entry>> entries_type;
 
     virtual ~table_handler();
 
@@ -41,7 +41,7 @@ public:
     virtual abs_range_t get_range(
         string_id_t table, string_id_t column_first, string_id_t column_last, table_areas_t areas) const;
 
-    void insert(entry* p);
+    void insert(std::unique_ptr<entry>& p);
 
 private:
     abs_range_t get_column_range(

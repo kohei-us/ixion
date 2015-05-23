@@ -479,7 +479,8 @@ void model_parser::push_table()
     cout << endl;
 
     cout << "totals row count: " << mp_table_entry->totals_row_count << endl;
-    m_table_handler.insert(mp_table_entry.release());
+    m_table_handler.insert(mp_table_entry);
+    assert(!mp_table_entry);
 }
 
 void model_parser::parse_table_columns(const mem_str_buf& str)
