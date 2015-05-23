@@ -20,8 +20,8 @@
 #include <memory>
 #include <sstream>
 #include <unordered_map>
+#include <map>
 
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #define DEBUG_MODEL_CONTEXT 0
@@ -137,7 +137,7 @@ bool set_shared_formula_tokens_to_cell(
 
 class model_context_impl : boost::noncopyable
 {
-    typedef boost::ptr_map<std::string, formula_cell> named_expressions_type;
+    typedef std::map<std::string, unique_ptr<formula_cell>> named_expressions_type;
     typedef boost::ptr_vector<std::string> strings_type;
     typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
@@ -285,19 +285,21 @@ private:
 void model_context_impl::set_named_expression(const char* p, size_t n, formula_cell* cell)
 {
     string name(p, n);
-    m_named_expressions.insert(name, cell);
+    m_named_expressions.insert(
+        named_expressions_type::value_type(
+            name, std::unique_ptr<formula_cell>(cell)));
 }
 
 formula_cell* model_context_impl::get_named_expression(const string& name)
 {
     named_expressions_type::iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? NULL : itr->second;
+    return itr == m_named_expressions.end() ? NULL : itr->second.get();
 }
 
 const formula_cell* model_context_impl::get_named_expression(const string& name) const
 {
     named_expressions_type::const_iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? NULL : itr->second;
+    return itr == m_named_expressions.end() ? NULL : itr->second.get();
 }
 
 const string* model_context_impl::get_named_expression_name(const formula_cell* expr) const
@@ -305,7 +307,7 @@ const string* model_context_impl::get_named_expression_name(const formula_cell* 
     named_expressions_type::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
     for (; itr != itr_end; ++itr)
     {
-        if (itr->second == expr)
+        if (itr->second.get() == expr)
             return &itr->first;
     }
     return NULL;
