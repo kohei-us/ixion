@@ -8,12 +8,12 @@
 #ifndef INCLUDED_FORMULA_TOKENS_HPP
 #define INCLUDED_FORMULA_TOKENS_HPP
 
-#include <string>
-
 #include "ixion/address.hpp"
 #include "ixion/table.hpp"
-#include "ixion/formula_tokens_fwd.hpp"
 #include "ixion/formula_opcode.hpp"
+
+#include <string>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace ixion {
 
@@ -54,6 +54,8 @@ private:
 
     fopcode_t m_opcode;
 };
+
+typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
 
 // ============================================================================
 

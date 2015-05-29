@@ -18,7 +18,6 @@ libixion_HEADERS = \
 	formula_opcode.hpp \
 	formula_parser.hpp \
 	formula_result.hpp \
-	formula_tokens_fwd.hpp \
 	formula_tokens.hpp \
 	global.hpp \
 	info.hpp \

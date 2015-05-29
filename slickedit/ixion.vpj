@@ -245,7 +245,6 @@
 				<F N="../include/ixion/formula_parser.hpp"/>
 				<F N="../include/ixion/formula_result.hpp"/>
 				<F N="../include/ixion/formula_tokens.hpp"/>
-				<F N="../include/ixion/formula_tokens_fwd.hpp"/>
 				<F N="../include/ixion/global.hpp"/>
 				<F N="../include/ixion/info.hpp"/>
 				<F N="../include/ixion/lexer_tokens.hpp"/>
