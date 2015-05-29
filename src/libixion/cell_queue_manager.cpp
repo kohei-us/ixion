@@ -10,7 +10,6 @@
 
 #include "ixion/interface/formula_model_access.hpp"
 
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/mutex.hpp>
@@ -19,6 +18,7 @@
 #include <iostream>
 #include <queue>
 #include <string>
+#include <vector>
 
 #define DEBUG_QUEUE_MANAGER 0
 
@@ -30,7 +30,6 @@ using ::std::queue;
 using ::boost::mutex;
 using ::boost::thread;
 using ::boost::condition_variable;
-using ::boost::ptr_vector;
 
 namespace {
 
@@ -117,6 +116,8 @@ struct worker_thread_data
     worker_thread_data() {}
 };
 
+typedef std::vector<std::unique_ptr<worker_thread_data>> worker_threads_type;
+
 /**
  * This structure keeps track of idle worker threads.
  */
@@ -183,7 +184,7 @@ struct manage_queue_data
     // thread ready
 
     mutex mtx_thread_ready;
-    ptr_vector<worker_thread_data> workers;
+    worker_threads_type workers;
     condition_variable cond_thread_ready;
     bool thread_ready;
 
@@ -214,16 +215,16 @@ void init_workers(size_t worker_count, iface::formula_model_access* context)
     // Create specified number of worker threads.
     for (size_t i = 0; i < worker_count; ++i)
     {
-        data.workers.push_back(new worker_thread_data);
-        worker_thread_data& wt = data.workers.back();
+        data.workers.push_back(make_unique<worker_thread_data>());
+        worker_thread_data& wt = *data.workers.back();
         wt.thr_main = thread(::boost::bind(worker_main, &wt, context));
     }
 
     // Wait until the worker threads become ready.
-    ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+    worker_threads_type::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
-        worker_thread_data& wt = *itr;
+        worker_thread_data& wt = **itr;
         mutex::scoped_lock lock(wt.init_status.mtx);
         while (!wt.init_status.ready)
             wt.init_status.cond.wait(lock);
@@ -237,10 +238,10 @@ void terminate_workers()
     os << "terminating all workers..." << endl;
     cout << os.str();
 #endif
-    ptr_vector<worker_thread_data>::iterator itr = data.workers.begin(), itr_end = data.workers.end();
+    worker_threads_type::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
-        worker_thread_data& wt = *itr;
+        worker_thread_data& wt = **itr;
         mutex::scoped_lock lock(wt.action.mtx);
         wt.action.terminate_requested = true;
         wt.action.cond.notify_all();
@@ -248,7 +249,7 @@ void terminate_workers()
 
     itr = data.workers.begin();
     for (; itr != itr_end; ++itr)
-        itr->thr_main.join();
+        (*itr)->thr_main.join();
 }
 
 void interpret_cell(worker_thread_data& wt)
