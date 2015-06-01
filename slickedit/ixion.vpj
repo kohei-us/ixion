@@ -263,6 +263,7 @@
 				<F N="../src/libixion/cell_listener_tracker.cpp"/>
 				<F N="../src/libixion/cell_queue_manager.cpp"/>
 				<F N="../src/libixion/config.cpp"/>
+				<F N="../src/libixion/constants.inl"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>
 				<F N="../src/libixion/depends_tracker.hpp"/>
 				<F N="../src/libixion/exceptions.cpp"/>
@@ -277,6 +278,8 @@
 				<F N="../src/libixion/formula_parser.cpp"/>
 				<F N="../src/libixion/formula_result.cpp"/>
 				<F N="../src/libixion/formula_tokens.cpp"/>
+				<F N="../src/libixion/formula_value_stack.cpp"/>
+				<F N="../src/libixion/formula_value_stack.hpp"/>
 				<F N="../src/libixion/function_objects.cpp"/>
 				<F N="../src/libixion/function_objects.hpp"/>
 				<F N="../src/libixion/global.cpp"/>
