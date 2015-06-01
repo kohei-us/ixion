@@ -140,7 +140,7 @@ void formula_interpreter::init_tokens()
     formula_tokens_t::const_iterator itr = orig_tokens->begin(), itr_end = orig_tokens->end();
     for (; itr != itr_end; ++itr)
     {
-        const formula_token_base* p = &(*itr);
+        const formula_token_base* p = &(**itr);
         assert(p);
         if (p->get_opcode() == fop_named_expression)
         {
@@ -241,9 +241,10 @@ void formula_interpreter::expand_named_expression(
     formula_tokens_t::const_iterator itr = expr_tokens->begin(), itr_end = expr_tokens->end();
     for (; itr != itr_end; ++itr)
     {
-        if (itr->get_opcode() == fop_named_expression)
+        const formula_token_base& t = **itr;
+        if (t.get_opcode() == fop_named_expression)
         {
-            string expr_name = itr->get_name();
+            string expr_name = t.get_name();
             if (used_names.count(expr_name) > 0)
             {
                 // Circular reference detected.
@@ -254,7 +255,7 @@ void formula_interpreter::expand_named_expression(
             expand_named_expression(expr_name, expr, used_names);
         }
         else
-            m_tokens.push_back(&(*itr));
+            m_tokens.push_back(&t);
     }
     m_tokens.push_back(&paren_close);
 }

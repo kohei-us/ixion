@@ -13,7 +13,7 @@
 #include "ixion/formula_opcode.hpp"
 
 #include <string>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
 
 namespace ixion {
 
@@ -55,7 +55,7 @@ private:
     fopcode_t m_opcode;
 };
 
-typedef ::boost::ptr_vector<formula_token_base> formula_tokens_t;
+typedef std::vector<std::unique_ptr<formula_token_base>> formula_tokens_t;
 
 // ============================================================================
 

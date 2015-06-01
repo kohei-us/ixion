@@ -236,7 +236,7 @@ void formula_parser::primitive(lexer_opcode_t oc)
         default:
             throw parse_error("unknown primitive token received");
     }
-    m_formula_tokens.push_back(new opcode_token(foc));
+    m_formula_tokens.push_back(make_unique<opcode_token>(foc));
 }
 
 void formula_parser::name(const lexer_token_base& t)
@@ -251,9 +251,10 @@ void formula_parser::name(const lexer_token_base& t)
     {
         case formula_name_type::cell_reference:
             m_formula_tokens.push_back(
-                new single_ref_token(
-                    address_t(fn.address.sheet, fn.address.row, fn.address.col,
-                              fn.address.abs_sheet, fn.address.abs_row, fn.address.abs_col)));
+                make_unique<single_ref_token>(
+                    address_t(
+                        fn.address.sheet, fn.address.row, fn.address.col,
+                        fn.address.abs_sheet, fn.address.abs_row, fn.address.abs_col)));
         break;
         case formula_name_type::range_reference:
         {
@@ -261,8 +262,7 @@ void formula_parser::name(const lexer_token_base& t)
                             fn.range.first.abs_sheet, fn.range.first.abs_row, fn.range.first.abs_col);
             address_t last(fn.range.last.sheet, fn.range.last.row, fn.range.last.col,
                            fn.range.last.abs_sheet, fn.range.last.abs_row, fn.range.last.abs_col);
-            m_formula_tokens.push_back(
-                new range_ref_token(range_t(first, last)));
+            m_formula_tokens.push_back(make_unique<range_ref_token>(range_t(first, last)));
         }
         break;
         case formula_name_type::table_reference:
@@ -272,14 +272,16 @@ void formula_parser::name(const lexer_token_base& t)
             table.column_first = m_context.add_string(fn.table.column_first, fn.table.column_first_length);
             table.column_last = m_context.add_string(fn.table.column_last, fn.table.column_last_length);
             table.areas = fn.table.areas;
-            m_formula_tokens.push_back(new table_ref_token(table));
+            m_formula_tokens.push_back(make_unique<table_ref_token>(table));
         }
         break;
         case formula_name_type::function:
-            m_formula_tokens.push_back(new function_token(static_cast<size_t>(fn.func_oc)));
+            m_formula_tokens.push_back(
+                make_unique<function_token>(static_cast<size_t>(fn.func_oc)));
         break;
         case formula_name_type::named_expression:
-            m_formula_tokens.push_back(new named_exp_token(name.get(), name.size()));
+            m_formula_tokens.push_back(
+                make_unique<named_exp_token>(name.get(), name.size()));
         break;
         default:
         {
@@ -294,13 +296,13 @@ void formula_parser::literal(const lexer_token_base& t)
 {
     mem_str_buf s = t.get_string();
     string_id_t sid = m_context.add_string(s.get(), s.size());
-    m_formula_tokens.push_back(new string_token(sid));
+    m_formula_tokens.push_back(make_unique<string_token>(sid));
 }
 
 void formula_parser::value(const lexer_token_base& t)
 {
     double val = t.get_value();
-    m_formula_tokens.push_back(new value_token(val));
+    m_formula_tokens.push_back(make_unique<value_token>(val));
 }
 
 void formula_parser::less(const lexer_token_base& t)
@@ -311,17 +313,17 @@ void formula_parser::less(const lexer_token_base& t)
         switch (get_token().get_opcode())
         {
             case op_equal:
-                m_formula_tokens.push_back(new opcode_token(fop_less_equal));
+                m_formula_tokens.push_back(make_unique<opcode_token>(fop_less_equal));
                 return;
             case op_greater:
-                m_formula_tokens.push_back(new opcode_token(fop_not_equal));
+                m_formula_tokens.push_back(make_unique<opcode_token>(fop_not_equal));
                 return;
             default:
                 ;
         }
         prev();
     }
-    m_formula_tokens.push_back(new opcode_token(fop_less));
+    m_formula_tokens.push_back(make_unique<opcode_token>(fop_less));
 }
 
 void formula_parser::greater(const lexer_token_base& t)
@@ -331,12 +333,12 @@ void formula_parser::greater(const lexer_token_base& t)
         next();
         if (get_token().get_opcode() == op_equal)
         {
-            m_formula_tokens.push_back(new opcode_token(fop_greater_equal));
+            m_formula_tokens.push_back(make_unique<opcode_token>(fop_greater_equal));
             return;
         }
         prev();
     }
-    m_formula_tokens.push_back(new opcode_token(fop_greater));
+    m_formula_tokens.push_back(make_unique<opcode_token>(fop_greater));
 
 }
 

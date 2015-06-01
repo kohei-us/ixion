@@ -47,7 +47,7 @@ void parse_formula_string(
 
 namespace {
 
-class print_formula_token : std::unary_function<formula_token_base, void>
+class print_formula_token : std::unary_function<formula_tokens_t::value_type, void>
 {
     const iface::formula_model_access& m_cxt;
     const abs_address_t& m_pos;
@@ -62,9 +62,9 @@ public:
         m_resolver(resolver),
         m_os(os) {}
 
-    void operator() (const formula_token_base& token)
+    void operator() (const formula_tokens_t::value_type& token)
     {
-        switch (token.get_opcode())
+        switch (token->get_opcode())
         {
             case fop_close:
                 m_os << ")";
@@ -85,38 +85,38 @@ public:
                 m_os << "+";
                 break;
             case fop_value:
-                m_os << token.get_value();
+                m_os << token->get_value();
                 break;
             case fop_sep:
                 m_os << ",";
             break;
             case fop_function:
             {
-                formula_function_t fop = static_cast<formula_function_t>(token.get_index());
+                formula_function_t fop = static_cast<formula_function_t>(token->get_index());
                 m_os << formula_functions::get_function_name(fop);
             }
             break;
             case fop_single_ref:
             {
-                address_t addr = token.get_single_ref();
+                address_t addr = token->get_single_ref();
                 m_os << m_resolver.get_name(addr, m_pos, false);
             }
             break;
             case fop_range_ref:
             {
-                range_t range = token.get_range_ref();
+                range_t range = token->get_range_ref();
                 m_os << m_resolver.get_name(range, m_pos, false);
             }
             break;
             case fop_table_ref:
             {
-                table_t tbl = token.get_table_ref();
+                table_t tbl = token->get_table_ref();
                 m_os << m_resolver.get_name(tbl);
             }
             break;
             case fop_string:
             {
-                const std::string* p = m_cxt.get_string(token.get_index());
+                const std::string* p = m_cxt.get_string(token->get_index());
                 if (p)
                     m_os << "\"" << *p << "\"";
             }
@@ -152,7 +152,7 @@ bool has_volatile(const formula_tokens_t& tokens)
     formula_tokens_t::const_iterator i = tokens.begin(), iend = tokens.end();
     for (; i != iend; ++i)
     {
-        const formula_token_base& t = *i;
+        const formula_token_base& t = **i;
         if (t.get_opcode() != fop_function)
             continue;
 

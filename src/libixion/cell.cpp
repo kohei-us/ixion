@@ -37,7 +37,7 @@ namespace ixion {
 
 namespace {
 
-class ref_token_picker : public unary_function<formula_token_base, void>
+class ref_token_picker : public unary_function<formula_tokens_t::value_type, void>
 {
 public:
     ref_token_picker() :
@@ -46,13 +46,13 @@ public:
     ref_token_picker(const ref_token_picker& r) :
         mp_tokens(r.mp_tokens) {}
 
-    void operator() (const formula_token_base& t)
+    void operator() (const formula_tokens_t::value_type& t)
     {
-        switch (t.get_opcode())
+        switch (t->get_opcode())
         {
             case fop_single_ref:
             case fop_range_ref:
-                mp_tokens->push_back(&t);
+                mp_tokens->push_back(&(*t));
             break;
             default:
                 ; // ignore the rest.
@@ -205,11 +205,11 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
     formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();
     for (; itr != itr_end; ++itr)
     {
-        switch (itr->get_opcode())
+        switch ((*itr)->get_opcode())
         {
             case fop_single_ref:
             {
-                abs_address_t addr = itr->get_single_ref().to_abs(pos);
+                abs_address_t addr = (*itr)->get_single_ref().to_abs(pos);
                 const formula_cell* ref = cxt.get_formula_cell(addr);
 
                 if (!ref)
@@ -221,7 +221,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
             break;
             case fop_range_ref:
             {
-                abs_range_t range = itr->get_range_ref().to_abs(pos);
+                abs_range_t range = (*itr)->get_range_ref().to_abs(pos);
                 for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
                     for (col_t col = range.first.column; col <= range.last.column; ++col)
@@ -240,7 +240,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
             }
             default:
 #if DEBUG_FORMULA_CELL
-                __IXION_DEBUG_OUT__ << "check_circular: token type " << get_opcode_name(itr->get_opcode())
+                __IXION_DEBUG_OUT__ << "check_circular: token type " << get_opcode_name((*itr)->get_opcode())
                     << " was not processed." << endl;
 #else
                 ;
