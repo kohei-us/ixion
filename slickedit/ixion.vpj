@@ -219,10 +219,6 @@
 		</Folder>
 		<Folder Name="../include">
 			<Folder Name="ixion">
-				<Folder Name="hash_container">
-					<F N="../include/ixion/hash_container/map.hpp"/>
-					<F N="../include/ixion/hash_container/set.hpp"/>
-				</Folder>
 				<Folder Name="interface">
 					<F N="../include/ixion/interface/formula_model_access.hpp"/>
 					<F N="../include/ixion/interface/session_handler.hpp"/>
