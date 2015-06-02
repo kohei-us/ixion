@@ -5,14 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_FUNCTION_OPCODE_HPP__
-#define __IXION_FORMULA_FUNCTION_OPCODE_HPP__
+#ifndef INCLUDED_IXION_FORMULA_FUNCTION_OPCODE_HPP
+#define INCLUDED_IXION_FORMULA_FUNCTION_OPCODE_HPP
 
 #include "ixion/env.hpp"
 
 namespace ixion {
 
-enum formula_function_t
+enum class formula_function_t
 {
     func_unknown = 0,
 

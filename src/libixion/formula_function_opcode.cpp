@@ -15,7 +15,7 @@ bool is_volatile(formula_function_t func)
 {
     switch (func)
     {
-        case func_now:
+        case formula_function_t::func_now:
             return true;
         default:
             ;

@@ -38,17 +38,17 @@ struct builtin_func
 };
 
 const builtin_func builtin_funcs[] = {
-    { "MAX", func_max },
-    { "MIN", func_min },
-    { "AVERAGE", func_average },
-    { "WAIT", func_wait },
-    { "SUM", func_sum },
-    { "COUNTA", func_counta },
-    { "IF", func_if },
-    { "LEN", func_len },
-    { "CONCATENATE", func_concatenate },
-    { "NOW", func_now },
-    { "SUBTOTAL", func_subtotal },
+    { "MAX",         formula_function_t::func_max },
+    { "MIN",         formula_function_t::func_min },
+    { "AVERAGE",     formula_function_t::func_average },
+    { "WAIT",        formula_function_t::func_wait },
+    { "SUM",         formula_function_t::func_sum },
+    { "COUNTA",      formula_function_t::func_counta },
+    { "IF",          formula_function_t::func_if },
+    { "LEN",         formula_function_t::func_len },
+    { "CONCATENATE", formula_function_t::func_concatenate },
+    { "NOW",         formula_function_t::func_now },
+    { "SUBTOTAL",    formula_function_t::func_subtotal },
 };
 
 size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
@@ -121,7 +121,7 @@ formula_function_t formula_functions::get_function_opcode(const char* p, size_t 
         if (match_func_name(builtin_funcs[i].name, p, n))
             return builtin_funcs[i].oc;
     }
-    return func_unknown;
+    return formula_function_t::func_unknown;
 }
 
 const char* formula_functions::get_function_name(formula_function_t oc)
@@ -147,40 +147,40 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
 {
     switch (oc)
     {
-        case func_max:
+        case formula_function_t::func_max:
             fnc_max(args);
             break;
-        case func_average:
+        case formula_function_t::func_average:
             fnc_average(args);
             break;
-        case func_min:
+        case formula_function_t::func_min:
             fnc_min(args);
             break;
-        case func_wait:
+        case formula_function_t::func_wait:
             fnc_wait(args);
             break;
-        case func_sum:
+        case formula_function_t::func_sum:
             fnc_sum(args);
             break;
-        case func_counta:
+        case formula_function_t::func_counta:
             fnc_counta(args);
             break;
-        case func_if:
+        case formula_function_t::func_if:
             fnc_if(args);
             break;
-        case func_len:
+        case formula_function_t::func_len:
             fnc_len(args);
             break;
-        case func_concatenate:
+        case formula_function_t::func_concatenate:
             fnc_concatenate(args);
             break;
-        case func_now:
+        case formula_function_t::func_now:
             fnc_now(args);
             break;
-        case func_subtotal:
+        case formula_function_t::func_subtotal:
             fnc_subtotal(args);
             break;
-        case func_unknown:
+        case formula_function_t::func_unknown:
         default:
             throw formula_functions::invalid_arg("unknown function opcode");
     }

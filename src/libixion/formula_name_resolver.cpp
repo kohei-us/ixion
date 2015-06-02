@@ -30,7 +30,7 @@ namespace {
 bool resolve_function(const char* p, size_t n, formula_name_type& ret)
 {
     formula_function_t func_oc = formula_functions::get_function_opcode(p, n);
-    if (func_oc != func_unknown)
+    if (func_oc != formula_function_t::func_unknown)
     {
         // This is a built-in function.
         ret.type = formula_name_type::function;
