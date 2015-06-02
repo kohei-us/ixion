@@ -11,7 +11,8 @@
 #include "ixion/global.hpp"
 
 #include <boost/noncopyable.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
+
+#include <vector>
 
 namespace ixion {
 
@@ -65,7 +66,7 @@ public:
 
 class value_stack_t
 {
-    typedef ::boost::ptr_vector<stack_value> store_type;
+    typedef std::vector<std::unique_ptr<stack_value>> store_type;
     store_type m_stack;
     const iface::formula_model_access& m_context;
 
@@ -73,14 +74,14 @@ class value_stack_t
 public:
     explicit value_stack_t(const iface::formula_model_access& cxt);
 
-    typedef store_type::auto_type auto_type;
+    typedef store_type::value_type value_type;
     typedef store_type::iterator iterator;
     typedef store_type::const_iterator const_iterator;
     iterator begin();
     iterator end();
     const_iterator begin() const;
     const_iterator end() const;
-    auto_type release(iterator pos);
+    value_type release(iterator pos);
     bool empty() const;
     size_t size() const;
     void clear();
@@ -91,7 +92,7 @@ public:
 
     double get_value(size_t pos) const;
 
-    void push_back(auto_type val);
+    void push_back(value_type&& val);
     void push_value(double val);
     void push_string(size_t sid);
     void push_single_ref(const abs_address_t& val);

@@ -17,6 +17,7 @@
 #include <sstream>
 #include <vector>
 #include <limits>
+#include <algorithm>
 
 #define DEBUG_NAME_RESOLVER 0
 
@@ -302,7 +303,7 @@ void append_column_name_a1(ostringstream& os, col_t col)
         col -= 1;
     }
 
-    reverse(col_name.begin(), col_name.end());
+    std::reverse(col_name.begin(), col_name.end());
     os << col_name;
 }
 

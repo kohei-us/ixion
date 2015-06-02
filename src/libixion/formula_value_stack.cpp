@@ -126,9 +126,11 @@ value_stack_t::const_iterator value_stack_t::end() const
     return m_stack.end();
 }
 
-value_stack_t::auto_type value_stack_t::release(iterator pos)
+value_stack_t::value_type value_stack_t::release(iterator pos)
 {
-    return m_stack.release(pos);
+    stack_value* p = pos->release();
+    m_stack.erase(pos);
+    return value_type(p);
 }
 
 bool value_stack_t::empty() const
@@ -153,43 +155,43 @@ void value_stack_t::swap(value_stack_t& other)
 
 const stack_value& value_stack_t::back() const
 {
-    return m_stack.back();
+    return *m_stack.back();
 }
 
 const stack_value& value_stack_t::operator[](size_t pos) const
 {
-    return m_stack[pos];
+    return *m_stack[pos];
 }
 
 double value_stack_t::get_value(size_t pos) const
 {
-    const stack_value& v = m_stack[pos];
+    const stack_value& v = *m_stack[pos];
     return get_numeric_value(m_context, v);
 }
 
-void value_stack_t::push_back(auto_type val)
+void value_stack_t::push_back(value_type&& val)
 {
-    m_stack.push_back(val.release());
+    m_stack.push_back(std::move(val));
 }
 
 void value_stack_t::push_value(double val)
 {
-    m_stack.push_back(new stack_value(val));
+    m_stack.push_back(make_unique<stack_value>(val));
 }
 
 void value_stack_t::push_string(size_t sid)
 {
-    m_stack.push_back(new stack_value(sid));
+    m_stack.push_back(make_unique<stack_value>(sid));
 }
 
 void value_stack_t::push_single_ref(const abs_address_t& val)
 {
-    m_stack.push_back(new stack_value(val));
+    m_stack.push_back(make_unique<stack_value>(val));
 }
 
 void value_stack_t::push_range_ref(const abs_range_t& val)
 {
-    m_stack.push_back(new stack_value(val));
+    m_stack.push_back(make_unique<stack_value>(val));
 }
 
 double value_stack_t::pop_value()
@@ -198,7 +200,7 @@ double value_stack_t::pop_value()
     if (m_stack.empty())
         throw formula_error(fe_stack_error);
 
-    const stack_value& v = m_stack.back();
+    const stack_value& v = *m_stack.back();
     ret = get_numeric_value(m_context, v);
     m_stack.pop_back();
     return ret;
@@ -209,7 +211,7 @@ const std::string value_stack_t::pop_string()
     if (m_stack.empty())
         throw formula_error(fe_stack_error);
 
-    const stack_value& v = m_stack.back();
+    const stack_value& v = *m_stack.back();
     switch (v.get_type())
     {
         case stack_value_t::string:
@@ -297,7 +299,7 @@ abs_address_t value_stack_t::pop_single_ref()
     if (m_stack.empty())
         throw formula_error(fe_stack_error);
 
-    const stack_value& v = m_stack.back();
+    const stack_value& v = *m_stack.back();
     if (v.get_type() != stack_value_t::single_ref)
         throw formula_error(fe_stack_error);
 
@@ -311,7 +313,7 @@ abs_range_t value_stack_t::pop_range_ref()
     if (m_stack.empty())
         throw formula_error(fe_stack_error);
 
-    const stack_value& v = m_stack.back();
+    const stack_value& v = *m_stack.back();
     if (v.get_type() != stack_value_t::range_ref)
         throw formula_error(fe_stack_error);
 
@@ -325,7 +327,7 @@ matrix value_stack_t::pop_range_value()
     if (m_stack.empty())
         throw formula_error(fe_stack_error);
 
-    const stack_value& v = m_stack.back();
+    const stack_value& v = *m_stack.back();
     if (v.get_type() != stack_value_t::range_ref)
         throw formula_error(fe_stack_error);
 
@@ -339,7 +341,7 @@ stack_value_t value_stack_t::get_type() const
     if (m_stack.empty())
         throw formula_error(fe_stack_error);
 
-    return m_stack.back().get_type();
+    return m_stack.back()->get_type();
 }
 
 }

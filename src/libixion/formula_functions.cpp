@@ -330,7 +330,6 @@ void formula_functions::fnc_if(value_stack_t& args) const
     if (args.size() != 3)
         throw formula_functions::invalid_arg("IF requires exactly 3 arguments.");
 
-    value_stack_t ret(m_context);
     value_stack_t::iterator pos = args.begin();
     bool eval = args.get_value(0) != 0.0;
     if (eval)
@@ -338,6 +337,7 @@ void formula_functions::fnc_if(value_stack_t& args) const
     else
         std::advance(pos, 2);
 
+    value_stack_t ret(m_context);
     ret.push_back(args.release(pos));
     args.swap(ret);
 }
