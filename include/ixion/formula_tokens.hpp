@@ -177,41 +177,6 @@ private:
 
 bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
 
-// We need the following inline functions for boost::ptr_container.
-
-inline formula_token_base* new_clone(const formula_token_base& r)
-{
-    switch (r.get_opcode())
-    {
-        case fop_close:
-        case fop_divide:
-        case fop_minus:
-        case fop_multiply:
-        case fop_open:
-        case fop_plus:
-        case fop_sep:
-            return new opcode_token(r.get_opcode());
-        case fop_single_ref:
-            return new single_ref_token(r.get_single_ref());
-        case fop_range_ref:
-            return new range_ref_token(r.get_range_ref());
-        case fop_named_expression:
-            return new named_exp_token(static_cast<const named_exp_token&>(r));
-        case fop_string:
-            return new string_token(r.get_index());
-        case fop_value:
-            return new value_token(r.get_value());
-            break;
-        case fop_function:
-            return new function_token(r.get_index());
-        default:
-            ;
-    }
-    return NULL;
-}
-
-// ============================================================================
-
 }
 
 #endif

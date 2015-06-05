@@ -124,46 +124,6 @@ private:
     mem_str_buf m_str;
 };
 
-// ============================================================================
-
-// We need the following inline functions for boost::ptr_container.
-
-inline lexer_token_base* new_clone(const lexer_token_base& r)
-{
-    lexer_opcode_t oc = r.get_opcode();
-
-    switch (oc)
-    {
-        case op_value:
-            return new lexer_value_token(r.get_value());
-        case op_string:
-            return new lexer_string_token(static_cast<const lexer_string_token&>(r));
-        case op_name:
-            return new lexer_name_token(static_cast<const lexer_name_token&>(r));
-        case op_close:
-        case op_divide:
-        case op_minus:
-        case op_multiply:
-        case op_equal:
-        case op_less:
-        case op_greater:
-        case op_open:
-        case op_plus:
-        case op_sep:
-        default:
-            ;
-    }
-
-    return new lexer_token(oc);
-}
-
-inline void delete_clone(const lexer_token_base* p)
-{
-    delete p;
-}
-
-// ============================================================================
-
 }
 
 #endif
