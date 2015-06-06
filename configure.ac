@@ -100,7 +100,6 @@ AC_CONFIG_FILES([Makefile
                  libixion-$IXION_API_VERSION.pc:libixion.pc.in
                  include/Makefile
                  include/ixion/Makefile
-                 include/ixion/hash_container/Makefile
                  include/ixion/interface/Makefile
                  misc/libixion.spec
                  src/Makefile
