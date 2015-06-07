@@ -15,7 +15,6 @@ AC_PREREQ([2.63])
 AC_INIT([libixion], [ixion_version])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
-AM_PATH_PYTHON(3)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
 
@@ -28,6 +27,9 @@ AC_ARG_WITH(hash-container-compat,
 AC_ARG_WITH(mdds-include-path,
     AS_HELP_STRING([--with-mdds-include-path], [specify include path for mdds headers.])
 ,)
+
+AC_ARG_ENABLE([python],
+    AS_HELP_STRING([--disable-python], [Disable python bindings]))
 
 IXION_API_VERSION=ixion_api_version
 IXION_MAJOR_VERSION=ixion_major_version
@@ -83,7 +85,11 @@ fi
 PKG_CHECK_MODULES([MDDS],[mdds >= 0.12.0])
 
 # Check for python.
-PKG_CHECK_MODULES([PYTHON], [python3 >= 0.28])
+AS_IF([test "x$enable_python" != "xno"], [
+    AM_PATH_PYTHON(3)
+    PKG_CHECK_MODULES([PYTHON], [python3 >= 0.28])
+])
+AM_CONDITIONAL([PYTHON], [test "x$enable_python" != "xno"])
 
 CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
 
@@ -94,7 +100,6 @@ AC_CONFIG_FILES([Makefile
                  libixion-$IXION_API_VERSION.pc:libixion.pc.in
                  include/Makefile
                  include/ixion/Makefile
-                 include/ixion/hash_container/Makefile
                  include/ixion/interface/Makefile
                  misc/libixion.spec
                  src/Makefile
