@@ -14,7 +14,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
@@ -37,9 +36,13 @@ class table_handler;
  * concrete implementation of this interface in order to provide access to
  * its content.
  */
-class formula_model_access : boost::noncopyable
+class formula_model_access
 {
+    formula_model_access(const formula_model_access&) = delete;
+    formula_model_access& operator=(const formula_model_access&) = delete;
+
 public:
+    IXION_DLLPUBLIC formula_model_access();
     virtual IXION_DLLPUBLIC ~formula_model_access();
 
     virtual const config& get_config() const = 0;

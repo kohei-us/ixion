@@ -15,6 +15,7 @@ table_handler::~table_handler() {}
 
 session_handler::~session_handler() {}
 
+formula_model_access::formula_model_access() {}
 formula_model_access::~formula_model_access() {}
 
 session_handler* formula_model_access::get_session_handler()

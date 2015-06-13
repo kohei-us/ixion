@@ -12,6 +12,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <boost/noncopyable.hpp>
+
 #define IXION_DEBUG_LEXER 0
 
 using namespace std;

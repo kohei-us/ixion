@@ -5,15 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_PARSER_HPP__
-#define __IXION_FORMULA_PARSER_HPP__
+#ifndef INCLUDED_IXION_FORMULA_PARSER_HPP
+#define INCLUDED_IXION_FORMULA_PARSER_HPP
 
 #include "ixion/exceptions.hpp"
 #include "ixion/lexer_tokens.hpp"
 #include "ixion/formula_tokens.hpp"
 
 #include <string>
-#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
@@ -26,8 +25,12 @@ class formula_name_resolver;
  * passed on from the lexer, and turn them into a series of formula tokens.
  * It also picks up a list of cells that it depends on.
  */
-class formula_parser : public ::boost::noncopyable
+class formula_parser
 {
+    formula_parser() = delete;
+    formula_parser(const formula_parser&) = delete;
+    formula_parser& operator=(const formula_parser&) = delete;
+
 public:
     class parse_error : public general_error
     {
@@ -45,7 +48,6 @@ public:
     formula_tokens_t& get_tokens();
 
 private:
-    formula_parser(); // disabled
 
     void primitive(lexer_opcode_t oc);
     void name(const lexer_token_base& t);
@@ -75,4 +77,5 @@ private:
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

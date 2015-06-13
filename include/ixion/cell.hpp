@@ -14,7 +14,6 @@
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace ixion {
 
@@ -29,8 +28,11 @@ class formula_model_access;
 
 class formula_cell
 {
-    struct interpret_status : boost::noncopyable
+    struct interpret_status
     {
+        interpret_status(const interpret_status&) = delete;
+        interpret_status& operator=(const interpret_status&) = delete;
+
         ::boost::mutex mtx;
         ::boost::condition_variable cond;
 

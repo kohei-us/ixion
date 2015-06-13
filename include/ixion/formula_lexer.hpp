@@ -10,7 +10,6 @@
 
 #include <string>
 #include <exception>
-#include <boost/noncopyable.hpp>
 
 #include "ixion/lexer_tokens.hpp"
 #include "ixion/mem_str_buf.hpp"
@@ -18,8 +17,11 @@
 
 namespace ixion {
 
-class formula_lexer : public ::boost::noncopyable
+class formula_lexer 
 {
+    formula_lexer() = delete;
+    formula_lexer(const formula_lexer&) = delete;
+    formula_lexer& operator= (const formula_lexer&) = delete;
 public:
     class tokenize_error : public general_error
     {
@@ -40,8 +42,6 @@ public:
     void swap_tokens(lexer_tokens_t& tokens);
 
 private:
-    formula_lexer();
-
     lexer_tokens_t m_tokens;
     const char* mp_first;
     size_t m_size;
