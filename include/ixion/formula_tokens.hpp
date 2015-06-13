@@ -50,7 +50,7 @@ public:
     virtual std::string get_name() const;
 
 private:
-    formula_token_base(); // disabled
+    formula_token_base() = delete;
 
     fopcode_t m_opcode;
 };
@@ -85,7 +85,7 @@ private:
 
 class string_token : public formula_token_base
 {
-    string_token(); // disabled
+    string_token() = delete;
 public:
     explicit string_token(size_t str_identifier);
     virtual ~string_token();

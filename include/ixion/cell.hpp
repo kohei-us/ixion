@@ -44,7 +44,7 @@ class formula_cell
 
     void reset_flag();
 
-    formula_cell(const formula_cell&); // disabled
+    formula_cell(const formula_cell&) = delete;
 public:
     IXION_DLLPUBLIC formula_cell();
     IXION_DLLPUBLIC formula_cell(size_t tokens_identifier);

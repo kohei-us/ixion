@@ -33,7 +33,9 @@ class IXION_DLLPUBLIC cell_listener_tracker
 
     impl* mp_impl;
 
-    cell_listener_tracker(); // disabled
+    cell_listener_tracker() = delete;
+    cell_listener_tracker(const cell_listener_tracker&) = delete;
+    cell_listener_tracker& operator=(const cell_listener_tracker&) = delete;
 public:
     cell_listener_tracker(iface::formula_model_access& cxt);
 
