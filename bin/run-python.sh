@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 PROGDIR=`dirname $0`
-ORCUS_PYTHONPATH="$PROGDIR/../src/python/.libs"
+IXION_PYTHONPATH="$PROGDIR/../src/python/.libs"
 
-export PYTHONPATH=$ORCUS_PYTHONPATH:$PYTHONPATH
-exec "$1"
+export PYTHONPATH=$IXION_PYTHONPATH:$PYTHONPATH
+exec $PWD/"$1"
 
 
