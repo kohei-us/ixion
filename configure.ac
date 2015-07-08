@@ -82,7 +82,7 @@ else
 fi
 
 # Check for mdds.
-PKG_CHECK_MODULES([MDDS],[mdds >= 0.12.0])
+PKG_CHECK_MODULES([MDDS],[mdds-1.0 >= 0.13.0])
 
 # Check for python.
 AS_IF([test "x$enable_python" != "xno"], [
