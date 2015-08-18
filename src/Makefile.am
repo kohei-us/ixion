@@ -1,7 +1,4 @@
-SUBDIRS = libixion
-if PYTHON
-	SUBDIRS += python
-endif
+SUBDIRS = libixion python
 
 AM_CPPFLAGS = -I$(top_srcdir)/include $(MDDS_CFLAGS)
 

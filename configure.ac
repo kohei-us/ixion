@@ -69,13 +69,12 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-CPPFLAGS="$CPPFLAGS -D_REENTRANT -DMDDS_HASH_CONTAINER_BOOST"
+CPPFLAGS="$CPPFLAGS -D_REENTRANT"
 
 AC_MSG_CHECKING([whether to turn on hash container compatibility])
 if test "z$with_hash_container_compat" = "zno"; then
     AC_MSG_RESULT([no])
     BOOST_REQUIRE([1.36])
-    BOOST_UNORDERED
 else
     AC_MSG_RESULT([yes])
     DEFINES="$DEFINES -D_IXION_HASH_CONTAINER_COMPAT"
@@ -89,7 +88,7 @@ AS_IF([test "x$enable_python" != "xno"], [
     AM_PATH_PYTHON(3)
     PKG_CHECK_MODULES([PYTHON], [python3 >= 0.28])
 ])
-AM_CONDITIONAL([PYTHON], [test "x$enable_python" != "xno"])
+AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 
 CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
 
@@ -107,3 +106,10 @@ AC_CONFIG_FILES([Makefile
                  src/libixion/constants.inl
                  src/python/Makefile])
 AC_OUTPUT
+
+AC_MSG_NOTICE([
+==============================================================================
+Build configuration:
+	python:               $enable_python
+==============================================================================
+])

@@ -1,3 +1,5 @@
+if BUILD_PYTHON
+
 pyexec_LTLIBRARIES = ixion.la
 ixion_la_SOURCES = \
 	document.hpp \
@@ -18,3 +20,5 @@ AM_TESTS_ENVIRONMENT = PYTHONPATH=.libs$${PYTHONPATH:+:$${PYTHONPATH}}; export P
 TESTS = \
 	../../test/python/document.py \
 	../../test/python/module.py
+
+endif
