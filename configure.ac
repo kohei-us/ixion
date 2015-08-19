@@ -18,18 +18,11 @@ AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
 
-AC_ARG_WITH(hash-container-compat,
-[
-  --with-hash-container-compat use std::hash_foo instead of boost::unordered_foo
-],
-,with_hash_container_compat=no)
-
-AC_ARG_WITH(mdds-include-path,
-    AS_HELP_STRING([--with-mdds-include-path], [specify include path for mdds headers.])
-,)
-
 AC_ARG_ENABLE([python],
-    AS_HELP_STRING([--disable-python], [Disable python bindings]))
+    [AS_HELP_STRING([--disable-python], [Disable python bindings])],
+    [enable_python="$enableval"],
+    [enable_python=yes]
+)
 
 IXION_API_VERSION=ixion_api_version
 IXION_MAJOR_VERSION=ixion_major_version
@@ -71,14 +64,7 @@ AC_CHECK_FUNCS([gettimeofday])
 
 CPPFLAGS="$CPPFLAGS -D_REENTRANT"
 
-AC_MSG_CHECKING([whether to turn on hash container compatibility])
-if test "z$with_hash_container_compat" = "zno"; then
-    AC_MSG_RESULT([no])
-    BOOST_REQUIRE([1.36])
-else
-    AC_MSG_RESULT([yes])
-    DEFINES="$DEFINES -D_IXION_HASH_CONTAINER_COMPAT"
-fi
+BOOST_REQUIRE([1.36])
 
 # Check for mdds.
 PKG_CHECK_MODULES([MDDS],[mdds-1.0 >= 0.13.0])
