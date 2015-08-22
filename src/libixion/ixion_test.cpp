@@ -55,6 +55,25 @@ void test_string_to_double()
     }
 }
 
+void test_string_pool()
+{
+    cout << "test string pool" << endl;
+    model_context cxt;
+
+    string_id_t s_table1 = cxt.append_string(IXION_ASCII("Table1"));
+    string_id_t s_table2 = cxt.append_string(IXION_ASCII("Table2"));
+    string_id_t s_cat = cxt.append_string(IXION_ASCII("Category"));
+    string_id_t s_val = cxt.append_string(IXION_ASCII("Value"));
+
+    cxt.dump_strings();
+
+    // Make sure these work correctly before proceeding further with the test.
+    assert(s_table1 == cxt.get_string_identifier(IXION_ASCII("Table1")));
+    assert(s_table2 == cxt.get_string_identifier(IXION_ASCII("Table2")));
+    assert(s_cat == cxt.get_string_identifier(IXION_ASCII("Category")));
+    assert(s_val == cxt.get_string_identifier(IXION_ASCII("Value")));
+}
+
 struct ref_name_entry
 {
     const char* name;
@@ -834,6 +853,7 @@ int main()
 {
     test_size();
     test_string_to_double();
+    test_string_pool();
     test_name_resolver_excel_a1();
     test_name_resolver_table_excel_a1();
     test_name_resolver_excel_r1c1();

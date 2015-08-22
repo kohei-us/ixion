@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <map>
 #include <vector>
+#include <iostream>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -230,6 +231,8 @@ public:
     string_id_t add_string(const char* p, size_t n);
     const std::string* get_string(string_id_t identifier) const;
     size_t get_string_count() const;
+    void dump_strings() const;
+
     const column_store_t* get_column(sheet_t sheet, col_t col) const;
 
     const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
@@ -396,6 +399,23 @@ const std::string* model_context_impl::get_string(string_id_t identifier) const
 size_t model_context_impl::get_string_count() const
 {
     return m_strings.size();
+}
+
+void model_context_impl::dump_strings() const
+{
+    {
+        cout << "string count: " << m_strings.size() << endl;
+        auto it = m_strings.begin(), ite = m_strings.end();
+        for (string_id_t sid = 0; it != ite; ++it, ++sid)
+            cout << "* " << sid << ": '" << *it << "'" << endl;
+    }
+
+    {
+        cout << "string map count: " << m_string_map.size() << endl;
+        auto it = m_string_map.begin(), ite = m_string_map.end();
+        for (; it != ite; ++it)
+            cout << "* key: '" << it->first << "', value: '" << it->second << "'" << endl;
+    }
 }
 
 const column_store_t* model_context_impl::get_column(sheet_t sheet, col_t col) const
@@ -1271,6 +1291,11 @@ void model_context::set_table_handler(iface::table_handler* handler)
 size_t model_context::get_string_count() const
 {
     return mp_impl->get_string_count();
+}
+
+void model_context::dump_strings() const
+{
+    mp_impl->dump_strings();
 }
 
 const column_store_t* model_context::get_column(sheet_t sheet, col_t col) const

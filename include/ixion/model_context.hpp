@@ -139,6 +139,8 @@ public:
 
     size_t get_string_count() const;
 
+    void dump_strings() const;
+
     /**
      * Get column storage.
      *

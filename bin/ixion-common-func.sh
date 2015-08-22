@@ -38,6 +38,8 @@ ixion_exec()
     ROOTDIR=$PROGDIR/..
     EXECPATH=$ROOTDIR/src/libixion/.libs/$EXEC
     export LD_LIBRARY_PATH=$PROGDIR/../src/libixion/.libs
+    # For OSX.
+    export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
     cd $EXECDIR
 
     common_exec "$@"
