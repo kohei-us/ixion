@@ -192,6 +192,12 @@ void test_name_resolver_table_excel_a1()
     string_id_t s_cat = cxt.append_string(IXION_ASCII("Category"));
     string_id_t s_val = cxt.append_string(IXION_ASCII("Value"));
 
+    // Make sure these work correctly before proceeding further with the test.
+    assert(s_table1 == cxt.get_string_identifier(IXION_ASCII("Table1")));
+    assert(s_table2 == cxt.get_string_identifier(IXION_ASCII("Table2")));
+    assert(s_cat == cxt.get_string_identifier(IXION_ASCII("Category")));
+    assert(s_val == cxt.get_string_identifier(IXION_ASCII("Value")));
+
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
