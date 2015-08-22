@@ -139,6 +139,7 @@ class model_context_impl : boost::noncopyable
 {
     typedef std::map<std::string, unique_ptr<formula_cell>> named_expressions_type;
     typedef std::vector<std::string> strings_type;
+    typedef std::vector<std::unique_ptr<std::string>> string_pool_type;
     typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
     typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
 
@@ -279,7 +280,7 @@ private:
     formula_tokens_store_type m_tokens;
     model_context::shared_tokens_type m_shared_tokens;
     strings_type m_sheet_names; ///< index to sheet name map.
-    strings_type m_strings;
+    string_pool_type m_strings;
     string_map_type m_string_map;
     string m_empty_string;
 };
@@ -369,8 +370,8 @@ string_id_t model_context_impl::append_string(const char* p, size_t n)
         return empty_string_id;
 
     string_id_t str_id = m_strings.size();
-    m_strings.emplace_back(p, n);
-    p = m_strings.back().data();
+    m_strings.push_back(make_unique<std::string>(p, n));
+    p = m_strings.back()->data();
     mem_str_buf key(p, n);
     m_string_map.insert(string_map_type::value_type(key, str_id));
     return str_id;
@@ -391,9 +392,9 @@ const std::string* model_context_impl::get_string(string_id_t identifier) const
         return &m_empty_string;
 
     if (identifier >= m_strings.size())
-        return NULL;
+        return nullptr;
 
-    return &m_strings[identifier];
+    return m_strings[identifier].get();
 }
 
 size_t model_context_impl::get_string_count() const
@@ -407,14 +408,20 @@ void model_context_impl::dump_strings() const
         cout << "string count: " << m_strings.size() << endl;
         auto it = m_strings.begin(), ite = m_strings.end();
         for (string_id_t sid = 0; it != ite; ++it, ++sid)
-            cout << "* " << sid << ": '" << *it << "'" << endl;
+        {
+            const std::string& s = **it;
+            cout << "* " << sid << ": '" << s << "' (" << (void*)s.data() << ")" << endl;
+        }
     }
 
     {
         cout << "string map count: " << m_string_map.size() << endl;
         auto it = m_string_map.begin(), ite = m_string_map.end();
         for (; it != ite; ++it)
-            cout << "* key: '" << it->first << "', value: '" << it->second << "'" << endl;
+        {
+            mem_str_buf key = it->first;
+            cout << "* key: '" << key << "' (" << (void*)key.get() << "; " << key.size() << "), value: " << it->second << endl;
+        }
     }
 }
 
