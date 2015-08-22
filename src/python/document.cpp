@@ -10,6 +10,7 @@
 #include "global.hpp"
 
 #include "ixion/formula.hpp"
+#include "ixion/exceptions.hpp"
 
 #include <iostream>
 #include <vector>
@@ -105,14 +106,21 @@ PyObject* document_append_sheet(document* self, PyObject* args)
         switch (e.get_error_type())
         {
             case model_context_error::sheet_name_conflict:
-                PyErr_SetString(get_python_document_error(),
-                    "The sheet name already exists in this document.");
+                PyErr_SetString(get_python_document_error(), e.what());
             break;
             default:
                 PyErr_SetString(get_python_document_error(),
                     "Sheet insertion failed for unknown reason.");
         }
-        return NULL;
+        return nullptr;
+    }
+    catch (const general_error& e)
+    {
+        Py_XDECREF(obj_sheet);
+        ostringstream os;
+        os << "Sheet insertion failed and the reason is '" << e.what() << "'";
+        PyErr_SetString(get_python_document_error(), os.str().c_str());
+        return nullptr;
     }
 
     // Append this sheet instance to the document.

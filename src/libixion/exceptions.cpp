@@ -36,8 +36,12 @@ file_not_found::file_not_found(const std::string& fpath) :
     set_message(os.str());
 }
 
+file_not_found::~file_not_found() throw() {}
+
 model_context_error::model_context_error(const std::string& msg, error_type type) :
     general_error(msg), m_type(type) {}
+
+model_context_error::~model_context_error() throw() {}
 
 model_context_error::error_type model_context_error::get_error_type() const
 {

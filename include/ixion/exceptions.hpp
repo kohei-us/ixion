@@ -20,7 +20,7 @@ class IXION_DLLPUBLIC general_error : public std::exception
 public:
     general_error();
     explicit general_error(const std::string& msg);
-    ~general_error() throw();
+    virtual ~general_error() throw();
     virtual const char* what() const throw();
 
 protected:
@@ -34,6 +34,7 @@ class IXION_DLLPUBLIC file_not_found : public general_error
 {
 public:
     explicit file_not_found(const std::string& fpath);
+    virtual ~file_not_found() throw();
 };
 
 /**
@@ -49,6 +50,7 @@ public:
     };
 
     explicit model_context_error(const std::string& msg, error_type type);
+    virtual ~model_context_error() throw();
 
     error_type get_error_type() const;
 
