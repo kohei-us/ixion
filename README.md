@@ -29,9 +29,10 @@ for both full and partial calculation modes.
 * Each calculation session is defined in a plain text file, which is parsed
   and interpreted by the Ixion parser.
 * Fully threaded calculation.
-* Name resolution using A1-style references.
+* Name resolution using A1- and R1C1-style references.
 * Support 2D cell references and named expressions.
 * Support range references.
+* Support table references.
 * Dependency tracking during both full calculation and partial re-calculation.
 * Inline strings.
 * Volatile functions. The framework for volatile functions is implemented. We
@@ -49,7 +50,6 @@ for both full and partial calculation modes.
   * Matrix as formula out from a single function.
   * Jump matrix - range input to function that expects a scalar input, and
     generate matrix output.
-* Support for R1C1 style references.
 * More built-in functions.
 * Support for custom functions defined in the caller program.
 * Support for external references.
