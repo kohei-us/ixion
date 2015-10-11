@@ -37,6 +37,7 @@ test_data = \
 	test/13-relational-operators-03.txt \
 	test/ixion-parser-test.sh \
 	test/python/document.py \
+	test/python/module.py \
 	test/thread/function-parallel.txt \
 	test/thread/function-wait-simple.txt
 
