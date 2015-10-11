@@ -1,5 +1,31 @@
-libixion 0.9.1
+ixion 0.11.0
 
-- Include python bindings test in the tarball.
-- Fix various portability problems in python bindings.
-- Several minor build fixes.
+* C++11 is a hard requirement.
+
+* implement R1C1 formula name resolver.
+
+* remove boost dependency from the public headers.
+
+* fix incorrect life-cycle management of pooled string instances.
+
+* make it buildable on OSX.
+
+* other general code cleanups.
+
+* python
+
+  * correctly catch and translate general_error into python's, for
+    Document.append_sheet() method.
+
+  * make python module build configurable.
+
+  * add ixion.column_label() to convert numeric column indices into
+    column labels.  A1 and R1C1 are supported.
+
+ixion 0.9.1
+
+* include python bindings test in the tarball.
+
+* fix various portability problems in python bindings.
+
+* several minor build fixes.
