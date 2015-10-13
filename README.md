@@ -54,7 +54,7 @@ for both full and partial calculation modes.
 * Support for custom functions defined in the caller program.
 * Support for external references.
 
-## Download
+## Download source packages
 
 | Version | Release Date | Download | Check Sum |
 |---------|--------------|----------|-----------|
@@ -63,6 +63,29 @@ for both full and partial calculation modes.
 | 0.7.0 | 2013-12-13 | [libixion-0.7.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.7.0.tar.bz2) | md5sum: 000157117801f9507f34b26ba998c4d1<br/>sha1sum: 99b8f9f49078ef7e15280f5c73dff639a6e9472c |
 | 0.5.0 | 2013-03-27 | [libixion-0.5.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.5.0.tar.bz2) | md5sum: ebaeab9ffe1e6bd68b2a20bfa430b3af<br/>sha1sum: 99290ed5aa2ab2338ba04737210256c48885107c |
 | 0.3.0 | 2011-11-01 | [libixion_0.3.0.tar.bz2](http://kohei.us/files/ixion/src/libixion_0.3.0.tar.bz2) | md5sum: 96a36a0016f968a5a7c4b167eeb1643b<br/>sha1sum: ac1fa915303ed8492ac50d6f0aa4d974e8405954 |
+
+## Building from source code
+
+Ixion uses autoconf and automake as its build system.  As such, building it
+from sources should be familiar to those who are used to these tools.
+
+In short, run the following command:
+
+```bash
+./autogen.sh
+make
+make install
+```
+
+at the root directory after either cloning from the repository or unpacking
+the source package.
+
+### Build dependencies
+
+Ixion has build-time dependency on the following libraries:
+
+* [boost](http://boost.org)
+* [mdds](http://gitlab.com/mdds/mdds)
 
 ## Python binding
 Starting with version 0.9.0, Ixion provides Python binding for those who wish
