@@ -87,6 +87,10 @@ Ixion has build-time dependency on the following libraries:
 * [boost](http://boost.org)
 * [mdds](http://gitlab.com/mdds/mdds)
 
+Note that when you are building from the master branch of the git repository,
+it's recommended that you also use the latest mdds source code from its
+repository for the build, else you may encounter build issues or test failures.
+
 ## Python binding
 Starting with version 0.9.0, Ixion provides Python binding for those who wish
 to use Ixion from Python scripts.  Refer to this
