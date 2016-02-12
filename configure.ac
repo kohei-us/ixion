@@ -71,7 +71,7 @@ CPPFLAGS="$CPPFLAGS -D_REENTRANT"
 BOOST_REQUIRE([1.36])
 
 # Check for mdds.
-PKG_CHECK_MODULES([MDDS],[mdds-1.0 >= 1.0.0])
+PKG_CHECK_MODULES([MDDS],[mdds-1.0 >= 1.1.0])
 
 # Check for python.
 AS_IF([test "x$enable_python" != "xno"], [
