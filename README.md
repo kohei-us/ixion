@@ -56,13 +56,15 @@ for both full and partial calculation modes.
 
 ## Download source packages
 
-| Version | Release Date | Download | Check Sum |
-|---------|--------------|----------|-----------|
-| 0.9.1 | 2015-04-05 | [libixion-0.9.1.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.1.tar.xz) | md5sum: d292f6d62847f2305178459390842eac<br/>sha1sum: 8ae071e7e89784933caadeffc16ed7b0764350a9 |
-| 0.9.0 | 2015-02-16 | [libixion-0.9.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.0.tar.xz) | md5sum: 26f293e708513dea5e6e25e9232a7400<br/>sha1sum: 4f97682546236aee686e86293f9890d79f25cf23 |
-| 0.7.0 | 2013-12-13 | [libixion-0.7.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.7.0.tar.bz2) | md5sum: 000157117801f9507f34b26ba998c4d1<br/>sha1sum: 99b8f9f49078ef7e15280f5c73dff639a6e9472c |
-| 0.5.0 | 2013-03-27 | [libixion-0.5.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.5.0.tar.bz2) | md5sum: ebaeab9ffe1e6bd68b2a20bfa430b3af<br/>sha1sum: 99290ed5aa2ab2338ba04737210256c48885107c |
-| 0.3.0 | 2011-11-01 | [libixion_0.3.0.tar.bz2](http://kohei.us/files/ixion/src/libixion_0.3.0.tar.bz2) | md5sum: 96a36a0016f968a5a7c4b167eeb1643b<br/>sha1sum: ac1fa915303ed8492ac50d6f0aa4d974e8405954 |
+| Version | API Version | Release Date | Download | Check Sum | File Size (bytes) |
+|---------|-------------|--------------|----------|-----------|-------------------|
+| 0.11.0 | 0.11.0 | 2016-02-13 | [libixion-0.11.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.11.0.tar.xz) | sha256sum: 97a6e7f2b1fcbff69e76fe4e1df62f1cfcc353820472991e37de00aacb024293 | 365652 |
+|        |        |            | [libixion-0.11.0.tar.gz](http://kohei.us/files/ixion/src/libixion-0.11.0.tar.gz) | sha256sum: fd697e9ab334bb1cf0161fab25f46bbbcf517248de9bbc1f684d9854b9b287c0 | 567644 |
+| 0.9.1  |        | 2015-04-05 | [libixion-0.9.1.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.1.tar.xz) | md5sum: d292f6d62847f2305178459390842eac<br/>sha1sum: 8ae071e7e89784933caadeffc16ed7b0764350a9 | - |
+| 0.9.0  |        | 2015-02-16 | [libixion-0.9.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.9.0.tar.xz) | md5sum: 26f293e708513dea5e6e25e9232a7400<br/>sha1sum: 4f97682546236aee686e86293f9890d79f25cf23 | - |
+| 0.7.0  |        | 2013-12-13 | [libixion-0.7.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.7.0.tar.bz2) | md5sum: 000157117801f9507f34b26ba998c4d1<br/>sha1sum: 99b8f9f49078ef7e15280f5c73dff639a6e9472c | - |
+| 0.5.0  |        | 2013-03-27 | [libixion-0.5.0.tar.bz2](http://kohei.us/files/ixion/src/libixion-0.5.0.tar.bz2) | md5sum: ebaeab9ffe1e6bd68b2a20bfa430b3af<br/>sha1sum: 99290ed5aa2ab2338ba04737210256c48885107c | - |
+| 0.3.0  |        | 2011-11-01 | [libixion_0.3.0.tar.bz2](http://kohei.us/files/ixion/src/libixion_0.3.0.tar.bz2) | md5sum: 96a36a0016f968a5a7c4b167eeb1643b<br/>sha1sum: ac1fa915303ed8492ac50d6f0aa4d974e8405954 | - |
 
 ## Building from source code
 
