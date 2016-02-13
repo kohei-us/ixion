@@ -22,6 +22,17 @@ AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
 
+AC_CANONICAL_HOST
+
+case $host_os in
+    darwin*)
+        _os=Darwin
+    ;;
+    *)
+        _os=
+    ;;
+esac
+
 AC_ARG_ENABLE([python],
     [AS_HELP_STRING([--disable-python], [Disable python bindings])],
     [enable_python="$enableval"],
@@ -81,6 +92,7 @@ AS_IF([test "x$enable_python" != "xno"], [
     PKG_CHECK_MODULES([PYTHON], [python3 >= 0.28])
 ])
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
+AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
 
 CPPFLAGS="$CPPFLAGS -g -O2 -fvisibility=hidden -I/usr/local/include"
 LDFLAGS="-L/usr/local/lib"

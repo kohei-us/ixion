@@ -12,7 +12,8 @@ bin_data = \
 	bin/ixion-test.sh \
 	bin/ixion-parser-mem.sh \
 	bin/ixion-parser.sh \
-	bin/ixion-parser-gdb.sh
+	bin/ixion-parser-gdb.sh \
+	bin/run-python-test-osx.sh
 
 test_data = \
 	test/01-simple-arithmetic.txt \

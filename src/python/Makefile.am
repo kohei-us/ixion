@@ -16,9 +16,18 @@ ixion_la_LIBADD = \
 	../libixion/libixion-@IXION_API_VERSION@.la \
 	$(PYTHON_LIBS)
 
+if OSX
+
+TESTS = ../../bin/run-python-test-osx.sh
+
+else
+
 AM_TESTS_ENVIRONMENT = PYTHONPATH=.libs$${PYTHONPATH:+:$${PYTHONPATH}}; export PYTHONPATH;
+
 TESTS = \
 	../../test/python/document.py \
 	../../test/python/module.py
+
+endif
 
 endif
