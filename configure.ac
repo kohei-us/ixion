@@ -28,10 +28,12 @@ AC_ARG_ENABLE([python],
     [enable_python=yes]
 )
 
+IXION_VERSION=ixion_version
 IXION_API_VERSION=ixion_api_version
 IXION_MAJOR_VERSION=ixion_major_version
 IXION_MINOR_VERSION=ixion_minor_version
 IXION_MICRO_VERSION=ixion_micro_version
+AC_SUBST(IXION_VERSION)
 AC_SUBST(IXION_API_VERSION)
 AC_SUBST(IXION_MAJOR_VERSION)
 AC_SUBST(IXION_MINOR_VERSION)
@@ -87,6 +89,7 @@ BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile
                  libixion-$IXION_API_VERSION.pc:libixion.pc.in
+                 bin/env.sh
                  include/Makefile
                  include/ixion/Makefile
                  include/ixion/interface/Makefile
