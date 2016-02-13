@@ -82,7 +82,8 @@ AS_IF([test "x$enable_python" != "xno"], [
 ])
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 
-CPPFLAGS="$CPPFLAGS -g -Os -fvisibility=hidden"
+CPPFLAGS="$CPPFLAGS -g -O2 -fvisibility=hidden -I/usr/local/include"
+LDFLAGS="-L/usr/local/lib"
 
 BOOST_THREADS
 BOOST_PROGRAM_OPTIONS
