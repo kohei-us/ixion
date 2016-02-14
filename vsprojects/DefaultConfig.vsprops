@@ -7,7 +7,6 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="..\..\include;$(BOOST_DIR);$(MDDS_DIR)\include"
-		PreprocessorDefinitions="MDDS_HASH_CONTAINER_BOOST"
 	/>
 	<Tool
 		Name="VCLinkerTool"
