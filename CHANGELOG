@@ -4,7 +4,8 @@ ixion 0.11.0
 
 * implement R1C1 formula name resolver.
 
-* remove boost dependency from the public headers.
+* remove boost dependency from the public headers (except for
+  boost::thread).
 
 * fix incorrect life-cycle management of pooled string instances.
 
