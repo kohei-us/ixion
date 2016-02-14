@@ -50,6 +50,7 @@ doc_data = \
 	doc/sheet.rst
 
 EXTRA_DIST = \
+	LICENSE \
 	libixion.pc.in \
 	autogen.sh \
 	$(bin_data) \
