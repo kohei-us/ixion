@@ -38,8 +38,10 @@ public:
      */
     size_type size() const { return m_columns.size(); }
 
+    const column_stores_t& get_columns() const { return m_columns; }
+
 private:
-    std::vector<column_store_t*> m_columns;
+    column_stores_t m_columns;
     std::vector<column_store_t::iterator> m_pos_hints;
 };
 

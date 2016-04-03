@@ -235,6 +235,7 @@ public:
     void dump_strings() const;
 
     const column_store_t* get_column(sheet_t sheet, col_t col) const;
+    const column_stores_t* get_columns(sheet_t sheet) const;
 
     const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
@@ -428,14 +429,23 @@ void model_context_impl::dump_strings() const
 const column_store_t* model_context_impl::get_column(sheet_t sheet, col_t col) const
 {
     if (static_cast<size_t>(sheet) >= m_sheets.size())
-        return NULL;
+        return nullptr;
 
     const worksheet& sh = m_sheets[sheet];
 
     if (static_cast<size_t>(col) >= sh.size())
-        return NULL;
+        return nullptr;
 
     return &sh[col];
+}
+
+const column_stores_t* model_context_impl::get_columns(sheet_t sheet) const
+{
+    if (static_cast<size_t>(sheet) >= m_sheets.size())
+        return nullptr;
+
+    const worksheet& sh = m_sheets[sheet];
+    return &sh.get_columns();
 }
 
 const formula_tokens_t* model_context_impl::get_formula_tokens(sheet_t sheet, size_t identifier) const
@@ -1308,6 +1318,11 @@ void model_context::dump_strings() const
 const column_store_t* model_context::get_column(sheet_t sheet, col_t col) const
 {
     return mp_impl->get_column(sheet, col);
+}
+
+const column_stores_t* model_context::get_columns(sheet_t sheet) const
+{
+    return mp_impl->get_columns(sheet);
 }
 
 void model_context::get_all_formula_cells(dirty_formula_cells_t& cells) const

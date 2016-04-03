@@ -152,6 +152,17 @@ public:
      */
     const column_store_t* get_column(sheet_t sheet, col_t col) const;
 
+    /**
+     * Get an array of column stores for the entire sheet.
+     *
+     *
+     * @param sheet sheet index.
+     *
+     * @return const pointer to an array of column stores, or nullptr in case
+     * the sheet index is out of bound.
+     */
+    const column_stores_t* get_columns(sheet_t sheet) const;
+
     void get_all_formula_cells(dirty_formula_cells_t& cells) const;
 
 private:
