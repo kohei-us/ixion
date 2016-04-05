@@ -41,12 +41,46 @@ public:
     void set_string(string_id_t strid);
     void set_error(formula_error_t e);
 
+    /**
+     * Get a numeric result value.  The caller must make sure the result is of
+     * numeric type, else the behavior is undefined.
+     *
+     * @return numeric result value.
+     */
     double get_value() const;
+
+    /**
+     * Get a string ID for textural result value.  The caller must make sure
+     * the result is of textural type, else the behavior is undefined.
+     *
+     * @return string ID.
+     */
     string_id_t get_string() const;
+
+    /**
+     * Get an error value of the result.  The caller must make sure that the
+     * result is of error type, else the behavior is undefined.
+     *
+     * @return enum value representing the error.
+     * @see ixion::get_formula_error_name
+     */
     formula_error_t get_error() const;
 
+    /**
+     * Get the type of result.
+     *
+     * @return enum value representing the result type.
+     */
     result_type get_type() const;
 
+    /**
+     * Get a string representation of the result value no matter what the
+     * result type is.
+     *
+     * @param cxt model context object.
+     *
+     * @return string representation of the result value.
+     */
     std::string str(const iface::formula_model_access& cxt) const;
 
     /**
