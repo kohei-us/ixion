@@ -1,7 +1,9 @@
 ixion 0.11.1 (tentative)
 
-* add get_columns() method to the model_context class to return an array of
-  column_store_t.
+* add get_columns() method to the model_context class to return an
+  array of column_store_t.
+
+* make it buildable with mdds-1.2.
 
 ixion 0.11.0
 
