@@ -19,8 +19,6 @@
 #include <string>
 #include <vector>
 
-#define DEBUG_QUEUE_MANAGER 0
-
 using ::std::string;
 using ::std::cout;
 using ::std::endl;
@@ -29,53 +27,6 @@ using ::std::queue;
 using ::boost::mutex;
 using ::boost::thread;
 using ::boost::condition_variable;
-
-namespace {
-
-#if DEBUG_QUEUE_MANAGER
-mutex tprintf_mtx;
-
-void tprintf(const string& s)
-{
-    mutex::scoped_lock lock(tprintf_mtx);
-    cout << s << endl;
-    cout.flush();
-}
-#else
-void tprintf(const string&) {} // no-op
-#endif
-
-class stack_printer
-{
-public:
-    explicit stack_printer(const char* msg) :
-        m_msg(msg)
-    {
-#if DEBUG_QUEUE_MANAGER
-        string s = msg + string(": --begin");
-        tprintf(s);
-        m_start_time = getTime();
-#endif
-    }
-
-    ~stack_printer()
-    {
-#if DEBUG_QUEUE_MANAGER
-        double end_time = global::get_current_time();
-        ostringstream os;
-        os << m_msg << ": --end (durtion: " << (end_time-m_start_time) << " sec)";
-        tprintf(os.str());
-#endif
-    }
-
-private:
-    std::string m_msg;
-#if DEBUG_QUEUE_MANAGER
-    double m_start_time;
-#endif
-};
-
-}
 
 namespace ixion {
 
@@ -141,7 +92,6 @@ worker_thread_status wts;
  */
 void worker_main(worker_thread_data* data, iface::formula_model_access* context)
 {
-    stack_printer __stack_printer__("manage_queue::worker_main");
     mutex::scoped_lock lock_cell(data->action.mtx);
     {
         mutex::scoped_lock lock_ready(data->init_status.mtx);
@@ -149,11 +99,8 @@ void worker_main(worker_thread_data* data, iface::formula_model_access* context)
         data->init_status.cond.notify_all();
     }
 
-    tprintf("worker ready");
-
     while (!data->action.terminate_requested)
     {
-        tprintf("worker waits...");
         {
             // Register itself as an idle thread.
             mutex::scoped_lock lock_wts(wts.mtx);
@@ -232,11 +179,6 @@ void init_workers(size_t worker_count, iface::formula_model_access* context)
 
 void terminate_workers()
 {
-#if DEBUG_QUEUE_MANAGER
-    ostringstream os;
-    os << "terminating all workers..." << endl;
-    cout << os.str();
-#endif
     worker_threads_type::iterator itr = data.workers.begin(), itr_end = data.workers.end();
     for (; itr != itr_end; ++itr)
     {
@@ -268,7 +210,6 @@ void interpret_cell(worker_thread_data& wt)
  */
 void manage_queue_main(size_t worker_count, iface::formula_model_access* context)
 {
-    stack_printer __stack_printer__("::manage_queue_main");
     mutex::scoped_lock lock(data.mtx_queue);
     {
         mutex::scoped_lock lock(data.mtx_thread_ready);
@@ -279,7 +220,6 @@ void manage_queue_main(size_t worker_count, iface::formula_model_access* context
 
     while (data.action != qm_terminate_requested)
     {
-        tprintf("waiting...");
         data.cond_queue.wait(lock);
         if (data.action == qm_cell_added_to_queue)
         {
@@ -302,7 +242,6 @@ void manage_queue_main(size_t worker_count, iface::formula_model_access* context
     // Termination is being requested.  Finish interpreting the rest of the
     // cells, as no more new cells will be added.
 
-    tprintf("terminating manage queue thread...");
     while (!data.cells.empty())
     {
         mutex::scoped_lock wts_lock(wts.mtx);
@@ -327,12 +266,6 @@ void manage_queue_main(size_t worker_count, iface::formula_model_access* context
 
 void add_cell_to_queue(const abs_address_t& cell)
 {
-#if DEBUG_QUEUE_MANAGER
-//  ostringstream os;
-//  os << "adding cell " << global::get_cell_name(p) << " to queue..." << endl;
-//  cout << os.str();
-#endif
-
     ::boost::mutex::scoped_lock lock(data.mtx_queue);
     data.cells.push(cell);
     data.action = qm_cell_added_to_queue;

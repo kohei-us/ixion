@@ -18,30 +18,11 @@
 #include <iostream>
 #include <fstream>
 
-#define DEBUG_DEPENDS_TRACKER 0
-
 using namespace std;
 
 namespace ixion {
 
 namespace {
-
-#if DEBUG_DEPENDS_TRACKER
-class cell_printer : public unary_function<abs_address_t, void>
-{
-public:
-    cell_printer(const iface::formula_model_access& cxt) : m_cxt(cxt) {}
-
-    void operator() (const abs_address_t& cell) const
-    {
-        const ixion::formula_name_resolver& resolver = m_cxt.get_name_resolver();
-        __IXION_DEBUG_OUT__ << "  " << resolver.get_name(cell, false) << endl;
-    }
-
-private:
-    const iface::formula_model_access& m_cxt;
-};
-#endif
 
 /**
  * Function object to reset the status of formula cell to pre-interpretation
@@ -121,10 +102,6 @@ dependency_tracker::~dependency_tracker()
 
 void dependency_tracker::insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell)
 {
-#if DEBUG_DEPENDS_TRACKER
-    const formula_name_resolver& resolver = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << resolver.get_name(origin_cell, false) << "->" << resolver.get_name(depend_cell, false) << endl;
-#endif
     m_deps.insert(origin_cell, depend_cell);
 }
 
@@ -133,22 +110,11 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
     vector<abs_address_t> sorted_cells;
     topo_sort_cells(sorted_cells);
 
-#if DEBUG_DEPENDS_TRACKER
-    __IXION_DEBUG_OUT__ << "Topologically sorted cells ---------------------------------" << endl;
-    for_each(sorted_cells.begin(), sorted_cells.end(), cell_printer(m_context));
-#endif
-
     // Reset cell status.
-#if DEBUG_DEPENDS_TRACKER
-    __IXION_DEBUG_OUT__ << "Reset cell status ------------------------------------------" << endl;
-#endif
     for_each(sorted_cells.begin(), sorted_cells.end(), cell_reset_handler(m_context));
 
     // First, detect circular dependencies and mark those circular
     // dependent cells with appropriate error flags.
-#if DEBUG_DEPENDS_TRACKER
-    __IXION_DEBUG_OUT__ << "Check circular dependencies --------------------------------" << endl;
-#endif
     for_each(sorted_cells.begin(), sorted_cells.end(), circular_check_handler(m_context));
 
     if (thread_count > 0)
