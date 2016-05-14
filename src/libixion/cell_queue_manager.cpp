@@ -201,6 +201,7 @@ void interpret_cell(worker_thread_data& wt)
     assert(!wt.action.cell_active);
 
     wt.action.fcell = data.cells.front();
+    wt.action.cell_active = true;
     data.cells.pop();
     wt.action.cond.notify_all();
 }
