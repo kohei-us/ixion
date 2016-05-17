@@ -89,7 +89,7 @@ PKG_CHECK_MODULES([MDDS],[mdds-1.2 >= 1.2.0])
 # Check for python.
 AS_IF([test "x$enable_python" != "xno"], [
     AM_PATH_PYTHON(3)
-    PKG_CHECK_MODULES([PYTHON], [python3 >= 0.28])
+    PKG_CHECK_MODULES([PYTHON], [python3 >= 3.4])
 ])
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
