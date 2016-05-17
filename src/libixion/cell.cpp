@@ -173,8 +173,9 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
             // Interpretation ended with an error condition.
             m_interpret_status.result->set_error(fin.get_error());
         }
+
+        m_interpret_status.cond.notify_all();
     }
-    m_interpret_status.cond.notify_all();
 }
 
 bool formula_cell::is_circular_safe() const
