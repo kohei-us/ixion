@@ -70,23 +70,46 @@ private:
 
 }
 
-formula_cell::interpret_status::interpret_status() :
-    result(NULL) {}
-
-formula_cell::interpret_status::~interpret_status()
+struct interpret_status
 {
-    delete result;
-}
+    interpret_status(const interpret_status&) = delete;
+    interpret_status& operator=(const interpret_status&) = delete;
 
-formula_cell::formula_cell() :
-    m_identifier(0), m_shared_token(false), m_circular_safe(false)
+    ::boost::mutex mtx;
+    ::boost::condition_variable cond;
+
+    formula_result* result;
+
+    interpret_status() : result(nullptr) {}
+
+    ~interpret_status()
+    {
+        delete result;
+    }
+};
+
+struct formula_cell::impl
 {
-}
+    mutable interpret_status m_interpret_status;
+    size_t m_identifier;
+    bool m_shared_token:1;
+    bool m_circular_safe:1;
+
+    impl() :
+        m_identifier(0),
+        m_shared_token(false),
+        m_circular_safe(false) {}
+
+    impl(size_t tokens_identifier) :
+        m_identifier(tokens_identifier),
+        m_shared_token(false),
+        m_circular_safe(false) {}
+};
+
+formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
 
 formula_cell::formula_cell(size_t tokens_identifier) :
-    m_identifier(tokens_identifier), m_shared_token(false), m_circular_safe(false)
-{
-}
+    mp_impl(ixion::make_unique<impl>(tokens_identifier)) {}
 
 formula_cell::~formula_cell()
 {
@@ -94,44 +117,44 @@ formula_cell::~formula_cell()
 
 void formula_cell::reset_flag()
 {
-    m_circular_safe = false;
+    mp_impl->m_circular_safe = false;
 }
 
 size_t formula_cell::get_identifier() const
 {
-    return m_identifier;
+    return mp_impl->m_identifier;
 }
 
 void formula_cell::set_identifier(size_t identifier)
 {
-    m_identifier = identifier;
+    mp_impl->m_identifier = identifier;
 }
 
 double formula_cell::get_value() const
 {
-    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+    ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
     wait_for_interpreted_result(lock);
     return fetch_value_from_result();
 }
 
 double formula_cell::get_value_nowait() const
 {
-    boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+    boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
     return fetch_value_from_result();
 }
 
 double formula_cell::fetch_value_from_result() const
 {
-    if (!m_interpret_status.result)
+    if (!mp_impl->m_interpret_status.result)
         // Result not cached yet.  Reference error.
         throw formula_error(fe_ref_result_not_available);
 
-    if (m_interpret_status.result->get_type() == formula_result::rt_error)
+    if (mp_impl->m_interpret_status.result->get_type() == formula_result::rt_error)
         // Error condition.
-        throw formula_error(m_interpret_status.result->get_error());
+        throw formula_error(mp_impl->m_interpret_status.result->get_error());
 
-    assert(m_interpret_status.result->get_type() == formula_result::rt_value);
-    return m_interpret_status.result->get_value();
+    assert(mp_impl->m_interpret_status.result->get_type() == formula_result::rt_value);
+    return mp_impl->m_interpret_status.result->get_value();
 }
 
 void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
@@ -141,19 +164,19 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
     {
-        ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
+        ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
 
-        if (m_interpret_status.result)
+        if (mp_impl->m_interpret_status.result)
         {
             // When the result is already cached before the cell is interpreted,
             // it can mean the cell has circular dependency.
-            if (m_interpret_status.result->get_type() == formula_result::rt_error)
+            if (mp_impl->m_interpret_status.result->get_type() == formula_result::rt_error)
             {
                 iface::session_handler* handler = context.get_session_handler();
                 if (handler)
                 {
                     handler->begin_cell_interpret(pos);
-                    const char* msg = get_formula_error_name(m_interpret_status.result->get_error());
+                    const char* msg = get_formula_error_name(mp_impl->m_interpret_status.result->get_error());
                     handler->set_formula_error(msg);
                 }
             }
@@ -162,25 +185,25 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 
         formula_interpreter fin(this, context);
         fin.set_origin(pos);
-        m_interpret_status.result = new formula_result;
+        mp_impl->m_interpret_status.result = new formula_result;
         if (fin.interpret())
         {
             // Successful interpretation.
-            *m_interpret_status.result = fin.get_result();
+            *mp_impl->m_interpret_status.result = fin.get_result();
         }
         else
         {
             // Interpretation ended with an error condition.
-            m_interpret_status.result->set_error(fin.get_error());
+            mp_impl->m_interpret_status.result->set_error(fin.get_error());
         }
 
-        m_interpret_status.cond.notify_all();
+        mp_impl->m_interpret_status.cond.notify_all();
     }
 }
 
 bool formula_cell::is_circular_safe() const
 {
-    return m_circular_safe;
+    return mp_impl->m_circular_safe;
 }
 
 void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
@@ -188,9 +211,9 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
     // TODO: Check to make sure this is being run on the main thread only.
     const formula_tokens_t* tokens = NULL;
     if (is_shared())
-        tokens = cxt.get_shared_formula_tokens(pos.sheet, m_identifier);
+        tokens = cxt.get_shared_formula_tokens(pos.sheet, mp_impl->m_identifier);
     else
-        tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+        tokens = cxt.get_formula_tokens(pos.sheet, mp_impl->m_identifier);
 
     if (!tokens)
     {
@@ -199,7 +222,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
             os << "failed to retrieve shared formula tokens from formula cell's identifier. ";
         else
             os << "failed to retrieve formula tokens from formula cell's identifier. ";
-        os << "(identifier=" << m_identifier << ")";
+        os << "(identifier=" << mp_impl->m_identifier << ")";
         throw model_context_error(os.str(), model_context_error::circular_dependency);
     }
 
@@ -251,7 +274,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
     }
 
     // No circular dependencies.  Good.
-    m_circular_safe = true;
+    mp_impl->m_circular_safe = true;
 }
 
 bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos)
@@ -262,8 +285,8 @@ bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref, const 
 #if DEBUG_FORMULA_CELL
         __IXION_DEBUG_OUT__ << "circular dependency detected !!" << endl;
 #endif
-        assert(!m_interpret_status.result);
-        m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+        assert(!mp_impl->m_interpret_status.result);
+        mp_impl->m_interpret_status.result = new formula_result(fe_ref_result_not_available);
         return false;
     }
     return true;
@@ -271,9 +294,9 @@ bool formula_cell::check_ref_for_circular_safety(const formula_cell& ref, const 
 
 void formula_cell::reset()
 {
-    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-    delete m_interpret_status.result;
-    m_interpret_status.result = NULL;
+    ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+    delete mp_impl->m_interpret_status.result;
+    mp_impl->m_interpret_status.result = NULL;
     reset_flag();
 }
 
@@ -281,9 +304,9 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
 {
     const formula_tokens_t* this_tokens = NULL;
     if (is_shared())
-        this_tokens = cxt.get_shared_formula_tokens(pos.sheet, m_identifier);
+        this_tokens = cxt.get_shared_formula_tokens(pos.sheet, mp_impl->m_identifier);
     else
-        this_tokens = cxt.get_formula_tokens(pos.sheet, m_identifier);
+        this_tokens = cxt.get_formula_tokens(pos.sheet, mp_impl->m_identifier);
 
     if (!this_tokens)
         return;
@@ -294,18 +317,18 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
 
 const formula_result* formula_cell::get_result_cache() const
 {
-    ::boost::mutex::scoped_lock lock(m_interpret_status.mtx);
-    return m_interpret_status.result;
+    ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+    return mp_impl->m_interpret_status.result;
 }
 
 bool formula_cell::is_shared() const
 {
-    return m_shared_token;
+    return mp_impl->m_shared_token;
 }
 
 void formula_cell::set_shared(bool b)
 {
-    m_shared_token = b;
+    mp_impl->m_shared_token = b;
 }
 
 void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
@@ -313,14 +336,15 @@ void formula_cell::wait_for_interpreted_result(::boost::mutex::scoped_lock& lock
 #if DEBUG_FORMULA_CELL
     __IXION_DEBUG_OUT__ << "wait for interpreted result" << endl;
 #endif
-    while (!m_interpret_status.result)
+    while (!mp_impl->m_interpret_status.result)
     {
 #if DEBUG_FORMULA_CELL
         __IXION_DEBUG_OUT__ << "waiting" << endl;
 #endif
-        m_interpret_status.cond.wait(lock);
+        mp_impl->m_interpret_status.cond.wait(lock);
     }
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

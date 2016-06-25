@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_CELL_HPP__
-#define __IXION_CELL_HPP__
+#ifndef INCLUDED_IXION_CELL_HPP
+#define INCLUDED_IXION_CELL_HPP
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/address.hpp"
@@ -14,6 +14,8 @@
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+
+#include <memory>
 
 namespace ixion {
 
@@ -28,21 +30,30 @@ class formula_model_access;
 
 class formula_cell
 {
-    struct interpret_status
-    {
-        interpret_status(const interpret_status&) = delete;
-        interpret_status& operator=(const interpret_status&) = delete;
+    struct impl;
 
-        ::boost::mutex mtx;
-        ::boost::condition_variable cond;
-
-        formula_result* result;
-
-        interpret_status();
-        ~interpret_status();
-    };
+    std::unique_ptr<impl> mp_impl;
 
     void reset_flag();
+
+    /**
+     * Block until the result becomes available.
+     *
+     * @param lock mutex lock associated with the result cache data.
+     */
+    void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const;
+
+    /**
+     * Check if this cell contains a circular reference.
+     *
+     * @return true if this cell contains no circular reference, hence
+     *         considered "safe", false otherwise.
+     */
+    bool is_circular_safe() const;
+
+    bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos);
+
+    double fetch_value_from_result() const;
 
     formula_cell(const formula_cell&) = delete;
 public:
@@ -75,32 +86,6 @@ public:
 
     IXION_DLLPUBLIC bool is_shared() const;
     IXION_DLLPUBLIC void set_shared(bool b);
-
-private:
-    /**
-     * Block until the result becomes available.
-     *
-     * @param lock mutex lock associated with the result cache data.
-     */
-    void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const;
-
-    /**
-     * Check if this cell contains a circular reference.
-     *
-     * @return true if this cell contains no circular reference, hence
-     *         considered "safe", false otherwise.
-     */
-    bool is_circular_safe() const;
-
-    bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos);
-
-    double fetch_value_from_result() const;
-
-private:
-    mutable interpret_status m_interpret_status;
-    size_t m_identifier;
-    bool m_shared_token:1;
-    bool m_circular_safe:1;
 };
 
 }
