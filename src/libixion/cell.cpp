@@ -37,41 +37,6 @@ using namespace std;
 
 namespace ixion {
 
-namespace {
-
-class ref_token_picker : public unary_function<formula_tokens_t::value_type, void>
-{
-public:
-    ref_token_picker() :
-        mp_tokens(new vector<const formula_token_base*>()) {}
-
-    ref_token_picker(const ref_token_picker& r) :
-        mp_tokens(r.mp_tokens) {}
-
-    void operator() (const formula_tokens_t::value_type& t)
-    {
-        switch (t->get_opcode())
-        {
-            case fop_single_ref:
-            case fop_range_ref:
-                mp_tokens->push_back(&(*t));
-            break;
-            default:
-                ; // ignore the rest.
-        }
-    }
-
-    void swap_tokens(vector<const formula_token_base*>& dest)
-    {
-        mp_tokens->swap(dest);
-    }
-
-private:
-    ::boost::shared_ptr<vector<const formula_token_base*> > mp_tokens;
-};
-
-}
-
 struct interpret_status
 {
     interpret_status(const interpret_status&) = delete;
@@ -338,8 +303,20 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
     if (!this_tokens)
         return;
 
-    ref_token_picker func;
-    for_each(this_tokens->begin(), this_tokens->end(), func).swap_tokens(tokens);
+    std::for_each(this_tokens->begin(), this_tokens->end(),
+        [&](const formula_tokens_t::value_type& t)
+        {
+            switch (t->get_opcode())
+            {
+                case fop_single_ref:
+                case fop_range_ref:
+                    tokens.push_back(&(*t));
+                break;
+                default:
+                    ; // ignore the rest.
+            }
+        }
+    );
 }
 
 const formula_result* formula_cell::get_result_cache() const
