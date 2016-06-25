@@ -14,15 +14,14 @@
 
 #include "formula_interpreter.hpp"
 
-#include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
+#include <condition_variable>
 
 #include <cassert>
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 #define DEBUG_FORMULA_CELL 0
 #if DEBUG_FORMULA_CELL
@@ -42,8 +41,8 @@ struct interpret_status
     interpret_status(const interpret_status&) = delete;
     interpret_status& operator=(const interpret_status&) = delete;
 
-    ::boost::mutex mtx;
-    ::boost::condition_variable cond;
+    std::mutex mtx;
+    std::condition_variable cond;
 
     formula_result* result;
 
@@ -77,7 +76,7 @@ struct formula_cell::impl
      *
      * @param lock mutex lock associated with the result cache data.
      */
-    void wait_for_interpreted_result(::boost::mutex::scoped_lock& lock) const
+    void wait_for_interpreted_result(std::unique_lock<std::mutex>& lock) const
     {
 #if DEBUG_FORMULA_CELL
         __IXION_DEBUG_OUT__ << "wait for interpreted result" << endl;
@@ -158,14 +157,14 @@ void formula_cell::set_identifier(size_t identifier)
 
 double formula_cell::get_value() const
 {
-    ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     mp_impl->wait_for_interpreted_result(lock);
     return mp_impl->fetch_value_from_result();
 }
 
 double formula_cell::get_value_nowait() const
 {
-    boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     return mp_impl->fetch_value_from_result();
 }
 
@@ -176,7 +175,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
     {
-        ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+        std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
 
         if (mp_impl->m_interpret_status.result)
         {
@@ -286,7 +285,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
 
 void formula_cell::reset()
 {
-    ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     delete mp_impl->m_interpret_status.result;
     mp_impl->m_interpret_status.result = NULL;
     mp_impl->reset_flag();
@@ -321,7 +320,7 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
 
 const formula_result* formula_cell::get_result_cache() const
 {
-    ::boost::mutex::scoped_lock lock(mp_impl->m_interpret_status.mtx);
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     return mp_impl->m_interpret_status.result;
 }
 
