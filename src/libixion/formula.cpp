@@ -21,6 +21,7 @@
 #define DEBUG_FORMULA_API 0
 
 #include <sstream>
+#include <algorithm>
 
 #if DEBUG_FORMULA_API
 #include <iostream>

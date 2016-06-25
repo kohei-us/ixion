@@ -24,6 +24,8 @@
 #include <vector>
 #include <iostream>
 
+#include <boost/noncopyable.hpp>
+
 #define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;

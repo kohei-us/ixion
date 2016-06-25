@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <vector>
+#include <algorithm>
 
 #define DEBUG_FUNCTION_OBJECTS 0
 
