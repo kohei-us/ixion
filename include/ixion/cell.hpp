@@ -8,16 +8,17 @@
 #ifndef INCLUDED_IXION_CELL_HPP
 #define INCLUDED_IXION_CELL_HPP
 
-#include "ixion/formula_tokens.hpp"
-#include "ixion/address.hpp"
 #include "ixion/types.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace ixion {
 
 class formula_result;
 class formula_cell;
+class formula_token_base;
+struct abs_address_t;
 
 namespace iface {
 
@@ -28,13 +29,12 @@ class formula_model_access;
 class IXION_DLLPUBLIC formula_cell
 {
     struct impl;
-
     std::unique_ptr<impl> mp_impl;
 
+public:
     formula_cell(const formula_cell&) = delete;
     formula_cell& operator= (formula_cell) = delete;
 
-public:
     formula_cell();
     formula_cell(size_t tokens_identifier);
     ~formula_cell();
@@ -69,4 +69,5 @@ public:
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
