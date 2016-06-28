@@ -175,7 +175,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
     {
-        std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+        std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
 
         if (mp_impl->m_interpret_status.result)
         {
@@ -285,7 +285,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
 
 void formula_cell::reset()
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     mp_impl->m_interpret_status.result.reset();
     mp_impl->reset_flag();
 }
@@ -319,7 +319,7 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
 
 const formula_result* formula_cell::get_result_cache() const
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     return mp_impl->m_interpret_status.result.get();
 }
 
