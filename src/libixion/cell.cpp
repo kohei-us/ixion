@@ -207,9 +207,9 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
             // Interpretation ended with an error condition.
             mp_impl->m_interpret_status.result->set_error(fin.get_error());
         }
-
-        mp_impl->m_interpret_status.cond.notify_all();
     }
+
+    mp_impl->m_interpret_status.cond.notify_all();
 }
 
 void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
