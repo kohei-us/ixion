@@ -13,6 +13,7 @@
 #include "ixion/formula_tokens.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/interface/session_handler.hpp"
+#include "ixion/global.hpp"
 
 #include "formula_interpreter.hpp"
 
@@ -46,14 +47,9 @@ struct interpret_status
     std::mutex mtx;
     std::condition_variable cond;
 
-    formula_result* result;
+    std::unique_ptr<formula_result> result;
 
     interpret_status() : result(nullptr) {}
-
-    ~interpret_status()
-    {
-        delete result;
-    }
 };
 
 struct formula_cell::impl
@@ -117,7 +113,9 @@ struct formula_cell::impl
             __IXION_DEBUG_OUT__ << "circular dependency detected !!" << endl;
 #endif
             assert(!m_interpret_status.result);
-            m_interpret_status.result = new formula_result(fe_ref_result_not_available);
+            m_interpret_status.result =
+                ixion::make_unique<formula_result>(fe_ref_result_not_available);
+
             return false;
         }
         return true;
@@ -198,7 +196,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 
         formula_interpreter fin(this, context);
         fin.set_origin(pos);
-        mp_impl->m_interpret_status.result = new formula_result;
+        mp_impl->m_interpret_status.result = ixion::make_unique<formula_result>();
         if (fin.interpret())
         {
             // Successful interpretation.
@@ -288,8 +286,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
 void formula_cell::reset()
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
-    delete mp_impl->m_interpret_status.result;
-    mp_impl->m_interpret_status.result = NULL;
+    mp_impl->m_interpret_status.result.reset();
     mp_impl->reset_flag();
 }
 
@@ -323,7 +320,7 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
 const formula_result* formula_cell::get_result_cache() const
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
-    return mp_impl->m_interpret_status.result;
+    return mp_impl->m_interpret_status.result.get();
 }
 
 bool formula_cell::is_shared() const
