@@ -5,12 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_CELL_QUEUE_MANAGER_HPP__
-#define __IXION_CELL_QUEUE_MANAGER_HPP__
+#ifndef INCLUDED_IXION_CELL_QUEUE_MANAGER_HPP
+#define INCLUDED_IXION_CELL_QUEUE_MANAGER_HPP
 
 #include "ixion/global.hpp"
 
 #include <cstdlib>
+#include <memory>
+#include <vector>
 
 namespace ixion {
 
@@ -21,6 +23,8 @@ namespace iface {
 class formula_model_access;
 
 }
+
+#if 0
 
 /**
  * This class manages parallel cell interpretation using threads.  This
@@ -56,7 +60,26 @@ private:
     ~cell_queue_manager();
 };
 
+#else
+
+class formula_cell_queue
+{
+    struct impl;
+    std::unique_ptr<impl> mp_impl;
+
+public:
+    formula_cell_queue() = delete;
+
+    formula_cell_queue(iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells);
+    ~formula_cell_queue();
+
+    void run();
+};
+
+#endif
+
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

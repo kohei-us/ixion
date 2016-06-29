@@ -30,6 +30,8 @@ using ::boost::condition_variable;
 
 namespace ixion {
 
+#if 0
+
 namespace {
 
 /**
@@ -316,5 +318,30 @@ void cell_queue_manager::terminate()
     thr_queue.join();
 }
 
+#else
+
+struct formula_cell_queue::impl
+{
+    iface::formula_model_access& m_context;
+    std::vector<abs_address_t> m_cells;
+
+    impl(iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells) :
+        m_context(cxt), m_cells(cells) {}
+};
+
+formula_cell_queue::formula_cell_queue(
+    iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells) :
+    mp_impl(ixion::make_unique<impl>(cxt, std::move(cells))) {}
+
+formula_cell_queue::~formula_cell_queue() {}
+
+void formula_cell_queue::run()
+{
+    // TODO : implement this.
 }
+
+#endif
+
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
