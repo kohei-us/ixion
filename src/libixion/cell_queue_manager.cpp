@@ -10,337 +10,125 @@
 
 #include "ixion/interface/formula_model_access.hpp"
 
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-
 #include <cassert>
-#include <iostream>
 #include <queue>
-#include <string>
-#include <vector>
-
-using ::std::string;
-using ::std::cout;
-using ::std::endl;
-using ::std::ostringstream;
-using ::std::queue;
-using ::boost::mutex;
-using ::boost::thread;
-using ::boost::condition_variable;
+#include <future>
+#include <algorithm>
 
 namespace ixion {
 
-#if 0
-
 namespace {
 
-/**
- * Data for each worker thread.
- */
-struct worker_thread_data
+class interpreter_queue
 {
-    struct init_status_data
+    using future_type = std::future<void>;
+
+    iface::formula_model_access& m_context;
+
+    std::queue<future_type> m_futures;
+    std::mutex m_mtx;
+    std::condition_variable m_cond;
+
+    size_t m_max_queue;
+
+    void interpret(formula_cell* p, const abs_address_t& pos)
     {
-        mutex mtx;
-        condition_variable cond;
-        bool ready;
+        p->interpret(m_context, pos);
+    }
 
-        init_status_data() : ready(false) {}
-    };
+public:
+    interpreter_queue(iface::formula_model_access& cxt, size_t max_queue) :
+        m_context(cxt), m_max_queue(max_queue) {}
 
-    struct action_data
+    /**
+     * Push one formula cell to the interpreter queue for future
+     * intepretation.
+     *
+     * @param p pointer to formula cell instance.
+     * @param pos position of the formual cell.
+     */
+    void push(formula_cell* p, const abs_address_t& pos)
     {
-        mutex mtx;
-        condition_variable cond;
-        abs_address_t fcell;
-        formula_cell* cell;
-        bool cell_active;
-        bool terminate_requested;
+        std::unique_lock<std::mutex> lock(m_mtx);
 
-        action_data() : cell(NULL), cell_active(false), terminate_requested(false) {}
-    };
+        while (m_futures.size() >= m_max_queue)
+            m_cond.wait(lock);
 
-    thread thr_main;
+        future_type f = std::async(
+            std::launch::async, &interpreter_queue::interpret, this, p, pos);
+        m_futures.push(std::move(f));
+        lock.unlock();
 
-    init_status_data init_status;
-    action_data action;
+        m_cond.notify_one();
+    }
 
-    worker_thread_data() {}
-};
-
-typedef std::vector<std::unique_ptr<worker_thread_data>> worker_threads_type;
-
-/**
- * This structure keeps track of idle worker threads.
- */
-struct worker_thread_status
-{
-    mutex mtx;
-    condition_variable cond;
-    queue<worker_thread_data*> idle_wts;
-    worker_thread_status() {}
-
-    void reset()
+    /**
+     * Wait for one formula cell to finish its interpretation.
+     */
+    void wait_one()
     {
-        while (!idle_wts.empty())
-            idle_wts.pop();
+        std::unique_lock<std::mutex> lock(m_mtx);
+
+        while (m_futures.empty())
+            m_cond.wait(lock);
+
+        future_type ret = std::move(m_futures.front());
+        m_futures.pop();
+
+        ret.get();  // This may throw if an exception was thrown on the thread.
+
+        lock.unlock();
+        m_cond.notify_one();
     }
 };
 
-worker_thread_status wts;
-
-/**
- * Main worker thread routine.
- */
-void worker_main(worker_thread_data* data, iface::formula_model_access* context)
-{
-    mutex::scoped_lock lock_cell(data->action.mtx);
-    {
-        mutex::scoped_lock lock_ready(data->init_status.mtx);
-        data->init_status.ready = true;
-        data->init_status.cond.notify_all();
-    }
-
-    while (!data->action.terminate_requested)
-    {
-        {
-            // Register itself as an idle thread.
-            mutex::scoped_lock lock_wts(wts.mtx);
-            wts.idle_wts.push(data);
-            wts.cond.notify_all();
-        }
-        data->action.cond.wait(lock_cell);
-
-        if (!data->action.cell_active)
-            continue;
-
-        formula_cell* p = context->get_formula_cell(data->action.fcell);
-        p->interpret(*context, data->action.fcell);
-        data->action.cell_active = false;
-    }
 }
-
-enum manage_queue_action_t
-{
-    qm_no_action,
-    qm_cell_added_to_queue,
-    qm_terminate_requested
-};
-
-struct manage_queue_data
-{
-    // thread ready
-
-    mutex mtx_thread_ready;
-    worker_threads_type workers;
-    condition_variable cond_thread_ready;
-    bool thread_ready;
-
-    // queue status
-
-    mutex mtx_queue;
-    condition_variable cond_queue;
-    queue<abs_address_t> cells;
-    manage_queue_action_t action;
-
-    manage_queue_data() :
-        thread_ready(false),
-        action(qm_no_action) {}
-
-    void reset()
-    {
-        thread_ready = false;
-        action = qm_no_action;
-        while (!cells.empty())
-            cells.pop();
-    }
-};
-
-manage_queue_data data;
-
-void init_workers(size_t worker_count, iface::formula_model_access* context)
-{
-    // Create specified number of worker threads.
-    for (size_t i = 0; i < worker_count; ++i)
-    {
-        data.workers.push_back(make_unique<worker_thread_data>());
-        worker_thread_data& wt = *data.workers.back();
-        wt.thr_main = thread(::boost::bind(worker_main, &wt, context));
-    }
-
-    // Wait until the worker threads become ready.
-    worker_threads_type::iterator itr = data.workers.begin(), itr_end = data.workers.end();
-    for (; itr != itr_end; ++itr)
-    {
-        worker_thread_data& wt = **itr;
-        mutex::scoped_lock lock(wt.init_status.mtx);
-        while (!wt.init_status.ready)
-            wt.init_status.cond.wait(lock);
-    }
-}
-
-void terminate_workers()
-{
-    worker_threads_type::iterator itr = data.workers.begin(), itr_end = data.workers.end();
-    for (; itr != itr_end; ++itr)
-    {
-        worker_thread_data& wt = **itr;
-        mutex::scoped_lock lock(wt.action.mtx);
-        wt.action.terminate_requested = true;
-        wt.action.cond.notify_all();
-    }
-
-    itr = data.workers.begin();
-    for (; itr != itr_end; ++itr)
-        (*itr)->thr_main.join();
-}
-
-void interpret_cell(worker_thread_data& wt)
-{
-    mutex::scoped_lock lock(wt.action.mtx);
-
-    // When we obtain the lock, the cell is expected to be inactive.
-    assert(!wt.action.cell_active);
-
-    wt.action.fcell = data.cells.front();
-    wt.action.cell_active = true;
-    data.cells.pop();
-    wt.action.cond.notify_all();
-}
-
-/**
- * Main queue manager thread routine.
- */
-void manage_queue_main(size_t worker_count, iface::formula_model_access* context)
-{
-    mutex::scoped_lock lock(data.mtx_queue);
-    {
-        mutex::scoped_lock lock(data.mtx_thread_ready);
-        init_workers(worker_count, context);
-        data.thread_ready = true;
-        data.cond_thread_ready.notify_all();
-    }
-
-    while (data.action != qm_terminate_requested)
-    {
-        data.cond_queue.wait(lock);
-        if (data.action == qm_cell_added_to_queue)
-        {
-            data.action = qm_no_action;
-
-            mutex::scoped_lock wts_lock(wts.mtx);
-            while (!wts.idle_wts.empty())
-            {
-                if (data.cells.empty())
-                    // No more cells to interpret.  Bail out.
-                    break;
-
-                worker_thread_data& wt = *wts.idle_wts.front();
-                wts.idle_wts.pop();
-                interpret_cell(wt);
-            }
-        }
-    }
-
-    // Termination is being requested.  Finish interpreting the rest of the
-    // cells, as no more new cells will be added.
-
-    while (!data.cells.empty())
-    {
-        mutex::scoped_lock wts_lock(wts.mtx);
-        if (wts.idle_wts.empty())
-            // In case no threads are idle, wait until one becomes idle.
-            wts.cond.wait(wts_lock);
-
-        while (!wts.idle_wts.empty())
-        {
-            if (data.cells.empty())
-                // No more cells to interpret.  Bail out.
-                break;
-
-            worker_thread_data& wt = *wts.idle_wts.front();
-            wts.idle_wts.pop();
-            interpret_cell(wt);
-        }
-    }
-
-    terminate_workers();
-}
-
-void add_cell_to_queue(const abs_address_t& cell)
-{
-    ::boost::mutex::scoped_lock lock(data.mtx_queue);
-    data.cells.push(cell);
-    data.action = qm_cell_added_to_queue;
-    data.cond_queue.notify_all();
-}
-
-void terminate_queue_thread()
-{
-    ::boost::mutex::scoped_lock lock(data.mtx_queue);
-    data.action = qm_terminate_requested;
-    data.cond_queue.notify_all();
-}
-
-/**
- * Wait until the manage queue thread becomes ready.
- */
-void wait_init()
-{
-    mutex::scoped_lock lock(data.mtx_thread_ready);
-    while (!data.thread_ready)
-        data.cond_thread_ready.wait(lock);
-}
-
-thread thr_queue;
-
-} // anonymous namespace
-
-void cell_queue_manager::init(size_t thread_count, iface::formula_model_access& context)
-{
-    // Don't forget to reset the global data.
-    data.reset();
-    wts.reset();
-
-    thread thr(::boost::bind(manage_queue_main, thread_count, &context));
-    thr_queue.swap(thr);
-    wait_init();
-}
-
-void cell_queue_manager::add_cell(const abs_address_t& cell)
-{
-    add_cell_to_queue(cell);
-}
-
-void cell_queue_manager::terminate()
-{
-    terminate_queue_thread();
-    thr_queue.join();
-}
-
-#else
 
 struct formula_cell_queue::impl
 {
     iface::formula_model_access& m_context;
     std::vector<abs_address_t> m_cells;
+    size_t m_thread_count;
 
-    impl(iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells) :
-        m_context(cxt), m_cells(cells) {}
+    impl(iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells, size_t thread_count) :
+        m_context(cxt),
+        m_cells(cells),
+        m_thread_count(thread_count) {}
+
+    void thread_launch(interpreter_queue* queue)
+    {
+        std::for_each(m_cells.begin(), m_cells.end(),
+            [&](const abs_address_t& pos)
+            {
+                formula_cell* p = m_context.get_formula_cell(pos);
+                queue->push(p, pos);
+            }
+        );
+    }
+
+    void run()
+    {
+        interpreter_queue queue(m_context, m_thread_count);
+
+        std::thread t(&formula_cell_queue::impl::thread_launch, this, &queue);
+
+        for (size_t i = 0, n = m_cells.size(); i < n; ++i)
+            queue.wait_one();
+
+        t.join();
+    }
 };
 
 formula_cell_queue::formula_cell_queue(
-    iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells) :
-    mp_impl(ixion::make_unique<impl>(cxt, std::move(cells))) {}
+    iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells, size_t thread_count) :
+    mp_impl(ixion::make_unique<impl>(cxt, std::move(cells), thread_count)) {}
 
 formula_cell_queue::~formula_cell_queue() {}
 
 void formula_cell_queue::run()
 {
-    // TODO : implement this.
+    mp_impl->run();
 }
-
-#endif
 
 }
 

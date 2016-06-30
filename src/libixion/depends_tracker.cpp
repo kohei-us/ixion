@@ -83,21 +83,9 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
         return;
     }
 
-#if 1
-    formula_cell_queue queue(m_context, std::move(sorted_cells));
-    queue.run();
-#else
     // Interpret cells in topological order using threads.
-    cell_queue_manager::init(thread_count, m_context);
-    std::for_each(sorted_cells.begin(), sorted_cells.end(),
-        [&](const abs_address_t& pos)
-        {
-            cell_queue_manager::add_cell(pos);
-        }
-    );
-
-    cell_queue_manager::terminate();
-#endif
+    formula_cell_queue queue(m_context, std::move(sorted_cells), thread_count);
+    queue.run();
 }
 
 void dependency_tracker::topo_sort_cells(vector<abs_address_t>& sorted_cells) const
