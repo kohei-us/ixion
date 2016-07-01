@@ -619,14 +619,14 @@ double count_formula_block(
 
         switch (res->get_type())
         {
-            case formula_result::rt_value:
+            case formula_result::result_type::value:
                 if (vt.is_numeric())
                     ++ret;
             break;
-            case formula_result::rt_string:
+            case formula_result::result_type::string:
                 if (vt.is_string())
                     ++ret;
-            case formula_result::rt_error:
+            case formula_result::result_type::error:
                 // TODO : how do we handle error formula cells?
             break;
         }
@@ -1003,9 +1003,9 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
             const formula_result* res_cache = p->get_result_cache();
             switch (res_cache->get_type())
             {
-                case formula_result::rt_string:
+                case formula_result::result_type::string:
                     return res_cache->get_string();
-                case formula_result::rt_error:
+                case formula_result::result_type::error:
                     // TODO : perhaps we should return the error string here.
                 default:
                     ;

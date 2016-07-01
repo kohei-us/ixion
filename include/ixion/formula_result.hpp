@@ -31,7 +31,7 @@ class IXION_DLLPUBLIC formula_result
     std::unique_ptr<impl> mp_impl;
 
 public:
-    enum result_type { rt_value, rt_string, rt_error };
+    enum class result_type { value, string, error };
 
     formula_result();
     formula_result(const formula_result& r);

@@ -32,22 +32,22 @@ struct formula_result::impl
         formula_error_t m_error;
     };
 
-    impl() : m_type(formula_result::rt_value), m_value(0.0) {}
-    impl(double v) : m_type(rt_value), m_value(v) {}
-    impl(string_id_t strid) : m_type(rt_string), m_str_identifier(strid) {}
-    impl(formula_error_t e) : m_type(rt_error), m_error(e) {}
+    impl() : m_type(result_type::value), m_value(0.0) {}
+    impl(double v) : m_type(result_type::value), m_value(v) {}
+    impl(string_id_t strid) : m_type(result_type::string), m_str_identifier(strid) {}
+    impl(formula_error_t e) : m_type(result_type::error), m_error(e) {}
 
     impl(const impl& other) : m_type(other.m_type)
     {
         switch (m_type)
         {
-            case formula_result::rt_value:
+            case result_type::value:
                 m_value = other.m_value;
             break;
-            case formula_result::rt_string:
+            case result_type::string:
                 m_str_identifier = other.m_str_identifier;
             break;
-            case formula_result::rt_error:
+            case result_type::error:
                 m_error = other.m_error;
             break;
             default:
@@ -57,47 +57,47 @@ struct formula_result::impl
 
     void reset()
     {
-        m_type = rt_value;
+        m_type = result_type::value;
         m_value = 0.0;
     }
 
     void set_value(double v)
     {
-        m_type = rt_value;
+        m_type = result_type::value;
         m_value = v;
     }
 
     void set_string(string_id_t strid)
     {
-        m_type = rt_string;
+        m_type = result_type::string;
         m_str_identifier = strid;
     }
 
     void set_error(formula_error_t e)
     {
-        m_type = rt_error;
+        m_type = result_type::error;
         m_error = e;
     }
 
     double get_value() const
     {
-        assert(m_type == rt_value);
+        assert(m_type == result_type::value);
         return m_value;
     }
 
     string_id_t get_string() const
     {
-        assert(m_type == rt_string);
+        assert(m_type == result_type::string);
         return m_str_identifier;
     }
 
     formula_error_t get_error() const
     {
-        assert(m_type == rt_error);
+        assert(m_type == result_type::error);
         return m_error;
     }
 
-    formula_result::result_type get_type() const
+    result_type get_type() const
     {
         return m_type;
     }
@@ -106,14 +106,14 @@ struct formula_result::impl
     {
         switch (m_type)
         {
-            case rt_error:
+            case result_type::error:
                 return string(get_formula_error_name(m_error));
-            case rt_string:
+            case result_type::string:
             {
                 const string* p = cxt.get_string(m_str_identifier);
                 return p ? *p : string();
             }
-            case rt_value:
+            case result_type::value:
             {
                 ostringstream os;
                 os << m_value;
@@ -138,7 +138,7 @@ struct formula_result::impl
         {
             // parse this as a number.
             m_value = global::to_double(p, n);
-            m_type = rt_value;
+            m_type = result_type::value;
         }
 
     }
@@ -148,13 +148,13 @@ struct formula_result::impl
         m_type = r.mp_impl->m_type;
         switch (m_type)
         {
-            case rt_value:
+            case result_type::value:
                 m_value = r.mp_impl->m_value;
             break;
-            case rt_string:
+            case result_type::string:
                 m_str_identifier = r.mp_impl->m_str_identifier;
             break;
-            case rt_error:
+            case result_type::error:
                 m_error = r.mp_impl->m_error;
             break;
             default:
@@ -169,13 +169,13 @@ struct formula_result::impl
 
         switch (m_type)
         {
-            case rt_value:
+            case result_type::value:
                 return m_value == r.mp_impl->m_value;
             break;
-            case rt_string:
+            case result_type::string:
                 return m_str_identifier == r.mp_impl->m_str_identifier;
             break;
-            case rt_error:
+            case result_type::error:
                 return m_error == r.mp_impl->m_error;
             break;
             default:
@@ -211,7 +211,7 @@ struct formula_result::impl
                 else
                     throw general_error("failed to parse error string in formula_result::parse_error().");
 
-                m_type = rt_error;
+                m_type = result_type::error;
                 return;
             }
 
@@ -245,7 +245,7 @@ struct formula_result::impl
         if (!len)
             throw general_error("failed to parse string result.");
 
-        m_type = rt_string;
+        m_type = result_type::string;
         m_str_identifier = cxt.add_string(p_first, len);
     }
 };

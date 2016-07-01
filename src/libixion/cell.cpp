@@ -127,11 +127,11 @@ struct formula_cell::impl
             // Result not cached yet.  Reference error.
             throw formula_error(formula_error_t::ref_result_not_available);
 
-        if (m_interpret_status.result->get_type() == formula_result::rt_error)
+        if (m_interpret_status.result->get_type() == formula_result::result_type::error)
             // Error condition.
             throw formula_error(m_interpret_status.result->get_error());
 
-        assert(m_interpret_status.result->get_type() == formula_result::rt_value);
+        assert(m_interpret_status.result->get_type() == formula_result::result_type::value);
         return m_interpret_status.result->get_value();
     }
 };
@@ -181,7 +181,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
         {
             // When the result is already cached before the cell is interpreted,
             // it can mean the cell has circular dependency.
-            if (mp_impl->m_interpret_status.result->get_type() == formula_result::rt_error)
+            if (mp_impl->m_interpret_status.result->get_type() == formula_result::result_type::error)
             {
                 auto handler = context.create_session_handler();
                 if (handler)

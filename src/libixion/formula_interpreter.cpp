@@ -363,13 +363,13 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
 
                     switch (res->get_type())
                     {
-                        case formula_result::rt_value:
+                        case formula_result::result_type::value:
                         {
                             vt = stack_value_t::value;
                             val = res->get_value();
                             return true;
                         }
-                        case formula_result::rt_string:
+                        case formula_result::result_type::string:
                         {
                             vt = stack_value_t::string;
                             string_id_t strid = res->get_string();
@@ -379,7 +379,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                             str = *ps;
                             return true;
                         }
-                        case formula_result::rt_error:
+                        case formula_result::result_type::error:
                         default:
                             return false;
                     }

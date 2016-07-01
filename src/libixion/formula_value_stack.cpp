@@ -248,9 +248,9 @@ const std::string value_stack_t::pop_string()
 
                     switch (res->get_type())
                     {
-                        case formula_result::rt_error:
+                        case formula_result::result_type::error:
                             throw formula_error(res->get_error());
-                        case formula_result::rt_string:
+                        case formula_result::result_type::string:
                         {
                             const std::string* ps = m_context.get_string(res->get_string());
                             if (!ps)
@@ -258,7 +258,7 @@ const std::string value_stack_t::pop_string()
                             return *ps;
                         }
                         break;
-                        case formula_result::rt_value:
+                        case formula_result::result_type::value:
                         {
                             std::ostringstream os;
                             os << res->get_value();
