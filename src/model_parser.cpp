@@ -549,14 +549,12 @@ void model_parser::check()
                     case celltype_t::formula:
                     {
                         const formula_cell* fcell = m_context.get_formula_cell(addr);
-                        const formula_result* res_cell = fcell->get_result_cache();
-                        if (!res_cell)
-                            throw check_error("result is not cached");
+                        const formula_result& res_cell = fcell->get_result_cache();
 
-                        if (*res_cell != res)
+                        if (res_cell != res)
                         {
                             ostringstream os;
-                            os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell->str(m_context) << ")";
+                            os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell.str(m_context) << ")";
                             throw check_error(os.str());
                         }
                     }
@@ -596,14 +594,12 @@ void model_parser::check()
             case formula_name_t::named_expression:
             {
                 const formula_cell* fcell = m_context.get_named_expression(name);
-                const formula_result* res_cell = fcell->get_result_cache();
-                if (!res_cell)
-                    throw check_error("result is not cached");
+                const formula_result& res_cell = fcell->get_result_cache();
 
-                if (*res_cell != res)
+                if (res_cell != res)
                 {
                     ostringstream os;
-                    os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell->str(m_context) << ")";
+                    os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell.str(m_context) << ")";
                     throw check_error(os.str());
                 }
             }

@@ -72,7 +72,8 @@ public:
     std::vector<const formula_token*> get_ref_tokens(
         const iface::formula_model_access& cxt, const abs_address_t& pos) const;
 
-    const formula_result* get_result_cache() const;
+    const formula_result& get_result_cache() const;
+    const formula_result* get_result_cache_nowait() const;
 
     bool is_shared() const;
     void set_shared(bool b);

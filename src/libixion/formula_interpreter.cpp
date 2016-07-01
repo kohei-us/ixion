@@ -175,9 +175,7 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
             if (!fcell)
                 return;
 
-            const formula_result* fres = fcell->get_result_cache();
-            if (fres)
-                res = *fres;
+            res = fcell->get_result_cache();
         }
         break;
         case celltype_t::numeric:
@@ -358,22 +356,20 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                 {
                     const formula_cell* fc = cxt.get_formula_cell(addr);
                     assert(fc);
-                    const formula_result* res = fc->get_result_cache();
-                    if (!res)
-                        return false;
+                    const formula_result& res = fc->get_result_cache();
 
-                    switch (res->get_type())
+                    switch (res.get_type())
                     {
                         case formula_result::result_type::value:
                         {
                             vt = stack_value_t::value;
-                            val = res->get_value();
+                            val = res.get_value();
                             return true;
                         }
                         case formula_result::result_type::string:
                         {
                             vt = stack_value_t::string;
-                            string_id_t strid = res->get_string();
+                            string_id_t strid = res.get_string();
                             const string* ps = cxt.get_string(strid);
                             if (!ps)
                                 return false;

@@ -243,17 +243,15 @@ const std::string value_stack_t::pop_string()
                 case celltype_t::formula:
                 {
                     const formula_cell* fc = m_context.get_formula_cell(addr);
-                    const formula_result* res = fc->get_result_cache();
-                    if (!res)
-                        break;
+                    const formula_result& res = fc->get_result_cache();
 
-                    switch (res->get_type())
+                    switch (res.get_type())
                     {
                         case formula_result::result_type::error:
-                            throw formula_error(res->get_error());
+                            throw formula_error(res.get_error());
                         case formula_result::result_type::string:
                         {
-                            const std::string* ps = m_context.get_string(res->get_string());
+                            const std::string* ps = m_context.get_string(res.get_string());
                             if (!ps)
                                 throw formula_error(formula_error_t::stack_error);
                             return *ps;
@@ -262,7 +260,7 @@ const std::string value_stack_t::pop_string()
                         case formula_result::result_type::value:
                         {
                             std::ostringstream os;
-                            os << res->get_value();
+                            os << res.get_value();
                             return os.str();
                         }
                         default:

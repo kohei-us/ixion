@@ -323,9 +323,19 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
     return ret;
 }
 
-const formula_result* formula_cell::get_result_cache() const
+const formula_result& formula_cell::get_result_cache() const
 {
-    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    mp_impl->wait_for_interpreted_result(lock);
+    if (!mp_impl->m_interpret_status.result)
+        throw formula_error(formula_error_t::ref_result_not_available);
+
+    return *mp_impl->m_interpret_status.result;
+}
+
+const formula_result* formula_cell::get_result_cache_nowait() const
+{
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     return mp_impl->m_interpret_status.result.get();
 }
 

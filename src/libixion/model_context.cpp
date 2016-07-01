@@ -613,11 +613,9 @@ double count_formula_block(
     for (; pp != pp_end; ++pp)
     {
         const formula_cell& fc = **pp;
-        const formula_result* res = fc.get_result_cache();
-        if (!res)
-            continue;
+        const formula_result& res = fc.get_result_cache();
 
-        switch (res->get_type())
+        switch (res.get_type())
         {
             case formula_result::result_type::value:
                 if (vt.is_numeric())
@@ -1000,7 +998,10 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
         case ixion::element_type_formula:
         {
             const formula_cell* p = col_store.get<formula_cell*>(addr.row);
-            const formula_result* res_cache = p->get_result_cache();
+            const formula_result* res_cache = p->get_result_cache_nowait();
+            if (!res_cache)
+                break;
+
             switch (res_cache->get_type())
             {
                 case formula_result::result_type::string:
@@ -1010,6 +1011,7 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
                 default:
                     ;
             }
+            break;
         }
         default:
             ;
