@@ -6,20 +6,33 @@
  */
 
 #include "ixion/matrix.hpp"
+#include "ixion/global.hpp"
+
+#include <mdds/multi_type_matrix.hpp>
 
 namespace ixion {
 
+typedef mdds::multi_type_matrix<mdds::mtm::std_string_trait> store_type;
+
+struct matrix::impl
+{
+    store_type m_data;
+
+    impl(size_t rows, size_t cols) : m_data(rows, cols) {}
+    impl(const impl& other) : m_data(other.m_data) {}
+};
+
 matrix::matrix(size_t rows, size_t cols) :
-    m_data(rows, cols) {}
+    mp_impl(ixion::make_unique<impl>(rows, cols)) {}
 
 matrix::matrix(const matrix& other) :
-    m_data(other.m_data) {}
+    mp_impl(ixion::make_unique<impl>(*other.mp_impl)) {}
 
 matrix::~matrix() {}
 
 bool matrix::is_numeric(size_t row, size_t col) const
 {
-    switch (m_data.get_type(row, col))
+    switch (mp_impl->m_data.get_type(row, col))
     {
         case mdds::mtm::element_numeric:
         case mdds::mtm::element_boolean:
@@ -33,18 +46,25 @@ bool matrix::is_numeric(size_t row, size_t col) const
 
 double matrix::get_numeric(size_t row, size_t col) const
 {
-    return m_data.get_numeric(row, col);
+    return mp_impl->m_data.get_numeric(row, col);
 }
 
 void matrix::set(size_t row, size_t col, double val)
 {
-    m_data.set(row, col, val);
+    mp_impl->m_data.set(row, col, val);
 }
 
-matrix::size_pair_type matrix::size() const
+size_t matrix::row_size() const
 {
-    return m_data.size();
+    return mp_impl->m_data.size().row;
+}
+
+size_t matrix::col_size() const
+{
+    return mp_impl->m_data.size().column;
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
+

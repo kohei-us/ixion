@@ -14,6 +14,7 @@
 #include "ixion/interface/formula_model_access.hpp"
 
 #include <string>
+#include <sstream>
 
 namespace ixion {
 

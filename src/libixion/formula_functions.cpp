@@ -63,9 +63,10 @@ const char* unknown_func_name = "unknown";
 double sum_matrix_elements(const matrix& mx)
 {
     double sum = 0.0;
-    matrix::size_pair_type sz = mx.size();
-    for (size_t row = 0; row < sz.row; ++row)
-        for (size_t col = 0; col < sz.column; ++col)
+    size_t rows = mx.row_size();
+    size_t cols = mx.col_size();
+    for (size_t row = 0; row < rows; ++row)
+        for (size_t col = 0; col < cols; ++col)
             sum += mx.get_numeric(row, col);
 
     return sum;
@@ -301,10 +302,12 @@ void formula_functions::fnc_average(value_stack_t& args) const
             case stack_value_t::range_ref:
             {
                 matrix mx = args.pop_range_value();
-                matrix::size_pair_type sp = mx.size();
-                for (size_t r = 0; r < sp.row; ++r)
+                size_t rows = mx.row_size();
+                size_t cols = mx.col_size();
+
+                for (size_t r = 0; r < rows; ++r)
                 {
-                    for (size_t c = 0; c < sp.column; ++c)
+                    for (size_t c = 0; c < cols; ++c)
                     {
                         if (!mx.is_numeric(r, c))
                             continue;
