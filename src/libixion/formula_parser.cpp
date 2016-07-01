@@ -10,6 +10,7 @@
 #include "ixion/interface/formula_model_access.hpp"
 
 #include "formula_functions.hpp"
+#include "concrete_formula_tokens.hpp"
 
 #include <iostream>
 #include <sstream>

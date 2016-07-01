@@ -258,6 +258,8 @@
                 <F N="../src/libixion/cell_listener_tracker.cpp"/>
                 <F N="../src/libixion/cell_queue_manager.cpp"/>
                 <F N="../src/libixion/cell_queue_manager.hpp"/>
+                <F N="../src/libixion/concrete_formula_tokens.cpp"/>
+                <F N="../src/libixion/concrete_formula_tokens.hpp"/>
                 <F N="../src/libixion/config.cpp"/>
                 <F N="../src/libixion/constants.inl"/>
                 <F N="../src/libixion/depends_tracker.cpp"/>

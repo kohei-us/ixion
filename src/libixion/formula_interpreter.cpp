@@ -7,6 +7,7 @@
 
 #include "formula_interpreter.hpp"
 #include "formula_functions.hpp"
+#include "concrete_formula_tokens.hpp"
 
 #include "ixion/cell.hpp"
 #include "ixion/global.hpp"

@@ -8,6 +8,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	cell.cpp \
 	cell_queue_manager.hpp \
 	cell_queue_manager.cpp \
+	concrete_formula_tokens.hpp \
+	concrete_formula_tokens.cpp \
 	config.cpp \
 	depends_tracker.hpp \
 	depends_tracker.cpp \
