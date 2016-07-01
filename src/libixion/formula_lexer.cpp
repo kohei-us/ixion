@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_lexer.hpp"
+#include "formula_lexer.hpp"
 #include "ixion/global.hpp"
 
 #include <cassert>

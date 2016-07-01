@@ -644,7 +644,7 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
 
     double ret = 0.0;
     sheet_t last_sheet = range.last.sheet;
-    if (last_sheet >= m_sheets.size())
+    if (static_cast<size_t>(last_sheet) >= m_sheets.size())
         last_sheet = m_sheets.size() - 1;
 
     for (sheet_t sheet = range.first.sheet; sheet <= last_sheet; ++sheet)

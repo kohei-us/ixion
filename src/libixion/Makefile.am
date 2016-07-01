@@ -17,6 +17,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	formula_functions.cpp \
 	formula_interpreter.hpp \
 	formula_interpreter.cpp \
+	formula_lexer.hpp \
 	formula_lexer.cpp \
 	formula_name_resolver.cpp \
 	formula_parser.cpp \
