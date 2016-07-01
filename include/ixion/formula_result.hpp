@@ -5,12 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_RESULT_HPP__
-#define __IXION_FORMULA_RESULT_HPP__
+#ifndef INCLUDED_IXION_FORMULA_RESULT_HPP
+#define INCLUDED_IXION_FORMULA_RESULT_HPP
 
 #include "ixion/global.hpp"
 
 #include <string>
+#include <memory>
 
 namespace ixion {
 
@@ -26,6 +27,9 @@ class formula_model_access;
  */
 class IXION_DLLPUBLIC formula_result
 {
+    struct impl;
+    std::unique_ptr<impl> mp_impl;
+
 public:
     enum result_type { rt_value, rt_string, rt_error };
 
@@ -92,21 +96,10 @@ public:
     formula_result& operator= (const formula_result& r);
     bool operator== (const formula_result& r) const;
     bool operator!= (const formula_result& r) const;
-
-private:
-    void parse_error(const char* p, size_t n);
-    void parse_string(iface::formula_model_access& cxt, const char* p, size_t n);
-
-private:
-    result_type m_type;
-    union {
-        string_id_t m_str_identifier;
-        double m_value;
-        formula_error_t m_error;
-    };
 };
 
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
