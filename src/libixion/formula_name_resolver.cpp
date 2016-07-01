@@ -27,13 +27,13 @@ namespace ixion {
 
 namespace {
 
-bool resolve_function(const char* p, size_t n, formula_name_type& ret)
+bool resolve_function(const char* p, size_t n, formula_name_t& ret)
 {
     formula_function_t func_oc = formula_functions::get_function_opcode(p, n);
     if (func_oc != formula_function_t::func_unknown)
     {
         // This is a built-in function.
-        ret.type = formula_name_type::function;
+        ret.type = formula_name_t::function;
         ret.func_oc = func_oc;
         return true;
     }
@@ -59,7 +59,7 @@ bool resolve_function(const char* p, size_t n, formula_name_type& ret)
  * <li>#All</li>
  * </ul>
  */
-bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t n, formula_name_type& ret)
+bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t n, formula_name_t& ret)
 {
     if (!cxt)
         return false;
@@ -153,7 +153,7 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
         return false;
 
     ret.table.areas = table_area_none;
-    ret.type = formula_name_type::table_reference;
+    ret.type = formula_name_t::table_reference;
     ret.table.name = table_name.get();
     ret.table.name_length = table_name.size();
     ret.table.column_first = NULL;
@@ -213,16 +213,16 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
  * @param name name to be resolved
  * @param ret resolved name type
  */
-void resolve_function_or_name(const char* p, size_t n, formula_name_type& ret)
+void resolve_function_or_name(const char* p, size_t n, formula_name_t& ret)
 {
     if (resolve_function(p, n, ret))
         return;
 
     // Everything else is assumed to be a named expression.
-    ret.type = formula_name_type::named_expression;
+    ret.type = formula_name_t::named_expression;
 }
 
-void set_address(formula_name_type::address_type& dest, const address_t& addr)
+void set_address(formula_name_t::address_type& dest, const address_t& addr)
 {
     dest.sheet = addr.sheet;
     dest.row = addr.row;
@@ -232,9 +232,9 @@ void set_address(formula_name_type::address_type& dest, const address_t& addr)
     dest.abs_col = addr.abs_column;
 }
 
-void set_cell_reference(formula_name_type& ret, const address_t& addr)
+void set_cell_reference(formula_name_t& ret, const address_t& addr)
 {
-    ret.type = formula_name_type::cell_reference;
+    ret.type = formula_name_t::cell_reference;
     set_address(ret.address, addr);
 }
 
@@ -875,7 +875,7 @@ string abs_or_rel(bool _abs)
     return _abs ? "(abs)" : "(rel)";
 }
 
-string _to_string(const formula_name_type::address_type& addr)
+string _to_string(const formula_name_t::address_type& addr)
 {
     std::ostringstream os;
     os << "[sheet=" << addr.sheet << abs_or_rel(addr.abs_sheet) << ",row="
@@ -972,9 +972,9 @@ string to_string(const iface::formula_model_access* cxt, const table_t& table)
 
 } // anonymous namespace
 
-formula_name_type::formula_name_type() : type(invalid) {}
+formula_name_t::formula_name_t() : type(invalid) {}
 
-string formula_name_type::to_string() const
+string formula_name_t::to_string() const
 {
     std::ostringstream os;
 
@@ -1006,7 +1006,7 @@ string formula_name_type::to_string() const
     return os.str();
 }
 
-address_t to_address(const formula_name_type::address_type& src)
+address_t to_address(const formula_name_t::address_type& src)
 {
     address_t addr;
 
@@ -1020,7 +1020,7 @@ address_t to_address(const formula_name_type::address_type& src)
     return addr;
 }
 
-range_t to_range(const formula_name_type::range_type& src)
+range_t to_range(const formula_name_t::range_type& src)
 {
     range_t range;
     range.first = to_address(src.first);
@@ -1047,12 +1047,12 @@ public:
     excel_a1(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~excel_a1() {}
 
-    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
+    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
     {
 #if DEBUG_NAME_RESOLVER
         __IXION_DEBUG_OUT__ << "name=" << string(p,n) << "; origin=" << pos.get_name() << endl;
 #endif
-        formula_name_type ret;
+        formula_name_t ret;
         if (!n)
             return ret;
 
@@ -1111,7 +1111,7 @@ public:
             to_relative_address(parsed_addr, pos);
             set_address(ret.range.last, parsed_addr);
             ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
-            ret.type = formula_name_type::range_reference;
+            ret.type = formula_name_t::range_reference;
             return ret;
         }
 
@@ -1222,9 +1222,9 @@ class excel_r1c1 : public formula_name_resolver
 public:
     excel_r1c1(const iface::formula_model_access* cxt) : mp_cxt(cxt) {}
 
-    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
+    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
     {
-        formula_name_type ret;
+        formula_name_t ret;
         if (!n)
             return ret;
 
@@ -1260,7 +1260,7 @@ public:
 
                 set_address(ret.range.first, parsed_addr);
                 set_address(ret.range.last, parsed_addr2);
-                ret.type = formula_name_type::range_reference;
+                ret.type = formula_name_t::range_reference;
             }
             break;
             default:
@@ -1316,9 +1316,9 @@ public:
     odff_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~odff_resolver() {}
 
-    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const
+    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
     {
-        formula_name_type ret;
+        formula_name_t ret;
 
         if (resolve_function(p, n, ret))
             return ret;
@@ -1376,7 +1376,7 @@ public:
             to_relative_address(parsed_addr, pos);
             set_address(ret.range.last, parsed_addr);
             ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
-            ret.type = formula_name_type::range_reference;
+            ret.type = formula_name_t::range_reference;
             return ret;
         }
 

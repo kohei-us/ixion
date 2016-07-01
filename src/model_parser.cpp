@@ -276,8 +276,8 @@ void model_parser::parse_init(const char*& p)
         throw model_parser::parse_error("separator is missing");
     }
 
-    formula_name_type ret = mp_name_resolver->resolve(name.get(), name.size(), abs_address_t());
-    if (ret.type != formula_name_type::cell_reference)
+    formula_name_t ret = mp_name_resolver->resolve(name.get(), name.size(), abs_address_t());
+    if (ret.type != formula_name_t::cell_reference)
     {
         ostringstream os;
         os << "invalid cell name: " << name.str();
@@ -445,8 +445,8 @@ void model_parser::parse_table(const char*& p)
             return;
 
         abs_address_t pos(0,0,0);
-        formula_name_type ret = mp_name_resolver->resolve(value.get(), value.size(), pos);
-        if (ret.type != formula_name_type::range_reference)
+        formula_name_t ret = mp_name_resolver->resolve(value.get(), value.size(), pos);
+        if (ret.type != formula_name_t::range_reference)
             throw parse_error("range of a table is expected to be given as a range reference.");
 
         entry.range = to_range(ret.range).to_abs(pos);
@@ -534,12 +534,12 @@ void model_parser::check()
         const formula_result& res = itr->second;
         cout << name << " : " << res.str(m_context) << endl;
 
-        formula_name_type name_type = mp_name_resolver->resolve(&name[0], name.size(), abs_address_t());
+        formula_name_t name_type = mp_name_resolver->resolve(&name[0], name.size(), abs_address_t());
         switch (name_type.type)
         {
-            case formula_name_type::cell_reference:
+            case formula_name_t::cell_reference:
             {
-                const formula_name_type::address_type& _addr = name_type.address;
+                const formula_name_t::address_type& _addr = name_type.address;
                 abs_address_t addr(_addr.sheet, _addr.row, _addr.col);
 
                 switch (m_context.get_celltype(addr))
@@ -591,7 +591,7 @@ void model_parser::check()
                 }
             }
             break;
-            case formula_name_type::named_expression:
+            case formula_name_t::named_expression:
             {
                 const formula_cell* fcell = m_context.get_named_expression(name);
                 const formula_result* res_cell = fcell->get_result_cache();

@@ -493,17 +493,17 @@ void model_context_impl::set_shared_formula(
         const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
         const formula_name_resolver& resolver)
 {
-    formula_name_type name_type = resolver.resolve(p_range, n_range, abs_address_t());
+    formula_name_t name_type = resolver.resolve(p_range, n_range, abs_address_t());
     abs_range_t range;
     switch (name_type.type)
     {
-        case ixion::formula_name_type::cell_reference:
+        case ixion::formula_name_t::cell_reference:
             range.first.sheet = name_type.address.sheet;
             range.first.row = name_type.address.row;
             range.first.column = name_type.address.col;
             range.last = range.first;
         break;
-        case ixion::formula_name_type::range_reference:
+        case ixion::formula_name_t::range_reference:
             range.first.sheet = name_type.range.first.sheet;
             range.first.row = name_type.range.first.row;
             range.first.column = name_type.range.first.col;

@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_NAME_RESOLVER_HPP__
-#define __IXION_FORMULA_NAME_RESOLVER_HPP__
+#ifndef INCLUDED_IXION_FORMULA_NAME_RESOLVER_HPP
+#define INCLUDED_IXION_FORMULA_NAME_RESOLVER_HPP
 
 #include <string>
 #include <memory>
@@ -24,7 +24,19 @@ class formula_model_access;
 
 struct table_t;
 
-struct formula_name_type
+/**
+ * Structure that represents the type of a 'name' in a formula expression.
+ *
+ * A name can be either one of:
+ * <ul>
+ * <li>cell reference</li>
+ * <li>range reference</li>
+ * <li>table reference</li>
+ * <li>named expression</li>
+ * <li>function</li>
+ * </ul>
+ */
+struct IXION_DLLPUBLIC formula_name_t
 {
     enum name_type
     {
@@ -36,6 +48,9 @@ struct formula_name_type
         invalid
     };
 
+    /**
+     * Single cell address information for a cell reference name.
+     */
     struct address_type
     {
         sheet_t sheet;
@@ -46,12 +61,18 @@ struct formula_name_type
         bool abs_col:1;
     };
 
+    /**
+     * Range address information for a range reference name.
+     */
     struct range_type
     {
         address_type first;
         address_type last;
     };
 
+    /**
+     * Table information for a table reference name.
+     */
     struct table_type
     {
         const char* name;
@@ -73,25 +94,29 @@ struct formula_name_type
         formula_function_t func_oc; // function opcode
     };
 
-    formula_name_type();
+    formula_name_t();
 
     /**
      * Return a string that represents the data stored internally.  Useful for
      * debugging.
      */
-    ::std::string to_string() const;
+    std::string to_string() const;
 };
 
-IXION_DLLPUBLIC address_t to_address(const formula_name_type::address_type& src);
-IXION_DLLPUBLIC range_t to_range(const formula_name_type::range_type& src);
+IXION_DLLPUBLIC address_t to_address(const formula_name_t::address_type& src);
+IXION_DLLPUBLIC range_t to_range(const formula_name_t::range_type& src);
 
+/**
+ * Formula name resolvers resolves a name in a formula expression to a more
+ * concrete name type.
+ */
 class formula_name_resolver
 {
 public:
     formula_name_resolver();
     virtual ~formula_name_resolver() = 0;
 
-    virtual formula_name_type resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
+    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const table_t& table) const = 0;
@@ -124,4 +149,5 @@ public:
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

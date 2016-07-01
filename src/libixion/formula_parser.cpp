@@ -243,20 +243,20 @@ void formula_parser::name(const lexer_token_base& t)
 {
     mem_str_buf name = t.get_string();
 
-    formula_name_type fn = m_resolver.resolve(name.get(), name.size(), m_pos);
+    formula_name_t fn = m_resolver.resolve(name.get(), name.size(), m_pos);
 #if DEBUG_FORMULA_PARSER
             __IXION_DEBUG_OUT__ << "name = '" << name << "' - " << fn.to_string() << endl;
 #endif
     switch (fn.type)
     {
-        case formula_name_type::cell_reference:
+        case formula_name_t::cell_reference:
             m_formula_tokens.push_back(
                 make_unique<single_ref_token>(
                     address_t(
                         fn.address.sheet, fn.address.row, fn.address.col,
                         fn.address.abs_sheet, fn.address.abs_row, fn.address.abs_col)));
         break;
-        case formula_name_type::range_reference:
+        case formula_name_t::range_reference:
         {
             address_t first(fn.range.first.sheet, fn.range.first.row, fn.range.first.col,
                             fn.range.first.abs_sheet, fn.range.first.abs_row, fn.range.first.abs_col);
@@ -265,7 +265,7 @@ void formula_parser::name(const lexer_token_base& t)
             m_formula_tokens.push_back(make_unique<range_ref_token>(range_t(first, last)));
         }
         break;
-        case formula_name_type::table_reference:
+        case formula_name_t::table_reference:
         {
             table_t table;
             table.name = m_context.add_string(fn.table.name, fn.table.name_length);
@@ -275,11 +275,11 @@ void formula_parser::name(const lexer_token_base& t)
             m_formula_tokens.push_back(make_unique<table_ref_token>(table));
         }
         break;
-        case formula_name_type::function:
+        case formula_name_t::function:
             m_formula_tokens.push_back(
                 make_unique<function_token>(static_cast<size_t>(fn.func_oc)));
         break;
-        case formula_name_type::named_expression:
+        case formula_name_t::named_expression:
             m_formula_tokens.push_back(
                 make_unique<named_exp_token>(name.get(), name.size()));
         break;
