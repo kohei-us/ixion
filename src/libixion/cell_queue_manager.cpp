@@ -19,6 +19,22 @@ namespace ixion {
 
 namespace {
 
+class scoped_guard
+{
+    std::thread m_thread;
+public:
+    scoped_guard(std::thread thread) : m_thread(std::move(thread)) {}
+    scoped_guard(scoped_guard&& other) : m_thread(std::move(other.m_thread)) {}
+
+    scoped_guard(const scoped_guard&) = delete;
+    scoped_guard& operator= (const scoped_guard&) = delete;
+
+    ~scoped_guard()
+    {
+        m_thread.join();
+    }
+};
+
 class interpreter_queue
 {
     using future_type = std::future<void>;
@@ -111,11 +127,10 @@ struct formula_cell_queue::impl
         interpreter_queue queue(m_context, m_thread_count);
 
         std::thread t(&formula_cell_queue::impl::thread_launch, this, &queue);
+        scoped_guard guard(std::move(t));
 
         for (size_t i = 0, n = m_cells.size(); i < n; ++i)
             queue.wait_one();
-
-        t.join();
     }
 };
 
