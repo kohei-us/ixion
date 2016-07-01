@@ -111,7 +111,7 @@ void tokenizer::run()
 
         if (is_arg_sep(*mp_char))
         {
-            op(op_sep);
+            op(lexer_opcode_t::sep);
             continue;
         }
 
@@ -121,31 +121,31 @@ void tokenizer::run()
                 space();
                 break;
             case '+':
-                op(op_plus);
+                op(lexer_opcode_t::plus);
                 break;
             case '-':
-                op(op_minus);
+                op(lexer_opcode_t::minus);
                 break;
             case '/':
-                op(op_divide);
+                op(lexer_opcode_t::divide);
                 break;
             case '*':
-                op(op_multiply);
+                op(lexer_opcode_t::multiply);
                 break;
             case '=':
-                op(op_equal);
+                op(lexer_opcode_t::equal);
                 break;
             case '<':
-                op(op_less);
+                op(lexer_opcode_t::less);
                 break;
             case '>':
-                op(op_greater);
+                op(lexer_opcode_t::greater);
                 break;
             case '(':
-                op(op_open);
+                op(lexer_opcode_t::open);
                 break;
             case ')':
-                op(op_close);
+                op(lexer_opcode_t::close);
                 break;
             case '"':
                 string();

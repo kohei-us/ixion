@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_LEXER_TOKENS_HPP__
-#define __IXION_LEXER_TOKENS_HPP__
+#ifndef INCLUDED_IXION_LEXER_TOKENS_HPP
+#define INCLUDED_IXION_LEXER_TOKENS_HPP
 
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/env.hpp"
@@ -24,28 +24,28 @@ std::string print_tokens(const lexer_tokens_t& tokens, bool verbose);
 
 // ============================================================================
 
-enum lexer_opcode_t
+enum class lexer_opcode_t
 {
     // data types
-    op_value,
-    op_string,
-    op_name,
+    value,
+    string,
+    name,
 
     // arithmetic operators
-    op_plus,
-    op_minus,
-    op_divide,
-    op_multiply,
+    plus,
+    minus,
+    divide,
+    multiply,
 
     // relational operators
-    op_equal,
-    op_less,
-    op_greater,
+    equal,
+    less,
+    greater,
 
     // parentheses, separators
-    op_open,
-    op_close,
-    op_sep,
+    open,
+    close,
+    sep,
 };
 
 const char* get_opcode_name(lexer_opcode_t oc);
@@ -127,4 +127,5 @@ private:
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

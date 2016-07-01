@@ -145,29 +145,29 @@ void formula_parser::parse()
             lexer_opcode_t oc = t.get_opcode();
             switch (oc)
             {
-                case op_open:
-                case op_close:
-                case op_plus:
-                case op_minus:
-                case op_multiply:
-                case op_equal:
-                case op_divide:
-                case op_sep:
+                case lexer_opcode_t::open:
+                case lexer_opcode_t::close:
+                case lexer_opcode_t::plus:
+                case lexer_opcode_t::minus:
+                case lexer_opcode_t::multiply:
+                case lexer_opcode_t::equal:
+                case lexer_opcode_t::divide:
+                case lexer_opcode_t::sep:
                     primitive(oc);
                     break;
-                case op_name:
+                case lexer_opcode_t::name:
                     name(t);
                     break;
-                case op_string:
+                case lexer_opcode_t::string:
                     literal(t);
                     break;
-                case op_value:
+                case lexer_opcode_t::value:
                     value(t);
                     break;
-                case op_less:
+                case lexer_opcode_t::less:
                     less(t);
                     break;
-                case op_greater:
+                case lexer_opcode_t::greater:
                     greater(t);
                     break;
                 default:
@@ -209,28 +209,28 @@ void formula_parser::primitive(lexer_opcode_t oc)
     fopcode_t foc = fop_unknown;
     switch (oc)
     {
-        case op_close:
+        case lexer_opcode_t::close:
             foc = fop_close;
             break;
-        case op_divide:
+        case lexer_opcode_t::divide:
             foc = fop_divide;
             break;
-        case op_minus:
+        case lexer_opcode_t::minus:
             foc = fop_minus;
             break;
-        case op_multiply:
+        case lexer_opcode_t::multiply:
             foc = fop_multiply;
             break;
-        case op_equal:
+        case lexer_opcode_t::equal:
             foc = fop_equal;
             break;
-        case op_open:
+        case lexer_opcode_t::open:
             foc = fop_open;
             break;
-        case op_plus:
+        case lexer_opcode_t::plus:
             foc = fop_plus;
             break;
-        case op_sep:
+        case lexer_opcode_t::sep:
             foc = fop_sep;
             break;
         default:
@@ -312,10 +312,10 @@ void formula_parser::less(const lexer_token_base& t)
         next();
         switch (get_token().get_opcode())
         {
-            case op_equal:
+            case lexer_opcode_t::equal:
                 m_formula_tokens.push_back(make_unique<opcode_token>(fop_less_equal));
                 return;
-            case op_greater:
+            case lexer_opcode_t::greater:
                 m_formula_tokens.push_back(make_unique<opcode_token>(fop_not_equal));
                 return;
             default:
@@ -331,7 +331,7 @@ void formula_parser::greater(const lexer_token_base& t)
     if (has_next())
     {
         next();
-        if (get_token().get_opcode() == op_equal)
+        if (get_token().get_opcode() == lexer_opcode_t::equal)
         {
             m_formula_tokens.push_back(make_unique<opcode_token>(fop_greater_equal));
             return;

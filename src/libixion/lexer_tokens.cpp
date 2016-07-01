@@ -49,19 +49,19 @@ const char* get_opcode_name(lexer_opcode_t oc)
 {
     switch (oc)
     {
-        case op_value:      return "value";
-        case op_string:     return "string";
-        case op_name:       return "name";
-        case op_divide:     return "divide";
-        case op_minus:      return "minus";
-        case op_multiply:   return "multiply";
-        case op_equal:      return "equal";
-        case op_less:       return "less";
-        case op_greater:    return "greater";
-        case op_plus:       return "plus";
-        case op_open:       return "open";
-        case op_close:      return "close";
-        case op_sep:        return "sep";
+        case lexer_opcode_t::value:      return "value";
+        case lexer_opcode_t::string:     return "string";
+        case lexer_opcode_t::name:       return "name";
+        case lexer_opcode_t::divide:     return "divide";
+        case lexer_opcode_t::minus:      return "minus";
+        case lexer_opcode_t::multiply:   return "multiply";
+        case lexer_opcode_t::equal:      return "equal";
+        case lexer_opcode_t::less:       return "less";
+        case lexer_opcode_t::greater:    return "greater";
+        case lexer_opcode_t::plus:       return "plus";
+        case lexer_opcode_t::open:       return "open";
+        case lexer_opcode_t::close:      return "close";
+        case lexer_opcode_t::sep:        return "sep";
         default:
             ;
     }
@@ -114,29 +114,29 @@ string lexer_token::print() const
 {
     switch (get_opcode())
     {
-        case op_plus:
+        case lexer_opcode_t::plus:
             return "+";
-        case op_minus:
+        case lexer_opcode_t::minus:
             return "-";
-        case op_divide:
+        case lexer_opcode_t::divide:
             return "/";
-        case op_multiply:
+        case lexer_opcode_t::multiply:
             return "*";
-        case op_equal:
+        case lexer_opcode_t::equal:
             return "=";
-        case op_less:
+        case lexer_opcode_t::less:
             return "<";
-        case op_greater:
+        case lexer_opcode_t::greater:
             return ">";
-        case op_open:
+        case lexer_opcode_t::open:
             return "(";
-        case op_close:
+        case lexer_opcode_t::close:
             return ")";
-        case op_sep:
+        case lexer_opcode_t::sep:
             return ",";
-        case op_name:
-        case op_string:
-        case op_value:
+        case lexer_opcode_t::name:
+        case lexer_opcode_t::string:
+        case lexer_opcode_t::value:
         default:
             ;
     }
@@ -146,7 +146,7 @@ string lexer_token::print() const
 // ============================================================================
 
 lexer_value_token::lexer_value_token(double val) :
-    lexer_token_base(op_value),
+    lexer_token_base(lexer_opcode_t::value),
     m_val(val)
 {
 }
@@ -176,7 +176,7 @@ string lexer_value_token::print() const
 // ============================================================================
 
 lexer_string_token::lexer_string_token(const char* p, size_t n) :
-    lexer_token_base(op_string), m_str(p, n) {}
+    lexer_token_base(lexer_opcode_t::string), m_str(p, n) {}
 
 lexer_string_token::lexer_string_token(const lexer_string_token& r) :
     lexer_token_base(r), m_str(r.m_str) {}
@@ -196,7 +196,7 @@ string lexer_string_token::print() const
 // ============================================================================
 
 lexer_name_token::lexer_name_token(const char* p, size_t n) :
-    lexer_token_base(op_name), m_str(p, n) {}
+    lexer_token_base(lexer_opcode_t::name), m_str(p, n) {}
 
 lexer_name_token::lexer_name_token(const lexer_name_token& r) :
     lexer_token_base(r), m_str(r.m_str) {}
