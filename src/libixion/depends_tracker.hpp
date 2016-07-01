@@ -5,10 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __DEPENDS_TRACKER_HPP__
-#define __DEPENDS_TRACKER_HPP__
+#ifndef INCLUDED_DEPENDS_TRACKER_HPP
+#define INCLUDED_DEPENDS_TRACKER_HPP
 
-#include "ixion/formula_parser.hpp"
+#include "formula_parser.hpp"
 #include "ixion/depth_first_search.hpp"
 
 #include <set>

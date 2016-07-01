@@ -154,7 +154,7 @@ PyObject* document_get_sheet(document* self, PyObject* arg)
         if (index == -1 && PyErr_Occurred())
             return NULL;
 
-        if (index < 0 || index >= sheets.size())
+        if (index < 0 || static_cast<size_t>(index) >= sheets.size())
         {
             PyErr_SetString(PyExc_IndexError, "Out-of-bound sheet index");
             return NULL;

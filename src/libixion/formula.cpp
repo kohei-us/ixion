@@ -7,13 +7,13 @@
 
 #include "ixion/formula.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula_parser.hpp"
 #include "ixion/formula_function_opcode.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/types.hpp"
 
 #include "formula_lexer.hpp"
+#include "formula_parser.hpp"
 #include "function_objects.hpp"
 #include "formula_functions.hpp"
 #include "depends_tracker.hpp"

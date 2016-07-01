@@ -237,7 +237,6 @@
                 <F N="../include/ixion/formula_function_opcode.hpp"/>
                 <F N="../include/ixion/formula_name_resolver.hpp"/>
                 <F N="../include/ixion/formula_opcode.hpp"/>
-                <F N="../include/ixion/formula_parser.hpp"/>
                 <F N="../include/ixion/formula_result.hpp"/>
                 <F N="../include/ixion/formula_tokens.hpp"/>
                 <F N="../include/ixion/global.hpp"/>
@@ -275,6 +274,7 @@
                 <F N="../src/libixion/formula_lexer.hpp"/>
                 <F N="../src/libixion/formula_name_resolver.cpp"/>
                 <F N="../src/libixion/formula_parser.cpp"/>
+                <F N="../src/libixion/formula_parser.hpp"/>
                 <F N="../src/libixion/formula_result.cpp"/>
                 <F N="../src/libixion/formula_tokens.cpp"/>
                 <F N="../src/libixion/formula_value_stack.cpp"/>

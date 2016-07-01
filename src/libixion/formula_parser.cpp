@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_parser.hpp"
+#include "formula_parser.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 
