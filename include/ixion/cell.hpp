@@ -17,7 +17,7 @@ namespace ixion {
 
 class formula_result;
 class formula_cell;
-class formula_token_base;
+class formula_token;
 struct abs_address_t;
 
 namespace iface {
@@ -58,7 +58,7 @@ public:
     void reset();
 
     void get_ref_tokens(
-        const iface::formula_model_access& cxt, const abs_address_t& pos, std::vector<const formula_token_base*>& tokens);
+        const iface::formula_model_access& cxt, const abs_address_t& pos, std::vector<const formula_token*>& tokens);
 
     const formula_result* get_result_cache() const;
 

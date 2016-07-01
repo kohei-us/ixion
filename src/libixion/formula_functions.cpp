@@ -110,7 +110,7 @@ bool match_func_name(const char* func_name, const char* p, size_t n)
 formula_functions::invalid_arg::invalid_arg(const string& msg) :
     general_error(msg) {}
 
-formula_function_t formula_functions::get_function_opcode(const formula_token_base& token)
+formula_function_t formula_functions::get_function_opcode(const formula_token& token)
 {
     assert(token.get_opcode() == fop_function);
     return static_cast<formula_function_t>(token.get_index());

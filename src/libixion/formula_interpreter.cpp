@@ -147,7 +147,7 @@ void formula_interpreter::init_tokens()
     formula_tokens_t::const_iterator itr = orig_tokens->begin(), itr_end = orig_tokens->end();
     for (; itr != itr_end; ++itr)
     {
-        const formula_token_base* p = &(**itr);
+        const formula_token* p = &(**itr);
         assert(p);
         if (p->get_opcode() == fop_named_expression)
         {
@@ -248,7 +248,7 @@ void formula_interpreter::expand_named_expression(
     formula_tokens_t::const_iterator itr = expr_tokens->begin(), itr_end = expr_tokens->end();
     for (; itr != itr_end; ++itr)
     {
-        const formula_token_base& t = **itr;
+        const formula_token& t = **itr;
         if (t.get_opcode() == fop_named_expression)
         {
             string expr_name = t.get_name();
@@ -277,13 +277,13 @@ void formula_interpreter::next()
     ++m_cur_token_itr;
 }
 
-const formula_token_base& formula_interpreter::token() const
+const formula_token& formula_interpreter::token() const
 {
     assert(m_cur_token_itr != m_end_token_pos);
     return *(*m_cur_token_itr);
 }
 
-const formula_token_base& formula_interpreter::next_token()
+const formula_token& formula_interpreter::next_token()
 {
     next();
     if (!has_token())

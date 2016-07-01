@@ -17,7 +17,7 @@ namespace ixion {
 /**
  * Very simple token that stores opcode only.
  */
-class opcode_token : public formula_token_base
+class opcode_token : public formula_token
 {
 public:
     explicit opcode_token(fopcode_t oc);
@@ -27,7 +27,7 @@ public:
 
 // ============================================================================
 
-class value_token : public formula_token_base
+class value_token : public formula_token
 {
 public:
     explicit value_token(double value);
@@ -38,7 +38,7 @@ private:
     double m_value;
 };
 
-class string_token : public formula_token_base
+class string_token : public formula_token
 {
     string_token() = delete;
 public:
@@ -56,7 +56,7 @@ private:
  * Token that stores a cell reference.  Note that the address it stores may
  * be either relative to the origin cell or absolute.
  */
-class single_ref_token : public formula_token_base
+class single_ref_token : public formula_token
 {
 public:
     single_ref_token(const address_t& addr);
@@ -71,7 +71,7 @@ private:
 
 // ============================================================================
 
-class range_ref_token : public formula_token_base
+class range_ref_token : public formula_token
 {
 public:
     range_ref_token(const range_t& range);
@@ -84,7 +84,7 @@ private:
     range_t m_range;
 };
 
-class table_ref_token : public formula_token_base
+class table_ref_token : public formula_token
 {
 public:
     table_ref_token(const table_t& table);
@@ -102,7 +102,7 @@ private:
 /**
  * Token that stores a named expression.
  */
-class named_exp_token : public formula_token_base
+class named_exp_token : public formula_token
 {
 public:
     named_exp_token(const char* p, size_t n);
@@ -115,7 +115,7 @@ private:
 
 // ============================================================================
 
-class function_token : public formula_token_base
+class function_token : public formula_token
 {
 public:
     function_token(size_t func_oc);

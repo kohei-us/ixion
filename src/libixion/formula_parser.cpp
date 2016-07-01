@@ -30,14 +30,14 @@ public:
         general_error(msg) {}
 };
 
-class formula_token_printer : public unary_function<formula_token_base, void>
+class formula_token_printer : public unary_function<formula_token, void>
 {
 public:
     formula_token_printer()
     {
     }
 
-    void operator() (const formula_token_base& token) const
+    void operator() (const formula_token& token) const
     {
         fopcode_t oc = token.get_opcode();
         ostringstream os;

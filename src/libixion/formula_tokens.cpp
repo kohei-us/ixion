@@ -95,26 +95,26 @@ const char* get_formula_opcode_string(fopcode_t oc)
 
 // ============================================================================
 
-formula_token_base::formula_token_base(fopcode_t op) :
+formula_token::formula_token(fopcode_t op) :
     m_opcode(op)
 {
 }
 
-formula_token_base::formula_token_base(const formula_token_base& r) :
+formula_token::formula_token(const formula_token& r) :
     m_opcode(r.m_opcode)
 {
 }
 
-formula_token_base::~formula_token_base()
+formula_token::~formula_token()
 {
 }
 
-fopcode_t formula_token_base::get_opcode() const
+fopcode_t formula_token::get_opcode() const
 {
     return m_opcode;
 }
 
-bool formula_token_base::operator== (const formula_token_base& r) const
+bool formula_token::operator== (const formula_token& r) const
 {
     if (m_opcode != r.m_opcode)
         return false;
@@ -147,37 +147,37 @@ bool formula_token_base::operator== (const formula_token_base& r) const
     return false;
 }
 
-bool formula_token_base::operator!= (const formula_token_base& r) const
+bool formula_token::operator!= (const formula_token& r) const
 {
     return !operator== (r);
 }
 
-address_t formula_token_base::get_single_ref() const
+address_t formula_token::get_single_ref() const
 {
     return address_t();
 }
 
-range_t formula_token_base::get_range_ref() const
+range_t formula_token::get_range_ref() const
 {
     return range_t();
 }
 
-table_t formula_token_base::get_table_ref() const
+table_t formula_token::get_table_ref() const
 {
     return table_t();
 }
 
-double formula_token_base::get_value() const
+double formula_token::get_value() const
 {
     return 0.0;
 }
 
-size_t formula_token_base::get_index() const
+size_t formula_token::get_index() const
 {
     return 0;
 }
 
-std::string formula_token_base::get_name() const
+std::string formula_token::get_name() const
 {
     return std::string();
 }

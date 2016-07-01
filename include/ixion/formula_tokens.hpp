@@ -30,17 +30,17 @@ IXION_DLLPUBLIC const char* get_formula_opcode_string(fopcode_t oc);
 
 // ============================================================================
 
-class IXION_DLLPUBLIC formula_token_base
+class IXION_DLLPUBLIC formula_token
 {
 public:
-    formula_token_base(fopcode_t op);
-    formula_token_base(const formula_token_base& r);
-    virtual ~formula_token_base() = 0;
+    formula_token(fopcode_t op);
+    formula_token(const formula_token& r);
+    virtual ~formula_token() = 0;
 
     fopcode_t get_opcode() const;
 
-    bool operator== (const formula_token_base& r) const;
-    bool operator!= (const formula_token_base& r) const;
+    bool operator== (const formula_token& r) const;
+    bool operator!= (const formula_token& r) const;
 
     virtual address_t get_single_ref() const;
     virtual range_t get_range_ref() const;
@@ -50,12 +50,12 @@ public:
     virtual std::string get_name() const;
 
 private:
-    formula_token_base() = delete;
+    formula_token() = delete;
 
     fopcode_t m_opcode;
 };
 
-typedef std::vector<std::unique_ptr<formula_token_base>> formula_tokens_t;
+typedef std::vector<std::unique_ptr<formula_token>> formula_tokens_t;
 
 // ============================================================================
 

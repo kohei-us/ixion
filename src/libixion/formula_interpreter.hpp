@@ -46,7 +46,7 @@ class formula_interpreter
     typedef std::unordered_set< ::std::string> name_set;
 
 public:
-    typedef ::std::vector<const formula_token_base*> local_tokens_type;
+    typedef ::std::vector<const formula_token*> local_tokens_type;
 
     formula_interpreter() = delete;
     formula_interpreter(const formula_interpreter&) = delete;
@@ -74,8 +74,8 @@ private:
 
     bool has_token() const;
     void next();
-    const formula_token_base& token() const;
-    const formula_token_base& next_token();
+    const formula_token& token() const;
+    const formula_token& next_token();
 
     // The following methods are handlers.  In each handler, the initial
     // position is always set to the first unprocessed token.  Each handler is

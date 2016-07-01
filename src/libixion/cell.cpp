@@ -291,7 +291,7 @@ void formula_cell::reset()
     mp_impl->reset_flag();
 }
 
-void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const abs_address_t& pos, vector<const formula_token_base*>& tokens)
+void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const abs_address_t& pos, vector<const formula_token*>& tokens)
 {
     const formula_tokens_t* this_tokens = NULL;
     if (is_shared())

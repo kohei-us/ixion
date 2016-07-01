@@ -19,7 +19,7 @@
 
 namespace ixion {
 
-class formula_token_base;
+class formula_token;
 
 namespace iface {
 
@@ -45,7 +45,7 @@ public:
     formula_functions(iface::formula_model_access& cxt);
     ~formula_functions();
 
-    static formula_function_t get_function_opcode(const formula_token_base& token);
+    static formula_function_t get_function_opcode(const formula_token& token);
     static formula_function_t get_function_opcode(const char* p, size_t n);
     static const char* get_function_name(formula_function_t oc);
 

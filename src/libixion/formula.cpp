@@ -165,7 +165,7 @@ bool has_volatile(const formula_tokens_t& tokens)
     formula_tokens_t::const_iterator i = tokens.begin(), iend = tokens.end();
     for (; i != iend; ++i)
     {
-        const formula_token_base& t = **i;
+        const formula_token& t = **i;
         if (t.get_opcode() != fop_function)
             continue;
 
@@ -185,7 +185,7 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
         // Not a formula cell. Bail out.
         return;
 
-    std::vector<const formula_token_base*> ref_tokens;
+    std::vector<const formula_token*> ref_tokens;
     cell->get_ref_tokens(cxt, pos, ref_tokens);
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
@@ -212,7 +212,7 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
     // Go through all its existing references, and remove
     // itself as their listener.  This step is important
     // especially during partial re-calculation.
-    std::vector<const formula_token_base*> ref_tokens;
+    std::vector<const formula_token*> ref_tokens;
     fcell->get_ref_tokens(cxt, pos, ref_tokens);
     for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,

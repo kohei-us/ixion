@@ -31,13 +31,13 @@ namespace ixion {
 
 namespace {
 
-class ref_cell_picker : public std::unary_function<const formula_token_base*, void>
+class ref_cell_picker : public std::unary_function<const formula_token*, void>
 {
 public:
     ref_cell_picker(iface::formula_model_access& cxt, const abs_address_t& origin, std::vector<abs_address_t>& deps) :
         m_context(cxt), m_origin(origin), m_deps(deps) {}
 
-    void operator() (const formula_token_base* p)
+    void operator() (const formula_token* p)
     {
         switch (p->get_opcode())
         {
@@ -113,7 +113,7 @@ formula_cell_listener_handler::formula_cell_listener_handler(
 #endif
 }
 
-void formula_cell_listener_handler::operator() (const formula_token_base* p) const
+void formula_cell_listener_handler::operator() (const formula_token* p) const
 {
     switch (p->get_opcode())
     {
@@ -163,7 +163,7 @@ void cell_dependency_handler::operator() (const abs_address_t& fcell)
     __IXION_DEBUG_OUT__ << "processing dependency of " << resolver.get_name(fcell, false) << endl;
 #endif
     // Register cell dependencies.
-    std::vector<const formula_token_base*> ref_tokens;
+    std::vector<const formula_token*> ref_tokens;
     formula_cell* p = m_context.get_formula_cell(fcell);
     assert(p);
     p->get_ref_tokens(m_context, fcell, ref_tokens);
