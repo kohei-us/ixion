@@ -11,8 +11,8 @@
 #include <vector>
 #include <iostream>
 
-#include <boost/thread.hpp>
 #include <boost/program_options.hpp>
+#include <thread>
 
 using namespace std;
 using namespace ixion;
@@ -106,7 +106,7 @@ int main (int argc, char** argv)
     if (thread_count > 0)
     {
         cout << "Using " << thread_count << " threads" << endl;
-        cout << "Number of CPUS: " << boost::thread::hardware_concurrency() << endl;
+        cout << "Number of CPUS: " << std::thread::hardware_concurrency() << endl;
     }
 
     try

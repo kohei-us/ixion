@@ -25,8 +25,6 @@
 #include <sys/time.h>
 #endif
 
-#include <boost/thread/mutex.hpp>
-
 #define IXION_DEBUG_GLOBAL 0
 
 using namespace std;
