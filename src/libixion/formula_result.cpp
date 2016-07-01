@@ -209,11 +209,11 @@ void formula_result::parse_error(const char* p, size_t n)
 
             if (buf.equals("REF"))
             {
-                m_error = fe_ref_result_not_available;
+                m_error = formula_error_t::ref_result_not_available;
             }
             else if (buf.equals("DIV/0"))
             {
-                m_error = fe_division_by_zero;
+                m_error = formula_error_t::division_by_zero;
             }
             else
                 throw general_error("failed to parse error string in formula_result::parse_error().");

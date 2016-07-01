@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_GLOBAL_HPP__
-#define __IXION_GLOBAL_HPP__
+#ifndef INCLUDED_IXION_GLOBAL_HPP
+#define INCLUDED_IXION_GLOBAL_HPP
 
 #include "ixion/types.hpp"
 #include "ixion/env.hpp"
@@ -59,16 +59,17 @@ private:
     ~global();
 };
 
-// ============================================================================
-
-enum formula_error_t
+/**
+ * Formula error types.
+ */
+enum class formula_error_t
 {
-    fe_no_error = 0,
-    fe_ref_result_not_available,
-    fe_division_by_zero,
-    fe_invalid_expression,
-    fe_stack_error,
-    fe_general_error,
+    no_error = 0,
+    ref_result_not_available = 1,
+    division_by_zero = 2,
+    invalid_expression = 3,
+    stack_error = 4,
+    general_error = 5,
 };
 
 IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);

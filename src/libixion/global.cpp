@@ -145,7 +145,7 @@ const char* get_formula_error_name(formula_error_t fe)
     };
     static const size_t name_size = 4;
     if (static_cast<size_t>(fe) < name_size)
-        return names[fe];
+        return names[static_cast<size_t>(fe)];
 
     return default_err_name;
 }

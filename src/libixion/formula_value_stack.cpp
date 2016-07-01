@@ -38,7 +38,7 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
 #if IXION_DEBUG_GLOBAL
             __IXION_DEBUG_OUT__ << "value is being popped, but the stack value type is not appropriate." << endl;
 #endif
-            throw formula_error(fe_stack_error);
+            throw formula_error(formula_error_t::stack_error);
     }
     return ret;
 }
@@ -198,7 +198,7 @@ double value_stack_t::pop_value()
 {
     double ret = 0.0;
     if (m_stack.empty())
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     const stack_value& v = *m_stack.back();
     ret = get_numeric_value(m_context, v);
@@ -209,7 +209,7 @@ double value_stack_t::pop_value()
 const std::string value_stack_t::pop_string()
 {
     if (m_stack.empty())
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     const stack_value& v = *m_stack.back();
     switch (v.get_type())
@@ -254,7 +254,7 @@ const std::string value_stack_t::pop_string()
                         {
                             const std::string* ps = m_context.get_string(res->get_string());
                             if (!ps)
-                                throw formula_error(fe_stack_error);
+                                throw formula_error(formula_error_t::stack_error);
                             return *ps;
                         }
                         break;
@@ -265,7 +265,7 @@ const std::string value_stack_t::pop_string()
                             return os.str();
                         }
                         default:
-                            throw formula_error(fe_stack_error);
+                            throw formula_error(formula_error_t::stack_error);
                     }
                 }
                 break;
@@ -279,29 +279,29 @@ const std::string value_stack_t::pop_string()
                 {
                     const std::string* ps = m_context.get_string(m_context.get_string_identifier(addr));
                     if (!ps)
-                        throw formula_error(fe_stack_error);
+                        throw formula_error(formula_error_t::stack_error);
                     return *ps;
                 }
                 break;
                 default:
-                    throw formula_error(fe_stack_error);
+                    throw formula_error(formula_error_t::stack_error);
             }
         }
         break;
         default:
             ;
     }
-    throw formula_error(fe_stack_error);
+    throw formula_error(formula_error_t::stack_error);
 }
 
 abs_address_t value_stack_t::pop_single_ref()
 {
     if (m_stack.empty())
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     const stack_value& v = *m_stack.back();
     if (v.get_type() != stack_value_t::single_ref)
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     abs_address_t addr = v.get_address();
     m_stack.pop_back();
@@ -311,11 +311,11 @@ abs_address_t value_stack_t::pop_single_ref()
 abs_range_t value_stack_t::pop_range_ref()
 {
     if (m_stack.empty())
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     const stack_value& v = *m_stack.back();
     if (v.get_type() != stack_value_t::range_ref)
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     abs_range_t range = v.get_range();
     m_stack.pop_back();
@@ -325,11 +325,11 @@ abs_range_t value_stack_t::pop_range_ref()
 matrix value_stack_t::pop_range_value()
 {
     if (m_stack.empty())
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     const stack_value& v = *m_stack.back();
     if (v.get_type() != stack_value_t::range_ref)
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     matrix ret = m_context.get_range_value(v.get_range());
     m_stack.pop_back();
@@ -339,7 +339,7 @@ matrix value_stack_t::pop_range_value()
 stack_value_t value_stack_t::get_type() const
 {
     if (m_stack.empty())
-        throw formula_error(fe_stack_error);
+        throw formula_error(formula_error_t::stack_error);
 
     return m_stack.back()->get_type();
 }

@@ -43,7 +43,7 @@ formula_interpreter::formula_interpreter(const formula_cell* cell, iface::formul
     m_parent_cell(cell),
     m_context(cxt),
     m_stack(cxt),
-    m_error(fe_no_error)
+    m_error(formula_error_t::no_error)
 {
 }
 
@@ -75,7 +75,7 @@ bool formula_interpreter::interpret()
         }
 
         m_cur_token_itr = m_tokens.begin();
-        m_error = fe_no_error;
+        m_error = formula_error_t::no_error;
         m_result.reset();
 
         expression();
@@ -100,7 +100,7 @@ bool formula_interpreter::interpret()
         if (mp_handler)
             mp_handler->set_invalid_expression(e.what());
 
-        m_error = fe_invalid_expression;
+        m_error = formula_error_t::invalid_expression;
     }
     catch (const formula_error& e)
     {
@@ -435,7 +435,7 @@ void compare_strings(value_stack_t& vs, fopcode_t oc, const std::string& str1, c
     {
         case fop_plus:
         case fop_minus:
-            throw formula_error(fe_invalid_expression);
+            throw formula_error(formula_error_t::invalid_expression);
         case fop_equal:
             vs.push_value(str1 == str2);
         break;
@@ -468,7 +468,7 @@ void compare_value_to_string(
     {
         case fop_plus:
         case fop_minus:
-            throw formula_error(fe_invalid_expression);
+            throw formula_error(formula_error_t::invalid_expression);
         case fop_equal:
             vs.push_value(false);
         break;
@@ -497,7 +497,7 @@ void compare_string_to_value(
     {
         case fop_plus:
         case fop_minus:
-            throw formula_error(fe_invalid_expression);
+            throw formula_error(formula_error_t::invalid_expression);
         case fop_equal:
             vs.push_value(false);
         break;
@@ -539,7 +539,7 @@ void formula_interpreter::expression()
 
         stack_value_t vt;
         if (!pop_stack_value_or_string(m_context, m_stack, vt, val1, str1))
-            throw formula_error(fe_general_error);
+            throw formula_error(formula_error_t::general_error);
         is_val1 = vt == stack_value_t::value;
 
         if (mp_handler)
@@ -549,7 +549,7 @@ void formula_interpreter::expression()
         term();
 
         if (!pop_stack_value_or_string(m_context, m_stack, vt, val2, str2))
-            throw formula_error(fe_general_error);
+            throw formula_error(formula_error_t::general_error);
         is_val2 = vt == stack_value_t::value;
 
         if (is_val1)
@@ -612,7 +612,7 @@ void formula_interpreter::term()
             term();
             double val2 = m_stack.pop_value();
             if (val2 == 0.0)
-                throw formula_error(fe_division_by_zero);
+                throw formula_error(formula_error_t::division_by_zero);
             m_stack.push_value(val/val2);
             return;
         }
@@ -636,7 +636,7 @@ void formula_interpreter::factor()
             __IXION_DEBUG_OUT__ << "named expression encountered in factor" << endl;
 #endif
             // All named expressions are supposed to be expanded prior to interpretation.
-            throw formula_error(fe_general_error);
+            throw formula_error(formula_error_t::general_error);
         case fop_value:
             constant();
             return;
@@ -699,7 +699,7 @@ void formula_interpreter::single_ref()
     if (abs_addr == m_pos)
     {
         // self-referencing is not permitted.
-        throw formula_error(fe_ref_result_not_available);
+        throw formula_error(formula_error_t::ref_result_not_available);
     }
 
     m_stack.push_single_ref(abs_addr);
@@ -726,7 +726,7 @@ void formula_interpreter::range_ref()
     if (abs_range.contains(m_pos))
     {
         // Referenced range contains the address of this cell.  Not good.
-        throw formula_error(fe_ref_result_not_available);
+        throw formula_error(formula_error_t::ref_result_not_available);
     }
 
     m_stack.push_range_ref(abs_range);
@@ -741,7 +741,7 @@ void formula_interpreter::table_ref()
 #if DEBUG_FORMULA_INTERPRETER
         __IXION_DEBUG_OUT__ << "formula_interpreter::table_ref: failed to get a table_handler instance." << endl;
 #endif
-        throw formula_error(fe_ref_result_not_available);
+        throw formula_error(formula_error_t::ref_result_not_available);
     }
 
     table_t table = token().get_table_ref();

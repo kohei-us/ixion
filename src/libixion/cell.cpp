@@ -114,7 +114,7 @@ struct formula_cell::impl
 #endif
             assert(!m_interpret_status.result);
             m_interpret_status.result =
-                ixion::make_unique<formula_result>(fe_ref_result_not_available);
+                ixion::make_unique<formula_result>(formula_error_t::ref_result_not_available);
 
             return false;
         }
@@ -125,7 +125,7 @@ struct formula_cell::impl
     {
         if (!m_interpret_status.result)
             // Result not cached yet.  Reference error.
-            throw formula_error(fe_ref_result_not_available);
+            throw formula_error(formula_error_t::ref_result_not_available);
 
         if (m_interpret_status.result->get_type() == formula_result::rt_error)
             // Error condition.
