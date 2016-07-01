@@ -17,8 +17,6 @@
 #include <sstream>
 #include <unordered_set>
 
-#include <boost/noncopyable.hpp>
-
 namespace ixion {
 
 class formula_cell;
@@ -43,12 +41,16 @@ class session_handler;
  * of stack values may be more than one when the function may take more than
  * one argument.</p>
  */
-class formula_interpreter : public ::boost::noncopyable
+class formula_interpreter
 {
     typedef std::unordered_set< ::std::string> name_set;
 
 public:
     typedef ::std::vector<const formula_token_base*> local_tokens_type;
+
+    formula_interpreter() = delete;
+    formula_interpreter(const formula_interpreter&) = delete;
+    formula_interpreter& operator= (formula_interpreter) = delete;
 
     formula_interpreter(const formula_cell* cell, iface::formula_model_access& cxt);
     ~formula_interpreter();

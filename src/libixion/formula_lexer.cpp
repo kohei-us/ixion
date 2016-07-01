@@ -12,15 +12,13 @@
 #include <iostream>
 #include <sstream>
 
-#include <boost/noncopyable.hpp>
-
 #define IXION_DEBUG_LEXER 0
 
 using namespace std;
 
 namespace ixion {
 
-class tokenizer : public ::boost::noncopyable
+class tokenizer
 {
     enum buffer_type {
         buf_numeral,
@@ -28,6 +26,10 @@ class tokenizer : public ::boost::noncopyable
     };
 
 public:
+    tokenizer() = delete;
+    tokenizer(const tokenizer&) = delete;
+    tokenizer& operator= (tokenizer) = delete;
+
     explicit tokenizer(lexer_tokens_t& tokens, const char* p, size_t n) :
         m_tokens(tokens),
         m_sep_arg(','),

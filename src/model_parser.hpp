@@ -20,11 +20,9 @@
 #include <vector>
 #include <unordered_map>
 
-#include <boost/noncopyable.hpp>
-
 namespace ixion {
 
-class model_parser : public ::boost::noncopyable
+class model_parser
 {
 public:
     typedef std::unordered_map< ::std::string, formula_result> results_type;
@@ -52,13 +50,16 @@ public:
         ct_string
     };
 
+    model_parser() = delete;
+    model_parser(const model_parser&) = delete;
+    model_parser& operator= (model_parser) = delete;
+
     model_parser(const ::std::string& filepath, size_t thread_count);
     ~model_parser();
 
     void parse();
 
 private:
-    model_parser(); // disabled
 
     void parse_init(const char*& p);
     void parse_result(const char*& p);

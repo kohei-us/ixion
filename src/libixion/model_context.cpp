@@ -24,8 +24,6 @@
 #include <vector>
 #include <iostream>
 
-#include <boost/noncopyable.hpp>
-
 #define DEBUG_MODEL_CONTEXT 0
 
 using namespace std;
@@ -137,7 +135,7 @@ bool set_shared_formula_tokens_to_cell(
 
 }
 
-class model_context_impl : boost::noncopyable
+class model_context_impl
 {
     typedef std::map<std::string, unique_ptr<formula_cell>> named_expressions_type;
     typedef std::vector<std::string> strings_type;
@@ -149,6 +147,10 @@ class model_context_impl : boost::noncopyable
     typedef model_context::shared_tokens_type shared_tokens_type;
 
 public:
+    model_context_impl() = delete;
+    model_context_impl(const model_context_impl&) = delete;
+    model_context_impl& operator= (model_context_impl) = delete;
+
     model_context_impl(model_context& parent) :
         m_parent(parent),
         mp_config(new config),

@@ -10,8 +10,6 @@
 
 #include "ixion/global.hpp"
 
-#include <boost/noncopyable.hpp>
-
 #include <vector>
 
 namespace ixion {
@@ -40,7 +38,7 @@ enum class stack_value_t {
 /**
  * Individual stack value storage.
  */
-class stack_value : boost::noncopyable
+class stack_value
 {
     stack_value_t m_type;
     union {
@@ -51,6 +49,10 @@ class stack_value : boost::noncopyable
     };
 
 public:
+    stack_value() = delete;
+    stack_value(const stack_value&) = delete;
+    stack_value& operator= (stack_value) = delete;
+
     explicit stack_value(double val);
     explicit stack_value(size_t sid);
     explicit stack_value(const abs_address_t& val);
