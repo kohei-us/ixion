@@ -11,9 +11,10 @@
 #include <string>
 #include <exception>
 
-#include "ixion/lexer_tokens.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
+
+#include "lexer_tokens.hpp"
 
 namespace ixion {
 

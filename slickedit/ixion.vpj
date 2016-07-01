@@ -241,7 +241,6 @@
                 <F N="../include/ixion/formula_tokens.hpp"/>
                 <F N="../include/ixion/global.hpp"/>
                 <F N="../include/ixion/info.hpp"/>
-                <F N="../include/ixion/lexer_tokens.hpp"/>
                 <F N="../include/ixion/macros.hpp"/>
                 <F
                     N="../include/ixion/Makefile.am"
@@ -286,6 +285,7 @@
                 <F N="../src/libixion/interface.cpp"/>
                 <F N="../src/libixion/ixion_test.cpp"/>
                 <F N="../src/libixion/lexer_tokens.cpp"/>
+                <F N="../src/libixion/lexer_tokens.hpp"/>
                 <F
                     N="../src/libixion/Makefile.am"
                     Type="Makefile"/>

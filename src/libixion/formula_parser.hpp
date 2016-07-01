@@ -9,8 +9,9 @@
 #define INCLUDED_IXION_FORMULA_PARSER_HPP
 
 #include "ixion/exceptions.hpp"
-#include "ixion/lexer_tokens.hpp"
 #include "ixion/formula_tokens.hpp"
+
+#include "lexer_tokens.hpp"
 
 #include <string>
 

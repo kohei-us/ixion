@@ -19,7 +19,6 @@ libixion_HEADERS = \
 	formula_tokens.hpp \
 	global.hpp \
 	info.hpp \
-	lexer_tokens.hpp \
 	macros.hpp \
 	matrix.hpp \
 	mem_str_buf.hpp \

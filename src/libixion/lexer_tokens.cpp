@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/lexer_tokens.hpp"
+#include "lexer_tokens.hpp"
 
 #include <iostream>
 #include <sstream>

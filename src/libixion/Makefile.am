@@ -30,6 +30,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	function_objects.cpp \
 	global.cpp \
 	info.cpp \
+	lexer_tokens.hpp \
 	lexer_tokens.cpp \
 	matrix.cpp \
 	mem_str_buf.cpp \
