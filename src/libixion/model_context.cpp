@@ -153,8 +153,8 @@ public:
         m_parent(parent),
         mp_config(new config),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
-        mp_session_handler(NULL),
-        mp_table_handler(NULL)
+        mp_table_handler(NULL),
+        m_session_factory(ixion::make_unique<model_context::session_handler_factory>())
     {
     }
 
@@ -276,7 +276,6 @@ private:
 
     config* mp_config;
     cell_listener_tracker* mp_cell_listener_tracker;
-    iface::session_handler* mp_session_handler;
     iface::table_handler* mp_table_handler;
     named_expressions_type m_named_expressions;
 

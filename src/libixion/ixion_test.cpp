@@ -696,7 +696,6 @@ void test_model_context_storage()
         assert(resolver);
 
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
-        cxt.set_session_handler(NULL);
 
         // Test storage of numeric values.
         volatile double val = 0.1;
@@ -726,7 +725,6 @@ void test_model_context_storage()
         assert(resolver);
 
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
-        cxt.set_session_handler(NULL);
         string exp = "1";
         cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size(), *resolver);
         cxt.set_formula_cell(abs_address_t(0,2,0), &exp[0], exp.size(), *resolver);
@@ -782,7 +780,6 @@ void test_volatile_function()
     assert(resolver);
 
     cxt.append_sheet(IXION_ASCII("test"), 1048576, 1024);
-    cxt.set_session_handler(NULL);
 
     dirty_formula_cells_t dirty_cells;
     modified_cells_t dirty_addrs;
