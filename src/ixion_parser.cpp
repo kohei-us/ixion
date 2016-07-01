@@ -60,7 +60,7 @@ int main (int argc, char** argv)
     desc.add_options()
         ("help,h", "print this help.")
         ("thread,t", po::value<size_t>(),
-         "specify the number of threads to use for calculation.  Note that the number specified by this option corresponds with the number of calculation threads i.e. those child threads that perform cell interpretations.  The main thread does not perform any calculations; instead, it creates a new child thread to manage the calculation threads, the number of which is specified by the arg.  Therefore, the total number of threads used by this program will be arg + 2.");
+         "specify the number of threads to use for calculation.  Note that the number specified by this option corresponds with the number of calculation threads i.e. those child threads that perform cell interpretations.  The main thread does not perform any calculations; instead, it creates a new child thread to manage the calculation threads, the number of which is specified by the arg.  Therefore, the total number of threads used by this program will be arg + 1.");
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
