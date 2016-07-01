@@ -11,13 +11,15 @@
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/model_context.hpp"
 
-#include <string>
-#include <sstream>
+#include <memory>
 
 namespace ixion {
 
 class session_handler : public iface::session_handler
 {
+    struct impl;
+    std::unique_ptr<impl> mp_impl;
+
 public:
     session_handler(const model_context& cxt);
     virtual ~session_handler();
@@ -45,13 +47,12 @@ public:
         virtual std::unique_ptr<iface::session_handler> create();
     };
 
+    /**
+     * Print string to stdout in a thread-safe way.
+     *
+     * @param msg string to print to stdout.
+     */
     static void print(const std::string& msg);
-
-private:
-    const model_context& m_context;
-    std::unique_ptr<formula_name_resolver> mp_resolver;
-    std::string m_cell_name;
-    std::ostringstream m_buf;
 };
 
 }

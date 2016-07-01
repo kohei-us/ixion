@@ -12,6 +12,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <mutex>
 
 using namespace std;
@@ -25,9 +26,20 @@ std::unique_ptr<iface::session_handler> session_handler::factory::create()
     return ixion::make_unique<session_handler>(m_context);
 }
 
+struct session_handler::impl
+{
+    const model_context& m_context;
+    std::unique_ptr<formula_name_resolver> mp_resolver;
+    std::string m_cell_name;
+    std::ostringstream m_buf;
+
+    impl(const model_context& cxt) :
+        m_context(cxt),
+        mp_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt)) {}
+};
+
 session_handler::session_handler(const model_context& cxt) :
-    m_context(cxt),
-    mp_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt)) {}
+    mp_impl(ixion::make_unique<impl>(cxt)) {}
 
 session_handler::~session_handler() {}
 
@@ -36,71 +48,71 @@ void session_handler::begin_cell_interpret(const abs_address_t& pos)
     // Convert absolute to relative address, which looks better when printed.
     address_t pos_display(pos);
     pos_display.set_absolute(false);
-    m_cell_name = mp_resolver->get_name(pos_display, abs_address_t(), false);
+    mp_impl->m_cell_name = mp_impl->mp_resolver->get_name(pos_display, abs_address_t(), false);
 
-    m_buf << get_formula_result_output_separator() << endl;
-    m_buf << m_cell_name << ": ";
+    mp_impl->m_buf << get_formula_result_output_separator() << endl;
+    mp_impl->m_buf << mp_impl->m_cell_name << ": ";
 }
 
 void session_handler::end_cell_interpret()
 {
-    print(m_buf.str());
+    print(mp_impl->m_buf.str());
 }
 
 void session_handler::set_result(const formula_result& result)
 {
-    m_buf << endl << m_cell_name << ": result = " << result.str(m_context) << endl;
+    mp_impl->m_buf << endl << mp_impl->m_cell_name << ": result = " << result.str(mp_impl->m_context) << endl;
 }
 
 void session_handler::set_invalid_expression(const char* msg)
 {
-    m_buf << endl << m_cell_name << ": invalid expression: " << msg << endl;
+    mp_impl->m_buf << endl << mp_impl->m_cell_name << ": invalid expression: " << msg << endl;
 }
 
 void session_handler::set_formula_error(const char* msg)
 {
-    m_buf << endl << m_cell_name << ": result = " << msg << endl;
+    mp_impl->m_buf << endl << mp_impl->m_cell_name << ": result = " << msg << endl;
 }
 
 void session_handler::push_token(fopcode_t fop)
 {
-    m_buf << get_formula_opcode_string(fop);
+    mp_impl->m_buf << get_formula_opcode_string(fop);
 }
 
 void session_handler::push_value(double val)
 {
-    m_buf << val;
+    mp_impl->m_buf << val;
 }
 
 void session_handler::push_string(size_t sid)
 {
-    const string* p = m_context.get_string(sid);
-    m_buf << '"';
+    const string* p = mp_impl->m_context.get_string(sid);
+    mp_impl->m_buf << '"';
     if (p)
-        m_buf << *p;
+        mp_impl->m_buf << *p;
     else
-        m_buf << "(null string)";
-    m_buf << '"';
+        mp_impl->m_buf << "(null string)";
+    mp_impl->m_buf << '"';
 }
 
 void session_handler::push_single_ref(const address_t& addr, const abs_address_t& pos)
 {
-    m_buf << mp_resolver->get_name(addr, pos, false);
+    mp_impl->m_buf << mp_impl->mp_resolver->get_name(addr, pos, false);
 }
 
 void session_handler::push_range_ref(const range_t& range, const abs_address_t& pos)
 {
-    m_buf << mp_resolver->get_name(range, pos, false);
+    mp_impl->m_buf << mp_impl->mp_resolver->get_name(range, pos, false);
 }
 
 void session_handler::push_table_ref(const table_t& table)
 {
-    m_buf << mp_resolver->get_name(table);
+    mp_impl->m_buf << mp_impl->mp_resolver->get_name(table);
 }
 
 void session_handler::push_function(formula_function_t foc)
 {
-    m_buf << get_formula_function_name(foc);
+    mp_impl->m_buf << get_formula_function_name(foc);
 }
 
 void session_handler::print(const std::string& msg)
