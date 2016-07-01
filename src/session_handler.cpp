@@ -17,6 +17,13 @@ using namespace std;
 
 namespace ixion {
 
+session_handler::factory::factory(const model_context& cxt) : m_context(cxt) {}
+
+std::unique_ptr<iface::session_handler> session_handler::factory::create()
+{
+    return ixion::make_unique<session_handler>(m_context);
+}
+
 session_handler::session_handler(const model_context& cxt) :
     m_context(cxt),
     mp_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt)) {}
@@ -32,6 +39,10 @@ void session_handler::begin_cell_interpret(const abs_address_t& pos)
 
     cout << get_formula_result_output_separator() << endl;
     cout << m_cell_name << ": ";
+}
+
+void session_handler::end_cell_interpret()
+{
 }
 
 void session_handler::set_result(const formula_result& result)
@@ -91,4 +102,6 @@ void session_handler::push_function(formula_function_t foc)
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
+

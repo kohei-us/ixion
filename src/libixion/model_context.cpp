@@ -177,14 +177,14 @@ public:
         return *mp_cell_listener_tracker;
     }
 
-    iface::session_handler* get_session_handler()
+    std::unique_ptr<iface::session_handler> create_session_handler()
     {
-        return mp_session_handler;
+        return m_session_factory->create();
     }
 
-    void set_session_handler(iface::session_handler* handler)
+    void set_session_handler_factory(std::unique_ptr<model_context::session_handler_factory>&& factory)
     {
-        mp_session_handler = handler;
+        m_session_factory = std::move(factory);
     }
 
     iface::table_handler* get_table_handler()
@@ -279,6 +279,8 @@ private:
     iface::session_handler* mp_session_handler;
     iface::table_handler* mp_table_handler;
     named_expressions_type m_named_expressions;
+
+    std::unique_ptr<model_context::session_handler_factory> m_session_factory;
 
     formula_tokens_store_type m_tokens;
     model_context::shared_tokens_type m_shared_tokens;
@@ -1038,6 +1040,11 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
     return col_store.get<formula_cell*>(addr.row);
 }
 
+std::unique_ptr<iface::session_handler> model_context::session_handler_factory::create()
+{
+    return std::unique_ptr<iface::session_handler>();
+}
+
 model_context::shared_tokens::shared_tokens() : tokens(NULL) {}
 model_context::shared_tokens::shared_tokens(formula_tokens_t* _tokens) : tokens(_tokens) {}
 model_context::shared_tokens::shared_tokens(const shared_tokens& r) : tokens(r.tokens), range(r.range) {}
@@ -1181,9 +1188,9 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     return ret;
 }
 
-iface::session_handler* model_context::get_session_handler()
+std::unique_ptr<iface::session_handler> model_context::create_session_handler()
 {
-    return mp_impl->get_session_handler();
+    return mp_impl->create_session_handler();
 }
 
 iface::table_handler* model_context::get_table_handler()
@@ -1297,9 +1304,9 @@ sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col
     return mp_impl->append_sheet(p, n, row_size, col_size);
 }
 
-void model_context::set_session_handler(iface::session_handler* handler)
+void model_context::set_session_handler_factory(std::unique_ptr<session_handler_factory>&& factory)
 {
-    mp_impl->set_session_handler(handler);
+    mp_impl->set_session_handler_factory(std::move(factory));
 }
 
 void model_context::set_table_handler(iface::table_handler* handler)

@@ -42,7 +42,6 @@ opcode_token paren_close = opcode_token(fop_close);
 formula_interpreter::formula_interpreter(const formula_cell* cell, iface::formula_model_access& cxt) :
     m_parent_cell(cell),
     m_context(cxt),
-    mp_handler(NULL),
     m_stack(cxt),
     m_error(fe_no_error)
 {
@@ -59,7 +58,7 @@ void formula_interpreter::set_origin(const abs_address_t& pos)
 
 bool formula_interpreter::interpret()
 {
-    mp_handler = m_context.get_session_handler();
+    mp_handler = m_context.create_session_handler();
     if (mp_handler)
         mp_handler->begin_cell_interpret(m_pos);
 
@@ -91,6 +90,9 @@ bool formula_interpreter::interpret()
 #if DEBUG_FORMULA_INTERPRETER
         __IXION_DEBUG_OUT__ << "interpretation successfully finished" << endl;
 #endif
+        if (mp_handler)
+            mp_handler->end_cell_interpret();
+
         return true;
     }
     catch (const invalid_expression& e)
@@ -110,6 +112,10 @@ bool formula_interpreter::interpret()
 
         m_error = e.get_error();
     }
+
+    if (mp_handler)
+        mp_handler->end_cell_interpret();
+
     return false;
 }
 

@@ -14,6 +14,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace ixion {
 
@@ -90,10 +91,9 @@ public:
      * optional; the model context implementation is not required to provide a
      * handler.
      *
-     * @return non-NULL pointer of the model context provides a session
-     *         handler, otherwise a NULL pointer is returned.
+     * @return a new session handler instance.  It may be nullptr.
      */
-    virtual session_handler* get_session_handler();
+    virtual std::unique_ptr<session_handler> create_session_handler();
 
     /**
      * Table interface provides access to all table ranges stored in the

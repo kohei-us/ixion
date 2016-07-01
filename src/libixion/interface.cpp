@@ -18,9 +18,9 @@ session_handler::~session_handler() {}
 formula_model_access::formula_model_access() {}
 formula_model_access::~formula_model_access() {}
 
-session_handler* formula_model_access::get_session_handler()
+std::unique_ptr<session_handler> formula_model_access::create_session_handler()
 {
-    return NULL;
+    return std::unique_ptr<session_handler>();
 }
 
 table_handler* formula_model_access::get_table_handler()

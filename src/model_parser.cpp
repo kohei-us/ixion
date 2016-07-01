@@ -102,7 +102,6 @@ model_parser::check_error::check_error(const string& msg) :
 
 model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_context(),
-    m_session_handler(m_context),
     m_table_handler(),
     mp_table_entry(nullptr),
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
@@ -110,7 +109,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_thread_count(thread_count),
     m_print_separator(true)
 {
-    m_context.set_session_handler(&m_session_handler);
+    m_context.set_session_handler_factory(ixion::make_unique<session_handler::factory>(m_context));
     m_context.set_table_handler(&m_table_handler);
     m_context.append_sheet(IXION_ASCII("sheet"), 1048576, 1024);
 }

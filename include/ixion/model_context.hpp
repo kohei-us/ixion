@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_MODEL_CONTEXT_HPP__
-#define __IXION_MODEL_CONTEXT_HPP__
+#ifndef INCLUDED_IXION_MODEL_CONTEXT_HPP
+#define INCLUDED_IXION_MODEL_CONTEXT_HPP
 
 #include "ixion/column_store_type.hpp"
 #include "ixion/mem_str_buf.hpp"
@@ -15,7 +15,6 @@
 
 #include <string>
 #include <deque>
-#include <memory>
 
 namespace ixion {
 
@@ -34,6 +33,12 @@ class model_context_impl;
 class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 {
 public:
+    class session_handler_factory
+    {
+    public:
+        virtual std::unique_ptr<iface::session_handler> create();
+    };
+
     struct shared_tokens
     {
         formula_tokens_t* tokens;
@@ -65,7 +70,7 @@ public:
     virtual const ::std::string* get_named_expression_name(const formula_cell* expr) const;
     virtual double count_range(const abs_range_t& range, const values_t& values_type) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
-    virtual iface::session_handler* get_session_handler();
+    virtual std::unique_ptr<iface::session_handler> create_session_handler();
     virtual iface::table_handler* get_table_handler();
     virtual const iface::table_handler* get_table_handler() const;
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
@@ -124,16 +129,7 @@ public:
      */
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
-    /**
-     * Set new session handler instance.  The client code needs to allocate
-     * the new instance and pass it to the model context; the model context
-     * will in turn manage the life cycle of the passed instance. Passing NULL
-     * here will only delete the existing session handler, which disables
-     * session handling altogether.
-     *
-     * @param handler pointer to the new session handler instance.
-     */
-    void set_session_handler(iface::session_handler* handler);
+    void set_session_handler_factory(std::unique_ptr<session_handler_factory>&& factory);
 
     void set_table_handler(iface::table_handler* handler);
 

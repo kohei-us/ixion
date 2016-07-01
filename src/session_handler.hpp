@@ -22,6 +22,7 @@ public:
     virtual ~session_handler();
 
     virtual void begin_cell_interpret(const abs_address_t& pos);
+    virtual void end_cell_interpret();
     virtual void set_result(const formula_result& result);
     virtual void set_invalid_expression(const char* msg);
     virtual void set_formula_error(const char* msg);
@@ -34,6 +35,15 @@ public:
     virtual void push_table_ref(const table_t& table);
     virtual void push_function(formula_function_t foc);
 
+    class factory : public model_context::session_handler_factory
+    {
+        const model_context& m_context;
+    public:
+        factory(const model_context& cxt);
+
+        virtual std::unique_ptr<iface::session_handler> create();
+    };
+
 private:
     const model_context& m_context;
     std::unique_ptr<formula_name_resolver> mp_resolver;
@@ -43,4 +53,5 @@ private:
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

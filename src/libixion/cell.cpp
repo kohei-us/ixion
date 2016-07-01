@@ -183,12 +183,13 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
             // it can mean the cell has circular dependency.
             if (mp_impl->m_interpret_status.result->get_type() == formula_result::rt_error)
             {
-                iface::session_handler* handler = context.get_session_handler();
+                auto handler = context.create_session_handler();
                 if (handler)
                 {
                     handler->begin_cell_interpret(pos);
                     const char* msg = get_formula_error_name(mp_impl->m_interpret_status.result->get_error());
                     handler->set_formula_error(msg);
+                    handler->end_cell_interpret();
                 }
             }
             return;

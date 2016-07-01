@@ -94,7 +94,7 @@ private:
 private:
     const formula_cell* m_parent_cell;
     iface::formula_model_access& m_context;
-    iface::session_handler* mp_handler;
+    std::unique_ptr<iface::session_handler> mp_handler;
     abs_address_t m_pos;
 
     value_stack_t m_stack;
