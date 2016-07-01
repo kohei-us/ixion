@@ -173,6 +173,9 @@ void model_parser::parse()
             }
             else if (buf_com.equals("mode init"))
             {
+                cout << get_formula_result_output_separator() << endl
+                    << "initializing" << endl;
+
                 parse_mode = parse_mode_init;
                 m_print_separator = true;
             }
@@ -184,6 +187,9 @@ void model_parser::parse()
             }
             else if (buf_com.equals("mode edit"))
             {
+                cout << get_formula_result_output_separator() << endl
+                    << "editing" << endl;
+
                 parse_mode = parse_mode_edit;
                 m_dirty_cells.clear();
                 m_dirty_cell_addrs.clear();
@@ -296,6 +302,12 @@ void model_parser::parse_init(const char*& p)
         return;
     }
 
+    if (m_print_separator)
+    {
+        m_print_separator = false;
+        cout << get_formula_result_output_separator() << endl;
+    }
+
     switch (content_type)
     {
         case ct_formula:
@@ -309,6 +321,7 @@ void model_parser::parse_init(const char*& p)
             assert(p);
             m_dirty_cells.insert(pos);
             register_formula_cell(m_context, pos);
+            cout << name.str() << ": (f) " << buf.str() << endl;
 #if DEBUG_MODEL_PARSER
             std::string s;
             print_formula_tokens(m_context, pos, *tokens, s);
@@ -322,11 +335,6 @@ void model_parser::parse_init(const char*& p)
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: string" << endl;
 #endif
             m_context.set_string_cell(pos, buf.get(), buf.size());
-            if (m_print_separator)
-            {
-                m_print_separator = false;
-                cout << get_formula_result_output_separator() << endl;
-            }
             cout << name.str() << ": (s) " << buf.str() << endl;
         }
         break;
@@ -337,12 +345,6 @@ void model_parser::parse_init(const char*& p)
 #endif
             double value = global::to_double(buf.get(), buf.size());
             m_context.set_numeric_cell(pos, value);
-
-            if (m_print_separator)
-            {
-                m_print_separator = false;
-                cout << get_formula_result_output_separator() << endl;
-            }
 
             address_t pos_display(pos);
             pos_display.set_absolute(false);
