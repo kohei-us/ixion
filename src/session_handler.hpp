@@ -5,13 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_SESSION_HANDLER_HPP__
-#define __IXION_SESSION_HANDLER_HPP__
+#ifndef INCLUDED_IXION_SESSION_HANDLER_HPP
+#define INCLUDED_IXION_SESSION_HANDLER_HPP
 
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/model_context.hpp"
 
 #include <string>
+#include <sstream>
 
 namespace ixion {
 
@@ -44,10 +45,13 @@ public:
         virtual std::unique_ptr<iface::session_handler> create();
     };
 
+    static void print(const std::string& msg);
+
 private:
     const model_context& m_context;
     std::unique_ptr<formula_name_resolver> mp_resolver;
     std::string m_cell_name;
+    std::ostringstream m_buf;
 };
 
 }
