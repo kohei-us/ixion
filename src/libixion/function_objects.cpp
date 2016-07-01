@@ -163,10 +163,9 @@ void cell_dependency_handler::operator() (const abs_address_t& fcell)
     __IXION_DEBUG_OUT__ << "processing dependency of " << resolver.get_name(fcell, false) << endl;
 #endif
     // Register cell dependencies.
-    std::vector<const formula_token*> ref_tokens;
     formula_cell* p = m_context.get_formula_cell(fcell);
     assert(p);
-    p->get_ref_tokens(m_context, fcell, ref_tokens);
+    std::vector<const formula_token*> ref_tokens = p->get_ref_tokens(m_context, fcell);
 
 #if DEBUG_FUNCTION_OBJECTS
     __IXION_DEBUG_OUT__ << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;

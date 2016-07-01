@@ -57,8 +57,20 @@ public:
      */
     void reset();
 
-    void get_ref_tokens(
-        const iface::formula_model_access& cxt, const abs_address_t& pos, std::vector<const formula_token*>& tokens);
+    /**
+     * Get a series of all reference tokens included in the formula
+     * expression stored in this cell.
+     *
+     * @param cxt model context instance.
+     * @param pos position of the cell.
+     *
+     * @return an array of reference formula tokens.  Each element is a
+     *         pointer to the actual token instance stored in the cell object.
+     *         Be aware that the pointer is valid only as long as the actual
+     *         token instance is alive.
+     */
+    std::vector<const formula_token*> get_ref_tokens(
+        const iface::formula_model_access& cxt, const abs_address_t& pos) const;
 
     const formula_result* get_result_cache() const;
 

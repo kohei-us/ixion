@@ -185,8 +185,7 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
         // Not a formula cell. Bail out.
         return;
 
-    std::vector<const formula_token*> ref_tokens;
-    cell->get_ref_tokens(cxt, pos, ref_tokens);
+    std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
     std::for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_add));
@@ -212,8 +211,7 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
     // Go through all its existing references, and remove
     // itself as their listener.  This step is important
     // especially during partial re-calculation.
-    std::vector<const formula_token*> ref_tokens;
-    fcell->get_ref_tokens(cxt, pos, ref_tokens);
+    std::vector<const formula_token*> ref_tokens = fcell->get_ref_tokens(cxt, pos);
     for_each(ref_tokens.begin(), ref_tokens.end(),
              formula_cell_listener_handler(cxt,
                  pos, formula_cell_listener_handler::mode_remove));

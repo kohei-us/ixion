@@ -291,8 +291,11 @@ void formula_cell::reset()
     mp_impl->reset_flag();
 }
 
-void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const abs_address_t& pos, vector<const formula_token*>& tokens)
+std::vector<const formula_token*> formula_cell::get_ref_tokens(
+    const iface::formula_model_access& cxt, const abs_address_t& pos) const
 {
+    std::vector<const formula_token*> ret;
+
     const formula_tokens_t* this_tokens = NULL;
     if (is_shared())
         this_tokens = cxt.get_shared_formula_tokens(pos.sheet, mp_impl->m_identifier);
@@ -300,7 +303,7 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
         this_tokens = cxt.get_formula_tokens(pos.sheet, mp_impl->m_identifier);
 
     if (!this_tokens)
-        return;
+        return ret;
 
     std::for_each(this_tokens->begin(), this_tokens->end(),
         [&](const formula_tokens_t::value_type& t)
@@ -309,13 +312,15 @@ void formula_cell::get_ref_tokens(const iface::formula_model_access& cxt, const 
             {
                 case fop_single_ref:
                 case fop_range_ref:
-                    tokens.push_back(&(*t));
+                    ret.push_back(t.get());
                 break;
                 default:
                     ; // ignore the rest.
             }
         }
     );
+
+    return ret;
 }
 
 const formula_result* formula_cell::get_result_cache() const
