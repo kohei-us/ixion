@@ -141,12 +141,9 @@ void cell_listener_tracker::impl::get_all_range_listeners_re(
 }
 
 cell_listener_tracker::cell_listener_tracker(iface::formula_model_access& cxt) :
-    mp_impl(new impl(cxt)) {}
+    mp_impl(make_unique<impl>(cxt)) {}
 
-cell_listener_tracker::~cell_listener_tracker()
-{
-    delete mp_impl;
-}
+cell_listener_tracker::~cell_listener_tracker() {}
 
 void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
 {

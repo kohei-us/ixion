@@ -200,7 +200,7 @@ depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_precedent_ce
     typename precedent_map_type::const_iterator itr = m_precedent_map.find(cell);
     if (itr == m_precedent_map.end())
         // This cell has no dependent cells.
-        return NULL;
+        return nullptr;
 
     return &itr->second;
 }

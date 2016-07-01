@@ -5,13 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_RANGE_LISTENER_TRACKER_HPP__
-#define __IXION_RANGE_LISTENER_TRACKER_HPP__
+#ifndef INCLUDED_IXION_RANGE_LISTENER_TRACKER_HPP
+#define INCLUDED_IXION_RANGE_LISTENER_TRACKER_HPP
 
 #include "ixion/global.hpp"
 #include "ixion/address.hpp"
 
 #include <unordered_set>
+#include <memory>
 
 namespace ixion {
 
@@ -30,13 +31,14 @@ class formula_model_access;
 class IXION_DLLPUBLIC cell_listener_tracker
 {
     struct impl;
+    std::unique_ptr<impl> mp_impl;
 
-    impl* mp_impl;
+public:
 
     cell_listener_tracker() = delete;
     cell_listener_tracker(const cell_listener_tracker&) = delete;
     cell_listener_tracker& operator=(const cell_listener_tracker&) = delete;
-public:
+
     cell_listener_tracker(iface::formula_model_access& cxt);
 
     typedef std::unordered_set<abs_address_t, abs_address_t::hash> address_set_type;
@@ -93,4 +95,5 @@ public:
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
