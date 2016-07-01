@@ -6,6 +6,7 @@ lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
 	address.cpp \
 	cell.cpp \
+	cell_queue_manager.hpp \
 	cell_queue_manager.cpp \
 	config.cpp \
 	depends_tracker.hpp \

@@ -6,12 +6,11 @@
  */
 
 #include "depends_tracker.hpp"
+#include "cell_queue_manager.hpp"
 
 #include "ixion/global.hpp"
 #include "ixion/cell.hpp"
-#include "ixion/cell_queue_manager.hpp"
 #include "ixion/formula_name_resolver.hpp"
-
 #include "ixion/interface/formula_model_access.hpp"
 
 #include <vector>

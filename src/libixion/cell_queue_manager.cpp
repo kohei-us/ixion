@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/cell_queue_manager.hpp"
+#include "cell_queue_manager.hpp"
 #include "ixion/cell.hpp"
 
 #include "ixion/interface/formula_model_access.hpp"
