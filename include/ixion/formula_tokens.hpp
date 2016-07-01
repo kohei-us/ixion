@@ -24,11 +24,9 @@ namespace ixion {
  *
  * @return printable name for a formula opcode.
  */
-const char* get_opcode_name(fopcode_t oc);
+IXION_DLLPUBLIC const char* get_opcode_name(fopcode_t oc);
 
 IXION_DLLPUBLIC const char* get_formula_opcode_string(fopcode_t oc);
-
-// ============================================================================
 
 class IXION_DLLPUBLIC formula_token
 {
@@ -57,11 +55,10 @@ private:
 
 typedef std::vector<std::unique_ptr<formula_token>> formula_tokens_t;
 
-// ============================================================================
-
-bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
+IXION_DLLPUBLIC bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
 
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
