@@ -74,10 +74,10 @@ public:
 
         future_type ret = std::move(m_futures.front());
         m_futures.pop();
+        lock.unlock();
 
         ret.get();  // This may throw if an exception was thrown on the thread.
 
-        lock.unlock();
         m_cond.notify_one();
     }
 };
