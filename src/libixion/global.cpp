@@ -52,15 +52,6 @@ double global::get_current_time()
 #endif
 }
 
-void global::sleep(unsigned int mseconds)
-{
-#ifdef _WIN32
-    ::Sleep(mseconds);
-#else
-    ::usleep(1000*mseconds);
-#endif
-}
-
 void global::load_file_content(const string& filepath, string& content)
 {
     ifstream file(filepath.c_str());

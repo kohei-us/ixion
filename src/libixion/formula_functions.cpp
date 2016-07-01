@@ -24,6 +24,8 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -375,7 +377,7 @@ void formula_functions::fnc_now(value_stack_t& args) const
 
 void formula_functions::fnc_wait(value_stack_t& args) const
 {
-    global::sleep(1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     args.clear();
     args.push_value(1);
 }

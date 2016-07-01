@@ -18,6 +18,8 @@
 #include <string>
 #include <cstring>
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 using namespace ixion;
@@ -827,7 +829,7 @@ void test_volatile_function()
     double t1 = cxt.get_numeric_value(abs_address_t(0,0,1));
 
     // Pause for 0.2 second.
-    global::sleep(200);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     // No modification, but B1 should still be flagged dirty.
     dirty_cells.clear();

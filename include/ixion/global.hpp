@@ -35,13 +35,6 @@ public:
     static double get_current_time();
 
     /**
-     * Suspend execution of the calling thread for specified seconds.
-     *
-     * @param seconds duration of sleep.
-     */
-    static void sleep(unsigned int mseconds);
-
-    /**
      * Load the entire content of a file on disk.  When loading, this function
      * appends an extra character to the end, the pointer to which can be used
      * as the position past the last character.
