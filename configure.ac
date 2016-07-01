@@ -21,6 +21,8 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
+CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -pthread"
+LDFLAGS="-pthread -Wl,--no-as-needed"
 
 AC_CANONICAL_HOST
 
@@ -79,9 +81,22 @@ AC_TYPE_SIZE_T
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gettimeofday])
 
-CPPFLAGS="$CPPFLAGS -D_REENTRANT"
-
 BOOST_REQUIRE([1.36])
+
+# =====
+# Debug
+# =====
+AC_ARG_ENABLE(debug,
+	AS_HELP_STRING([--enable-debug], [Build with debug features in mind.])],
+	[enable_debug="$enableval"],
+	[enable_debug=no]
+)
+AS_IF([test "x$enable_debug" != "xno"], [
+	CXXFLAGS="$CXXFLAGS -g -O0"
+], [
+	CXXFLAGS="$CXXFLAGS -O2"
+	AC_DEFINE([NDEBUG], [], [Disable debugging information])
+])
 
 # Check for mdds.
 PKG_CHECK_MODULES([MDDS],[mdds-1.2 >= 1.2.0])
@@ -93,9 +108,6 @@ AS_IF([test "x$enable_python" != "xno"], [
 ])
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
-
-CPPFLAGS="$CPPFLAGS -g -O2 -fvisibility=hidden -I/usr/local/include"
-LDFLAGS="-L/usr/local/lib"
 
 BOOST_THREADS
 BOOST_PROGRAM_OPTIONS
