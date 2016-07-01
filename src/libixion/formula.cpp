@@ -148,6 +148,18 @@ void print_formula_tokens(
 
 namespace {
 
+bool is_volatile(formula_function_t func)
+{
+    switch (func)
+    {
+        case formula_function_t::func_now:
+            return true;
+        default:
+            ;
+    }
+    return false;
+}
+
 bool has_volatile(const formula_tokens_t& tokens)
 {
     formula_tokens_t::const_iterator i = tokens.begin(), iend = tokens.end();

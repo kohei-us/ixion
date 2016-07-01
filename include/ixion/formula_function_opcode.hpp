@@ -41,8 +41,6 @@ enum class formula_function_t
     // TODO: more functions to come...
 };
 
-bool is_volatile(formula_function_t func);
-
 IXION_DLLPUBLIC const char* get_formula_function_name(formula_function_t func);
 
 }

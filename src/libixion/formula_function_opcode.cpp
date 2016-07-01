@@ -11,18 +11,6 @@
 
 namespace ixion {
 
-bool is_volatile(formula_function_t func)
-{
-    switch (func)
-    {
-        case formula_function_t::func_now:
-            return true;
-        default:
-            ;
-    }
-    return false;
-}
-
 const char* get_formula_function_name(formula_function_t func)
 {
     return formula_functions::get_function_name(func);
