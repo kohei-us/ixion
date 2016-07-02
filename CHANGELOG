@@ -1,5 +1,9 @@
 * refactor the multi-threaded calculation code to make it more robust.
 
+* properly wait on formula calculation when fetching for a result
+  cache, without which threaded calculations would sometimes generate
+  wrong results.
+
 ixion 0.11.1
 
 * add get_columns() method to the model_context class to return an
