@@ -28,4 +28,13 @@ AM_TESTS_ENVIRONMENT = PATH=.libs$${PATH:+:$${PATH}}; export PATH; \
 	LD_LIBRARY_PATH=libixion/.libs$${LD_LIBRARY_PATH:+:$${LD_LIBRARY_PATH}}; export LD_LIBRARY_PATH; \
 	DYLD_LIBRARY_PATH=$${LD_LIBRARY_PATH}}; export DYLD_LIBRARY_PATH;
 
-TESTS = ../test/ixion-parser-test.sh
+TESTS = \
+	../test/parser-test-t0.sh \
+	../test/parser-test-t1.sh \
+	../test/parser-test-t2.sh \
+	../test/parser-test-t3.sh \
+	../test/parser-test-t4.sh \
+	../test/parser-test-t5.sh \
+	../test/parser-test-t6.sh \
+	../test/parser-test-t7.sh \
+	../test/parser-test-t8.sh
