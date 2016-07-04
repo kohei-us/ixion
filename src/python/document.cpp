@@ -130,14 +130,35 @@ PyObject* document_append_sheet(document* self, PyObject* args)
     return obj_sheet;
 }
 
-PyObject* document_calculate(document* self, PyObject*, PyObject*)
+const char* doc_document_calculate =
+"Document.calculate([threads])\n"
+"\n"
+"(Re-)calculate all modified formula cells in the document.\n"
+"\n"
+"Keyword arguments:\n"
+"\n"
+"threads -- number of threads to use besides the main thread, or 0 if all\n"
+"           calculations are to be performed on the main thread. (default 0)\n"
+;
+
+PyObject* document_calculate(document* self, PyObject* args, PyObject* kwargs)
 {
+    static const char* kwlist[] = { "threads", nullptr };
+
+    long threads = 0;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|i", const_cast<char**>(kwlist), &threads))
+    {
+        PyErr_SetString(PyExc_TypeError, "Failed to parse the arguments for Document.calculate()");
+        return nullptr;
+    }
+
     model_context& cxt = self->m_data->m_global.m_cxt;
     modified_cells_t& mod_cells = self->m_data->m_global.m_modified_cells;
     dirty_formula_cells_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
 
     ixion::get_all_dirty_cells(cxt, mod_cells, dirty_fcells);
-    calculate_cells(cxt, dirty_fcells, 0);
+    calculate_cells(cxt, dirty_fcells, threads);
     mod_cells.clear();
     dirty_fcells.clear();
 
@@ -216,7 +237,7 @@ PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)
 PyMethodDef document_methods[] =
 {
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
-    { "calculate", (PyCFunction)document_calculate, METH_NOARGS, "calculate formula cells" },
+    { "calculate", (PyCFunction)document_calculate, METH_VARARGS | METH_KEYWORDS, doc_document_calculate },
     { "get_sheet_names", (PyCFunction)document_get_sheet_names, METH_NOARGS, "get a tuple of sheet names" },
     { "get_sheet", (PyCFunction)document_get_sheet, METH_O, "get a sheet object either by index or name" },
     { NULL }

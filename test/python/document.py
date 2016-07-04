@@ -160,6 +160,27 @@ class DocumentTest(unittest.TestCase):
         val = sh1.get_numeric_value(6, 1)
         self.assertEqual(10.0, val)
 
+    def test_formula_cell_threaded_recalc(self):
+
+        sh1 = self.doc.append_sheet("Data")
+        sh1.set_numeric_cell(0, 0, 1.1)
+        sh1.set_numeric_cell(1, 0, 1.2)
+        sh1.set_numeric_cell(2, 0, 1.3)
+        sh1.set_formula_cell(0, 1, "SUM(A1:A3)")
+        sh1.set_formula_cell(1, 1, "B1*2")
+
+        self.doc.calculate(threads=2)
+
+        # Check the value in B1.
+        v = sh1.get_numeric_value(0, 1)
+        v = round(v, 1)
+        self.assertEqual(v, 3.6)
+
+        # Check the value in B2.
+        v = sh1.get_numeric_value(1, 1)
+        v = round(v, 1)
+        self.assertEqual(v, 7.2)
+
     def test_formula_cell_string(self):
         sh1 = self.doc.append_sheet("MyData")
         sh1.set_string_cell(1, 1, "My precious string")  # B2
