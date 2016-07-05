@@ -1,4 +1,6 @@
 
+.. py:currentmodule:: ixion
+
 Overview
 ========
 

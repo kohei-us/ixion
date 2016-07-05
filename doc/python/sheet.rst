@@ -1,8 +1,10 @@
 
+.. py:currentmodule:: ixion
+
 Sheet
 =====
 
-.. class:: Sheet()
+.. class:: ixion.Sheet()
 
    Class :class:`Sheet` represents a single sheet that stores cells in a
    2-dimensional grid address space.  Rows and columns are used to specify a
