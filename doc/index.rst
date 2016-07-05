@@ -9,11 +9,11 @@ Welcome to Ixion's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   overview.rst
-   document.rst
-   sheet.rst
+   overview/index.rst
+   cpp/index.rst
+   python/index.rst
 
 Indices and tables
 ==================
