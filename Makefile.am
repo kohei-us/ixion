@@ -57,6 +57,8 @@ EXTRA_DIST = \
 	$(test_data) \
 	$(doc_data)
 
+.PHONY: distclean-local dist-hook doc-doxygen doc-sphinx doc
+
 distclean-local:
 	rm -rf *.pc
 
@@ -74,7 +76,13 @@ dist-hook:
 		echo A git clone is required to generate a ChangeLog >&2; \
 	fi
 
-python-doc:
-	@echo "Building Python doc..."
-	sphinx-build -b html ./doc/ ./doc/_build
+doc-doxygen:
+	@echo "Building documentation by doxygen..."
+	@cd doc && doxygen doxygen.conf
+
+doc-sphinx:
+	@echo "Building documentation by sphinx..."
+	@sphinx-build -b html ./doc/ ./doc/_build
+
+doc: doc-doxygen doc-sphinx
 
