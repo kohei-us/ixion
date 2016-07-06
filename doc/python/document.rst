@@ -9,6 +9,12 @@ Document
    Class :class:`~ixion.Document` represents an entire document which consists
    of one or more :class:`~ixion.Sheet` objects.
 
+.. attribute:: Document.sheet_names
+
+   A read-only attribute that provides a tuple of the names of the sheets that
+   belong to the document. The order of the sheet names signifies the order
+   of the sheets in the document.
+
 .. method:: Document.append_sheet(sheet_name)
 
    Append a new sheet to the document object and return the newly created
@@ -49,10 +55,4 @@ Document
       besides the main thread.  Set this to 0 if you want the calculation to
       be performed on the main thread only.  The value of 0 is assumed if this
       value is not specified.
-
-.. attribute:: Document.sheet_names
-
-   A read-only attribute that provides a tuple of the names of the sheets that
-   belong to the document. The order of the sheet names signifies the order
-   of the sheets in the document.
 
