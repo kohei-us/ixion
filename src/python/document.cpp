@@ -221,7 +221,7 @@ PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
     return NULL;
 }
 
-PyObject* document_get_sheet_names(pyobj_document* self, PyObject*, PyObject*)
+PyObject* document_getter_sheet_names(pyobj_document* self, void* closure)
 {
     model_context& cxt = self->m_data->m_global.m_cxt;
     const vector<PyObject*>& sheets = self->m_data->m_sheets;
@@ -241,9 +241,14 @@ PyMethodDef document_methods[] =
 {
     { "append_sheet", (PyCFunction)document_append_sheet, METH_VARARGS, "append new sheet to the document" },
     { "calculate", (PyCFunction)document_calculate, METH_VARARGS | METH_KEYWORDS, doc_document_calculate },
-    { "get_sheet_names", (PyCFunction)document_get_sheet_names, METH_NOARGS, "get a tuple of sheet names" },
     { "get_sheet", (PyCFunction)document_get_sheet, METH_O, "get a sheet object either by index or name" },
-    { NULL }
+    { nullptr }
+};
+
+PyGetSetDef document_getset[] =
+{
+    { "sheet_names", (getter)document_getter_sheet_names, (setter)nullptr, "A tuple of sheet names", nullptr },
+    { nullptr }
 };
 
 PyTypeObject document_type =
@@ -277,7 +282,7 @@ PyTypeObject document_type =
     0,		                                  // tp_iternext
     document_methods,                         // tp_methods
     0,                                        // tp_members
-    0,                                        // tp_getset
+    document_getset,                          // tp_getset
     0,                                        // tp_base
     0,                                        // tp_dict
     0,                                        // tp_descr_get

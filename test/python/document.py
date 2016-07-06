@@ -25,7 +25,7 @@ class DocumentTest(unittest.TestCase):
         for test, sheet in zip(tests, sheets):
             self.assertEqual(test, sheet.name)
 
-        self.assertEqual(tests, self.doc.get_sheet_names())
+        self.assertEqual(tests, self.doc.sheet_names)
 
         for i, test in enumerate(tests):
             # get sheet by index.
