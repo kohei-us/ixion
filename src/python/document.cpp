@@ -75,22 +75,22 @@ int document_init(pyobj_document* self, PyObject* /*args*/, PyObject* /*kwargs*/
 
 PyObject* document_append_sheet(pyobj_document* self, PyObject* args)
 {
-    char* sheet_name = NULL;
+    char* sheet_name = nullptr;
     if (!PyArg_ParseTuple(args, "s", &sheet_name))
     {
         PyErr_SetString(PyExc_TypeError, "The method must be given a sheet name string");
-        return NULL;
+        return nullptr;
     }
 
     assert(sheet_name);
 
     PyTypeObject* sheet_type = get_sheet_type();
     if (!sheet_type)
-        return NULL;
+        return nullptr;
 
     PyObject* obj_sheet = sheet_type->tp_new(sheet_type, args, 0);
     if (!obj_sheet)
-        return NULL;
+        return nullptr;
 
     sheet_type->tp_init(obj_sheet, args, 0);
 
@@ -176,12 +176,12 @@ PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
     {
         long index = PyLong_AsLong(arg);
         if (index == -1 && PyErr_Occurred())
-            return NULL;
+            return nullptr;
 
         if (index < 0 || static_cast<size_t>(index) >= sheets.size())
         {
             PyErr_SetString(PyExc_IndexError, "Out-of-bound sheet index");
-            return NULL;
+            return nullptr;
         }
 
         PyObject* sheet_obj = sheets[index];
@@ -192,7 +192,7 @@ PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
     // Not a python int object.  See if it's a string object.
     const char* name = PyUnicode_AsUTF8(arg);
     if (!name)
-        return NULL;
+        return nullptr;
 
     // Iterate through all sheets to find a match.
     // TODO : Use string hash to speed up the lookup.
@@ -218,7 +218,7 @@ PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
     ostringstream os;
     os << "No sheet named '" << name << "' found";
     PyErr_SetString(PyExc_IndexError, os.str().c_str());
-    return NULL;
+    return nullptr;
 }
 
 PyObject* document_getter_sheet_names(pyobj_document* self, void* closure)
@@ -253,7 +253,7 @@ PyGetSetDef document_getset[] =
 
 PyTypeObject document_type =
 {
-    PyVarObject_HEAD_INIT(NULL, 0)
+    PyVarObject_HEAD_INIT(nullptr, 0)
     "ixion.Document",                         // tp_name
     sizeof(pyobj_document),                         // tp_basicsize
     0,                                        // tp_itemsize

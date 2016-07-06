@@ -55,16 +55,16 @@ PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
     int start;
     int stop;
     int resolver_index = 1; // Excel A1 by default
-    static const char* kwlist[] = { "start", "stop", "resolver", NULL };
+    static const char* kwlist[] = { "start", "stop", "resolver", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|i", const_cast<char**>(kwlist), &start, &stop, &resolver_index))
-        return NULL;
+        return nullptr;
 
     if (start >= stop)
     {
         PyErr_SetString(
             PyExc_IndexError,
             "Start position is larger or equal to the stop position.");
-        return NULL;
+        return nullptr;
     }
 
     if (start < 0)
@@ -72,16 +72,16 @@ PyObject* column_label(PyObject* /*module*/, PyObject* args, PyObject* kwargs)
         PyErr_SetString(
             PyExc_IndexError,
             "Start position should be larger than or equal to 0.");
-        return NULL;
+        return nullptr;
     }
 
     auto resolver = formula_name_resolver::get(
-        static_cast<formula_name_resolver_t>(resolver_index), NULL);
+        static_cast<formula_name_resolver_t>(resolver_index), nullptr);
     if (!resolver)
     {
         PyErr_SetString(
             get_python_formula_error(), "Specified resolver type is invalid.");
-        return NULL;
+        return nullptr;
     }
 
     int size = stop - start;
@@ -102,7 +102,7 @@ PyMethodDef ixion_methods[] =
     { "info", (PyCFunction)info, METH_NOARGS, "Print ixion module information." },
     { "column_label", (PyCFunction)column_label, METH_VARARGS | METH_KEYWORDS,
       "Return a list of column label strings based on specified column range values." },
-    { NULL, NULL, 0, NULL }
+    { nullptr, nullptr, 0, nullptr }
 };
 
 struct module_state
@@ -128,13 +128,13 @@ struct PyModuleDef moduledef =
 {
     PyModuleDef_HEAD_INIT,
     "ixion",
-    NULL,
+    nullptr,
     sizeof(struct module_state),
     ixion_methods,
-    NULL,
+    nullptr,
     ixion_traverse,
     ixion_clear,
-    NULL
+    nullptr
 };
 
 }}
@@ -145,11 +145,11 @@ IXION_DLLPUBLIC PyObject* PyInit_ixion()
 {
     PyTypeObject* doc_type = ixion::python::get_document_type();
     if (PyType_Ready(doc_type) < 0)
-        return NULL;
+        return nullptr;
 
     PyTypeObject* sheet_type = ixion::python::get_sheet_type();
     if (PyType_Ready(sheet_type) < 0)
-        return NULL;
+        return nullptr;
 
     PyObject* m = PyModule_Create(&ixion::python::moduledef);
 

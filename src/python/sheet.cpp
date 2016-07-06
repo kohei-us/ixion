@@ -20,7 +20,7 @@ using namespace std;
 
 namespace ixion { namespace python {
 
-sheet_data::sheet_data() : m_global(NULL), m_sheet_index(-1) {}
+sheet_data::sheet_data() : m_global(nullptr), m_sheet_index(-1) {}
 
 namespace {
 
@@ -44,7 +44,7 @@ PyObject* sheet_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/
 {
     sheet* self = (sheet*)type->tp_alloc(type, 0);
     if (!self)
-        return NULL;
+        return nullptr;
 
     self->m_data = new sheet_data;
 
@@ -52,15 +52,15 @@ PyObject* sheet_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/
     if (!self->name)
     {
         Py_DECREF(self);
-        return NULL;
+        return nullptr;
     }
     return reinterpret_cast<PyObject*>(self);
 }
 
 int sheet_init(sheet* self, PyObject* args, PyObject* kwargs)
 {
-    PyObject* name = NULL;
-    static const char* kwlist[] = { "name", NULL };
+    PyObject* name = nullptr;
+    static const char* kwlist[] = { "name", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", (char**)kwlist, &name))
         return -1;
 
@@ -81,16 +81,16 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
     int row = -1;
     double val = 0.0;
 
-    static const char* kwlist[] = { "row", "column", "value", NULL };
+    static const char* kwlist[] = { "row", "column", "value", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iid", const_cast<char**>(kwlist), &row, &col, &val))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
@@ -106,18 +106,18 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
     int col = -1;
     int row = -1;
-    char* val = NULL;
+    char* val = nullptr;
 
-    static const char* kwlist[] = { "row", "column", "value", NULL };
+    static const char* kwlist[] = { "row", "column", "value", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", const_cast<char**>(kwlist), &row, &col, &val))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
@@ -133,18 +133,18 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
     int col = -1;
     int row = -1;
-    char* formula = NULL;
+    char* formula = nullptr;
 
-    static const char* kwlist[] = { "row", "column", "value", NULL };
+    static const char* kwlist[] = { "row", "column", "value", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "iis", const_cast<char**>(kwlist), &row, &col, &formula))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
@@ -166,16 +166,16 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     int col = -1;
     int row = -1;
 
-    static const char* kwlist[] = { "row", "column", NULL };
+    static const char* kwlist[] = { "row", "column", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
@@ -187,7 +187,7 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     catch (const formula_error&)
     {
         PyErr_SetString(PyExc_TypeError, "The formula cell has yet to be calculated");
-        return NULL;
+        return nullptr;
     }
 
     return PyFloat_FromDouble(val);
@@ -198,23 +198,23 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     int col = -1;
     int row = -1;
 
-    static const char* kwlist[] = { "row", "column", NULL };
+    static const char* kwlist[] = { "row", "column", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
     string_id_t sid = cxt.get_string_identifier_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
     const std::string* ps = cxt.get_string(sid);
     if (!ps)
-        return NULL;
+        return nullptr;
 
     return PyUnicode_FromStringAndSize(ps->data(), ps->size());
 }
@@ -224,16 +224,16 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     int col = -1;
     int row = -1;
 
-    static const char* kwlist[] = { "row", "column", NULL };
+    static const char* kwlist[] = { "row", "column", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
@@ -241,12 +241,12 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
 
     if (!fc)
-        return NULL;
+        return nullptr;
 
     size_t tid = fc->get_identifier();
     const formula_tokens_t* ft = cxt.get_formula_tokens(sd->m_sheet_index, tid);
     if (!ft)
-        return NULL;
+        return nullptr;
 
     string str;
     ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft, str);
@@ -261,16 +261,16 @@ PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
     int col = -1;
     int row = -1;
 
-    static const char* kwlist[] = { "row", "column", NULL };
+    static const char* kwlist[] = { "row", "column", nullptr };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii", const_cast<char**>(kwlist), &row, &col))
-        return NULL;
+        return nullptr;
 
     sheet_data* sd = get_sheet_data(reinterpret_cast<PyObject*>(self));
     if (!sd->m_global)
     {
         PyErr_SetString(get_python_sheet_error(),
             "This Sheet object does not belong to a Document object.");
-        return NULL;
+        return nullptr;
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
@@ -291,18 +291,18 @@ PyMethodDef sheet_methods[] =
     { "get_string_value",  (PyCFunction)sheet_get_string_value,  METH_VARARGS | METH_KEYWORDS, "get string value from specified cell" },
     { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_VARARGS | METH_KEYWORDS, "get formula expression string from specified cell position" },
     { "erase_cell", (PyCFunction)sheet_erase_cell, METH_VARARGS | METH_KEYWORDS, "erase cell at specified position" },
-    { NULL }
+    { nullptr }
 };
 
 PyMemberDef sheet_members[] =
 {
     { (char*)"name", T_OBJECT_EX, offsetof(sheet, name), READONLY, (char*)"sheet name" },
-    { NULL }
+    { nullptr }
 };
 
 PyTypeObject sheet_type =
 {
-    PyVarObject_HEAD_INIT(NULL, 0)
+    PyVarObject_HEAD_INIT(nullptr, 0)
     "ixion.Sheet",                            // tp_name
     sizeof(sheet),                            // tp_basicsize
     0,                                        // tp_itemsize
