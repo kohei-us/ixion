@@ -90,7 +90,11 @@ PyObject* document_append_sheet(pyobj_document* self, PyObject* args)
 
     PyObject* obj_sheet = sheet_type->tp_new(sheet_type, args, 0);
     if (!obj_sheet)
+    {
+        PyErr_SetString(PyExc_RuntimeError,
+            "Failed to allocate memory for the new sheet object.");
         return nullptr;
+    }
 
     sheet_type->tp_init(obj_sheet, args, 0);
 
@@ -192,7 +196,11 @@ PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
     // Not a python int object.  See if it's a string object.
     const char* name = PyUnicode_AsUTF8(arg);
     if (!name)
+    {
+        PyErr_SetString(PyExc_TypeError,
+            "The 'arg' value must be either of type int or type str.");
         return nullptr;
+    }
 
     // Iterate through all sheets to find a match.
     // TODO : Use string hash to speed up the lookup.

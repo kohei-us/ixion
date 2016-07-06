@@ -214,7 +214,11 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     string_id_t sid = cxt.get_string_identifier_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
     const std::string* ps = cxt.get_string(sid);
     if (!ps)
+    {
+        PyErr_SetString(PyExc_RuntimeError,
+            "Failed to get a string object associated with a string ID.");
         return nullptr;
+    }
 
     return PyUnicode_FromStringAndSize(ps->data(), ps->size());
 }
@@ -241,12 +245,19 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
     const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
 
     if (!fc)
+    {
+        PyErr_SetString(get_python_sheet_error(), "No formula cell at specified position.");
         return nullptr;
+    }
 
     size_t tid = fc->get_identifier();
     const formula_tokens_t* ft = cxt.get_formula_tokens(sd->m_sheet_index, tid);
     if (!ft)
+    {
+        PyErr_SetString(PyExc_RuntimeError,
+            "Failed to retrieve a formula tokens object from a token ID.");
         return nullptr;
+    }
 
     string str;
     ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft, str);
