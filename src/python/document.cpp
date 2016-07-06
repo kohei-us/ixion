@@ -45,14 +45,17 @@ document_data::~document_data()
     for_each(m_sheets.begin(), m_sheets.end(), free_pyobj());
 }
 
-struct document
+/**
+ * Python Document object.
+ */
+struct pyobj_document
 {
     PyObject_HEAD
 
     document_data* m_data;
 };
 
-void document_dealloc(document* self)
+void document_dealloc(pyobj_document* self)
 {
     delete self->m_data;
     Py_TYPE(self)->tp_free(reinterpret_cast<PyObject*>(self));
@@ -60,17 +63,17 @@ void document_dealloc(document* self)
 
 PyObject* document_new(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwargs*/)
 {
-    document* self = (document*)type->tp_alloc(type, 0);
+    pyobj_document* self = (pyobj_document*)type->tp_alloc(type, 0);
     self->m_data = new document_data;
     return reinterpret_cast<PyObject*>(self);
 }
 
-int document_init(document* self, PyObject* /*args*/, PyObject* /*kwargs*/)
+int document_init(pyobj_document* self, PyObject* /*args*/, PyObject* /*kwargs*/)
 {
     return 0;
 }
 
-PyObject* document_append_sheet(document* self, PyObject* args)
+PyObject* document_append_sheet(pyobj_document* self, PyObject* args)
 {
     char* sheet_name = NULL;
     if (!PyArg_ParseTuple(args, "s", &sheet_name))
@@ -141,7 +144,7 @@ const char* doc_document_calculate =
 "           calculations are to be performed on the main thread. (default 0)\n"
 ;
 
-PyObject* document_calculate(document* self, PyObject* args, PyObject* kwargs)
+PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwargs)
 {
     static const char* kwlist[] = { "threads", nullptr };
 
@@ -166,7 +169,7 @@ PyObject* document_calculate(document* self, PyObject* args, PyObject* kwargs)
     return Py_None;
 }
 
-PyObject* document_get_sheet(document* self, PyObject* arg)
+PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
 {
     const vector<PyObject*>& sheets = self->m_data->m_sheets;
     if (PyLong_Check(arg))
@@ -218,7 +221,7 @@ PyObject* document_get_sheet(document* self, PyObject* arg)
     return NULL;
 }
 
-PyObject* document_get_sheet_names(document* self, PyObject*, PyObject*)
+PyObject* document_get_sheet_names(pyobj_document* self, PyObject*, PyObject*)
 {
     model_context& cxt = self->m_data->m_global.m_cxt;
     const vector<PyObject*>& sheets = self->m_data->m_sheets;
@@ -247,7 +250,7 @@ PyTypeObject document_type =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
     "ixion.Document",                         // tp_name
-    sizeof(document),                         // tp_basicsize
+    sizeof(pyobj_document),                         // tp_basicsize
     0,                                        // tp_itemsize
     (destructor)document_dealloc,             // tp_dealloc
     0,                                        // tp_print
