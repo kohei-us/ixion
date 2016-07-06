@@ -17,6 +17,8 @@ Document
    and the name must be unique within the document.
 
    :param str sheet_name: name of the sheet to be appended to the document.
+   :rtype: :class:`ixion.Sheet`
+   :return: appended sheet object.
 
 .. method:: Document.get_sheet(arg)
 
@@ -36,12 +38,17 @@ Document
              implementation has to iterate through the sheet objects in the
              document to find a matching one.
 
-.. method:: Document.calculate()
+.. method:: Document.calculate([threads])
 
    Calculate all formula cells within the document that are marked "dirty" i.e.
    either those formula cells whose direct or indirect references have changed
    their values, or those formula cells that have been entered into the
    document.
+
+   :param int threads: (optional) number of threads to use for the calculation
+      besides the main thread.  Set this to 0 if you want the calculation to
+      be performed on the main thread only.  The value of 0 is assumed if this
+      value is not specified.
 
 .. attribute:: Document.sheet_names
 
