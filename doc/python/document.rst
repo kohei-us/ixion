@@ -18,12 +18,6 @@ Document
 
    :param str sheet_name: name of the sheet to be appended to the document.
 
-.. method:: Document.get_sheet_names()
-
-   Get a tuple of string objects that represent the names of the sheets that
-   belong to the document.  The order of the sheet names represents the order
-   of the sheets in the document.
-
 .. method:: Document.get_sheet(arg)
 
    Get a sheet object either by the position or by the name.  When the ``arg``
@@ -49,4 +43,9 @@ Document
    their values, or those formula cells that have been entered into the
    document.
 
+.. attribute:: Document.sheet_names
+
+   A read-only attribute that provides a tuple of the names of the sheets that
+   belong to the document. The order of the sheet names signifies the order
+   of the sheets in the document.
 
