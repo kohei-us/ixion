@@ -18,6 +18,31 @@ Formula API
 
 .. doxygenfunction:: ixion::calculate_cells
 
+
+Primitive Types
+---------------
+
+.. doxygentypedef:: ixion::col_t
+.. doxygentypedef:: ixion::row_t
+.. doxygentypedef:: ixion::sheet_t
+.. doxygentypedef:: ixion::string_id_t
+
+.. doxygenvariable:: ixion::global_scope
+.. doxygenvariable:: ixion::invalid_sheet
+.. doxygenvariable:: ixion::empty_string_id
+
+.. doxygenenum:: ixion::celltype_t
+.. doxygenenum:: ixion::value_t
+
+.. doxygenclass:: ixion::values_t
+
+.. doxygenenum:: ixion::table_area_t
+
+.. doxygentypedef:: ixion::table_areas_t
+
+.. doxygenenum:: ixion::formula_name_resolver_t
+
+
 Address Types
 -------------
 
@@ -38,6 +63,37 @@ Address Types
 .. doxygentypedef:: ixion::modified_cells_t
 
 
+Formula Name Resolver
+---------------------
+
+.. doxygenclass:: ixion::formula_name_resolver
+   :members:
+
+.. doxygenstruct:: ixion::formula_name_t
+   :members:
+
+.. doxygenfunction:: ixion::to_address
+
+.. doxygenfunction:: ixion::to_range
+
+
+Model Context
+-------------
+
+.. doxygenclass:: ixion::model_context
+   :members:
+
+
+Formula Cell
+------------
+
+.. doxygenclass:: ixion::formula_cell
+   :members:
+
+.. doxygenclass:: ixion::formula_result
+   :members:
+
+
 Interfaces
 ----------
 
@@ -49,3 +105,4 @@ Interfaces
 
 .. doxygenclass:: ixion::iface::table_handler
    :members:
+
