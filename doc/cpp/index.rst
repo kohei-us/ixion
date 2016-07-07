@@ -18,6 +18,26 @@ Formula API
 
 .. doxygenfunction:: ixion::calculate_cells
 
+Address Types
+-------------
+
+.. doxygenstruct:: ixion::address_t
+   :members:
+
+.. doxygenstruct:: ixion::abs_address_t
+   :members:
+
+.. doxygenstruct:: ixion::range_t
+   :members:
+
+.. doxygenstruct:: ixion::abs_range_t
+   :members:
+
+.. doxygentypedef:: ixion::dirty_formula_cells_t
+
+.. doxygentypedef:: ixion::modified_cells_t
+
+
 Interfaces
 ----------
 
