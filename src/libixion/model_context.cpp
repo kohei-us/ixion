@@ -269,7 +269,7 @@ public:
 
     double count_range(const abs_range_t& range, const values_t& values_type) const;
 
-    void get_all_formula_cells(dirty_formula_cells_t& cells) const;
+    dirty_formula_cells_t get_all_formula_cells() const;
 
 private:
     model_context& m_parent;
@@ -707,8 +707,10 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
     return ret;
 }
 
-void model_context_impl::get_all_formula_cells(dirty_formula_cells_t& cells) const
+dirty_formula_cells_t model_context_impl::get_all_formula_cells() const
 {
+    dirty_formula_cells_t cells;
+
     for (size_t sid = 0; sid < m_sheets.size(); ++sid)
     {
         const worksheet& sh = m_sheets[sid];
@@ -729,6 +731,8 @@ void model_context_impl::get_all_formula_cells(dirty_formula_cells_t& cells) con
             }
         }
     }
+
+    return cells;
 }
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
@@ -1337,9 +1341,9 @@ const column_stores_t* model_context::get_columns(sheet_t sheet) const
     return mp_impl->get_columns(sheet);
 }
 
-void model_context::get_all_formula_cells(dirty_formula_cells_t& cells) const
+dirty_formula_cells_t model_context::get_all_formula_cells() const
 {
-    mp_impl->get_all_formula_cells(cells);
+    return mp_impl->get_all_formula_cells();
 }
 
 }

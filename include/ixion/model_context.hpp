@@ -159,7 +159,7 @@ public:
      */
     const column_stores_t* get_columns(sheet_t sheet) const;
 
-    void get_all_formula_cells(dirty_formula_cells_t& cells) const;
+    dirty_formula_cells_t get_all_formula_cells() const;
 
 private:
     model_context_impl* mp_impl;
