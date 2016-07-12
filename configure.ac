@@ -22,16 +22,17 @@ AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
 CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -pthread"
-LDFLAGS="-pthread -Wl,--no-as-needed"
 
 AC_CANONICAL_HOST
 
 case $host_os in
     darwin*)
         _os=Darwin
+        LDFLAGS="$LDFLAGS -L/usr/local/lib"
     ;;
     *)
         _os=
+        LDFLAGS="$LDFLAGS -Wl,--no-as-needed -pthread"
     ;;
 esac
 
@@ -128,6 +129,7 @@ AC_OUTPUT
 AC_MSG_NOTICE([
 ==============================================================================
 Build configuration:
-	python:               $enable_python
+        host os:              $host_os
+        python:               $enable_python
 ==============================================================================
 ])

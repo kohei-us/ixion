@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS) $(BOOST_CPPFLAGS)
 
 check_PROGRAMS = ixion-test
 

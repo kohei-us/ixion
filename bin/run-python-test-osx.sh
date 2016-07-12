@@ -15,6 +15,9 @@ PYTESTFILEDIR=$PROGDIR/../test/python
 mkdir -p $TESTPYTHONPATH
 cp $PROGDIR/../src/python/.libs/ixion.so $TESTPYTHONPATH/
 
+echo "library installation directory: $IXION_INSTLIBDIR"
+echo "library base name: $IXION_LIBNAME"
+
 # Re-write the path to libixion.dylib in ixion.so.
 install_name_tool -change \
     $IXION_INSTLIBDIR/$IXION_LIBNAME.dylib \
