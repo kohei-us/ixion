@@ -36,18 +36,37 @@ test_data = \
 	test/13-relational-operators-01.txt \
 	test/13-relational-operators-02.txt \
 	test/13-relational-operators-03.txt \
-	test/ixion-parser-test.sh \
 	test/python/document.py \
 	test/python/module.py \
 	test/thread/function-parallel.txt \
-	test/thread/function-wait-simple.txt
+	test/thread/function-wait-simple.txt \
+	test/parser-test-func.sh \
+	test/parser-test-t0.sh \
+	test/parser-test-t1.sh \
+	test/parser-test-t2.sh \
+	test/parser-test-t3.sh \
+	test/parser-test-t4.sh \
+	test/parser-test-t5.sh \
+	test/parser-test-t6.sh \
+	test/parser-test-t7.sh \
+	test/parser-test-t8.sh
 
 doc_data = \
 	doc/conf.py \
+	doc/doxygen.conf \
+	doc/overview/index.rst \
 	doc/index.rst \
-	doc/overview.rst \
-	doc/document.rst \
-	doc/sheet.rst
+	doc/python/overview.rst \
+	doc/python/index.rst \
+	doc/python/sheet.rst \
+	doc/python/document.rst \
+	doc/cpp/interface/index.rst \
+	doc/cpp/model_context/index.rst \
+	doc/cpp/formula/index.rst \
+	doc/cpp/index.rst \
+	doc/cpp/formula_cell/index.rst \
+	doc/cpp/formula_name_resolver/index.rst \
+	doc/cpp/types/index.rst
 
 EXTRA_DIST = \
 	LICENSE \
