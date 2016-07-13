@@ -14,8 +14,8 @@ be calculated.
 
 ## Portability
 This library is written with portability in mind; platform specific calls
-are avoided as much as possible.  It makes extensive use of the [boost
-library](http://boost.org) to achieve portability where possible.
+are avoided as much as possible.  It makes use of the [boost library](http://boost.org)
+to achieve portability in some places.
 
 ## Performance
 Achieving good performance is one of the goals of this project.  As much
@@ -33,16 +33,13 @@ for both full and partial calculation modes.
 * Support 2D cell references and named expressions.
 * Support range references.
 * Support table references.
+* 3D cell and range references.
 * Dependency tracking during both full calculation and partial re-calculation.
 * Inline strings.
 * Volatile functions. The framework for volatile functions is implemented. We
   just need to implement more functions.
-
-## Features in progress
-* 3D cell and range references - Initial support is in place.  Needs more
-  testing.
-* Standard C/C++ interface for external applications - It's there, but needs
-  to be stabilized.
+* C++ API.
+* Python API.
 
 ## Planned features
 * Matrix support.
