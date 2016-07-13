@@ -456,7 +456,6 @@ void parse_sheet_name_quoted(
                 ++len;
                 buffer += string(p1, len);
                 ++p;
-                ++len;
                 p1 = p;
                 len = 0;
                 continue;
