@@ -238,7 +238,7 @@ void set_cell_reference(formula_name_t& ret, const address_t& addr)
     set_address(ret.address, addr);
 }
 
-enum resolver_parse_mode { column, row };
+enum class resolver_parse_mode { column, row };
 
 void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
 {
