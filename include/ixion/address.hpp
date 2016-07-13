@@ -123,9 +123,29 @@ struct IXION_DLLPUBLIC abs_range_t
     };
 
     bool valid() const;
+
+    /**
+     * Expand the range to include the entire columns.  The row range will
+     * remain unchanged.
+     */
     void set_whole_column();
+
+    /**
+     * Expand the range to include the entire rows.  The column range will
+     * remain unchanged.
+     */
     void set_whole_row();
+
+    /**
+     * @return true if the range is unspecified in the column direction,
+     *         false otherwise.
+     */
     bool whole_column() const;
+
+    /**
+     * @return true if the range is unspecified in the row direction, false
+     *         otherwise.
+     */
     bool whole_row() const;
 
     /**
