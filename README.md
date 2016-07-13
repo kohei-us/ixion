@@ -54,6 +54,10 @@ for both full and partial calculation modes.
 * Support for custom functions defined in the caller program.
 * Support for external references.
 
+## Documentation
+
+* [Official API documentation](http://kohei.us/files/ixion/doc/)
+
 ## Download source packages
 
 | Version | API Version | Release Date | Download | Check Sum | File Size (bytes) |
@@ -95,8 +99,3 @@ Note that when you are building from the master branch of the git repository,
 it's recommended that you also use the latest mdds source code from its
 repository for the build, else you may encounter build issues or test failures.
 
-## Python binding
-Starting with version 0.9.0, Ixion provides Python binding for those who wish
-to use Ixion from Python scripts.  Refer to this
-[documentation](http://kohei.us/files/ixion/pydoc/current) for more details on
-how to use Ixion's Python API.
