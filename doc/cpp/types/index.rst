@@ -45,6 +45,8 @@ Address Types
 .. doxygenstruct:: ixion::abs_range_t
    :members:
 
+.. doxygentypedef:: ixion::cell_addresses_t
+
 .. doxygentypedef:: ixion::dirty_formula_cells_t
 
 .. doxygentypedef:: ixion::modified_cells_t

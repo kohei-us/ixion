@@ -152,9 +152,29 @@ struct IXION_DLLPUBLIC range_t
     range_t(const abs_range_t& r);
 
     bool valid() const;
+
+    /**
+     * Expand the range to include the entire columns.  The row range will
+     * remain unchanged.
+     */
     void set_whole_column();
+
+    /**
+     * Expand the range to include the entire rows.  The column range will
+     * remain unchanged.
+     */
     void set_whole_row();
+
+    /**
+     * @return true if the range is unspecified in the column direction,
+     *         false otherwise.
+     */
     bool whole_column() const;
+
+    /**
+     * @return true if the range is unspecified in the row direction, false
+     *         otherwise.
+     */
     bool whole_row() const;
 
     abs_range_t to_abs(const abs_address_t& origin) const;
@@ -169,13 +189,18 @@ IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_range_t& ra
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range);
 
 /**
+ * Type that represents a collection of multiple cell addresses.
+ */
+typedef std::unordered_set<abs_address_t, abs_address_t::hash> cell_address_set_t;
+
+/**
  * Collection of formula cells that have been modified or formula cells that
  * reference other modified cells either directly or indirectly.
  */
-typedef std::unordered_set<abs_address_t, abs_address_t::hash> dirty_formula_cells_t;
+typedef cell_address_set_t dirty_formula_cells_t;
 
 /**
- * Collection of cells that have been modified.
+ * Collection of cells that have been modified since last recalculation.
  */
 typedef std::vector<abs_address_t> modified_cells_t;
 

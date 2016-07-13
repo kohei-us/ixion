@@ -14,12 +14,33 @@
 
 namespace ixion {
 
+/** Column index type. */
 typedef int col_t;
+
+/** Row index type. */
 typedef int row_t;
+
+/** Sheet index type.*/
 typedef int sheet_t;
+
+/**
+ * String ID type.
+ *
+ * All string values are converted into integer tokens. You need to call the
+ * get_string() method of ixion::iface::formula_model_access to get the
+ * actual string value.
+ */
 typedef unsigned long string_id_t;
 
+/**
+ * Special sheet ID that represents a global scope, as opposed to a
+ * sheet-local scope.
+ */
 IXION_DLLPUBLIC_VAR const sheet_t global_scope;
+
+/**
+ * Special sheet ID that represents an invalid sheet.
+ */
 IXION_DLLPUBLIC_VAR const sheet_t invalid_sheet;
 
 /** Global string ID representing an empty string. */
