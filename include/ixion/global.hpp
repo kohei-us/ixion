@@ -52,21 +52,6 @@ private:
     ~global();
 };
 
-/**
- * Formula error types.
- */
-enum class formula_error_t
-{
-    no_error = 0,
-    ref_result_not_available = 1,
-    division_by_zero = 2,
-    invalid_expression = 3,
-    stack_error = 4,
-    general_error = 5,
-};
-
-IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
-
 // ============================================================================
 
 class IXION_DLLPUBLIC formula_error : public std::exception

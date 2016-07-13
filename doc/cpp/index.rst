@@ -45,6 +45,10 @@ Primitive Types
 .. doxygentypedef:: ixion::column_store_t
 .. doxygentypedef:: ixion::column_stores_t
 
+.. doxygenenum:: ixion::formula_error_t
+
+.. doxygenfunction:: ixion::get_formula_error_name
+
 
 Address Types
 -------------

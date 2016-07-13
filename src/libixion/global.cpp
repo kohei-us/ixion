@@ -125,22 +125,6 @@ double global::to_double(const char* p, size_t n)
     return sign*val;
 }
 
-const char* get_formula_error_name(formula_error_t fe)
-{
-    static const char* default_err_name = "#ERR!";
-    static const char* names[] = {
-        "",        // no error
-        "#REF!",   // result not available
-        "#DIV/0!", // division by zero
-        "#NUM!"    // invalid expression
-    };
-    static const size_t name_size = 4;
-    if (static_cast<size_t>(fe) < name_size)
-        return names[static_cast<size_t>(fe)];
-
-    return default_err_name;
-}
-
 // ============================================================================
 
 formula_error::formula_error(formula_error_t fe) :

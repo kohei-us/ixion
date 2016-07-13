@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_TYPES_HPP__
-#define __IXION_TYPES_HPP__
+#ifndef INCLUDED_IXION_TYPES_HPP
+#define INCLUDED_IXION_TYPES_HPP
 
 #include "ixion/env.hpp"
 
@@ -78,7 +78,23 @@ enum class formula_name_resolver_t
     odff       = 4
 };
 
+/**
+ * Formula error types.
+ */
+enum class formula_error_t
+{
+    no_error = 0,
+    ref_result_not_available = 1,
+    division_by_zero = 2,
+    invalid_expression = 3,
+    stack_error = 4,
+    general_error = 5,
+};
+
+IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
+
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
