@@ -42,6 +42,9 @@ Primitive Types
 
 .. doxygenenum:: ixion::formula_name_resolver_t
 
+.. doxygentypedef:: ixion::column_store_t
+.. doxygentypedef:: ixion::column_stores_t
+
 
 Address Types
 -------------
