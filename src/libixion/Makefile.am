@@ -47,12 +47,13 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
-libixion_@IXION_API_VERSION@_la_LIBADD = $(BOOST_THREAD_LIBS)
+libixion_@IXION_API_VERSION@_la_LIBADD =
 
 EXTRA_DIST = makefile.mk
 
 ixion_test_SOURCES = ixion_test.cpp
-ixion_test_LDADD = libixion-@IXION_API_VERSION@.la \
-					 $(BOOST_THREAD_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
+ixion_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la \
+	$(BOOST_PROGRAM_OPTIONS_LIBS)
 
 TESTS = ixion-test

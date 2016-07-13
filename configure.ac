@@ -110,7 +110,6 @@ AS_IF([test "x$enable_python" != "xno"], [
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
 
-BOOST_THREADS
 BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile
