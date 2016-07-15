@@ -274,7 +274,8 @@ void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_acce
         os << sheet_name;
     else
     {
-        buffer += string(p0, p-p0);
+        if (p0)
+            buffer += string(p0, p-p0);
         os << buffer;
     }
 

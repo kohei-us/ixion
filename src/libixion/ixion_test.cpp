@@ -91,6 +91,7 @@ void test_name_resolver_excel_a1()
     cxt.append_sheet(IXION_ASCII("Two"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("Three"), 1048576, 1024);
     cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 1024); // name with space
+    cxt.append_sheet(IXION_ASCII("'quote'"), 1048576, 1024); // quoted name
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
@@ -120,6 +121,7 @@ void test_name_resolver_excel_a1()
         { "Two!$B$10", true },
         { "Three!CFD234", true },
         { "'A B C'!Z12", true },
+        { "'''quote'''!Z12", true },
         { 0, false }
     };
 
