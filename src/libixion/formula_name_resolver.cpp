@@ -107,10 +107,6 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
                     buf.clear();
                 }
 
-                if (!scope)
-                    // Non-matching brace detected.  Bail out.
-                    return false;
-
                 --scope;
             }
             break;
