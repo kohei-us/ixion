@@ -34,7 +34,7 @@ int main (int argc, char** argv)
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
-        ("input-file", po::value< vector<string> >(), "input file");
+        ("input-file", po::value<vector<string>>(), "input file");
 
     po::options_description cmd_opt;
     cmd_opt.add(desc).add(hidden);
@@ -65,7 +65,7 @@ int main (int argc, char** argv)
 
     vector<string> files;
     if (vm.count("input-file"))
-        files = vm["input-file"].as< vector<string> >();
+        files = vm["input-file"].as<vector<string>>();
 
     if (files.size() != 1)
     {
@@ -75,9 +75,18 @@ int main (int argc, char** argv)
     }
 
     const string& filepath = files[0];
-    ::ixion::sort_input_parser parser(filepath);
-    parser.parse();
-    parser.print();
+    try
+    {
+        ::ixion::sort_input_parser parser(filepath);
+        parser.parse();
+        parser.print();
+    }
+    catch (const exception& e)
+    {
+        // Unknown options.
+        cerr << e.what() << endl;
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
