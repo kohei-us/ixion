@@ -59,6 +59,8 @@ for both full and partial calculation modes.
 
 | Version | API Version | Release Date | Download | Check Sum | File Size (bytes) |
 |---------|-------------|--------------|----------|-----------|-------------------|
+| 0.12.0 | 0.12   | 2016-07-15 | [libixion-0.12.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.12.0.tar.xz) | sha256sum: 055b7b9e31663f0acb7f249d68ca08e480f8f5d43ef5e4bd57b2fb04242307b0 | 393284 |
+|        |        |            | [libixion-0.12.0.tar.gz](http://kohei.us/files/ixion/src/libixion-0.12.0.tar.gz) | sha256sum: ba1d6f78fe3f302723d286ffe1ec25571b7983a360184c66a88782177fe3496e | 601525 |
 | 0.11.1 | 0.11   | 2016-05-11 | [libixion-0.11.1.tar.xz](http://kohei.us/files/ixion/src/libixion-0.11.1.tar.xz) | sha256sum: c9e9f52580d618fa969fc0293f55af21a9c74bfb802e655c6bf239202f95bede | 366660 |
 |        |        |            | [libixion-0.11.1.tar.gz](http://kohei.us/files/ixion/src/libixion-0.11.1.tar.gz) | sha256sum: 9ff20f6370e6f1e86a67d4159123195a875b11f7332b0cf9373ba98c57953916 | 568876 |
 | 0.11.0 | 0.11   | 2016-02-13 | [libixion-0.11.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.11.0.tar.xz) | sha256sum: 97a6e7f2b1fcbff69e76fe4e1df62f1cfcc353820472991e37de00aacb024293 | 365652 |
