@@ -1,3 +1,7 @@
+ixion 0.12.0
+
+* remove boost::thread dependency from the public headers.
+
 * refactor the multi-threaded calculation code to make it more robust.
 
 * properly wait on formula calculation when fetching for a result
