@@ -40,7 +40,6 @@ private:
     iface::formula_model_access& m_context;
     cell_listener_tracker& m_listener_tracker;
     const abs_address_t& m_addr;
-    formula_cell* mp_cell;
     mode_t m_mode;
 };
 
