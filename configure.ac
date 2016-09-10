@@ -42,6 +42,12 @@ AC_ARG_ENABLE([python],
     [enable_python=yes]
 )
 
+AC_ARG_ENABLE([threads],
+    [AS_HELP_STRING([--disable-threads], [Disable threaded calculations])],
+    [enable_threads="$enableval"],
+    [enable_threads=yes]
+)
+
 IXION_VERSION=ixion_version
 IXION_API_VERSION=ixion_api_version
 IXION_MAJOR_VERSION=ixion_major_version
@@ -107,7 +113,15 @@ AS_IF([test "x$enable_python" != "xno"], [
     AM_PATH_PYTHON(3)
     PKG_CHECK_MODULES([PYTHON], [python3 >= 3.4])
 ])
+
+AS_IF([test "x$enable_threads" != "xno"], [
+        CXXFLAGS="$CXXFLAGS -DIXION_THREADS=1"
+], [
+        CXXFLAGS="$CXXFLAGS -DIXION_THREADS=0"
+])
+
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
+AM_CONDITIONAL([IXION_THREADS], [test "x$enable_threads" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
 
 BOOST_PROGRAM_OPTIONS
@@ -130,5 +144,6 @@ AC_MSG_NOTICE([
 Build configuration:
         host os:              $host_os
         python:               $enable_python
+        threads:              $enable_threads
 ==============================================================================
 ])

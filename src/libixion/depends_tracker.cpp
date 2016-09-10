@@ -6,7 +6,10 @@
  */
 
 #include "depends_tracker.hpp"
+
+#if IXION_THREADS
 #include "cell_queue_manager.hpp"
+#endif
 
 #include "ixion/global.hpp"
 #include "ixion/cell.hpp"
@@ -47,6 +50,10 @@ void dependency_tracker::insert_depend(const abs_address_t& origin_cell, const a
 
 void dependency_tracker::interpret_all_cells(size_t thread_count)
 {
+#if IXION_THREADS == 0
+    thread_count = 0;  // threads are disabled thus not to be used.
+#endif
+
     vector<abs_address_t> sorted_cells;
     topo_sort_cells(sorted_cells);
 
@@ -82,9 +89,11 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
         return;
     }
 
+#if IXION_THREADS
     // Interpret cells in topological order using threads.
     formula_cell_queue queue(m_context, std::move(sorted_cells), thread_count);
     queue.run();
+#endif
 }
 
 void dependency_tracker::topo_sort_cells(vector<abs_address_t>& sorted_cells) const

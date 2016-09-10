@@ -6,8 +6,6 @@ lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
 	address.cpp \
 	cell.cpp \
-	cell_queue_manager.hpp \
-	cell_queue_manager.cpp \
 	concrete_formula_tokens.hpp \
 	concrete_formula_tokens.cpp \
 	config.cpp \
@@ -45,6 +43,13 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	workbook.cpp \
 	interface.cpp
 
+if IXION_THREADS
+
+libixion_@IXION_API_VERSION@_la_SOURCES += \
+	cell_queue_manager.hpp \
+	cell_queue_manager.cpp
+
+endif
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 libixion_@IXION_API_VERSION@_la_LIBADD =
