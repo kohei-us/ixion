@@ -1,3 +1,8 @@
+ixion 0.12.1
+
+* add --enable-threads configure switch, to optionally enable/disable
+  thread support.  Threads are enabled by default.
+
 ixion 0.12.0
 
 * remove boost::thread dependency from the public headers.

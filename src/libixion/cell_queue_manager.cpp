@@ -15,6 +15,10 @@
 #include <future>
 #include <algorithm>
 
+#if !IXION_THREADS
+#error "This file is not to be compiled when the threads are disabled."
+#endif
+
 namespace ixion {
 
 namespace {
