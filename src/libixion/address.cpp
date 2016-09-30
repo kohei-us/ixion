@@ -316,6 +316,12 @@ abs_range_t range_t::to_abs(const abs_address_t& origin) const
     return ret;
 }
 
+size_t range_t::hash::operator() (const range_t& range) const
+{
+    address_t::hash adr_hash;
+    return adr_hash(range.first) + 65536*adr_hash(range.last);
+}
+
 bool operator==(const range_t& left, const range_t& right)
 {
     return left.first == right.first && left.last == right.last;

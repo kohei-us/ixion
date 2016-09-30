@@ -96,7 +96,7 @@ struct IXION_DLLPUBLIC address_t
 
     struct hash
     {
-        size_t operator() (const address_t& addr) const;
+        IXION_DLLPUBLIC size_t operator() (const address_t& addr) const;
     };
 };
 
@@ -119,7 +119,7 @@ struct IXION_DLLPUBLIC abs_range_t
 
     struct hash
     {
-        size_t operator() (const abs_range_t& range) const;
+        IXION_DLLPUBLIC size_t operator() (const abs_range_t& range) const;
     };
 
     bool valid() const;
@@ -198,6 +198,11 @@ struct IXION_DLLPUBLIC range_t
     bool whole_row() const;
 
     abs_range_t to_abs(const abs_address_t& origin) const;
+
+    struct hash
+    {
+        IXION_DLLPUBLIC size_t operator() (const range_t& range) const;
+    };
 };
 
 IXION_DLLPUBLIC bool operator==(const range_t& left, const range_t& right);
