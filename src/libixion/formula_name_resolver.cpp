@@ -770,8 +770,7 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
         }
 
         ++p;
-        addr.abs_column = (*p != '[');
-        if (!addr.abs_column)
+        if (*p == '[')
         {
             // Relative column address.
             ++p;
@@ -784,12 +783,11 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
                 return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
 
             ++p;
-            if (*p == ':')
-                return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
         }
         else if (is_digit(*p))
         {
             // Absolute column address.
+            addr.abs_column = true;
             addr.column = parse_number<col_t>(p, p_last);
             if (addr.column <= 0)
                 // absolute address with 0 or negative value is invalid.
@@ -801,11 +799,10 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
                 return parse_address_result::valid_address;
 
             ++p;
-            if (*p == ':')
-                return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
         }
     }
-    else if (*p == ':')
+
+    if (*p == ':')
         return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
 
     return parse_address_result::invalid;
