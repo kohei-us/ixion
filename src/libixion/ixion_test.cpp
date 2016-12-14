@@ -308,6 +308,7 @@ void test_name_resolver_excel_r1c1()
         { "R[1]C2", false },
         { "R2C[-2]", false },
         { "R1C", false },
+        { "R[-3]C", false },
         { "RC2", false },
         { "One!R10C", true },
         { "Two!C[-2]", true },
@@ -319,6 +320,7 @@ void test_name_resolver_excel_r1c1()
     {
         const char* p = single_ref_names[i].name;
         string name_r1c1(p);
+        cout << "Parsing " << name_r1c1 << endl;
         formula_name_t res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
         if (res.type != formula_name_t::cell_reference)
         {
@@ -448,6 +450,7 @@ void test_name_resolver_excel_r1c1()
     {
         { "R2C2:R3C3", false },
         { "R[-3]C2:R[-1]C3", false },
+        { "R[-5]C:R[-1]C", false },
         { "'A B C'!R2:R4", true },
         { "'80''s Music'!C[2]:C[4]", true },
         { 0, false },
@@ -457,6 +460,7 @@ void test_name_resolver_excel_r1c1()
     {
         const char* p = range_ref_names[i].name;
         string name_r1c1(p);
+        cout << "Parsing " << name_r1c1 << endl;
         formula_name_t res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
         if (res.type != formula_name_t::range_reference)
         {
@@ -608,7 +612,10 @@ bool check_formula_expression(
 void test_parse_and_print_expressions()
 {
     cout << "test public formula api" << endl;
-    const char* exps[] = {
+
+    // Excel A1
+
+    std::vector<const char*> exps = {
         "1/3*1.4",
         "2.3*(1+2)/(34*(3-2))",
         "SUM(1,2,3)",
@@ -629,17 +636,33 @@ void test_parse_and_print_expressions()
         "Table1[[#Headers],[Category]:[Value]]",
         "Table1[[#Headers],[#Data],[Category]:[Value]]",
     };
-    size_t num_exps = sizeof(exps) / sizeof(exps[0]);
+
     model_context cxt;
     cxt.append_string(IXION_ASCII("Table1"));
     cxt.append_string(IXION_ASCII("Category"));
     cxt.append_string(IXION_ASCII("Value"));
+
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
-    for (size_t i = 0; i < num_exps; ++i)
+    for (const char* exp : exps)
     {
-        bool result = check_formula_expression(cxt, *resolver, exps[i]);
+        bool result = check_formula_expression(cxt, *resolver, exp);
+        assert(result);
+    }
+
+    // Excel R1C1
+
+    exps = {
+        "SUM(R[-5]C:R[-1]C)",
+    };
+
+    resolver = formula_name_resolver::get(formula_name_resolver_t::excel_r1c1, &cxt);
+    assert(resolver);
+
+    for (const char* exp : exps)
+    {
+        bool result = check_formula_expression(cxt, *resolver, exp);
         assert(result);
     }
 }
