@@ -258,7 +258,12 @@ void tokenizer::name()
 
             --m_scope;
         }
+        else if (m_scope)
+        {
+            // Anything goes between '[' and ']' for now.
+        }
         else if (is_op(c))
+            // An operator is not part of a name. Bail out.
             break;
     }
 
