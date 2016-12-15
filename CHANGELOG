@@ -1,3 +1,8 @@
+ixion 0.12.2
+
+* fix a parser bug that prevented valid R1C1 address from being
+  parsed.
+
 ixion 0.12.1
 
 * add --enable-threads configure switch, to optionally enable/disable
