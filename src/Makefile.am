@@ -2,7 +2,7 @@ SUBDIRS = libixion python
 
 AM_CPPFLAGS = -I$(top_srcdir)/include $(MDDS_CFLAGS) $(BOOST_CPPFLAGS)
 
-bin_PROGRAMS = ixion-parser ixion-sorter
+bin_PROGRAMS = ixion-parser ixion-sorter ixion-formula-tokenizer
 
 ixion_parser_SOURCES = \
 	ixion_parser.cpp \
@@ -23,6 +23,13 @@ ixion_sorter_SOURCES = \
 
 ixion_sorter_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
 					 $(BOOST_PROGRAM_OPTIONS_LIBS)
+
+ixion_formula_tokenizer_SOURCES = \
+	ixion_formula_tokenizer.cpp
+
+ixion_formula_tokenizer_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
+					 $(BOOST_PROGRAM_OPTIONS_LIBS)
+
 
 AM_TESTS_ENVIRONMENT = PATH=.libs$${PATH:+:$${PATH}}; export PATH; \
 	LD_LIBRARY_PATH=libixion/.libs$${LD_LIBRARY_PATH:+:$${LD_LIBRARY_PATH}}; export LD_LIBRARY_PATH; \
