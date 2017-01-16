@@ -16,6 +16,7 @@
 #include "ixion/formula.hpp"
 
 #include "workbook.hpp"
+#include "model_types.hpp"
 
 #include <memory>
 #include <sstream>
@@ -137,7 +138,6 @@ bool set_shared_formula_tokens_to_cell(
 
 class model_context_impl
 {
-    typedef std::map<std::string, unique_ptr<formula_cell>> named_expressions_type;
     typedef std::vector<std::string> strings_type;
     typedef std::vector<std::unique_ptr<std::string>> string_pool_type;
     typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
@@ -279,7 +279,7 @@ private:
     config* mp_config;
     cell_listener_tracker* mp_cell_listener_tracker;
     iface::table_handler* mp_table_handler;
-    named_expressions_type m_named_expressions;
+    detail::named_expressions_t m_named_expressions;
 
     std::unique_ptr<model_context::session_handler_factory> m_session_factory;
 
@@ -295,25 +295,25 @@ void model_context_impl::set_named_expression(const char* p, size_t n, formula_c
 {
     string name(p, n);
     m_named_expressions.insert(
-        named_expressions_type::value_type(
+        detail::named_expressions_t::value_type(
             name, std::unique_ptr<formula_cell>(cell)));
 }
 
 formula_cell* model_context_impl::get_named_expression(const string& name)
 {
-    named_expressions_type::iterator itr = m_named_expressions.find(name);
+    detail::named_expressions_t::iterator itr = m_named_expressions.find(name);
     return itr == m_named_expressions.end() ? NULL : itr->second.get();
 }
 
 const formula_cell* model_context_impl::get_named_expression(const string& name) const
 {
-    named_expressions_type::const_iterator itr = m_named_expressions.find(name);
+    detail::named_expressions_t::const_iterator itr = m_named_expressions.find(name);
     return itr == m_named_expressions.end() ? NULL : itr->second.get();
 }
 
 const string* model_context_impl::get_named_expression_name(const formula_cell* expr) const
 {
-    named_expressions_type::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
+    detail::named_expressions_t::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
     for (; itr != itr_end; ++itr)
     {
         if (itr->second.get() == expr)
