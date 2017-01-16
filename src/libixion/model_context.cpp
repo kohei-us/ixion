@@ -226,8 +226,11 @@ public:
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
     formula_cell* get_named_expression(const string& name);
+    formula_cell* get_named_expression(sheet_t sheet, const string& name);
     const formula_cell* get_named_expression(const string& name) const;
+    const formula_cell* get_named_expression(sheet_t sheet, const string& name) const;
     const string* get_named_expression_name(const formula_cell* expr) const;
+    const string* get_named_expression_name(sheet_t sheet, const formula_cell* expr) const;
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
@@ -305,10 +308,24 @@ formula_cell* model_context_impl::get_named_expression(const string& name)
     return itr == m_named_expressions.end() ? NULL : itr->second.get();
 }
 
+formula_cell* model_context_impl::get_named_expression(sheet_t sheet, const string& name)
+{
+    const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
+    auto it = ns.find(name);
+    return it == ns.end() ? nullptr : it->second.get();
+}
+
 const formula_cell* model_context_impl::get_named_expression(const string& name) const
 {
     detail::named_expressions_t::const_iterator itr = m_named_expressions.find(name);
     return itr == m_named_expressions.end() ? NULL : itr->second.get();
+}
+
+const formula_cell* model_context_impl::get_named_expression(sheet_t sheet, const string& name) const
+{
+    const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
+    auto it = ns.find(name);
+    return it == ns.end() ? nullptr : it->second.get();
 }
 
 const string* model_context_impl::get_named_expression_name(const formula_cell* expr) const
@@ -319,7 +336,20 @@ const string* model_context_impl::get_named_expression_name(const formula_cell* 
         if (itr->second.get() == expr)
             return &itr->first;
     }
-    return NULL;
+    return nullptr;
+}
+
+const string* model_context_impl::get_named_expression_name(sheet_t sheet, const formula_cell* expr) const
+{
+    const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
+    auto it = std::find_if(ns.begin(), ns.end(),
+        [expr](const detail::named_expressions_t::value_type& v) -> bool
+        {
+            return v.second.get() == expr;
+        }
+    );
+
+    return it == ns.end() ? nullptr : &it->first;
 }
 
 sheet_t model_context_impl::get_sheet_index(const char* p, size_t n) const
@@ -1296,14 +1326,29 @@ formula_cell* model_context::get_named_expression(const string& name)
     return mp_impl->get_named_expression(name);
 }
 
+formula_cell* model_context::get_named_expression(sheet_t sheet, const string& name)
+{
+    return mp_impl->get_named_expression(sheet, name);
+}
+
 const formula_cell* model_context::get_named_expression(const string& name) const
 {
     return mp_impl->get_named_expression(name);
 }
 
+const formula_cell* model_context::get_named_expression(sheet_t sheet, const string& name) const
+{
+    return mp_impl->get_named_expression(sheet, name);
+}
+
 const string* model_context::get_named_expression_name(const formula_cell* expr) const
 {
     return mp_impl->get_named_expression_name(expr);
+}
+
+const string* model_context::get_named_expression_name(sheet_t sheet, const formula_cell* expr) const
+{
+    return mp_impl->get_named_expression_name(sheet, expr);
 }
 
 sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)

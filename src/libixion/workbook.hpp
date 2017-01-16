@@ -5,10 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_WORKBOOK_HPP__
-#define __IXION_WORKBOOK_HPP__
+#ifndef INCLUDED_IXION_WORKBOOK_HPP
+#define INCLUDED_IXION_WORKBOOK_HPP
 
 #include "ixion/column_store_type.hpp"
+#include "model_types.hpp"
 
 #include <vector>
 
@@ -40,9 +41,13 @@ public:
 
     const column_stores_t& get_columns() const { return m_columns; }
 
+    detail::named_expressions_t& get_named_expressions() { return m_named_expressions; }
+    const detail::named_expressions_t& get_named_expressions() const { return m_named_expressions; }
+
 private:
     column_stores_t m_columns;
     std::vector<column_store_t::iterator> m_pos_hints;
+    detail::named_expressions_t m_named_expressions;
 };
 
 class workbook
