@@ -114,6 +114,8 @@ public:
     abs_range_t get_data_range(sheet_t sheet) const;
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_cell* cell);
+
     formula_cell* get_named_expression(const std::string& name);
     formula_cell* get_named_expression(sheet_t sheet, const std::string& name);
 

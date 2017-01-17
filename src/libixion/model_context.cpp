@@ -225,6 +225,8 @@ public:
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
     void set_named_expression(const char* p, size_t n, formula_cell* cell);
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_cell* cell);
+
     formula_cell* get_named_expression(const string& name);
     formula_cell* get_named_expression(sheet_t sheet, const string& name);
     const formula_cell* get_named_expression(const string& name) const;
@@ -298,6 +300,16 @@ void model_context_impl::set_named_expression(const char* p, size_t n, formula_c
 {
     string name(p, n);
     m_named_expressions.insert(
+        detail::named_expressions_t::value_type(
+            name, std::unique_ptr<formula_cell>(cell)));
+}
+
+void model_context_impl::set_named_expression(
+    sheet_t sheet, const char* p, size_t n, formula_cell* cell)
+{
+    detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
+    string name(p, n);
+    ns.insert(
         detail::named_expressions_t::value_type(
             name, std::unique_ptr<formula_cell>(cell)));
 }
@@ -1319,6 +1331,12 @@ std::string model_context::get_sheet_name(sheet_t sheet) const
 void model_context::set_named_expression(const char* p, size_t n, formula_cell* cell)
 {
     mp_impl->set_named_expression(p, n, cell);
+}
+
+void model_context::set_named_expression(
+    sheet_t sheet, const char* p, size_t n, formula_cell* cell)
+{
+    mp_impl->set_named_expression(sheet, p, n, cell);
 }
 
 formula_cell* model_context::get_named_expression(const string& name)
