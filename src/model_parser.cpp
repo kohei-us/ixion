@@ -107,11 +107,13 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
     m_filepath(filepath),
     m_thread_count(thread_count),
+    m_row_limit(1048576),
+    m_col_limit(1024),
+    m_current_sheet(0),
     m_print_separator(true)
 {
     m_context.set_session_handler_factory(ixion::make_unique<session_handler::factory>(m_context));
     m_context.set_table_handler(&m_table_handler);
-    m_context.append_sheet(IXION_ASCII("sheet"), 1048576, 1024);
 }
 
 model_parser::~model_parser() {}
@@ -231,8 +233,16 @@ void model_parser::parse()
     }
 }
 
+void model_parser::init_model()
+{
+    if (m_context.empty())
+        m_context.append_sheet(IXION_ASCII("sheet"), m_row_limit, m_col_limit);
+}
+
 void model_parser::parse_init(const char*& p)
 {
+    init_model();
+
     model_parser::cell_type content_type = model_parser::ct_unknown;
     mem_str_buf buf, name, formula;
     for (; *p != '\n'; ++p)

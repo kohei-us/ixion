@@ -60,6 +60,7 @@ public:
     void parse();
 
 private:
+    void init_model();
 
     void parse_init(const char*& p);
     void parse_result(const char*& p);
@@ -81,6 +82,10 @@ private:
     dirty_formula_cells_t m_dirty_cells;
     modified_cells_t m_dirty_cell_addrs;
     results_type m_formula_results;
+
+    row_t m_row_limit;
+    col_t m_col_limit;
+    sheet_t m_current_sheet;
 
     bool m_print_separator:1;
 };

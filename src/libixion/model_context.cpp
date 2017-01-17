@@ -276,6 +276,8 @@ public:
 
     dirty_formula_cells_t get_all_formula_cells() const;
 
+    bool empty() const;
+
 private:
     model_context& m_parent;
 
@@ -775,6 +777,11 @@ dirty_formula_cells_t model_context_impl::get_all_formula_cells() const
     }
 
     return cells;
+}
+
+bool model_context_impl::empty() const
+{
+    return m_sheets.empty();
 }
 
 void model_context_impl::erase_cell(const abs_address_t& addr)
@@ -1407,6 +1414,11 @@ const column_stores_t* model_context::get_columns(sheet_t sheet) const
 dirty_formula_cells_t model_context::get_all_formula_cells() const
 {
     return mp_impl->get_all_formula_cells();
+}
+
+bool model_context::empty() const
+{
+    return mp_impl->empty();
 }
 
 }

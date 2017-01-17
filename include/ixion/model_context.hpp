@@ -167,6 +167,8 @@ public:
 
     dirty_formula_cells_t get_all_formula_cells() const;
 
+    bool empty() const;
+
 private:
     model_context_impl* mp_impl;
 };
