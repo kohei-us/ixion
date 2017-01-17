@@ -13,3 +13,5 @@ C1="Charles"
 D1="David"
 A2="Andy"
 %check
+%exit
+

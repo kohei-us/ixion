@@ -10,4 +10,4 @@ A5=AVERAGE(A1,A2,A3)
 A4=5
 A5=5
 %check
-
+%exit

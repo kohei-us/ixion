@@ -122,9 +122,10 @@ void model_parser::parse()
     global::load_file_content(m_filepath, strm);
 
     parse_mode_t parse_mode = parse_mode_unknown;
-    const char *p = &strm[0], *p_last = &strm[strm.size()-1];
+    const char* p = strm.data();
+    const char* p_end = p + strm.size();
 
-    for (; p != p_last; ++p)
+    for (; p != p_end; ++p)
     {
         // In each iteration, the p always points to the 1st character of a
         // line.

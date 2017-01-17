@@ -23,3 +23,5 @@ A8=#REF!
 A9=#REF!
 A10=#REF!
 %check
+%exit
+

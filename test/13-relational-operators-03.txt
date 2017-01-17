@@ -16,3 +16,4 @@ B3=1
 B4=0
 B5=1
 %check
+%exit

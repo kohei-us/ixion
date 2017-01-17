@@ -9,6 +9,4 @@ A4=if(A1<>A2,"not equal","equal")
 A3="not equal"
 A4="not equal"
 %check
-
-
-
+%exit

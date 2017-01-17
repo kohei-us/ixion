@@ -7,4 +7,5 @@ A5=A1+A2+A3+A4+WAIT()
 A6=(A2+A3)*2+WAIT()
 A7=A5+A6+WAIT()
 %calc
+%exit
 

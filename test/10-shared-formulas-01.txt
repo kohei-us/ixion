@@ -6,4 +6,4 @@ A3=A2+1
 A4=A3+1
 A5=A4+1
 %calc
-
+%exit

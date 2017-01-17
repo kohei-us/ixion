@@ -22,4 +22,4 @@ C4=1000
 %mode result
 A2=1010
 %check
-
+%exit

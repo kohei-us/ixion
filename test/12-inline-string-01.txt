@@ -29,3 +29,5 @@ A11=4
 A12="Andy"
 A13="Andy is smart"
 %check
+%exit
+

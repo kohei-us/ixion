@@ -8,4 +8,4 @@ A1=0
 %mode edit
 B1=SUM(A1:A2)
 %recalc
-
+%exit

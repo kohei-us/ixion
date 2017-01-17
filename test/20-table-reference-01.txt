@@ -33,4 +33,5 @@ E2=2
 E3=1
 E4=6
 %check
+%exit
 

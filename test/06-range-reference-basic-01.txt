@@ -25,7 +25,4 @@ B4=1
 %mode result
 D1=20
 %check
-
-
-
-
+%exit

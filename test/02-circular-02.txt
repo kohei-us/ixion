@@ -12,4 +12,4 @@ B1=A1
 A1=#REF!
 B1=#REF!
 %check
-
+%exit
