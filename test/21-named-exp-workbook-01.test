@@ -2,8 +2,9 @@
 %% --------------------------------------------------------------------------
 %mode session
 row-limit:1000
-column:limit:100
+column-limit:100
 insert-sheet:Sheet1
+insert-sheet:Sheet2
 current-sheet:Sheet1
 %% --------------------------------------------------------------------------
 %mode init

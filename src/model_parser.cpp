@@ -28,6 +28,21 @@ namespace ixion {
 
 namespace {
 
+long to_long(const mem_str_buf& value)
+{
+    char* pe = nullptr;
+    long ret = std::strtol(value.get(), &pe, 10);
+
+    if (value.get() == pe)
+    {
+        ostringstream os;
+        os << "'" << value << "' is not a valid integer.";
+        throw model_parser::parse_error(os.str());
+    }
+
+    return ret;
+}
+
 bool is_separator(char c)
 {
     return c == '=' || c == ':' || c == '@';
@@ -41,11 +56,11 @@ mem_str_buf parse_command_to_buffer(const char*& p, const char* p_end)
     if (*p == '%')
     {
         // This line is a comment.  Skip the rest of the line.
-        while (*p != '\n' && p != p_end) ++p;
+        while (p != p_end && *p != '\n') ++p;
         return buf;
     }
 
-    for (++p; *p != '\n' && p != p_end; ++p)
+    for (++p; p != p_end && *p != '\n'; ++p)
         buf.inc();
 
     return buf;
@@ -106,7 +121,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_col_limit(1024),
     m_current_sheet(0),
     m_parse_mode(parse_mode_unknown),
-    m_print_separator(true)
+    m_print_separator(false)
 {
     m_context.set_session_handler_factory(ixion::make_unique<session_handler::factory>(m_context));
     m_context.set_table_handler(&m_table_handler);
@@ -134,6 +149,12 @@ void model_parser::parse()
             continue;
         }
 
+        if (m_print_separator)
+        {
+            m_print_separator = false;
+            cout << get_formula_result_output_separator() << endl;
+        }
+
         switch (m_parse_mode)
         {
             case parse_mode_init:
@@ -147,6 +168,9 @@ void model_parser::parse()
                 break;
             case parse_mode_table:
                 parse_table();
+                break;
+            case parse_mode_session:
+                parse_session();
                 break;
             case parse_mode_exit:
                 return;
@@ -233,11 +257,14 @@ void model_parser::parse_command()
     else if (buf_com.equals("mode table"))
     {
         m_parse_mode = parse_mode_table;
-        m_print_separator = true;
         mp_table_entry.reset(new table_handler::entry);
     }
     else if (buf_com.equals("mode session"))
     {
+        cout << get_formula_result_output_separator() << endl
+            << "session" << endl;
+
+        m_print_separator = true;
         m_parse_mode = parse_mode_session;
     }
     else
@@ -248,13 +275,59 @@ void model_parser::parse_command()
     }
 }
 
+void model_parser::parse_session()
+{
+    mem_str_buf cmd, value;
+    mem_str_buf* buf = &cmd;
+
+    for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
+    {
+        if (*mp_char == ':')
+        {
+            if (buf == &value)
+                throw parse_error("2nd ':' character is illegal.");
+
+            buf = &value;
+            continue;
+        }
+
+        if (buf->empty())
+            buf->set_start(mp_char);
+        else
+            buf->inc();
+    }
+
+    if (cmd == "row-limit")
+        m_row_limit = to_long(value);
+    else if (cmd == "column-limit")
+        m_col_limit = to_long(value);
+    else if (cmd == "insert-sheet")
+    {
+        m_context.append_sheet(value.get(), value.size(), m_row_limit, m_col_limit);
+        cout << "sheet: (name: " << value << ", rows: " << m_row_limit << ", columns: " << m_col_limit << ")" << endl;
+    }
+    else if (cmd == "current-sheet")
+    {
+        m_current_sheet = m_context.get_sheet_index(value.get(), value.size());
+
+        if (m_current_sheet == invalid_sheet)
+        {
+            ostringstream os;
+            os << "No sheet named '" << value << "' found.";
+            throw parse_error(os.str());
+        }
+
+        cout << "current sheet: " << value << endl;
+    }
+}
+
 void model_parser::parse_init()
 {
     init_model();
 
     model_parser::cell_type content_type = model_parser::ct_unknown;
     mem_str_buf buf, name, formula;
-    for (; *mp_char != '\n' && mp_char != mp_end; ++mp_char)
+    for (; mp_char != mp_end  && *mp_char != '\n'; ++mp_char)
     {
         if (name.empty() && is_separator(*mp_char))
         {
@@ -322,12 +395,6 @@ void model_parser::parse_init()
         return;
     }
 
-    if (m_print_separator)
-    {
-        m_print_separator = false;
-        cout << get_formula_result_output_separator() << endl;
-    }
-
     switch (content_type)
     {
         case ct_formula:
@@ -379,7 +446,7 @@ void model_parser::parse_init()
 void model_parser::parse_result()
 {
     mem_str_buf buf, name, result;
-    for (; *mp_char != '\n' && mp_char != mp_end; ++mp_char)
+    for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
     {
         if (*mp_char == '=')
         {
@@ -430,7 +497,7 @@ void model_parser::parse_table()
 
     // Parse to get name and value strings.
     mem_str_buf buf, name, value;
-    for (; *mp_char != '\n'; ++mp_char)
+    for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
     {
         if (*mp_char == '=')
         {

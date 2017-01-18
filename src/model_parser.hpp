@@ -75,6 +75,7 @@ private:
 
     void parse_command();
 
+    void parse_session();
     void parse_init();
     void parse_result();
     void parse_table();
