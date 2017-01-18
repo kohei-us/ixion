@@ -32,8 +32,11 @@ class model_parser
         parse_mode_edit,
         parse_mode_table,
         parse_mode_session,
+        parse_mode_named_expression,
         parse_mode_exit
     };
+
+    using parsed_assignment_type = std::pair<mem_str_buf, mem_str_buf>;
 
 public:
     typedef std::unordered_map< ::std::string, formula_result> results_type;
@@ -78,10 +81,18 @@ private:
     void parse_session();
     void parse_init();
     void parse_result();
+
     void parse_table();
+    void parse_table_columns(const mem_str_buf& str);
     void push_table();
 
-    void parse_table_columns(const mem_str_buf& str);
+    void parse_named_expression();
+    void push_named_expression();
+
+    /**
+     * Parse a simple left=right assignment line.
+     */
+    parsed_assignment_type parse_assignment();
 
     void check();
 

@@ -172,6 +172,9 @@ void model_parser::parse()
             case parse_mode_session:
                 parse_session();
                 break;
+            case parse_mode_named_expression:
+                parse_named_expression();
+                break;
             case parse_mode_exit:
                 return;
             default:
@@ -225,7 +228,10 @@ void model_parser::parse_command()
         {
             case parse_mode_table:
                 push_table();
-            break;
+                break;
+            case parse_mode_named_expression:
+                push_named_expression();
+                break;
             default:
                 throw parse_error("push command was used for wrong mode!");
         }
@@ -266,6 +272,11 @@ void model_parser::parse_command()
 
         m_print_separator = true;
         m_parse_mode = parse_mode_session;
+    }
+    else if (buf_com.equals("mode named-expression"))
+    {
+        m_print_separator = true;
+        m_parse_mode = parse_mode_named_expression;
     }
     else
     {
@@ -494,35 +505,9 @@ void model_parser::parse_table()
     assert(mp_table_entry);
 
     // In table mode, each line must be attribute=value.
-
-    // Parse to get name and value strings.
-    mem_str_buf buf, name, value;
-    for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
-    {
-        if (*mp_char == '=')
-        {
-            if (buf.empty())
-                throw model_parser::parse_error("left hand side is empty");
-
-            name = buf;
-            buf.clear();
-        }
-        else
-        {
-            if (buf.empty())
-                buf.set_start(mp_char);
-            else
-                buf.inc();
-        }
-    }
-
-    if (!buf.empty())
-    {
-        if (name.empty())
-            throw model_parser::parse_error("'=' is missing");
-
-        value = buf;
-    }
+    parsed_assignment_type res = parse_assignment();
+    const mem_str_buf& name = res.first;
+    const mem_str_buf& value = res.second;
 
     table_handler::entry& entry = *mp_table_entry;
 
@@ -571,6 +556,15 @@ void model_parser::push_table()
     assert(!mp_table_entry);
 }
 
+void model_parser::parse_named_expression()
+{
+    parsed_assignment_type res = parse_assignment();
+}
+
+void model_parser::push_named_expression()
+{
+}
+
 void model_parser::parse_table_columns(const mem_str_buf& str)
 {
     assert(mp_table_entry);
@@ -605,6 +599,42 @@ void model_parser::parse_table_columns(const mem_str_buf& str)
         col_name = m_context.add_string(buf.get(), buf.size());
 
     entry.columns.push_back(col_name);
+}
+
+model_parser::parsed_assignment_type model_parser::parse_assignment()
+{
+    // Parse to get name and value strings.
+    parsed_assignment_type res;
+    mem_str_buf buf;
+
+    for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
+    {
+        if (*mp_char == '=')
+        {
+            if (buf.empty())
+                throw model_parser::parse_error("left hand side is empty");
+
+            res.first = buf;
+            buf.clear();
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(mp_char);
+            else
+                buf.inc();
+        }
+    }
+
+    if (!buf.empty())
+    {
+        if (res.first.empty())
+            throw model_parser::parse_error("'=' is missing");
+
+        res.second = buf;
+    }
+
+    return res;
 }
 
 void model_parser::check()
