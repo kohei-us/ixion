@@ -24,6 +24,17 @@ namespace ixion {
 
 class model_parser
 {
+    enum parse_mode_type
+    {
+        parse_mode_unknown = 0,
+        parse_mode_init,
+        parse_mode_result,
+        parse_mode_edit,
+        parse_mode_table,
+        parse_mode_session,
+        parse_mode_exit
+    };
+
 public:
     typedef std::unordered_map< ::std::string, formula_result> results_type;
 
@@ -62,9 +73,11 @@ public:
 private:
     void init_model();
 
-    void parse_init(const char*& p);
-    void parse_result(const char*& p);
-    void parse_table(const char*& p);
+    void parse_command();
+
+    void parse_init();
+    void parse_result();
+    void parse_table();
     void push_table();
 
     void parse_table_columns(const mem_str_buf& str);
@@ -78,15 +91,21 @@ private:
     std::unique_ptr<table_handler::entry> mp_table_entry;
     std::unique_ptr<formula_name_resolver> mp_name_resolver;
     std::string m_filepath;
+    std::string m_strm;
     size_t m_thread_count;
     dirty_formula_cells_t m_dirty_cells;
     modified_cells_t m_dirty_cell_addrs;
     results_type m_formula_results;
 
+    const char* mp_head;
+    const char* mp_end;
+    const char* mp_char;
+
     row_t m_row_limit;
     col_t m_col_limit;
     sheet_t m_current_sheet;
 
+    parse_mode_type m_parse_mode;
     bool m_print_separator:1;
 };
 

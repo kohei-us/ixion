@@ -30,6 +30,7 @@ public:
     mem_str_buf();
     mem_str_buf(const char* p);
     mem_str_buf(const char* p, size_t n);
+    mem_str_buf(const mem_str_buf& r);
 
     void append(const char* p);
     void set_start(const char* p);

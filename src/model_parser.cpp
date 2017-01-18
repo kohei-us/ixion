@@ -28,35 +28,27 @@ namespace ixion {
 
 namespace {
 
-enum parse_mode_t
-{
-    parse_mode_unknown = 0,
-    parse_mode_init,
-    parse_mode_result,
-    parse_mode_edit,
-    parse_mode_table
-};
-
 bool is_separator(char c)
 {
     return c == '=' || c == ':' || c == '@';
 }
 
-void parse_command(const char*& p, mem_str_buf& com)
+mem_str_buf parse_command_to_buffer(const char*& p, const char* p_end)
 {
-    mem_str_buf _com;
+    mem_str_buf buf;
     ++p; // skip '%'.
-    _com.set_start(p);
+    buf.set_start(p);
     if (*p == '%')
     {
         // This line is a comment.  Skip the rest of the line.
-        _com.swap(com);
-        while (*p != '\n') ++p;
-        return;
+        while (*p != '\n' && p != p_end) ++p;
+        return buf;
     }
-    for (++p; *p != '\n'; ++p)
-        _com.inc();
-    _com.swap(com);
+
+    for (++p; *p != '\n' && p != p_end; ++p)
+        buf.inc();
+
+    return buf;
 }
 
 class string_printer : public std::unary_function<string_id_t, void>
@@ -107,126 +99,57 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
     m_filepath(filepath),
     m_thread_count(thread_count),
+    mp_head(nullptr),
+    mp_end(nullptr),
+    mp_char(nullptr),
     m_row_limit(1048576),
     m_col_limit(1024),
     m_current_sheet(0),
+    m_parse_mode(parse_mode_unknown),
     m_print_separator(true)
 {
     m_context.set_session_handler_factory(ixion::make_unique<session_handler::factory>(m_context));
     m_context.set_table_handler(&m_table_handler);
+
+    global::load_file_content(m_filepath, m_strm);
+
+    mp_head = m_strm.data();
+    mp_end = mp_head + m_strm.size();
 }
 
 model_parser::~model_parser() {}
 
 void model_parser::parse()
 {
-    string strm;
-    global::load_file_content(m_filepath, strm);
+    mp_char = mp_head;
+    m_parse_mode = parse_mode_unknown;
 
-    parse_mode_t parse_mode = parse_mode_unknown;
-    const char* p = strm.data();
-    const char* p_end = p + strm.size();
-
-    for (; p != p_end; ++p)
+    for (; mp_char != mp_end; ++mp_char)
     {
         // In each iteration, the p always points to the 1st character of a
         // line.
-        if (*p == '%')
+        if (*mp_char== '%')
         {
-            // This line contains a command.
-            mem_str_buf buf_com;
-            parse_command(p, buf_com);
-            if (buf_com.equals("%"))
-            {
-                // This is a comment line.  Just ignore it.
-            }
-            else if (buf_com.equals("calc"))
-            {
-                // Perform full calculation on currently stored cells.
-                calculate_cells(m_context, m_dirty_cells, m_thread_count);
-            }
-            else if (buf_com.equals("recalc"))
-            {
-                cout << get_formula_result_output_separator() << endl
-                    << "recalculating" << endl;
-
-                get_all_dirty_cells(m_context, m_dirty_cell_addrs, m_dirty_cells);
-                calculate_cells(m_context, m_dirty_cells, m_thread_count);
-            }
-            else if (buf_com.equals("check"))
-            {
-                // Check cell results.
-                check();
-            }
-            else if (buf_com.equals("exit"))
-            {
-                // Exit the loop.
-                return;
-            }
-            else if (buf_com.equals("push"))
-            {
-                switch (parse_mode)
-                {
-                    case parse_mode_table:
-                        push_table();
-                    break;
-                    default:
-                        throw parse_error("push command was used for wrong mode!");
-                }
-            }
-            else if (buf_com.equals("mode init"))
-            {
-                cout << get_formula_result_output_separator() << endl
-                    << "initializing" << endl;
-
-                parse_mode = parse_mode_init;
-                m_print_separator = true;
-            }
-            else if (buf_com.equals("mode result"))
-            {
-                // Clear any previous result values.
-                m_formula_results.clear();
-                parse_mode = parse_mode_result;
-            }
-            else if (buf_com.equals("mode edit"))
-            {
-                cout << get_formula_result_output_separator() << endl
-                    << "editing" << endl;
-
-                parse_mode = parse_mode_edit;
-                m_dirty_cells.clear();
-                m_dirty_cell_addrs.clear();
-                m_print_separator = true;
-            }
-            else if (buf_com.equals("mode table"))
-            {
-                parse_mode = parse_mode_table;
-                m_print_separator = true;
-                mp_table_entry.reset(new table_handler::entry);
-            }
-            else
-            {
-                ostringstream os;
-                os << "unknown command: " << buf_com.str() << endl;
-                throw parse_error(os.str());
-            }
+            parse_command();
             continue;
         }
 
-        switch (parse_mode)
+        switch (m_parse_mode)
         {
             case parse_mode_init:
-                parse_init(p);
-            break;
+                parse_init();
+                break;
             case parse_mode_edit:
-                parse_init(p);
-            break;
+                parse_init();
+                break;
             case parse_mode_result:
-                parse_result(p);
-            break;
+                parse_result();
+                break;
             case parse_mode_table:
-                parse_table(p);
-            break;
+                parse_table();
+                break;
+            case parse_mode_exit:
+                return;
             default:
                 throw parse_error("unknown parse mode");
         }
@@ -239,15 +162,101 @@ void model_parser::init_model()
         m_context.append_sheet(IXION_ASCII("sheet"), m_row_limit, m_col_limit);
 }
 
-void model_parser::parse_init(const char*& p)
+void model_parser::parse_command()
+{
+    // This line contains a command.
+    mem_str_buf buf_com = parse_command_to_buffer(mp_char, mp_end);
+
+    if (buf_com.equals("%"))
+    {
+        // This is a comment line.  Just ignore it.
+    }
+    else if (buf_com.equals("calc"))
+    {
+        // Perform full calculation on currently stored cells.
+        calculate_cells(m_context, m_dirty_cells, m_thread_count);
+    }
+    else if (buf_com.equals("recalc"))
+    {
+        cout << get_formula_result_output_separator() << endl
+            << "recalculating" << endl;
+
+        get_all_dirty_cells(m_context, m_dirty_cell_addrs, m_dirty_cells);
+        calculate_cells(m_context, m_dirty_cells, m_thread_count);
+    }
+    else if (buf_com.equals("check"))
+    {
+        // Check cell results.
+        check();
+    }
+    else if (buf_com.equals("exit"))
+    {
+        // Exit the loop.
+        m_parse_mode = parse_mode_exit;
+        return;
+    }
+    else if (buf_com.equals("push"))
+    {
+        switch (m_parse_mode)
+        {
+            case parse_mode_table:
+                push_table();
+            break;
+            default:
+                throw parse_error("push command was used for wrong mode!");
+        }
+    }
+    else if (buf_com.equals("mode init"))
+    {
+        cout << get_formula_result_output_separator() << endl
+            << "initializing" << endl;
+
+        m_parse_mode = parse_mode_init;
+        m_print_separator = true;
+    }
+    else if (buf_com.equals("mode result"))
+    {
+        // Clear any previous result values.
+        m_formula_results.clear();
+        m_parse_mode = parse_mode_result;
+    }
+    else if (buf_com.equals("mode edit"))
+    {
+        cout << get_formula_result_output_separator() << endl
+            << "editing" << endl;
+
+        m_parse_mode = parse_mode_edit;
+        m_dirty_cells.clear();
+        m_dirty_cell_addrs.clear();
+        m_print_separator = true;
+    }
+    else if (buf_com.equals("mode table"))
+    {
+        m_parse_mode = parse_mode_table;
+        m_print_separator = true;
+        mp_table_entry.reset(new table_handler::entry);
+    }
+    else if (buf_com.equals("mode session"))
+    {
+        m_parse_mode = parse_mode_session;
+    }
+    else
+    {
+        ostringstream os;
+        os << "unknown command: " << buf_com.str() << endl;
+        throw parse_error(os.str());
+    }
+}
+
+void model_parser::parse_init()
 {
     init_model();
 
     model_parser::cell_type content_type = model_parser::ct_unknown;
     mem_str_buf buf, name, formula;
-    for (; *p != '\n'; ++p)
+    for (; *mp_char != '\n' && mp_char != mp_end; ++mp_char)
     {
-        if (name.empty() && is_separator(*p))
+        if (name.empty() && is_separator(*mp_char))
         {
             // Separator encountered.  Set the name and clear the buffer.
             if (buf.empty())
@@ -255,7 +264,7 @@ void model_parser::parse_init(const char*& p)
 
             name = buf;
             buf.clear();
-            switch (*p)
+            switch (*mp_char)
             {
                 case '=':
                     content_type = model_parser::ct_formula;
@@ -273,7 +282,7 @@ void model_parser::parse_init(const char*& p)
         else
         {
             if (buf.empty())
-                buf.set_start(p);
+                buf.set_start(mp_char);
             else
                 buf.inc();
         }
@@ -328,8 +337,8 @@ void model_parser::parse_init(const char*& p)
 #endif
             unregister_formula_cell(m_context, pos);
             m_context.set_formula_cell(pos, buf.get(), buf.size(), *mp_name_resolver);
-            formula_cell* p = m_context.get_formula_cell(pos);
-            assert(p);
+            formula_cell* mp_char = m_context.get_formula_cell(pos);
+            assert(mp_char);
             m_dirty_cells.insert(pos);
             register_formula_cell(m_context, pos);
             cout << name.str() << ": (f) " << buf.str() << endl;
@@ -367,12 +376,12 @@ void model_parser::parse_init(const char*& p)
     }
 }
 
-void model_parser::parse_result(const char*& p)
+void model_parser::parse_result()
 {
     mem_str_buf buf, name, result;
-    for (; *p != '\n'; ++p)
+    for (; *mp_char != '\n' && mp_char != mp_end; ++mp_char)
     {
-        if (*p == '=')
+        if (*mp_char == '=')
         {
             if (buf.empty())
                 throw model_parser::parse_error("left hand side is empty");
@@ -383,7 +392,7 @@ void model_parser::parse_result(const char*& p)
         else
         {
             if (buf.empty())
-                buf.set_start(p);
+                buf.set_start(mp_char);
             else
                 buf.inc();
         }
@@ -413,7 +422,7 @@ void model_parser::parse_result(const char*& p)
         itr->second = res;
 }
 
-void model_parser::parse_table(const char*& p)
+void model_parser::parse_table()
 {
     assert(mp_table_entry);
 
@@ -421,9 +430,9 @@ void model_parser::parse_table(const char*& p)
 
     // Parse to get name and value strings.
     mem_str_buf buf, name, value;
-    for (; *p != '\n'; ++p)
+    for (; *mp_char != '\n'; ++mp_char)
     {
-        if (*p == '=')
+        if (*mp_char == '=')
         {
             if (buf.empty())
                 throw model_parser::parse_error("left hand side is empty");
@@ -434,7 +443,7 @@ void model_parser::parse_table(const char*& p)
         else
         {
             if (buf.empty())
-                buf.set_start(p);
+                buf.set_start(mp_char);
             else
                 buf.inc();
         }

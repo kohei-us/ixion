@@ -32,6 +32,7 @@ size_t mem_str_buf::hash::operator() (const mem_str_buf& s) const
 mem_str_buf::mem_str_buf() : mp_buf(NULL), m_size(0) {}
 mem_str_buf::mem_str_buf(const char* p) : mp_buf(p), m_size(strlen(p)) {}
 mem_str_buf::mem_str_buf(const char* p, size_t n) : mp_buf(p), m_size(n) {}
+mem_str_buf::mem_str_buf(const mem_str_buf& r) : mp_buf(r.mp_buf), m_size(r.m_size) {}
 
 void mem_str_buf::append(const char* p)
 {
