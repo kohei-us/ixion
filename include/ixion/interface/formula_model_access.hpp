@@ -68,10 +68,8 @@ public:
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
-    virtual const formula_cell* get_named_expression(const std::string& name) const = 0;
-    virtual const formula_cell* get_named_expression(sheet_t sheet, const std::string& name) const = 0;
-    virtual const std::string* get_named_expression_name(const formula_cell* expr) const = 0;
-    virtual const std::string* get_named_expression_name(sheet_t sheet, const formula_cell* expr) const = 0;
+    virtual const formula_tokens_t* get_named_expression(const std::string& name) const = 0;
+    virtual const formula_tokens_t* get_named_expression(sheet_t sheet, const std::string& name) const = 0;
 
     virtual double count_range(const abs_range_t& range, const values_t& values_type) const = 0;
 

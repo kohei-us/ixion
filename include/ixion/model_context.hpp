@@ -66,10 +66,8 @@ public:
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr);
 
-    virtual const formula_cell* get_named_expression(const std::string& name) const;
-    virtual const formula_cell* get_named_expression(sheet_t sheet, const std::string& name) const;
-    virtual const std::string* get_named_expression_name(const formula_cell* expr) const;
-    virtual const std::string* get_named_expression_name(sheet_t sheet, const formula_cell* expr) const;
+    virtual const formula_tokens_t* get_named_expression(const std::string& name) const;
+    virtual const formula_tokens_t* get_named_expression(sheet_t sheet, const std::string& name) const;
 
     virtual double count_range(const abs_range_t& range, const values_t& values_type) const;
     virtual matrix get_range_value(const abs_range_t& range) const;
@@ -113,11 +111,8 @@ public:
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
-    void set_named_expression(const char* p, size_t n, formula_cell* cell);
-    void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_cell* cell);
-
-    formula_cell* get_named_expression(const std::string& name);
-    formula_cell* get_named_expression(sheet_t sheet, const std::string& name);
+    void set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
 
     /**
      * Append a new sheet to the model.  The caller must ensure that the name

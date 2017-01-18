@@ -12,13 +12,15 @@
 #include <map>
 #include <memory>
 
+#include "ixion/formula_tokens.hpp"
+
 namespace ixion {
 
 class formula_cell;
 
 namespace detail {
 
-typedef std::map<std::string, std::unique_ptr<formula_cell>> named_expressions_t;
+typedef std::map<std::string, std::unique_ptr<formula_tokens_t>> named_expressions_t;
 
 }}
 

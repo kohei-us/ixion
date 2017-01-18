@@ -224,15 +224,12 @@ public:
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
-    void set_named_expression(const char* p, size_t n, formula_cell* cell);
-    void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_cell* cell);
+    void set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
 
-    formula_cell* get_named_expression(const string& name);
-    formula_cell* get_named_expression(sheet_t sheet, const string& name);
-    const formula_cell* get_named_expression(const string& name) const;
-    const formula_cell* get_named_expression(sheet_t sheet, const string& name) const;
-    const string* get_named_expression_name(const formula_cell* expr) const;
-    const string* get_named_expression_name(sheet_t sheet, const formula_cell* expr) const;
+    const formula_tokens_t* get_named_expression(const string& name) const;
+    const formula_tokens_t* get_named_expression(sheet_t sheet, const string& name) const;
+
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
@@ -298,72 +295,33 @@ private:
     string m_empty_string;
 };
 
-void model_context_impl::set_named_expression(const char* p, size_t n, formula_cell* cell)
+void model_context_impl::set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
 {
     string name(p, n);
     m_named_expressions.insert(
-        detail::named_expressions_t::value_type(
-            name, std::unique_ptr<formula_cell>(cell)));
+        detail::named_expressions_t::value_type(std::move(name), std::move(expr)));
 }
 
 void model_context_impl::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, formula_cell* cell)
+    sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
 {
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     string name(p, n);
     ns.insert(
-        detail::named_expressions_t::value_type(
-            name, std::unique_ptr<formula_cell>(cell)));
+        detail::named_expressions_t::value_type(std::move(name), std::move(expr)));
 }
 
-formula_cell* model_context_impl::get_named_expression(const string& name)
-{
-    detail::named_expressions_t::iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? NULL : itr->second.get();
-}
-
-formula_cell* model_context_impl::get_named_expression(sheet_t sheet, const string& name)
-{
-    const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
-    auto it = ns.find(name);
-    return it == ns.end() ? nullptr : it->second.get();
-}
-
-const formula_cell* model_context_impl::get_named_expression(const string& name) const
+const formula_tokens_t* model_context_impl::get_named_expression(const string& name) const
 {
     detail::named_expressions_t::const_iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? NULL : itr->second.get();
+    return itr == m_named_expressions.end() ? nullptr : itr->second.get();
 }
 
-const formula_cell* model_context_impl::get_named_expression(sheet_t sheet, const string& name) const
+const formula_tokens_t* model_context_impl::get_named_expression(sheet_t sheet, const string& name) const
 {
     const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     auto it = ns.find(name);
     return it == ns.end() ? nullptr : it->second.get();
-}
-
-const string* model_context_impl::get_named_expression_name(const formula_cell* expr) const
-{
-    detail::named_expressions_t::const_iterator itr = m_named_expressions.begin(), itr_end = m_named_expressions.end();
-    for (; itr != itr_end; ++itr)
-    {
-        if (itr->second.get() == expr)
-            return &itr->first;
-    }
-    return nullptr;
-}
-
-const string* model_context_impl::get_named_expression_name(sheet_t sheet, const formula_cell* expr) const
-{
-    const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
-    auto it = std::find_if(ns.begin(), ns.end(),
-        [expr](const detail::named_expressions_t::value_type& v) -> bool
-        {
-            return v.second.get() == expr;
-        }
-    );
-
-    return it == ns.end() ? nullptr : &it->first;
 }
 
 sheet_t model_context_impl::get_sheet_index(const char* p, size_t n) const
@@ -1335,45 +1293,25 @@ std::string model_context::get_sheet_name(sheet_t sheet) const
     return mp_impl->get_sheet_name(sheet);
 }
 
-void model_context::set_named_expression(const char* p, size_t n, formula_cell* cell)
+void model_context::set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
 {
-    mp_impl->set_named_expression(p, n, cell);
+    mp_impl->set_named_expression(p, n, std::move(expr));
 }
 
 void model_context::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, formula_cell* cell)
+    sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
 {
-    mp_impl->set_named_expression(sheet, p, n, cell);
+    mp_impl->set_named_expression(sheet, p, n, std::move(expr));
 }
 
-formula_cell* model_context::get_named_expression(const string& name)
+const formula_tokens_t* model_context::get_named_expression(const string& name) const
 {
     return mp_impl->get_named_expression(name);
 }
 
-formula_cell* model_context::get_named_expression(sheet_t sheet, const string& name)
+const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const string& name) const
 {
     return mp_impl->get_named_expression(sheet, name);
-}
-
-const formula_cell* model_context::get_named_expression(const string& name) const
-{
-    return mp_impl->get_named_expression(name);
-}
-
-const formula_cell* model_context::get_named_expression(sheet_t sheet, const string& name) const
-{
-    return mp_impl->get_named_expression(sheet, name);
-}
-
-const string* model_context::get_named_expression_name(const formula_cell* expr) const
-{
-    return mp_impl->get_named_expression_name(expr);
-}
-
-const string* model_context::get_named_expression_name(sheet_t sheet, const formula_cell* expr) const
-{
-    return mp_impl->get_named_expression_name(sheet, expr);
 }
 
 sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)

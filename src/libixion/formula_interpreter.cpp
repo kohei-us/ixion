@@ -152,7 +152,7 @@ void formula_interpreter::init_tokens()
         if (p->get_opcode() == fop_named_expression)
         {
             // Named expression.  Expand it.
-            const formula_cell* expr = m_context.get_named_expression(p->get_name());
+            const formula_tokens_t* expr = m_context.get_named_expression(p->get_name());
             used_names.insert(p->get_name());
             expand_named_expression(p->get_name(), expr, used_names);
         }
@@ -228,7 +228,7 @@ void formula_interpreter::pop_result()
 }
 
 void formula_interpreter::expand_named_expression(
-    const string& expr_name, const formula_cell* expr, name_set& used_names)
+    const string& expr_name, const formula_tokens_t* expr, name_set& used_names)
 {
     if (!expr)
     {
@@ -237,13 +237,8 @@ void formula_interpreter::expand_named_expression(
         throw invalid_expression(os.str());
     }
 
-    size_t tokens_id = expr->get_identifier();
-    const formula_tokens_t* expr_tokens = m_context.get_formula_tokens(global_scope, tokens_id);
-    if (!expr_tokens)
-        return;
-
     m_tokens.push_back(&paren_open);
-    formula_tokens_t::const_iterator itr = expr_tokens->begin(), itr_end = expr_tokens->end();
+    formula_tokens_t::const_iterator itr = expr->begin(), itr_end = expr->end();
     for (; itr != itr_end; ++itr)
     {
         const formula_token& t = **itr;
@@ -255,7 +250,7 @@ void formula_interpreter::expand_named_expression(
                 // Circular reference detected.
                 throw invalid_expression("circular referencing of named expressions");
             }
-            const formula_cell* expr = m_context.get_named_expression(expr_name);
+            const formula_tokens_t* expr = m_context.get_named_expression(expr_name);
             used_names.insert(expr_name);
             expand_named_expression(expr_name, expr, used_names);
         }

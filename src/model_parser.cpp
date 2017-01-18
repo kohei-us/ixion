@@ -654,63 +654,21 @@ void model_parser::check()
         cout << name << " : " << res.str(m_context) << endl;
 
         formula_name_t name_type = mp_name_resolver->resolve(&name[0], name.size(), abs_address_t());
-        switch (name_type.type)
+        if (name_type.type != formula_name_t::cell_reference)
         {
-            case formula_name_t::cell_reference:
+            ostringstream os;
+            os << "unrecognized cell address: " << name;
+            throw std::runtime_error(os.str());
+        }
+
+        const formula_name_t::address_type& _addr = name_type.address;
+        abs_address_t addr(_addr.sheet, _addr.row, _addr.col);
+
+        switch (m_context.get_celltype(addr))
+        {
+            case celltype_t::formula:
             {
-                const formula_name_t::address_type& _addr = name_type.address;
-                abs_address_t addr(_addr.sheet, _addr.row, _addr.col);
-
-                switch (m_context.get_celltype(addr))
-                {
-                    case celltype_t::formula:
-                    {
-                        const formula_cell* fcell = m_context.get_formula_cell(addr);
-                        const formula_result& res_cell = fcell->get_result_cache();
-
-                        if (res_cell != res)
-                        {
-                            ostringstream os;
-                            os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell.str(m_context) << ")";
-                            throw check_error(os.str());
-                        }
-                    }
-                    break;
-                    case celltype_t::numeric:
-                    {
-                        double actual_val = m_context.get_numeric_value(addr);
-                        if (actual_val != res.get_value())
-                        {
-                            ostringstream os;
-                            os << "unexpected numeric result: (expected: " << res.get_value() << "; actual: " << actual_val << ")";
-                            throw check_error(os.str());
-                        }
-                    }
-                    break;
-                    case celltype_t::string:
-                    {
-                        string_id_t str_id = m_context.get_string_identifier(addr);
-
-                        if (str_id != res.get_string())
-                        {
-                            const string* ps = m_context.get_string(str_id);
-                            if (!ps)
-                                throw check_error("failed to retrieve a string value for a string cell.");
-
-                            ostringstream os;
-                            os << "unexpected string result: (expected: " << res.get_string() << "; actual: " << *ps << ")";
-                            throw check_error(os.str());
-                        }
-                    }
-                    break;
-                    default:
-                        throw check_error("unhandled cell type.");
-                }
-            }
-            break;
-            case formula_name_t::named_expression:
-            {
-                const formula_cell* fcell = m_context.get_named_expression(name);
+                const formula_cell* fcell = m_context.get_formula_cell(addr);
                 const formula_result& res_cell = fcell->get_result_cache();
 
                 if (res_cell != res)
@@ -721,8 +679,35 @@ void model_parser::check()
                 }
             }
             break;
+            case celltype_t::numeric:
+            {
+                double actual_val = m_context.get_numeric_value(addr);
+                if (actual_val != res.get_value())
+                {
+                    ostringstream os;
+                    os << "unexpected numeric result: (expected: " << res.get_value() << "; actual: " << actual_val << ")";
+                    throw check_error(os.str());
+                }
+            }
+            break;
+            case celltype_t::string:
+            {
+                string_id_t str_id = m_context.get_string_identifier(addr);
+
+                if (str_id != res.get_string())
+                {
+                    const string* ps = m_context.get_string(str_id);
+                    if (!ps)
+                        throw check_error("failed to retrieve a string value for a string cell.");
+
+                    ostringstream os;
+                    os << "unexpected string result: (expected: " << res.get_string() << "; actual: " << *ps << ")";
+                    throw check_error(os.str());
+                }
+            }
+            break;
             default:
-                ;
+                throw check_error("unhandled cell type.");
         }
     }
 }
