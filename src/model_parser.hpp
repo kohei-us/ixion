@@ -38,6 +38,13 @@ class model_parser
 
     using parsed_assignment_type = std::pair<mem_str_buf, mem_str_buf>;
 
+    struct named_expression_type
+    {
+        std::string name;
+        std::string expression;
+        abs_address_t origin;
+    };
+
 public:
     typedef std::unordered_map< ::std::string, formula_result> results_type;
 
@@ -102,6 +109,7 @@ private:
     table_handler m_table_handler;
     std::unique_ptr<table_handler::entry> mp_table_entry;
     std::unique_ptr<formula_name_resolver> mp_name_resolver;
+    std::unique_ptr<named_expression_type> mp_named_expression;
     std::string m_filepath;
     std::string m_strm;
     size_t m_thread_count;

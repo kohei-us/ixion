@@ -277,6 +277,7 @@ void model_parser::parse_command()
     {
         m_print_separator = true;
         m_parse_mode = parse_mode_named_expression;
+        mp_named_expression = ixion::make_unique<named_expression_type>();
     }
     else
     {
@@ -558,11 +559,61 @@ void model_parser::push_table()
 
 void model_parser::parse_named_expression()
 {
+    assert(mp_named_expression);
+
     parsed_assignment_type res = parse_assignment();
+    if (res.first == "name")
+        mp_named_expression->name = std::move(res.second.str());
+    else if (res.first == "expression")
+        mp_named_expression->expression = std::move(res.second.str());
+    else if (res.first == "origin")
+    {
+        const mem_str_buf& s = res.second;
+
+        formula_name_t name =
+            mp_name_resolver->resolve(
+                s.get(), s.size(), abs_address_t(m_current_sheet,0,0));
+
+        if (name.type != formula_name_t::name_type::cell_reference)
+        {
+            ostringstream os;
+            os << "'" << s << "' is not a valid named expression origin.";
+            throw parse_error(os.str());
+        }
+
+        mp_named_expression->origin = to_address(name.address).to_abs(abs_address_t(0,0,0));
+    }
+    else
+    {
+        ostringstream os;
+        os << "unknown property of named expression '" << res.first << "'";
+        throw parse_error(os.str());
+    }
 }
 
 void model_parser::push_named_expression()
 {
+    assert(mp_named_expression);
+
+    // TODO : push this for real.
+
+    std::unique_ptr<formula_tokens_t> tokens = ixion::make_unique<formula_tokens_t>();
+
+    parse_formula_string(
+        m_context, mp_named_expression->origin, *mp_name_resolver,
+        mp_named_expression->expression.data(),
+        mp_named_expression->expression.size(),
+        *tokens);
+
+    std::string exp_s;
+    print_formula_tokens(
+        m_context, mp_named_expression->origin, *mp_name_resolver, *tokens, exp_s);
+
+    cout << "name: " << mp_named_expression->name << endl;
+    cout << "expression: " << exp_s << endl;
+    cout << "origin: " << mp_named_expression->origin << endl;
+
+    mp_named_expression.reset();
 }
 
 void model_parser::parse_table_columns(const mem_str_buf& str)
