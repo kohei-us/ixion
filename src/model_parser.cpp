@@ -595,8 +595,6 @@ void model_parser::push_named_expression()
 {
     assert(mp_named_expression);
 
-    // TODO : push this for real.
-
     std::unique_ptr<formula_tokens_t> tokens = ixion::make_unique<formula_tokens_t>();
 
     parse_formula_string(
@@ -612,6 +610,9 @@ void model_parser::push_named_expression()
     cout << "name: " << mp_named_expression->name << endl;
     cout << "expression: " << exp_s << endl;
     cout << "origin: " << mp_named_expression->origin << endl;
+
+    m_context.set_named_expression(
+        mp_named_expression->name.data(), mp_named_expression->name.size(), std::move(tokens));
 
     mp_named_expression.reset();
 }
