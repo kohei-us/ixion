@@ -19,14 +19,6 @@
 #include <vector>
 #include <algorithm>
 
-#define DEBUG_FUNCTION_OBJECTS 0
-
-#if DEBUG_FUNCTION_OBJECTS
-#include <iostream>
-using std::cout;
-using std::endl;
-#endif
-
 namespace ixion {
 
 namespace {
@@ -108,9 +100,6 @@ formula_cell_listener_handler::formula_cell_listener_handler(
     m_addr(addr),
     m_mode(mode)
 {
-#if DEBUG_FUNCTION_OBJECTS
-    __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: cell position=" << m_addr.get_name() << endl;
-#endif
 }
 
 void formula_cell_listener_handler::operator() (const formula_token* p) const
@@ -120,9 +109,6 @@ void formula_cell_listener_handler::operator() (const formula_token* p) const
         case fop_single_ref:
         {
             abs_address_t addr = p->get_single_ref().to_abs(m_addr);
-#if DEBUG_FUNCTION_OBJECTS
-            __IXION_DEBUG_OUT__ << "formula_cell_listener_handler: ref address=" << addr.get_name() << endl;
-#endif
             if (m_mode == mode_add)
             {
                 m_listener_tracker.add(m_addr, addr);
@@ -157,28 +143,17 @@ cell_dependency_handler::cell_dependency_handler(
 
 void cell_dependency_handler::operator() (const abs_address_t& fcell)
 {
-#if DEBUG_FUNCTION_OBJECTS
-    const formula_name_resolver& resolver = m_context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << get_formula_result_output_separator() << endl;
-    __IXION_DEBUG_OUT__ << "processing dependency of " << resolver.get_name(fcell, false) << endl;
-#endif
     // Register cell dependencies.
     formula_cell* p = m_context.get_formula_cell(fcell);
     assert(p);
     std::vector<const formula_token*> ref_tokens = p->get_ref_tokens(m_context, fcell);
 
-#if DEBUG_FUNCTION_OBJECTS
-    __IXION_DEBUG_OUT__ << "this cell contains " << ref_tokens.size() << " reference tokens." << endl;
-#endif
     // Pick up the referenced cells from the ref tokens.  I should
     // probably combine this with the above get_ref_tokens() call above
     // for efficiency.
     std::vector<abs_address_t> deps;
     for_each(ref_tokens.begin(), ref_tokens.end(), ref_cell_picker(m_context, fcell, deps));
 
-#if DEBUG_FUNCTION_OBJECTS
-    __IXION_DEBUG_OUT__ << "number of precedent cells picked up: " << deps.size() << endl;
-#endif
     // Register dependency information.  Only dirty cells should be
     // registered as precedent cells since non-dirty cells are equivalent
     // to constants.
