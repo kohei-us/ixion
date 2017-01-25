@@ -45,6 +45,25 @@ class model_parser
         abs_address_t origin;
     };
 
+    /**
+     * Right-hand-side cell content type.
+     */
+    enum cell_type
+    {
+        ct_unknown = 0,
+        ct_formula,
+        ct_value,
+        ct_string
+    };
+
+    struct cell_def_type
+    {
+        mem_str_buf name;
+        mem_str_buf value;
+        cell_type type;
+        abs_address_t pos;
+    };
+
 public:
     typedef std::unordered_map< ::std::string, formula_result> results_type;
 
@@ -58,17 +77,6 @@ public:
     {
     public:
         check_error(const ::std::string& msg);
-    };
-
-    /**
-     * Right-hand-side cell content type.
-     */
-    enum cell_type
-    {
-        ct_unknown = 0,
-        ct_formula,
-        ct_value,
-        ct_string
     };
 
     model_parser() = delete;
@@ -87,6 +95,7 @@ private:
 
     void parse_session();
     void parse_init();
+    void parse_edit();
     void parse_result();
 
     void parse_table();
@@ -100,6 +109,8 @@ private:
      * Parse a simple left=right assignment line.
      */
     parsed_assignment_type parse_assignment();
+
+    cell_def_type parse_cell_definition();
 
     void check();
 

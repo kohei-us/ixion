@@ -161,7 +161,7 @@ void model_parser::parse()
                 parse_init();
                 break;
             case parse_mode_edit:
-                parse_init();
+                parse_edit();
                 break;
             case parse_mode_result:
                 parse_result();
@@ -201,6 +201,10 @@ void model_parser::parse_command()
     else if (buf_com.equals("calc"))
     {
         // Perform full calculation on currently stored cells.
+
+        for (const abs_address_t& pos : m_dirty_cells)
+            register_formula_cell(m_context, pos);
+
         calculate_cells(m_context, m_dirty_cells, m_thread_count);
     }
     else if (buf_com.equals("recalc"))
@@ -337,93 +341,25 @@ void model_parser::parse_init()
 {
     init_model();
 
-    model_parser::cell_type content_type = model_parser::ct_unknown;
-    mem_str_buf buf, name, formula;
-    for (; mp_char != mp_end  && *mp_char != '\n'; ++mp_char)
-    {
-        if (name.empty() && is_separator(*mp_char))
-        {
-            // Separator encountered.  Set the name and clear the buffer.
-            if (buf.empty())
-                throw model_parser::parse_error("left hand side is empty");
-
-            name = buf;
-            buf.clear();
-            switch (*mp_char)
-            {
-                case '=':
-                    content_type = model_parser::ct_formula;
-                break;
-                case ':':
-                    content_type = model_parser::ct_value;
-                break;
-                case '@':
-                    content_type = model_parser::ct_string;
-                break;
-                default:
-                    ;
-            }
-        }
-        else
-        {
-            if (buf.empty())
-                buf.set_start(mp_char);
-            else
-                buf.inc();
-        }
-    }
-
-#if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << "name: " << name.str() << "  buf: " << buf.str() << endl;
-#endif
-
-    if (name.empty())
-    {
-        if (buf.empty())
-            // This is an empty line. Bail out.
-            return;
-
-        // Buffer is not empty but name is not given.  We must be missing a separator.
-        throw model_parser::parse_error("separator is missing");
-    }
-
-    formula_name_t ret = mp_name_resolver->resolve(name.get(), name.size(), abs_address_t());
-    if (ret.type != formula_name_t::cell_reference)
-    {
-        ostringstream os;
-        os << "invalid cell name: " << name.str();
-        throw model_parser::parse_error(os.str());
-    }
-
-    abs_address_t pos(ret.address.sheet, ret.address.row, ret.address.col);
-    m_dirty_cell_addrs.push_back(pos);
-    unregister_formula_cell(m_context, pos);
-
-    if (buf.empty())
-    {
-        // A valid name is given but with empty definition.  Just remove the
-        // existing cell.
-        m_context.erase_cell(pos);
+    cell_def_type cell_def = parse_cell_definition();
+    if (cell_def.name.empty() && cell_def.value.empty())
         return;
-    }
 
-    switch (content_type)
+    m_dirty_cell_addrs.push_back(cell_def.pos);
+
+    switch (cell_def.type)
     {
         case ct_formula:
         {
 #if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: formula" << endl;
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: formula" << endl;
 #endif
-            unregister_formula_cell(m_context, pos);
-            m_context.set_formula_cell(pos, buf.get(), buf.size(), *mp_name_resolver);
-            formula_cell* mp_char = m_context.get_formula_cell(pos);
-            assert(mp_char);
-            m_dirty_cells.insert(pos);
-            register_formula_cell(m_context, pos);
-            cout << name.str() << ": (f) " << buf.str() << endl;
+            m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
+            m_dirty_cells.insert(cell_def.pos);
+            cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
 #if DEBUG_MODEL_PARSER
             std::string s;
-            print_formula_tokens(m_context, pos, *tokens, s);
+            print_formula_tokens(m_context, cell_def.pos, *tokens, s);
             __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
 #endif
         }
@@ -431,23 +367,86 @@ void model_parser::parse_init()
         case ct_string:
         {
 #if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: string" << endl;
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: string" << endl;
 #endif
-            m_context.set_string_cell(pos, buf.get(), buf.size());
-            cout << name.str() << ": (s) " << buf.str() << endl;
+            m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
+            cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
         }
         break;
         case ct_value:
         {
 #if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(pos, false) << " type: numeric" << endl;
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: numeric" << endl;
 #endif
-            double value = global::to_double(buf.get(), buf.size());
-            m_context.set_numeric_cell(pos, value);
+            double v = global::to_double(cell_def.value.get(), cell_def.value.size());
+            m_context.set_numeric_cell(cell_def.pos, v);
 
-            address_t pos_display(pos);
+            address_t pos_display(cell_def.pos);
             pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << value << endl;
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
+        }
+        break;
+        default:
+            throw model_parser::parse_error("unknown content type");
+    }
+}
+
+void model_parser::parse_edit()
+{
+    cell_def_type cell_def = parse_cell_definition();
+    if (cell_def.name.empty() && cell_def.value.empty())
+        return;
+
+    m_dirty_cell_addrs.push_back(cell_def.pos);
+    unregister_formula_cell(m_context, cell_def.pos);
+
+    if (cell_def.value.empty())
+    {
+        // A valid name is given but with empty definition.  Just remove the
+        // existing cell.
+        m_context.erase_cell(cell_def.pos);
+        return;
+    }
+
+    switch (cell_def.type)
+    {
+        case ct_formula:
+        {
+#if DEBUG_MODEL_PARSER
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: formula" << endl;
+#endif
+            unregister_formula_cell(m_context, cell_def.pos);
+            m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
+            m_dirty_cells.insert(cell_def.pos);
+            register_formula_cell(m_context, cell_def.pos);
+            cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
+#if DEBUG_MODEL_PARSER
+            std::string s;
+            print_formula_tokens(m_context, cell_def.pos, *tokens, s);
+            __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
+#endif
+        }
+        break;
+        case ct_string:
+        {
+#if DEBUG_MODEL_PARSER
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: string" << endl;
+#endif
+            m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
+            cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
+        }
+        break;
+        case ct_value:
+        {
+#if DEBUG_MODEL_PARSER
+            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: numeric" << endl;
+#endif
+            double v = global::to_double(cell_def.value.get(), cell_def.value.size());
+            m_context.set_numeric_cell(cell_def.pos, v);
+
+            address_t pos_display(cell_def.pos);
+            pos_display.set_absolute(false);
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
         }
         break;
         default:
@@ -687,6 +686,76 @@ model_parser::parsed_assignment_type model_parser::parse_assignment()
     }
 
     return res;
+}
+
+model_parser::cell_def_type model_parser::parse_cell_definition()
+{
+    cell_def_type ret;
+    ret.type = model_parser::ct_unknown;
+
+    mem_str_buf buf;
+
+    for (; mp_char != mp_end  && *mp_char != '\n'; ++mp_char)
+    {
+        if (ret.name.empty() && is_separator(*mp_char))
+        {
+            // Separator encountered.  Set the name and clear the buffer.
+            if (buf.empty())
+                throw model_parser::parse_error("left hand side is empty");
+
+            ret.name = buf;
+            buf.clear();
+            switch (*mp_char)
+            {
+                case '=':
+                    ret.type = model_parser::ct_formula;
+                break;
+                case ':':
+                    ret.type = model_parser::ct_value;
+                break;
+                case '@':
+                    ret.type = model_parser::ct_string;
+                break;
+                default:
+                    ;
+            }
+        }
+        else
+        {
+            if (buf.empty())
+                buf.set_start(mp_char);
+            else
+                buf.inc();
+        }
+    }
+
+    ret.value = buf;
+
+#if DEBUG_MODEL_PARSER
+    __IXION_DEBUG_OUT__ << "name: " << ret.name.str() << "  value: " << ret.value.str() << endl;
+#endif
+
+    if (ret.name.empty())
+    {
+        if (ret.value.empty())
+            // This is an empty line. Bail out.
+            return ret;
+
+        // Buffer is not empty but name is not given.  We must be missing a separator.
+        throw model_parser::parse_error("separator is missing");
+    }
+
+    formula_name_t fnt = mp_name_resolver->resolve(ret.name.get(), ret.name.size(), abs_address_t());
+    if (fnt.type != formula_name_t::cell_reference)
+    {
+        ostringstream os;
+        os << "invalid cell name: " << ret.name.str();
+        throw model_parser::parse_error(os.str());
+    }
+
+    ret.pos = abs_address_t(fnt.address.sheet, fnt.address.row, fnt.address.col);
+
+    return ret;
 }
 
 void model_parser::check()

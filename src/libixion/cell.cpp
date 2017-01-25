@@ -305,20 +305,36 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
     if (!this_tokens)
         return ret;
 
-    std::for_each(this_tokens->begin(), this_tokens->end(),
-        [&](const formula_tokens_t::value_type& t)
+    std::function<void(const formula_tokens_t::value_type&)> get_refs = [&](const formula_tokens_t::value_type& t)
+    {
+        switch (t->get_opcode())
         {
-            switch (t->get_opcode())
-            {
-                case fop_single_ref:
-                case fop_range_ref:
-                    ret.push_back(t.get());
+            case fop_single_ref:
+            case fop_range_ref:
+                ret.push_back(t.get());
                 break;
-                default:
-                    ; // ignore the rest.
+            case fop_named_expression:
+            {
+                const formula_tokens_t* named_exp =
+                    cxt.get_named_expression(t->get_name());
+
+                if (!named_exp)
+                {
+                    std::ostringstream os;
+                    os << "named expression '" << t->get_name() << "' is not found.";
+                    throw general_error(os.str());
+                }
+
+                // recursive call.
+                std::for_each(named_exp->begin(), named_exp->end(), get_refs);
+                break;
             }
+            default:
+                ; // ignore the rest.
         }
-    );
+    };
+
+    std::for_each(this_tokens->begin(), this_tokens->end(), get_refs);
 
     return ret;
 }

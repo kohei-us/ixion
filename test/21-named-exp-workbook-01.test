@@ -33,5 +33,10 @@ expression=Sheet1!$A$1:$B$5
 origin=Sheet1!$A$1
 %push
 %% --------------------------------------------------------------------------
+%calc
+%mode result
+A7=15
+B7=55
+%check
 %exit
 
