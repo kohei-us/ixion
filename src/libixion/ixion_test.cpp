@@ -205,6 +205,29 @@ void test_name_resolver_excel_a1()
     }
 }
 
+void test_name_resolver_named_expression_excel_a1()
+{
+    cout << "Testing the Excel A1 name resolver for parsing named expressions." << endl;
+
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("Sheet"), 1048576, 1024);
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    std::vector<std::string> names = {
+        "MyRange",
+        "MyRange2",
+    };
+
+    for (const std::string& name : names)
+    {
+        cout << "parsing '" << name << "'..." << endl;
+        formula_name_t res = resolver->resolve(name.data(), name.size(), abs_address_t(0,0,0));
+        assert(res.type == formula_name_t::name_type::named_expression);
+    }
+}
+
 void test_name_resolver_table_excel_a1()
 {
     cout << "Testing the Excel A1 name resolver for parsing table references." << endl;
@@ -879,6 +902,7 @@ int main()
     test_string_to_double();
     test_string_pool();
     test_name_resolver_excel_a1();
+    test_name_resolver_named_expression_excel_a1();
     test_name_resolver_table_excel_a1();
     test_name_resolver_excel_r1c1();
     test_name_resolver_odff();
