@@ -578,6 +578,8 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
     // the state of a value-not-set.  They are subtracted by one before
     // returning.
 
+    static const col_t max_column_value = std::numeric_limits<col_t>::max() / 26 - 26;
+
     resolver_parse_mode mode = resolver_parse_mode::column;
 
     while (true)
@@ -598,6 +600,9 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
             if (addr.column)
                 addr.column *= 26;
             addr.column += static_cast<col_t>(c - 'A' + 1);
+
+            if (addr.column > max_column_value)
+                return invalid;
         }
         else if (is_digit(c))
         {
