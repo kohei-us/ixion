@@ -112,6 +112,16 @@ enum class formula_error_t
     general_error = 5,
 };
 
+struct IXION_DLLPUBLIC sheet_size_t
+{
+    row_t row;
+    col_t column;
+
+    sheet_size_t();
+    sheet_size_t(const sheet_size_t& other);
+    sheet_size_t(row_t _row, col_t _column);
+};
+
 IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
 
 }

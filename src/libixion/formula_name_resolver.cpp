@@ -1072,6 +1072,17 @@ public:
         __IXION_DEBUG_OUT__ << "parse address result: " << parse_address_result_names[parse_res] << endl;
 #endif
 
+        if (parse_res != invalid)
+        {
+            // Make sure the address is within the sheet size.
+            sheet_size_t sheet_size = mp_cxt->get_sheet_size(pos.sheet);
+
+            if (parsed_addr.row != row_unset && parsed_addr.row >= sheet_size.row)
+                parse_res = invalid;
+            else if (parsed_addr.column != column_unset && parsed_addr.column >= sheet_size.column)
+                parse_res = invalid;
+        }
+
         // prevent for example H to be recognized as column address
         if (parse_res == valid_address && parsed_addr.row != row_unset)
         {

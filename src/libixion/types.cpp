@@ -16,6 +16,10 @@ const sheet_t invalid_sheet = -2;
 
 const string_id_t empty_string_id = std::numeric_limits<string_id_t>::max();
 
+sheet_size_t::sheet_size_t() : row(0), column(0) {}
+sheet_size_t::sheet_size_t(const sheet_size_t& other) : row(other.row), column(other.column) {}
+sheet_size_t::sheet_size_t(row_t _row, col_t _column) : row(_row), column(_column) {}
+
 const char* get_formula_error_name(formula_error_t fe)
 {
     static const char* default_err_name = "#ERR!";

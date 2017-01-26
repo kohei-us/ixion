@@ -83,6 +83,7 @@ public:
     virtual const std::string* get_string(string_id_t identifier) const;
     virtual sheet_t get_sheet_index(const char* p, size_t n) const;
     virtual std::string get_sheet_name(sheet_t sheet) const;
+    virtual sheet_size_t get_sheet_size(sheet_t sheet) const override;
 
     double get_numeric_value_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;

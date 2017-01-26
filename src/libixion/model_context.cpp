@@ -232,6 +232,7 @@ public:
 
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
+    sheet_size_t get_sheet_size(sheet_t sheet) const;
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
     string_id_t append_string(const char* p, size_t n);
@@ -346,6 +347,11 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
         return std::string();
 
     return m_sheet_names[sheet];
+}
+
+sheet_size_t model_context_impl::get_sheet_size(sheet_t sheet) const
+{
+    return m_sheets.at(sheet).get_sheet_size();
 }
 
 sheet_t model_context_impl::append_sheet(
@@ -1291,6 +1297,11 @@ sheet_t model_context::get_sheet_index(const char* p, size_t n) const
 std::string model_context::get_sheet_name(sheet_t sheet) const
 {
     return mp_impl->get_sheet_name(sheet);
+}
+
+sheet_size_t model_context::get_sheet_size(sheet_t sheet) const
+{
+    return mp_impl->get_sheet_size(sheet);
 }
 
 void model_context::set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)

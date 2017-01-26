@@ -128,6 +128,15 @@ public:
     virtual sheet_t get_sheet_index(const char* p, size_t n) const = 0;
 
     virtual std::string get_sheet_name(sheet_t sheet) const = 0;
+
+    /**
+     * Get the size of specified sheet.
+     *
+     * @param sheet sheet index.
+     *
+     * @return size of the sheet.
+     */
+    virtual sheet_size_t get_sheet_size(sheet_t sheet) const = 0;
 };
 
 }}
