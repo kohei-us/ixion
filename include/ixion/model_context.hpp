@@ -53,36 +53,36 @@ public:
     typedef std::vector<shared_tokens> shared_tokens_type;
 
     model_context();
-    virtual ~model_context();
+    virtual ~model_context() override;
 
-    virtual const config& get_config() const;
-    virtual cell_listener_tracker& get_cell_listener_tracker();
+    virtual const config& get_config() const override;
+    virtual cell_listener_tracker& get_cell_listener_tracker() override;
 
-    virtual bool is_empty(const abs_address_t& addr) const;
-    virtual celltype_t get_celltype(const abs_address_t& addr) const;
-    virtual double get_numeric_value(const abs_address_t& addr) const;
-    virtual string_id_t get_string_identifier(const abs_address_t& addr) const;
-    virtual string_id_t get_string_identifier(const char* p, size_t n) const;
-    virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const;
-    virtual formula_cell* get_formula_cell(const abs_address_t& addr);
+    virtual bool is_empty(const abs_address_t& addr) const override;
+    virtual celltype_t get_celltype(const abs_address_t& addr) const override;
+    virtual double get_numeric_value(const abs_address_t& addr) const override;
+    virtual string_id_t get_string_identifier(const abs_address_t& addr) const override;
+    virtual string_id_t get_string_identifier(const char* p, size_t n) const override;
+    virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const override;
+    virtual formula_cell* get_formula_cell(const abs_address_t& addr) override;
 
-    virtual const formula_tokens_t* get_named_expression(const std::string& name) const;
-    virtual const formula_tokens_t* get_named_expression(sheet_t sheet, const std::string& name) const;
+    virtual const formula_tokens_t* get_named_expression(const std::string& name) const override;
+    virtual const formula_tokens_t* get_named_expression(sheet_t sheet, const std::string& name) const override;
 
-    virtual double count_range(const abs_range_t& range, const values_t& values_type) const;
-    virtual matrix get_range_value(const abs_range_t& range) const;
-    virtual std::unique_ptr<iface::session_handler> create_session_handler();
-    virtual iface::table_handler* get_table_handler();
-    virtual const iface::table_handler* get_table_handler() const;
-    virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
-    virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
-    virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
+    virtual double count_range(const abs_range_t& range, const values_t& values_type) const override;
+    virtual matrix get_range_value(const abs_range_t& range) const override;
+    virtual std::unique_ptr<iface::session_handler> create_session_handler() override;
+    virtual iface::table_handler* get_table_handler() override;
+    virtual const iface::table_handler* get_table_handler() const override;
+    virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const override;
+    virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const override;
+    virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const override;
 
-    virtual string_id_t append_string(const char* p, size_t n);
-    virtual string_id_t add_string(const char* p, size_t n);
-    virtual const std::string* get_string(string_id_t identifier) const;
-    virtual sheet_t get_sheet_index(const char* p, size_t n) const;
-    virtual std::string get_sheet_name(sheet_t sheet) const;
+    virtual string_id_t append_string(const char* p, size_t n) override;
+    virtual string_id_t add_string(const char* p, size_t n) override;
+    virtual const std::string* get_string(string_id_t identifier) const override;
+    virtual sheet_t get_sheet_index(const char* p, size_t n) const override;
+    virtual std::string get_sheet_name(sheet_t sheet) const override;
     virtual sheet_size_t get_sheet_size(sheet_t sheet) const override;
 
     double get_numeric_value_nowait(const abs_address_t& addr) const;
