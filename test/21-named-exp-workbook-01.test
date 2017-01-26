@@ -38,5 +38,12 @@ origin=Sheet1!$A$1
 A7=15
 B7=55
 %check
+%mode edit
+A1:10
+%recalc
+%mode result
+A7=24
+B7=64
+%check
 %exit
 
