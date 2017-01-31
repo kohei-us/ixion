@@ -43,6 +43,11 @@ long to_long(const mem_str_buf& value)
     return ret;
 }
 
+bool to_bool(const mem_str_buf& value)
+{
+    return value == "true";
+}
+
 bool is_separator(char c)
 {
     return c == '=' || c == ':' || c == '@';
@@ -121,7 +126,8 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_col_limit(1024),
     m_current_sheet(0),
     m_parse_mode(parse_mode_unknown),
-    m_print_separator(false)
+    m_print_separator(false),
+    m_print_sheet_name(false)
 {
     m_context.set_session_handler_factory(ixion::make_unique<session_handler::factory>(m_context));
     m_context.set_table_handler(&m_table_handler);
@@ -335,6 +341,11 @@ void model_parser::parse_session()
 
         cout << "current sheet: " << value << endl;
     }
+    else if (cmd == "display-sheet-name")
+    {
+        cout << "display sheet name: " << value << endl;
+        m_print_sheet_name = to_bool(value);
+    }
 }
 
 void model_parser::parse_init()
@@ -356,7 +367,11 @@ void model_parser::parse_init()
 #endif
             m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
             m_dirty_cells.insert(cell_def.pos);
-            cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
+
+            address_t pos_display(cell_def.pos);
+            pos_display.set_absolute(false);
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
+                << ": (f) " << cell_def.value.str() << endl;
 #if DEBUG_MODEL_PARSER
             std::string s;
             print_formula_tokens(m_context, cell_def.pos, *tokens, s);
@@ -370,7 +385,11 @@ void model_parser::parse_init()
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: string" << endl;
 #endif
             m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
-            cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
+
+            address_t pos_display(cell_def.pos);
+            pos_display.set_absolute(false);
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
+                << ": (s) " << cell_def.value.str() << endl;
         }
         break;
         case ct_value:
@@ -383,7 +402,8 @@ void model_parser::parse_init()
 
             address_t pos_display(cell_def.pos);
             pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
+                << ": (n) " << v << endl;
         }
         break;
         default:
@@ -518,7 +538,7 @@ void model_parser::parse_table()
         if (!mp_name_resolver)
             return;
 
-        abs_address_t pos(0,0,0);
+        abs_address_t pos(m_current_sheet,0,0);
         formula_name_t ret = mp_name_resolver->resolve(value.get(), value.size(), pos);
         if (ret.type != formula_name_t::range_reference)
             throw parse_error("range of a table is expected to be given as a range reference.");
@@ -545,7 +565,7 @@ void model_parser::push_table()
         cout << "name: " << *ps << endl;
 
     if (mp_name_resolver)
-        cout << "range: " << mp_name_resolver->get_name(entry.range, abs_address_t(0,0,0), false) << endl;
+        cout << "range: " << mp_name_resolver->get_name(entry.range, abs_address_t(m_current_sheet,0,0), false) << endl;
 
     cout << "columns: ";
     std::for_each(entry.columns.begin(), entry.columns.end(), string_printer(m_context, ','));
@@ -580,7 +600,7 @@ void model_parser::parse_named_expression()
             throw parse_error(os.str());
         }
 
-        mp_named_expression->origin = to_address(name.address).to_abs(abs_address_t(0,0,0));
+        mp_named_expression->origin = to_address(name.address).to_abs(abs_address_t(m_current_sheet,0,0));
     }
     else
     {
@@ -745,7 +765,9 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
         throw model_parser::parse_error("separator is missing");
     }
 
-    formula_name_t fnt = mp_name_resolver->resolve(ret.name.get(), ret.name.size(), abs_address_t());
+    formula_name_t fnt = mp_name_resolver->resolve(
+        ret.name.get(), ret.name.size(), abs_address_t(m_current_sheet,0,0));
+
     if (fnt.type != formula_name_t::cell_reference)
     {
         ostringstream os;

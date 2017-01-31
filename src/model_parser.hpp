@@ -138,6 +138,7 @@ private:
 
     parse_mode_type m_parse_mode;
     bool m_print_separator:1;
+    bool m_print_sheet_name:1;
 };
 
 }
