@@ -316,7 +316,7 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
             case fop_named_expression:
             {
                 const formula_tokens_t* named_exp =
-                    cxt.get_named_expression(t->get_name());
+                    cxt.get_named_expression(pos.sheet, t->get_name());
 
                 if (!named_exp)
                 {

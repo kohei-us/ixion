@@ -276,6 +276,8 @@ public:
 
     bool empty() const;
 
+    const worksheet* fetch_sheet(sheet_t sheet_index) const;
+
 private:
     model_context& m_parent;
 
@@ -320,9 +322,18 @@ const formula_tokens_t* model_context_impl::get_named_expression(const string& n
 
 const formula_tokens_t* model_context_impl::get_named_expression(sheet_t sheet, const string& name) const
 {
-    const detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
-    auto it = ns.find(name);
-    return it == ns.end() ? nullptr : it->second.get();
+    const worksheet* ws = fetch_sheet(sheet);
+
+    if (ws)
+    {
+        const detail::named_expressions_t& ns = ws->get_named_expressions();
+        auto it = ns.find(name);
+        if (it != ns.end())
+            return it->second.get();
+    }
+
+    // Search the global scope if not found in the sheet local scope.
+    return get_named_expression(name);
 }
 
 sheet_t model_context_impl::get_sheet_index(const char* p, size_t n) const
@@ -746,6 +757,14 @@ dirty_formula_cells_t model_context_impl::get_all_formula_cells() const
 bool model_context_impl::empty() const
 {
     return m_sheets.empty();
+}
+
+const worksheet* model_context_impl::fetch_sheet(sheet_t sheet_index) const
+{
+    if (sheet_index < 0 || m_sheets.size() <= size_t(sheet_index))
+        return nullptr;
+
+    return &m_sheets[sheet_index];
 }
 
 void model_context_impl::erase_cell(const abs_address_t& addr)

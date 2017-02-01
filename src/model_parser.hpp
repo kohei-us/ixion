@@ -43,6 +43,7 @@ class model_parser
         std::string name;
         std::string expression;
         abs_address_t origin;
+        sheet_t scope = global_scope;
     };
 
     /**

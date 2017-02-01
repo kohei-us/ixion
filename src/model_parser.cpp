@@ -602,6 +602,18 @@ void model_parser::parse_named_expression()
 
         mp_named_expression->origin = to_address(name.address).to_abs(abs_address_t(m_current_sheet,0,0));
     }
+    else if (res.first == "scope")
+    {
+        // Resolve it as a sheet name and store the sheet index if found.
+        const mem_str_buf& s = res.second;
+        mp_named_expression->scope = m_context.get_sheet_index(s.get(), s.size());
+        if (mp_named_expression->scope == invalid_sheet)
+        {
+            ostringstream os;
+            os << "no sheet named '" << s << "' exists in the model.";
+            throw parse_error(os.str());
+        }
+    }
     else
     {
         ostringstream os;
@@ -630,8 +642,38 @@ void model_parser::push_named_expression()
     cout << "expression: " << exp_s << endl;
     cout << "origin: " << mp_named_expression->origin << endl;
 
-    m_context.set_named_expression(
-        mp_named_expression->name.data(), mp_named_expression->name.size(), std::move(tokens));
+    cout << "scope: ";
+
+    if (mp_named_expression->scope == global_scope)
+        cout << "(global)";
+    else
+    {
+        std::string sheet_name =
+            m_context.get_sheet_name(mp_named_expression->scope);
+
+        if (sheet_name.empty())
+        {
+            ostringstream os;
+            os << "no sheet exists with a sheet index of " << mp_named_expression->scope;
+            throw std::runtime_error(os.str());
+        }
+
+        cout << sheet_name;
+    }
+
+    cout << endl;
+
+    if (mp_named_expression->scope == global_scope)
+    {
+        m_context.set_named_expression(
+            mp_named_expression->name.data(), mp_named_expression->name.size(), std::move(tokens));
+    }
+    else
+    {
+        m_context.set_named_expression(
+            mp_named_expression->scope,
+            mp_named_expression->name.data(), mp_named_expression->name.size(), std::move(tokens));
+    }
 
     mp_named_expression.reset();
 }
