@@ -1,0 +1,58 @@
+%% Named expression in sheet scope.
+%% Sizes of the equally named sheet-local ranges are intentionally different,
+%% to easily test whether the correct range is picked on each sheet.
+%% --------------------------------------------------------------------------
+%mode session
+row-limit:1000
+column-limit:100
+insert-sheet:Sheet1
+insert-sheet:Sheet2
+current-sheet:Sheet1
+display-sheet-name:true
+%% --------------------------------------------------------------------------
+%mode init
+A1:1
+A2:2
+A3:3
+A4:4
+A5:5
+B1:6
+B2:7
+B3:8
+B4:9
+B5:10
+B7=SUM(MyLocalRange)
+%% --------------------------------------------------------------------------
+%mode session
+current-sheet:Sheet2
+%% --------------------------------------------------------------------------
+%mode init
+A1:10
+A2:20
+A3:30
+A4:40
+A5:50
+B1:60
+B2:70
+B3:80
+B4:90
+B5:100
+B7=SUM(MyLocalRange)
+%% --------------------------------------------------------------------------
+%mode named-expression
+name=MyLocalRange
+scope=Sheet1
+expression=Sheet1!$A$1:$A$5
+origin=Sheet1!$A$1
+%push
+%% --------------------------------------------------------------------------
+%mode named-expression
+name=MyLocalRange
+scope=Sheet2
+expression=Sheet2!$A$4:$B$5
+origin=Sheet2!$A$1
+%push
+%% --------------------------------------------------------------------------
+%calc
+%exit
+
