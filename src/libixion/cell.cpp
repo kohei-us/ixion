@@ -319,11 +319,7 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
                     cxt.get_named_expression(pos.sheet, t->get_name());
 
                 if (!named_exp)
-                {
-                    std::ostringstream os;
-                    os << "named expression '" << t->get_name() << "' is not found.";
-                    throw general_error(os.str());
-                }
+                    throw named_expression_error(t->get_name());
 
                 // recursive call.
                 std::for_each(named_exp->begin(), named_exp->end(), get_refs);

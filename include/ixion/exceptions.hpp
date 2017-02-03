@@ -58,6 +58,14 @@ private:
     error_type m_type;
 };
 
+class IXION_DLLPUBLIC named_expression_error : public general_error
+{
+    std::string m_name;
+public:
+    named_expression_error(const std::string& name);
+    virtual ~named_expression_error() throw();
+};
+
 }
 
 #endif

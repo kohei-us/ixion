@@ -48,5 +48,16 @@ model_context_error::error_type model_context_error::get_error_type() const
     return m_type;
 }
 
+named_expression_error::named_expression_error(const std::string& name) :
+    general_error(), m_name(name)
+{
+    std::ostringstream os;
+    os << "named expression not found: " << name;
+    set_message(os.str());
 }
+
+named_expression_error::~named_expression_error() {}
+
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
