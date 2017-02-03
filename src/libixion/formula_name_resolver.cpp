@@ -578,8 +578,6 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
     // the state of a value-not-set.  They are subtracted by one before
     // returning.
 
-    static const col_t max_column_value = std::numeric_limits<col_t>::max() / 26 - 26;
-
     resolver_parse_mode mode = resolver_parse_mode::column;
 
     while (true)
@@ -601,7 +599,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
                 addr.column *= 26;
             addr.column += static_cast<col_t>(c - 'A' + 1);
 
-            if (addr.column > max_column_value)
+            if (addr.column > column_upper_bound)
                 return invalid;
         }
         else if (is_digit(c))
@@ -1074,12 +1072,20 @@ public:
 
         if (parse_res != invalid)
         {
-            // Make sure the address is within the sheet size.
-            sheet_size_t sheet_size = mp_cxt->get_sheet_size(pos.sheet);
+            row_t row_max = row_upper_bound;
+            col_t col_max = column_upper_bound;
 
-            if (parsed_addr.row != row_unset && parsed_addr.row >= sheet_size.row)
+            if (mp_cxt)
+            {
+                // Make sure the address is within the sheet size.
+                sheet_size_t sheet_size = mp_cxt->get_sheet_size(pos.sheet);
+                row_max = sheet_size.row;
+                col_max = sheet_size.column;
+            }
+
+            if (parsed_addr.row != row_unset && parsed_addr.row > row_max)
                 parse_res = invalid;
-            else if (parsed_addr.column != column_unset && parsed_addr.column >= sheet_size.column)
+            else if (parsed_addr.column != column_unset && parsed_addr.column > col_max)
                 parse_res = invalid;
         }
 

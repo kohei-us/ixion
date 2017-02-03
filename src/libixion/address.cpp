@@ -21,7 +21,7 @@ const row_t row_unset = row_max - 9;
 const row_t row_upper_bound = row_max - 10;
 
 const col_t column_unset = column_max - 9;
-const col_t column_upper_bound = column_max - 10;
+const col_t column_upper_bound = column_max / 26 - 26;
 
 abs_address_t::abs_address_t() : sheet(0), row(0), column(0) {}
 abs_address_t::abs_address_t(init_invalid) : sheet(-1), row(-1), column(-1) {}

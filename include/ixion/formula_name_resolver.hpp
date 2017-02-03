@@ -136,8 +136,8 @@ public:
      * type.
      *
      * @param type type formula name resolver being requested.
-     * @param cxt document model context for resolving sheet names, or NULL in
-     *            case names being resolved don't contain sheet names.
+     * @param cxt document model context for resolving sheet names, or nullptr
+     *            in case names being resolved don't contain sheet names.
      *
      * @return formula name resolver instance created on the heap.  The caller
      *         is responsible for managing its life cycle.
