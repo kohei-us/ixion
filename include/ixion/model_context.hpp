@@ -131,7 +131,7 @@ public:
      */
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
-    void set_session_handler_factory(std::unique_ptr<session_handler_factory>&& factory);
+    void set_session_handler_factory(session_handler_factory* factory);
 
     void set_table_handler(iface::table_handler* handler);
 

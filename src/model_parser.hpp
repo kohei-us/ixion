@@ -119,6 +119,7 @@ private:
 
     model_context m_context;
     table_handler m_table_handler;
+    session_handler::factory m_session_handler_factory;
     std::unique_ptr<table_handler::entry> mp_table_entry;
     std::unique_ptr<formula_name_resolver> mp_name_resolver;
     std::unique_ptr<named_expression_type> mp_named_expression;

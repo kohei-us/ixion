@@ -19,11 +19,17 @@ using namespace std;
 
 namespace ixion {
 
-session_handler::factory::factory(const model_context& cxt) : m_context(cxt) {}
+session_handler::factory::factory(const model_context& cxt) :
+    m_context(cxt), m_show_sheet_name(false) {}
 
 std::unique_ptr<iface::session_handler> session_handler::factory::create()
 {
-    return ixion::make_unique<session_handler>(m_context);
+    return ixion::make_unique<session_handler>(m_context, m_show_sheet_name);
+}
+
+void session_handler::factory::show_sheet_name(bool b)
+{
+    m_show_sheet_name = b;
 }
 
 struct session_handler::impl
@@ -32,14 +38,16 @@ struct session_handler::impl
     std::unique_ptr<formula_name_resolver> mp_resolver;
     std::string m_cell_name;
     std::ostringstream m_buf;
+    bool m_show_sheet_name;
 
-    impl(const model_context& cxt) :
+    impl(const model_context& cxt, bool show_sheet_name) :
         m_context(cxt),
-        mp_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt)) {}
+        mp_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt)),
+        m_show_sheet_name(show_sheet_name) {}
 };
 
-session_handler::session_handler(const model_context& cxt) :
-    mp_impl(ixion::make_unique<impl>(cxt)) {}
+session_handler::session_handler(const model_context& cxt, bool show_sheet_name) :
+    mp_impl(ixion::make_unique<impl>(cxt, show_sheet_name)) {}
 
 session_handler::~session_handler() {}
 
@@ -48,7 +56,7 @@ void session_handler::begin_cell_interpret(const abs_address_t& pos)
     // Convert absolute to relative address, which looks better when printed.
     address_t pos_display(pos);
     pos_display.set_absolute(false);
-    mp_impl->m_cell_name = mp_impl->mp_resolver->get_name(pos_display, abs_address_t(), false);
+    mp_impl->m_cell_name = mp_impl->mp_resolver->get_name(pos_display, abs_address_t(), mp_impl->m_show_sheet_name);
 
     mp_impl->m_buf << get_formula_result_output_separator() << endl;
     mp_impl->m_buf << mp_impl->m_cell_name << ": ";

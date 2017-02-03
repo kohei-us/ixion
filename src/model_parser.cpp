@@ -115,6 +115,7 @@ model_parser::check_error::check_error(const string& msg) :
 model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_context(),
     m_table_handler(),
+    m_session_handler_factory(m_context),
     mp_table_entry(nullptr),
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
     m_filepath(filepath),
@@ -129,7 +130,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     m_print_separator(false),
     m_print_sheet_name(false)
 {
-    m_context.set_session_handler_factory(ixion::make_unique<session_handler::factory>(m_context));
+    m_context.set_session_handler_factory(&m_session_handler_factory);
     m_context.set_table_handler(&m_table_handler);
 
     global::load_file_content(m_filepath, m_strm);
@@ -345,6 +346,7 @@ void model_parser::parse_session()
     {
         cout << "display sheet name: " << value << endl;
         m_print_sheet_name = to_bool(value);
+        m_session_handler_factory.show_sheet_name(m_print_sheet_name);
     }
 }
 

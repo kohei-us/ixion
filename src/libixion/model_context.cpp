@@ -134,7 +134,9 @@ bool set_shared_formula_tokens_to_cell(
     return true;
 }
 
-}
+model_context::session_handler_factory dummy_session_handler_factory;
+
+} // anonymous namespace
 
 class model_context_impl
 {
@@ -155,8 +157,8 @@ public:
         m_parent(parent),
         mp_config(new config),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
-        mp_table_handler(NULL),
-        m_session_factory(ixion::make_unique<model_context::session_handler_factory>())
+        mp_table_handler(nullptr),
+        mp_session_factory(&dummy_session_handler_factory)
     {
     }
 
@@ -181,12 +183,12 @@ public:
 
     std::unique_ptr<iface::session_handler> create_session_handler()
     {
-        return m_session_factory->create();
+        return mp_session_factory->create();
     }
 
-    void set_session_handler_factory(std::unique_ptr<model_context::session_handler_factory>&& factory)
+    void set_session_handler_factory(model_context::session_handler_factory* factory)
     {
-        m_session_factory = std::move(factory);
+        mp_session_factory = factory;
     }
 
     iface::table_handler* get_table_handler()
@@ -288,7 +290,7 @@ private:
     iface::table_handler* mp_table_handler;
     detail::named_expressions_t m_named_expressions;
 
-    std::unique_ptr<model_context::session_handler_factory> m_session_factory;
+    model_context::session_handler_factory* mp_session_factory;
 
     formula_tokens_store_type m_tokens;
     model_context::shared_tokens_type m_shared_tokens;
@@ -1349,9 +1351,9 @@ sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col
     return mp_impl->append_sheet(p, n, row_size, col_size);
 }
 
-void model_context::set_session_handler_factory(std::unique_ptr<session_handler_factory>&& factory)
+void model_context::set_session_handler_factory(session_handler_factory* factory)
 {
-    mp_impl->set_session_handler_factory(std::move(factory));
+    mp_impl->set_session_handler_factory(factory);
 }
 
 void model_context::set_table_handler(iface::table_handler* handler)

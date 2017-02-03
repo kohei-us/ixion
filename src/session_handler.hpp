@@ -21,30 +21,33 @@ class session_handler : public iface::session_handler
     std::unique_ptr<impl> mp_impl;
 
 public:
-    session_handler(const model_context& cxt);
+    session_handler(const model_context& cxt, bool show_sheet_name);
     virtual ~session_handler();
 
-    virtual void begin_cell_interpret(const abs_address_t& pos);
-    virtual void end_cell_interpret();
-    virtual void set_result(const formula_result& result);
-    virtual void set_invalid_expression(const char* msg);
-    virtual void set_formula_error(const char* msg);
+    virtual void begin_cell_interpret(const abs_address_t& pos) override;
+    virtual void end_cell_interpret() override;
+    virtual void set_result(const formula_result& result) override;
+    virtual void set_invalid_expression(const char* msg) override;
+    virtual void set_formula_error(const char* msg) override;
 
-    virtual void push_token(fopcode_t fop);
-    virtual void push_value(double val);
-    virtual void push_string(size_t sid);
-    virtual void push_single_ref(const address_t& addr, const abs_address_t& pos);
-    virtual void push_range_ref(const range_t& range, const abs_address_t& pos);
-    virtual void push_table_ref(const table_t& table);
-    virtual void push_function(formula_function_t foc);
+    virtual void push_token(fopcode_t fop) override;
+    virtual void push_value(double val) override;
+    virtual void push_string(size_t sid) override;
+    virtual void push_single_ref(const address_t& addr, const abs_address_t& pos) override;
+    virtual void push_range_ref(const range_t& range, const abs_address_t& pos) override;
+    virtual void push_table_ref(const table_t& table) override;
+    virtual void push_function(formula_function_t foc) override;
 
     class factory : public model_context::session_handler_factory
     {
         const model_context& m_context;
+        bool m_show_sheet_name;
     public:
         factory(const model_context& cxt);
 
-        virtual std::unique_ptr<iface::session_handler> create();
+        virtual std::unique_ptr<iface::session_handler> create() override;
+
+        void show_sheet_name(bool b);
     };
 
     /**
