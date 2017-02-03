@@ -5,13 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_OPCODE_HPP__
-#define __IXION_FORMULA_OPCODE_HPP__
+#ifndef INCLUDED_IXION_FORMULA_OPCODE_HPP
+#define INCLUDED_IXION_FORMULA_OPCODE_HPP
 
 namespace ixion {
 
 /** formula opcode type */
-enum fopcode_t {
+enum fopcode_t
+{
     // data types
     fop_single_ref,
     fop_range_ref,
@@ -41,7 +42,8 @@ enum fopcode_t {
     fop_sep,
 
     // error conditions
-    fop_err_no_ref,
+    fop_err_no_ref,   // #REF!
+    fop_err_no_name,  // #NAME?
 
     fop_unknown
 };

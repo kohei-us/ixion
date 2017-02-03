@@ -131,6 +131,9 @@ public:
             case fop_err_no_ref:
                 m_os << "#REF!";
                 break;
+            case fop_err_no_name:
+                m_os << "#NAME?";
+                break;
             case fop_unknown:
             default:
                 ;
