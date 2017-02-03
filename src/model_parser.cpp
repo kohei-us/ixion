@@ -153,6 +153,8 @@ void model_parser::parse()
         if (*mp_char== '%')
         {
             parse_command();
+            if (m_parse_mode == parse_mode_exit)
+                return;
             continue;
         }
 
@@ -182,8 +184,6 @@ void model_parser::parse()
             case parse_mode_named_expression:
                 parse_named_expression();
                 break;
-            case parse_mode_exit:
-                return;
             default:
                 throw parse_error("unknown parse mode");
         }

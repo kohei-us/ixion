@@ -1,0 +1,9 @@
+%% Test to make sure the %exit command really exits.
+%% The 'foo' command doesn't exist, so if that line is reached the parser
+%% throws an error.
+%mode init
+A1:1
+A2:2
+%exit
+%foo
+
