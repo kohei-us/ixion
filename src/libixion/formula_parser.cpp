@@ -15,8 +15,6 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_FORMULA_PARSER 0
-
 using namespace std;
 
 namespace ixion {
@@ -28,83 +26,6 @@ class ref_error : public general_error
 public:
     ref_error(const string& msg) :
         general_error(msg) {}
-};
-
-class formula_token_printer : public unary_function<formula_token, void>
-{
-public:
-    formula_token_printer()
-    {
-    }
-
-    void operator() (const formula_token& token) const
-    {
-        fopcode_t oc = token.get_opcode();
-        ostringstream os;
-        os << " ";
-        os << "<" << get_opcode_name(oc) << ">'";
-
-        switch (oc)
-        {
-            case fop_close:
-                os << ")";
-                break;
-            case fop_divide:
-                os << "/";
-                break;
-            case fop_err_no_ref:
-                break;
-            case fop_minus:
-                os << "-";
-                break;
-            case fop_multiply:
-                os << "*";
-                break;
-            case fop_open:
-                os << "(";
-                break;
-            case fop_plus:
-                os << "+";
-                break;
-            case fop_sep:
-                os << ",";
-                break;
-            case fop_single_ref:
-            {
-                address_t addr = token.get_single_ref();
-                os << "(s=" << addr.sheet << ",r=" << addr.row << ",c=" << addr.column << ")";
-            }
-            break;
-            case fop_range_ref:
-            {
-                range_t range = token.get_range_ref();
-                os << "(s=" << range.first.sheet << ":" << range.last.sheet
-                    << ",r=" << range.first.row << ":" << range.last.row
-                    << ",c=" << range.first.column << ":" << range.last.column << ")";
-            }
-            break;
-            case fop_named_expression:
-                os << token.get_name();
-                break;
-            case fop_string:
-                break;
-            case fop_value:
-                os << token.get_value();
-                break;
-            case fop_function:
-            {
-                formula_function_t func_oc = formula_functions::get_function_opcode(token);
-                os << formula_functions::get_function_name(func_oc);
-            }
-            break;
-            default:
-                ;
-        }
-        os << "'";
-#if DEBUG_FORMULA_PARSER
-        cout << os.str();
-#endif
-    }
 };
 
 }
@@ -176,28 +97,11 @@ void formula_parser::parse()
             }
         }
     }
-#if DEBUG_FORMULA_PARSER
-    catch (const ref_error& e)
-    {
-        cout << "reference error: " << e.what() << endl;
-    }
-    catch (const parse_error& e)
-    {
-        cout << "parse error: " << e.what() << endl;
-    }
-#else
     catch (const general_error&) {}
-#endif
 }
 
 void formula_parser::print_tokens() const
 {
-#if DEBUG_FORMULA_PARSER
-    cout << "formula tokens:";
-    for_each(m_formula_tokens.begin(), m_formula_tokens.end(), formula_token_printer());
-    cout << " (size=" << m_formula_tokens.size() << ")";
-    cout << endl;
-#endif
 }
 
 formula_tokens_t& formula_parser::get_tokens()
@@ -245,9 +149,7 @@ void formula_parser::name(const lexer_token_base& t)
     mem_str_buf name = t.get_string();
 
     formula_name_t fn = m_resolver.resolve(name.get(), name.size(), m_pos);
-#if DEBUG_FORMULA_PARSER
-            __IXION_DEBUG_OUT__ << "name = '" << name << "' - " << fn.to_string() << endl;
-#endif
+
     switch (fn.type)
     {
         case formula_name_t::cell_reference:
