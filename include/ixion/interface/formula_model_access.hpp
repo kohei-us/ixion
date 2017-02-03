@@ -68,7 +68,16 @@ public:
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
-    virtual const formula_tokens_t* get_named_expression(const std::string& name) const = 0;
+    /**
+     * Get a named expression token set associated with specified name if
+     * present.  It first searches the local sheet scope for the name, then if
+     * it's not present, it searches the global scope.
+     *
+     * @param sheet index of the sheet scope to search in.
+     * @param name name of the expression.
+     *
+     * @return const pointer to the token set if exists, nullptr otherwise.
+     */
     virtual const formula_tokens_t* get_named_expression(sheet_t sheet, const std::string& name) const = 0;
 
     virtual double count_range(const abs_range_t& range, const values_t& values_type) const = 0;

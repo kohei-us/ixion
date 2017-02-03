@@ -1336,11 +1336,6 @@ void model_context::set_named_expression(
     mp_impl->set_named_expression(sheet, p, n, std::move(expr));
 }
 
-const formula_tokens_t* model_context::get_named_expression(const string& name) const
-{
-    return mp_impl->get_named_expression(name);
-}
-
 const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const string& name) const
 {
     return mp_impl->get_named_expression(sheet, name);
