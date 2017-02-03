@@ -35,10 +35,15 @@ void tokenize_formula(const std::string& formula)
     formula_tokens_t tokens;
     parse_formula_string(cxt, pos, *resolver, formula.data(), formula.size(), tokens);
 
-    cout << "original formula: " << formula << endl;
+    cout << "original formula string: " << formula << endl;
+
     std::string normalized;
     print_formula_tokens(cxt, pos, *resolver, tokens, normalized);
-    cout << "normalized formula: " << normalized << endl;
+    cout << "normalized formula string: " << normalized << endl;
+
+    cout << "individual tokens:" << endl;
+    for (const formula_tokens_t::value_type& tp : tokens)
+        cout << "  * " << *tp << endl;
 }
 
 int main (int argc, char** argv)

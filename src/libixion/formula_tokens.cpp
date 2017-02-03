@@ -182,6 +182,10 @@ std::string formula_token::get_name() const
     return std::string();
 }
 
+void formula_token::write_string(std::ostream& /*os*/) const
+{
+}
+
 bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
 {
     size_t n = left.size();
@@ -197,5 +201,12 @@ bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
     return true;
 }
 
+std::ostream& operator<< (std::ostream& os, const formula_token& ft)
+{
+    ft.write_string(os);
+    return os;
 }
+
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

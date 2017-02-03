@@ -50,11 +50,14 @@ public:
     virtual double get_value() const;
     virtual size_t get_index() const;
     virtual std::string get_name() const;
+    virtual void write_string(std::ostream& os) const;
 };
 
 typedef std::vector<std::unique_ptr<formula_token>> formula_tokens_t;
 
 IXION_DLLPUBLIC bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
+
+IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const formula_token& ft);
 
 }
 

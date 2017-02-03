@@ -6,6 +6,7 @@
  */
 
 #include "concrete_formula_tokens.hpp"
+#include "ixion/formula_function_opcode.hpp"
 
 namespace ixion {
 
@@ -25,6 +26,13 @@ opcode_token::~opcode_token()
 {
 }
 
+void opcode_token::write_string(std::ostream& os) const
+{
+    os << "opcode token: '";
+    os << get_formula_opcode_string(get_opcode());
+    os << "'";
+}
+
 // ============================================================================
 
 value_token::value_token(double value) :
@@ -42,6 +50,11 @@ double value_token::get_value() const
     return m_value;
 }
 
+void value_token::write_string(std::ostream& os) const
+{
+    os << "value token: " << m_value;
+}
+
 string_token::string_token(size_t str_identifier) :
     formula_token(fop_string),
     m_str_identifier(str_identifier) {}
@@ -51,6 +64,11 @@ string_token::~string_token() {}
 size_t string_token::get_index() const
 {
     return m_str_identifier;
+}
+
+void string_token::write_string(std::ostream& os) const
+{
+    os << "string token: (identifier=" << m_str_identifier << ")";
 }
 
 // ============================================================================
@@ -76,6 +94,11 @@ address_t single_ref_token::get_single_ref() const
     return m_address;
 }
 
+void single_ref_token::write_string(std::ostream& os) const
+{
+    os << "single ref token: " << m_address;
+}
+
 // ============================================================================
 
 range_ref_token::range_ref_token(const range_t& range) :
@@ -99,6 +122,11 @@ range_t range_ref_token::get_range_ref() const
     return m_range;
 }
 
+void range_ref_token::write_string(std::ostream& os) const
+{
+    os << "range ref token: " << m_range;
+}
+
 table_ref_token::table_ref_token(const table_t& table) :
     formula_token(fop_table_ref),
     m_table(table) {}
@@ -114,6 +142,11 @@ table_t table_ref_token::get_table_ref() const
     return m_table;
 }
 
+void table_ref_token::write_string(std::ostream& os) const
+{
+    os << "table ref token: " << "TODO";
+}
+
 named_exp_token::named_exp_token(const char* p, size_t n) :
     formula_token(fop_named_expression),
     m_name(p, n) {}
@@ -127,6 +160,11 @@ named_exp_token::~named_exp_token() {}
 std::string named_exp_token::get_name() const
 {
     return m_name;
+}
+
+void named_exp_token::write_string(std::ostream& os) const
+{
+    os << "named expression token: '" << m_name << "'";
 }
 
 // ============================================================================
@@ -150,6 +188,13 @@ function_token::~function_token()
 size_t function_token::get_index() const
 {
     return m_func_oc;
+}
+
+void function_token::write_string(std::ostream& os) const
+{
+    os << "function token: (opcode=" << m_func_oc << "; name='"
+        << get_formula_function_name(static_cast<formula_function_t>(m_func_oc))
+        << "')";
 }
 
 }
