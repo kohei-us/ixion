@@ -1075,7 +1075,7 @@ public:
             row_t row_max = row_upper_bound;
             col_t col_max = column_upper_bound;
 
-            if (mp_cxt)
+            if (mp_cxt && pos.sheet >= 0 && size_t(pos.sheet) < mp_cxt->get_sheet_count())
             {
                 // Make sure the address is within the sheet size.
                 sheet_size_t sheet_size = mp_cxt->get_sheet_size(pos.sheet);
