@@ -90,43 +90,47 @@ public:
                 break;
             case fop_sep:
                 m_os << ",";
-            break;
+                break;
             case fop_function:
             {
                 formula_function_t fop = static_cast<formula_function_t>(token->get_index());
                 m_os << formula_functions::get_function_name(fop);
+                break;
             }
-            break;
             case fop_single_ref:
             {
                 address_t addr = token->get_single_ref();
                 m_os << m_resolver.get_name(addr, m_pos, false);
+                break;
             }
-            break;
             case fop_range_ref:
             {
                 range_t range = token->get_range_ref();
                 m_os << m_resolver.get_name(range, m_pos, false);
+                break;
             }
-            break;
             case fop_table_ref:
             {
                 table_t tbl = token->get_table_ref();
                 m_os << m_resolver.get_name(tbl);
+                break;
             }
-            break;
             case fop_string:
             {
                 const std::string* p = m_cxt.get_string(token->get_index());
                 if (p)
                     m_os << "\"" << *p << "\"";
+                break;
             }
-            break;
             case fop_equal:
                 m_os << "=";
-            break;
-            case fop_err_no_ref:
+                break;
             case fop_named_expression:
+                m_os << token->get_name();
+                break;
+            case fop_err_no_ref:
+                m_os << "#REF!";
+                break;
             case fop_unknown:
             default:
                 ;
