@@ -232,11 +232,7 @@ void formula_interpreter::expand_named_expression(
     const string& expr_name, const formula_tokens_t* expr, name_set& used_names)
 {
     if (!expr)
-    {
-        ostringstream os;
-        os << "unable to find named expression '" << expr_name << "'";
-        throw invalid_expression(os.str());
-    }
+        throw formula_error(formula_error_t::name_not_found);
 
     m_tokens.push_back(&paren_open);
     formula_tokens_t::const_iterator itr = expr->begin(), itr_end = expr->end();

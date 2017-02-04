@@ -8,6 +8,7 @@
 #include "ixion/types.hpp"
 
 #include <limits>
+#include <vector>
 
 namespace ixion {
 
@@ -23,14 +24,16 @@ sheet_size_t::sheet_size_t(row_t _row, col_t _column) : row(_row), column(_colum
 const char* get_formula_error_name(formula_error_t fe)
 {
     static const char* default_err_name = "#ERR!";
-    static const char* names[] = {
+
+    static std::vector<const char*> names = {
         "",        // no error
         "#REF!",   // result not available
         "#DIV/0!", // division by zero
-        "#NUM!"    // invalid expression
+        "#NUM!",   // invalid expression
+        "#NAME?"   // name not found
     };
-    static const size_t name_size = 4;
-    if (static_cast<size_t>(fe) < name_size)
+
+    if (static_cast<size_t>(fe) < names.size())
         return names[static_cast<size_t>(fe)];
 
     return default_err_name;

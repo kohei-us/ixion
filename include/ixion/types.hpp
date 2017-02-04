@@ -108,8 +108,9 @@ enum class formula_error_t
     ref_result_not_available = 1,
     division_by_zero = 2,
     invalid_expression = 3,
-    stack_error = 4,
-    general_error = 5,
+    name_not_found = 4,
+    stack_error = 5,
+    general_error = 999,
 };
 
 struct IXION_DLLPUBLIC sheet_size_t
