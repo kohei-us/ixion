@@ -191,6 +191,8 @@ struct formula_result::impl
         assert(n);
         assert(*p == '#');
 
+        const char* p0 = p;
+
         ++p; // skip '#'.
         mem_str_buf buf;
         for (size_t i = 0; i < n; ++p, ++i)
@@ -222,7 +224,7 @@ struct formula_result::impl
         }
 
         ostringstream os;
-        os << "malformed error string: " << string(p, n);
+        os << "malformed error string: " << string(p0, n);
         throw general_error(os.str());
     }
 
