@@ -1,0 +1,9 @@
+%% invalid function name should produce the result of #NAME?.
+%mode init
+A1=Foo()
+%calc
+%mode result
+A1=#NAME?
+%check
+%exit
+
