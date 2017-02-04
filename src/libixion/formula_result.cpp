@@ -192,30 +192,65 @@ struct formula_result::impl
         assert(*p == '#');
 
         const char* p0 = p;
+        const char* p_end = p + n;
 
         ++p; // skip '#'.
         mem_str_buf buf;
-        for (size_t i = 0; i < n; ++p, ++i)
+        for (; p != p_end; ++p)
         {
-            if (*p == '!')
+            bool good = true;
+
+            switch (*p)
             {
-                if (buf.empty())
-                    throw general_error("failed to parse error string: buffer is empty.");
-
-                if (buf.equals("REF"))
+                case '!':
                 {
-                    m_error = formula_error_t::ref_result_not_available;
-                }
-                else if (buf.equals("DIV/0"))
-                {
-                    m_error = formula_error_t::division_by_zero;
-                }
-                else
-                    throw general_error("failed to parse error string in formula_result::parse_error().");
+                    if (buf.empty())
+                    {
+                        good = false;
+                        break;
+                    }
 
-                m_type = result_type::error;
-                return;
+                    if (buf.equals("REF"))
+                    {
+                        m_error = formula_error_t::ref_result_not_available;
+                    }
+                    else if (buf.equals("DIV/0"))
+                    {
+                        m_error = formula_error_t::division_by_zero;
+                    }
+                    else
+                    {
+                        good = false;
+                        break;
+                    }
+
+                    m_type = result_type::error;
+                    return;
+                }
+                case '?':
+                {
+                    if (buf.empty())
+                    {
+                        good = false;
+                        break;
+                    }
+
+                    if (buf.equals("NAME"))
+                        m_error = formula_error_t::name_not_found;
+                    else
+                    {
+                        good = false;
+                        break;
+                    }
+
+                    m_type = result_type::error;
+                    return;
+                }
             }
+
+            if (!good)
+                // parse failure.
+                break;
 
             if (buf.empty())
                 buf.set_start(p);
