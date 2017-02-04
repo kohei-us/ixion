@@ -478,48 +478,23 @@ void model_parser::parse_edit()
 
 void model_parser::parse_result()
 {
-    mem_str_buf buf, name, result;
-    for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
-    {
-        if (*mp_char == '=')
-        {
-            if (buf.empty())
-                throw model_parser::parse_error("left hand side is empty");
+    parsed_assignment_type res = parse_assignment();
 
-            name = buf;
-            buf.clear();
-        }
-        else
-        {
-            if (buf.empty())
-                buf.set_start(mp_char);
-            else
-                buf.inc();
-        }
-    }
+    string name_s = res.first.str();
 
-    if (!buf.empty())
-    {
-        if (name.empty())
-            throw model_parser::parse_error("'=' is missing");
-
-        result = buf;
-    }
-
-    string name_s = name.str();
-    formula_result res;
-    res.parse(m_context, result.get(), result.size());
+    formula_result fres;
+    fres.parse(m_context, res.second.get(), res.second.size());
     model_parser::results_type::iterator itr = m_formula_results.find(name_s);
     if (itr == m_formula_results.end())
     {
         // This cell doesn't exist yet.
         pair<model_parser::results_type::iterator, bool> r =
-            m_formula_results.insert(model_parser::results_type::value_type(name_s, res));
+            m_formula_results.insert(model_parser::results_type::value_type(name_s, fres));
         if (!r.second)
             throw model_parser::parse_error("failed to insert a new result.");
     }
     else
-        itr->second = res;
+        itr->second = fres;
 }
 
 void model_parser::parse_table()
