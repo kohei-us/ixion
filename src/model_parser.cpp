@@ -375,8 +375,7 @@ void model_parser::parse_init()
             cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
                 << ": (f) " << cell_def.value.str() << endl;
 #if DEBUG_MODEL_PARSER
-            std::string s;
-            print_formula_tokens(m_context, cell_def.pos, *tokens, s);
+            std::string s = print_formula_tokens(m_context, cell_def.pos, *tokens);
             __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
 #endif
         }
@@ -443,8 +442,7 @@ void model_parser::parse_edit()
             register_formula_cell(m_context, cell_def.pos);
             cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
 #if DEBUG_MODEL_PARSER
-            std::string s;
-            print_formula_tokens(m_context, cell_def.pos, *tokens, s);
+            std::string s = print_formula_tokens(m_context, cell_def.pos, *tokens);
             __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
 #endif
         }
@@ -603,17 +601,15 @@ void model_parser::push_named_expression()
 {
     assert(mp_named_expression);
 
-    std::unique_ptr<formula_tokens_t> tokens = ixion::make_unique<formula_tokens_t>();
+    std::unique_ptr<formula_tokens_t> tokens =
+        ixion::make_unique<formula_tokens_t>(
+            parse_formula_string(
+                m_context, mp_named_expression->origin, *mp_name_resolver,
+                mp_named_expression->expression.data(),
+                mp_named_expression->expression.size()));
 
-    parse_formula_string(
-        m_context, mp_named_expression->origin, *mp_name_resolver,
-        mp_named_expression->expression.data(),
-        mp_named_expression->expression.size(),
-        *tokens);
-
-    std::string exp_s;
-    print_formula_tokens(
-        m_context, mp_named_expression->origin, *mp_name_resolver, *tokens, exp_s);
+    std::string exp_s = print_formula_tokens(
+        m_context, mp_named_expression->origin, *mp_name_resolver, *tokens);
 
     cout << "name: " << mp_named_expression->name << endl;
     cout << "expression: " << exp_s << endl;

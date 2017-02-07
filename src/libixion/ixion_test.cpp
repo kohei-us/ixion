@@ -618,10 +618,9 @@ bool check_formula_expression(
 {
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;
-    formula_tokens_t tokens;
-    parse_formula_string(cxt, abs_address_t(), resolver, p, n, tokens);
-    std::string str;
-    print_formula_tokens(cxt, abs_address_t(), resolver, tokens, str);
+    formula_tokens_t tokens = parse_formula_string(
+        cxt, abs_address_t(), resolver, p, n);
+    std::string str = print_formula_tokens(cxt, abs_address_t(), resolver, tokens);
     int res = strcmp(p, str.c_str());
     if (res)
         cout << "formula expressions differ: '" << p << "' (before) -> '" << str << "' (after)" << endl;

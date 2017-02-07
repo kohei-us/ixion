@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_HPP__
-#define __IXION_FORMULA_HPP__
+#ifndef INCLUDED_IXION_FORMULA_HPP
+#define INCLUDED_IXION_FORMULA_HPP
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/interface/formula_model_access.hpp"
@@ -26,12 +26,12 @@ class formula_name_resolver;
  * @param resolver name resolver object used to resolve name tokens.
  * @param p pointer to the first character of raw formula expression string.
  * @param n size of the raw formula expression string.
- * @param tokens formula tokens representing the parsed formula expression.
+ *
+ * @return formula tokens representing the parsed formula expression.
  */
-void IXION_DLLPUBLIC parse_formula_string(
+IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
     iface::formula_model_access& cxt, const abs_address_t& pos,
-    const formula_name_resolver& resolver, const char* p, size_t n,
-    formula_tokens_t& tokens);
+    const formula_name_resolver& resolver, const char* p, size_t n);
 
 /**
  * Convert formula tokens into a human-readable string representation.
@@ -40,12 +40,12 @@ void IXION_DLLPUBLIC parse_formula_string(
  * @param pos address of the cell that has the formula tokens.
  * @param resolver name resolver object used to print name tokens.
  * @param tokens formula tokens.
- * @param str string representation of the formula tokens.
+ *
+ * @return string representation of the formula tokens.
  */
-void IXION_DLLPUBLIC print_formula_tokens(
+IXION_DLLPUBLIC std::string print_formula_tokens(
     const iface::formula_model_access& cxt, const abs_address_t& pos,
-    const formula_name_resolver& resolver, const formula_tokens_t& tokens,
-    std::string& str);
+    const formula_name_resolver& resolver, const formula_tokens_t& tokens);
 
 /**
  * Regisiter a formula cell with cell dependency tracker.

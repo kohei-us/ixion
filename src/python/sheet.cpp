@@ -259,8 +259,7 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
         return nullptr;
     }
 
-    string str;
-    ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft, str);
+    string str = ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft);
     if (str.empty())
         return PyUnicode_FromString("");
 

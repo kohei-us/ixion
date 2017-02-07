@@ -32,13 +32,12 @@ void tokenize_formula(const std::string& formula)
 
     abs_address_t pos;
 
-    formula_tokens_t tokens;
-    parse_formula_string(cxt, pos, *resolver, formula.data(), formula.size(), tokens);
+    formula_tokens_t tokens = parse_formula_string(
+        cxt, pos, *resolver, formula.data(), formula.size());
 
     cout << "original formula string: " << formula << endl;
 
-    std::string normalized;
-    print_formula_tokens(cxt, pos, *resolver, tokens, normalized);
+    std::string normalized = print_formula_tokens(cxt, pos, *resolver, tokens);
     cout << "normalized formula string: " << normalized << endl;
 
     cout << "individual tokens:" << endl;

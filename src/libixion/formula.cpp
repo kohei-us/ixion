@@ -30,20 +30,22 @@ using namespace std;
 
 namespace ixion {
 
-void parse_formula_string(
+formula_tokens_t parse_formula_string(
     iface::formula_model_access& cxt, const abs_address_t& pos,
-    const formula_name_resolver& resolver,
-    const char* p, size_t n, formula_tokens_t& tokens)
+    const formula_name_resolver& resolver, const char* p, size_t n)
 {
     lexer_tokens_t lxr_tokens;
     formula_lexer lexer(p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
+    formula_tokens_t tokens;
     formula_parser parser(lxr_tokens, cxt, resolver);
     parser.set_origin(pos);
     parser.parse();
     parser.get_tokens().swap(tokens);
+
+    return tokens;
 }
 
 namespace {
@@ -143,14 +145,13 @@ public:
 
 }
 
-void print_formula_tokens(
+std::string print_formula_tokens(
     const iface::formula_model_access& cxt, const abs_address_t& pos,
-    const formula_name_resolver& resolver, const formula_tokens_t& tokens,
-    std::string& str)
+    const formula_name_resolver& resolver, const formula_tokens_t& tokens)
 {
     std::ostringstream os;
     std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, pos, resolver, os));
-    str = os.str();
+    return os.str();
 }
 
 namespace {
