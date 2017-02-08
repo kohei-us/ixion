@@ -203,6 +203,11 @@ void test_name_resolver_excel_a1()
         formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
         assert(res.type == name_tests[i].type);
     }
+
+    // Parse address with non-existing sheet name.  It should be flagged invalid.
+
+    res = resolver->resolve(IXION_ASCII("NotExists!A1"), abs_address_t());
+    assert(res.type == formula_name_t::invalid);
 }
 
 void test_name_resolver_named_expression_excel_a1()

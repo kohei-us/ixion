@@ -40,12 +40,12 @@ struct IXION_DLLPUBLIC formula_name_t
 {
     enum name_type
     {
+        invalid = 0,
         cell_reference,
         range_reference,
         table_reference,
         named_expression,
-        function,
-        invalid
+        function
     };
 
     /**

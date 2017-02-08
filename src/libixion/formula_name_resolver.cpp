@@ -1072,6 +1072,12 @@ public:
 
         if (parse_res != invalid)
         {
+            // This is a valid A1-style address syntax-wise.
+
+            if (parsed_addr.sheet == invalid_sheet)
+                // sheet name is not found in the model.  Report back as invalid.
+                return ret;
+
             row_t row_max = row_upper_bound;
             col_t col_max = column_upper_bound;
 
