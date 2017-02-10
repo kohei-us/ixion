@@ -27,6 +27,29 @@ namespace ixion {
 
 namespace {
 
+bool check_address_by_sheet_bounds(const iface::formula_model_access* cxt, const address_t& pos)
+{
+    sheet_size_t ss(row_upper_bound, column_upper_bound);
+
+    if (cxt && pos.sheet >= 0 && size_t(pos.sheet) < cxt->get_sheet_count())
+    {
+        // Make sure the address is within the sheet size.
+        ss = cxt->get_sheet_size(pos.sheet);
+    }
+
+    row_t row_check = pos.row >= 0 ? pos.row : -pos.row;
+
+    if (pos.row != row_unset && row_check >= ss.row)
+        return false;
+
+    col_t col_check = pos.column >= 0 ? pos.column : -pos.column;
+
+    if (pos.column != column_unset && col_check >= ss.column)
+        return false;
+
+    return true;
+}
+
 bool resolve_function(const char* p, size_t n, formula_name_t& ret)
 {
     formula_function_t func_oc = formula_functions::get_function_opcode(p, n);
@@ -1078,20 +1101,7 @@ public:
                 // sheet name is not found in the model.  Report back as invalid.
                 return ret;
 
-            row_t row_max = row_upper_bound;
-            col_t col_max = column_upper_bound;
-
-            if (mp_cxt && pos.sheet >= 0 && size_t(pos.sheet) < mp_cxt->get_sheet_count())
-            {
-                // Make sure the address is within the sheet size.
-                sheet_size_t sheet_size = mp_cxt->get_sheet_size(pos.sheet);
-                row_max = sheet_size.row;
-                col_max = sheet_size.column;
-            }
-
-            if (parsed_addr.row != row_unset && parsed_addr.row > row_max)
-                parse_res = invalid;
-            else if (parsed_addr.column != column_unset && parsed_addr.column > col_max)
+            if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
                 parse_res = invalid;
         }
 
@@ -1252,6 +1262,7 @@ public:
         if (resolve_function(p, n, ret))
             return ret;
 
+        const char* p_end = p + n;
         const char* p_last = p;
         std::advance(p_last, n-1);
 
@@ -1259,6 +1270,19 @@ public:
         address_t parsed_addr(pos.sheet, 0, 0);
 
         parse_address_result parse_res = parse_address_excel_r1c1(mp_cxt, p, p_last, parsed_addr);
+
+        if (parse_res != invalid)
+        {
+            // This is a valid R1C1-style address syntax-wise.
+
+            if (parsed_addr.sheet == invalid_sheet)
+                // sheet name is not found in the model.  Report back as invalid.
+                return ret;
+
+            if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
+                parse_res = invalid;
+        }
+
         switch (parse_res)
         {
             case parse_address_result::valid_address:
@@ -1266,10 +1290,12 @@ public:
                 set_cell_reference(ret, parsed_addr);
                 return ret;
             }
-            break;
             case parse_address_result::range_expected:
             {
                 ++p; // skip ':'
+                if (p == p_end)
+                    return ret;
+
                 address_t parsed_addr2(0, 0, 0);
                 parse_address_result parse_res2 = parse_address_excel_r1c1(nullptr, p, p_last, parsed_addr2);
                 if (parse_res2 != parse_address_result::valid_address)
@@ -1282,12 +1308,13 @@ public:
                 set_address(ret.range.first, parsed_addr);
                 set_address(ret.range.last, parsed_addr2);
                 ret.type = formula_name_t::range_reference;
+                return ret;
             }
-            break;
             default:
                 ;
         }
 
+        resolve_function_or_name(p, n, ret);
         return ret;
     }
 

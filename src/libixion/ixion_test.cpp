@@ -210,26 +210,37 @@ void test_name_resolver_excel_a1()
     assert(res.type == formula_name_t::invalid);
 }
 
-void test_name_resolver_named_expression_excel_a1()
+void test_name_resolver_named_expression()
 {
-    cout << "Testing the Excel A1 name resolver for parsing named expressions." << endl;
+    cout << "Testing the name resolvers for parsing named expressions." << endl;
 
     model_context cxt;
     cxt.append_sheet(IXION_ASCII("Sheet"), 1048576, 16384);
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
-    assert(resolver);
+    const std::vector<formula_name_resolver_t> resolver_types = {
+        formula_name_resolver_t::excel_a1,
+        formula_name_resolver_t::excel_r1c1,
+        // TODO : add more resolver types.
+    };
 
-    std::vector<std::string> names = {
+    const std::vector<std::string> names = {
         "MyRange",
         "MyRange2",
     };
 
-    for (const std::string& name : names)
+    for (formula_name_resolver_t rt : resolver_types)
     {
-        cout << "parsing '" << name << "'..." << endl;
-        formula_name_t res = resolver->resolve(name.data(), name.size(), abs_address_t(0,0,0));
-        assert(res.type == formula_name_t::name_type::named_expression);
+        cout << "formula resolver type: " << int(rt) << endl; // TODO : map the enum value to string name.
+
+        auto resolver = formula_name_resolver::get(rt, &cxt);
+        assert(resolver);
+
+        for (const std::string& name : names)
+        {
+            cout << "parsing '" << name << "'..." << endl;
+            formula_name_t res = resolver->resolve(name.data(), name.size(), abs_address_t(0,0,0));
+            assert(res.type == formula_name_t::name_type::named_expression);
+        }
     }
 }
 
@@ -367,7 +378,7 @@ void test_name_resolver_excel_r1c1()
         }
     }
 
-    // These are supposed to be all invalid.
+    // These are supposed to be all invalid or named expression.
     const char* invalid_address[] = {
         "F",
         "RR",
@@ -391,7 +402,7 @@ void test_name_resolver_excel_r1c1()
         const char* p = invalid_address[i];
         string name_r1c1(p);
         formula_name_t res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
-        if (res.type != formula_name_t::invalid)
+        if (res.type != formula_name_t::invalid && res.type != formula_name_t::named_expression)
         {
             cerr << "address " << name_r1c1 << " is expected to be invalid." << endl;
             assert(false);
@@ -908,7 +919,7 @@ int main()
     test_string_to_double();
     test_string_pool();
     test_name_resolver_excel_a1();
-    test_name_resolver_named_expression_excel_a1();
+    test_name_resolver_named_expression();
     test_name_resolver_table_excel_a1();
     test_name_resolver_excel_r1c1();
     test_name_resolver_odff();

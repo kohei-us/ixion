@@ -25,7 +25,7 @@ const char* get_formula_error_name(formula_error_t fe)
 {
     static const char* default_err_name = "#ERR!";
 
-    static std::vector<const char*> names = {
+    static const std::vector<const char*> names = {
         "",        // no error
         "#REF!",   // result not available
         "#DIV/0!", // division by zero
