@@ -49,4 +49,3 @@ add_library(libixion SHARED
     ${LIBIXION_SRC_DIR}/types.cpp
     ${LIBIXION_SRC_DIR}/workbook.cpp
 )
-

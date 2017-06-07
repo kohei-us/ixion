@@ -9,6 +9,7 @@
 
 #include <cstring>
 #include <cassert>
+#include <algorithm>
 
 using namespace std;
 
