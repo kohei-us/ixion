@@ -37,10 +37,10 @@ example.
 
 # Linux
 
-## Using autotools to build the test binaries
+## Using autotools to build ixion
 
 You need to use GNU Autotools to build ixion on Linux.  The process follows a
-standard autotools workflow, which basically includes the following steps:
+standard autotools workflow, which basically involves the following steps:
 
 ```bash
 ./autogen.sh
