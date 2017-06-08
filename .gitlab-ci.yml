@@ -10,4 +10,4 @@ build:
     - apt -y install libboost-all-dev || apt-get -y install libboost-all-dev
     - git clone https://gitlab.com/mdds/mdds.git /mdds && (cd /mdds && ./autogen.sh && make install)
   script: 
-    - ./autogen.sh && make -j $(nproc) && make -j $(nproc) check
+    - ./autogen.sh && (make -j $(nproc) || cat config.log) && make -j $(nproc) check
