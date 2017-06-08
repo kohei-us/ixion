@@ -67,3 +67,5 @@ add_custom_target(
 )
 
 add_dependencies(libixion py_gen_files)
+
+target_compile_definitions(libixion PRIVATE IXION_BUILD DLL_EXPORT)
