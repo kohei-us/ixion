@@ -21,6 +21,8 @@ include_directories(
     ${MDDS_INCLUDE_DIR}
 )
 
+link_directories(${BOOST_LIB_DIR})
+
 set(LIBIXION_SRC_DIR ${PROJECT_SOURCE_DIR}/src/libixion)
 
 add_library(libixion SHARED
@@ -55,6 +57,13 @@ add_library(libixion SHARED
     ${LIBIXION_SRC_DIR}/workbook.cpp
 )
 
+add_executable(ixion-parser
+	${PROJECT_SOURCE_DIR}/src/ixion_parser.cpp
+	${PROJECT_SOURCE_DIR}/src/model_parser.cpp
+	${PROJECT_SOURCE_DIR}/src/session_handler.cpp
+	${PROJECT_SOURCE_DIR}/src/table_handler.cpp
+)
+
 add_custom_target(
     py_gen_files
     COMMAND python ${PROJECT_SOURCE_DIR}/bin/gen-files.py
@@ -69,3 +78,5 @@ add_custom_target(
 add_dependencies(libixion py_gen_files)
 
 target_compile_definitions(libixion PRIVATE IXION_BUILD DLL_EXPORT)
+
+target_link_libraries(ixion-parser libixion)

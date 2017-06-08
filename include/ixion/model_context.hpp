@@ -33,7 +33,7 @@ class model_context_impl;
 class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 {
 public:
-    class session_handler_factory
+    class IXION_DLLPUBLIC session_handler_factory
     {
     public:
         virtual std::unique_ptr<iface::session_handler> create();
