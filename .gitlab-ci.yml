@@ -2,8 +2,6 @@ image: gcc
 
 build:
   stage: build
-  variables:
-    CPPFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0"
   before_script: 
     - apt update
     - apt -y install make autoconf automake libtool pkg-config git python3-dev
