@@ -64,6 +64,15 @@ add_executable(ixion-parser
 	${PROJECT_SOURCE_DIR}/src/table_handler.cpp
 )
 
+add_executable(ixion-sorter
+	${PROJECT_SOURCE_DIR}/src/ixion_sorter.cpp
+	${PROJECT_SOURCE_DIR}/src/sort_input_parser.cpp
+)
+
+add_executable(ixion-formula-tokenizer
+	${PROJECT_SOURCE_DIR}/src/ixion_formula_tokenizer.cpp
+)
+
 add_custom_target(
     py_gen_files
     COMMAND python ${PROJECT_SOURCE_DIR}/bin/gen-files.py
@@ -80,3 +89,5 @@ add_dependencies(libixion py_gen_files)
 target_compile_definitions(libixion PRIVATE IXION_BUILD DLL_EXPORT)
 
 target_link_libraries(ixion-parser libixion)
+target_link_libraries(ixion-sorter libixion)
+target_link_libraries(ixion-formula-tokenizer libixion)
