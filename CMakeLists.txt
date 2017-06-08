@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0048 NEW)
 
-project(ixion VERSION 0.12.99 LANGUAGES CXX)
+set(IXION_MAJOR_VERSION 0)
+set(IXION_MINOR_VERSION 12)
+set(IXION_MICRO_VERSION 99)
+set(IXION_VERSION ${IXION_MAJOR_VERSION}.${IXION_MINOR_VERSION}.${IXION_MICRO_VERSION})
+
+project(ixion VERSION ${IXION_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 option(MDDS_INCLUDE_DIR "path to mdds header directory.")
@@ -49,3 +54,16 @@ add_library(libixion SHARED
     ${LIBIXION_SRC_DIR}/types.cpp
     ${LIBIXION_SRC_DIR}/workbook.cpp
 )
+
+add_custom_target(
+    py_gen_files
+    COMMAND python ${PROJECT_SOURCE_DIR}/bin/gen-files.py
+        --properties
+            IXION_MAJOR_VERSION=${IXION_MAJOR_VERSION}
+            IXION_MINOR_VERSION=${IXION_MINOR_VERSION}
+            IXION_MICRO_VERSION=${IXION_MICRO_VERSION}
+        --files
+            ${LIBIXION_SRC_DIR}/constants.inl
+)
+
+add_dependencies(libixion py_gen_files)
