@@ -25,6 +25,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 #define DEBUG_FORMULA_CELL 0
 #if DEBUG_FORMULA_CELL
