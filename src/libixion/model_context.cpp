@@ -977,7 +977,11 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
         case element_type_formula:
             return celltype_t::formula;
         default:
-            throw general_error("unknown cell type");
+        {
+            std::ostringstream os;
+            os << "ixion::model_context_impl::get_celltype: unknown cell type (" << gmcell_type << ")";
+            throw general_error(os.str());
+        }
     }
 
     return celltype_t::unknown;
