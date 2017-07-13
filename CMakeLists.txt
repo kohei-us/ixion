@@ -10,7 +10,7 @@ project(ixion VERSION ${IXION_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /MP")
 endif(MSVC)
 
 option(MDDS_INCLUDE_DIR "path to mdds header directory.")
