@@ -52,6 +52,7 @@ enum class celltype_t
     string,
     numeric,
     formula,
+    boolean,
     empty
 };
 
@@ -60,7 +61,8 @@ enum value_t
     value_none    = 0x00,
     value_string  = 0x01,
     value_numeric = 0x02,
-    value_empty   = 0x04
+    value_boolean = 0x04,
+    value_empty   = 0x08
 };
 
 /** type that stores a mixture of {@link value_t} values. */
@@ -70,6 +72,7 @@ class values_t
 public:
     values_t(int val) : m_val(val) {}
     bool is_numeric() const { return (m_val & value_numeric) == value_numeric; }
+    bool is_boolean() const { return (m_val & value_boolean) == value_boolean; }
     bool is_string() const { return (m_val & value_string) == value_string; }
     bool is_empty() const { return (m_val & value_empty) == value_empty; }
 };

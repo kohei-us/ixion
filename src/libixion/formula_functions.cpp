@@ -268,7 +268,7 @@ void formula_functions::fnc_counta(value_stack_t& args) const
             case stack_value_t::range_ref:
             {
                 abs_range_t range = args.pop_range_ref();
-                ret += m_context.count_range(range, value_numeric | value_string);
+                ret += m_context.count_range(range, value_numeric | value_boolean | value_string);
             }
             break;
             case stack_value_t::single_ref:
@@ -276,7 +276,7 @@ void formula_functions::fnc_counta(value_stack_t& args) const
                 abs_address_t pos = args.pop_single_ref();
                 abs_range_t range;
                 range.first = range.last = pos;
-                ret += m_context.count_range(range, value_numeric | value_string);
+                ret += m_context.count_range(range, value_numeric | value_boolean | value_string);
             }
             break;
             default:

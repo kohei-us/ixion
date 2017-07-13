@@ -220,6 +220,7 @@ public:
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
     double get_numeric_value_nowait(const abs_address_t& addr) const;
+    bool get_boolean_value(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const abs_address_t& addr) const;
     string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const char* p, size_t n) const;
@@ -716,6 +717,8 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
                     case element_type_formula:
                         ret += count_formula_block(itb, offset, len, values_type);
                     break;
+                    default:
+                        throw general_error("unknown block type");
                 }
 
                 if (match)
@@ -972,6 +975,8 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
             return celltype_t::empty;
         case mdds::mtv::element_type_numeric:
             return celltype_t::numeric;
+        case mdds::mtv::element_type_boolean:
+            return celltype_t::boolean;
         case mdds::mtv::element_type_ulong:
             return celltype_t::string;
         case element_type_formula:
@@ -994,6 +999,8 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
     {
         case mdds::mtv::element_type_numeric:
             return col_store.get<double>(addr.row);
+        case mdds::mtv::element_type_boolean:
+            return col_store.get<bool>(addr.row);
         case element_type_formula:
         {
             const formula_cell* p = col_store.get<formula_cell*>(addr.row);
@@ -1013,6 +1020,8 @@ double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) c
     {
         case element_type_numeric:
             return col_store.get<double>(addr.row);
+        case mdds::mtv::element_type_boolean:
+            return col_store.get<bool>(addr.row);
         case element_type_formula:
         {
             const formula_cell* p = col_store.get<formula_cell*>(addr.row);
@@ -1023,6 +1032,27 @@ double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) c
             ;
     }
     return 0.0;
+}
+
+bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
+{
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    switch (col_store.get_type(addr.row))
+    {
+        case mdds::mtv::element_type_numeric:
+            return col_store.get<double>(addr.row) != 0.0 ? true : false;
+        case mdds::mtv::element_type_boolean:
+            return col_store.get<bool>(addr.row);
+        case element_type_formula:
+        {
+            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
+            return p->get_value() != 0.0 ? true : false;
+        }
+        break;
+        default:
+            ;
+    }
+    return false;
 }
 
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
@@ -1180,6 +1210,11 @@ celltype_t model_context::get_celltype(const abs_address_t& addr) const
 double model_context::get_numeric_value(const abs_address_t& addr) const
 {
     return mp_impl->get_numeric_value(addr);
+}
+
+bool model_context::get_boolean_value(const abs_address_t& addr) const
+{
+    return mp_impl->get_boolean_value(addr);
 }
 
 double model_context::get_numeric_value_nowait(const abs_address_t& addr) const

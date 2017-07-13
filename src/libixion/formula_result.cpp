@@ -130,17 +130,33 @@ struct formula_result::impl
         if (!n)
             return;
 
-        if (*p == '#')
-            parse_error(p, n);
-        else if (*p == '"')
-            parse_string(cxt, p, n);
-        else
+        switch (*p)
         {
-            // parse this as a number.
-            m_value = global::to_double(p, n);
-            m_type = result_type::value;
+            case '#':
+            {
+                parse_error(p, n);
+                break;
+            }
+            case '"':
+            {
+                parse_string(cxt, p, n);
+                break;
+            }
+            case 't':
+            case 'f':
+            {
+                // parse this as a boolean value.
+                m_value = global::to_bool(p, n) ? 1.0 : 0.0;
+                m_type = result_type::value;
+                break;
+            }
+            default:
+            {
+                // parse this as a number.
+                m_value = global::to_double(p, n);
+                m_type = result_type::value;
+            }
         }
-
     }
 
     void assign_from(const formula_result& r)

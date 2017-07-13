@@ -54,7 +54,8 @@ class model_parser
         ct_unknown = 0,
         ct_formula,
         ct_value,
-        ct_string
+        ct_string,
+        ct_boolean
     };
 
     struct cell_def_type

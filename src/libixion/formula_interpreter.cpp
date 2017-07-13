@@ -177,14 +177,18 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
                 return;
 
             res = fcell->get_result_cache();
+            break;
         }
-        break;
+        case celltype_t::boolean:
+            // TODO : treat this as a numeric value for now.  Later we need to
+            // decide whether we need to treat this as a distinct boolean
+            // type.
         case celltype_t::numeric:
             res.set_value(cxt.get_numeric_value(addr));
-        break;
+            break;
         case celltype_t::string:
             res.set_string(cxt.get_string_identifier(addr));
-        break;
+            break;
         case celltype_t::unknown:
         default:
             ;
@@ -328,6 +332,10 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                     val = 0.0;
                     return true;
                 }
+                case celltype_t::boolean:
+                    // TODO : Decide whether we need to treat this as a
+                    // distinct boolean value.  For now, let's treat this as a
+                    // numeric value equivalent.
                 case celltype_t::numeric:
                 {
                     vt = stack_value_t::value;

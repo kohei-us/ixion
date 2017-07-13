@@ -125,6 +125,17 @@ double global::to_double(const char* p, size_t n)
     return sign*val;
 }
 
+bool global::to_bool(const char* p, size_t n)
+{
+    if (n == 4)
+    {
+        if (*p++ == 't' && *p++ == 'r' && *p++ == 'u' && *p == 'e')
+            return true;
+    }
+
+    return false;
+}
+
 // ============================================================================
 
 formula_error::formula_error(formula_error_t fe) :

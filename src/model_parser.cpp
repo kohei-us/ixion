@@ -50,7 +50,17 @@ bool to_bool(const mem_str_buf& value)
 
 bool is_separator(char c)
 {
-    return c == '=' || c == ':' || c == '@';
+    switch (c)
+    {
+        case '=':
+        case ':':
+        case '@':
+            return true;
+        default:
+            ;
+    }
+
+    return false;
 }
 
 mem_str_buf parse_command_to_buffer(const char*& p, const char* p_end)
@@ -364,9 +374,6 @@ void model_parser::parse_init()
     {
         case ct_formula:
         {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: formula" << endl;
-#endif
             m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
             m_dirty_cells.insert(cell_def.pos);
 
@@ -374,30 +381,20 @@ void model_parser::parse_init()
             pos_display.set_absolute(false);
             cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
                 << ": (f) " << cell_def.value.str() << endl;
-#if DEBUG_MODEL_PARSER
-            std::string s = print_formula_tokens(m_context, cell_def.pos, *tokens);
-            __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
-#endif
+            break;
         }
-        break;
         case ct_string:
         {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: string" << endl;
-#endif
             m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
 
             address_t pos_display(cell_def.pos);
             pos_display.set_absolute(false);
             cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
                 << ": (s) " << cell_def.value.str() << endl;
+            break;
         }
-        break;
         case ct_value:
         {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: numeric" << endl;
-#endif
             double v = global::to_double(cell_def.value.get(), cell_def.value.size());
             m_context.set_numeric_cell(cell_def.pos, v);
 
@@ -405,8 +402,19 @@ void model_parser::parse_init()
             pos_display.set_absolute(false);
             cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
                 << ": (n) " << v << endl;
+            break;
         }
-        break;
+        case ct_boolean:
+        {
+            bool b = global::to_bool(cell_def.value.get(), cell_def.value.size());
+            m_context.set_boolean_cell(cell_def.pos, b);
+
+            address_t pos_display(cell_def.pos);
+            pos_display.set_absolute(false);
+            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
+                << ": (b) " << (b ? "true" : "false") << endl;
+            break;
+        }
         default:
             throw model_parser::parse_error("unknown content type");
     }
@@ -744,13 +752,13 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
             {
                 case '=':
                     ret.type = model_parser::ct_formula;
-                break;
+                    break;
                 case ':':
                     ret.type = model_parser::ct_value;
-                break;
+                    break;
                 case '@':
                     ret.type = model_parser::ct_string;
-                break;
+                    break;
                 default:
                     ;
             }
@@ -766,6 +774,13 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
 
     ret.value = buf;
 
+    if (ret.type == model_parser::ct_value && !ret.value.empty())
+    {
+        // Check if this is a potential boolean value.
+        if (ret.value[0] == 't' || ret.value[0] == 'f')
+            ret.type = model_parser::ct_boolean;
+    }
+
 #if DEBUG_MODEL_PARSER
     __IXION_DEBUG_OUT__ << "name: " << ret.name.str() << "  value: " << ret.value.str() << endl;
 #endif
@@ -777,7 +792,9 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
             return ret;
 
         // Buffer is not empty but name is not given.  We must be missing a separator.
-        throw model_parser::parse_error("separator is missing");
+        std::ostringstream os;
+        os << "separator may be missing (name='" << ret.name << "'; value='" << ret.value << "')";
+        throw model_parser::parse_error(os.str());
     }
 
     formula_name_t fnt = mp_name_resolver->resolve(
@@ -835,8 +852,8 @@ void model_parser::check()
                     os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell.str(m_context) << ")";
                     throw check_error(os.str());
                 }
+                break;
             }
-            break;
             case celltype_t::numeric:
             {
                 double actual_val = m_context.get_numeric_value(addr);
@@ -846,8 +863,20 @@ void model_parser::check()
                     os << "unexpected numeric result: (expected: " << res.get_value() << "; actual: " << actual_val << ")";
                     throw check_error(os.str());
                 }
+                break;
             }
-            break;
+            case celltype_t::boolean:
+            {
+                bool actual = m_context.get_boolean_value(addr);
+                bool expected = res.get_value() ? true : false;
+                if (actual != expected)
+                {
+                    ostringstream os;
+                    os << "unexpected boolean result: (expected: " << expected << "; actual: " << actual << ")";
+                    throw check_error(os.str());
+                }
+                break;
+            }
             case celltype_t::string:
             {
                 string_id_t str_id = m_context.get_string_identifier(addr);
@@ -862,8 +891,8 @@ void model_parser::check()
                     os << "unexpected string result: (expected: " << res.get_string() << "; actual: " << *ps << ")";
                     throw check_error(os.str());
                 }
+                break;
             }
-            break;
             default:
                 throw check_error("unhandled cell type.");
         }

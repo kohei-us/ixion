@@ -63,6 +63,7 @@ public:
      * @return numeric representation of the cell value.
      */
     virtual double get_numeric_value(const abs_address_t& addr) const = 0;
+    virtual bool get_boolean_value(const abs_address_t& addr) const = 0;
     virtual string_id_t get_string_identifier(const abs_address_t& addr) const = 0;
     virtual string_id_t get_string_identifier(const char* p, size_t n) const = 0;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
