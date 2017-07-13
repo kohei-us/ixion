@@ -377,20 +377,14 @@ void model_parser::parse_init()
             m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
             m_dirty_cells.insert(cell_def.pos);
 
-            address_t pos_display(cell_def.pos);
-            pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
-                << ": (f) " << cell_def.value.str() << endl;
+            cout << get_display_cell_string(cell_def.pos) << ": (f) " << cell_def.value.str() << endl;
             break;
         }
         case ct_string:
         {
             m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
 
-            address_t pos_display(cell_def.pos);
-            pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
-                << ": (s) " << cell_def.value.str() << endl;
+            cout << get_display_cell_string(cell_def.pos) << ": (s) " << cell_def.value.str() << endl;
             break;
         }
         case ct_value:
@@ -398,10 +392,7 @@ void model_parser::parse_init()
             double v = global::to_double(cell_def.value.get(), cell_def.value.size());
             m_context.set_numeric_cell(cell_def.pos, v);
 
-            address_t pos_display(cell_def.pos);
-            pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
-                << ": (n) " << v << endl;
+            cout << get_display_cell_string(cell_def.pos) << ": (n) " << v << endl;
             break;
         }
         case ct_boolean:
@@ -409,10 +400,7 @@ void model_parser::parse_init()
             bool b = global::to_bool(cell_def.value.get(), cell_def.value.size());
             m_context.set_boolean_cell(cell_def.pos, b);
 
-            address_t pos_display(cell_def.pos);
-            pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name)
-                << ": (b) " << (b ? "true" : "false") << endl;
+            cout << get_display_cell_string(cell_def.pos) << ": (b) " << (b ? "true" : "false") << endl;
             break;
         }
         default:
@@ -897,6 +885,13 @@ void model_parser::check()
                 throw check_error("unhandled cell type.");
         }
     }
+}
+
+std::string model_parser::get_display_cell_string(const abs_address_t& pos) const
+{
+    address_t pos_display(pos);
+    pos_display.set_absolute(false);
+    return mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name);
 }
 
 }

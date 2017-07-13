@@ -116,6 +116,8 @@ private:
 
     void check();
 
+    std::string get_display_cell_string(const abs_address_t& pos) const;
+
 private:
 
     model_context m_context;
