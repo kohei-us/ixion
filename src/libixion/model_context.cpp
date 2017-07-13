@@ -707,18 +707,25 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
                 {
                     case element_type_numeric:
                         match = values_type.is_numeric();
-                    break;
+                        break;
+                    case element_type_boolean:
+                        match = values_type.is_boolean();
+                        break;
                     case element_type_string:
                         match = values_type.is_string();
-                    break;
+                        break;
                     case element_type_empty:
                         match = values_type.is_empty();
-                    break;
+                        break;
                     case element_type_formula:
                         ret += count_formula_block(itb, offset, len, values_type);
-                    break;
+                        break;
                     default:
-                        throw general_error("unknown block type");
+                    {
+                        std::ostringstream os;
+                        os << __FUNCTION__ << ": unhandled block type (" << itb->type << ")";
+                        throw general_error(os.str());
+                    }
                 }
 
                 if (match)
