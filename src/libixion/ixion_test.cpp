@@ -836,6 +836,27 @@ void test_model_context_storage()
         abs_range_t test = cxt.get_data_range(0);
         assert(test == area);
     }
+
+    {
+        // Fill up the document model and make sure the data range is still
+        // correct.
+        const row_t row_size = 5;
+        const col_t col_size = 4;
+        model_context cxt;
+        cxt.append_sheet(IXION_ASCII("test"), row_size, col_size);
+        for (row_t row = 0; row < row_size; ++row)
+            for (col_t col = 0; col < col_size; ++col)
+                cxt.set_numeric_cell(abs_address_t(0,row,col), 1.0);
+
+        abs_range_t test = cxt.get_data_range(0);
+
+        assert(test.first.sheet == 0);
+        assert(test.first.row == 0);
+        assert(test.first.column == 0);
+        assert(test.last.sheet == 0);
+        assert(test.last.row == row_size-1);
+        assert(test.last.column == col_size-1);
+    }
 }
 
 void test_volatile_function()
