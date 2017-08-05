@@ -923,8 +923,6 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
             else
                 // Set the first row to 0, and lock it.
                 range.first.row = 0;
-
-            range.last.column = i;
         }
 
         if (range.last.row < (row_size-1))
@@ -954,10 +952,9 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
             else
                 // Last block is not empty.
                 range.last.row = row_size - 1;
-
-            range.last.column = i;
         }
 
+        range.last.column = i;
     }
 
     if (range.last.column < 0)
