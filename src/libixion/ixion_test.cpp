@@ -857,6 +857,25 @@ void test_model_context_storage()
         assert(test.last.row == row_size-1);
         assert(test.last.column == col_size-1);
     }
+
+    {
+        const row_t row_size = 5;
+        const col_t col_size = 4;
+        model_context cxt;
+        cxt.append_sheet(IXION_ASCII("test"), row_size, col_size);
+        cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);
+        cxt.set_numeric_cell(abs_address_t(0,row_size-1,0), 1.0);
+        cxt.set_numeric_cell(abs_address_t(0,row_size/2,col_size/2), 1.0);
+
+        abs_range_t test = cxt.get_data_range(0);
+
+        assert(test.first.sheet == 0);
+        assert(test.first.row == 0);
+        assert(test.first.column == 0);
+        assert(test.last.sheet == 0);
+        assert(test.last.row == row_size-1);
+        assert(test.last.column == col_size/2);
+    }
 }
 
 void test_volatile_function()

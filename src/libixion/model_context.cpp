@@ -954,7 +954,9 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                 range.last.row = row_size - 1;
         }
 
-        range.last.column = i;
+        // Check if the column contains at least one non-empty cell.
+        if (col.block_size() > 1 || !col.is_empty(0))
+            range.last.column = i;
     }
 
     if (range.last.column < 0)
