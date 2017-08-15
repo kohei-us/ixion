@@ -1,3 +1,16 @@
+ixion 0.13.0
+
+* add support for named expressions.
+
+* add support for boolean cell value type.
+
+* fix a bug in sheet data range computation function which incorrectly
+  reported data range when the first column is entirely filled to the
+  max row.
+
+* add experimental support for cmake-based build.  Currently tested
+  only on Windows.
+
 ixion 0.12.2
 
 * fix a parser bug that prevented valid R1C1 address from being
