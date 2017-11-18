@@ -25,12 +25,12 @@ std::unique_ptr<session_handler> formula_model_access::create_session_handler()
 
 table_handler* formula_model_access::get_table_handler()
 {
-    return NULL;
+    return nullptr;
 }
 
 const table_handler* formula_model_access::get_table_handler() const
 {
-    return NULL;
+    return nullptr;
 }
 
 }}
