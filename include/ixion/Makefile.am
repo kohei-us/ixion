@@ -6,6 +6,7 @@ libixion_HEADERS = \
 	cell.hpp \
 	cell_listener_tracker.hpp \
 	column_store_type.hpp \
+	compute_engine.hpp \
 	config.hpp \
 	depth_first_search.hpp \
 	env.hpp \

@@ -6,6 +6,7 @@ lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
 	address.cpp \
 	cell.cpp \
+	compute_engine.cpp \
 	concrete_formula_tokens.hpp \
 	concrete_formula_tokens.cpp \
 	config.cpp \
@@ -43,6 +44,22 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	workbook.hpp \
 	workbook.cpp \
 	interface.cpp
+
+# CUDA module
+
+pkglib_LTLIBRARIES = ixion-@IXION_API_VERSION@-cuda.la
+ixion_@IXION_API_VERSION@_cuda_la_SOURCES = \
+	compute_engine_cuda.hpp \
+	compute_engine_cuda.cpp
+
+ixion_@IXION_API_VERSION@_cuda_la_LDFLAGS = -module
+ixion_@IXION_API_VERSION@_cuda_la_LIBADD = \
+	libixion-@IXION_API_VERSION@.la
+
+check_PROGRAMS += compute-engine-test
+compute_engine_test_SOURCES = compute_engine_test.cpp
+compute_engine_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la
 
 if IXION_THREADS
 

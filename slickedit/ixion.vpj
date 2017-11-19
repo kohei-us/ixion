@@ -228,6 +228,7 @@
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>
 				<F N="../include/ixion/column_store_type.hpp"/>
+				<F N="../include/ixion/compute_engine.hpp"/>
 				<F N="../include/ixion/config.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
 				<F N="../include/ixion/env.hpp"/>
@@ -258,6 +259,10 @@
 				<F N="../src/libixion/cell_listener_tracker.cpp"/>
 				<F N="../src/libixion/cell_queue_manager.cpp"/>
 				<F N="../src/libixion/cell_queue_manager.hpp"/>
+				<F N="../src/libixion/compute_engine.cpp"/>
+				<F N="../src/libixion/compute_engine_cuda.cpp"/>
+				<F N="../src/libixion/compute_engine_cuda.hpp"/>
+				<F N="../src/libixion/compute_engine_test.cpp"/>
 				<F N="../src/libixion/concrete_formula_tokens.cpp"/>
 				<F N="../src/libixion/concrete_formula_tokens.hpp"/>
 				<F N="../src/libixion/config.cpp"/>
