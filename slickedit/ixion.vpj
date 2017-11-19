@@ -248,6 +248,7 @@
 				<F N="../include/ixion/matrix.hpp"/>
 				<F N="../include/ixion/mem_str_buf.hpp"/>
 				<F N="../include/ixion/model_context.hpp"/>
+				<F N="../include/ixion/module.hpp"/>
 				<F N="../include/ixion/table.hpp"/>
 				<F N="../include/ixion/types.hpp"/>
 			</Folder>

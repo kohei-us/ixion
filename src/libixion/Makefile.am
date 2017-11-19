@@ -38,6 +38,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	mem_str_buf.cpp \
 	model_context.cpp \
 	model_types.hpp \
+	module.cpp \
 	cell_listener_tracker.cpp \
 	table.cpp \
 	types.cpp \
@@ -52,7 +53,7 @@ ixion_@IXION_API_VERSION@_cuda_la_SOURCES = \
 	compute_engine_cuda.hpp \
 	compute_engine_cuda.cpp
 
-ixion_@IXION_API_VERSION@_cuda_la_LDFLAGS = -module
+ixion_@IXION_API_VERSION@_cuda_la_LDFLAGS = -module -avoid-version -export-symbols-regex register_module
 ixion_@IXION_API_VERSION@_cuda_la_LIBADD = \
 	libixion-@IXION_API_VERSION@.la
 

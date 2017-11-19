@@ -32,7 +32,7 @@ case $host_os in
     ;;
     *)
         _os=
-        LDFLAGS="$LDFLAGS -Wl,--no-as-needed -pthread"
+        LDFLAGS="$LDFLAGS -Wl,--no-as-needed -pthread -ldl"
     ;;
 esac
 

@@ -23,5 +23,6 @@ libixion_HEADERS = \
 	matrix.hpp \
 	mem_str_buf.hpp \
 	model_context.hpp \
+	module.hpp \
 	table.hpp \
 	types.hpp

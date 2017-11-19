@@ -6,6 +6,7 @@
  */
 
 #include <ixion/compute_engine.hpp>
+#include <ixion/module.hpp>
 #include <iostream>
 
 void test_foo()
@@ -19,7 +20,10 @@ void test_foo()
 
 int main()
 {
+    ixion::init_modules();
+
     test_foo();
+
     return EXIT_SUCCESS;
 }
 

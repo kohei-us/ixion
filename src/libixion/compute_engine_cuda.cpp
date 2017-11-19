@@ -6,6 +6,8 @@
  */
 
 #include "compute_engine_cuda.hpp"
+#include "ixion/module.hpp"
+#include "ixion/env.hpp"
 #include <iostream>
 
 namespace ixion {
@@ -22,6 +24,31 @@ compute_engine_cuda::~compute_engine_cuda()
 void compute_engine_cuda::test()
 {
     std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine_cuda:test): cuda" << std::endl;
+}
+
+void* create()
+{
+    return new compute_engine_cuda();
+}
+
+void destroy(const void* p)
+{
+    delete reinterpret_cast<const compute_engine_cuda*>(p);
+}
+
+}
+
+extern "C" {
+
+IXION_DLLPUBLIC ixion::module_def* register_module()
+{
+    static ixion::module_def md =
+    {
+        ixion::create,
+        ixion::destroy
+    };
+
+    return &md;
 }
 
 }
