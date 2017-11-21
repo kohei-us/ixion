@@ -14,20 +14,49 @@
 
 namespace ixion {
 
+/**
+ * Default compute engine class that uses CPU for all its computations.
+ *
+ * <p>This class also serves as the fallback for its child classes in case
+ * they don't support the function being requested or the function doesn't
+ * meet the criteria that it requires.</p>
+ *
+ * <p>Each function of this class should not modify the state of the class
+ * instance.</p>
+ */
 class IXION_DLLPUBLIC compute_engine
 {
     struct impl;
     std::unique_ptr<impl> mp_impl;
 
 public:
+    /**
+     * Create a compute engine instance.
+     *
+     * @param name name of the compute engine, or nullptr for the default one.
+     *
+     * @return compute engine instance associted with the specified name. Note
+     *         that if no compute engine is registered with the specified
+     *         name, the default one is created.
+     */
     static std::shared_ptr<compute_engine> create(const char* name = nullptr);
+
+    /**
+     * Add a new compute engine class.
+     *
+     * @param name name of the compute engine.
+     * @param func_create function that creates a new instance of this compute
+     *                    engine class.
+     * @param func_destroy function that destroyes the instance of this
+     *                     compute engine class.
+     */
     static void add_class(
         const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy);
 
     compute_engine();
     virtual ~compute_engine();
 
-    virtual void test();
+    virtual void test() const;
 };
 
 }

@@ -66,7 +66,7 @@ compute_engine::~compute_engine()
 {
 }
 
-void compute_engine::test()
+void compute_engine::test() const
 {
     std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine:test): base" << std::endl;
 }

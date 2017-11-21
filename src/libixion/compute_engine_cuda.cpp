@@ -12,8 +12,7 @@
 
 namespace ixion {
 
-compute_engine_cuda::compute_engine_cuda() :
-    compute_engine()
+compute_engine_cuda::compute_engine_cuda() : compute_engine()
 {
     std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine_cuda:compute_engine_cuda): ctor" << std::endl;
 }
@@ -23,9 +22,11 @@ compute_engine_cuda::~compute_engine_cuda()
     std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine_cuda:~compute_engine_cuda): dtor" << std::endl;
 }
 
-void compute_engine_cuda::test()
+void compute_engine_cuda::test() const
 {
     std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine_cuda:test): cuda" << std::endl;
+
+    compute_engine::test();
 }
 
 compute_engine* create()

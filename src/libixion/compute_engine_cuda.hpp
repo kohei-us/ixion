@@ -18,7 +18,7 @@ public:
     compute_engine_cuda();
     virtual ~compute_engine_cuda();
 
-    virtual void test();
+    virtual void test() const;
 };
 
 }
