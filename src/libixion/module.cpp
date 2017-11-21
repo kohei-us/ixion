@@ -6,6 +6,7 @@
  */
 
 #include "ixion/module.hpp"
+#include "ixion/compute_engine.hpp"
 #include <iostream>
 #include <dlfcn.h>
 
@@ -13,33 +14,28 @@ namespace ixion {
 
 void init_modules()
 {
-    std::cout << __FILE__ << ":" << __LINE__ << " (ixion:init_modules): " << std::endl;
     const char* module_path = std::getenv("IXION_MODULE_PATH");
     if (!module_path)
         return;
 
-    std::cout << __FILE__ << ":" << __LINE__ << " (ixion:init_modules): module path = " << module_path << std::endl;
+    // TODO: use boost.filesystem.
     std::string cuda_path = module_path;
     cuda_path += "/ixion-0.13-cuda.so";
 
-    std::cout << __FILE__ << ":" << __LINE__ << " (ixion:init_modules): cuda path = " << cuda_path << std::endl;
+    // TODO: make this cross-platform.
     void* hdl = dlopen(cuda_path.data(), RTLD_NOW | RTLD_GLOBAL);
     if (!hdl)
         return;
 
-    std::cout << __FILE__ << ":" << __LINE__ << " (ixion:init_modules): loaded " << hdl << std::endl;
+    typedef module_def* (*register_module_type)(void);
+    register_module_type register_module;
+    *(void**)(&register_module) = dlsym(hdl, "register_module");
 
-    typedef module_def* (*foo)(void);
-    foo my_func;
-    *(void**)(&my_func) = dlsym(hdl, "register_module");
-
-    if (my_func)
+    if (register_module)
     {
-        module_def* md = my_func();
-        std::cout << __FILE__ << ":" << __LINE__ << " (ixion:init_modules): md = " << md << std::endl;
+        module_def* md = register_module();
+        compute_engine::add_class("cuda", md->create_compute_engine, md->destroy_compute_engine);
     }
-
-    dlclose(hdl);
 }
 
 }

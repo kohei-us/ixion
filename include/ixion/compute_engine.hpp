@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_COMPUTE_ENGINE_HPP
 
 #include "ixion/env.hpp"
+#include "ixion/module.hpp"
 #include <memory>
 
 namespace ixion {
@@ -19,7 +20,9 @@ class IXION_DLLPUBLIC compute_engine
     std::unique_ptr<impl> mp_impl;
 
 public:
-    static std::unique_ptr<compute_engine> create(const char* name = nullptr);
+    static std::shared_ptr<compute_engine> create(const char* name = nullptr);
+    static void add_class(
+        const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy);
 
     compute_engine();
     virtual ~compute_engine();

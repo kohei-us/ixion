@@ -9,17 +9,52 @@
 #include "ixion/global.hpp"
 
 #include <iostream>
+#include <unordered_map>
 
 namespace ixion {
+
+namespace {
+
+struct class_factory
+{
+    create_compute_engine_t create;
+    destroy_compute_engine_t destroy;
+};
+
+using class_factory_store_t = std::unordered_map<std::string, class_factory>;
+
+class_factory_store_t class_factory_store;
+
+}
 
 struct compute_engine::impl
 {
     impl() {}
 };
 
-std::unique_ptr<compute_engine> compute_engine::create(const char* name)
+std::shared_ptr<compute_engine> compute_engine::create(const char* name)
 {
-    return ixion::make_unique<compute_engine>();
+    if (!name)
+        // Name is not specified. Use the default engine.
+        return std::make_shared<compute_engine>();
+
+    class_factory_store_t::iterator it = class_factory_store.find(name);
+    if (it == class_factory_store.end())
+        // No class factory for this name. Fall back to default.
+        return std::make_shared<compute_engine>();
+
+    const class_factory& cf = it->second;
+    return std::shared_ptr<compute_engine>(cf.create(), cf.destroy);
+}
+
+void compute_engine::add_class(
+    const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy)
+{
+    class_factory cf;
+    cf.create = func_create;
+    cf.destroy = func_destroy;
+
+    class_factory_store.emplace(name, cf);
 }
 
 compute_engine::compute_engine() :

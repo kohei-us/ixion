@@ -11,7 +11,7 @@
 
 void test_foo()
 {
-    std::unique_ptr<ixion::compute_engine> p = ixion::compute_engine::create(nullptr);
+    std::shared_ptr<ixion::compute_engine> p = ixion::compute_engine::create(nullptr);
     p->test();
 
     p = ixion::compute_engine::create("cuda");

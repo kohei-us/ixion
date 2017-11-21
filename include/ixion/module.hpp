@@ -17,10 +17,15 @@ namespace ixion {
  */
 IXION_DLLPUBLIC void init_modules();
 
+class compute_engine;
+
+using create_compute_engine_t = compute_engine* (*)();
+using destroy_compute_engine_t = void (*)(const compute_engine*);
+
 struct module_def
 {
-    void* (*create_compute_engine)();
-    void (*destroy_compute_engine)(const void*);
+    create_compute_engine_t create_compute_engine;
+    destroy_compute_engine_t destroy_compute_engine;
 };
 
 }
