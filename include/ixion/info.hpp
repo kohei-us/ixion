@@ -16,6 +16,9 @@ IXION_DLLPUBLIC int get_version_major();
 IXION_DLLPUBLIC int get_version_minor();
 IXION_DLLPUBLIC int get_version_micro();
 
+IXION_DLLPUBLIC int get_api_version_major();
+IXION_DLLPUBLIC int get_api_version_minor();
+
 }
 
 #endif

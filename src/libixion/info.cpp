@@ -26,6 +26,16 @@ int get_version_micro()
     return IXION_MICRO_VERSION;
 }
 
+int get_api_version_major()
+{
+    return IXION_MAJOR_API_VERSION;
+}
+
+int get_api_version_minor()
+{
+    return IXION_MINOR_API_VERSION;
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

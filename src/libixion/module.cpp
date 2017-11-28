@@ -6,8 +6,9 @@
  */
 
 #include "ixion/module.hpp"
+#include "ixion/info.hpp"
 #include "ixion/compute_engine.hpp"
-#include <iostream>
+#include <sstream>
 #include <dlfcn.h>
 
 namespace ixion {
@@ -19,8 +20,9 @@ void init_modules()
         return;
 
     // TODO: use boost.filesystem.
-    std::string cuda_path = module_path;
-    cuda_path += "/ixion-0.13-cuda.so";
+    std::ostringstream os;
+    os << module_path << "/ixion-" << get_api_version_major() << "." << get_api_version_minor() << "-cuda.so";
+    std::string cuda_path = os.str();
 
     // TODO: make this cross-platform.
     void* hdl = dlopen(cuda_path.data(), RTLD_NOW | RTLD_GLOBAL);
