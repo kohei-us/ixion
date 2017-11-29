@@ -10,7 +10,10 @@
 #include "ixion/compute_engine.hpp"
 #include <sstream>
 #include <vector>
+#include <boost/filesystem.hpp>
 #include <dlfcn.h>
+
+namespace fs = boost::filesystem;
 
 namespace ixion {
 
@@ -30,13 +33,15 @@ void init_modules()
 
     for (const char* mod_name : mod_names)
     {
-        // TODO: use boost.filesystem.
+        fs::path p(module_path);
+
         std::ostringstream os;
-        os << module_path << "/" << mod_prefix << mod_name << ".so";
-        std::string cuda_path = os.str();
+        os << mod_prefix << mod_name << ".so";
+
+        p /= os.str();
 
         // TODO: make this cross-platform.
-        void* hdl = dlopen(cuda_path.data(), RTLD_NOW | RTLD_GLOBAL);
+        void* hdl = dlopen(p.string().data(), RTLD_NOW | RTLD_GLOBAL);
         if (!hdl)
             return;
 
@@ -47,7 +52,8 @@ void init_modules()
         if (register_module)
         {
             module_def* md = register_module();
-            compute_engine::add_class("cuda", md->create_compute_engine, md->destroy_compute_engine);
+            compute_engine::add_class(
+                mod_name, md->create_compute_engine, md->destroy_compute_engine);
         }
     }
 }

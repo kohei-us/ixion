@@ -70,8 +70,14 @@ libixion_@IXION_API_VERSION@_la_SOURCES += \
 
 endif
 
-libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
-libixion_@IXION_API_VERSION@_la_LIBADD =
+libixion_@IXION_API_VERSION@_la_LDFLAGS = \
+	-no-undefined \
+	$(BOOST_FILESYSTEM_LDFLAGS) \
+	$(BOOST_SYSTEM_LDFLAGS)
+
+libixion_@IXION_API_VERSION@_la_LIBADD = \
+	$(BOOST_FILESYSTEM_LIBS) \
+	$(BOOST_SYSTEM_LIBS)
 
 EXTRA_DIST = makefile.mk
 
