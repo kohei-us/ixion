@@ -1,6 +1,17 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -DIXION_BUILD $(MDDS_CFLAGS) $(BOOST_CPPFLAGS)
 
-check_PROGRAMS = ixion-test
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/include \
+	-DIXION_BUILD \
+	$(MDDS_CFLAGS) \
+	$(BOOST_CPPFLAGS)
+
+if BUILD_CUDA
+
+AM_CPPFLAGS += -DBUILD_CUDA
+
+endif # BUILD_CUDA
+
+check_PROGRAMS = ixion-test compute-engine-test
 
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
@@ -46,6 +57,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	workbook.cpp \
 	interface.cpp
 
+if BUILD_CUDA
+
 # CUDA module
 
 pkglib_LTLIBRARIES = ixion-@IXION_API_VERSION@-cuda.la
@@ -57,10 +70,7 @@ ixion_@IXION_API_VERSION@_cuda_la_LDFLAGS = -module -avoid-version -export-symbo
 ixion_@IXION_API_VERSION@_cuda_la_LIBADD = \
 	libixion-@IXION_API_VERSION@.la
 
-check_PROGRAMS += compute-engine-test
-compute_engine_test_SOURCES = compute_engine_test.cpp
-compute_engine_test_LDADD = \
-	libixion-@IXION_API_VERSION@.la
+endif # BUILD_CUDA
 
 if IXION_THREADS
 
@@ -86,4 +96,10 @@ ixion_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)
 
-TESTS = ixion-test
+compute_engine_test_SOURCES = compute_engine_test.cpp
+compute_engine_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la
+
+AM_TESTS_ENVIRONMENT = IXION_MODULE_PATH=.libs; export IXION_MODULE_PATH;
+
+TESTS = ixion-test compute-engine-test

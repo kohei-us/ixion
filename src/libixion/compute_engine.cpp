@@ -66,9 +66,9 @@ compute_engine::~compute_engine()
 {
 }
 
-void compute_engine::test() const
+const char* compute_engine::get_name() const
 {
-    std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine:test): base" << std::endl;
+    return "base";
 }
 
 }

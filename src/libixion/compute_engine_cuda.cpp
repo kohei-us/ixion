@@ -22,11 +22,9 @@ compute_engine_cuda::~compute_engine_cuda()
     std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine_cuda:~compute_engine_cuda): dtor" << std::endl;
 }
 
-void compute_engine_cuda::test() const
+const char* compute_engine_cuda::get_name() const
 {
-    std::cout << __FILE__ << ":" << __LINE__ << " (compute_engine_cuda:test): cuda" << std::endl;
-
-    compute_engine::test();
+    return "cuda";
 }
 
 compute_engine* create()

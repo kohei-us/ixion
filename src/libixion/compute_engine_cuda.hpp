@@ -18,7 +18,7 @@ public:
     compute_engine_cuda();
     virtual ~compute_engine_cuda();
 
-    virtual void test() const;
+    virtual const char* get_name() const override;
 };
 
 }

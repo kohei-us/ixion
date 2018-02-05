@@ -8,21 +8,31 @@
 #include <ixion/compute_engine.hpp>
 #include <ixion/module.hpp>
 #include <iostream>
+#include <cassert>
+#include <cstring>
 
-void test_foo()
+void test_create_default()
 {
     std::shared_ptr<ixion::compute_engine> p = ixion::compute_engine::create(nullptr);
-    p->test();
+    assert(p);
+    assert(!std::strcmp(p->get_name(), "base"));
+}
 
-    p = ixion::compute_engine::create("cuda");
-    p->test();
+void test_create_cuda()
+{
+    std::shared_ptr<ixion::compute_engine> p = ixion::compute_engine::create("cuda");
+    assert(p);
+    assert(!std::strcmp(p->get_name(), "cuda"));
 }
 
 int main()
 {
     ixion::init_modules();
 
-    test_foo();
+    test_create_default();
+#ifdef BUILD_CUDA
+    test_create_cuda();
+#endif
 
     return EXIT_SUCCESS;
 }

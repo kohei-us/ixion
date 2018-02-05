@@ -56,7 +56,7 @@ public:
     compute_engine();
     virtual ~compute_engine();
 
-    virtual void test() const;
+    virtual const char* get_name() const;
 };
 
 }

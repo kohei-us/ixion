@@ -48,6 +48,12 @@ AC_ARG_ENABLE([threads],
     [enable_threads=yes]
 )
 
+AC_ARG_ENABLE([cuda],
+    [AS_HELP_STRING([--enable-cuda], [Enable CUDA compute engine])],
+    [enable_cuda="$enableval"],
+    [enable_cuda=no]
+)
+
 IXION_VERSION=ixion_version
 IXION_API_VERSION=ixion_api_version
 IXION_MAJOR_VERSION=ixion_major_version
@@ -128,6 +134,7 @@ AS_IF([test "x$enable_threads" != "xno"], [
 
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([IXION_THREADS], [test "x$enable_threads" != "xno"])
+AM_CONDITIONAL([BUILD_CUDA], [test "x$enable_cuda" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
 
 BOOST_PROGRAM_OPTIONS
@@ -151,5 +158,6 @@ Build configuration:
         host os:              $host_os
         python:               $enable_python
         threads:              $enable_threads
+        cuda:                 $enable_cuda
 ==============================================================================
 ])
