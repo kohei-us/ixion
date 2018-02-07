@@ -11,11 +11,21 @@
 #include <sstream>
 #include <vector>
 #include <boost/filesystem.hpp>
+#ifndef _WIN32
 #include <dlfcn.h>
+#endif
 
 namespace fs = boost::filesystem;
 
 namespace ixion { namespace draft {
+
+#ifdef _WIN32
+
+void init_modules()
+{
+}
+
+#else
 
 void init_modules()
 {
@@ -57,6 +67,8 @@ void init_modules()
         }
     }
 }
+
+#endif
 
 }}
 
