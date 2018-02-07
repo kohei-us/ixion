@@ -15,7 +15,7 @@
 
 namespace fs = boost::filesystem;
 
-namespace ixion {
+namespace ixion { namespace draft {
 
 void init_modules()
 {
@@ -58,6 +58,6 @@ void init_modules()
     }
 }
 
-}
+}}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

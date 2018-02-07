@@ -11,7 +11,7 @@
 #include <iostream>
 #include <unordered_map>
 
-namespace ixion {
+namespace ixion { namespace draft {
 
 namespace {
 
@@ -71,6 +71,6 @@ const char* compute_engine::get_name() const
     return "default";
 }
 
-}
+}}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -10,7 +10,7 @@
 
 #include "ixion/compute_engine.hpp"
 
-namespace ixion {
+namespace ixion { namespace draft {
 
 class compute_engine_cuda : public compute_engine
 {
@@ -21,7 +21,7 @@ public:
     virtual const char* get_name() const override;
 };
 
-}
+}}
 
 #endif
 

@@ -10,7 +10,7 @@
 
 #include "ixion/env.hpp"
 
-namespace ixion {
+namespace ixion { namespace draft {
 
 /**
  * Initialize modules if exists.
@@ -28,7 +28,7 @@ struct module_def
     destroy_compute_engine_t destroy_compute_engine;
 };
 
-}
+}}
 
 #endif
 

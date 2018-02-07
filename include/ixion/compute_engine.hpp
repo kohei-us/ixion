@@ -12,7 +12,7 @@
 #include "ixion/module.hpp"
 #include <memory>
 
-namespace ixion {
+namespace ixion { namespace draft {
 
 /**
  * Default compute engine class that uses CPU for all its computations.
@@ -59,7 +59,7 @@ public:
     virtual const char* get_name() const;
 };
 
-}
+}}
 
 #endif
 

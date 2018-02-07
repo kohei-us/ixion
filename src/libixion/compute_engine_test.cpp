@@ -13,21 +13,21 @@
 
 void test_create_default()
 {
-    std::shared_ptr<ixion::compute_engine> p = ixion::compute_engine::create(nullptr);
+    std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create(nullptr);
     assert(p);
     assert(!std::strcmp(p->get_name(), "default"));
 }
 
 void test_create_cuda()
 {
-    std::shared_ptr<ixion::compute_engine> p = ixion::compute_engine::create("cuda");
+    std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create("cuda");
     assert(p);
     assert(!std::strcmp(p->get_name(), "cuda"));
 }
 
 int main()
 {
-    ixion::init_modules();
+    ixion::draft::init_modules();
 
     test_create_default();
 #ifdef BUILD_CUDA

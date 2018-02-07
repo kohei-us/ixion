@@ -10,7 +10,7 @@
 #include "ixion/env.hpp"
 #include <iostream>
 
-namespace ixion {
+namespace ixion { namespace draft {
 
 compute_engine_cuda::compute_engine_cuda() : compute_engine()
 {
@@ -37,16 +37,16 @@ void destroy(const compute_engine* p)
     delete static_cast<const compute_engine_cuda*>(p);
 }
 
-}
+}}
 
 extern "C" {
 
-IXION_DLLPUBLIC ixion::module_def* register_module()
+IXION_DLLPUBLIC ixion::draft::module_def* register_module()
 {
-    static ixion::module_def md =
+    static ixion::draft::module_def md =
     {
-        ixion::create,
-        ixion::destroy
+        ixion::draft::create,
+        ixion::draft::destroy
     };
 
     return &md;
