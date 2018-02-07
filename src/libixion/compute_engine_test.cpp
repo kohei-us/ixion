@@ -15,7 +15,7 @@ void test_create_default()
 {
     std::shared_ptr<ixion::compute_engine> p = ixion::compute_engine::create(nullptr);
     assert(p);
-    assert(!std::strcmp(p->get_name(), "base"));
+    assert(!std::strcmp(p->get_name(), "default"));
 }
 
 void test_create_cuda()

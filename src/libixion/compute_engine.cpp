@@ -68,7 +68,7 @@ compute_engine::~compute_engine()
 
 const char* compute_engine::get_name() const
 {
-    return "base";
+    return "default";
 }
 
 }
