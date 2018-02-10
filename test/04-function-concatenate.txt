@@ -1,0 +1,12 @@
+%% Test built-in functions.
+%mode init
+A1:1
+A2@One
+A3=CONCATENATE(A1," ",A2)
+%calc
+%mode result
+A1=1
+A2="One"
+A3="1 One"
+%check
+%exit
