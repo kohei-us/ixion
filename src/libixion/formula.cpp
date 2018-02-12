@@ -35,7 +35,7 @@ formula_tokens_t parse_formula_string(
     const formula_name_resolver& resolver, const char* p, size_t n)
 {
     lexer_tokens_t lxr_tokens;
-    formula_lexer lexer(p, n);
+    formula_lexer lexer(cxt.get_config(), p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
@@ -91,7 +91,7 @@ public:
                 m_os << token->get_value();
                 break;
             case fop_sep:
-                m_os << ",";
+                m_os << m_cxt.get_config().sep_function_arg;
                 break;
             case fop_function:
             {

@@ -17,6 +17,7 @@
 #include "ixion/formula.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/config.hpp"
 
 using std::cout;
 using std::endl;
@@ -29,6 +30,10 @@ void tokenize_formula(const std::string& formula)
 
     std::unique_ptr<formula_name_resolver> resolver =
         formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+
+    config cfg = cxt.get_config();
+    cfg.sep_function_arg = ',';
+    cxt.set_config(cfg);
 
     abs_address_t pos;
 

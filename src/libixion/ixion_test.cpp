@@ -12,6 +12,7 @@
 #include "ixion/global.hpp"
 #include "ixion/macros.hpp"
 #include "ixion/interface/table_handler.hpp"
+#include "ixion/config.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -654,6 +655,7 @@ void test_parse_and_print_expressions()
     // Excel A1
 
     std::vector<const char*> exps = {
+        "\" \"",
         "1/3*1.4",
         "2.3*(1+2)/(34*(3-2))",
         "SUM(1,2,3)",
@@ -698,6 +700,27 @@ void test_parse_and_print_expressions()
 
     resolver = formula_name_resolver::get(formula_name_resolver_t::excel_r1c1, &cxt);
     assert(resolver);
+
+    for (const char* exp : exps)
+    {
+        bool result = check_formula_expression(cxt, *resolver, exp);
+        assert(result);
+    }
+
+    // ODFF
+
+    exps = {
+        "\" \"",
+        "SUM([.A1];[.B1])",
+        "CONCATENATE([.A6];\" \";[.B6])",
+    };
+
+    resolver = formula_name_resolver::get(formula_name_resolver_t::odff, &cxt);
+    assert(resolver);
+
+    config cfg = cxt.get_config();
+    cfg.sep_function_arg = ';';
+    cxt.set_config(cfg);
 
     for (const char* exp : exps)
     {

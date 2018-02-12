@@ -13,6 +13,7 @@
 
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
+#include "ixion/config.hpp"
 
 #include "lexer_tokens.hpp"
 
@@ -30,7 +31,7 @@ public:
         tokenize_error(const std::string& msg);
     };
 
-    formula_lexer(const char* p, size_t n);
+    formula_lexer(const config& config, const char* p, size_t n);
     ~formula_lexer();
 
     void tokenize();
@@ -43,6 +44,7 @@ public:
     void swap_tokens(lexer_tokens_t& tokens);
 
 private:
+    const config& m_config;
     lexer_tokens_t m_tokens;
     const char* mp_first;
     size_t m_size;

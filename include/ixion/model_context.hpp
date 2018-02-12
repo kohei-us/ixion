@@ -86,6 +86,8 @@ public:
     virtual sheet_size_t get_sheet_size(sheet_t sheet) const override;
     virtual size_t get_sheet_count() const override;
 
+    void set_config(const config& cfg);
+
     double get_numeric_value_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
 

@@ -155,7 +155,6 @@ public:
 
     model_context_impl(model_context& parent) :
         m_parent(parent),
-        mp_config(new config),
         mp_cell_listener_tracker(new cell_listener_tracker(parent)),
         mp_table_handler(nullptr),
         mp_session_factory(&dummy_session_handler_factory)
@@ -164,7 +163,6 @@ public:
 
     ~model_context_impl()
     {
-        delete mp_config;
         delete mp_cell_listener_tracker;
 
         for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
@@ -173,7 +171,12 @@ public:
 
     const config& get_config() const
     {
-        return *mp_config;
+        return m_config;
+    }
+
+    void set_config(const config& cfg)
+    {
+        m_config = cfg;
     }
 
     cell_listener_tracker& get_cell_listener_tracker()
@@ -287,7 +290,7 @@ private:
 
     workbook m_sheets;
 
-    config* mp_config;
+    config m_config;
     cell_listener_tracker* mp_cell_listener_tracker;
     iface::table_handler* mp_table_handler;
     detail::named_expressions_t m_named_expressions;
@@ -1221,6 +1224,11 @@ double model_context::get_numeric_value(const abs_address_t& addr) const
 bool model_context::get_boolean_value(const abs_address_t& addr) const
 {
     return mp_impl->get_boolean_value(addr);
+}
+
+void model_context::set_config(const config& cfg)
+{
+    mp_impl->set_config(cfg);
 }
 
 double model_context::get_numeric_value_nowait(const abs_address_t& addr) const

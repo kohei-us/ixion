@@ -46,6 +46,8 @@ public:
 
     void run();
 
+    void set_sep_arg(char c);
+
 private:
     bool is_arg_sep(char c) const;
     bool is_decimal_sep(char c) const;
@@ -152,6 +154,11 @@ void tokenizer::run()
                 break;
         }
     }
+}
+
+void tokenizer::set_sep_arg(char c)
+{
+    m_sep_arg = c;
 }
 
 bool tokenizer::is_arg_sep(char c) const
@@ -321,8 +328,8 @@ bool tokenizer::has_char() const
 
 formula_lexer::tokenize_error::tokenize_error(const string& msg) : general_error(msg) {}
 
-formula_lexer::formula_lexer(const char* p, size_t n) :
-    mp_first(p), m_size(n) {}
+formula_lexer::formula_lexer(const config& config, const char* p, size_t n) :
+    m_config(config), mp_first(p), m_size(n) {}
 
 formula_lexer::~formula_lexer() {}
 
@@ -332,6 +339,7 @@ void formula_lexer::tokenize()
     __IXION_DEBUG_OUT__ << "formula string: '" << std::string(mp_first, m_size) << "'" << endl;
 #endif
     tokenizer tkr(m_tokens, mp_first, m_size);
+    tkr.set_sep_arg(m_config.sep_function_arg);
     tkr.run();
 #if IXION_DEBUG_LEXER
     __IXION_DEBUG_OUT__ << print_tokens(m_tokens, true) << endl;
