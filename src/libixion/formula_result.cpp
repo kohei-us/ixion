@@ -9,9 +9,11 @@
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
 #include "ixion/interface/formula_model_access.hpp"
+#include "ixion/config.hpp"
 
 #include <cassert>
 #include <sstream>
+#include <iomanip>
 
 #define DEBUG_FORMULA_RESULT 0
 
@@ -116,6 +118,8 @@ struct formula_result::impl
             case result_type::value:
             {
                 ostringstream os;
+                if (cxt.get_config().output_precision >= 0)
+                    os << std::fixed << std::setprecision(cxt.get_config().output_precision);
                 os << m_value;
                 return os.str();
             }

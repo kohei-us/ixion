@@ -10,10 +10,13 @@
 namespace ixion {
 
 config::config() :
-    sep_function_arg(',') {}
+    sep_function_arg(','),
+    output_precision(-1) {}
 
 config::config(const config& r) :
-    sep_function_arg(r.sep_function_arg) {}
+    sep_function_arg(r.sep_function_arg),
+    output_precision(r.output_precision) {}
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -9,6 +9,7 @@
 #define __IXION_CONFIG_HPP__
 
 #include "ixion/env.hpp"
+#include <cstdint>
 
 namespace ixion {
 
@@ -22,6 +23,12 @@ struct IXION_DLLPUBLIC config
      * Function argument separator.  By default it's ','.
      */
     char sep_function_arg;
+
+    /**
+     * Precision to use when converting a numeric value to a string
+     * representation.  A negative value indicates an unspecified precision.
+     */
+    int8_t output_precision;
 
     config();
     config(const config& r);
