@@ -56,6 +56,8 @@ public:
     virtual void write_string(std::ostream& os) const;
 };
 
+using formula_tokens_t = std::vector<std::unique_ptr<formula_token>>;
+
 class IXION_DLLPUBLIC formula_tokens_store
 {
     friend void intrusive_ptr_add_ref(formula_tokens_store*);
@@ -80,6 +82,9 @@ public:
     formula_tokens_store& operator= (const formula_tokens_store&) = delete;
 
     size_t get_reference_count() const;
+
+    formula_tokens_t& get_store();
+    const formula_tokens_t& get_store() const;
 };
 
 inline void intrusive_ptr_add_ref(formula_tokens_store* p)
@@ -91,8 +96,6 @@ inline void intrusive_ptr_release(formula_tokens_store* p)
 {
     p->release_ref();
 }
-
-typedef std::vector<std::unique_ptr<formula_token>> formula_tokens_t;
 
 IXION_DLLPUBLIC bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
 

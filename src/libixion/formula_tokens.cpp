@@ -224,6 +224,16 @@ size_t formula_tokens_store::get_reference_count() const
     return mp_impl->m_refcount;
 }
 
+formula_tokens_t& formula_tokens_store::get_store()
+{
+    return mp_impl->m_tokens;
+}
+
+const formula_tokens_t& formula_tokens_store::get_store() const
+{
+    return mp_impl->m_tokens;
+}
+
 bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
 {
     size_t n = left.size();
