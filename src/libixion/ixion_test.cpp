@@ -77,6 +77,30 @@ void test_string_pool()
     assert(s_val == cxt.get_string_identifier(IXION_ASCII("Value")));
 }
 
+void test_formula_tokens_store()
+{
+    formula_tokens_store::ptr_type p = formula_tokens_store::create();
+    assert(p->get_reference_count() == 1);
+    auto p2 = p;
+
+    assert(p->get_reference_count() == 2);
+    assert(p2->get_reference_count() == 2);
+
+    auto p3(p);
+
+    assert(p->get_reference_count() == 3);
+    assert(p2->get_reference_count() == 3);
+    assert(p3->get_reference_count() == 3);
+
+    p3.reset();
+    assert(p->get_reference_count() == 2);
+    assert(p2->get_reference_count() == 2);
+
+    p2.reset();
+    assert(p->get_reference_count() == 1);
+    p.reset();
+}
+
 struct ref_name_entry
 {
     const char* name;
@@ -981,6 +1005,8 @@ int main()
     test_size();
     test_string_to_double();
     test_string_pool();
+    test_formula_tokens_store();
+
     test_name_resolver_excel_a1();
     test_name_resolver_named_expression();
     test_name_resolver_table_excel_a1();

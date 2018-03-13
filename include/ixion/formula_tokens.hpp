@@ -67,14 +67,19 @@ class IXION_DLLPUBLIC formula_tokens_store
     void add_ref();
     void release_ref();
 
+    formula_tokens_store();
+
 public:
     using ptr_type = boost::intrusive_ptr<formula_tokens_store>;
 
-    formula_tokens_store();
+    static ptr_type create();
+
     ~formula_tokens_store();
 
     formula_tokens_store(const formula_tokens_store&) = delete;
     formula_tokens_store& operator= (const formula_tokens_store&) = delete;
+
+    size_t get_reference_count() const;
 };
 
 inline void intrusive_ptr_add_ref(formula_tokens_store* p)

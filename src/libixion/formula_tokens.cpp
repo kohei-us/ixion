@@ -194,8 +194,19 @@ struct formula_tokens_store::impl
     impl() : m_refcount(0) {}
 };
 
-formula_tokens_store::formula_tokens_store() : mp_impl(ixion::make_unique<impl>()) {}
-formula_tokens_store::~formula_tokens_store() {}
+formula_tokens_store::formula_tokens_store() :
+    mp_impl(ixion::make_unique<impl>())
+{
+}
+
+formula_tokens_store::~formula_tokens_store()
+{
+}
+
+formula_tokens_store::ptr_type formula_tokens_store::create()
+{
+    return ptr_type(new formula_tokens_store);
+}
 
 void formula_tokens_store::add_ref()
 {
@@ -206,6 +217,11 @@ void formula_tokens_store::release_ref()
 {
     if (--mp_impl->m_refcount == 0)
         delete this;
+}
+
+size_t formula_tokens_store::get_reference_count() const
+{
+    return mp_impl->m_refcount;
 }
 
 bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
