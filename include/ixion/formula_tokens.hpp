@@ -14,6 +14,9 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
+#include <boost/intrusive_ptr.hpp>
 
 namespace ixion {
 
@@ -52,6 +55,37 @@ public:
     virtual std::string get_name() const;
     virtual void write_string(std::ostream& os) const;
 };
+
+class IXION_DLLPUBLIC formula_tokens_store
+{
+    friend void intrusive_ptr_add_ref(formula_tokens_store*);
+    friend void intrusive_ptr_release(formula_tokens_store*);
+
+    struct impl;
+    std::unique_ptr<impl> mp_impl;
+
+    void add_ref();
+    void release_ref();
+
+public:
+    using ptr_type = boost::intrusive_ptr<formula_tokens_store>;
+
+    formula_tokens_store();
+    ~formula_tokens_store();
+
+    formula_tokens_store(const formula_tokens_store&) = delete;
+    formula_tokens_store& operator= (const formula_tokens_store&) = delete;
+};
+
+inline void intrusive_ptr_add_ref(formula_tokens_store* p)
+{
+    p->add_ref();
+}
+
+inline void intrusive_ptr_release(formula_tokens_store* p)
+{
+    p->release_ref();
+}
 
 typedef std::vector<std::unique_ptr<formula_token>> formula_tokens_t;
 

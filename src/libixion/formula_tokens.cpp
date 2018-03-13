@@ -186,6 +186,28 @@ void formula_token::write_string(std::ostream& /*os*/) const
 {
 }
 
+struct formula_tokens_store::impl
+{
+    formula_tokens_t m_tokens;
+    size_t m_refcount;
+
+    impl() : m_refcount(0) {}
+};
+
+formula_tokens_store::formula_tokens_store() : mp_impl(ixion::make_unique<impl>()) {}
+formula_tokens_store::~formula_tokens_store() {}
+
+void formula_tokens_store::add_ref()
+{
+    ++mp_impl->m_refcount;
+}
+
+void formula_tokens_store::release_ref()
+{
+    if (--mp_impl->m_refcount == 0)
+        delete this;
+}
+
 bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
 {
     size_t n = left.size();
