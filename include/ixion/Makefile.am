@@ -17,6 +17,7 @@ libixion_HEADERS = \
 	formula_opcode.hpp \
 	formula_result.hpp \
 	formula_tokens.hpp \
+	formula_tokens_fwd.hpp \
 	global.hpp \
 	info.hpp \
 	macros.hpp \

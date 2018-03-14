@@ -56,6 +56,7 @@ struct interpret_status
 struct formula_cell::impl
 {
     mutable interpret_status m_interpret_status;
+    formula_tokens_store_ptr_t m_tokens;
     size_t m_identifier;
     bool m_shared_token:1;
     bool m_circular_safe:1;
@@ -67,6 +68,12 @@ struct formula_cell::impl
 
     impl(size_t tokens_identifier) :
         m_identifier(tokens_identifier),
+        m_shared_token(false),
+        m_circular_safe(false) {}
+
+    impl(const formula_tokens_store_ptr_t& tokens) :
+        m_tokens(tokens),
+        m_identifier(0),
         m_shared_token(false),
         m_circular_safe(false) {}
 
@@ -142,6 +149,9 @@ formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
 formula_cell::formula_cell(size_t tokens_identifier) :
     mp_impl(ixion::make_unique<impl>(tokens_identifier)) {}
 
+formula_cell::formula_cell(const formula_tokens_store_ptr_t& tokens) :
+    mp_impl(ixion::make_unique<impl>(tokens)) {}
+
 formula_cell::~formula_cell()
 {
 }
@@ -154,6 +164,16 @@ size_t formula_cell::get_identifier() const
 void formula_cell::set_identifier(size_t identifier)
 {
     mp_impl->m_identifier = identifier;
+}
+
+formula_tokens_store_ptr_t formula_cell::get_tokens()
+{
+    return mp_impl->m_tokens;
+}
+
+void formula_cell::set_tokens(const formula_tokens_store_ptr_t& tokens)
+{
+    mp_impl->m_tokens = tokens;
 }
 
 double formula_cell::get_value() const

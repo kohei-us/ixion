@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_CELL_HPP
 
 #include "ixion/types.hpp"
+#include "ixion/formula_tokens_fwd.hpp"
 
 #include <memory>
 #include <vector>
@@ -17,7 +18,6 @@ namespace ixion {
 
 class formula_result;
 class formula_cell;
-class formula_token;
 struct abs_address_t;
 
 namespace iface {
@@ -37,10 +37,14 @@ public:
 
     formula_cell();
     formula_cell(size_t tokens_identifier);
+    formula_cell(const formula_tokens_store_ptr_t& tokens);
     ~formula_cell();
 
     size_t get_identifier() const;
     void set_identifier(size_t identifier);
+
+    formula_tokens_store_ptr_t get_tokens();
+    void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
     double get_value() const;
     double get_value_nowait() const;

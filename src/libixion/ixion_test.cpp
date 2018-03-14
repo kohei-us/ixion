@@ -79,7 +79,7 @@ void test_string_pool()
 
 void test_formula_tokens_store()
 {
-    formula_tokens_store::ptr_type p = formula_tokens_store::create();
+    formula_tokens_store_ptr_t p = formula_tokens_store::create();
     assert(p->get_reference_count() == 1);
     auto p2 = p;
 

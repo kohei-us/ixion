@@ -11,12 +11,11 @@
 #include "ixion/address.hpp"
 #include "ixion/table.hpp"
 #include "ixion/formula_opcode.hpp"
+#include "ixion/formula_tokens_fwd.hpp"
 
 #include <string>
 #include <vector>
 #include <memory>
-
-#include <boost/intrusive_ptr.hpp>
 
 namespace ixion {
 
@@ -72,9 +71,8 @@ class IXION_DLLPUBLIC formula_tokens_store
     formula_tokens_store();
 
 public:
-    using ptr_type = boost::intrusive_ptr<formula_tokens_store>;
 
-    static ptr_type create();
+    static formula_tokens_store_ptr_t create();
 
     ~formula_tokens_store();
 

@@ -203,9 +203,9 @@ formula_tokens_store::~formula_tokens_store()
 {
 }
 
-formula_tokens_store::ptr_type formula_tokens_store::create()
+formula_tokens_store_ptr_t formula_tokens_store::create()
 {
-    return ptr_type(new formula_tokens_store);
+    return formula_tokens_store_ptr_t(new formula_tokens_store);
 }
 
 void formula_tokens_store::add_ref()
