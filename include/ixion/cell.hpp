@@ -43,7 +43,7 @@ public:
     size_t get_identifier() const;
     void set_identifier(size_t identifier);
 
-    formula_tokens_store_ptr_t get_tokens();
+    const formula_tokens_store_ptr_t& get_tokens() const;
     void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
     double get_value() const;

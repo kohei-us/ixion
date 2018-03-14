@@ -166,7 +166,7 @@ void formula_cell::set_identifier(size_t identifier)
     mp_impl->m_identifier = identifier;
 }
 
-formula_tokens_store_ptr_t formula_cell::get_tokens()
+const formula_tokens_store_ptr_t& formula_cell::get_tokens() const
 {
     return mp_impl->m_tokens;
 }
