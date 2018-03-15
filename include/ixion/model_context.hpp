@@ -76,7 +76,6 @@ public:
     virtual const iface::table_handler* get_table_handler() const override;
     virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const override;
     virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const override;
-    virtual abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const override;
 
     virtual string_id_t append_string(const char* p, size_t n) override;
     virtual string_id_t add_string(const char* p, size_t n) override;
@@ -92,6 +91,7 @@ public:
     string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
 
     size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
+    abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
     void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
     size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
     void remove_formula_tokens(sheet_t sheet, size_t identifier);
