@@ -81,8 +81,8 @@ public:
 
     size_t get_reference_count() const;
 
-    formula_tokens_t& get_store();
-    const formula_tokens_t& get_store() const;
+    formula_tokens_t& get();
+    const formula_tokens_t& get() const;
 };
 
 inline void intrusive_ptr_add_ref(formula_tokens_store* p)

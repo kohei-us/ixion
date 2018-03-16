@@ -549,7 +549,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
 {
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
-    ts->get_store() = std::move(tokens);
+    ts->get() = std::move(tokens);
 
     set_formula_cell(addr, ts);
 }

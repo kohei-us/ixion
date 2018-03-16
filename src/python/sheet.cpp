@@ -255,7 +255,7 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
         return nullptr;
     }
 
-    const ixion::formula_tokens_t& ft = fc->get_tokens()->get_store();
+    const ixion::formula_tokens_t& ft = fc->get_tokens()->get();
 
     string str = ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, ft);
     if (str.empty())

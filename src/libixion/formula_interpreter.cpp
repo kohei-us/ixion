@@ -140,7 +140,7 @@ void formula_interpreter::init_tokens()
     if (!ts)
         return;
 
-    const formula_tokens_t& src_tokens = ts->get_store();
+    const formula_tokens_t& src_tokens = ts->get();
 
     for (const std::unique_ptr<formula_token>& p : src_tokens)
     {

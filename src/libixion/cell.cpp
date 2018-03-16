@@ -213,7 +213,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
 {
     // TODO: Check to make sure this is being run on the main thread only.
-    const formula_tokens_t& tokens = mp_impl->m_tokens->get_store();
+    const formula_tokens_t& tokens = mp_impl->m_tokens->get();
     for (const std::unique_ptr<formula_token>& t : tokens)
     {
         switch (t->get_opcode())
@@ -305,7 +305,7 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
         }
     };
 
-    const formula_tokens_t& this_tokens = mp_impl->m_tokens->get_store();
+    const formula_tokens_t& this_tokens = mp_impl->m_tokens->get();
 
     std::for_each(this_tokens.begin(), this_tokens.end(), get_refs);
 

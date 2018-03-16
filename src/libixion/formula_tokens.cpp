@@ -224,12 +224,12 @@ size_t formula_tokens_store::get_reference_count() const
     return mp_impl->m_refcount;
 }
 
-formula_tokens_t& formula_tokens_store::get_store()
+formula_tokens_t& formula_tokens_store::get()
 {
     return mp_impl->m_tokens;
 }
 
-const formula_tokens_t& formula_tokens_store::get_store() const
+const formula_tokens_t& formula_tokens_store::get() const
 {
     return mp_impl->m_tokens;
 }
