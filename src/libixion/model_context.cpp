@@ -18,11 +18,11 @@
 #include "workbook.hpp"
 #include "model_types.hpp"
 
-#include <memory>
 #include <sstream>
 #include <unordered_map>
 #include <map>
 #include <vector>
+#include <deque>
 #include <iostream>
 
 #define DEBUG_MODEL_CONTEXT 0
@@ -849,7 +849,6 @@ model_context::model_context() :
 
 model_context::~model_context()
 {
-    delete mp_impl;
 }
 
 const config& model_context::get_config() const

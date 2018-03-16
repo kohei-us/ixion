@@ -14,7 +14,7 @@
 #include "ixion/env.hpp"
 
 #include <string>
-#include <deque>
+#include <memory>
 
 namespace ixion {
 
@@ -32,6 +32,8 @@ class model_context_impl;
  */
 class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 {
+    std::unique_ptr<model_context_impl> mp_impl;
+
 public:
     class IXION_DLLPUBLIC session_handler_factory
     {
@@ -167,9 +169,6 @@ public:
     dirty_formula_cells_t get_all_formula_cells() const;
 
     bool empty() const;
-
-private:
-    model_context_impl* mp_impl;
 };
 
 }
