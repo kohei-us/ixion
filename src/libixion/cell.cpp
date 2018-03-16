@@ -57,16 +57,13 @@ struct formula_cell::impl
 {
     mutable interpret_status m_interpret_status;
     formula_tokens_store_ptr_t m_tokens;
-    bool m_shared_token:1;
     bool m_circular_safe:1;
 
     impl() :
-        m_shared_token(false),
         m_circular_safe(false) {}
 
     impl(const formula_tokens_store_ptr_t& tokens) :
         m_tokens(tokens),
-        m_shared_token(false),
         m_circular_safe(false) {}
 
     /**
@@ -329,16 +326,6 @@ const formula_result* formula_cell::get_result_cache_nowait() const
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
     return mp_impl->m_interpret_status.result.get();
-}
-
-bool formula_cell::is_shared() const
-{
-    return mp_impl->m_shared_token;
-}
-
-void formula_cell::set_shared(bool b)
-{
-    mp_impl->m_shared_token = b;
 }
 
 }

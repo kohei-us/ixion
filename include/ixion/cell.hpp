@@ -74,9 +74,6 @@ public:
 
     const formula_result& get_result_cache() const;
     const formula_result* get_result_cache_nowait() const;
-
-    bool is_shared() const;
-    void set_shared(bool b);
 };
 
 }
