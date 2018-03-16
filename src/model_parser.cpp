@@ -374,7 +374,11 @@ void model_parser::parse_init()
     {
         case ct_formula:
         {
-            m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
+            formula_tokens_t tokens =
+                parse_formula_string(
+                    m_context, cell_def.pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+
+            m_context.set_formula_cell(cell_def.pos, std::move(tokens));
             m_dirty_cells.insert(cell_def.pos);
 
             cout << get_display_cell_string(cell_def.pos) << ": (f) " << cell_def.value.str() << endl;
@@ -433,7 +437,12 @@ void model_parser::parse_edit()
             __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: formula" << endl;
 #endif
             unregister_formula_cell(m_context, cell_def.pos);
-            m_context.set_formula_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size(), *mp_name_resolver);
+
+            formula_tokens_t tokens =
+                parse_formula_string(
+                    m_context, cell_def.pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+
+            m_context.set_formula_cell(cell_def.pos, std::move(tokens));
             m_dirty_cells.insert(cell_def.pos);
             register_formula_cell(m_context, cell_def.pos);
             cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;

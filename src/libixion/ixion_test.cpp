@@ -794,7 +794,8 @@ formula_cell* insert_formula(
     model_context& cxt, const abs_address_t& pos, const char* exp,
     const formula_name_resolver& resolver)
 {
-    cxt.set_formula_cell(pos, exp, strlen(exp), resolver);
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, resolver, exp, strlen(exp));
+    cxt.set_formula_cell(pos, std::move(tokens));
     register_formula_cell(cxt, pos);
     formula_cell* p = cxt.get_formula_cell(pos);
     assert(p);
@@ -828,7 +829,8 @@ void test_model_context_storage()
         // Test formula cells.
         abs_address_t pos(0,3,0);
         const char* exp = "SUM(1,2,3)";
-        cxt.set_formula_cell(pos, exp, strlen(exp), *resolver);
+        formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp, strlen(exp));
+        cxt.set_formula_cell(pos, std::move(tokens));
         formula_cell* p = cxt.get_formula_cell(pos);
         assert(p);
     }
@@ -840,9 +842,9 @@ void test_model_context_storage()
 
         cxt.append_sheet(IXION_ASCII("test"), 1048576, 16384);
         string exp = "1";
-        cxt.set_formula_cell(abs_address_t(0,0,0), &exp[0], exp.size(), *resolver);
-        cxt.set_formula_cell(abs_address_t(0,2,0), &exp[0], exp.size(), *resolver);
-        cxt.set_formula_cell(abs_address_t(0,1,0), &exp[0], exp.size(), *resolver);
+        cxt.set_formula_cell(abs_address_t(0,0,0), parse_formula_string(cxt, abs_address_t(0,0,0), *resolver, &exp[0], exp.size()));
+        cxt.set_formula_cell(abs_address_t(0,2,0), parse_formula_string(cxt, abs_address_t(0,2,0), *resolver, &exp[0], exp.size()));
+        cxt.set_formula_cell(abs_address_t(0,1,0), parse_formula_string(cxt, abs_address_t(0,1,0), *resolver, &exp[0], exp.size()));
     }
 
     {

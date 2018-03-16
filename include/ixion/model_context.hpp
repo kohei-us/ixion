@@ -94,7 +94,7 @@ public:
     void set_boolean_cell(const abs_address_t& adr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
-    void set_formula_cell(const abs_address_t& addr, const char* p, size_t n, const formula_name_resolver& resolver);
+    void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
 

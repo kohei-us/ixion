@@ -152,7 +152,12 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
     sd->m_global->m_modified_cells.push_back(pos);
     sd->m_global->m_dirty_formula_cells.insert(pos);
-    cxt.set_formula_cell(pos, formula, strlen(formula), *sd->m_global->m_resolver);
+
+    ixion::formula_tokens_t tokens =
+        ixion::parse_formula_string(
+            cxt, pos, *sd->m_global->m_resolver, formula, strlen(formula));
+
+    cxt.set_formula_cell(pos, std::move(tokens));
 
     // Put this formula cell in a dependency chain.
     ixion::register_formula_cell(cxt, pos);
