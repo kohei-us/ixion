@@ -250,16 +250,9 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
         return nullptr;
     }
 
-    size_t tid = fc->get_identifier();
-    const formula_tokens_t* ft = cxt.get_formula_tokens(sd->m_sheet_index, tid);
-    if (!ft)
-    {
-        PyErr_SetString(PyExc_RuntimeError,
-            "Failed to retrieve a formula tokens object from a token ID.");
-        return nullptr;
-    }
+    const ixion::formula_tokens_t& ft = fc->get_tokens()->get_store();
 
-    string str = ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, *ft);
+    string str = ixion::print_formula_tokens(cxt, pos, *sd->m_global->m_resolver, ft);
     if (str.empty())
         return PyUnicode_FromString("");
 

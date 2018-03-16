@@ -36,12 +36,8 @@ public:
     formula_cell& operator= (formula_cell) = delete;
 
     formula_cell();
-    formula_cell(size_t tokens_identifier);
     formula_cell(const formula_tokens_store_ptr_t& tokens);
     ~formula_cell();
-
-    size_t get_identifier() const;
-    void set_identifier(size_t identifier);
 
     const formula_tokens_store_ptr_t& get_tokens() const;
     void set_tokens(const formula_tokens_store_ptr_t& tokens);

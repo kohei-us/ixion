@@ -57,23 +57,15 @@ struct formula_cell::impl
 {
     mutable interpret_status m_interpret_status;
     formula_tokens_store_ptr_t m_tokens;
-    size_t m_identifier;
     bool m_shared_token:1;
     bool m_circular_safe:1;
 
     impl() :
-        m_identifier(0),
-        m_shared_token(false),
-        m_circular_safe(false) {}
-
-    impl(size_t tokens_identifier) :
-        m_identifier(tokens_identifier),
         m_shared_token(false),
         m_circular_safe(false) {}
 
     impl(const formula_tokens_store_ptr_t& tokens) :
         m_tokens(tokens),
-        m_identifier(0),
         m_shared_token(false),
         m_circular_safe(false) {}
 
@@ -146,24 +138,11 @@ struct formula_cell::impl
 
 formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
 
-formula_cell::formula_cell(size_t tokens_identifier) :
-    mp_impl(ixion::make_unique<impl>(tokens_identifier)) {}
-
 formula_cell::formula_cell(const formula_tokens_store_ptr_t& tokens) :
     mp_impl(ixion::make_unique<impl>(tokens)) {}
 
 formula_cell::~formula_cell()
 {
-}
-
-size_t formula_cell::get_identifier() const
-{
-    return mp_impl->m_identifier;
-}
-
-void formula_cell::set_identifier(size_t identifier)
-{
-    mp_impl->m_identifier = identifier;
 }
 
 const formula_tokens_store_ptr_t& formula_cell::get_tokens() const
@@ -237,31 +216,14 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
 {
     // TODO: Check to make sure this is being run on the main thread only.
-    const formula_tokens_t* tokens = NULL;
-    if (is_shared())
-        tokens = cxt.get_shared_formula_tokens(pos.sheet, mp_impl->m_identifier);
-    else
-        tokens = cxt.get_formula_tokens(pos.sheet, mp_impl->m_identifier);
-
-    if (!tokens)
+    const formula_tokens_t& tokens = mp_impl->m_tokens->get_store();
+    for (const std::unique_ptr<formula_token>& t : tokens)
     {
-        std::ostringstream os;
-        if (is_shared())
-            os << "failed to retrieve shared formula tokens from formula cell's identifier. ";
-        else
-            os << "failed to retrieve formula tokens from formula cell's identifier. ";
-        os << "(identifier=" << mp_impl->m_identifier << ")";
-        throw model_context_error(os.str(), model_context_error::circular_dependency);
-    }
-
-    formula_tokens_t::const_iterator itr = tokens->begin(), itr_end = tokens->end();
-    for (; itr != itr_end; ++itr)
-    {
-        switch ((*itr)->get_opcode())
+        switch (t->get_opcode())
         {
             case fop_single_ref:
             {
-                abs_address_t addr = (*itr)->get_single_ref().to_abs(pos);
+                abs_address_t addr = t->get_single_ref().to_abs(pos);
                 const formula_cell* ref = cxt.get_formula_cell(addr);
 
                 if (!ref)
@@ -269,11 +231,12 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
 
                 if (!mp_impl->check_ref_for_circular_safety(*ref, addr))
                     return;
+
+                break;
             }
-            break;
             case fop_range_ref:
             {
-                abs_range_t range = (*itr)->get_range_ref().to_abs(pos);
+                abs_range_t range = t->get_range_ref().to_abs(pos);
                 for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
                     for (col_t col = range.first.column; col <= range.last.column; ++col)
@@ -289,6 +252,8 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                         }
                     }
                 }
+
+                break;
             }
             default:
 #if DEBUG_FORMULA_CELL
@@ -317,15 +282,6 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
 {
     std::vector<const formula_token*> ret;
 
-    const formula_tokens_t* this_tokens = NULL;
-    if (is_shared())
-        this_tokens = cxt.get_shared_formula_tokens(pos.sheet, mp_impl->m_identifier);
-    else
-        this_tokens = cxt.get_formula_tokens(pos.sheet, mp_impl->m_identifier);
-
-    if (!this_tokens)
-        return ret;
-
     std::function<void(const formula_tokens_t::value_type&)> get_refs = [&](const formula_tokens_t::value_type& t)
     {
         switch (t->get_opcode())
@@ -352,7 +308,9 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
         }
     };
 
-    std::for_each(this_tokens->begin(), this_tokens->end(), get_refs);
+    const formula_tokens_t& this_tokens = mp_impl->m_tokens->get_store();
+
+    std::for_each(this_tokens.begin(), this_tokens.end(), get_refs);
 
     return ret;
 }

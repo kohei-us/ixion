@@ -135,20 +135,15 @@ void formula_interpreter::init_tokens()
     name_set used_names;
     m_tokens.clear();
     m_stack.clear();
-    const formula_tokens_t* orig_tokens = NULL;
-    if (m_parent_cell->is_shared())
-        orig_tokens = m_context.get_shared_formula_tokens(m_pos.sheet, m_parent_cell->get_identifier());
-    else
-        orig_tokens = m_context.get_formula_tokens(m_pos.sheet, m_parent_cell->get_identifier());
 
-    if (!orig_tokens)
+    const formula_tokens_store_ptr_t& ts = m_parent_cell->get_tokens();
+    if (!ts)
         return;
 
-    formula_tokens_t::const_iterator itr = orig_tokens->begin(), itr_end = orig_tokens->end();
-    for (; itr != itr_end; ++itr)
+    const formula_tokens_t& src_tokens = ts->get_store();
+
+    for (const std::unique_ptr<formula_token>& p : src_tokens)
     {
-        const formula_token* p = &(**itr);
-        assert(p);
         if (p->get_opcode() == fop_named_expression)
         {
             // Named expression.  Expand it.
@@ -159,8 +154,9 @@ void formula_interpreter::init_tokens()
         }
         else
             // Normal token.
-            m_tokens.push_back(p);
+            m_tokens.push_back(p.get());
     }
+
     m_end_token_pos = m_tokens.end();
 }
 

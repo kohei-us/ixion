@@ -199,8 +199,8 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
                  pos, formula_cell_listener_handler::mode_add));
 
     // Check if the cell is volatile.
-    const formula_tokens_t* tokens = cxt.get_formula_tokens(pos.sheet, cell->get_identifier());
-    if (tokens && has_volatile(*tokens))
+    const formula_tokens_store_ptr_t& ts = cell->get_tokens();
+    if (ts && has_volatile(ts->get_store()))
         cxt.get_cell_listener_tracker().add_volatile(pos);
 }
 

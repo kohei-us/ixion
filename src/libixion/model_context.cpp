@@ -53,10 +53,24 @@ public:
 };
 
 /**
+ * See if the tokens in the cell above is identical to the tokens in the
+ * cell being inserted.  If so, share the tokens with the above cell.
+ *
  * @return true if the formula cell is stored in the model with a shared
  *         formula token set, false if the formula cell has a non-shared
  *         formula token set, and is not yet stored in the model.
  */
+#if 1
+
+bool set_shared_formula_tokens_to_cell(
+    model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
+{
+    // TODO : work on this.
+    return false;
+}
+
+#else
+
 bool set_shared_formula_tokens_to_cell(
     model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
 {
@@ -133,6 +147,8 @@ bool set_shared_formula_tokens_to_cell(
     }
     return true;
 }
+
+#endif
 
 model_context::session_handler_factory dummy_session_handler_factory;
 
@@ -215,7 +231,6 @@ public:
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void set_formula_cell(const abs_address_t& addr, const char* p, size_t n, const formula_name_resolver& resolver);
-    void set_formula_cell(const abs_address_t& addr, size_t identifier, bool shared);
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
@@ -793,16 +808,6 @@ void model_context_impl::erase_cell(const abs_address_t& addr)
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-
-    mdds::mtv::element_t celltype = col_store.get_type(addr.row);
-    if (celltype == element_type_formula)
-    {
-        const formula_cell* fcell = col_store.get<formula_cell*>(addr.row);
-        assert(fcell);
-        remove_formula_tokens(addr.sheet, fcell->get_identifier());
-    }
-
-    // Just update the hint. This call is not used during import.
     pos_hint = col_store.set_empty(addr.row, addr.row);
 }
 
@@ -846,24 +851,19 @@ void model_context_impl::set_formula_cell(
         ixion::make_unique<formula_tokens_t>(
             parse_formula_string(m_parent, addr, resolver, p, n));
 
+#if 1
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
+    ts->get_store().swap(*tokens);
+    std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(ts);
+
+#else
     unique_ptr<formula_cell> fcell(new formula_cell);
     if (!set_shared_formula_tokens_to_cell(m_parent, addr, *fcell, *tokens))
     {
         size_t tkid = add_formula_tokens(0, tokens.release());
         fcell->set_identifier(tkid);
     }
-
-    worksheet& sheet = m_sheets.at(addr.sheet);
-    column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
-}
-
-void model_context_impl::set_formula_cell(
-    const abs_address_t& addr, size_t identifier, bool shared)
-{
-    unique_ptr<formula_cell> fcell(new formula_cell(identifier));
-    fcell->set_shared(shared);
+#endif
 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
@@ -1195,12 +1195,6 @@ void model_context::set_formula_cell(
     mp_impl->set_formula_cell(addr, p, n, resolver);
 }
 
-void model_context::set_formula_cell(
-    const abs_address_t& addr, size_t identifier, bool shared)
-{
-    mp_impl->set_formula_cell(addr, identifier, shared);
-}
-
 abs_range_t model_context::get_data_range(sheet_t sheet) const
 {
     return mp_impl->get_data_range(sheet);
@@ -1453,4 +1447,5 @@ bool model_context::empty() const
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
