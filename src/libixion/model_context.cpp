@@ -42,10 +42,6 @@ class model_context_impl
     typedef std::vector<std::string> strings_type;
     typedef std::vector<std::unique_ptr<std::string>> string_pool_type;
     typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
-    typedef std::deque<formula_tokens_t*> formula_tokens_store_type;
-
-    typedef model_context::shared_tokens shared_tokens;
-    typedef model_context::shared_tokens_type shared_tokens_type;
 
 public:
     model_context_impl() = delete;
@@ -833,15 +829,6 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 std::unique_ptr<iface::session_handler> model_context::session_handler_factory::create()
 {
     return std::unique_ptr<iface::session_handler>();
-}
-
-model_context::shared_tokens::shared_tokens() : tokens(NULL) {}
-model_context::shared_tokens::shared_tokens(formula_tokens_t* _tokens) : tokens(_tokens) {}
-model_context::shared_tokens::shared_tokens(const shared_tokens& r) : tokens(r.tokens), range(r.range) {}
-
-bool model_context::shared_tokens::operator== (const shared_tokens& r) const
-{
-    return tokens == r.tokens && range == r.range;
 }
 
 model_context::model_context() :

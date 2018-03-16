@@ -41,19 +41,6 @@ public:
         virtual std::unique_ptr<iface::session_handler> create();
     };
 
-    struct shared_tokens
-    {
-        formula_tokens_t* tokens;
-        abs_range_t range;
-
-        shared_tokens();
-        shared_tokens(formula_tokens_t* tokens);
-        shared_tokens(const shared_tokens& r);
-
-        bool operator== (const shared_tokens& r) const;
-    };
-    typedef std::vector<shared_tokens> shared_tokens_type;
-
     model_context();
     virtual ~model_context() override;
 
