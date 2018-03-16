@@ -33,123 +33,6 @@ namespace ixion {
 
 namespace {
 
-struct delete_shared_tokens : public std::unary_function<model_context::shared_tokens, void>
-{
-    void operator() (const model_context::shared_tokens& v)
-    {
-        delete v.tokens;
-    }
-};
-
-class find_tokens_by_pointer : public std::unary_function<model_context::shared_tokens, bool>
-{
-    const formula_tokens_t* m_ptr;
-public:
-    find_tokens_by_pointer(const formula_tokens_t* p) : m_ptr(p) {}
-    bool operator() (const model_context::shared_tokens& v) const
-    {
-        return v.tokens == m_ptr;
-    }
-};
-
-/**
- * See if the tokens in the cell above is identical to the tokens in the
- * cell being inserted.  If so, share the tokens with the above cell.
- *
- * @return true if the formula cell is stored in the model with a shared
- *         formula token set, false if the formula cell has a non-shared
- *         formula token set, and is not yet stored in the model.
- */
-#if 1
-
-bool set_shared_formula_tokens_to_cell(
-    model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
-{
-    // TODO : work on this.
-    return false;
-}
-
-#else
-
-bool set_shared_formula_tokens_to_cell(
-    model_context& cxt, const abs_address_t& addr, formula_cell& fcell, const formula_tokens_t& new_tokens)
-{
-    if (addr.sheet == global_scope)
-        return false;
-
-    // Check its neighbors for adjacent formula cells.
-    if (addr.row == 0)
-        return false;
-
-    abs_address_t test = addr;
-    test.row -= 1;
-
-    if (cxt.get_celltype(test) != celltype_t::formula)
-        // The neighboring cell is not a formula cell.
-        return false;
-
-    formula_cell* test_cell = cxt.get_formula_cell(test);
-    if (!test_cell)
-        // The neighboring cell is not a formula cell.
-        throw general_error("formula cell doesn't exist but it should!");
-
-    if (test_cell->is_shared())
-    {
-        size_t token_id = test_cell->get_identifier();
-        const formula_tokens_t* tokens = cxt.get_shared_formula_tokens(addr.sheet, token_id);
-        assert(tokens);
-
-        if (new_tokens != *tokens)
-            return false;
-
-        // Make sure that we can extend the shared range properly.
-        abs_range_t range = cxt.get_shared_formula_range(addr.sheet, token_id);
-        if (range.first.sheet != addr.sheet)
-            // Wrong sheet
-            return false;
-
-        if (range.first.column != range.last.column)
-            // Must be a single column.
-            return false;
-
-        if (range.last.row != (addr.row - 1))
-            // Last row is not immediately above the current cell.
-            return false;
-
-        fcell.set_identifier(token_id);
-        fcell.set_shared(true);
-
-        range.last.row += 1;
-        cxt.set_shared_formula_range(addr.sheet, token_id, range);
-    }
-    else
-    {
-        size_t token_id = test_cell->get_identifier();
-        const formula_tokens_t* tokens = cxt.get_formula_tokens(addr.sheet, token_id);
-        assert(tokens);
-
-        if (new_tokens != *tokens)
-            return false;
-
-        // Move the tokens of the master cell to the shared token storage.
-        size_t shared_id = cxt.set_formula_tokens_shared(addr.sheet, token_id);
-        test_cell->set_shared(true);
-        test_cell->set_identifier(shared_id);
-        assert(test_cell->is_shared());
-        fcell.set_identifier(shared_id);
-        fcell.set_shared(true);
-        assert(fcell.is_shared());
-        abs_range_t range;
-        range.first = addr;
-        range.last = addr;
-        range.first.row -= 1;
-        cxt.set_shared_formula_range(addr.sheet, shared_id, range);
-    }
-    return true;
-}
-
-#endif
-
 model_context::session_handler_factory dummy_session_handler_factory;
 
 } // anonymous namespace
@@ -180,9 +63,6 @@ public:
     ~model_context_impl()
     {
         delete mp_cell_listener_tracker;
-
-        for_each(m_tokens.begin(), m_tokens.end(), delete_element<formula_tokens_t>());
-        for_each(m_shared_tokens.begin(), m_shared_tokens.end(), delete_shared_tokens());
     }
 
     const config& get_config() const
@@ -266,32 +146,6 @@ public:
     const column_store_t* get_column(sheet_t sheet, col_t col) const;
     const column_stores_t* get_columns(sheet_t sheet) const;
 
-    const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const;
-    size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
-    void remove_formula_tokens(sheet_t sheet, size_t identifier);
-
-    void set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula,
-        const formula_name_resolver& resolver);
-
-    void set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
-        const formula_name_resolver& resolver);
-
-    void set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const abs_range_t& range,
-        const formula_name_resolver& resolver);
-
-    void set_shared_formula(const abs_address_t& addr, size_t si);
-
-    const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const;
-    size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
-    abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
-    void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
-
     double count_range(const abs_range_t& range, const values_t& values_type) const;
 
     dirty_formula_cells_t get_all_formula_cells() const;
@@ -312,8 +166,6 @@ private:
 
     model_context::session_handler_factory* mp_session_factory;
 
-    formula_tokens_store_type m_tokens;
-    model_context::shared_tokens_type m_shared_tokens;
     strings_type m_sheet_names; ///< index to sheet name map.
     string_pool_type m_strings;
     string_map_type m_string_map;
@@ -497,153 +349,6 @@ const column_stores_t* model_context_impl::get_columns(sheet_t sheet) const
 
     const worksheet& sh = m_sheets[sheet];
     return &sh.get_columns();
-}
-
-const formula_tokens_t* model_context_impl::get_formula_tokens(sheet_t sheet, size_t identifier) const
-{
-    if (m_tokens.size() <= identifier)
-        return NULL;
-    return m_tokens[identifier];
-}
-
-size_t model_context_impl::add_formula_tokens(sheet_t sheet, formula_tokens_t* p)
-{
-    // First, search for a NULL spot.
-    formula_tokens_store_type::iterator itr = std::find(
-        m_tokens.begin(), m_tokens.end(), static_cast<formula_tokens_t*>(NULL));
-
-    if (itr != m_tokens.end())
-    {
-        // NULL spot found.
-        size_t pos = std::distance(m_tokens.begin(), itr);
-        m_tokens[pos] = p;
-        return pos;
-    }
-
-    size_t identifier = m_tokens.size();
-    m_tokens.push_back(p);
-    return identifier;
-}
-
-void model_context_impl::remove_formula_tokens(sheet_t sheet, size_t identifier)
-{
-    if (m_tokens.size() >= identifier)
-        return;
-
-    delete m_tokens[identifier];
-    m_tokens[identifier] = NULL;
-}
-
-void model_context_impl::set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
-        const formula_name_resolver& resolver)
-{
-    formula_name_t name_type = resolver.resolve(p_range, n_range, abs_address_t());
-    abs_range_t range;
-    switch (name_type.type)
-    {
-        case ixion::formula_name_t::cell_reference:
-            range.first.sheet = name_type.address.sheet;
-            range.first.row = name_type.address.row;
-            range.first.column = name_type.address.col;
-            range.last = range.first;
-        break;
-        case ixion::formula_name_t::range_reference:
-            range.first.sheet = name_type.range.first.sheet;
-            range.first.row = name_type.range.first.row;
-            range.first.column = name_type.range.first.col;
-            range.last.sheet = name_type.range.last.sheet;
-            range.last.row = name_type.range.last.row;
-            range.last.column = name_type.range.last.col;
-        break;
-        default:
-        {
-            std::ostringstream os;
-            os << "failed to resolve shared formula range. ";
-            os << "(" << string(p_range, n_range) << ")";
-            throw general_error(os.str());
-        }
-    }
-
-    set_shared_formula(addr, si, p_formula, n_formula, range, resolver);
-}
-
-void model_context_impl::set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const abs_range_t& range,
-        const formula_name_resolver& resolver)
-{
-    // Tokenize the formula string and store it.
-    unique_ptr<formula_tokens_t> tokens = ixion::make_unique<formula_tokens_t>(
-        parse_formula_string(m_parent, addr, resolver, p_formula, n_formula));
-
-    if (si >= m_shared_tokens.size())
-        m_shared_tokens.resize(si+1);
-
-    m_shared_tokens[si].tokens = tokens.release();
-    m_shared_tokens[si].range = range;
-}
-
-void model_context_impl::set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula,
-        const formula_name_resolver& resolver)
-{
-    abs_range_t range;
-    range.first = addr;
-    range.last = range.first;
-    set_shared_formula(addr, si, p_formula, n_formula, range, resolver);
-}
-
-const formula_tokens_t* model_context_impl::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
-{
-#if DEBUG_MODEL_CONTEXT
-    __IXION_DEBUG_OUT__ << "identifier: " << identifier << "  shared token count: " << m_shared_tokens.size() << endl;
-#endif
-    if (m_shared_tokens.size() <= identifier)
-        return NULL;
-
-#if DEBUG_MODEL_CONTEXT
-    __IXION_DEBUG_OUT__ << "tokens: " << m_shared_tokens[identifier].tokens << endl;
-#endif
-    return m_shared_tokens[identifier].tokens;
-}
-
-size_t model_context_impl::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
-{
-    assert(identifier < m_tokens.size());
-    formula_tokens_t* tokens = m_tokens.at(identifier);
-    assert(tokens);
-    m_tokens[identifier] = NULL;
-
-    // First, search for a NULL spot.
-    shared_tokens_type::iterator itr = std::find_if(
-        m_shared_tokens.begin(), m_shared_tokens.end(),
-        find_tokens_by_pointer(static_cast<const formula_tokens_t*>(NULL)));
-
-    if (itr != m_shared_tokens.end())
-    {
-        // NULL spot found.
-        size_t pos = std::distance(m_shared_tokens.begin(), itr);
-        m_shared_tokens[pos].tokens = tokens;
-        return pos;
-    }
-
-    size_t shared_identifier = m_shared_tokens.size();
-    m_shared_tokens.push_back(shared_tokens(tokens));
-    return shared_identifier;
-}
-
-abs_range_t model_context_impl::get_shared_formula_range(sheet_t sheet, size_t identifier) const
-{
-    assert(identifier < m_shared_tokens.size());
-    return m_shared_tokens.at(identifier).range;
-}
-
-void model_context_impl::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
-{
-    m_shared_tokens.at(identifier).range = range;
 }
 
 namespace {
@@ -851,19 +556,9 @@ void model_context_impl::set_formula_cell(
         ixion::make_unique<formula_tokens_t>(
             parse_formula_string(m_parent, addr, resolver, p, n));
 
-#if 1
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
     ts->get_store().swap(*tokens);
     std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(ts);
-
-#else
-    unique_ptr<formula_cell> fcell(new formula_cell);
-    if (!set_shared_formula_tokens_to_cell(m_parent, addr, *fcell, *tokens))
-    {
-        size_t tkid = add_formula_tokens(0, tokens.release());
-        fcell->set_identifier(tkid);
-    }
-#endif
 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
@@ -1297,57 +992,6 @@ iface::table_handler* model_context::get_table_handler()
 const iface::table_handler* model_context::get_table_handler() const
 {
     return mp_impl->get_table_handler();
-}
-
-const formula_tokens_t* model_context::get_formula_tokens(sheet_t sheet, size_t identifier) const
-{
-    return mp_impl->get_formula_tokens(sheet, identifier);
-}
-
-size_t model_context::add_formula_tokens(sheet_t sheet, formula_tokens_t* p)
-{
-    return mp_impl->add_formula_tokens(sheet, p);
-}
-
-void model_context::remove_formula_tokens(sheet_t sheet, size_t identifier)
-{
-    mp_impl->remove_formula_tokens(sheet, identifier);
-}
-
-void model_context::set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
-        const formula_name_resolver& resolver)
-{
-    mp_impl->set_shared_formula(addr, si, p_formula, n_formula, p_range, n_range, resolver);
-}
-
-void model_context::set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula,
-        const formula_name_resolver& resolver)
-{
-    mp_impl->set_shared_formula(addr, si, p_formula, n_formula, resolver);
-}
-
-const formula_tokens_t* model_context::get_shared_formula_tokens(sheet_t sheet, size_t identifier) const
-{
-    return mp_impl->get_shared_formula_tokens(sheet, identifier);
-}
-
-size_t model_context::set_formula_tokens_shared(sheet_t sheet, size_t identifier)
-{
-    return mp_impl->set_formula_tokens_shared(sheet, identifier);
-}
-
-abs_range_t model_context::get_shared_formula_range(sheet_t sheet, size_t identifier) const
-{
-    return mp_impl->get_shared_formula_range(sheet, identifier);
-}
-
-void model_context::set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range)
-{
-    return mp_impl->set_shared_formula_range(sheet, identifier, range);
 }
 
 string_id_t model_context::append_string(const char* p, size_t n)

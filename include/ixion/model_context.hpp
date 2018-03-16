@@ -74,8 +74,6 @@ public:
     virtual std::unique_ptr<iface::session_handler> create_session_handler() override;
     virtual iface::table_handler* get_table_handler() override;
     virtual const iface::table_handler* get_table_handler() const override;
-    virtual const formula_tokens_t* get_formula_tokens(sheet_t sheet, size_t identifier) const override;
-    virtual const formula_tokens_t* get_shared_formula_tokens(sheet_t sheet, size_t identifier) const override;
 
     virtual string_id_t append_string(const char* p, size_t n) override;
     virtual string_id_t add_string(const char* p, size_t n) override;
@@ -89,20 +87,6 @@ public:
 
     double get_numeric_value_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
-
-    size_t add_formula_tokens(sheet_t sheet, formula_tokens_t* p);
-    abs_range_t get_shared_formula_range(sheet_t sheet, size_t identifier) const;
-    void set_shared_formula_range(sheet_t sheet, size_t identifier, const abs_range_t& range);
-    size_t set_formula_tokens_shared(sheet_t sheet, size_t identifier);
-    void remove_formula_tokens(sheet_t sheet, size_t identifier);
-
-    void set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const char* p_range, size_t n_range,
-        const formula_name_resolver& resolver);
-    void set_shared_formula(
-        const abs_address_t& addr, size_t si,
-        const char* p_formula, size_t n_formula, const formula_name_resolver& resolver);
 
     void erase_cell(const abs_address_t& addr);
 
