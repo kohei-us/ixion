@@ -111,6 +111,7 @@ public:
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
+    void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
@@ -553,7 +554,14 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, formula_tok
 {
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
     ts->get_store() = std::move(tokens);
-    std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(ts);
+
+    set_formula_cell(addr, ts);
+}
+
+void model_context_impl::set_formula_cell(
+    const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
+{
+    std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(tokens);
 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
@@ -882,6 +890,12 @@ void model_context::set_string_cell(const abs_address_t& addr, string_id_t ident
 void model_context::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
 {
     mp_impl->set_formula_cell(addr, std::move(tokens));
+}
+
+void model_context::set_formula_cell(
+    const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
+{
+    mp_impl->set_formula_cell(addr, tokens);
 }
 
 abs_range_t model_context::get_data_range(sheet_t sheet) const

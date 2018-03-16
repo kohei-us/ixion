@@ -94,7 +94,24 @@ public:
     void set_boolean_cell(const abs_address_t& adr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
+
+    /**
+     * Set a formula cell at a specified address.
+     *
+     * @param addr address at which to set a formula cell.
+     * @param tokens formula tokens to put into the formula cell.
+     */
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
+
+    /**
+     * Set a formula cell at a specified address.  This variant takes a
+     * formula tokens store that can be shared between multiple formula cell
+     * instances.
+     *
+     * @param addr address at which to set a formula cell.
+     * @param tokens formula tokens to put into the formula cell.
+     */
+    void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
