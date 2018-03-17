@@ -33,6 +33,9 @@ enum class formula_function_t
     // date & time functions
     func_now,
 
+    // array functions
+    func_mmult,
+
     // other
     func_subtotal,
 

@@ -106,7 +106,7 @@ bool formula_interpreter::interpret()
     catch (const formula_error& e)
     {
 #if DEBUG_FORMULA_INTERPRETER
-        __IXION_DEBUG_OUT__ << "formula error" << endl;
+        __IXION_DEBUG_OUT__ << "formula error: " << e.what() << endl;
 #endif
         if (mp_handler)
             mp_handler->set_formula_error(e.what());

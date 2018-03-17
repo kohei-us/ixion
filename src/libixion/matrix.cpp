@@ -18,9 +18,13 @@ struct matrix::impl
 {
     store_type m_data;
 
+    impl() {}
     impl(size_t rows, size_t cols) : m_data(rows, cols) {}
     impl(const impl& other) : m_data(other.m_data) {}
 };
+
+matrix::matrix() :
+    mp_impl(ixion::make_unique<impl>()) {}
 
 matrix::matrix(size_t rows, size_t cols) :
     mp_impl(ixion::make_unique<impl>(rows, cols)) {}
@@ -62,6 +66,11 @@ size_t matrix::row_size() const
 size_t matrix::col_size() const
 {
     return mp_impl->m_data.size().column;
+}
+
+void matrix::swap(matrix& r)
+{
+    mp_impl.swap(r.mp_impl);
 }
 
 }

@@ -25,7 +25,7 @@ class IXION_DLLPUBLIC matrix
     std::unique_ptr<impl> mp_impl;
 
 public:
-
+    matrix();
     matrix(size_t rows, size_t cols);
     matrix(const matrix& other);
     ~matrix();
@@ -35,6 +35,8 @@ public:
     void set(size_t row, size_t col, double val);
     size_t row_size() const;
     size_t col_size() const;
+
+    void swap(matrix& r);
 };
 
 }

@@ -11,6 +11,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/formula_model_access.hpp"
+#include "ixion/macros.hpp"
 
 #ifdef max
 #undef max
@@ -27,33 +28,43 @@
 #include <thread>
 #include <chrono>
 
+#include <mdds/sorted_string_map.hpp>
+
 using namespace std;
 
 namespace ixion {
 
 namespace {
 
-struct builtin_func
+namespace builtin_funcs {
+
+typedef mdds::sorted_string_map<formula_function_t> map_type;
+
+// Keys must be sorted.
+const std::vector<map_type::entry> entries =
 {
-    const char*         name;
-    formula_function_t  oc;
+    { IXION_ASCII("AVERAGE"),     formula_function_t::func_average     },
+    { IXION_ASCII("CONCATENATE"), formula_function_t::func_concatenate },
+    { IXION_ASCII("COUNTA"),      formula_function_t::func_counta      },
+    { IXION_ASCII("IF"),          formula_function_t::func_if          },
+    { IXION_ASCII("LEN"),         formula_function_t::func_len         },
+    { IXION_ASCII("MAX"),         formula_function_t::func_max         },
+    { IXION_ASCII("MIN"),         formula_function_t::func_min         },
+    { IXION_ASCII("MMULT"),       formula_function_t::func_mmult       },
+    { IXION_ASCII("NOW"),         formula_function_t::func_now         },
+    { IXION_ASCII("SUBTOTAL"),    formula_function_t::func_subtotal    },
+    { IXION_ASCII("SUM"),         formula_function_t::func_sum         },
+    { IXION_ASCII("WAIT"),        formula_function_t::func_wait        },
 };
 
-const builtin_func builtin_funcs[] = {
-    { "MAX",         formula_function_t::func_max },
-    { "MIN",         formula_function_t::func_min },
-    { "AVERAGE",     formula_function_t::func_average },
-    { "WAIT",        formula_function_t::func_wait },
-    { "SUM",         formula_function_t::func_sum },
-    { "COUNTA",      formula_function_t::func_counta },
-    { "IF",          formula_function_t::func_if },
-    { "LEN",         formula_function_t::func_len },
-    { "CONCATENATE", formula_function_t::func_concatenate },
-    { "NOW",         formula_function_t::func_now },
-    { "SUBTOTAL",    formula_function_t::func_subtotal },
-};
+const map_type& get()
+{
+    static map_type mt(entries.data(), entries.size(), formula_function_t::func_unknown);
+    return mt;
+}
 
-size_t builtin_func_count = sizeof(builtin_funcs) / sizeof(builtin_func);
+
+} // anonymous namespace
 
 const char* unknown_func_name = "unknown";
 
@@ -72,38 +83,6 @@ double sum_matrix_elements(const matrix& mx)
     return sum;
 }
 
-/**
- * Compare given string with a known function name to see if they are equal.
- * The comparison is case-insensitive.
- *
- * @param func_name function name. Null-terminated, and is all in upper
- *                  case.
- * @param p string to test. Not null-terminated and may be in mixed case.
- * @param n length of the string being tested.
- *
- * @return true if they are equal, false otherwise.
- */
-bool match_func_name(const char* func_name, const char* p, size_t n)
-{
-    const char* fp = func_name;
-    for (size_t i = 0; i < n; ++i, ++p, ++fp)
-    {
-        if (!*fp)
-            // function name ended first.
-            return false;
-
-        char c = *p;
-        if (c > 'Z')
-            // convert to upper case.
-            c -= 'a' - 'A';
-
-        if (c != *fp)
-            return false;
-    }
-
-    return *fp == 0;
-}
-
 }
 
 // ============================================================================
@@ -119,20 +98,30 @@ formula_function_t formula_functions::get_function_opcode(const formula_token& t
 
 formula_function_t formula_functions::get_function_opcode(const char* p, size_t n)
 {
-    for (size_t i = 0; i < builtin_func_count; ++i)
+    std::string upper;
+
+    for (const char* p_end = p + n; p != p_end; ++p)
     {
-        if (match_func_name(builtin_funcs[i].name, p, n))
-            return builtin_funcs[i].oc;
+        char c = *p;
+
+        if (c > 'Z')
+        {
+            // Convert to upper case.
+            c -= 'a' - 'A';
+        }
+
+        upper.push_back(c);
     }
-    return formula_function_t::func_unknown;
+
+    return builtin_funcs::get().find(upper.data(), upper.size());
 }
 
 const char* formula_functions::get_function_name(formula_function_t oc)
 {
-    for (size_t i = 0; i < builtin_func_count; ++i)
+    for (const builtin_funcs::map_type::entry& e : builtin_funcs::entries)
     {
-        if (oc == builtin_funcs[i].oc)
-            return builtin_funcs[i].name;
+        if (e.value == oc)
+            return e.key;
     }
     return unknown_func_name;
 }
@@ -182,6 +171,9 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
             break;
         case formula_function_t::func_subtotal:
             fnc_subtotal(args);
+            break;
+        case formula_function_t::func_mmult:
+            fnc_mmult(args);
             break;
         case formula_function_t::func_unknown:
         default:
@@ -328,6 +320,50 @@ void formula_functions::fnc_average(value_stack_t& args) const
     }
 
     args.push_value(ret/count);
+}
+
+void formula_functions::fnc_mmult(value_stack_t& args) const
+{
+    matrix mx[2];
+    matrix* mxp = mx;
+    const matrix* mxp_end = mxp + 2;
+
+    bool invalid_arg = false;
+
+    while (!args.empty())
+    {
+        switch (args.get_type())
+        {
+            case stack_value_t::range_ref:
+            {
+                if (mxp == mxp_end)
+                {
+                    invalid_arg = true;
+                    break;
+                }
+
+                matrix m = args.pop_range_value();
+                mxp->swap(m);
+                ++mxp;
+                break;
+            }
+            default:
+                invalid_arg = true;
+        }
+
+        if (invalid_arg)
+            break;
+    }
+
+    if (mxp != mxp_end)
+        invalid_arg = true;
+
+    if (invalid_arg)
+        throw formula_functions::invalid_arg("MMULT requires exactly two ranges.");
+
+    // TODO : implement matrix multiplication, and push the result.
+
+    args.push_value(42.0);
 }
 
 void formula_functions::fnc_if(value_stack_t& args) const

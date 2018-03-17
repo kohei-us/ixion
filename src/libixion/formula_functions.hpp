@@ -57,6 +57,7 @@ private:
     void fnc_sum(value_stack_t& args) const;
     void fnc_counta(value_stack_t& args) const;
     void fnc_average(value_stack_t& args) const;
+    void fnc_mmult(value_stack_t& args) const;
 
     void fnc_if(value_stack_t& args) const;
 
