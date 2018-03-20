@@ -184,11 +184,11 @@ numeric_matrix matrix::as_numeric() const
     return numeric_matrix(std::move(num_array), mtx_size.row, mtx_size.column);
 }
 
-numeric_matrix::numeric_matrix() : mp_impl(make_unique<impl>()) {}
+numeric_matrix::numeric_matrix() : mp_impl(ixion::make_unique<impl>()) {}
 numeric_matrix::numeric_matrix(size_t rows, size_t cols) :
-    mp_impl(make_unique<impl>(rows, cols)) {}
+    mp_impl(ixion::make_unique<impl>(rows, cols)) {}
 numeric_matrix::numeric_matrix(std::vector<double> array, size_t rows, size_t cols) :
-    mp_impl(make_unique<impl>(std::move(array), rows, cols)) {}
+    mp_impl(ixion::make_unique<impl>(std::move(array), rows, cols)) {}
 
 numeric_matrix::numeric_matrix(numeric_matrix&& r) : mp_impl(std::move(r.mp_impl)) {}
 
