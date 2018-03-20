@@ -105,6 +105,27 @@ IXION_DLLPUBLIC bool operator!=(const address_t& left, const address_t& right);
 IXION_DLLPUBLIC bool operator<(const address_t& left, const address_t& right);
 
 /**
+ * Stores either absolute or relative address, but unlike the {@link
+ * address_t} counterpart, this struct only stores row and column positions.
+ */
+struct IXION_DLLPUBLIC rc_address_t
+{
+    row_t row;
+    col_t column;
+    bool  abs_row:1;
+    bool  abs_column:1;
+
+    rc_address_t();
+    rc_address_t(row_t row, col_t column, bool abs_row=true, bool abs_column=true);
+    rc_address_t(const rc_address_t& r);
+
+    struct hash
+    {
+        IXION_DLLPUBLIC size_t operator() (const rc_address_t& addr) const;
+    };
+};
+
+/**
  * Stores absolute range address.
  */
 struct IXION_DLLPUBLIC abs_range_t

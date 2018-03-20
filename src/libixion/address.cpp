@@ -213,6 +213,23 @@ bool operator< (const address_t& left, const address_t& right)
     return left.column < right.column;
 }
 
+rc_address_t::rc_address_t() :
+    row(0), column(0), abs_row(true), abs_column(true) {}
+
+rc_address_t::rc_address_t(row_t row, col_t column, bool abs_row, bool abs_column) :
+    row(row), column(column), abs_row(abs_row), abs_column(abs_column) {}
+
+rc_address_t::rc_address_t(const rc_address_t& r) :
+    row(r.row), column(r.column), abs_row(r.abs_row), abs_column(r.abs_column) {}
+
+size_t rc_address_t::hash::operator()(const rc_address_t& addr) const
+{
+    size_t hv = addr.column;
+    hv <<= 16;
+    hv += addr.row;
+    return hv;
+}
+
 abs_range_t::abs_range_t() {}
 abs_range_t::abs_range_t(init_invalid) :
     first(abs_address_t::invalid), last(abs_address_t::invalid) {}

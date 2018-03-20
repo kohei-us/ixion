@@ -40,6 +40,8 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
 struct interpret_status
 {
     interpret_status(const interpret_status&) = delete;
@@ -47,23 +49,54 @@ struct interpret_status
 
     std::mutex mtx;
     std::condition_variable cond;
-
     std::unique_ptr<formula_result> result;
+    size_t refcount;
 
-    interpret_status() : result(nullptr) {}
+    interpret_status() : result(nullptr), refcount(0) {}
+
+    void add_ref()
+    {
+        ++refcount;
+    }
+
+    void release_ref()
+    {
+        if (--refcount == 0)
+            delete this;
+    }
 };
+
+inline void intrusive_ptr_add_ref(interpret_status* p)
+{
+    p->add_ref();
+}
+
+inline void intrusive_ptr_release(interpret_status* p)
+{
+    p->release_ref();
+}
+
+using interpret_status_ptr_t = boost::intrusive_ptr<interpret_status>;
+
+}
 
 struct formula_cell::impl
 {
-    mutable interpret_status m_interpret_status;
+    mutable interpret_status_ptr_t m_interpret_status;
     formula_tokens_store_ptr_t m_tokens;
+    rc_address_t m_group_pos;
+
     bool m_circular_safe:1;
 
     impl() :
+        m_interpret_status(new interpret_status),
+        m_group_pos(-1, -1, false, false),
         m_circular_safe(false) {}
 
     impl(const formula_tokens_store_ptr_t& tokens) :
+        m_interpret_status(new interpret_status),
         m_tokens(tokens),
+        m_group_pos(-1, -1, false, false),
         m_circular_safe(false) {}
 
     /**
@@ -76,12 +109,12 @@ struct formula_cell::impl
 #if DEBUG_FORMULA_CELL
         __IXION_DEBUG_OUT__ << "wait for interpreted result" << endl;
 #endif
-        while (!m_interpret_status.result)
+        while (!m_interpret_status->result)
         {
 #if DEBUG_FORMULA_CELL
             __IXION_DEBUG_OUT__ << "waiting" << endl;
 #endif
-            m_interpret_status.cond.wait(lock);
+            m_interpret_status->cond.wait(lock);
         }
     }
 
@@ -109,8 +142,8 @@ struct formula_cell::impl
 #if DEBUG_FORMULA_CELL
             __IXION_DEBUG_OUT__ << "circular dependency detected !!" << endl;
 #endif
-            assert(!m_interpret_status.result);
-            m_interpret_status.result =
+            assert(!m_interpret_status->result);
+            m_interpret_status->result =
                 ixion::make_unique<formula_result>(formula_error_t::ref_result_not_available);
 
             return false;
@@ -120,16 +153,26 @@ struct formula_cell::impl
 
     double fetch_value_from_result() const
     {
-        if (!m_interpret_status.result)
+        if (!m_interpret_status->result)
             // Result not cached yet.  Reference error.
             throw formula_error(formula_error_t::ref_result_not_available);
 
-        if (m_interpret_status.result->get_type() == formula_result::result_type::error)
+        if (m_interpret_status->result->get_type() == formula_result::result_type::error)
             // Error condition.
-            throw formula_error(m_interpret_status.result->get_error());
+            throw formula_error(m_interpret_status->result->get_error());
 
-        assert(m_interpret_status.result->get_type() == formula_result::result_type::value);
-        return m_interpret_status.result->get_value();
+        assert(m_interpret_status->result->get_type() == formula_result::result_type::value);
+        return m_interpret_status->result->get_value();
+    }
+
+    bool is_grouped() const
+    {
+        return m_group_pos.column >= 0 && m_group_pos.row >= 0;
+    }
+
+    bool is_group_parent() const
+    {
+        return m_group_pos.column == 0 && m_group_pos.row == 0;
     }
 };
 
@@ -154,14 +197,14 @@ void formula_cell::set_tokens(const formula_tokens_store_ptr_t& tokens)
 
 double formula_cell::get_value() const
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status->mtx);
     mp_impl->wait_for_interpreted_result(lock);
     return mp_impl->fetch_value_from_result();
 }
 
 double formula_cell::get_value_nowait() const
 {
-    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status->mtx);
     return mp_impl->fetch_value_from_result();
 }
 
@@ -172,19 +215,19 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
     {
-        std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+        std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status->mtx);
 
-        if (mp_impl->m_interpret_status.result)
+        if (mp_impl->m_interpret_status->result)
         {
             // When the result is already cached before the cell is interpreted,
             // it can mean the cell has circular dependency.
-            if (mp_impl->m_interpret_status.result->get_type() == formula_result::result_type::error)
+            if (mp_impl->m_interpret_status->result->get_type() == formula_result::result_type::error)
             {
                 auto handler = context.create_session_handler();
                 if (handler)
                 {
                     handler->begin_cell_interpret(pos);
-                    const char* msg = get_formula_error_name(mp_impl->m_interpret_status.result->get_error());
+                    const char* msg = get_formula_error_name(mp_impl->m_interpret_status->result->get_error());
                     handler->set_formula_error(msg);
                     handler->end_cell_interpret();
                 }
@@ -194,20 +237,20 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 
         formula_interpreter fin(this, context);
         fin.set_origin(pos);
-        mp_impl->m_interpret_status.result = ixion::make_unique<formula_result>();
+        mp_impl->m_interpret_status->result = ixion::make_unique<formula_result>();
         if (fin.interpret())
         {
             // Successful interpretation.
-            *mp_impl->m_interpret_status.result = fin.get_result();
+            *mp_impl->m_interpret_status->result = fin.get_result();
         }
         else
         {
             // Interpretation ended with an error condition.
-            mp_impl->m_interpret_status.result->set_error(fin.get_error());
+            mp_impl->m_interpret_status->result->set_error(fin.get_error());
         }
     }
 
-    mp_impl->m_interpret_status.cond.notify_all();
+    mp_impl->m_interpret_status->cond.notify_all();
 }
 
 void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
@@ -269,8 +312,8 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
 
 void formula_cell::reset()
 {
-    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status.mtx);
-    mp_impl->m_interpret_status.result.reset();
+    std::lock_guard<std::mutex> lock(mp_impl->m_interpret_status->mtx);
+    mp_impl->m_interpret_status->result.reset();
     mp_impl->reset_flag();
 }
 
@@ -314,18 +357,18 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
 
 const formula_result& formula_cell::get_result_cache() const
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status->mtx);
     mp_impl->wait_for_interpreted_result(lock);
-    if (!mp_impl->m_interpret_status.result)
+    if (!mp_impl->m_interpret_status->result)
         throw formula_error(formula_error_t::ref_result_not_available);
 
-    return *mp_impl->m_interpret_status.result;
+    return *mp_impl->m_interpret_status->result;
 }
 
 const formula_result* formula_cell::get_result_cache_nowait() const
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status.mtx);
-    return mp_impl->m_interpret_status.result.get();
+    std::unique_lock<std::mutex> lock(mp_impl->m_interpret_status->mtx);
+    return mp_impl->m_interpret_status->result.get();
 }
 
 }

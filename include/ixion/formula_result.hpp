@@ -35,6 +35,7 @@ public:
 
     formula_result();
     formula_result(const formula_result& r);
+    formula_result(formula_result&& r);
     formula_result(double v);
     formula_result(string_id_t strid);
     formula_result(formula_error_t e);

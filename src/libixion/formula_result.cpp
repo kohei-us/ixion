@@ -313,6 +313,8 @@ formula_result::formula_result() :
 formula_result::formula_result(const formula_result& r) :
     mp_impl(ixion::make_unique<impl>(*r.mp_impl)) {}
 
+formula_result::formula_result(formula_result&& r) : mp_impl(std::move(r.mp_impl)) {}
+
 formula_result::formula_result(double v) : mp_impl(ixion::make_unique<impl>(v)) {}
 
 formula_result::formula_result(string_id_t strid) : mp_impl(ixion::make_unique<impl>(strid)) {}
