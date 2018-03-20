@@ -204,22 +204,25 @@ void formula_interpreter::pop_result()
         {
             const abs_range_t& range = res.get_range();
             get_result_from_cell(m_context, range.first, m_result);
+            break;
         }
-        break;
         case stack_value_t::single_ref:
         {
             get_result_from_cell(m_context, res.get_address(), m_result);
+            break;
         }
-        break;
         case stack_value_t::string:
             m_result.set_string(res.get_string());
-        break;
+            break;
         case stack_value_t::value:
 #if DEBUG_FORMULA_INTERPRETER
             __IXION_DEBUG_OUT__ << "result: " << res.get_value() << endl;
 #endif
             m_result.set_value(res.get_value());
-        break;
+            break;
+        case stack_value_t::matrix:
+            m_result.set_value(res.get_value());
+            break;
         default:
             ;
     }

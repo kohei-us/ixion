@@ -402,7 +402,7 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
 
     numeric_matrix ans = multiply_matrices(mx[0], mx[1]);
 
-    args.push_value(ans(0, 0));
+    args.push_matrix(ans);
 }
 
 void formula_functions::fnc_if(value_stack_t& args) const

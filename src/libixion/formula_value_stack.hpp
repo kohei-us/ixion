@@ -28,11 +28,13 @@ class matrix;
  * Type of stack value which can be used as intermediate value during
  * formula interpretation.
  */
-enum class stack_value_t {
+enum class stack_value_t
+{
     value,
     string,
     single_ref,
-    range_ref
+    range_ref,
+    matrix,
 };
 
 /**
@@ -41,10 +43,13 @@ enum class stack_value_t {
 class stack_value
 {
     stack_value_t m_type;
-    union {
+
+    union
+    {
         double m_value;
         abs_address_t* m_address;
         abs_range_t* m_range;
+        matrix* m_matrix;
         size_t m_str_identifier;
     };
 
@@ -57,6 +62,7 @@ public:
     explicit stack_value(size_t sid);
     explicit stack_value(const abs_address_t& val);
     explicit stack_value(const abs_range_t& val);
+    explicit stack_value(matrix mtx);
     ~stack_value();
 
     stack_value_t get_type() const;
@@ -99,6 +105,7 @@ public:
     void push_string(size_t sid);
     void push_single_ref(const abs_address_t& val);
     void push_range_ref(const abs_range_t& val);
+    void push_matrix(matrix mtx);
 
     double pop_value();
     const std::string pop_string();

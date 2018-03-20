@@ -12,6 +12,7 @@
 
 #include <limits>
 #include <cstring>
+#include <functional>
 
 namespace ixion {
 
@@ -24,8 +25,33 @@ struct matrix::impl
     store_type m_data;
 
     impl() {}
+
     impl(size_t rows, size_t cols) : m_data(rows, cols) {}
+
+    impl(const std::vector<double>& array, size_t rows, size_t cols) :
+        m_data(rows, cols, array.begin(), array.end()) {}
+
     impl(const impl& other) : m_data(other.m_data) {}
+};
+
+struct numeric_matrix::impl
+{
+    std::vector<double> m_array;
+    size_t m_rows;
+    size_t m_cols;
+
+    impl() : m_rows(0), m_cols(0) {}
+
+    impl(size_t rows, size_t cols) :
+        m_array(rows * cols, 0.0), m_rows(rows), m_cols(cols) {}
+
+    impl(std::vector<double> array, size_t rows, size_t cols) :
+        m_array(std::move(array)), m_rows(rows), m_cols(cols) {}
+
+    size_t to_array_pos(size_t row, size_t col) const
+    {
+        return row * m_cols + col;
+    }
 };
 
 matrix::matrix() :
@@ -39,6 +65,12 @@ matrix::matrix(const matrix& other) :
 
 matrix::matrix(matrix&& other) :
     mp_impl(std::move(other.mp_impl)) {}
+
+matrix::matrix(const numeric_matrix& other) :
+    mp_impl(ixion::make_unique<impl>(
+        other.mp_impl->m_array, other.row_size(), other.col_size()))
+{
+}
 
 matrix::~matrix() {}
 
@@ -151,26 +183,6 @@ numeric_matrix matrix::as_numeric() const
 
     return numeric_matrix(std::move(num_array), mtx_size.row, mtx_size.column);
 }
-
-struct numeric_matrix::impl
-{
-    std::vector<double> m_array;
-    size_t m_rows;
-    size_t m_cols;
-
-    impl() : m_rows(0), m_cols(0) {}
-
-    impl(size_t rows, size_t cols) :
-        m_array(rows * cols, 0.0), m_rows(rows), m_cols(cols) {}
-
-    impl(std::vector<double> array, size_t rows, size_t cols) :
-        m_array(std::move(array)), m_rows(rows), m_cols(cols) {}
-
-    size_t to_array_pos(size_t row, size_t col) const
-    {
-        return row * m_cols + col;
-    }
-};
 
 numeric_matrix::numeric_matrix() : mp_impl(make_unique<impl>()) {}
 numeric_matrix::numeric_matrix(size_t rows, size_t cols) :

@@ -32,6 +32,7 @@ public:
     matrix(size_t rows, size_t cols);
     matrix(const matrix& other);
     matrix(matrix&& other);
+    matrix(const numeric_matrix& other);
     ~matrix();
 
     matrix& operator= (matrix other);
@@ -57,6 +58,8 @@ public:
 
 class IXION_DLLPUBLIC numeric_matrix
 {
+    friend class matrix;
+
     struct impl;
     std::unique_ptr<impl> mp_impl;
 

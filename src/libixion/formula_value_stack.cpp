@@ -26,15 +26,16 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
     switch (v.get_type())
     {
         case stack_value_t::value:
+        case stack_value_t::matrix:
             ret = v.get_value();
-        break;
+            break;
         case stack_value_t::single_ref:
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
             ret = cxt.get_numeric_value(addr);
+            break;
         }
-        break;
         default:
 #if IXION_DEBUG_GLOBAL
             __IXION_DEBUG_OUT__ << "value is being popped, but the stack value type is not appropriate." << endl;
@@ -58,6 +59,9 @@ stack_value::stack_value(const abs_address_t& val) :
 stack_value::stack_value(const abs_range_t& val) :
     m_type(stack_value_t::range_ref), m_range(new abs_range_t(val)) {}
 
+stack_value::stack_value(matrix mtx) :
+    m_type(stack_value_t::matrix), m_matrix(new matrix(std::move(mtx))) {}
+
 stack_value::~stack_value()
 {
     switch (m_type)
@@ -67,6 +71,9 @@ stack_value::~stack_value()
             break;
         case stack_value_t::single_ref:
             delete m_address;
+            break;
+        case stack_value_t::matrix:
+            delete m_matrix;
             break;
         case stack_value_t::string:
         case stack_value_t::value:
@@ -82,8 +89,15 @@ stack_value_t stack_value::get_type() const
 
 double stack_value::get_value() const
 {
-    if (m_type == stack_value_t::value)
-        return m_value;
+    switch (m_type)
+    {
+        case stack_value_t::value:
+            return m_value;
+        case stack_value_t::matrix:
+            return m_matrix->get_numeric(0, 0);
+        default:
+            ;
+    }
 
     return 0.0;
 }
@@ -193,6 +207,11 @@ void value_stack_t::push_single_ref(const abs_address_t& val)
 void value_stack_t::push_range_ref(const abs_range_t& val)
 {
     m_stack.push_back(make_unique<stack_value>(val));
+}
+
+void value_stack_t::push_matrix(matrix mtx)
+{
+    m_stack.emplace_back(make_unique<stack_value>(std::move(mtx)));
 }
 
 double value_stack_t::pop_value()
