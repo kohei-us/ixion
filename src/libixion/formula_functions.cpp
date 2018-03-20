@@ -83,6 +83,36 @@ double sum_matrix_elements(const matrix& mx)
     return sum;
 }
 
+numeric_matrix multiply_matrices(const matrix& left, const matrix& right)
+{
+    // The column size of the left matrix must equal the row size of the right
+    // matrix.
+
+    size_t n = left.col_size();
+
+    if (n != right.row_size())
+        throw formula_error(formula_error_t::invalid_expression);
+
+    numeric_matrix left_nm = left.as_numeric();
+    numeric_matrix right_nm = right.as_numeric();
+
+    numeric_matrix output(left_nm.row_size(), right_nm.col_size());
+
+    for (size_t row = 0; row < output.row_size(); ++row)
+    {
+        for (size_t col = 0; col < output.col_size(); ++col)
+        {
+            double v = 0.0;
+            for (size_t i = 0; i < n; ++i)
+                v += left_nm(row, i) * right_nm(i, col);
+
+            output(row, col) = v;
+        }
+    }
+
+    return output;
+}
+
 }
 
 // ============================================================================
@@ -330,6 +360,9 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
 
     bool invalid_arg = false;
 
+    // NB : the stack is FIFO i.e. the first matrix is the right matrix and
+    // the second one is the left one.
+
     while (!args.empty())
     {
         switch (args.get_type())
@@ -361,9 +394,15 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
     if (invalid_arg)
         throw formula_functions::invalid_arg("MMULT requires exactly two ranges.");
 
-    // TODO : implement matrix multiplication, and push the result.
+    mx[0].swap(mx[1]); // Make it so that 0 -> left and 1 -> right.
 
-    args.push_value(42.0);
+    if (!mx[0].is_numeric() || !mx[1].is_numeric())
+        throw formula_functions::invalid_arg(
+            "MMULT requires two numeric ranges. At least one range is not numeric.");
+
+    numeric_matrix ans = multiply_matrices(mx[0], mx[1]);
+
+    args.push_value(ans(0, 0));
 }
 
 void formula_functions::fnc_if(value_stack_t& args) const

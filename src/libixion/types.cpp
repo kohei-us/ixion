@@ -30,7 +30,7 @@ const char* get_formula_error_name(formula_error_t fe)
         "#REF!",   // result not available
         "#DIV/0!", // division by zero
         "#NUM!",   // invalid expression
-        "#NAME?"   // name not found
+        "#NAME?",  // name not found
     };
 
     if (static_cast<size_t>(fe) < names.size())

@@ -11,8 +11,11 @@
 #include "ixion/env.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace ixion {
+
+class numeric_matrix;
 
 /**
  * 2-dimensional matrix consisting of elements of variable types.  Each
@@ -28,7 +31,18 @@ public:
     matrix();
     matrix(size_t rows, size_t cols);
     matrix(const matrix& other);
+    matrix(matrix&& other);
     ~matrix();
+
+    matrix& operator= (matrix other);
+
+    /**
+     * Determine if the entire matrix consists only of numeric value elements.
+     *
+     * @return true if the entire matrix consits only of numeric value
+     *         elements, false otherwise.
+     */
+    bool is_numeric() const;
 
     bool is_numeric(size_t row, size_t col) const;
     double get_numeric(size_t row, size_t col) const;
@@ -37,6 +51,31 @@ public:
     size_t col_size() const;
 
     void swap(matrix& r);
+
+    numeric_matrix as_numeric() const;
+};
+
+class IXION_DLLPUBLIC numeric_matrix
+{
+    struct impl;
+    std::unique_ptr<impl> mp_impl;
+
+public:
+    numeric_matrix();
+    numeric_matrix(size_t rows, size_t cols);
+    numeric_matrix(std::vector<double> array, size_t rows, size_t cols);
+    numeric_matrix(numeric_matrix&& r);
+    ~numeric_matrix();
+
+    numeric_matrix& operator= (numeric_matrix other);
+
+    double& operator() (size_t row, size_t col);
+    const double& operator() (size_t row, size_t col) const;
+
+    void swap(numeric_matrix& r);
+
+    size_t row_size() const;
+    size_t col_size() const;
 };
 
 }
