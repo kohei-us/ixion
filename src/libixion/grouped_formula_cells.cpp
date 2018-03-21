@@ -6,6 +6,7 @@
  */
 
 #include "grouped_formula_cells.hpp"
+#include "calc_status.hpp"
 #include "ixion/formula_tokens.hpp"
 
 namespace ixion {
@@ -21,12 +22,14 @@ grouped_formula_cells::grouped_formula_cells(row_t rows, col_t cols, formula_tok
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
 
+    calc_status_ptr_t cs(new calc_status);
+
     for (row_t row = 0; row < rows; ++row)
     {
         for (col_t col = 0; col < cols; ++col)
         {
             size_t pos = to_pos(row, col);
-            m_cells[pos] = ixion::make_unique<formula_cell>(row, col, ts);
+            m_cells[pos] = ixion::make_unique<formula_cell>(row, col, cs, ts);
         }
     }
 }

@@ -21,6 +21,10 @@ class formula_cell;
 struct abs_address_t;
 struct rc_address_t;
 
+// calc_status is internal.
+struct calc_status;
+using calc_status_ptr_t = boost::intrusive_ptr<calc_status>;
+
 namespace iface {
 
 class formula_model_access;
@@ -38,7 +42,12 @@ public:
 
     formula_cell();
     formula_cell(const formula_tokens_store_ptr_t& tokens);
-    formula_cell(row_t group_row, col_t group_col, const formula_tokens_store_ptr_t& tokens);
+
+    formula_cell(
+        row_t group_row, col_t group_col,
+        const calc_status_ptr_t& cs,
+        const formula_tokens_store_ptr_t& tokens);
+
     ~formula_cell();
 
     const formula_tokens_store_ptr_t& get_tokens() const;

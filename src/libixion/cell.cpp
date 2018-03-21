@@ -17,9 +17,6 @@
 
 #include "formula_interpreter.hpp"
 
-#include <mutex>
-#include <condition_variable>
-
 #include <cassert>
 #include <string>
 #include <sstream>
@@ -32,6 +29,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #endif
 
+#include "calc_status.hpp"
 
 #define FORMULA_CIRCULAR_SAFE 0x01
 #define FORMULA_SHARED_TOKENS 0x02
@@ -39,46 +37,6 @@
 using namespace std;
 
 namespace ixion {
-
-namespace {
-
-struct calc_status
-{
-    calc_status(const calc_status&) = delete;
-    calc_status& operator=(const calc_status&) = delete;
-
-    std::mutex mtx;
-    std::condition_variable cond;
-    std::unique_ptr<formula_result> result;
-    size_t refcount;
-
-    calc_status() : result(nullptr), refcount(0) {}
-
-    void add_ref()
-    {
-        ++refcount;
-    }
-
-    void release_ref()
-    {
-        if (--refcount == 0)
-            delete this;
-    }
-};
-
-inline void intrusive_ptr_add_ref(calc_status* p)
-{
-    p->add_ref();
-}
-
-inline void intrusive_ptr_release(calc_status* p)
-{
-    p->release_ref();
-}
-
-using calc_status_ptr_t = boost::intrusive_ptr<calc_status>;
-
-}
 
 struct formula_cell::impl
 {
@@ -88,12 +46,13 @@ struct formula_cell::impl
 
     bool m_circular_safe:1;
 
-    impl() : impl(-1, -1, formula_tokens_store_ptr_t()) {}
+    impl() : impl(-1, -1, new calc_status, formula_tokens_store_ptr_t()) {}
 
-    impl(const formula_tokens_store_ptr_t& tokens) : impl(-1, -1, tokens) {}
+    impl(const formula_tokens_store_ptr_t& tokens) : impl(-1, -1, new calc_status, tokens) {}
 
-    impl(row_t row, col_t col, const formula_tokens_store_ptr_t& tokens) :
-        m_calc_status(new calc_status),
+    impl(row_t row, col_t col, const calc_status_ptr_t& cs,
+        const formula_tokens_store_ptr_t& tokens) :
+        m_calc_status(cs),
         m_tokens(tokens),
         m_group_pos(row, col, false, false),
         m_circular_safe(false) {}
@@ -189,8 +148,10 @@ formula_cell::formula_cell(const formula_tokens_store_ptr_t& tokens) :
     mp_impl(ixion::make_unique<impl>(tokens)) {}
 
 formula_cell::formula_cell(
-    row_t group_row, col_t group_col, const formula_tokens_store_ptr_t& tokens) :
-    mp_impl(ixion::make_unique<impl>(group_row, group_col, tokens)) {}
+    row_t group_row, col_t group_col,
+    const calc_status_ptr_t& cs,
+    const formula_tokens_store_ptr_t& tokens) :
+    mp_impl(ixion::make_unique<impl>(group_row, group_col, cs, tokens)) {}
 
 formula_cell::~formula_cell()
 {
