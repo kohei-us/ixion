@@ -214,20 +214,22 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     const formula_name_resolver& resolver = context.get_name_resolver();
     __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
+    calc_status& status = *mp_impl->m_calc_status;
+
     {
-        std::lock_guard<std::mutex> lock(mp_impl->m_calc_status->mtx);
+        std::lock_guard<std::mutex> lock(status.mtx);
 
         if (mp_impl->m_calc_status->result)
         {
             // When the result is already cached before the cell is interpreted,
             // it can mean the cell has circular dependency.
-            if (mp_impl->m_calc_status->result->get_type() == formula_result::result_type::error)
+            if (status.result->get_type() == formula_result::result_type::error)
             {
                 auto handler = context.create_session_handler();
                 if (handler)
                 {
                     handler->begin_cell_interpret(pos);
-                    const char* msg = get_formula_error_name(mp_impl->m_calc_status->result->get_error());
+                    const char* msg = get_formula_error_name(status.result->get_error());
                     handler->set_formula_error(msg);
                     handler->end_cell_interpret();
                 }
@@ -237,20 +239,20 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 
         formula_interpreter fin(this, context);
         fin.set_origin(pos);
-        mp_impl->m_calc_status->result = ixion::make_unique<formula_result>();
+        status.result = ixion::make_unique<formula_result>();
         if (fin.interpret())
         {
             // Successful interpretation.
-            *mp_impl->m_calc_status->result = fin.get_result();
+            *status.result = fin.get_result();
         }
         else
         {
             // Interpretation ended with an error condition.
-            mp_impl->m_calc_status->result->set_error(fin.get_error());
+            status.result->set_error(fin.get_error());
         }
     }
 
-    mp_impl->m_calc_status->cond.notify_all();
+    status.cond.notify_all();
 }
 
 void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
