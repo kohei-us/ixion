@@ -14,8 +14,6 @@
 #include "ixion/formula_tokens_fwd.hpp"
 
 #include <string>
-#include <vector>
-#include <memory>
 
 namespace ixion {
 
@@ -54,8 +52,6 @@ public:
     virtual std::string get_name() const;
     virtual void write_string(std::ostream& os) const;
 };
-
-using formula_tokens_t = std::vector<std::unique_ptr<formula_token>>;
 
 class IXION_DLLPUBLIC formula_tokens_store
 {

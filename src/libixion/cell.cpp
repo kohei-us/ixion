@@ -88,15 +88,14 @@ struct formula_cell::impl
 
     bool m_circular_safe:1;
 
-    impl() :
-        m_calc_status(new calc_status),
-        m_group_pos(-1, -1, false, false),
-        m_circular_safe(false) {}
+    impl() : impl(-1, -1, formula_tokens_store_ptr_t()) {}
 
-    impl(const formula_tokens_store_ptr_t& tokens) :
+    impl(const formula_tokens_store_ptr_t& tokens) : impl(-1, -1, tokens) {}
+
+    impl(row_t row, col_t col, const formula_tokens_store_ptr_t& tokens) :
         m_calc_status(new calc_status),
         m_tokens(tokens),
-        m_group_pos(-1, -1, false, false),
+        m_group_pos(row, col, false, false),
         m_circular_safe(false) {}
 
     /**
@@ -188,6 +187,10 @@ formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
 
 formula_cell::formula_cell(const formula_tokens_store_ptr_t& tokens) :
     mp_impl(ixion::make_unique<impl>(tokens)) {}
+
+formula_cell::formula_cell(
+    row_t group_row, col_t group_col, const formula_tokens_store_ptr_t& tokens) :
+    mp_impl(ixion::make_unique<impl>(group_row, group_col, tokens)) {}
 
 formula_cell::~formula_cell()
 {

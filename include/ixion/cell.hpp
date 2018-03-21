@@ -19,6 +19,7 @@ namespace ixion {
 class formula_result;
 class formula_cell;
 struct abs_address_t;
+struct rc_address_t;
 
 namespace iface {
 
@@ -37,6 +38,7 @@ public:
 
     formula_cell();
     formula_cell(const formula_tokens_store_ptr_t& tokens);
+    formula_cell(row_t group_row, col_t group_col, const formula_tokens_store_ptr_t& tokens);
     ~formula_cell();
 
     const formula_tokens_store_ptr_t& get_tokens() const;
