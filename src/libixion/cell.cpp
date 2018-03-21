@@ -174,6 +174,14 @@ struct formula_cell::impl
     {
         return m_group_pos.column == 0 && m_group_pos.row == 0;
     }
+
+    bool calc_allowed() const
+    {
+        if (!is_grouped())
+            return true;
+
+        return is_group_parent();
+    }
 };
 
 formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
@@ -214,6 +222,9 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     const formula_name_resolver& resolver = context.get_name_resolver();
     __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
 #endif
+    if (!mp_impl->calc_allowed())
+        throw std::logic_error("Calculation on this formula cell is not allowed.");
+
     calc_status& status = *mp_impl->m_calc_status;
 
     {
