@@ -257,6 +257,8 @@
 		<Folder Name="../src">
 			<Folder Name="libixion">
 				<F N="../src/libixion/address.cpp"/>
+				<F N="../src/libixion/calc_status.cpp"/>
+				<F N="../src/libixion/calc_status.hpp"/>
 				<F N="../src/libixion/cell.cpp"/>
 				<F N="../src/libixion/cell_listener_tracker.cpp"/>
 				<F N="../src/libixion/cell_queue_manager.cpp"/>
