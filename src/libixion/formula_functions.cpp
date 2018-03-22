@@ -360,7 +360,7 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
 
     bool invalid_arg = false;
 
-    // NB : the stack is FIFO i.e. the first matrix is the right matrix and
+    // NB : the stack is LIFO i.e. the first matrix is the right matrix and
     // the second one is the left one.
 
     while (!args.empty())
