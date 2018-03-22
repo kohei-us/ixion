@@ -54,6 +54,9 @@ public:
     void swap(matrix& r);
 
     numeric_matrix as_numeric() const;
+
+    bool operator== (const matrix& r) const;
+    bool operator!= (const matrix& r) const;
 };
 
 class IXION_DLLPUBLIC numeric_matrix

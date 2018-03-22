@@ -12,6 +12,7 @@
 #include "ixion/cell.hpp"
 #include "ixion/global.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/matrix.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/table_handler.hpp"
@@ -120,9 +121,9 @@ bool formula_interpreter::interpret()
     return false;
 }
 
-const formula_result& formula_interpreter::get_result() const
+formula_result formula_interpreter::transfer_result()
 {
-    return m_result;
+    return std::move(m_result);
 }
 
 formula_error_t formula_interpreter::get_error() const
@@ -197,7 +198,7 @@ void formula_interpreter::pop_result()
 {
     // there should only be one stack value left for the result value.
     assert(m_stack.size() == 1);
-    const stack_value& res = m_stack.back();
+    stack_value& res = m_stack.back();
     switch (res.get_type())
     {
         case stack_value_t::range_ref:
@@ -221,7 +222,7 @@ void formula_interpreter::pop_result()
             m_result.set_value(res.get_value());
             break;
         case stack_value_t::matrix:
-            m_result.set_value(res.get_value());
+            m_result.set_matrix(res.pop_matrix());
             break;
         default:
             ;

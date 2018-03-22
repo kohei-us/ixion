@@ -13,6 +13,7 @@
 #include <limits>
 #include <cstring>
 #include <functional>
+#include <iostream>
 
 namespace ixion {
 
@@ -61,10 +62,14 @@ matrix::matrix(size_t rows, size_t cols) :
     mp_impl(ixion::make_unique<impl>(rows, cols)) {}
 
 matrix::matrix(const matrix& other) :
-    mp_impl(ixion::make_unique<impl>(*other.mp_impl)) {}
+    mp_impl(ixion::make_unique<impl>(*other.mp_impl))
+{
+}
 
 matrix::matrix(matrix&& other) :
-    mp_impl(std::move(other.mp_impl)) {}
+    mp_impl(std::move(other.mp_impl))
+{
+}
 
 matrix::matrix(const numeric_matrix& other) :
     mp_impl(ixion::make_unique<impl>(
@@ -182,6 +187,16 @@ numeric_matrix matrix::as_numeric() const
     mp_impl->m_data.walk(f);
 
     return numeric_matrix(std::move(num_array), mtx_size.row, mtx_size.column);
+}
+
+bool matrix::operator== (const matrix& r) const
+{
+    return mp_impl->m_data == r.mp_impl->m_data;
+}
+
+bool matrix::operator!= (const matrix& r) const
+{
+    return !operator==(r);
 }
 
 numeric_matrix::numeric_matrix() : mp_impl(ixion::make_unique<impl>()) {}

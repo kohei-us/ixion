@@ -368,13 +368,17 @@ double count_formula_block(
             case formula_result::result_type::value:
                 if (vt.is_numeric())
                     ++ret;
-            break;
+                break;
             case formula_result::result_type::string:
                 if (vt.is_string())
                     ++ret;
+                break;
             case formula_result::result_type::error:
                 // TODO : how do we handle error formula cells?
-            break;
+                break;
+            case formula_result::result_type::matrix:
+                // TODO : ditto
+                break;
         }
     }
 

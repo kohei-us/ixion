@@ -57,7 +57,7 @@ public:
 
     void set_origin(const abs_address_t& pos);
     bool interpret();
-    const formula_result& get_result() const;
+    formula_result transfer_result();
     formula_error_t get_error() const;
 
 private:

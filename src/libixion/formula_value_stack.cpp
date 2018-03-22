@@ -119,6 +119,27 @@ const abs_range_t& stack_value::get_range() const
     return *m_range;
 }
 
+matrix stack_value::pop_matrix()
+{
+    switch (m_type)
+    {
+        case stack_value_t::value:
+        {
+            matrix mtx(1, 1);
+            mtx.set(0, 0, m_value);
+            return mtx;
+        }
+        case stack_value_t::matrix:
+        {
+            matrix mtx;
+            mtx.swap(*m_matrix);
+            return mtx;
+        }
+        default:
+            throw formula_error(formula_error_t::stack_error);
+    }
+}
+
 value_stack_t::value_stack_t(const iface::formula_model_access& cxt) : m_context(cxt) {}
 
 value_stack_t::iterator value_stack_t::begin()
@@ -166,6 +187,11 @@ void value_stack_t::clear()
 void value_stack_t::swap(value_stack_t& other)
 {
     m_stack.swap(other.m_stack);
+}
+
+stack_value& value_stack_t::back()
+{
+    return *m_stack.back();
 }
 
 const stack_value& value_stack_t::back() const

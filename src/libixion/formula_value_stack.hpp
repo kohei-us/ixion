@@ -70,6 +70,12 @@ public:
     size_t get_string() const;
     const abs_address_t& get_address() const;
     const abs_range_t& get_range() const;
+
+    /**
+     * Move the matrix value out from storage.  The internal matrix content
+     * will be empty after this call.
+     */
+    matrix pop_matrix();
 };
 
 class value_stack_t
@@ -95,6 +101,7 @@ public:
     void clear();
     void swap(value_stack_t& other);
 
+    stack_value& back();
     const stack_value& back() const;
     const stack_value& operator[](size_t pos) const;
 

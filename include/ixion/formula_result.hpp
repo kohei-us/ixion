@@ -15,6 +15,8 @@
 
 namespace ixion {
 
+class matrix;
+
 namespace iface {
 
 class formula_model_access;
@@ -31,7 +33,7 @@ class IXION_DLLPUBLIC formula_result
     std::unique_ptr<impl> mp_impl;
 
 public:
-    enum class result_type { value, string, error };
+    enum class result_type { value, string, error, matrix };
 
     formula_result();
     formula_result(const formula_result& r);
@@ -45,6 +47,7 @@ public:
     void set_value(double v);
     void set_string(string_id_t strid);
     void set_error(formula_error_t e);
+    void set_matrix(matrix mtx);
 
     /**
      * Get a numeric result value.  The caller must make sure the result is of
@@ -94,7 +97,7 @@ public:
      */
     void parse(iface::formula_model_access& cxt, const char* p, size_t n);
 
-    formula_result& operator= (const formula_result& r);
+    formula_result& operator= (formula_result r);
     bool operator== (const formula_result& r) const;
     bool operator!= (const formula_result& r) const;
 };

@@ -218,7 +218,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
         if (fin.interpret())
         {
             // Successful interpretation.
-            *status.result = fin.get_result();
+            *status.result = fin.transfer_result();
         }
         else
         {
