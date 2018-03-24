@@ -6,6 +6,6 @@ A3:3
 C1:4
 D1:5
 E1:6
-C5=MMULT(A1:A3,C1:E1)
+{C5:E7}{=MMULT(A1:A3,C1:E1)}
 %calc
 %exit

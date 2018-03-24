@@ -63,7 +63,7 @@ class model_parser
         mem_str_buf name;
         mem_str_buf value;
         cell_type type;
-        abs_address_t pos;
+        abs_range_t pos;
     };
 
 public:

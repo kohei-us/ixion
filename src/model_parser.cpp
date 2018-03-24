@@ -368,7 +368,9 @@ void model_parser::parse_init()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
-    m_dirty_cell_addrs.push_back(cell_def.pos);
+    abs_address_t pos = cell_def.pos.first;
+
+    m_dirty_cell_addrs.push_back(pos);
 
     switch (cell_def.type)
     {
@@ -376,35 +378,35 @@ void model_parser::parse_init()
         {
             formula_tokens_t tokens =
                 parse_formula_string(
-                    m_context, cell_def.pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+                    m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
-            m_context.set_formula_cell(cell_def.pos, std::move(tokens));
-            m_dirty_cells.insert(cell_def.pos);
+            m_context.set_formula_cell(pos, std::move(tokens));
+            m_dirty_cells.insert(pos);
 
-            cout << get_display_cell_string(cell_def.pos) << ": (f) " << cell_def.value.str() << endl;
+            cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
             break;
         }
         case ct_string:
         {
-            m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
+            m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
 
-            cout << get_display_cell_string(cell_def.pos) << ": (s) " << cell_def.value.str() << endl;
+            cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
             break;
         }
         case ct_value:
         {
             double v = global::to_double(cell_def.value.get(), cell_def.value.size());
-            m_context.set_numeric_cell(cell_def.pos, v);
+            m_context.set_numeric_cell(pos, v);
 
-            cout << get_display_cell_string(cell_def.pos) << ": (n) " << v << endl;
+            cout << get_display_cell_string(pos) << ": (n) " << v << endl;
             break;
         }
         case ct_boolean:
         {
             bool b = global::to_bool(cell_def.value.get(), cell_def.value.size());
-            m_context.set_boolean_cell(cell_def.pos, b);
+            m_context.set_boolean_cell(pos, b);
 
-            cout << get_display_cell_string(cell_def.pos) << ": (b) " << (b ? "true" : "false") << endl;
+            cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << endl;
             break;
         }
         default:
@@ -418,14 +420,15 @@ void model_parser::parse_edit()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
-    m_dirty_cell_addrs.push_back(cell_def.pos);
-    unregister_formula_cell(m_context, cell_def.pos);
+    abs_address_t pos = cell_def.pos.first;
+    m_dirty_cell_addrs.push_back(pos);
+    unregister_formula_cell(m_context, pos);
 
     if (cell_def.value.empty())
     {
         // A valid name is given but with empty definition.  Just remove the
         // existing cell.
-        m_context.erase_cell(cell_def.pos);
+        m_context.erase_cell(pos);
         return;
     }
 
@@ -433,30 +436,30 @@ void model_parser::parse_edit()
     {
         case ct_formula:
         {
-            unregister_formula_cell(m_context, cell_def.pos);
+            unregister_formula_cell(m_context, pos);
 
             formula_tokens_t tokens =
                 parse_formula_string(
-                    m_context, cell_def.pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+                    m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
-            m_context.set_formula_cell(cell_def.pos, std::move(tokens));
-            m_dirty_cells.insert(cell_def.pos);
-            register_formula_cell(m_context, cell_def.pos);
+            m_context.set_formula_cell(pos, std::move(tokens));
+            m_dirty_cells.insert(pos);
+            register_formula_cell(m_context, pos);
             cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
         }
         break;
         case ct_string:
         {
-            m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
+            m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
             cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
         }
         break;
         case ct_value:
         {
             double v = global::to_double(cell_def.value.get(), cell_def.value.size());
-            m_context.set_numeric_cell(cell_def.pos, v);
+            m_context.set_numeric_cell(pos, v);
 
-            address_t pos_display(cell_def.pos);
+            address_t pos_display(pos);
             pos_display.set_absolute(false);
             cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
         }
@@ -717,43 +720,107 @@ model_parser::parsed_assignment_type model_parser::parse_assignment()
 
 model_parser::cell_def_type model_parser::parse_cell_definition()
 {
+    enum class section_type { in_braced_name, after_braced_name, name, value };
+    section_type section = section_type::name;
+
     cell_def_type ret;
     ret.type = model_parser::ct_unknown;
 
     mem_str_buf buf;
 
+    const char* line_head = mp_char;
+
     for (; mp_char != mp_end  && *mp_char != '\n'; ++mp_char)
     {
-        if (ret.name.empty() && is_separator(*mp_char))
+        switch (section)
         {
-            // Separator encountered.  Set the name and clear the buffer.
-            if (buf.empty())
-                throw model_parser::parse_error("left hand side is empty");
-
-            ret.name = buf;
-            buf.clear();
-            switch (*mp_char)
+            case section_type::name:
             {
-                case '=':
-                    ret.type = model_parser::ct_formula;
-                    break;
-                case ':':
-                    ret.type = model_parser::ct_value;
-                    break;
-                case '@':
-                    ret.type = model_parser::ct_string;
-                    break;
-                default:
-                    ;
+                if (mp_char == line_head && *mp_char == '{')
+                {
+                    section = section_type::in_braced_name;
+                    continue;
+                }
+
+                if (is_separator(*mp_char))
+                {
+                    // Separator encountered.  Set the name and clear the buffer.
+                    if (buf.empty())
+                        throw model_parser::parse_error("left hand side is empty");
+
+                    ret.name = buf;
+                    buf.clear();
+
+                    switch (*mp_char)
+                    {
+                        case '=':
+                            ret.type = model_parser::ct_formula;
+                            break;
+                        case ':':
+                            ret.type = model_parser::ct_value;
+                            break;
+                        case '@':
+                            ret.type = model_parser::ct_string;
+                            break;
+                        default:
+                            ;
+                    }
+
+                    section = section_type::value;
+                    continue;
+                }
+
+                break;
             }
+            case section_type::in_braced_name:
+            {
+                if (*mp_char == '}')
+                {
+                    ret.name = buf;
+                    buf.clear();
+                    section = section_type::after_braced_name;
+                    continue;
+                }
+
+                break;
+            }
+            case section_type::after_braced_name:
+            {
+                if (is_separator(*mp_char))
+                {
+                    switch (*mp_char)
+                    {
+                        case '=':
+                            ret.type = model_parser::ct_formula;
+                            break;
+                        case ':':
+                            ret.type = model_parser::ct_value;
+                            break;
+                        case '@':
+                            ret.type = model_parser::ct_string;
+                            break;
+                        default:
+                            ;
+                    }
+
+                    section = section_type::value;
+                    continue;
+                }
+                else
+                {
+                    throw model_parser::parse_error("WIP");
+                }
+                break;
+            }
+            case section_type::value:
+            default:
+                ;
         }
+
+        if (buf.empty())
+            buf.set_start(mp_char);
         else
-        {
-            if (buf.empty())
-                buf.set_start(mp_char);
-            else
-                buf.inc();
-        }
+            buf.inc();
     }
 
     ret.value = buf;
@@ -766,7 +833,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
     }
 
 #if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << "(name='" << ret.name.str() << "'; value='" << ret.value.str() << "'" << endl;
+    __IXION_DEBUG_OUT__ << "(name='" << ret.name.str() << "'; value='" << ret.value.str() << "')" << endl;
 #endif
 
     if (ret.name.empty())
@@ -784,14 +851,26 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
     formula_name_t fnt = mp_name_resolver->resolve(
         ret.name.get(), ret.name.size(), abs_address_t(m_current_sheet,0,0));
 
-    if (fnt.type != formula_name_t::cell_reference)
+    switch (fnt.type)
     {
-        ostringstream os;
-        os << "invalid cell name: " << ret.name.str();
-        throw model_parser::parse_error(os.str());
+        case formula_name_t::cell_reference:
+        {
+            ret.pos.first = to_address(fnt.address).to_abs(abs_address_t(0,0,0));
+            ret.pos.last = ret.pos.first;
+            break;
+        }
+        case formula_name_t::range_reference:
+        {
+            ret.pos = to_range(fnt.range).to_abs(abs_address_t(0,0,0));
+            break;
+        }
+        default:
+        {
+            ostringstream os;
+            os << "invalid cell name: " << ret.name.str();
+            throw model_parser::parse_error(os.str());
+        }
     }
-
-    ret.pos = abs_address_t(fnt.address.sheet, fnt.address.row, fnt.address.col);
 
     return ret;
 }
