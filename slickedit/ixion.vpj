@@ -225,6 +225,7 @@
 					<F N="../include/ixion/interface/table_handler.hpp"/>
 				</Folder>
 				<F N="../include/ixion/address.hpp"/>
+				<F N="../include/ixion/address_iterator.hpp"/>
 				<F N="../include/ixion/cell.hpp"/>
 				<F N="../include/ixion/cell_listener_tracker.hpp"/>
 				<F N="../include/ixion/column_store_type.hpp"/>
@@ -257,6 +258,7 @@
 		<Folder Name="../src">
 			<Folder Name="libixion">
 				<F N="../src/libixion/address.cpp"/>
+				<F N="../src/libixion/address_iterator.cpp"/>
 				<F N="../src/libixion/calc_status.cpp"/>
 				<F N="../src/libixion/calc_status.hpp"/>
 				<F N="../src/libixion/cell.cpp"/>

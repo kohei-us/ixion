@@ -16,6 +16,7 @@ check_PROGRAMS = ixion-test compute-engine-test
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
 	address.cpp \
+	address_iterator.cpp \
 	calc_status.hpp \
 	calc_status.cpp \
 	cell.cpp \

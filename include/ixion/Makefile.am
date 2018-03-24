@@ -3,6 +3,7 @@ SUBDIRS = interface
 libixiondir = $(includedir)/libixion-@IXION_API_VERSION@/ixion
 libixion_HEADERS = \
 	address.hpp \
+	address_iterator.hpp \
 	cell.hpp \
 	cell_listener_tracker.hpp \
 	column_store_type.hpp \

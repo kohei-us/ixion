@@ -11,6 +11,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/macros.hpp"
+#include "ixion/address_iterator.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -368,49 +369,52 @@ void model_parser::parse_init()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
-    abs_address_t pos = cell_def.pos.first;
+    abs_address_iterator iter(cell_def.pos);
 
-    m_dirty_cell_addrs.push_back(pos);
-
-    switch (cell_def.type)
+    for (const abs_address_t& pos : iter)
     {
-        case ct_formula:
+        m_dirty_cell_addrs.push_back(pos);
+
+        switch (cell_def.type)
         {
-            formula_tokens_t tokens =
-                parse_formula_string(
-                    m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+            case ct_formula:
+            {
+                formula_tokens_t tokens =
+                    parse_formula_string(
+                        m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
-            m_context.set_formula_cell(pos, std::move(tokens));
-            m_dirty_cells.insert(pos);
+                m_context.set_formula_cell(pos, std::move(tokens));
+                m_dirty_cells.insert(pos);
 
-            cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
-            break;
+                cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
+                break;
+            }
+            case ct_string:
+            {
+                m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
+
+                cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
+                break;
+            }
+            case ct_value:
+            {
+                double v = global::to_double(cell_def.value.get(), cell_def.value.size());
+                m_context.set_numeric_cell(pos, v);
+
+                cout << get_display_cell_string(pos) << ": (n) " << v << endl;
+                break;
+            }
+            case ct_boolean:
+            {
+                bool b = global::to_bool(cell_def.value.get(), cell_def.value.size());
+                m_context.set_boolean_cell(pos, b);
+
+                cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << endl;
+                break;
+            }
+            default:
+                throw model_parser::parse_error("unknown content type");
         }
-        case ct_string:
-        {
-            m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
-
-            cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
-            break;
-        }
-        case ct_value:
-        {
-            double v = global::to_double(cell_def.value.get(), cell_def.value.size());
-            m_context.set_numeric_cell(pos, v);
-
-            cout << get_display_cell_string(pos) << ": (n) " << v << endl;
-            break;
-        }
-        case ct_boolean:
-        {
-            bool b = global::to_bool(cell_def.value.get(), cell_def.value.size());
-            m_context.set_boolean_cell(pos, b);
-
-            cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << endl;
-            break;
-        }
-        default:
-            throw model_parser::parse_error("unknown content type");
     }
 }
 
@@ -420,52 +424,56 @@ void model_parser::parse_edit()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
-    abs_address_t pos = cell_def.pos.first;
-    m_dirty_cell_addrs.push_back(pos);
-    unregister_formula_cell(m_context, pos);
+    abs_address_iterator iter(cell_def.pos);
 
-    if (cell_def.value.empty())
+    for (const abs_address_t& pos : iter)
     {
-        // A valid name is given but with empty definition.  Just remove the
-        // existing cell.
-        m_context.erase_cell(pos);
-        return;
-    }
+        m_dirty_cell_addrs.push_back(pos);
+        unregister_formula_cell(m_context, pos);
 
-    switch (cell_def.type)
-    {
-        case ct_formula:
+        if (cell_def.value.empty())
         {
-            unregister_formula_cell(m_context, pos);
-
-            formula_tokens_t tokens =
-                parse_formula_string(
-                    m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
-
-            m_context.set_formula_cell(pos, std::move(tokens));
-            m_dirty_cells.insert(pos);
-            register_formula_cell(m_context, pos);
-            cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
+            // A valid name is given but with empty definition.  Just remove the
+            // existing cell.
+            m_context.erase_cell(pos);
+            continue;
         }
-        break;
-        case ct_string:
+
+        switch (cell_def.type)
         {
-            m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
-            cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
-        }
-        break;
-        case ct_value:
-        {
-            double v = global::to_double(cell_def.value.get(), cell_def.value.size());
-            m_context.set_numeric_cell(pos, v);
+            case ct_formula:
+            {
+                unregister_formula_cell(m_context, pos);
 
-            address_t pos_display(pos);
-            pos_display.set_absolute(false);
-            cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
+                formula_tokens_t tokens =
+                    parse_formula_string(
+                        m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+
+                m_context.set_formula_cell(pos, std::move(tokens));
+                m_dirty_cells.insert(pos);
+                register_formula_cell(m_context, pos);
+                cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
+            }
+            break;
+            case ct_string:
+            {
+                m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
+                cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
+            }
+            break;
+            case ct_value:
+            {
+                double v = global::to_double(cell_def.value.get(), cell_def.value.size());
+                m_context.set_numeric_cell(pos, v);
+
+                address_t pos_display(pos);
+                pos_display.set_absolute(false);
+                cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
+            }
+            break;
+            default:
+                throw model_parser::parse_error("unknown content type");
         }
-        break;
-        default:
-            throw model_parser::parse_error("unknown content type");
     }
 }
 
