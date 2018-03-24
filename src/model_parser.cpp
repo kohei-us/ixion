@@ -369,7 +369,7 @@ void model_parser::parse_init()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
-    abs_address_iterator iter(cell_def.pos);
+    abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
 
     for (const abs_address_t& pos : iter)
     {
@@ -424,7 +424,7 @@ void model_parser::parse_edit()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
-    abs_address_iterator iter(cell_def.pos);
+    abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
 
     for (const abs_address_t& pos : iter)
     {
