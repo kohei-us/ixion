@@ -452,23 +452,20 @@ void model_parser::parse_edit()
                 m_context.set_formula_cell(pos, std::move(tokens));
                 m_dirty_cells.insert(pos);
                 register_formula_cell(m_context, pos);
-                cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
+                cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
             }
             break;
             case ct_string:
             {
                 m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
-                cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
+                cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
             }
             break;
             case ct_value:
             {
                 double v = global::to_double(cell_def.value.get(), cell_def.value.size());
                 m_context.set_numeric_cell(pos, v);
-
-                address_t pos_display(pos);
-                pos_display.set_absolute(false);
-                cout << mp_name_resolver->get_name(pos_display, abs_address_t(), false) << ": (n) " << v << endl;
+                cout << get_display_cell_string(pos) << ": (n) " << v << endl;
             }
             break;
             default:
@@ -958,8 +955,9 @@ void model_parser::check()
                     if (!ps)
                         throw check_error("failed to retrieve a string value for a string cell.");
 
+                    const string* ps_expected = m_context.get_string(res.get_string());
                     ostringstream os;
-                    os << "unexpected string result: (expected: " << res.get_string() << "; actual: " << *ps << ")";
+                    os << "unexpected string result: (expected: '" << *ps_expected << "'; actual: '" << *ps << "')";
                     throw check_error(os.str());
                 }
                 break;

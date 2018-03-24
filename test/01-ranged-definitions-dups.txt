@@ -1,0 +1,37 @@
+%% Test range definitions for duplicated values.
+%mode init
+{A1:B2}=2*3
+{A3:B4}@text
+{A5:B6}:12.2
+%calc
+%mode result
+A1=6
+A2=6
+A3="text"
+A4="text"
+A5=12.2
+A6=12.2
+B1=6
+B2=6
+B3="text"
+B4="text"
+B5=12.2
+B6=12.2
+%check
+%mode edit
+{A1:B6}@overwritten
+%mode result
+A1="overwritten"
+A2="overwritten"
+A3="overwritten"
+A4="overwritten"
+A5="overwritten"
+A6="overwritten"
+B1="overwritten"
+B2="overwritten"
+B3="overwritten"
+B4="overwritten"
+B5="overwritten"
+B6="overwritten"
+%check
+%exit
