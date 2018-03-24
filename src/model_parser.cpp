@@ -433,9 +433,6 @@ void model_parser::parse_edit()
     {
         case ct_formula:
         {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: formula" << endl;
-#endif
             unregister_formula_cell(m_context, cell_def.pos);
 
             formula_tokens_t tokens =
@@ -446,26 +443,16 @@ void model_parser::parse_edit()
             m_dirty_cells.insert(cell_def.pos);
             register_formula_cell(m_context, cell_def.pos);
             cout << cell_def.name.str() << ": (f) " << cell_def.value.str() << endl;
-#if DEBUG_MODEL_PARSER
-            std::string s = print_formula_tokens(m_context, cell_def.pos, *tokens);
-            __IXION_DEBUG_OUT__ << "formula tokens: " << s << endl;
-#endif
         }
         break;
         case ct_string:
         {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: string" << endl;
-#endif
             m_context.set_string_cell(cell_def.pos, cell_def.value.get(), cell_def.value.size());
             cout << cell_def.name.str() << ": (s) " << cell_def.value.str() << endl;
         }
         break;
         case ct_value:
         {
-#if DEBUG_MODEL_PARSER
-            __IXION_DEBUG_OUT__ << "pos: " << resolver.get_name(cell_def.pos, false) << " type: numeric" << endl;
-#endif
             double v = global::to_double(cell_def.value.get(), cell_def.value.size());
             m_context.set_numeric_cell(cell_def.pos, v);
 
@@ -779,7 +766,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
     }
 
 #if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << "name: " << ret.name.str() << "  value: " << ret.value.str() << endl;
+    __IXION_DEBUG_OUT__ << "(name='" << ret.name.str() << "'; value='" << ret.value.str() << "'" << endl;
 #endif
 
     if (ret.name.empty())
