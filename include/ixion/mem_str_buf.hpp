@@ -35,6 +35,7 @@ public:
     void append(const char* p);
     void set_start(const char* p);
     void inc();
+    void dec();
     void pop_front();
     bool empty() const;
     size_t size() const;
@@ -47,6 +48,7 @@ public:
     char operator[] (size_t pos) const;
     bool operator== (const mem_str_buf& r) const;
     bool operator!= (const mem_str_buf& r) const { return !operator==(r); }
+    char back() const;
 
 private:
     const char* mp_buf;

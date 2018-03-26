@@ -369,6 +369,11 @@ void model_parser::parse_init()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
+    if (cell_def.matrix_value)
+    {
+        throw std::runtime_error("WIP: handle matrix cells.");
+    }
+
     abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
 
     for (const abs_address_t& pos : iter)
@@ -725,11 +730,21 @@ model_parser::parsed_assignment_type model_parser::parse_assignment()
 
 model_parser::cell_def_type model_parser::parse_cell_definition()
 {
-    enum class section_type { in_braced_name, after_braced_name, name, value };
+    enum class section_type
+    {
+        name,
+        braced_name,
+        after_braced_name,
+        braced_value,
+        value
+    };
+
     section_type section = section_type::name;
 
     cell_def_type ret;
     ret.type = model_parser::ct_unknown;
+
+    char skip_next = 0;
 
     mem_str_buf buf;
 
@@ -737,13 +752,26 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
 
     for (; mp_char != mp_end  && *mp_char != '\n'; ++mp_char)
     {
+        if (skip_next)
+        {
+            if (*mp_char != skip_next)
+            {
+                std::ostringstream os;
+                os << "'" << skip_next << "' was expected, but '" << *mp_char << "' was found.";
+                throw model_parser::parse_error(os.str());
+            }
+
+            skip_next = 0;
+            continue;
+        }
+
         switch (section)
         {
             case section_type::name:
             {
                 if (mp_char == line_head && *mp_char == '{')
                 {
-                    section = section_type::in_braced_name;
+                    section = section_type::braced_name;
                     continue;
                 }
 
@@ -777,7 +805,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
 
                 break;
             }
-            case section_type::in_braced_name:
+            case section_type::braced_name:
             {
                 if (*mp_char == '}')
                 {
@@ -791,32 +819,36 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
             }
             case section_type::after_braced_name:
             {
-                if (is_separator(*mp_char))
+                switch (*mp_char)
                 {
-                    switch (*mp_char)
+                    case '{':
+                        section = section_type::braced_value;
+                        ret.type = model_parser::ct_formula;
+                        skip_next = '=';
+                        break;
+                    case '=':
+                        ret.type = model_parser::ct_formula;
+                        section = section_type::value;
+                        break;
+                    case ':':
+                        ret.type = model_parser::ct_value;
+                        section = section_type::value;
+                        break;
+                    case '@':
+                        ret.type = model_parser::ct_string;
+                        section = section_type::value;
+                        break;
+                    default:
                     {
-                        case '=':
-                            ret.type = model_parser::ct_formula;
-                            break;
-                        case ':':
-                            ret.type = model_parser::ct_value;
-                            break;
-                        case '@':
-                            ret.type = model_parser::ct_string;
-                            break;
-                        default:
-                            ;
+                        std::ostringstream os;
+                        os << "Unexpected character after braced name: '" << *mp_char << "'";
+                        throw model_parser::parse_error(os.str());
                     }
+                }
 
-                    section = section_type::value;
-                    continue;
-                }
-                else
-                {
-                    throw model_parser::parse_error("WIP");
-                }
-                break;
+                continue; // skip this character.
             }
+            case section_type::braced_value:
             case section_type::value:
             default:
                 ;
@@ -835,6 +867,20 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
         // Check if this is a potential boolean value.
         if (ret.value[0] == 't' || ret.value[0] == 'f')
             ret.type = model_parser::ct_boolean;
+    }
+
+    if (section == section_type::braced_value)
+    {
+        // Make sure that the braced value ends with '}'.
+        char last = ret.value.back();
+        if (last != '}')
+        {
+            std::ostringstream os;
+            os << "'}' was expected at the end of a braced value, but '" << last << "' was found.";
+            model_parser::parse_error(os.str());
+        }
+        ret.value.dec();
+        ret.matrix_value = true;
     }
 
 #if DEBUG_MODEL_PARSER

@@ -64,6 +64,8 @@ class model_parser
         mem_str_buf value;
         cell_type type;
         abs_range_t pos;
+
+        bool matrix_value = false;
     };
 
 public:

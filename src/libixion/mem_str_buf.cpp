@@ -55,6 +55,12 @@ void mem_str_buf::inc()
     ++m_size;
 }
 
+void mem_str_buf::dec()
+{
+    assert(mp_buf);
+    --m_size;
+}
+
 void mem_str_buf::pop_front()
 {
     ++mp_buf;
@@ -123,6 +129,14 @@ bool mem_str_buf::operator== (const mem_str_buf& r) const
             return false;
 
     return true;
+}
+
+char mem_str_buf::back() const
+{
+    if (!m_size)
+        return '\0';
+
+    return mp_buf[m_size-1];
 }
 
 bool operator< (const mem_str_buf& left, const mem_str_buf& right)
