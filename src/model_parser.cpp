@@ -380,6 +380,8 @@ void model_parser::parse_init()
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_cells.insert(pos);
+
+        cout << "{" << get_display_range_string(cell_def.pos) << "}: (m) " << cell_def.value.str() << endl;
         return;
     }
 
@@ -1043,6 +1045,14 @@ std::string model_parser::get_display_cell_string(const abs_address_t& pos) cons
 {
     address_t pos_display(pos);
     pos_display.set_absolute(false);
+    return mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name);
+}
+
+std::string model_parser::get_display_range_string(const abs_range_t& pos) const
+{
+    range_t pos_display(pos);
+    pos_display.first.set_absolute(false);
+    pos_display.last.set_absolute(false);
     return mp_name_resolver->get_name(pos_display, abs_address_t(), m_print_sheet_name);
 }
 

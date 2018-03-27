@@ -594,7 +594,7 @@ void model_context_impl::set_grouped_formula_cells(
         for (row_t row_offset = 0; row_offset < rows; ++row_offset)
         {
             row_t row = top_left.row + row_offset;
-            pos_hint = col_store.set(pos_hint, row, new formula_cell(row, col, cs, ts));
+            pos_hint = col_store.set(pos_hint, row, new formula_cell(row_offset, col_offset, cs, ts));
         }
     }
 }

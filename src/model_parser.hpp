@@ -119,6 +119,7 @@ private:
     void check();
 
     std::string get_display_cell_string(const abs_address_t& pos) const;
+    std::string get_display_range_string(const abs_range_t& pos) const;
 
 private:
 
