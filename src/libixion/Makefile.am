@@ -45,8 +45,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	function_objects.hpp \
 	function_objects.cpp \
 	global.cpp \
-	grouped_formula_cells.hpp \
-	grouped_formula_cells.cpp \
 	info.cpp \
 	lexer_tokens.hpp \
 	lexer_tokens.cpp \
