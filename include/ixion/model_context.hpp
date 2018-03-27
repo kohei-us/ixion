@@ -102,6 +102,8 @@ public:
      */
     void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
 
+    void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
+
     abs_range_t get_data_range(sheet_t sheet) const;
 
     void set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);

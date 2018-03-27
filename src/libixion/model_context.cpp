@@ -17,6 +17,7 @@
 
 #include "workbook.hpp"
 #include "model_types.hpp"
+#include "calc_status.hpp"
 
 #include <sstream>
 #include <unordered_map>
@@ -108,6 +109,7 @@ public:
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
     void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
+    void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
@@ -569,6 +571,34 @@ void model_context_impl::set_formula_cell(
     pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
 }
 
+void model_context_impl::set_grouped_formula_cells(
+    const abs_range_t& group_range, formula_tokens_t tokens)
+{
+    const abs_address_t& top_left = group_range.first;
+    row_t rows = group_range.last.row - group_range.first.row + 1;
+    col_t cols = group_range.last.column - group_range.first.column + 1;
+
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+
+    calc_status_ptr_t cs(new calc_status);
+
+    worksheet& sheet = m_sheets.at(top_left.sheet);
+
+    for (col_t col_offset = 0; col_offset < cols; ++col_offset)
+    {
+        col_t col = top_left.column + col_offset;
+        column_store_t& col_store = sheet.at(col);
+        column_store_t::iterator& pos_hint = sheet.get_pos_hint(col);
+
+        for (row_t row_offset = 0; row_offset < rows; ++row_offset)
+        {
+            row_t row = top_left.row + row_offset;
+            pos_hint = col_store.set(pos_hint, row, new formula_cell(row, col, cs, ts));
+        }
+    }
+}
+
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 {
     const worksheet& cols = m_sheets.at(sheet);
@@ -886,6 +916,12 @@ void model_context::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
     mp_impl->set_formula_cell(addr, tokens);
+}
+
+void model_context::set_grouped_formula_cells(
+    const abs_range_t& group_range, formula_tokens_t tokens)
+{
+    mp_impl->set_grouped_formula_cells(group_range, std::move(tokens));
 }
 
 abs_range_t model_context::get_data_range(sheet_t sheet) const

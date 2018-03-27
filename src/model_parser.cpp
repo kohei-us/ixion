@@ -371,7 +371,16 @@ void model_parser::parse_init()
 
     if (cell_def.matrix_value)
     {
-        throw std::runtime_error("WIP: handle matrix cells.");
+        assert(cell_def.type == ct_formula);
+        const abs_address_t& pos = cell_def.pos.first;
+
+        formula_tokens_t tokens =
+            parse_formula_string(
+                m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+
+        m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
+        m_dirty_cells.insert(pos);
+        return;
     }
 
     abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
@@ -429,6 +438,24 @@ void model_parser::parse_edit()
     if (cell_def.name.empty() && cell_def.value.empty())
         return;
 
+    if (cell_def.matrix_value)
+    {
+        assert(cell_def.type == ct_formula);
+        const abs_address_t& pos = cell_def.pos.first;
+
+        m_dirty_cell_addrs.push_back(pos);
+        unregister_formula_cell(m_context, pos);
+
+        formula_tokens_t tokens =
+            parse_formula_string(
+                m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+
+        m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
+        m_dirty_cells.insert(pos);
+        register_formula_cell(m_context, pos);
+        return;
+    }
+
     abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
 
     for (const abs_address_t& pos : iter)
@@ -448,8 +475,6 @@ void model_parser::parse_edit()
         {
             case ct_formula:
             {
-                unregister_formula_cell(m_context, pos);
-
                 formula_tokens_t tokens =
                     parse_formula_string(
                         m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
