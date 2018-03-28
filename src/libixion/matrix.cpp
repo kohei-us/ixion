@@ -47,7 +47,7 @@ struct numeric_matrix::impl
 
     size_t to_array_pos(size_t row, size_t col) const
     {
-        return row * m_cols + col;
+        return m_rows * col + row;
     }
 };
 
