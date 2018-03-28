@@ -8,4 +8,15 @@ D1:5
 E1:6
 {C5:E7}{=MMULT(A1:A3,C1:E1)}
 %calc
+%mode result
+C5=4
+D5=5
+E5=6
+C6=8
+D6=10
+E6=12
+C7=12
+D7=15
+E7=18
+%check
 %exit

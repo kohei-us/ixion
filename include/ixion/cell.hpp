@@ -85,6 +85,17 @@ public:
 
     const formula_result& get_result_cache() const;
     const formula_result* get_result_cache_nowait() const;
+
+    /**
+     * Get the cached result as a single cell.  For a non-grouped formula
+     * cell, it should be identical to the value from the {@link
+     * get_result_cache} call.  For a grouped formula cell, you'll get a
+     * single value assigned to the position of the cell in case the original
+     * result is a matrix value.
+     *
+     * @return formula result.
+     */
+    formula_result get_single_result_cache() const;
 };
 
 }

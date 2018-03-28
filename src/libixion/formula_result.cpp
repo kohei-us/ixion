@@ -472,6 +472,11 @@ formula_error_t formula_result::get_error() const
     return mp_impl->get_error();
 }
 
+const matrix& formula_result::get_matrix() const
+{
+    return mp_impl->get_matrix();
+}
+
 formula_result::result_type formula_result::get_type() const
 {
     return mp_impl->get_type();

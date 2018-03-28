@@ -14,6 +14,7 @@
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/global.hpp"
+#include "ixion/matrix.hpp"
 
 #include "formula_interpreter.hpp"
 
@@ -346,6 +347,43 @@ const formula_result* formula_cell::get_result_cache_nowait() const
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
     return mp_impl->m_calc_status->result.get();
+}
+
+formula_result formula_cell::get_single_result_cache() const
+{
+    const formula_result& src = get_result_cache();
+
+    if (!mp_impl->is_grouped())
+        return src;  // returns a copy.
+
+    if (src.get_type() != formula_result::result_type::matrix)
+        // A grouped cell should have a matrix result whose size equals the
+        // size of the group. But in case of anything else, just return the
+        // stored value.
+        return src;
+
+    const matrix& m = src.get_matrix();
+    row_t row_size = m.row_size();
+    col_t col_size = m.col_size();
+
+    if (mp_impl->m_group_pos.row >= row_size || mp_impl->m_group_pos.column >= col_size)
+        return formula_result(formula_error_t::invalid_value_type);
+
+    matrix::element elem = m.get(mp_impl->m_group_pos.row, mp_impl->m_group_pos.column);
+
+    switch (elem.type)
+    {
+        case matrix::element_type::numeric:
+            return formula_result(elem.numeric);
+        case matrix::element_type::string:
+            return formula_result(elem.string_id);
+        case matrix::element_type::empty:
+            return formula_result();
+        case matrix::element_type::boolean:
+            return formula_result(elem.boolean ? 1.0 : 0.0);
+        default:
+            throw std::logic_error("unhandled element type of a matrix result value.");
+    }
 }
 
 }

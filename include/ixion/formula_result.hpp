@@ -75,6 +75,14 @@ public:
     formula_error_t get_error() const;
 
     /**
+     * Get a matrix value of the result.  The caller must make sure that the
+     * result is of matrix type, else the behavior is undefined.
+     *
+     * @return matrix result value.
+     */
+    const matrix& get_matrix() const;
+
+    /**
      * Get the type of result.
      *
      * @return enum value representing the result type.

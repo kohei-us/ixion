@@ -104,16 +104,20 @@ enum class formula_name_resolver_t
 
 /**
  * Formula error types.
+ *
+ * @see get_formula_error_name
  */
 enum class formula_error_t
 {
-    no_error = 0,
+    no_error                 = 0,
     ref_result_not_available = 1,
-    division_by_zero = 2,
-    invalid_expression = 3,
-    name_not_found = 4,
-    stack_error = 5,
-    general_error = 999,
+    division_by_zero         = 2,
+    invalid_expression       = 3,
+    name_not_found           = 4,
+    no_range_intersection    = 5,
+    invalid_value_type       = 6,
+    stack_error              = 998,
+    general_error            = 999,
 };
 
 struct IXION_DLLPUBLIC sheet_size_t
@@ -126,6 +130,12 @@ struct IXION_DLLPUBLIC sheet_size_t
     sheet_size_t(row_t _row, col_t _column);
 };
 
+/**
+ * Get a string representation of a formula error type.
+ *
+ * @param fe enum value representing a formula error type.
+ * @return string representation of the formula error type.
+ */
 IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
 
 }

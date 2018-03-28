@@ -26,11 +26,13 @@ const char* get_formula_error_name(formula_error_t fe)
     static const char* default_err_name = "#ERR!";
 
     static const std::vector<const char*> names = {
-        "",        // no error
-        "#REF!",   // result not available
-        "#DIV/0!", // division by zero
-        "#NUM!",   // invalid expression
-        "#NAME?",  // name not found
+        "",        // 0: no error
+        "#REF!",   // 1: result not available
+        "#DIV/0!", // 2: division by zero
+        "#NUM!",   // 3: invalid expression
+        "#NAME?",  // 4: name not found
+        "#NULL!",  // 5: no range intersection
+        "#VALUE!", // 6: invalid value type
     };
 
     if (static_cast<size_t>(fe) < names.size())
