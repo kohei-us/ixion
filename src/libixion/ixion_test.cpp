@@ -13,6 +13,7 @@
 #include "ixion/macros.hpp"
 #include "ixion/interface/table_handler.hpp"
 #include "ixion/config.hpp"
+#include "ixion/matrix.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -100,6 +101,41 @@ void test_formula_tokens_store()
     assert(p->get_reference_count() == 1);
     p.reset();
 }
+
+void test_matrix()
+{
+    struct check
+    {
+        size_t row;
+        size_t col;
+        double val;
+    };
+
+    std::vector<check> checks =
+    {
+        { 0, 0, 1.0 },
+        { 0, 1, 2.0 },
+        { 1, 0, 3.0 },
+        { 1, 1, 4.0 },
+    };
+
+    numeric_matrix num_mtx(2, 2);
+
+    for (const check& c : checks)
+        num_mtx(c.row, c.col) = c.val;
+
+    for (const check& c : checks)
+        assert(num_mtx(c.row, c.col) == c.val);
+
+    matrix mtx(num_mtx);
+
+    for (const check& c : checks)
+    {
+        matrix::element e = mtx.get(c.row, c.col);
+        assert(e.type == matrix::element_type::numeric);
+        assert(e.numeric == c.val);
+    }
+};
 
 struct ref_name_entry
 {
@@ -1008,6 +1044,7 @@ int main()
     test_string_to_double();
     test_string_pool();
     test_formula_tokens_store();
+    test_matrix();
 
     test_name_resolver_excel_a1();
     test_name_resolver_named_expression();
@@ -1019,6 +1056,8 @@ int main()
     test_function_name_resolution();
     test_model_context_storage();
     test_volatile_function();
+
     return EXIT_SUCCESS;
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
