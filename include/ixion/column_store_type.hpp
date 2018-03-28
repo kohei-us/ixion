@@ -16,6 +16,7 @@
 #include <mdds/multi_type_vector.hpp>
 #include <mdds/multi_type_vector_macro.hpp>
 #include <mdds/multi_type_vector_custom_func1.hpp>
+#include <mdds/multi_type_matrix.hpp>
 
 namespace ixion {
 
@@ -45,6 +46,20 @@ typedef mdds::multi_type_vector<ixion_element_block_func> column_store_t;
 
 /** Type that represents a collection of columns. */
 typedef std::vector<column_store_t*> column_stores_t;
+
+/**
+ * The integer element blocks are used to store string ID's.  The actual
+ * string element blocks are not used in the matrix store in ixion.
+ */
+struct matrix_store_trait
+{
+    typedef mdds::mtv::ulong_element_block integer_element_block;
+    typedef mdds::mtv::string_element_block string_element_block;
+
+    typedef mdds::mtv::element_block_func element_block_func;
+};
+
+typedef mdds::multi_type_matrix<matrix_store_trait> matrix_store_t;
 
 }
 

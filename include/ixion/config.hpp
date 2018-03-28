@@ -25,6 +25,16 @@ struct IXION_DLLPUBLIC config
     char sep_function_arg;
 
     /**
+     * Matrix column separator.
+     */
+    char sep_matrix_column;
+
+    /**
+     * Matrix row separator.
+     */
+    char sep_matrix_row;
+
+    /**
      * Precision to use when converting a numeric value to a string
      * representation.  A negative value indicates an unspecified precision.
      */

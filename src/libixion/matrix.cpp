@@ -8,8 +8,6 @@
 #include "ixion/matrix.hpp"
 #include "ixion/global.hpp"
 
-#include <mdds/multi_type_matrix.hpp>
-
 #include <limits>
 #include <cstring>
 #include <functional>
@@ -17,13 +15,11 @@
 
 namespace ixion {
 
-typedef mdds::multi_type_matrix<mdds::mtm::std_string_trait> store_type;
-
 const double nan = std::numeric_limits<double>::quiet_NaN();
 
 struct matrix::impl
 {
-    store_type m_data;
+    matrix_store_t m_data;
 
     impl() {}
 
@@ -116,6 +112,32 @@ void matrix::set(size_t row, size_t col, double val)
     mp_impl->m_data.set(row, col, val);
 }
 
+matrix::element matrix::get(size_t row, size_t col) const
+{
+    element me;
+    me.type = element_type::empty;
+
+    switch (mp_impl->m_data.get_type(row, col))
+    {
+        case mdds::mtm::element_numeric:
+            me.type = element_type::numeric;
+            me.numeric = mp_impl->m_data.get_numeric(row, col);
+            break;
+        case mdds::mtm::element_integer:
+            // This is a string ID.
+            me.type = element_type::string;
+            me.string_id = mp_impl->m_data.get_integer(row, col);
+            break;
+        case mdds::mtm::element_boolean:
+            me.type = element_type::boolean;
+            me.boolean = mp_impl->m_data.get_boolean(row, col);
+        default:
+            ;
+    }
+
+    return me;
+}
+
 size_t matrix::row_size() const
 {
     return mp_impl->m_data.size().row;
@@ -133,13 +155,13 @@ void matrix::swap(matrix& r)
 
 numeric_matrix matrix::as_numeric() const
 {
-    store_type::size_pair_type mtx_size = mp_impl->m_data.size();
+    matrix_store_t::size_pair_type mtx_size = mp_impl->m_data.size();
 
     std::vector<double> num_array(mtx_size.row*mtx_size.column, nan);
     double* dest = num_array.data();
 
-    std::function<void(const store_type::element_block_node_type&)> f =
-        [&](const store_type::element_block_node_type& node)
+    std::function<void(const matrix_store_t::element_block_node_type&)> f =
+        [&](const matrix_store_t::element_block_node_type& node)
         {
             assert(node.offset == 0);
 
@@ -147,7 +169,7 @@ numeric_matrix matrix::as_numeric() const
             {
                 case mdds::mtm::element_integer:
                 {
-                    using block_type = store_type::integer_block_type;
+                    using block_type = matrix_store_t::integer_block_type;
                     auto it  = block_type::begin(*node.data);
                     auto ite = block_type::end(*node.data);
 
@@ -157,7 +179,7 @@ numeric_matrix matrix::as_numeric() const
                 }
                 case mdds::mtm::element_boolean:
                 {
-                    using block_type = store_type::boolean_block_type;
+                    using block_type = matrix_store_t::boolean_block_type;
                     auto it  = block_type::begin(*node.data);
                     auto ite = block_type::end(*node.data);
 
@@ -167,7 +189,7 @@ numeric_matrix matrix::as_numeric() const
                 }
                 case mdds::mtm::element_numeric:
                 {
-                    using block_type = store_type::numeric_block_type;
+                    using block_type = matrix_store_t::numeric_block_type;
                     const double* src = &block_type::at(*node.data, 0);
                     std::memcpy(dest, src, sizeof(double)*node.size);
                     std::advance(dest, node.size);

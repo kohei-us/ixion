@@ -11,10 +11,14 @@ namespace ixion {
 
 config::config() :
     sep_function_arg(','),
+    sep_matrix_column(','),
+    sep_matrix_row(';'),
     output_precision(-1) {}
 
 config::config(const config& r) :
     sep_function_arg(r.sep_function_arg),
+    sep_matrix_column(r.sep_matrix_column),
+    sep_matrix_row(r.sep_matrix_row),
     output_precision(r.output_precision) {}
 
 }

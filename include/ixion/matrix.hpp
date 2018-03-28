@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_MATRIX_HPP
 
 #include "ixion/env.hpp"
+#include "ixion/column_store_type.hpp"
 
 #include <memory>
 #include <vector>
@@ -28,6 +29,21 @@ class IXION_DLLPUBLIC matrix
     std::unique_ptr<impl> mp_impl;
 
 public:
+
+    enum class element_type { numeric, string, boolean, empty };
+
+    struct element
+    {
+        element_type type;
+
+        union
+        {
+            double numeric;
+            bool boolean;
+            string_id_t string_id;
+        };
+    };
+
     matrix();
     matrix(size_t rows, size_t cols);
     matrix(const matrix& other);
@@ -48,6 +64,9 @@ public:
     bool is_numeric(size_t row, size_t col) const;
     double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
+
+    element get(size_t row, size_t col) const;
+
     size_t row_size() const;
     size_t col_size() const;
 

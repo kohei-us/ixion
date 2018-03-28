@@ -165,8 +165,56 @@ struct formula_result::impl
             }
             case result_type::matrix:
             {
-                // TODO : improve this a bit.
-                return "(matrix)";
+                const matrix& m = *m_matrix;
+
+                std::ostringstream os;
+
+                os << '{';
+
+                for (size_t row = 0; row < m.row_size(); ++row)
+                {
+                    if (row > 0)
+                        os << cxt.get_config().sep_matrix_row;
+
+                    for (size_t col = 0; col < m.col_size(); ++col)
+                    {
+                        if (col > 0)
+                            os << cxt.get_config().sep_matrix_column;
+
+                        matrix::element e = m.get(row, col);
+
+                        switch (e.type)
+                        {
+                            case matrix::element_type::numeric:
+                            {
+                                os << e.numeric;
+                                break;
+                            }
+                            case matrix::element_type::string:
+                            {
+                                const std::string* p = cxt.get_string(e.string_id);
+
+                                if (p)
+                                    os << '"' << *p << '"';
+                                else
+                                    os << "\"#ERR!\"";
+
+                                break;
+                            }
+                            case matrix::element_type::boolean:
+                            {
+                                os << e.boolean;
+                                break;
+                            }
+                            default:
+                                ;
+                        }
+                    }
+                }
+
+                os << '}';
+
+                return os.str();
             }
             default:
                 assert(!"unknown formula result type!");
