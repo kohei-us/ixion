@@ -19,4 +19,20 @@ C7=12
 D7=15
 E7=18
 %check
+%mode edit
+A1:2
+A2:4
+A3:6
+%recalc
+%mode result
+C5=8
+D5=10
+E5=12
+C6=16
+D6=20
+E6=24
+C7=24
+D7=30
+E7=36
+%check
 %exit
