@@ -120,8 +120,37 @@ struct formula_cell::impl
             // Error condition.
             throw formula_error(m_calc_status->result->get_error());
 
-        assert(m_calc_status->result->get_type() == formula_result::result_type::value);
-        return m_calc_status->result->get_value();
+        switch (m_calc_status->result->get_type())
+        {
+            case formula_result::result_type::value:
+                return m_calc_status->result->get_value();
+            case formula_result::result_type::matrix:
+            {
+                const matrix& m = m_calc_status->result->get_matrix();
+                row_t row_size = m.row_size();
+                col_t col_size = m.col_size();
+
+                if (m_group_pos.row >= row_size || m_group_pos.column >= col_size)
+                    throw formula_error(formula_error_t::invalid_value_type);
+
+                matrix::element elem = m.get(m_group_pos.row, m_group_pos.column);
+
+                switch (elem.type)
+                {
+                    case matrix::element_type::numeric:
+                        return elem.numeric;
+                    case matrix::element_type::empty:
+                        return 0.0;
+                    case matrix::element_type::boolean:
+                        return elem.boolean ? 1.0 : 0.0;
+                    case matrix::element_type::string:
+                    default:
+                        throw formula_error(formula_error_t::invalid_value_type);
+                }
+            }
+            default:
+                throw formula_error(formula_error_t::invalid_value_type);
+        }
     }
 
     bool is_grouped() const
