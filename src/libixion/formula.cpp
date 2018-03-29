@@ -248,18 +248,26 @@ void get_all_dirty_cells(
         }
     }
 
+    // Get all range listeners first, then add the listeners to the list of
+    // modified cells, to get their listeners too.
+
+    dirty_formula_cells_t range_listeners;
+    for (const abs_address_t& addr : addrs)
+        tracker.get_all_range_listeners(addr, range_listeners);
+
+    for (const abs_address_t& cell : range_listeners)
+    {
+        addrs.push_back(cell);
+        cells.insert(cell);
+    }
+
     // Remove duplicate entries.
     std::sort(addrs.begin(), addrs.end());
     addrs.erase(std::unique(addrs.begin(), addrs.end()), addrs.end());
 
-    {
-        modified_cells_t::const_iterator itr = addrs.begin(), itr_end = addrs.end();
-        for (; itr != itr_end; ++itr)
-        {
-            tracker.get_all_range_listeners(*itr, cells);
-            tracker.get_all_cell_listeners(*itr, cells);
-        }
-    }
+    // Now get the single cell listeners.
+    for (const abs_address_t& addr : addrs)
+        tracker.get_all_cell_listeners(addr, cells);
 }
 
 void calculate_cells(iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count)

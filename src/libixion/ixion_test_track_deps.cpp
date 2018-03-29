@@ -85,11 +85,8 @@ void test_range_dependency()
     dirty_formula_cells_t cells;
     get_all_dirty_cells(cxt, addrs, cells);
 
-    for (const abs_address_t& cell : cells)
-    {
-        std::string name = resolver->get_name(cell, abs_address_t(0,0,0), false);
-        cout << name << endl;
-    }
+    assert(cells.count(abs_address_t(0,4,2)) == 1);
+    assert(cells.count(abs_address_t(0,9,0)) == 1);
 }
 
 void test_matrix_dependency()
@@ -111,8 +108,6 @@ void test_matrix_dependency()
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
 
-    cout << resolver->get_name(range, abs_address_t(0,0,0), false) << endl;
-
     // C5:E7
     formula_tokens_t tokens = parse_formula_string(
         cxt, range.first, *resolver, IXION_ASCII("MMULT(A1:A3,C1:E1)"));
@@ -131,11 +126,8 @@ void test_matrix_dependency()
     dirty_formula_cells_t cells;
     get_all_dirty_cells(cxt, addrs, cells);
 
-    for (const abs_address_t& cell : cells)
-    {
-        std::string name = resolver->get_name(cell, abs_address_t(0,0,0), false);
-        cout << name << endl;
-    }
+    assert(cells.count(abs_address_t(0,4,2)) == 1);
+    assert(cells.count(abs_address_t(0,9,0)) == 1);
 }
 
 int main()
