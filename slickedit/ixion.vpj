@@ -297,6 +297,7 @@
 				<F N="../src/libixion/info.cpp"/>
 				<F N="../src/libixion/interface.cpp"/>
 				<F N="../src/libixion/ixion_test.cpp"/>
+				<F N="../src/libixion/ixion_test_track_deps.cpp"/>
 				<F N="../src/libixion/lexer_tokens.cpp"/>
 				<F N="../src/libixion/lexer_tokens.hpp"/>
 				<F
