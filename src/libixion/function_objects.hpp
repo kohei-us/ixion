@@ -26,23 +26,6 @@ class formula_cell;
 class formula_token;
 struct abs_address_t;
 
-class formula_cell_listener_handler : public std::unary_function<formula_token*, void>
-{
-public:
-    enum mode_t { mode_add, mode_remove };
-
-    explicit formula_cell_listener_handler(
-        iface::formula_model_access& cxt, const abs_address_t& addr, mode_t mode);
-
-    void operator() (const formula_token* p) const;
-
-private:
-    iface::formula_model_access& m_context;
-    cell_listener_tracker& m_listener_tracker;
-    const abs_address_t& m_addr;
-    mode_t m_mode;
-};
-
 class cell_dependency_handler : public std::unary_function<abs_address_t, void>
 {
 public:

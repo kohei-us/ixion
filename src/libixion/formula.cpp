@@ -193,10 +193,30 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
         // Not a formula cell. Bail out.
         return;
 
+    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+
     std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
-    std::for_each(ref_tokens.begin(), ref_tokens.end(),
-             formula_cell_listener_handler(cxt,
-                 pos, formula_cell_listener_handler::mode_add));
+
+    for (const formula_token* p : ref_tokens)
+    {
+        switch (p->get_opcode())
+        {
+            case fop_single_ref:
+            {
+                abs_address_t addr = p->get_single_ref().to_abs(pos);
+                tracker.add(pos, addr);
+                break;
+            }
+            case fop_range_ref:
+            {
+                abs_range_t range = p->get_range_ref().to_abs(pos);
+                tracker.add(pos, range);
+                break;
+            }
+            default:
+                ; // ignore the rest.
+        }
+    }
 
     // Check if the cell is volatile.
     const formula_tokens_store_ptr_t& ts = cell->get_tokens();
@@ -220,9 +240,28 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
     // itself as their listener.  This step is important
     // especially during partial re-calculation.
     std::vector<const formula_token*> ref_tokens = fcell->get_ref_tokens(cxt, pos);
-    for_each(ref_tokens.begin(), ref_tokens.end(),
-             formula_cell_listener_handler(cxt,
-                 pos, formula_cell_listener_handler::mode_remove));
+
+    for (const formula_token* p : ref_tokens)
+    {
+
+        switch (p->get_opcode())
+        {
+            case fop_single_ref:
+            {
+                abs_address_t addr = p->get_single_ref().to_abs(pos);
+                tracker.remove(pos, addr);
+                break;
+            }
+            case fop_range_ref:
+            {
+                abs_range_t range = p->get_range_ref().to_abs(pos);
+                tracker.remove(pos, range);
+                break;
+            }
+            default:
+                ; // ignore the rest.
+        }
+    }
 }
 
 void get_all_dirty_cells(

@@ -93,50 +93,6 @@ private:
 
 }
 
-formula_cell_listener_handler::formula_cell_listener_handler(
-    iface::formula_model_access& cxt, const abs_address_t& addr, mode_t mode) :
-    m_context(cxt),
-    m_listener_tracker(cxt.get_cell_listener_tracker()),
-    m_addr(addr),
-    m_mode(mode)
-{
-}
-
-void formula_cell_listener_handler::operator() (const formula_token* p) const
-{
-    switch (p->get_opcode())
-    {
-        case fop_single_ref:
-        {
-            abs_address_t addr = p->get_single_ref().to_abs(m_addr);
-            if (m_mode == mode_add)
-            {
-                m_listener_tracker.add(m_addr, addr);
-            }
-            else
-            {
-                assert(m_mode == mode_remove);
-                m_listener_tracker.remove(m_addr, addr);
-            }
-        }
-        break;
-        case fop_range_ref:
-        {
-            abs_range_t range = p->get_range_ref().to_abs(m_addr);
-            if (m_mode == mode_add)
-                m_context.get_cell_listener_tracker().add(m_addr, range);
-            else
-            {
-                assert(m_mode == mode_remove);
-                m_context.get_cell_listener_tracker().remove(m_addr, range);
-            }
-        }
-        break;
-        default:
-            ; // ignore the rest.
-    }
-}
-
 cell_dependency_handler::cell_dependency_handler(
     iface::formula_model_access& cxt, dependency_tracker& dep_tracker, dirty_formula_cells_t& dirty_cells) :
     m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
