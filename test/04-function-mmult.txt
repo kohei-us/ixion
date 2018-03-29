@@ -1,4 +1,5 @@
-%% Test built-in functions.
+%% Test built-in MMULT function which performs a matrix multiplication whose
+%% result is a matrix spanning over a range of cells.
 %mode init
 A1:1
 A2:2
