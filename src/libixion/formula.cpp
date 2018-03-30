@@ -221,7 +221,9 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
     // Check if the cell is volatile.
     const formula_tokens_store_ptr_t& ts = cell->get_tokens();
     if (ts && has_volatile(ts->get()))
-        cxt.get_cell_listener_tracker().add_volatile(pos);
+        tracker.add_volatile(pos);
+
+
 }
 
 void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)

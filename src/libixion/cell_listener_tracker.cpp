@@ -61,7 +61,6 @@ public:
 
 struct cell_listener_tracker::impl
 {
-
     iface::formula_model_access& m_context;
 
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
@@ -290,30 +289,6 @@ void cell_listener_tracker::get_all_range_listeners(
     mp_impl->get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
-void cell_listener_tracker::print_cell_listeners(
-    const abs_address_t& target, const formula_name_resolver& resolver) const
-{
-    {
-        address_t pos_display(target);
-        pos_display.set_absolute(false);
-        cout << "The following cells listen to cell "
-            << resolver.get_name(pos_display, abs_address_t(), false) << endl;
-    }
-
-    cell_store_type::const_iterator itr = mp_impl->m_cell_listeners.find(target);
-    if (itr == mp_impl->m_cell_listeners.end())
-        // No one listens to this target.
-        return;
-
-    const address_set_type& addrs = *itr->second;
-    address_set_type::const_iterator itr2 = addrs.begin(), itr2_end = addrs.end();
-    for (; itr2 != itr2_end; ++itr2)
-    {
-        address_t pos_display(*itr2);
-        pos_display.set_absolute(false);
-        cout << "  cell " << resolver.get_name(pos_display, abs_address_t(), false) << endl;
-    }
 }
 
-}
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

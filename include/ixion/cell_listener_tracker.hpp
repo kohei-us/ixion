@@ -88,8 +88,6 @@ public:
      * @param listeners
      */
     void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
-
-    void print_cell_listeners(const abs_address_t& target, const formula_name_resolver& resolver) const;
 };
 
 }
