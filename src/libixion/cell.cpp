@@ -415,9 +415,10 @@ formula_result formula_cell::get_single_result_cache() const
     }
 }
 
-uintptr_t formula_cell::identity() const
+formula_group_t formula_cell::get_group_properties() const
 {
-    return reinterpret_cast<uintptr_t>(mp_impl->m_calc_status.get());
+    uintptr_t identity = reinterpret_cast<uintptr_t>(mp_impl->m_calc_status.get());
+    return formula_group_t(mp_impl->m_calc_status->group_size, identity);
 }
 
 }

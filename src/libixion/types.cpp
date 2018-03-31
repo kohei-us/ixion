@@ -17,9 +17,31 @@ const sheet_t invalid_sheet = -2;
 
 const string_id_t empty_string_id = std::numeric_limits<string_id_t>::max();
 
-sheet_size_t::sheet_size_t() : row(0), column(0) {}
-sheet_size_t::sheet_size_t(const sheet_size_t& other) : row(other.row), column(other.column) {}
-sheet_size_t::sheet_size_t(row_t _row, col_t _column) : row(_row), column(_column) {}
+rc_size_t::rc_size_t() : row(0), column(0) {}
+rc_size_t::rc_size_t(const rc_size_t& other) : row(other.row), column(other.column) {}
+rc_size_t::rc_size_t(row_t _row, col_t _column) : row(_row), column(_column) {}
+rc_size_t::~rc_size_t() {}
+
+rc_size_t& rc_size_t::operator= (const rc_size_t& other)
+{
+    row = other.row;
+    column = other.column;
+    return *this;
+}
+
+formula_group_t::formula_group_t() : size(), identity(0) {}
+formula_group_t::formula_group_t(const formula_group_t& r) :
+    size(r.size), identity(r.identity) {}
+formula_group_t::formula_group_t(const rc_size_t& group_size, uintptr_t identity) :
+    size(group_size), identity(identity) {}
+formula_group_t::~formula_group_t() {}
+
+formula_group_t& formula_group_t::operator= (const formula_group_t& other)
+{
+    size = other.size;
+    identity = other.identity;
+    return *this;
+}
 
 const char* get_formula_error_name(formula_error_t fe)
 {

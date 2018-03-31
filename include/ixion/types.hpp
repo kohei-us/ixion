@@ -127,14 +127,38 @@ enum class formula_error_t
     general_error            = 999,
 };
 
-struct IXION_DLLPUBLIC sheet_size_t
+/**
+ * This structure stores a 2-dimensional size information.
+ */
+struct IXION_DLLPUBLIC rc_size_t
 {
     row_t row;
     col_t column;
 
-    sheet_size_t();
-    sheet_size_t(const sheet_size_t& other);
-    sheet_size_t(row_t _row, col_t _column);
+    rc_size_t();
+    rc_size_t(const rc_size_t& other);
+    rc_size_t(row_t _row, col_t _column);
+    ~rc_size_t();
+
+    rc_size_t& operator= (const rc_size_t& other);
+};
+
+/**
+ * This strcuture stores information about grouped formula cells.  All
+ * formula cells belonging to the same group should return the same set of
+ * values.
+ */
+struct IXION_DLLPUBLIC formula_group_t
+{
+    rc_size_t size;
+    uintptr_t identity;
+
+    formula_group_t();
+    formula_group_t(const formula_group_t& r);
+    formula_group_t(const rc_size_t& group_size, uintptr_t identity);
+    ~formula_group_t();
+
+    formula_group_t& operator= (const formula_group_t& other);
 };
 
 /**

@@ -15,7 +15,7 @@ namespace ixion {
 grouped_range_error::grouped_range_error(const std::string& msg) : general_error(msg) {}
 grouped_range_error::~grouped_range_error() throw() {}
 
-grouped_ranges::sheet_type::sheet_type(sheet_size_t ss) :
+grouped_ranges::sheet_type::sheet_type(rc_size_t ss) :
     rows(0, ss.row, 0), columns(0, ss.column, 0) {}
 
 void grouped_ranges::sheet_type::build_trees() const

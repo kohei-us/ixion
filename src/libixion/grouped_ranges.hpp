@@ -35,7 +35,7 @@ class grouped_ranges
         mutable ranges_type rows;
         mutable ranges_type columns;
 
-        sheet_type(sheet_size_t ss);
+        sheet_type(rc_size_t ss);
 
         void build_trees() const;
     };

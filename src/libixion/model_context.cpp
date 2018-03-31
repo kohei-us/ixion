@@ -132,7 +132,7 @@ public:
 
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
-    sheet_size_t get_sheet_size(sheet_t sheet) const;
+    rc_size_t get_sheet_size(sheet_t sheet) const;
     size_t get_sheet_count() const;
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
@@ -233,7 +233,7 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
     return m_sheet_names[sheet];
 }
 
-sheet_size_t model_context_impl::get_sheet_size(sheet_t sheet) const
+rc_size_t model_context_impl::get_sheet_size(sheet_t sheet) const
 {
     return m_sheets.at(sheet).get_sheet_size();
 }
@@ -575,23 +575,25 @@ void model_context_impl::set_grouped_formula_cells(
     const abs_range_t& group_range, formula_tokens_t tokens)
 {
     const abs_address_t& top_left = group_range.first;
-    row_t rows = group_range.last.row - group_range.first.row + 1;
-    col_t cols = group_range.last.column - group_range.first.column + 1;
+
+    rc_size_t group_size;
+    group_size.row    = group_range.last.row - group_range.first.row + 1;
+    group_size.column = group_range.last.column - group_range.first.column + 1;
 
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
 
-    calc_status_ptr_t cs(new calc_status);
+    calc_status_ptr_t cs(new calc_status(group_size));
 
     worksheet& sheet = m_sheets.at(top_left.sheet);
 
-    for (col_t col_offset = 0; col_offset < cols; ++col_offset)
+    for (col_t col_offset = 0; col_offset < group_size.column; ++col_offset)
     {
         col_t col = top_left.column + col_offset;
         column_store_t& col_store = sheet.at(col);
         column_store_t::iterator& pos_hint = sheet.get_pos_hint(col);
 
-        for (row_t row_offset = 0; row_offset < rows; ++row_offset)
+        for (row_t row_offset = 0; row_offset < group_size.row; ++row_offset)
         {
             row_t row = top_left.row + row_offset;
             pos_hint = col_store.set(pos_hint, row, new formula_cell(row_offset, col_offset, cs, ts));
@@ -1053,7 +1055,7 @@ std::string model_context::get_sheet_name(sheet_t sheet) const
     return mp_impl->get_sheet_name(sheet);
 }
 
-sheet_size_t model_context::get_sheet_size(sheet_t sheet) const
+rc_size_t model_context::get_sheet_size(sheet_t sheet) const
 {
     return mp_impl->get_sheet_size(sheet);
 }

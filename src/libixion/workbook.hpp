@@ -44,7 +44,7 @@ public:
     detail::named_expressions_t& get_named_expressions() { return m_named_expressions; }
     const detail::named_expressions_t& get_named_expressions() const { return m_named_expressions; }
 
-    sheet_size_t get_sheet_size() const;
+    rc_size_t get_sheet_size() const;
 
 private:
     column_stores_t m_columns;

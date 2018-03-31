@@ -29,7 +29,7 @@ namespace {
 
 bool check_address_by_sheet_bounds(const iface::formula_model_access* cxt, const address_t& pos)
 {
-    sheet_size_t ss(row_upper_bound, column_upper_bound);
+    rc_size_t ss(row_upper_bound, column_upper_bound);
 
     if (cxt && pos.sheet >= 0 && size_t(pos.sheet) < cxt->get_sheet_count())
     {

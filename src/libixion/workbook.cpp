@@ -29,12 +29,12 @@ worksheet::~worksheet()
     std::for_each(m_columns.begin(), m_columns.end(), default_deleter<column_store_t>());
 }
 
-sheet_size_t worksheet::get_sheet_size() const
+rc_size_t worksheet::get_sheet_size() const
 {
     if (m_columns.empty())
-        return sheet_size_t(0, 0);
+        return rc_size_t(0, 0);
 
-    return sheet_size_t(m_columns[0]->size(), m_columns.size());
+    return rc_size_t(m_columns[0]->size(), m_columns.size());
 }
 
 workbook::workbook() {}

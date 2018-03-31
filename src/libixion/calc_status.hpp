@@ -25,9 +25,13 @@ struct calc_status
     std::mutex mtx;
     std::condition_variable cond;
     std::unique_ptr<formula_result> result;
+
+    const rc_size_t group_size;
+
     size_t refcount;
 
     calc_status();
+    calc_status(const rc_size_t& group_size);
 
     void add_ref();
     void release_ref();

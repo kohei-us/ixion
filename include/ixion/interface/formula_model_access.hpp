@@ -142,7 +142,7 @@ public:
      *
      * @return size of the sheet.
      */
-    virtual sheet_size_t get_sheet_size(sheet_t sheet) const = 0;
+    virtual rc_size_t get_sheet_size(sheet_t sheet) const = 0;
 
     /**
      * Return the number of sheets.
