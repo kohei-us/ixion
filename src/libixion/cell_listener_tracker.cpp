@@ -7,8 +7,8 @@
 
 #include "ixion/cell_listener_tracker.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/model_context.hpp"
 
 #include <mdds/rectangle_set.hpp>
 
@@ -20,6 +20,8 @@
 #if DEBUG_CELL_LISTENER_TRACKER
 #include <iostream>
 #endif
+
+#include "grouped_ranges.hpp"
 
 using namespace std;
 
@@ -33,11 +35,11 @@ typedef std::unordered_map<abs_range_t, cell_listener_tracker::address_set_type*
 
 class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
 {
-    iface::formula_model_access& m_context;
+    model_context& m_context;
     dirty_formula_cells_t& m_dirty_cells;
     cell_listener_tracker::address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(iface::formula_model_access& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
+    dirty_cell_inserter(model_context& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
     void operator() (const cell_listener_tracker::address_set_type* p)
@@ -61,14 +63,20 @@ public:
 
 struct cell_listener_tracker::impl
 {
-    iface::formula_model_access& m_context;
+    model_context& m_context;
 
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
     cell_store_type m_cell_listeners;         ///< store listeners for single cells.
     range_store_type m_range_listeners;       ///< store listeners for ranges.
     cell_listener_tracker::address_set_type m_volatile_cells;
 
-    impl(iface::formula_model_access& cxt) : m_context(cxt) {}
+    grouped_ranges m_grouped_ranges;
+
+    impl(model_context& cxt) :
+        m_context(cxt),
+        m_grouped_ranges(cxt)
+    {
+    }
 
     ~impl()
     {
@@ -129,7 +137,7 @@ void cell_listener_tracker::impl::get_all_range_listeners_re(
     listeners_addrs.insert(new_listeners_addrs.begin(), new_listeners_addrs.end());
 }
 
-cell_listener_tracker::cell_listener_tracker(iface::formula_model_access& cxt) :
+cell_listener_tracker::cell_listener_tracker(model_context& cxt) :
     mp_impl(make_unique<impl>(cxt)) {}
 
 cell_listener_tracker::~cell_listener_tracker() {}
@@ -287,6 +295,23 @@ void cell_listener_tracker::get_all_range_listeners(
 {
     address_set_type listeners_addrs; // to keep track of circular references.
     mp_impl->get_all_range_listeners_re(target, target, listeners, listeners_addrs);
+}
+
+void cell_listener_tracker::add_grouped_range(
+    sheet_t sheet, const abs_rc_range_t& range, uintptr_t identity)
+{
+    mp_impl->m_grouped_ranges.add(sheet, range, identity);
+}
+
+uintptr_t cell_listener_tracker::remove_grouped_range(sheet_t sheet, const abs_rc_range_t& range)
+{
+    return mp_impl->m_grouped_ranges.remove(sheet, range);
+}
+
+abs_rc_address_t cell_listener_tracker::move_to_grouped_range_origin(
+    sheet_t sheet, const abs_rc_address_t& pos) const
+{
+    return mp_impl->m_grouped_ranges.move_to_origin(sheet, pos);
 }
 
 }

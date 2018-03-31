@@ -11,17 +11,24 @@
 #include "ixion/env.hpp"
 
 #include <cstdlib>
+#include <cstdint>
 
 namespace ixion {
 
 /** Column index type. */
-typedef int col_t;
+using col_t = int32_t;
 
 /** Row index type. */
-typedef int row_t;
+using row_t = int32_t;
 
 /** Sheet index type.*/
-typedef int sheet_t;
+using sheet_t = int32_t;
+
+/**
+ * Integer type that is large enough to store either a row or a column
+ * index.
+ */
+using rc_t = row_t;
 
 /**
  * String ID type.
@@ -30,7 +37,7 @@ typedef int sheet_t;
  * get_string() method of ixion::iface::formula_model_access to get the
  * actual string value.
  */
-typedef unsigned long string_id_t;
+using string_id_t = uint64_t;
 
 /**
  * Special sheet ID that represents a global scope, as opposed to a

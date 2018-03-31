@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_ADDRESS_HPP__
-#define __IXION_ADDRESS_HPP__
+#ifndef INCLUDED_IXION_ADDRESS_HPP
+#define INCLUDED_IXION_ADDRESS_HPP
 
 #include "ixion/global.hpp"
 
@@ -104,6 +104,30 @@ IXION_DLLPUBLIC bool operator==(const address_t& left, const address_t& right);
 IXION_DLLPUBLIC bool operator!=(const address_t& left, const address_t& right);
 IXION_DLLPUBLIC bool operator<(const address_t& left, const address_t& right);
 
+struct IXION_DLLPUBLIC abs_rc_address_t
+{
+    enum init_invalid { invalid };
+
+    row_t row;
+    col_t column;
+
+    abs_rc_address_t();
+    abs_rc_address_t(init_invalid);
+    abs_rc_address_t(row_t row, col_t column);
+    abs_rc_address_t(const abs_rc_address_t& r);
+
+    bool valid() const;
+
+    struct hash
+    {
+        IXION_DLLPUBLIC size_t operator() (const abs_rc_address_t& addr) const;
+    };
+};
+
+IXION_DLLPUBLIC bool operator==(const abs_rc_address_t& left, const abs_rc_address_t& right);
+IXION_DLLPUBLIC bool operator!=(const abs_rc_address_t& left, const abs_rc_address_t& right);
+IXION_DLLPUBLIC bool operator<(const abs_rc_address_t& left, const abs_rc_address_t& right);
+
 /**
  * Stores either absolute or relative address, but unlike the {@link
  * address_t} counterpart, this struct only stores row and column positions.
@@ -178,6 +202,57 @@ struct IXION_DLLPUBLIC abs_range_t
 IXION_DLLPUBLIC bool operator==(const abs_range_t& left, const abs_range_t& right);
 IXION_DLLPUBLIC bool operator!=(const abs_range_t& left, const abs_range_t& right);
 IXION_DLLPUBLIC bool operator<(const abs_range_t& left, const abs_range_t& right);
+
+struct IXION_DLLPUBLIC abs_rc_range_t
+{
+    enum init_invalid { invalid };
+
+    abs_rc_address_t first;
+    abs_rc_address_t last;
+
+    abs_rc_range_t();
+    abs_rc_range_t(init_invalid);
+
+    struct hash
+    {
+        IXION_DLLPUBLIC size_t operator() (const abs_rc_range_t& range) const;
+    };
+
+    bool valid() const;
+
+    /**
+     * Expand the range to include the entire columns.  The row range will
+     * remain unchanged.
+     */
+    void set_whole_column();
+
+    /**
+     * Expand the range to include the entire rows.  The column range will
+     * remain unchanged.
+     */
+    void set_whole_row();
+
+    /**
+     * @return true if the range is unspecified in the column direction,
+     *         false otherwise.
+     */
+    bool whole_column() const;
+
+    /**
+     * @return true if the range is unspecified in the row direction, false
+     *         otherwise.
+     */
+    bool whole_row() const;
+
+    /**
+     * Check whether or not a given address is contained within this range.
+     */
+    bool contains(const abs_rc_address_t& addr) const;
+};
+
+IXION_DLLPUBLIC bool operator==(const abs_rc_range_t& left, const abs_rc_range_t& right);
+IXION_DLLPUBLIC bool operator!=(const abs_rc_range_t& left, const abs_rc_range_t& right);
+IXION_DLLPUBLIC bool operator<(const abs_rc_range_t& left, const abs_rc_range_t& right);
 
 /**
  * Stores range whose component may be relative or absolute.

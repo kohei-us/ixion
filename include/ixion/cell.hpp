@@ -96,6 +96,8 @@ public:
      * @return formula result.
      */
     formula_result get_single_result_cache() const;
+
+    uintptr_t identity() const;
 };
 
 }

@@ -415,6 +415,11 @@ formula_result formula_cell::get_single_result_cache() const
     }
 }
 
+uintptr_t formula_cell::identity() const
+{
+    return reinterpret_cast<uintptr_t>(mp_impl->m_calc_status.get());
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

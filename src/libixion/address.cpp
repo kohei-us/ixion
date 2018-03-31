@@ -213,6 +213,50 @@ bool operator< (const address_t& left, const address_t& right)
     return left.column < right.column;
 }
 
+abs_rc_address_t::abs_rc_address_t()
+{
+}
+
+abs_rc_address_t::abs_rc_address_t(init_invalid) :
+    row(-1), column(-1) {}
+
+abs_rc_address_t::abs_rc_address_t(row_t row, col_t column) :
+    row(row), column(column) {}
+
+abs_rc_address_t::abs_rc_address_t(const abs_rc_address_t& r) :
+    row(r.row), column(r.column) {}
+
+bool abs_rc_address_t::valid() const
+{
+    return row >= 0 && column >= 0 && row <= row_unset && column <= column_unset;
+}
+
+size_t abs_rc_address_t::hash::operator() (const abs_rc_address_t& addr) const
+{
+    size_t hv = addr.column;
+    hv <<= 16;
+    hv += addr.row;
+    return hv;
+}
+
+bool operator== (const abs_rc_address_t& left, const abs_rc_address_t& right)
+{
+    return left.row == right.row && left.column == right.column;
+}
+
+bool operator!= (const abs_rc_address_t& left, const abs_rc_address_t& right)
+{
+    return !operator==(left, right);
+}
+
+bool operator< (const abs_rc_address_t& left, const abs_rc_address_t& right)
+{
+    if (left.row != right.row)
+        return left.row < right.row;
+
+    return left.column < right.column;
+}
+
 rc_address_t::rc_address_t() :
     row(0), column(0), abs_row(true), abs_column(true) {}
 
@@ -285,6 +329,66 @@ bool operator!=(const abs_range_t& left, const abs_range_t& right)
 }
 
 bool operator<(const abs_range_t& left, const abs_range_t& right)
+{
+    if (left.first != right.first)
+        return left.first < right.first;
+    return left.last < right.last;
+}
+
+abs_rc_range_t::abs_rc_range_t() {}
+abs_rc_range_t::abs_rc_range_t(init_invalid) :
+    first(abs_rc_address_t::invalid), last(abs_rc_address_t::invalid) {}
+
+size_t abs_rc_range_t::hash::operator() (const abs_rc_range_t& range) const
+{
+    abs_rc_address_t::hash adr_hash;
+    return adr_hash(range.first) + 65536*adr_hash(range.last);
+}
+
+bool abs_rc_range_t::valid() const
+{
+    return first.valid() && last.valid();
+}
+
+void abs_rc_range_t::set_whole_column()
+{
+    first.column = column_unset;
+    last.column = column_unset;
+}
+
+void abs_rc_range_t::set_whole_row()
+{
+    first.row = row_unset;
+    last.row = row_unset;
+}
+
+bool abs_rc_range_t::whole_column() const
+{
+    return first.column == column_unset && last.column == column_unset;
+}
+
+bool abs_rc_range_t::whole_row() const
+{
+    return first.row == row_unset && last.row == row_unset;
+}
+
+bool abs_rc_range_t::contains(const abs_rc_address_t& addr) const
+{
+    return first.row <= addr.row && addr.row <= last.row &&
+        first.column <= addr.column && addr.column <= last.column;
+}
+
+bool operator==(const abs_rc_range_t& left, const abs_rc_range_t& right)
+{
+    return left.first == right.first && left.last == right.last;
+}
+
+bool operator!=(const abs_rc_range_t& left, const abs_rc_range_t& right)
+{
+    return !operator==(left, right);
+}
+
+bool operator<(const abs_rc_range_t& left, const abs_rc_range_t& right)
 {
     if (left.first != right.first)
         return left.first < right.first;

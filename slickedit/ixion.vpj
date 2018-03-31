@@ -294,6 +294,8 @@
 				<F N="../src/libixion/function_objects.cpp"/>
 				<F N="../src/libixion/function_objects.hpp"/>
 				<F N="../src/libixion/global.cpp"/>
+				<F N="../src/libixion/grouped_ranges.cpp"/>
+				<F N="../src/libixion/grouped_ranges.hpp"/>
 				<F N="../src/libixion/info.cpp"/>
 				<F N="../src/libixion/interface.cpp"/>
 				<F N="../src/libixion/ixion_test.cpp"/>
