@@ -73,10 +73,7 @@ struct cell_listener_tracker::impl
     grouped_ranges m_grouped_ranges;
 
     impl(model_context& cxt) :
-        m_context(cxt),
-        m_grouped_ranges(cxt)
-    {
-    }
+        m_context(cxt) {}
 
     ~impl()
     {
@@ -303,9 +300,9 @@ void cell_listener_tracker::add_grouped_range(
     mp_impl->m_grouped_ranges.add(sheet, range, identity);
 }
 
-uintptr_t cell_listener_tracker::remove_grouped_range(sheet_t sheet, const abs_rc_range_t& range)
+void cell_listener_tracker::remove_grouped_range(sheet_t sheet, uintptr_t identity)
 {
-    return mp_impl->m_grouped_ranges.remove(sheet, range);
+    return mp_impl->m_grouped_ranges.remove(sheet, identity);
 }
 
 abs_rc_address_t cell_listener_tracker::move_to_grouped_range_origin(

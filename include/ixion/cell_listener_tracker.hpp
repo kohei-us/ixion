@@ -101,10 +101,9 @@ public:
      *
      * @param sheet index of the sheet on which the grouped range to be
      *              removed currently exists.
-     * @param range grouped range to remove from the collection.
-     * @return identity of the removed grouped range.
+     * @param identity identity of the range to be removed.
      */
-    uintptr_t remove_grouped_range(sheet_t sheet, const abs_rc_range_t& range);
+    void remove_grouped_range(sheet_t sheet, uintptr_t identity);
 
     /**
      * Move the cell position to the top-left corner of a grouped range if the

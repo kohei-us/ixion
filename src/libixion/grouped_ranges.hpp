@@ -11,13 +11,12 @@
 #include "ixion/address.hpp"
 #include "ixion/exceptions.hpp"
 
-#include <mdds/flat_segment_tree.hpp>
+#include <mdds/rectangle_set.hpp>
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 namespace ixion {
-
-class model_context;
 
 class IXION_DLLPUBLIC grouped_range_error : public general_error
 {
@@ -28,28 +27,24 @@ public:
 
 class grouped_ranges
 {
-    using ranges_type = mdds::flat_segment_tree<rc_t, uintptr_t>;
+    using ranges_type = mdds::rectangle_set<rc_t, uintptr_t>;
+    using id_to_range_map_type = std::unordered_map<uintptr_t, abs_rc_range_t>;
 
     struct sheet_type
     {
-        mutable ranges_type rows;
-        mutable ranges_type columns;
-
-        sheet_type(rc_size_t ss);
-
-        void build_trees() const;
+        mutable ranges_type ranges;
+        id_to_range_map_type map;
     };
 
-    const model_context& m_cxt;
     std::vector<std::unique_ptr<sheet_type>> m_sheets;
 
 public:
-    grouped_ranges(const model_context& cxt);
+    grouped_ranges();
     ~grouped_ranges();
 
-    void add(sheet_t sheet, const abs_rc_range_t& range, uintptr_t identifier);
+    void add(sheet_t sheet, const abs_rc_range_t& range, uintptr_t identity);
 
-    uintptr_t remove(sheet_t sheet, const abs_rc_range_t& range);
+    void remove(sheet_t sheet, uintptr_t identity);
 
     abs_rc_address_t move_to_origin(sheet_t sheet, const abs_rc_address_t& pos) const;
 
