@@ -117,7 +117,7 @@ void test_matrix_dependency()
 
     // A10
     abs_address_t pos(0,9,0);
-    tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("E7*2"));
+    tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("C5*2"));
     cxt.set_formula_cell(pos, std::move(tokens));
     register_formula_cell(cxt, pos);
 
