@@ -141,20 +141,28 @@ cell_listener_tracker::~cell_listener_tracker() {}
 
 void cell_listener_tracker::add(const abs_address_t& src, const abs_address_t& dest)
 {
+    abs_rc_address_t origin_rc = mp_impl->m_grouped_ranges.move_to_origin(
+        dest.sheet, abs_rc_address_t(dest.row, dest.column));
+
+    abs_address_t dest_origin(dest.sheet, origin_rc.row, origin_rc.column);
+
 #if DEBUG_CELL_LISTENER_TRACKER
     {
-        abs_address_t origin(0,0,0);
         auto res = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &mp_impl->m_context);
-        __IXION_DEBUG_OUT__ << "adding - cell src: " << res->get_name(src, origin, false)
-            << "  cell dest: " << res->get_name(dest, origin, false) << endl;
+        __IXION_DEBUG_OUT__ << "adding - (cell src: " << res->get_name(src, abs_address_t(), false)
+            << "; cell dest: " << res->get_name(dest, abs_address_t(), false)
+            << "; dest origin: " << res->get_name(dest_origin, abs_address_t(), false)
+            << ")" << endl;
     }
 #endif
-    cell_store_type::iterator itr = mp_impl->m_cell_listeners.find(dest);
+    cell_store_type::iterator itr = mp_impl->m_cell_listeners.find(dest_origin);
     if (itr == mp_impl->m_cell_listeners.end())
     {
         // No container for this src cell yet.  Create one.
         pair<cell_store_type::iterator, bool> r =
-            mp_impl->m_cell_listeners.insert(cell_store_type::value_type(dest, new address_set_type));
+            mp_impl->m_cell_listeners.insert(
+                cell_store_type::value_type(dest_origin, new address_set_type));
+
         if (!r.second)
             throw general_error("failed to insert new address set to cell listener tracker.");
         itr = r.first;

@@ -222,6 +222,18 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
     const formula_tokens_store_ptr_t& ts = cell->get_tokens();
     if (ts && has_volatile(ts->get()))
         tracker.add_volatile(pos);
+
+    formula_group_t gp = cell->get_group_properties();
+    if (gp.size.column && gp.size.row)
+    {
+        abs_rc_range_t group_range;
+        group_range.first.column = pos.column;
+        group_range.first.row = pos.row;
+        group_range.last.column = pos.column + gp.size.column - 1;
+        group_range.last.row = pos.row + gp.size.row - 1;
+
+        tracker.add_grouped_range(pos.sheet, group_range, gp.identity);
+    }
 }
 
 void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)
@@ -234,6 +246,11 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
         return;
 
     cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+
+    formula_group_t gp = fcell->get_group_properties();
+    if (gp.size.column && gp.size.row)
+        tracker.remove_grouped_range(pos.sheet, gp.identity);
+
     tracker.remove_volatile(pos);
 
     // Go through all its existing references, and remove
