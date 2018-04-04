@@ -170,28 +170,28 @@ struct IXION_DLLPUBLIC abs_range_t
     bool valid() const;
 
     /**
-     * Expand the range to include the entire columns.  The row range will
+     * Expand the range horizontally to include all columns.  The row range
+     * will remain unchanged.
+     */
+    void set_all_columns();
+
+    /**
+     * Expand the range vertically to include all rows.  The column range will
      * remain unchanged.
      */
-    void set_whole_column();
+    void set_all_rows();
 
     /**
-     * Expand the range to include the entire rows.  The column range will
-     * remain unchanged.
+     * @return true if the range is unspecified in the horizontal direction
+     *         i.e. all columns are selected, false otherwise.
      */
-    void set_whole_row();
+    bool all_columns() const;
 
     /**
-     * @return true if the range is unspecified in the column direction,
-     *         false otherwise.
+     * @return true if the range is unspecified in the vertical direction i.e.
+     *         all rows are selected, false otherwise.
      */
-    bool whole_column() const;
-
-    /**
-     * @return true if the range is unspecified in the row direction, false
-     *         otherwise.
-     */
-    bool whole_row() const;
+    bool all_rows() const;
 
     /**
      * Check whether or not a given address is contained within this range.
@@ -221,28 +221,28 @@ struct IXION_DLLPUBLIC abs_rc_range_t
     bool valid() const;
 
     /**
-     * Expand the range to include the entire columns.  The row range will
+     * Expand the range horizontally to include all columns.  The row range
+     * will remain unchanged.
+     */
+    void set_all_columns();
+
+    /**
+     * Expand the range vertically to include all rows.  The column range will
      * remain unchanged.
      */
-    void set_whole_column();
+    void set_all_rows();
 
     /**
-     * Expand the range to include the entire rows.  The column range will
-     * remain unchanged.
+     * @return true if the range is unspecified in the horizontal direction
+     *         i.e. all columns are selected, false otherwise.
      */
-    void set_whole_row();
+    bool all_columns() const;
 
     /**
-     * @return true if the range is unspecified in the column direction,
-     *         false otherwise.
+     * @return true if the range is unspecified in the vertical direction i.e.
+     *         all rows are selected, false otherwise.
      */
-    bool whole_column() const;
-
-    /**
-     * @return true if the range is unspecified in the row direction, false
-     *         otherwise.
-     */
-    bool whole_row() const;
+    bool all_rows() const;
 
     /**
      * Check whether or not a given address is contained within this range.
@@ -270,28 +270,28 @@ struct IXION_DLLPUBLIC range_t
     bool valid() const;
 
     /**
-     * Expand the range to include the entire columns.  The row range will
+     * Expand the range horizontally to include all columns.  The row range
+     * will remain unchanged.
+     */
+    void set_all_columns();
+
+    /**
+     * Expand the range vertically to include all rows.  The column range will
      * remain unchanged.
      */
-    void set_whole_column();
+    void set_all_rows();
 
     /**
-     * Expand the range to include the entire rows.  The column range will
-     * remain unchanged.
+     * @return true if the range is unspecified in the horizontal direction
+     *         i.e. all columns are selected, false otherwise.
      */
-    void set_whole_row();
+    bool all_columns() const;
 
     /**
-     * @return true if the range is unspecified in the column direction,
-     *         false otherwise.
+     * @return true if the range is unspecified in the vertical direction i.e.
+     *         all rows are selected, false otherwise.
      */
-    bool whole_column() const;
-
-    /**
-     * @return true if the range is unspecified in the row direction, false
-     *         otherwise.
-     */
-    bool whole_row() const;
+    bool all_rows() const;
 
     abs_range_t to_abs(const abs_address_t& origin) const;
 

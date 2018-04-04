@@ -289,24 +289,24 @@ bool abs_range_t::valid() const
     return first.valid() && last.valid();
 }
 
-void abs_range_t::set_whole_column()
+void abs_range_t::set_all_columns()
 {
     first.column = column_unset;
     last.column = column_unset;
 }
 
-void abs_range_t::set_whole_row()
+void abs_range_t::set_all_rows()
 {
     first.row = row_unset;
     last.row = row_unset;
 }
 
-bool abs_range_t::whole_column() const
+bool abs_range_t::all_columns() const
 {
     return first.column == column_unset && last.column == column_unset;
 }
 
-bool abs_range_t::whole_row() const
+bool abs_range_t::all_rows() const
 {
     return first.row == row_unset && last.row == row_unset;
 }
@@ -350,24 +350,24 @@ bool abs_rc_range_t::valid() const
     return first.valid() && last.valid();
 }
 
-void abs_rc_range_t::set_whole_column()
+void abs_rc_range_t::set_all_columns()
 {
     first.column = column_unset;
     last.column = column_unset;
 }
 
-void abs_rc_range_t::set_whole_row()
+void abs_rc_range_t::set_all_rows()
 {
     first.row = row_unset;
     last.row = row_unset;
 }
 
-bool abs_rc_range_t::whole_column() const
+bool abs_rc_range_t::all_columns() const
 {
     return first.column == column_unset && last.column == column_unset;
 }
 
-bool abs_rc_range_t::whole_row() const
+bool abs_rc_range_t::all_rows() const
 {
     return first.row == row_unset && last.row == row_unset;
 }
@@ -407,24 +407,24 @@ bool range_t::valid() const
     return first.valid() && last.valid();
 }
 
-void range_t::set_whole_column()
+void range_t::set_all_columns()
 {
     first.column = column_unset;
     last.column = column_unset;
 }
 
-void range_t::set_whole_row()
+void range_t::set_all_rows()
 {
     first.row = row_unset;
     last.row = row_unset;
 }
 
-bool range_t::whole_column() const
+bool range_t::all_columns() const
 {
     return first.column == column_unset && last.column == column_unset;
 }
 
-bool range_t::whole_row() const
+bool range_t::all_rows() const
 {
     return first.row == row_unset && last.row == row_unset;
 }
