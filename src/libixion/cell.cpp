@@ -418,7 +418,7 @@ formula_result formula_cell::get_single_result_cache() const
 formula_group_t formula_cell::get_group_properties() const
 {
     uintptr_t identity = reinterpret_cast<uintptr_t>(mp_impl->m_calc_status.get());
-    return formula_group_t(mp_impl->m_calc_status->group_size, identity);
+    return formula_group_t(mp_impl->m_calc_status->group_size, identity, mp_impl->is_grouped());
 }
 
 abs_address_t formula_cell::get_parent_position(const abs_address_t& pos) const
