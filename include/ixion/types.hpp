@@ -114,7 +114,7 @@ enum class formula_name_resolver_t
  *
  * @see get_formula_error_name
  */
-enum class formula_error_t
+enum class formula_error_t : uint8_t
 {
     no_error                 = 0,
     ref_result_not_available = 1,
@@ -123,8 +123,10 @@ enum class formula_error_t
     name_not_found           = 4,
     no_range_intersection    = 5,
     invalid_value_type       = 6,
-    stack_error              = 998,
-    general_error            = 999,
+
+    no_result_error          = 253, // internal only error
+    stack_error              = 254, // internal only error
+    general_error            = 255, // internal only error
 };
 
 /**

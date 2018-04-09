@@ -363,7 +363,7 @@ double count_formula_block(
     for (; pp != pp_end; ++pp)
     {
         const formula_cell& fc = **pp;
-        const formula_result& res = fc.get_result_cache();
+        formula_result res = fc.get_result_cache();
 
         switch (res.get_type())
         {
@@ -817,14 +817,16 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
         case ixion::element_type_formula:
         {
             const formula_cell* p = col_store.get<formula_cell*>(addr.row);
-            const formula_result* res_cache = p->get_result_cache_nowait();
-            if (!res_cache)
+            formula_result res_cache = p->get_result_cache_nowait();
+            formula_result::result_type rt = res_cache.get_type();
+            if (rt == formula_result::result_type::error &&
+                res_cache.get_error() == formula_error_t::no_result_error)
                 break;
 
-            switch (res_cache->get_type())
+            switch (rt)
             {
                 case formula_result::result_type::string:
-                    return res_cache->get_string();
+                    return res_cache.get_string();
                 case formula_result::result_type::error:
                     // TODO : perhaps we should return the error string here.
                 default:

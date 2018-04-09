@@ -985,7 +985,7 @@ void model_parser::check()
             case celltype_t::formula:
             {
                 const formula_cell* fcell = m_context.get_formula_cell(addr);
-                formula_result res_cell = fcell->get_single_result_cache();
+                formula_result res_cell = fcell->get_result_cache();
 
                 if (res_cell != res)
                 {

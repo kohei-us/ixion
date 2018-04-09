@@ -83,8 +83,8 @@ public:
     std::vector<const formula_token*> get_ref_tokens(
         const iface::formula_model_access& cxt, const abs_address_t& pos) const;
 
-    const formula_result& get_result_cache() const;
-    const formula_result* get_result_cache_nowait() const;
+    const formula_result& get_raw_result_cache() const;
+    const formula_result* get_raw_result_cache_nowait() const;
 
     /**
      * Get the cached result as a single cell.  For a non-grouped formula
@@ -95,7 +95,9 @@ public:
      *
      * @return formula result.
      */
-    formula_result get_single_result_cache() const;
+    formula_result get_result_cache() const;
+
+    formula_result get_result_cache_nowait() const;
 
     formula_group_t get_group_properties() const;
 

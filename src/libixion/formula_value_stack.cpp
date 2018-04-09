@@ -288,7 +288,7 @@ const std::string value_stack_t::pop_string()
                 case celltype_t::formula:
                 {
                     const formula_cell* fc = m_context.get_formula_cell(addr);
-                    const formula_result& res = fc->get_result_cache();
+                    formula_result res = fc->get_result_cache();
 
                     switch (res.get_type())
                     {

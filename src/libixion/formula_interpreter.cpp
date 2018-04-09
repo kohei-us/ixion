@@ -356,7 +356,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                 {
                     const formula_cell* fc = cxt.get_formula_cell(addr);
                     assert(fc);
-                    const formula_result& res = fc->get_result_cache();
+                    formula_result res = fc->get_result_cache();
 
                     switch (res.get_type())
                     {
