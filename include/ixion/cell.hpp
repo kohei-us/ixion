@@ -98,6 +98,18 @@ public:
     formula_result get_single_result_cache() const;
 
     formula_group_t get_group_properties() const;
+
+    /**
+     * Get the absolute parent position of a grouped formula cell.  If the
+     * cell is not grouped, it simply returns the original position passed to
+     * this method.
+     *
+     * @param pos original position from which to calculate the parent
+     *            position.
+     *
+     * @return parent position of the grouped formula cell.
+     */
+    abs_address_t get_parent_position(const abs_address_t& pos) const;
 };
 
 }

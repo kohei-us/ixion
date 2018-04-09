@@ -421,6 +421,17 @@ formula_group_t formula_cell::get_group_properties() const
     return formula_group_t(mp_impl->m_calc_status->group_size, identity);
 }
 
+abs_address_t formula_cell::get_parent_position(const abs_address_t& pos) const
+{
+    if (!mp_impl->is_grouped())
+        return pos;
+
+    abs_address_t parent_pos = pos;
+    parent_pos.column -= mp_impl->m_group_pos.column;
+    parent_pos.row -= mp_impl->m_group_pos.row;
+    return parent_pos;
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
