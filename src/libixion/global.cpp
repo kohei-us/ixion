@@ -18,12 +18,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <fstream>
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#include <sys/time.h>
-#endif
+#include <chrono>
 
 #define IXION_DEBUG_GLOBAL 0
 
@@ -40,16 +35,11 @@ const char* get_formula_result_output_separator()
 
 double global::get_current_time()
 {
-#ifdef _WIN32
-    FILETIME ft;
-    __int64 *time64 = (__int64 *) &ft;
-    GetSystemTimeAsFileTime (&ft);
-    return *time64 / 10000000.0;
-#else
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + tv.tv_usec / 1000000.0;
-#endif
+    unsigned long usec_since_epoch =
+        std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+
+    return usec_since_epoch / 1000000.0;
 }
 
 void global::load_file_content(const string& filepath, string& content)
