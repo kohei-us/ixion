@@ -60,7 +60,7 @@ void global::load_file_content(const string& filepath, string& content)
         throw file_not_found(filepath);
 
     ostringstream os;
-    os << file.rdbuf() << ' '; // extra char as the end position.
+    os << file.rdbuf();
     file.close();
 
     os.str().swap(content);
