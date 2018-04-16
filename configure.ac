@@ -96,7 +96,6 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([gettimeofday])
 
 BOOST_REQUIRE([1.36])
 BOOST_FILESYSTEM
