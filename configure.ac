@@ -117,7 +117,7 @@ AS_IF([test "x$enable_debug" != "xno"], [
 ])
 
 # Check for mdds.
-PKG_CHECK_MODULES([MDDS],[mdds-1.2 >= 1.2.0])
+PKG_CHECK_MODULES([MDDS],[mdds-1.4 >= 1.3.99])
 
 # Check for python.
 AS_IF([test "x$enable_python" != "xno"], [
