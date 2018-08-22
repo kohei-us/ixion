@@ -1,3 +1,5 @@
+ixion 0.14.0
+
 * implement MMULT built-in formula function which makes use of the
   grouped formula support.
 
