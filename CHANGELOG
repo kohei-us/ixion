@@ -1,12 +1,15 @@
 ixion 0.14.0
 
-* implement MMULT built-in formula function which makes use of the
+* implemented MMULT built-in formula function which makes use of the
   grouped formula support.
 
-* add support for grouped formulas.
+* added support for grouped formulas.
 
-* add experimental compute engine framework to potentially accelerate
+* added experimental compute engine framework to potentially accelerate
   certain computations in the future.  It's not used yet.
+
+* refactored formula cell storage to use ref-countered formula cell
+  objects.
 
 ixion 0.13.0
 
