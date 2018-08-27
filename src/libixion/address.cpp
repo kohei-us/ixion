@@ -220,8 +220,8 @@ abs_rc_address_t::abs_rc_address_t()
 abs_rc_address_t::abs_rc_address_t(init_invalid) :
     row(-1), column(-1) {}
 
-abs_rc_address_t::abs_rc_address_t(row_t row, col_t column) :
-    row(row), column(column) {}
+abs_rc_address_t::abs_rc_address_t(row_t _row, col_t _column) :
+    row(_row), column(_column) {}
 
 abs_rc_address_t::abs_rc_address_t(const abs_rc_address_t& r) :
     row(r.row), column(r.column) {}
@@ -260,8 +260,8 @@ bool operator< (const abs_rc_address_t& left, const abs_rc_address_t& right)
 rc_address_t::rc_address_t() :
     row(0), column(0), abs_row(true), abs_column(true) {}
 
-rc_address_t::rc_address_t(row_t row, col_t column, bool abs_row, bool abs_column) :
-    row(row), column(column), abs_row(abs_row), abs_column(abs_column) {}
+rc_address_t::rc_address_t(row_t _row, col_t _column, bool _abs_row, bool _abs_column) :
+    row(_row), column(_column), abs_row(_abs_row), abs_column(_abs_column) {}
 
 rc_address_t::rc_address_t(const rc_address_t& r) :
     row(r.row), column(r.column), abs_row(r.abs_row), abs_column(r.abs_column) {}

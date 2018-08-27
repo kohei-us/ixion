@@ -358,7 +358,7 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
     matrix* mxp = mx;
     const matrix* mxp_end = mxp + 2;
 
-    bool invalid_arg = false;
+    bool is_arg_invalid = false;
 
     // NB : the stack is LIFO i.e. the first matrix is the right matrix and
     // the second one is the left one.
@@ -371,7 +371,7 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
             {
                 if (mxp == mxp_end)
                 {
-                    invalid_arg = true;
+                    is_arg_invalid = true;
                     break;
                 }
 
@@ -381,17 +381,17 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
                 break;
             }
             default:
-                invalid_arg = true;
+                is_arg_invalid = true;
         }
 
-        if (invalid_arg)
+        if (is_arg_invalid)
             break;
     }
 
     if (mxp != mxp_end)
-        invalid_arg = true;
+        is_arg_invalid = true;
 
-    if (invalid_arg)
+    if (is_arg_invalid)
         throw formula_functions::invalid_arg("MMULT requires exactly two ranges.");
 
     mx[0].swap(mx[1]); // Make it so that 0 -> left and 1 -> right.

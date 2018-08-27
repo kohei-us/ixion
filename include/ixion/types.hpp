@@ -158,7 +158,7 @@ struct IXION_DLLPUBLIC formula_group_t
 
     formula_group_t();
     formula_group_t(const formula_group_t& r);
-    formula_group_t(const rc_size_t& group_size, uintptr_t identity, bool grouped);
+    formula_group_t(const rc_size_t& _group_size, uintptr_t _identity, bool _grouped);
     ~formula_group_t();
 
     formula_group_t& operator= (const formula_group_t& other);

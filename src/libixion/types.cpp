@@ -32,8 +32,8 @@ rc_size_t& rc_size_t::operator= (const rc_size_t& other)
 formula_group_t::formula_group_t() : size(), identity(0), grouped(false) {}
 formula_group_t::formula_group_t(const formula_group_t& r) :
     size(r.size), identity(r.identity), grouped(r.grouped) {}
-formula_group_t::formula_group_t(const rc_size_t& group_size, uintptr_t identity, bool grouped) :
-    size(group_size), identity(identity), grouped(grouped) {}
+formula_group_t::formula_group_t(const rc_size_t& _group_size, uintptr_t _identity, bool _grouped) :
+    size(_group_size), identity(_identity), grouped(_grouped) {}
 formula_group_t::~formula_group_t() {}
 
 formula_group_t& formula_group_t::operator= (const formula_group_t& other)

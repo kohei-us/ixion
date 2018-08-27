@@ -37,18 +37,22 @@ void init_modules()
         "cuda",
     };
 
-    std::ostringstream os;
-    os << "ixion-" << get_api_version_major() << "." << get_api_version_minor() << "-";
-    std::string mod_prefix = os.str();
+    std::string mod_prefix;
+    {
+        std::ostringstream os;
+        os << "ixion-" << get_api_version_major() << "." << get_api_version_minor() << "-";
+        mod_prefix = os.str();
+    }
 
     for (const char* mod_name : mod_names)
     {
         fs::path p(module_path);
 
-        std::ostringstream os;
-        os << mod_prefix << mod_name << ".so";
-
-        p /= os.str();
+        {
+            std::ostringstream os;
+            os << mod_prefix << mod_name << ".so";
+            p /= os.str();
+        }
 
         // TODO: make this cross-platform.
         void* hdl = dlopen(p.string().data(), RTLD_NOW | RTLD_GLOBAL);

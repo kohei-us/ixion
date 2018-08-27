@@ -31,7 +31,7 @@ struct calc_status
     size_t refcount;
 
     calc_status();
-    calc_status(const rc_size_t& group_size);
+    calc_status(const rc_size_t& _group_size);
 
     void add_ref();
     void release_ref();

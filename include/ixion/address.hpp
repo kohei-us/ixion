@@ -113,7 +113,7 @@ struct IXION_DLLPUBLIC abs_rc_address_t
 
     abs_rc_address_t();
     abs_rc_address_t(init_invalid);
-    abs_rc_address_t(row_t row, col_t column);
+    abs_rc_address_t(row_t _row, col_t _column);
     abs_rc_address_t(const abs_rc_address_t& r);
 
     bool valid() const;
@@ -140,7 +140,7 @@ struct IXION_DLLPUBLIC rc_address_t
     bool  abs_column:1;
 
     rc_address_t();
-    rc_address_t(row_t row, col_t column, bool abs_row=true, bool abs_column=true);
+    rc_address_t(row_t _row, col_t _column, bool _abs_row=true, bool _abs_column=true);
     rc_address_t(const rc_address_t& r);
 
     struct hash

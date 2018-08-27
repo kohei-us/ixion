@@ -69,8 +69,7 @@ private:
 
     void pop_result();
 
-    void expand_named_expression(
-        const ::std::string& expr_name, const formula_tokens_t* expr, name_set& used_names);
+    void expand_named_expression(const formula_tokens_t* expr, name_set& used_names);
 
     bool has_token() const;
     void next();

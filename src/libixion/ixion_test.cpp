@@ -232,20 +232,24 @@ void test_name_resolver_excel_a1()
         assert(res.range.last.col == range_tests[i].col2);
     }
 
-    formula_name_t res = resolver->resolve("B1", 2, abs_address_t(0,1,1));
-    assert(res.type == formula_name_t::cell_reference);
-    assert(res.address.sheet == 0);
-    assert(res.address.row == -1);
-    assert(res.address.col == 0);
+    {
+        formula_name_t res = resolver->resolve("B1", 2, abs_address_t(0,1,1));
+        assert(res.type == formula_name_t::cell_reference);
+        assert(res.address.sheet == 0);
+        assert(res.address.row == -1);
+        assert(res.address.col == 0);
+    }
 
-    res = resolver->resolve("B2:B4", 5, abs_address_t(0,0,3));
-    assert(res.type == formula_name_t::range_reference);
-    assert(res.range.first.sheet == 0);
-    assert(res.range.first.row == 1);
-    assert(res.range.first.col == -2);
-    assert(res.range.last.sheet == 0);
-    assert(res.range.last.row == 3);
-    assert(res.range.last.col == -2);
+    {
+        formula_name_t res = resolver->resolve("B2:B4", 5, abs_address_t(0,0,3));
+        assert(res.type == formula_name_t::range_reference);
+        assert(res.range.first.sheet == 0);
+        assert(res.range.first.row == 1);
+        assert(res.range.first.col == -2);
+        assert(res.range.last.sheet == 0);
+        assert(res.range.last.row == 3);
+        assert(res.range.last.col == -2);
+    }
 
     // Parse name without row index.
     struct {
@@ -265,10 +269,11 @@ void test_name_resolver_excel_a1()
         assert(res.type == name_tests[i].type);
     }
 
-    // Parse address with non-existing sheet name.  It should be flagged invalid.
-
-    res = resolver->resolve(IXION_ASCII("NotExists!A1"), abs_address_t());
-    assert(res.type == formula_name_t::invalid);
+    {
+        // Parse address with non-existing sheet name.  It should be flagged invalid.
+        formula_name_t res = resolver->resolve(IXION_ASCII("NotExists!A1"), abs_address_t());
+        assert(res.type == formula_name_t::invalid);
+    }
 }
 
 void test_name_resolver_named_expression()
