@@ -541,7 +541,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, const char* 
     string_id_t str_id = add_string(p, n);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, str_id);
+    pos_hint = col_store.set(pos_hint, addr.row, static_cast<unsigned long>(str_id));
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
@@ -549,7 +549,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, identifier);
+    pos_hint = col_store.set(pos_hint, addr.row, static_cast<unsigned long>(identifier));
 }
 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
@@ -800,7 +800,7 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
     switch (col_store.get_type(addr.row))
     {
         case ixion::element_type_string:
-            return col_store.get<string_id_t>(addr.row);
+            return col_store.get<unsigned long>(addr.row);
         default:
             ;
     }
@@ -813,7 +813,7 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
     switch (col_store.get_type(addr.row))
     {
         case ixion::element_type_string:
-            return col_store.get<string_id_t>(addr.row);
+            return col_store.get<unsigned long>(addr.row);
         case ixion::element_type_formula:
         {
             const formula_cell* p = col_store.get<formula_cell*>(addr.row);
