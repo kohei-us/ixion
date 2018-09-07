@@ -1029,6 +1029,13 @@ void model_parser::check()
                         throw check_error("failed to retrieve a string value for a string cell.");
 
                     const string* ps_expected = m_context.get_string(res.get_string());
+                    if (!ps_expected)
+                    {
+                        std::ostringstream os;
+                        os << "no string value for the string ID of " << res.get_string();
+                        throw check_error(os.str());
+                    }
+
                     ostringstream os;
                     os << "unexpected string result: (expected: '" << *ps_expected << "'; actual: '" << *ps << "')";
                     throw check_error(os.str());
