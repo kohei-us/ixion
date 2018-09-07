@@ -213,7 +213,7 @@ bool operator< (const address_t& left, const address_t& right)
     return left.column < right.column;
 }
 
-abs_rc_address_t::abs_rc_address_t()
+abs_rc_address_t::abs_rc_address_t() : row(0), column(0)
 {
 }
 
