@@ -104,8 +104,16 @@ int main (int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    std::string formula = vm["formula-expression"].as<std::string>();
-    tokenize_formula(formula);
+    try
+    {
+        std::string formula = vm["formula-expression"].as<std::string>();
+        tokenize_formula(formula);
+    }
+    catch (const std::exception& e)
+    {
+        cout << "Failed to parse formula expression: " << e.what() << endl;
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
