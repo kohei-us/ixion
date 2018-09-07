@@ -56,7 +56,8 @@ sort_input_parser::parse_error::~parse_error() throw() {}
 
 // ----------------------------------------------------------------------------
 
-sort_input_parser::sort_input_parser(const string& filepath)
+sort_input_parser::sort_input_parser(const string& filepath) :
+    mp(nullptr), mp_last(nullptr)
 {
     global::load_file_content(filepath, m_content);
 }
