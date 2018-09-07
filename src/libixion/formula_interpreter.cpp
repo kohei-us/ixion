@@ -652,13 +652,12 @@ void formula_interpreter::factor()
             literal();
             return;
         default:
-        {
-            ostringstream os;
-            os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
-            throw invalid_expression(os.str());
-        }
+            ;
     }
-    m_stack.push_value(0.0);
+
+    ostringstream os;
+    os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
+    throw invalid_expression(os.str());
 }
 
 void formula_interpreter::paren()
