@@ -25,6 +25,10 @@ void init_modules()
 {
 }
 
+void unload_module(void* /*handler*/)
+{
+}
+
 #else
 
 void init_modules()
@@ -67,9 +71,14 @@ void init_modules()
         {
             module_def* md = register_module();
             compute_engine::add_class(
-                mod_name, md->create_compute_engine, md->destroy_compute_engine);
+                hdl, mod_name, md->create_compute_engine, md->destroy_compute_engine);
         }
     }
+}
+
+void unload_module(void* handler)
+{
+    dlclose(handler);
 }
 
 #endif

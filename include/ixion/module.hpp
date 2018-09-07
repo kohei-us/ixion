@@ -17,6 +17,8 @@ namespace ixion { namespace draft {
  */
 IXION_DLLPUBLIC void init_modules();
 
+IXION_DLLPUBLIC void unload_module(void* handler);
+
 class compute_engine;
 
 using create_compute_engine_t = compute_engine* (*)();

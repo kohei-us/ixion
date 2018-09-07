@@ -3,10 +3,10 @@
 
 m4_define([ixion_major_version], [0])
 m4_define([ixion_minor_version], [14])
-m4_define([ixion_micro_version], [0])
+m4_define([ixion_micro_version], [99])
 
 m4_define([ixion_major_api_version], [0])
-m4_define([ixion_minor_api_version], [14])
+m4_define([ixion_minor_api_version], [15])
 
 m4_define([ixion_version],
           [ixion_major_version.ixion_minor_version.ixion_micro_version])

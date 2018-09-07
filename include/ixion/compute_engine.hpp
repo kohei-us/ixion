@@ -44,6 +44,8 @@ public:
     /**
      * Add a new compute engine class.
      *
+     * @param hdl handler for the dynamically-loaded module in which the
+     *            compute engine being registered resides.
      * @param name name of the compute engine.
      * @param func_create function that creates a new instance of this compute
      *                    engine class.
@@ -51,7 +53,7 @@ public:
      *                     compute engine class.
      */
     static void add_class(
-        const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy);
+        void* hdl, const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy);
 
     compute_engine();
     virtual ~compute_engine();

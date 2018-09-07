@@ -17,13 +17,47 @@ namespace {
 
 struct class_factory
 {
+    void* handler;
     create_compute_engine_t create;
     destroy_compute_engine_t destroy;
 };
 
-using class_factory_store_t = std::unordered_map<std::string, class_factory>;
+class class_factory_store
+{
+    using store_type = std::unordered_map<std::string, class_factory>;
+    store_type m_store;
 
-class_factory_store_t class_factory_store;
+public:
+
+    const class_factory* get(const std::string& name) const
+    {
+        auto it = m_store.find(name);
+        if (it == m_store.end())
+            return nullptr;
+
+        return &it->second;
+    }
+
+    void insert(void* hdl, const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy)
+    {
+        class_factory cf;
+        cf.handler = hdl;
+        cf.create = func_create;
+        cf.destroy = func_destroy;
+        m_store.emplace(name, cf);
+    }
+
+    ~class_factory_store()
+    {
+        for (auto& kv : m_store)
+        {
+            class_factory& cf = kv.second;
+            unload_module(cf.handler);
+        }
+    }
+};
+
+class_factory_store store;
 
 }
 
@@ -38,23 +72,18 @@ std::shared_ptr<compute_engine> compute_engine::create(const char* name)
         // Name is not specified. Use the default engine.
         return std::make_shared<compute_engine>();
 
-    class_factory_store_t::iterator it = class_factory_store.find(name);
-    if (it == class_factory_store.end())
+    const class_factory* cf = store.get(name);
+    if (!cf)
         // No class factory for this name. Fall back to default.
         return std::make_shared<compute_engine>();
 
-    const class_factory& cf = it->second;
-    return std::shared_ptr<compute_engine>(cf.create(), cf.destroy);
+    return std::shared_ptr<compute_engine>(cf->create(), cf->destroy);
 }
 
 void compute_engine::add_class(
-    const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy)
+    void* hdl, const char* name, create_compute_engine_t func_create, destroy_compute_engine_t func_destroy)
 {
-    class_factory cf;
-    cf.create = func_create;
-    cf.destroy = func_destroy;
-
-    class_factory_store.emplace(name, cf);
+    store.insert(hdl, name, func_create, func_destroy);
 }
 
 compute_engine::compute_engine() :
