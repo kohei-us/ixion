@@ -1,3 +1,9 @@
+* fixed a resource leak with dynamic loading of compute engine modules.
+
+ixion 0.14.1
+
+* addressed a number of coverity issues.
+
 * Fixed build issues on 32-bit platforms.
 
 * fixed warnings on shadowed variables during build with -Wshadow
