@@ -70,8 +70,6 @@ struct cell_listener_tracker::impl
     range_store_type m_range_listeners;       ///< store listeners for ranges.
     cell_listener_tracker::address_set_type m_volatile_cells;
 
-    grouped_ranges m_grouped_ranges;
-
     impl(model_context& cxt) :
         m_context(cxt) {}
 
@@ -292,23 +290,6 @@ void cell_listener_tracker::get_all_range_listeners(
 {
     address_set_type listeners_addrs; // to keep track of circular references.
     mp_impl->get_all_range_listeners_re(target, target, listeners, listeners_addrs);
-}
-
-void cell_listener_tracker::add_grouped_range(
-    sheet_t sheet, const abs_rc_range_t& range, uintptr_t identity)
-{
-    mp_impl->m_grouped_ranges.add(sheet, range, identity);
-}
-
-void cell_listener_tracker::remove_grouped_range(sheet_t sheet, uintptr_t identity)
-{
-    return mp_impl->m_grouped_ranges.remove(sheet, identity);
-}
-
-abs_rc_address_t cell_listener_tracker::move_to_grouped_range_origin(
-    sheet_t sheet, const abs_rc_address_t& pos) const
-{
-    return mp_impl->m_grouped_ranges.move_to_origin(sheet, pos);
 }
 
 }

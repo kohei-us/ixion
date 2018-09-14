@@ -82,37 +82,6 @@ public:
      * @param listeners
      */
     void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
-
-    /**
-     * Register a new grouped range.  A grouped range is a range whose
-     * top-left cell is always used to track dependency.  One example of a
-     * grouped range is a group of matrix formula cells.
-     *
-     * Note that grouped ranges cannot overlap with each other.
-     *
-     * @param sheet index of the sheet on which the grouped range exists.
-     * @param range grouped range to add to the collection.
-     * @param identity identity of the grouped range.
-     */
-    void add_grouped_range(sheet_t sheet, const abs_rc_range_t& range, uintptr_t identity);
-
-    /**
-     * Remove an existing grouped range from being tracked.
-     *
-     * @param sheet index of the sheet on which the grouped range to be
-     *              removed currently exists.
-     * @param identity identity of the range to be removed.
-     */
-    void remove_grouped_range(sheet_t sheet, uintptr_t identity);
-
-    /**
-     * Move the cell position to the top-left corner of a grouped range if the
-     * specified position falls within a grouped range.  Nothing happens if
-     * the specified position is not within any grouped range.
-     *
-     * @param pos cell position to move.
-     */
-    abs_rc_address_t move_to_grouped_range_origin(sheet_t sheet, const abs_rc_address_t& pos) const;
 };
 
 }
