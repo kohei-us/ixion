@@ -271,42 +271,8 @@ void get_all_dirty_cells(
     __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
 #endif
 
-    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
-
-    // Volatile cells are always included.
-    const cell_listener_tracker::address_set_type& vcells = tracker.get_volatile_cells();
-    {
-        cell_listener_tracker::address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
-        for (; itr != itr_end; ++itr)
-        {
-            if (cxt.get_celltype(*itr) != celltype_t::formula)
-                continue;
-
-            addrs.push_back(*itr);
-            cells.insert(*itr);
-        }
-    }
-
-    // Get all range listeners first, then add the listeners to the list of
-    // modified cells, to get their listeners too.
-
-    dirty_formula_cells_t range_listeners;
-    for (const abs_address_t& addr : addrs)
-        tracker.get_all_range_listeners(addr, range_listeners);
-
-    for (const abs_address_t& cell : range_listeners)
-    {
-        addrs.push_back(cell);
-        cells.insert(cell);
-    }
-
-    // Remove duplicate entries.
-    std::sort(addrs.begin(), addrs.end());
-    addrs.erase(std::unique(addrs.begin(), addrs.end()), addrs.end());
-
-    // Now get the single cell listeners.
-    for (const abs_address_t& addr : addrs)
-        tracker.get_all_cell_listeners(addr, cells);
+    const cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+    tracker.get_all_dirty_cells(cxt, addrs, cells);
 }
 
 void calculate_cells(iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count)

@@ -16,6 +16,8 @@
 
 namespace ixion {
 
+namespace iface { class formula_model_access; }
+
 class formula_name_resolver;
 class model_context;
 
@@ -82,6 +84,9 @@ public:
      * @param listeners
      */
     void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
+
+    void get_all_dirty_cells(
+        const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const;
 };
 
 }

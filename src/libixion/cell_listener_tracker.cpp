@@ -292,6 +292,45 @@ void cell_listener_tracker::get_all_range_listeners(
     mp_impl->get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
+void cell_listener_tracker::get_all_dirty_cells(
+    const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const
+{
+    // Volatile cells are always included.
+    const cell_listener_tracker::address_set_type& vcells = get_volatile_cells();
+    {
+        cell_listener_tracker::address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
+        for (; itr != itr_end; ++itr)
+        {
+            if (cxt.get_celltype(*itr) != celltype_t::formula)
+                continue;
+
+            addrs.push_back(*itr);
+            cells.insert(*itr);
+        }
+    }
+
+    // Get all range listeners first, then add the listeners to the list of
+    // modified cells, to get their listeners too.
+
+    dirty_formula_cells_t range_listeners;
+    for (const abs_address_t& addr : addrs)
+        get_all_range_listeners(addr, range_listeners);
+
+    for (const abs_address_t& cell : range_listeners)
+    {
+        addrs.push_back(cell);
+        cells.insert(cell);
+    }
+
+    // Remove duplicate entries.
+    std::sort(addrs.begin(), addrs.end());
+    addrs.erase(std::unique(addrs.begin(), addrs.end()), addrs.end());
+
+    // Now get the single cell listeners.
+    for (const abs_address_t& addr : addrs)
+        get_all_cell_listeners(addr, cells);
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
