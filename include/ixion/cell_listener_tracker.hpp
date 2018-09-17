@@ -36,8 +36,6 @@ public:
     cell_listener_tracker(const cell_listener_tracker&) = delete;
     cell_listener_tracker& operator=(const cell_listener_tracker&) = delete;
 
-    typedef std::unordered_set<abs_address_t, abs_address_t::hash> address_set_type;
-
     cell_listener_tracker(model_context& cxt);
     ~cell_listener_tracker();
 
@@ -72,7 +70,6 @@ public:
 
     void add_volatile(const abs_address_t& pos);
     void remove_volatile(const abs_address_t& pos);
-    const address_set_type& get_volatile_cells() const;
 
     void get_all_dirty_cells(
         const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const;

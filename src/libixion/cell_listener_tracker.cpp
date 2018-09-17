@@ -29,23 +29,24 @@ namespace ixion {
 
 namespace {
 
-typedef mdds::rectangle_set<row_t, cell_listener_tracker::address_set_type*> range_query_set_type;
-typedef std::unordered_map<abs_address_t, cell_listener_tracker::address_set_type*, abs_address_t::hash> cell_store_type;
-typedef std::unordered_map<abs_range_t, cell_listener_tracker::address_set_type*, abs_range_t::hash> range_store_type;
+using address_set_type = std::unordered_set<abs_address_t, abs_address_t::hash>;
+using range_query_set_type = mdds::rectangle_set<row_t, address_set_type*>;
+using cell_store_type = std::unordered_map<abs_address_t, address_set_type*, abs_address_t::hash>;
+using range_store_type = std::unordered_map<abs_range_t, address_set_type*, abs_range_t::hash>;
 
-class dirty_cell_inserter : public std::unary_function<cell_listener_tracker::address_set_type*, void>
+class dirty_cell_inserter : public std::unary_function<address_set_type*, void>
 {
     model_context& m_context;
     dirty_formula_cells_t& m_dirty_cells;
-    cell_listener_tracker::address_set_type& m_addrs;
+    address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(model_context& cxt, dirty_formula_cells_t& dirty_cells, cell_listener_tracker::address_set_type& addrs) :
+    dirty_cell_inserter(model_context& cxt, dirty_formula_cells_t& dirty_cells, address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
-    void operator() (const cell_listener_tracker::address_set_type* p)
+    void operator() (const address_set_type* p)
     {
         // Add all addresses in this set to the dirty cells list.
-        cell_listener_tracker::address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
+        address_set_type::const_iterator itr = p->begin(), itr_end = p->end();
         for (; itr != itr_end; ++itr)
         {
             const abs_address_t& addr = *itr;
@@ -68,7 +69,7 @@ struct cell_listener_tracker::impl
     mutable range_query_set_type m_query_set; ///< used for fast lookup of range listeners.
     cell_store_type m_cell_listeners;         ///< store listeners for single cells.
     range_store_type m_range_listeners;       ///< store listeners for ranges.
-    cell_listener_tracker::address_set_type m_volatile_cells;
+    address_set_type m_volatile_cells;
 
     impl(model_context& cxt) :
         m_context(cxt) {}
@@ -78,6 +79,11 @@ struct cell_listener_tracker::impl
         // Delete all the listener set instances.
         for_each(m_range_listeners.begin(), m_range_listeners.end(), delete_map_value<range_store_type>());
         for_each(m_cell_listeners.begin(), m_cell_listeners.end(), delete_map_value<cell_store_type>());
+    }
+
+    const address_set_type& get_volatile_cells() const
+    {
+        return m_volatile_cells;
     }
 
     void get_all_cell_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
@@ -274,11 +280,6 @@ void cell_listener_tracker::remove_volatile(const abs_address_t& pos)
     mp_impl->m_volatile_cells.erase(pos);
 }
 
-const cell_listener_tracker::address_set_type& cell_listener_tracker::get_volatile_cells() const
-{
-    return mp_impl->m_volatile_cells;
-}
-
 namespace {
 
 class cell_addr_printer : public std::unary_function<abs_address_t, void>
@@ -300,9 +301,9 @@ void cell_listener_tracker::get_all_dirty_cells(
     const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const
 {
     // Volatile cells are always included.
-    const cell_listener_tracker::address_set_type& vcells = get_volatile_cells();
+    const auto& vcells = mp_impl->get_volatile_cells();
     {
-        cell_listener_tracker::address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
+        address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
         for (; itr != itr_end; ++itr)
         {
             if (cxt.get_celltype(*itr) != celltype_t::formula)
