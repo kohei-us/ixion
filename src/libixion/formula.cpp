@@ -272,7 +272,7 @@ void get_all_dirty_cells(
 #endif
 
     const cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
-    tracker.get_all_dirty_cells(cxt, addrs, cells);
+    tracker.get_all_dirty_cells(addrs, cells);
 }
 
 void calculate_cells(iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count)

@@ -16,9 +16,6 @@
 
 namespace ixion {
 
-namespace iface { class formula_model_access; }
-
-class formula_name_resolver;
 class model_context;
 
 /**
@@ -68,11 +65,24 @@ public:
      */
     void remove(const abs_address_t& cell, const abs_range_t& range);
 
+    /**
+     * Register a formula cell located at the specified position as volatile.
+     * Note that the caller should ensure that the cell at the specified
+     * position is indeed a formula cell.
+     *
+     * @param pos position of the cell to register as a volatile cell.
+     */
     void add_volatile(const abs_address_t& pos);
+
+    /**
+     * Remove the specified cell position from the internal set of registered
+     * volatile formula cells.
+     *
+     * @param pos position of the cell to unregister as a volatile cell.
+     */
     void remove_volatile(const abs_address_t& pos);
 
-    void get_all_dirty_cells(
-        const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const;
+    void get_all_dirty_cells(modified_cells_t& addrs, dirty_formula_cells_t& cells) const;
 };
 
 }

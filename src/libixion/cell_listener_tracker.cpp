@@ -297,21 +297,13 @@ public:
 
 }
 
-void cell_listener_tracker::get_all_dirty_cells(
-    const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const
+void cell_listener_tracker::get_all_dirty_cells(modified_cells_t& addrs, dirty_formula_cells_t& cells) const
 {
     // Volatile cells are always included.
-    const auto& vcells = mp_impl->get_volatile_cells();
+    for (const abs_address_t& addr : mp_impl->get_volatile_cells())
     {
-        address_set_type::const_iterator itr = vcells.begin(), itr_end = vcells.end();
-        for (; itr != itr_end; ++itr)
-        {
-            if (cxt.get_celltype(*itr) != celltype_t::formula)
-                continue;
-
-            addrs.push_back(*itr);
-            cells.insert(*itr);
-        }
+        addrs.push_back(addr);
+        cells.insert(addr);
     }
 
     // Get all range listeners first, then add the listeners to the list of
