@@ -74,6 +74,11 @@ public:
     void remove_volatile(const abs_address_t& pos);
     const address_set_type& get_volatile_cells() const;
 
+    void get_all_dirty_cells(
+        const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const;
+
+private:
+
     void get_all_cell_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
 
     /**
@@ -84,9 +89,6 @@ public:
      * @param listeners
      */
     void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
-
-    void get_all_dirty_cells(
-        const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const;
 };
 
 }

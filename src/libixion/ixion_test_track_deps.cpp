@@ -43,9 +43,12 @@ void test_single_cell_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, then both A2 and A3 should get updated.
-    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+    modified_cells_t mod_cells = {
+        { 0, 0, 0 }
+    };
+
     dirty_formula_cells_t cells;
-    tracker.get_all_cell_listeners(abs_address_t(0,0,0), cells);
+    get_all_dirty_cells(cxt, mod_cells, cells);
 
     assert(cells.size() == 2);
     assert(cells.count(abs_address_t(0,1,0)) == 1);
