@@ -80,10 +80,48 @@ struct cell_listener_tracker::impl
         for_each(m_cell_listeners.begin(), m_cell_listeners.end(), delete_map_value<cell_store_type>());
     }
 
+    void get_all_cell_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
+
+    void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
+
     void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target,
         dirty_formula_cells_t& listeners, address_set_type& listeners_addr) const;
 };
+
+void cell_listener_tracker::impl::get_all_cell_listeners(
+    const abs_address_t& target, dirty_formula_cells_t& listeners) const
+{
+    cell_store_type::const_iterator itr = m_cell_listeners.find(target);
+    if (itr == m_cell_listeners.end())
+        // This target cell has no listeners.
+        return;
+
+    const address_set_type& addrs = *itr->second;
+    address_set_type::const_iterator itr2 = addrs.begin(), itr2_end = addrs.end();
+    for (; itr2 != itr2_end; ++itr2)
+    {
+        const abs_address_t& addr = *itr2; // listener cell address
+        if (m_context.get_celltype(addr) != celltype_t::formula)
+            // Referenced cell is empty or not a formula cell.  Ignore this.
+            continue;
+
+        if (listeners.count(addr) == 0)
+        {
+            // This cell is not yet on the dirty cell list.  Run recursively.
+            listeners.insert(addr);
+            get_all_cell_listeners(addr, listeners);
+            get_all_range_listeners(addr, listeners);
+        }
+    }
+}
+
+void cell_listener_tracker::impl::get_all_range_listeners(
+    const abs_address_t& target, dirty_formula_cells_t& listeners) const
+{
+    address_set_type listeners_addrs; // to keep track of circular references.
+    get_all_range_listeners_re(target, target, listeners, listeners_addrs);
+}
 
 void cell_listener_tracker::impl::get_all_range_listeners_re(
     const abs_address_t& origin_target, const abs_address_t& target, dirty_formula_cells_t& listeners, address_set_type& listeners_addrs) const
@@ -258,40 +296,6 @@ public:
 
 }
 
-void cell_listener_tracker::get_all_cell_listeners(
-    const abs_address_t& target, dirty_formula_cells_t& listeners) const
-{
-    cell_store_type::const_iterator itr = mp_impl->m_cell_listeners.find(target);
-    if (itr == mp_impl->m_cell_listeners.end())
-        // This target cell has no listeners.
-        return;
-
-    const address_set_type& addrs = *itr->second;
-    address_set_type::const_iterator itr2 = addrs.begin(), itr2_end = addrs.end();
-    for (; itr2 != itr2_end; ++itr2)
-    {
-        const abs_address_t& addr = *itr2; // listener cell address
-        if (mp_impl->m_context.get_celltype(addr) != celltype_t::formula)
-            // Referenced cell is empty or not a formula cell.  Ignore this.
-            continue;
-
-        if (listeners.count(addr) == 0)
-        {
-            // This cell is not yet on the dirty cell list.  Run recursively.
-            listeners.insert(addr);
-            get_all_cell_listeners(addr, listeners);
-            get_all_range_listeners(addr, listeners);
-        }
-    }
-}
-
-void cell_listener_tracker::get_all_range_listeners(
-    const abs_address_t& target, dirty_formula_cells_t& listeners) const
-{
-    address_set_type listeners_addrs; // to keep track of circular references.
-    mp_impl->get_all_range_listeners_re(target, target, listeners, listeners_addrs);
-}
-
 void cell_listener_tracker::get_all_dirty_cells(
     const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const
 {
@@ -314,7 +318,7 @@ void cell_listener_tracker::get_all_dirty_cells(
 
     dirty_formula_cells_t range_listeners;
     for (const abs_address_t& addr : addrs)
-        get_all_range_listeners(addr, range_listeners);
+        mp_impl->get_all_range_listeners(addr, range_listeners);
 
     for (const abs_address_t& cell : range_listeners)
     {
@@ -328,7 +332,7 @@ void cell_listener_tracker::get_all_dirty_cells(
 
     // Now get the single cell listeners.
     for (const abs_address_t& addr : addrs)
-        get_all_cell_listeners(addr, cells);
+        mp_impl->get_all_cell_listeners(addr, cells);
 }
 
 }

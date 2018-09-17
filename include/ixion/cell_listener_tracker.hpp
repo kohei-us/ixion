@@ -76,19 +76,6 @@ public:
 
     void get_all_dirty_cells(
         const iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells) const;
-
-private:
-
-    void get_all_cell_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
-
-    /**
-     * Given a modified cell (target), get all formula cells that need to be
-     * re-calculated based on the range-to-cells listener relationships.
-     *
-     * @param target
-     * @param listeners
-     */
-    void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
 };
 
 }
