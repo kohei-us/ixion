@@ -297,12 +297,12 @@ public:
 
 }
 
-void cell_listener_tracker::get_all_dirty_cells(modified_cells_t& addrs, cell_address_set_t& cells) const
+void cell_listener_tracker::get_all_dirty_cells(cell_address_set_t& modified_cells, cell_address_set_t& cells) const
 {
     // Volatile cells are always included.
     for (const abs_address_t& addr : mp_impl->get_volatile_cells())
     {
-        addrs.push_back(addr);
+        modified_cells.insert(addr);
         cells.insert(addr);
     }
 
@@ -310,21 +310,17 @@ void cell_listener_tracker::get_all_dirty_cells(modified_cells_t& addrs, cell_ad
     // modified cells, to get their listeners too.
 
     cell_address_set_t range_listeners;
-    for (const abs_address_t& addr : addrs)
+    for (const abs_address_t& addr : modified_cells)
         mp_impl->get_all_range_listeners(addr, range_listeners);
 
     for (const abs_address_t& cell : range_listeners)
     {
-        addrs.push_back(cell);
+        modified_cells.insert(cell);
         cells.insert(cell);
     }
 
-    // Remove duplicate entries.
-    std::sort(addrs.begin(), addrs.end());
-    addrs.erase(std::unique(addrs.begin(), addrs.end()), addrs.end());
-
     // Now get the single cell listeners.
-    for (const abs_address_t& addr : addrs)
+    for (const abs_address_t& addr : modified_cells)
         mp_impl->get_all_cell_listeners(addr, cells);
 }
 

@@ -24,7 +24,7 @@ struct document_global
      * positions of all modified cells (formula and non-formula cells) since
      * last calculation.
      */
-    modified_cells_t m_modified_cells;
+    cell_address_set_t m_modified_cells;
 
     /** positions of all dirty formula cells since last calculation. */
     cell_address_set_t m_dirty_formula_cells;

@@ -389,7 +389,7 @@ void model_parser::parse_init()
 
     for (const abs_address_t& pos : iter)
     {
-        m_dirty_cell_addrs.push_back(pos);
+        m_dirty_cell_addrs.insert(pos);
 
         switch (cell_def.type)
         {
@@ -445,7 +445,7 @@ void model_parser::parse_edit()
         assert(cell_def.type == ct_formula);
         const abs_address_t& pos = cell_def.pos.first;
 
-        m_dirty_cell_addrs.push_back(pos);
+        m_dirty_cell_addrs.insert(pos);
         unregister_formula_cell(m_context, pos);
 
         formula_tokens_t tokens =
@@ -462,7 +462,7 @@ void model_parser::parse_edit()
 
     for (const abs_address_t& pos : iter)
     {
-        m_dirty_cell_addrs.push_back(pos);
+        m_dirty_cell_addrs.insert(pos);
         unregister_formula_cell(m_context, pos);
 
         if (cell_def.value.empty())

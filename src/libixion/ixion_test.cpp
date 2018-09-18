@@ -979,7 +979,7 @@ void test_volatile_function()
     cxt.append_sheet(IXION_ASCII("test"), 1048576, 16384);
 
     cell_address_set_t dirty_cells;
-    modified_cells_t dirty_addrs;
+    cell_address_set_t modified_cells;
 
     // Set values into A1:A3.
     cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);
@@ -1000,8 +1000,8 @@ void test_volatile_function()
     // Modify the value of A2.  This should flag A4 dirty.
     cxt.set_numeric_cell(abs_address_t(0,1,0), 10.0);
     dirty_cells.clear();
-    dirty_addrs.push_back(abs_address_t(0,1,0));
-    get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
+    modified_cells.insert(abs_address_t(0,1,0));
+    get_all_dirty_cells(cxt, modified_cells, dirty_cells);
     assert(dirty_cells.size() == 1);
 
     // Partial recalculation.
@@ -1011,12 +1011,12 @@ void test_volatile_function()
 
     // Insert a volatile cell into B1.  At this point B1 should be the only dirty cell.
     dirty_cells.clear();
-    dirty_addrs.clear();
+    modified_cells.clear();
     p = insert_formula(cxt, abs_address_t(0,0,1), "NOW()", *resolver);
     assert(p);
     dirty_cells.insert(abs_address_t(0,0,1));
-    dirty_addrs.push_back(abs_address_t(0,0,1));
-    get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
+    modified_cells.insert(abs_address_t(0,0,1));
+    get_all_dirty_cells(cxt, modified_cells, dirty_cells);
     assert(dirty_cells.size() == 1);
 
     // Partial recalc again.
@@ -1028,8 +1028,8 @@ void test_volatile_function()
 
     // No modification, but B1 should still be flagged dirty.
     dirty_cells.clear();
-    dirty_addrs.clear();
-    get_all_dirty_cells(cxt, dirty_addrs, dirty_cells);
+    modified_cells.clear();
+    get_all_dirty_cells(cxt, modified_cells, dirty_cells);
     assert(dirty_cells.size() == 1);
     calculate_cells(cxt, dirty_cells, 0);
     double t2 = cxt.get_numeric_value(abs_address_t(0,0,1));

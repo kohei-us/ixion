@@ -95,7 +95,7 @@ PyObject* sheet_set_numeric_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
-    sd->m_global->m_modified_cells.push_back(pos);
+    sd->m_global->m_modified_cells.insert(pos);
     cxt.set_numeric_cell(pos, val);
 
     Py_INCREF(Py_None);
@@ -122,7 +122,7 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
-    sd->m_global->m_modified_cells.push_back(pos);
+    sd->m_global->m_modified_cells.insert(pos);
     cxt.set_string_cell(pos, val, strlen(val));
 
     Py_INCREF(Py_None);
@@ -150,7 +150,7 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     ixion::model_context& cxt = sd->m_global->m_cxt;
 
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
-    sd->m_global->m_modified_cells.push_back(pos);
+    sd->m_global->m_modified_cells.insert(pos);
     sd->m_global->m_dirty_formula_cells.insert(pos);
 
     ixion::formula_tokens_t tokens =
@@ -283,7 +283,7 @@ PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
     abs_address_t pos(sd->m_sheet_index, row, col);
-    sd->m_global->m_modified_cells.push_back(pos);
+    sd->m_global->m_modified_cells.insert(pos);
     cxt.erase_cell(pos);
 
     Py_INCREF(Py_None);

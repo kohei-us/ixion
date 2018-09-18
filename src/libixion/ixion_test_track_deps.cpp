@@ -43,7 +43,7 @@ void test_single_cell_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, then both A2 and A3 should get updated.
-    modified_cells_t mod_cells = {
+    cell_address_set_t mod_cells = {
         { 0, 0, 0 }
     };
 
@@ -84,7 +84,7 @@ void test_range_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, both C5 and A10 should get updated.
-    modified_cells_t addrs = { abs_address_t(0,0,0) };
+    cell_address_set_t addrs = { abs_address_t(0,0,0) };
     cell_address_set_t cells;
     get_all_dirty_cells(cxt, addrs, cells);
 
@@ -125,7 +125,7 @@ void test_matrix_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, both C5 and A10 should get updated.
-    modified_cells_t addrs = { abs_address_t(0,0,0) };
+    cell_address_set_t addrs = { abs_address_t(0,0,0) };
     cell_address_set_t cells;
     get_all_dirty_cells(cxt, addrs, cells);
 

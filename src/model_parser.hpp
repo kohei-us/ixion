@@ -133,7 +133,7 @@ private:
     std::string m_strm;
     size_t m_thread_count;
     cell_address_set_t m_dirty_cells;
-    modified_cells_t m_dirty_cell_addrs;
+    cell_address_set_t m_dirty_cell_addrs;
     results_type m_formula_results;
 
     const char* mp_head;

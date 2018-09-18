@@ -73,14 +73,14 @@ void IXION_DLLPUBLIC unregister_formula_cell(
  * We call such cells "dirty cells".
  *
  * @param cxt model context
- * @param addrs list of addresses of cells that have been modified.  Note
- *              that this call may add additional cells to this list in a
- *              presence of volatile cells.
+ * @param modified_cells list of addresses of cells that have been modified.
+ *              Note that this call may add additional cells to this list in
+ *              a presence of volatile cells.
  * @param cells all dirty cells are inserted into this container when this
  *              function returns.
  */
 void IXION_DLLPUBLIC get_all_dirty_cells(
-    iface::formula_model_access& cxt, modified_cells_t& addrs, cell_address_set_t& cells);
+    iface::formula_model_access& cxt, cell_address_set_t& modified_cells, cell_address_set_t& cells);
 
 /**
  * Calculate all dirty cells in order of dependency.
