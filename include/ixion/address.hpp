@@ -315,12 +315,6 @@ IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range)
 typedef std::unordered_set<abs_address_t, abs_address_t::hash> cell_address_set_t;
 
 /**
- * Collection of formula cells that have been modified or formula cells that
- * reference other modified cells either directly or indirectly.
- */
-typedef cell_address_set_t dirty_formula_cells_t;
-
-/**
  * Collection of cells that have been modified since last recalculation.
  */
 typedef std::vector<abs_address_t> modified_cells_t;
@@ -328,4 +322,5 @@ typedef std::vector<abs_address_t> modified_cells_t;
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

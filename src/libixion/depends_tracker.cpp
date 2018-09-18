@@ -34,7 +34,7 @@ void dependency_tracker::cell_back_inserter::operator() (const abs_address_t& ce
 }
 
 dependency_tracker::dependency_tracker(
-    const dirty_formula_cells_t& dirty_cells, iface::formula_model_access& cxt) :
+    const cell_address_set_t& dirty_cells, iface::formula_model_access& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }
@@ -101,7 +101,7 @@ void dependency_tracker::topo_sort_cells(vector<abs_address_t>& sorted_cells) co
     cell_back_inserter handler(sorted_cells);
     vector<abs_address_t> all_cells;
     all_cells.reserve(m_dirty_cells.size());
-    dirty_formula_cells_t::const_iterator itr = m_dirty_cells.begin(), itr_end = m_dirty_cells.end();
+    cell_address_set_t::const_iterator itr = m_dirty_cells.begin(), itr_end = m_dirty_cells.end();
     for (; itr != itr_end; ++itr)
         all_cells.push_back(*itr);
 

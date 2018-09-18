@@ -27,7 +27,7 @@ struct document_global
     modified_cells_t m_modified_cells;
 
     /** positions of all dirty formula cells since last calculation. */
-    dirty_formula_cells_t m_dirty_formula_cells;
+    cell_address_set_t m_dirty_formula_cells;
 
     std::unique_ptr<formula_name_resolver> m_resolver;
 

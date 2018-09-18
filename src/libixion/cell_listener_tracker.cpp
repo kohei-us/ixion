@@ -37,10 +37,10 @@ using range_store_type = std::unordered_map<abs_range_t, address_set_type*, abs_
 class dirty_cell_inserter : public std::unary_function<address_set_type*, void>
 {
     model_context& m_context;
-    dirty_formula_cells_t& m_dirty_cells;
+    cell_address_set_t& m_dirty_cells;
     address_set_type& m_addrs;
 public:
-    dirty_cell_inserter(model_context& cxt, dirty_formula_cells_t& dirty_cells, address_set_type& addrs) :
+    dirty_cell_inserter(model_context& cxt, cell_address_set_t& dirty_cells, address_set_type& addrs) :
         m_context(cxt), m_dirty_cells(dirty_cells), m_addrs(addrs) {}
 
     void operator() (const address_set_type* p)
@@ -86,17 +86,17 @@ struct cell_listener_tracker::impl
         return m_volatile_cells;
     }
 
-    void get_all_cell_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
+    void get_all_cell_listeners(const abs_address_t& target, cell_address_set_t& listeners) const;
 
-    void get_all_range_listeners(const abs_address_t& target, dirty_formula_cells_t& listeners) const;
+    void get_all_range_listeners(const abs_address_t& target, cell_address_set_t& listeners) const;
 
     void get_all_range_listeners_re(
         const abs_address_t& origin_target, const abs_address_t& target,
-        dirty_formula_cells_t& listeners, address_set_type& listeners_addr) const;
+        cell_address_set_t& listeners, address_set_type& listeners_addr) const;
 };
 
 void cell_listener_tracker::impl::get_all_cell_listeners(
-    const abs_address_t& target, dirty_formula_cells_t& listeners) const
+    const abs_address_t& target, cell_address_set_t& listeners) const
 {
     cell_store_type::const_iterator itr = m_cell_listeners.find(target);
     if (itr == m_cell_listeners.end())
@@ -123,14 +123,14 @@ void cell_listener_tracker::impl::get_all_cell_listeners(
 }
 
 void cell_listener_tracker::impl::get_all_range_listeners(
-    const abs_address_t& target, dirty_formula_cells_t& listeners) const
+    const abs_address_t& target, cell_address_set_t& listeners) const
 {
     address_set_type listeners_addrs; // to keep track of circular references.
     get_all_range_listeners_re(target, target, listeners, listeners_addrs);
 }
 
 void cell_listener_tracker::impl::get_all_range_listeners_re(
-    const abs_address_t& origin_target, const abs_address_t& target, dirty_formula_cells_t& listeners, address_set_type& listeners_addrs) const
+    const abs_address_t& origin_target, const abs_address_t& target, cell_address_set_t& listeners, address_set_type& listeners_addrs) const
 {
     if (listeners_addrs.count(target))
     {
@@ -141,7 +141,7 @@ void cell_listener_tracker::impl::get_all_range_listeners_re(
         return;
     }
 
-    dirty_formula_cells_t new_listeners;
+    cell_address_set_t new_listeners;
     address_set_type new_listeners_addrs;
     range_query_set_type::search_result res = m_query_set.search(target.column, target.row);
 
@@ -297,7 +297,7 @@ public:
 
 }
 
-void cell_listener_tracker::get_all_dirty_cells(modified_cells_t& addrs, dirty_formula_cells_t& cells) const
+void cell_listener_tracker::get_all_dirty_cells(modified_cells_t& addrs, cell_address_set_t& cells) const
 {
     // Volatile cells are always included.
     for (const abs_address_t& addr : mp_impl->get_volatile_cells())
@@ -309,7 +309,7 @@ void cell_listener_tracker::get_all_dirty_cells(modified_cells_t& addrs, dirty_f
     // Get all range listeners first, then add the listeners to the list of
     // modified cells, to get their listeners too.
 
-    dirty_formula_cells_t range_listeners;
+    cell_address_set_t range_listeners;
     for (const abs_address_t& addr : addrs)
         mp_impl->get_all_range_listeners(addr, range_listeners);
 

@@ -80,7 +80,7 @@ void IXION_DLLPUBLIC unregister_formula_cell(
  *              function returns.
  */
 void IXION_DLLPUBLIC get_all_dirty_cells(
-    iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells);
+    iface::formula_model_access& cxt, modified_cells_t& addrs, cell_address_set_t& cells);
 
 /**
  * Calculate all dirty cells in order of dependency.
@@ -95,7 +95,7 @@ void IXION_DLLPUBLIC get_all_dirty_cells(
  *                     manage the calculation threads.
  */
 void IXION_DLLPUBLIC calculate_cells(
-    iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count);
+    iface::formula_model_access& cxt, cell_address_set_t& cells, size_t thread_count);
 
 }
 

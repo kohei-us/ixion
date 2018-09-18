@@ -265,7 +265,7 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
 }
 
 void get_all_dirty_cells(
-    iface::formula_model_access& cxt, modified_cells_t& addrs, dirty_formula_cells_t& cells)
+    iface::formula_model_access& cxt, modified_cells_t& addrs, cell_address_set_t& cells)
 {
 #if DEBUG_FORMULA_API
     __IXION_DEBUG_OUT__ << "number of modified cells: " << addrs.size() << endl;
@@ -275,7 +275,7 @@ void get_all_dirty_cells(
     tracker.get_all_dirty_cells(addrs, cells);
 }
 
-void calculate_cells(iface::formula_model_access& cxt, dirty_formula_cells_t& cells, size_t thread_count)
+void calculate_cells(iface::formula_model_access& cxt, cell_address_set_t& cells, size_t thread_count)
 {
     dependency_tracker deptracker(cells, cxt);
     std::for_each(cells.begin(), cells.end(),

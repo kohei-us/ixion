@@ -162,7 +162,7 @@ PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwa
 
     model_context& cxt = self->m_data->m_global.m_cxt;
     modified_cells_t& mod_cells = self->m_data->m_global.m_modified_cells;
-    dirty_formula_cells_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
+    cell_address_set_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
 
     ixion::get_all_dirty_cells(cxt, mod_cells, dirty_fcells);
     calculate_cells(cxt, dirty_fcells, threads);

@@ -132,7 +132,7 @@ private:
     std::string m_filepath;
     std::string m_strm;
     size_t m_thread_count;
-    dirty_formula_cells_t m_dirty_cells;
+    cell_address_set_t m_dirty_cells;
     modified_cells_t m_dirty_cell_addrs;
     results_type m_formula_results;
 

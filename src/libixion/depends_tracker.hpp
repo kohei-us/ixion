@@ -44,7 +44,7 @@ class dependency_tracker
     typedef depth_first_search<abs_address_t, cell_back_inserter, abs_address_t::hash> dfs_type;
 
 public:
-    dependency_tracker(const dirty_formula_cells_t& dirty_cells, iface::formula_model_access& cxt);
+    dependency_tracker(const cell_address_set_t& dirty_cells, iface::formula_model_access& cxt);
     ~dependency_tracker();
 
     /**
@@ -65,7 +65,7 @@ public:
 
 private:
     dfs_type::precedent_set m_deps;
-    const dirty_formula_cells_t& m_dirty_cells;
+    const cell_address_set_t& m_dirty_cells;
     iface::formula_model_access& m_context;
 };
 

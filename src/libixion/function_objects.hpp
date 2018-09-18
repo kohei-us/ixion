@@ -30,14 +30,14 @@ class cell_dependency_handler : public std::unary_function<abs_address_t, void>
 {
 public:
     explicit cell_dependency_handler(
-        iface::formula_model_access& cxt, dependency_tracker& dep_tracker, dirty_formula_cells_t& dirty_cells);
+        iface::formula_model_access& cxt, dependency_tracker& dep_tracker, cell_address_set_t& dirty_cells);
 
     void operator() (const abs_address_t& fcell);
 
 private:
     iface::formula_model_access& m_context;
     dependency_tracker& m_dep_tracker;
-    dirty_formula_cells_t& m_dirty_cells;
+    cell_address_set_t& m_dirty_cells;
 };
 
 }
