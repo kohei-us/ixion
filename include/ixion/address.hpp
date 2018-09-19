@@ -312,7 +312,7 @@ IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range)
 /**
  * Type that represents a collection of multiple cell addresses.
  */
-typedef std::unordered_set<abs_address_t, abs_address_t::hash> cell_address_set_t;
+using cell_address_set_t = std::unordered_set<abs_address_t, abs_address_t::hash>;
 
 }
 

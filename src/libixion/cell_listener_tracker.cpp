@@ -324,6 +324,39 @@ void cell_listener_tracker::get_all_dirty_cells(cell_address_set_t& modified_cel
         mp_impl->get_all_cell_listeners(addr, cells);
 }
 
+cell_address_set_t cell_listener_tracker::query_dirty_cells(const cell_address_set_t& modified_cells) const
+{
+    cell_address_set_t dirty_formula_cells;
+    cell_address_set_t all_modified_cells(modified_cells); // make a copy.
+
+    // Volatile cells are in theory always formula cells and therefore always
+    // should be included.
+    for (const abs_address_t& addr : mp_impl->get_volatile_cells())
+    {
+        all_modified_cells.insert(addr);
+        dirty_formula_cells.insert(addr);
+    }
+
+    // Get all range listeners first, then add the listeners to the list of
+    // modified cells, to get their listeners too.
+
+    cell_address_set_t range_listeners;
+    for (const abs_address_t& addr : all_modified_cells)
+        mp_impl->get_all_range_listeners(addr, range_listeners);
+
+    for (const abs_address_t& cell : range_listeners)
+    {
+        all_modified_cells.insert(cell);
+        dirty_formula_cells.insert(cell);
+    }
+
+    // Now get the single cell listeners.
+    for (const abs_address_t& addr : all_modified_cells)
+        mp_impl->get_all_cell_listeners(addr, dirty_formula_cells);
+
+    return dirty_formula_cells;
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -83,6 +83,8 @@ public:
     void remove_volatile(const abs_address_t& pos);
 
     void get_all_dirty_cells(cell_address_set_t& modified_cells, cell_address_set_t& cells) const;
+
+    cell_address_set_t query_dirty_cells(const cell_address_set_t& modified_cells) const;
 };
 
 }

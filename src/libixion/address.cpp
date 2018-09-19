@@ -480,4 +480,5 @@ std::ostream& operator<<(std::ostream& os, const range_t& range)
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
