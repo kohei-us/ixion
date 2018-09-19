@@ -164,7 +164,10 @@ PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwa
     cell_address_set_t& mod_cells = self->m_data->m_global.m_modified_cells;
     cell_address_set_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
 
-    ixion::get_all_dirty_cells(cxt, mod_cells, dirty_fcells);
+    // Query additional dirty formula cells and add them to the current set.
+    cell_address_set_t res = ixion::query_dirty_cells(cxt, mod_cells);
+    dirty_fcells.insert(res.begin(), res.end());
+
     calculate_cells(cxt, dirty_fcells, threads);
     mod_cells.clear();
     dirty_fcells.clear();

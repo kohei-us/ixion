@@ -47,8 +47,7 @@ void test_single_cell_dependency()
         { 0, 0, 0 }
     };
 
-    cell_address_set_t cells;
-    get_all_dirty_cells(cxt, mod_cells, cells);
+    cell_address_set_t cells = query_dirty_cells(cxt, mod_cells);
 
     assert(cells.size() == 2);
     assert(cells.count(abs_address_t(0,1,0)) == 1);
@@ -85,8 +84,7 @@ void test_range_dependency()
 
     // If A1 is modified, both C5 and A10 should get updated.
     cell_address_set_t addrs = { abs_address_t(0,0,0) };
-    cell_address_set_t cells;
-    get_all_dirty_cells(cxt, addrs, cells);
+    cell_address_set_t cells = query_dirty_cells(cxt, addrs);
 
     assert(cells.count(abs_address_t(0,4,2)) == 1);
     assert(cells.count(abs_address_t(0,9,0)) == 1);
@@ -126,8 +124,7 @@ void test_matrix_dependency()
 
     // If A1 is modified, both C5 and A10 should get updated.
     cell_address_set_t addrs = { abs_address_t(0,0,0) };
-    cell_address_set_t cells;
-    get_all_dirty_cells(cxt, addrs, cells);
+    cell_address_set_t cells = query_dirty_cells(cxt, addrs);
 
     assert(cells.count(abs_address_t(0,4,2)) == 1);
     assert(cells.count(abs_address_t(0,9,0)) == 1);

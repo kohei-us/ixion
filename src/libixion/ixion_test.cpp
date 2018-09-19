@@ -999,9 +999,8 @@ void test_volatile_function()
 
     // Modify the value of A2.  This should flag A4 dirty.
     cxt.set_numeric_cell(abs_address_t(0,1,0), 10.0);
-    dirty_cells.clear();
     modified_cells.insert(abs_address_t(0,1,0));
-    get_all_dirty_cells(cxt, modified_cells, dirty_cells);
+    dirty_cells = query_dirty_cells(cxt, modified_cells);
     assert(dirty_cells.size() == 1);
 
     // Partial recalculation.
@@ -1010,13 +1009,12 @@ void test_volatile_function()
     assert(val == 14);
 
     // Insert a volatile cell into B1.  At this point B1 should be the only dirty cell.
-    dirty_cells.clear();
     modified_cells.clear();
     p = insert_formula(cxt, abs_address_t(0,0,1), "NOW()", *resolver);
     assert(p);
     dirty_cells.insert(abs_address_t(0,0,1));
     modified_cells.insert(abs_address_t(0,0,1));
-    get_all_dirty_cells(cxt, modified_cells, dirty_cells);
+    dirty_cells = query_dirty_cells(cxt, modified_cells);
     assert(dirty_cells.size() == 1);
 
     // Partial recalc again.
@@ -1027,9 +1025,8 @@ void test_volatile_function()
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     // No modification, but B1 should still be flagged dirty.
-    dirty_cells.clear();
     modified_cells.clear();
-    get_all_dirty_cells(cxt, modified_cells, dirty_cells);
+    dirty_cells = query_dirty_cells(cxt, modified_cells);
     assert(dirty_cells.size() == 1);
     calculate_cells(cxt, dirty_cells, 0);
     double t2 = cxt.get_numeric_value(abs_address_t(0,0,1));

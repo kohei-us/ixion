@@ -264,17 +264,6 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
     }
 }
 
-void get_all_dirty_cells(
-    iface::formula_model_access& cxt, cell_address_set_t& modified_cells, cell_address_set_t& cells)
-{
-#if DEBUG_FORMULA_API
-    __IXION_DEBUG_OUT__ << "number of modified cells: " << modified_cells.size() << endl;
-#endif
-
-    const cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
-    tracker.get_all_dirty_cells(modified_cells, cells);
-}
-
 cell_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const cell_address_set_t& modified_cells)
 {
     const cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();

@@ -69,20 +69,18 @@ void IXION_DLLPUBLIC unregister_formula_cell(
     iface::formula_model_access& cxt, const abs_address_t& pos);
 
 /**
- * Get all cells that directly or indirectly depend on known modified cells.
- * We call such cells "dirty cells".
+ * Get the positions of those formula cells that directly or indirectly
+ * depend on the specified source cells.
  *
- * @param cxt model context
- * @param modified_cells list of addresses of cells that have been modified.
- *              Note that this call may add additional cells to this list in
- *              a presence of volatile cells.
- * @param cells all dirty cells are inserted into this container when this
- *              function returns.
+ * @param cxt model context.
+ * @param modified_cells collection of the postiions of cells that have been
+ *                       modified.
+ *
+ * @return collection of the positions of formula cells that directly or
+ *         indirectly depend on at least one of the specified source cells.
  */
-void IXION_DLLPUBLIC get_all_dirty_cells(
-    iface::formula_model_access& cxt, cell_address_set_t& modified_cells, cell_address_set_t& cells);
-
-IXION_DLLPUBLIC cell_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const cell_address_set_t& modified_cells);
+IXION_DLLPUBLIC cell_address_set_t query_dirty_cells(
+    iface::formula_model_access& cxt, const cell_address_set_t& modified_cells);
 
 /**
  * Calculate all dirty cells in order of dependency.

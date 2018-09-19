@@ -297,33 +297,6 @@ public:
 
 }
 
-void cell_listener_tracker::get_all_dirty_cells(cell_address_set_t& modified_cells, cell_address_set_t& cells) const
-{
-    // Volatile cells are always included.
-    for (const abs_address_t& addr : mp_impl->get_volatile_cells())
-    {
-        modified_cells.insert(addr);
-        cells.insert(addr);
-    }
-
-    // Get all range listeners first, then add the listeners to the list of
-    // modified cells, to get their listeners too.
-
-    cell_address_set_t range_listeners;
-    for (const abs_address_t& addr : modified_cells)
-        mp_impl->get_all_range_listeners(addr, range_listeners);
-
-    for (const abs_address_t& cell : range_listeners)
-    {
-        modified_cells.insert(cell);
-        cells.insert(cell);
-    }
-
-    // Now get the single cell listeners.
-    for (const abs_address_t& addr : modified_cells)
-        mp_impl->get_all_cell_listeners(addr, cells);
-}
-
 cell_address_set_t cell_listener_tracker::query_dirty_cells(const cell_address_set_t& modified_cells) const
 {
     cell_address_set_t dirty_formula_cells;

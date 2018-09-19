@@ -7,6 +7,8 @@ export PYTHONPATH=$_PYTHONPATH
 export LD_LIBRARY_PATH="$PROGDIR/../src/libixion/.libs"
 export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
-exec $PWD/"$1"
+CMD="$1"
+shift
+exec $PWD/$CMD "$@"
 
 
