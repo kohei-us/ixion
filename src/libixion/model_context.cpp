@@ -147,7 +147,7 @@ public:
 
     double count_range(const abs_range_t& range, const values_t& values_type) const;
 
-    cell_address_set_t get_all_formula_cells() const;
+    abs_address_set_t get_all_formula_cells() const;
 
     bool empty() const;
 
@@ -470,9 +470,9 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
     return ret;
 }
 
-cell_address_set_t model_context_impl::get_all_formula_cells() const
+abs_address_set_t model_context_impl::get_all_formula_cells() const
 {
-    cell_address_set_t cells;
+    abs_address_set_t cells;
 
     for (size_t sid = 0; sid < m_sheets.size(); ++sid)
     {
@@ -1118,7 +1118,7 @@ const column_stores_t* model_context::get_columns(sheet_t sheet) const
     return mp_impl->get_columns(sheet);
 }
 
-cell_address_set_t model_context::get_all_formula_cells() const
+abs_address_set_t model_context::get_all_formula_cells() const
 {
     return mp_impl->get_all_formula_cells();
 }

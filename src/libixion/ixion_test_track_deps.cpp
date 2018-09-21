@@ -43,11 +43,11 @@ void test_single_cell_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, then both A2 and A3 should get updated.
-    cell_address_set_t mod_cells = {
+    abs_address_set_t mod_cells = {
         { 0, 0, 0 }
     };
 
-    cell_address_set_t cells = query_dirty_cells(cxt, mod_cells);
+    abs_address_set_t cells = query_dirty_cells(cxt, mod_cells);
 
     assert(cells.size() == 2);
     assert(cells.count(abs_address_t(0,1,0)) == 1);
@@ -83,8 +83,8 @@ void test_range_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, both C5 and A10 should get updated.
-    cell_address_set_t addrs = { abs_address_t(0,0,0) };
-    cell_address_set_t cells = query_dirty_cells(cxt, addrs);
+    abs_address_set_t addrs = { abs_address_t(0,0,0) };
+    abs_address_set_t cells = query_dirty_cells(cxt, addrs);
 
     assert(cells.count(abs_address_t(0,4,2)) == 1);
     assert(cells.count(abs_address_t(0,9,0)) == 1);
@@ -123,8 +123,8 @@ void test_matrix_dependency()
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, both C5 and A10 should get updated.
-    cell_address_set_t addrs = { abs_address_t(0,0,0) };
-    cell_address_set_t cells = query_dirty_cells(cxt, addrs);
+    abs_address_set_t addrs = { abs_address_t(0,0,0) };
+    abs_address_set_t cells = query_dirty_cells(cxt, addrs);
 
     assert(cells.count(abs_address_t(0,4,2)) == 1);
     assert(cells.count(abs_address_t(0,9,0)) == 1);

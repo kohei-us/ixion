@@ -161,11 +161,11 @@ PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwa
     }
 
     model_context& cxt = self->m_data->m_global.m_cxt;
-    cell_address_set_t& mod_cells = self->m_data->m_global.m_modified_cells;
-    cell_address_set_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
+    abs_address_set_t& mod_cells = self->m_data->m_global.m_modified_cells;
+    abs_address_set_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
 
     // Query additional dirty formula cells and add them to the current set.
-    cell_address_set_t res = ixion::query_dirty_cells(cxt, mod_cells);
+    abs_address_set_t res = ixion::query_dirty_cells(cxt, mod_cells);
     dirty_fcells.insert(res.begin(), res.end());
 
     calculate_cells(cxt, dirty_fcells, threads);

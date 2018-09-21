@@ -155,7 +155,7 @@ public:
      */
     const column_stores_t* get_columns(sheet_t sheet) const;
 
-    cell_address_set_t get_all_formula_cells() const;
+    abs_address_set_t get_all_formula_cells() const;
 
     bool empty() const;
 };

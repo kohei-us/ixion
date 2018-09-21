@@ -264,13 +264,13 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
     }
 }
 
-cell_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const cell_address_set_t& modified_cells)
+abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_address_set_t& modified_cells)
 {
     const cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
     return tracker.query_dirty_cells(modified_cells);
 }
 
-void calculate_cells(iface::formula_model_access& cxt, cell_address_set_t& cells, size_t thread_count)
+void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& cells, size_t thread_count)
 {
     dependency_tracker deptracker(cells, cxt);
     std::for_each(cells.begin(), cells.end(),

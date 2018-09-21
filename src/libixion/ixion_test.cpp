@@ -978,8 +978,8 @@ void test_volatile_function()
 
     cxt.append_sheet(IXION_ASCII("test"), 1048576, 16384);
 
-    cell_address_set_t dirty_cells;
-    cell_address_set_t modified_cells;
+    abs_address_set_t dirty_cells;
+    abs_address_set_t modified_cells;
 
     // Set values into A1:A3.
     cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);

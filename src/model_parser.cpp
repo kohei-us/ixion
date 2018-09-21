@@ -230,7 +230,7 @@ void model_parser::parse_command()
         cout << get_formula_result_output_separator() << endl
             << "recalculating" << endl;
 
-        cell_address_set_t res = query_dirty_cells(m_context, m_dirty_cell_addrs);
+        abs_address_set_t res = query_dirty_cells(m_context, m_dirty_cell_addrs);
         m_dirty_cells.insert(res.begin(), res.end());
 
         calculate_cells(m_context, m_dirty_cells, m_thread_count);

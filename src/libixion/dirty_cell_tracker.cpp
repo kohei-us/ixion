@@ -12,7 +12,7 @@ namespace ixion {
 
 struct dirty_cell_tracker::impl
 {
-    cell_address_set_t m_volatile_cells;
+    abs_address_set_t m_volatile_cells;
     impl() {}
 };
 
@@ -45,9 +45,9 @@ void dirty_cell_tracker::remove_volatile(const abs_address_t& pos)
     mp_impl->m_volatile_cells.erase(pos);
 }
 
-cell_address_set_t dirty_cell_tracker::query_dirty_cells(const cell_address_set_t& modified_cells) const
+abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& modified_cells) const
 {
-    cell_address_set_t dirty_formula_cells;
+    abs_address_set_t dirty_formula_cells;
 
     // Volatile cells are in theory always formula cells and therefore always
     // should be included.

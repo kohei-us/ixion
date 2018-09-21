@@ -132,8 +132,8 @@ private:
     std::string m_filepath;
     std::string m_strm;
     size_t m_thread_count;
-    cell_address_set_t m_dirty_cells;
-    cell_address_set_t m_dirty_cell_addrs;
+    abs_address_set_t m_dirty_cells;
+    abs_address_set_t m_dirty_cell_addrs;
     results_type m_formula_results;
 
     const char* mp_head;

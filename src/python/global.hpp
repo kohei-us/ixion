@@ -24,10 +24,10 @@ struct document_global
      * positions of all modified cells (formula and non-formula cells) since
      * last calculation.
      */
-    cell_address_set_t m_modified_cells;
+    abs_address_set_t m_modified_cells;
 
     /** positions of all dirty formula cells since last calculation. */
-    cell_address_set_t m_dirty_formula_cells;
+    abs_address_set_t m_dirty_formula_cells;
 
     std::unique_ptr<formula_name_resolver> m_resolver;
 

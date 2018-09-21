@@ -75,7 +75,7 @@ private:
 class depcell_inserter : public std::unary_function<abs_address_t, void>
 {
 public:
-    depcell_inserter(dependency_tracker& tracker, const cell_address_set_t& dirty_cells, const abs_address_t& fcell) :
+    depcell_inserter(dependency_tracker& tracker, const abs_address_set_t& dirty_cells, const abs_address_t& fcell) :
         m_tracker(tracker),
         m_dirty_cells(dirty_cells),
         m_fcell(fcell) {}
@@ -87,14 +87,14 @@ public:
     }
 private:
     dependency_tracker& m_tracker;
-    const cell_address_set_t& m_dirty_cells;
+    const abs_address_set_t& m_dirty_cells;
     abs_address_t m_fcell;
 };
 
 }
 
 cell_dependency_handler::cell_dependency_handler(
-    iface::formula_model_access& cxt, dependency_tracker& dep_tracker, cell_address_set_t& dirty_cells) :
+    iface::formula_model_access& cxt, dependency_tracker& dep_tracker, abs_address_set_t& dirty_cells) :
     m_context(cxt), m_dep_tracker(dep_tracker), m_dirty_cells(dirty_cells) {}
 
 void cell_dependency_handler::operator() (const abs_address_t& fcell)
