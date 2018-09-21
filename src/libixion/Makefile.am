@@ -26,6 +26,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	config.cpp \
 	depends_tracker.hpp \
 	depends_tracker.cpp \
+	dirty_cell_tracker.cpp \
 	exceptions.cpp \
 	formula.cpp \
 	formula_function_opcode.cpp \

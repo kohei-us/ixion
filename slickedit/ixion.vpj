@@ -232,6 +232,7 @@
 				<F N="../include/ixion/compute_engine.hpp"/>
 				<F N="../include/ixion/config.hpp"/>
 				<F N="../include/ixion/depth_first_search.hpp"/>
+				<F N="../include/ixion/dirty_cell_tracker.hpp"/>
 				<F N="../include/ixion/env.hpp"/>
 				<F N="../include/ixion/exceptions.hpp"/>
 				<F N="../include/ixion/formula.hpp"/>
@@ -275,6 +276,7 @@
 				<F N="../src/libixion/constants.inl"/>
 				<F N="../src/libixion/depends_tracker.cpp"/>
 				<F N="../src/libixion/depends_tracker.hpp"/>
+				<F N="../src/libixion/dirty_cell_tracker.cpp"/>
 				<F N="../src/libixion/exceptions.cpp"/>
 				<F N="../src/libixion/formula.cpp"/>
 				<F N="../src/libixion/formula_function_opcode.cpp"/>

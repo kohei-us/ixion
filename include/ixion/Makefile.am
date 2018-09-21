@@ -10,6 +10,7 @@ libixion_HEADERS = \
 	compute_engine.hpp \
 	config.hpp \
 	depth_first_search.hpp \
+	dirty_cell_tracker.hpp \
 	env.hpp \
 	exceptions.hpp \
 	formula_function_opcode.hpp \
