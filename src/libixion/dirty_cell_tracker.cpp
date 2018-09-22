@@ -39,7 +39,6 @@ dirty_cell_tracker::~dirty_cell_tracker() {}
 
 void dirty_cell_tracker::add(const abs_address_t& src, const abs_address_t& dest)
 {
-    assert(!"TESTME");
     if (dest.sheet < 0)
     {
         BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << dest.sheet << ")";
