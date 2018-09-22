@@ -161,6 +161,8 @@ struct IXION_DLLPUBLIC abs_range_t
 
     abs_range_t();
     abs_range_t(init_invalid);
+    abs_range_t(sheet_t _sheet, row_t _row, col_t _col);
+    abs_range_t(const abs_address_t& addr);
 
     struct hash
     {
@@ -313,6 +315,8 @@ IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range)
  * Type that represents a collection of multiple cell addresses.
  */
 using abs_address_set_t = std::unordered_set<abs_address_t, abs_address_t::hash>;
+using abs_range_set_t = std::unordered_set<abs_range_t, abs_range_t::hash>;
+using abs_rc_range_set_t = std::unordered_set<abs_rc_range_t, abs_rc_range_t::hash>;
 
 }
 

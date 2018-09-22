@@ -278,6 +278,12 @@ abs_range_t::abs_range_t() {}
 abs_range_t::abs_range_t(init_invalid) :
     first(abs_address_t::invalid), last(abs_address_t::invalid) {}
 
+abs_range_t::abs_range_t(sheet_t _sheet, row_t _row, col_t _col) :
+    first(_sheet, _row, _col), last(_sheet, _row, _col) {}
+
+abs_range_t::abs_range_t(const abs_address_t& addr) :
+    first(addr), last(addr) {}
+
 size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 {
     abs_address_t::hash adr_hash;

@@ -21,7 +21,7 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
-CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -Wshadow -pthread"
+CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -Wshadow -pthread -DBOOST_LOG_DYN_LINK"
 
 AC_CANONICAL_HOST
 
@@ -100,6 +100,7 @@ AC_FUNC_STRTOD
 BOOST_REQUIRE([1.36])
 BOOST_FILESYSTEM
 BOOST_SYSTEM
+BOOST_LOG
 
 # =====
 # Debug
