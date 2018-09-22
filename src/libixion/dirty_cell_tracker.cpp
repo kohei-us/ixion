@@ -27,8 +27,8 @@ struct dirty_cell_tracker::impl
 
     rtree_type& fetch_md_grid(size_t n)
     {
-        if (m_md_grid.size() < n)
-            m_md_grid.resize(n);
+        if (m_md_grid.size() <= n)
+            m_md_grid.resize(n+1);
 
         return m_md_grid[n];
     }
