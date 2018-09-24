@@ -25,6 +25,16 @@ void test_cell_to_cell()
     assert(res.size() == 1);
     abs_address_t cell = *res.cbegin();
     assert(cell == abs_address_t(0, 1, 0));
+
+    // A3 to listen to A2.
+    tracker.add(abs_address_t(0, 2, 0), abs_address_t(0, 1, 0));
+
+    // A1 is modified.  Both A2 and A3 should be updated.
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 2);
+
+    assert(res.count(abs_address_t(0, 1, 0)) > 0);
+    assert(res.count(abs_address_t(0, 2, 0)) > 0);
 }
 
 int main()

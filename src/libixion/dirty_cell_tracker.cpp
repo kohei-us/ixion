@@ -121,10 +121,17 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
     // should be included.
     dirty_formula_cells.insert(mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
 
-    for (const abs_address_t& mc : modified_cells)
+    abs_address_set_t cur_modified_cells(modified_cells); // copy
+    while (!cur_modified_cells.empty())
     {
-        auto cells = mp_impl->get_affected_cells(mc);
-        dirty_formula_cells.insert(cells.begin(), cells.end());
+        abs_address_set_t next_modified_cells;
+        for (const abs_address_t& mc : cur_modified_cells)
+        {
+            next_modified_cells = mp_impl->get_affected_cells(mc);
+            dirty_formula_cells.insert(next_modified_cells.begin(), next_modified_cells.end());
+        }
+
+        cur_modified_cells.swap(next_modified_cells);
     }
 
     return dirty_formula_cells;
