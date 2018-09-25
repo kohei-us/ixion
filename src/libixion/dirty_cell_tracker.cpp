@@ -38,21 +38,19 @@ struct dirty_cell_tracker::impl
         return m_grids.at(n);
     }
 
-    abs_address_set_t get_affected_cells(const abs_address_t& cell) const
+    abs_range_set_t get_affected_cell_ranges(const abs_range_t& range) const
     {
-        const rtree_type& grid = fetch_grid(cell.sheet);
+        const rtree_type& grid = fetch_grid(range.first.sheet);
         rtree_type::const_search_results res = grid.search(
-            {cell.row, cell.column}, rtree_type::search_type::overlap);
+            {{range.first.row, range.first.column}, {range.last.row, range.last.column}},
+            rtree_type::search_type::overlap);
 
-        abs_address_set_t cells;
+        abs_range_set_t ranges;
 
         for (const abs_range_set_t& range_set : res)
-        {
-            for (const abs_range_t& range : range_set)
-                cells.insert(range.first);
-        }
+            ranges.insert(range_set.begin(), range_set.end());
 
-        return cells;
+        return ranges;
     }
 };
 
@@ -119,16 +117,22 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
 
     // Volatile cells are in theory always formula cells and therefore always
     // should be included.
-    dirty_formula_cells.insert(mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
+    dirty_formula_cells.insert(
+        mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
 
-    abs_address_set_t cur_modified_cells(modified_cells); // copy
+    abs_range_set_t cur_modified_cells;
+    for (const abs_address_t& mc : modified_cells)
+        cur_modified_cells.emplace(mc);
+
     while (!cur_modified_cells.empty())
     {
-        abs_address_set_t next_modified_cells;
-        for (const abs_address_t& mc : cur_modified_cells)
+        abs_range_set_t next_modified_cells;
+        for (const abs_range_t& mc : cur_modified_cells)
         {
-            next_modified_cells = mp_impl->get_affected_cells(mc);
-            dirty_formula_cells.insert(next_modified_cells.begin(), next_modified_cells.end());
+            next_modified_cells = mp_impl->get_affected_cell_ranges(mc);
+
+            for (const abs_range_t& r : next_modified_cells)
+                dirty_formula_cells.insert(r.first);
         }
 
         cur_modified_cells.swap(next_modified_cells);
