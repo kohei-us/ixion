@@ -60,6 +60,14 @@ void test_cell_to_cell()
     tracker.remove(A2, A1);
     res = tracker.query_dirty_cells(mod_cells);
     assert(res.empty());
+
+    // Add A2->A1 once again, to re-establish the previous chain.
+    tracker.add(A2, A1);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 2);
+
+    assert(res.count(A2) > 0);
+    assert(res.count(A3) > 0);
 }
 
 void test_cell_to_range()
