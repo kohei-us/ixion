@@ -32,25 +32,28 @@ void test_cell_to_cell()
     dirty_cell_tracker tracker;
 
     // A2 to listen to A1.
-    tracker.add(abs_address_t(0, 1, 0), abs_address_t(0, 0, 0));
+    abs_address_t A1(0, 0, 0);
+    abs_address_t A2(0, 1, 0);
+    tracker.add(A2, A1);
 
     // A1 is modified.  A2 should be updated.
     abs_address_set_t mod_cells;
-    mod_cells.emplace(0, 0, 0);
+    mod_cells.insert(A1);
     abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 1);
     abs_address_t cell = *res.cbegin();
-    assert(cell == abs_address_t(0, 1, 0));
+    assert(cell == A2);
 
     // A3 to listen to A2.
-    tracker.add(abs_address_t(0, 2, 0), abs_address_t(0, 1, 0));
+    abs_address_t A3(0, 2, 0);
+    tracker.add(A3, A2);
 
     // A1 is modified.  Both A2 and A3 should be updated.
     res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 2);
 
-    assert(res.count(abs_address_t(0, 1, 0)) > 0);
-    assert(res.count(abs_address_t(0, 2, 0)) > 0);
+    assert(res.count(A2) > 0);
+    assert(res.count(A3) > 0);
 }
 
 void test_cell_to_range()
