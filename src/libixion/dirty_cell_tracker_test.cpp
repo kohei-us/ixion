@@ -58,14 +58,25 @@ void test_cell_to_range()
     dirty_cell_tracker tracker;
 
     // B2 listens to C1:D4.
-    tracker.add(abs_address_t(0, 1, 1), abs_range_t(0, 0, 2, 4, 2));
+    abs_address_t B2(0, 1, 1);
+    tracker.add(B2, abs_range_t(0, 0, 2, 4, 2));
 
     // D3 gets modified.  B2 should be updated.
     abs_address_set_t mod_cells;
     mod_cells.emplace(0, 2, 3);
     abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 1);
-    assert(res.count(abs_address_t(0, 1, 1)) > 0);
+    assert(res.count(B2) > 0);
+
+    // E10 listens to A1:B4 which includes B2.
+    abs_address_t E10(0, 9, 4);
+    tracker.add(E10, abs_range_t(0, 0, 0, 4, 2));
+
+    // D3 gets modified again. This time both B2 and E10 need updating.
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 2);
+    assert(res.count(B2) > 0);
+    assert(res.count(E10) > 0);
 }
 
 int main()
