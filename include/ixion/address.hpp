@@ -162,6 +162,15 @@ struct IXION_DLLPUBLIC abs_range_t
     abs_range_t();
     abs_range_t(init_invalid);
     abs_range_t(sheet_t _sheet, row_t _row, col_t _col);
+
+    /**
+     * @param _sheet 0-based sheet index.
+     * @param _row 0-based row position of the top-left cell of the range.
+     * @param _col 0-based column position of the top-left cell of the range.
+     * @param _row_span row length of the range. It must be 1 or greater.
+     * @param _col_span column length of the range.  It must be 1 or greater.
+     */
+    abs_range_t(sheet_t _sheet, row_t _row, col_t _col, row_t _row_span, col_t _col_span);
     abs_range_t(const abs_address_t& addr);
 
     struct hash

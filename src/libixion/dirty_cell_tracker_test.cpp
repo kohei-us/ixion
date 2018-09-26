@@ -11,6 +11,22 @@
 
 using namespace ixion;
 
+void test_empty_query()
+{
+    dirty_cell_tracker tracker;
+
+    // Empty query.
+    abs_address_set_t mod_cells;
+    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+    assert(res.empty());
+
+    // A "modified" cell is outside existing sheet range. Make sure we don't
+    // crash here.
+    mod_cells.emplace(1, 1, 1);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.empty());
+}
+
 void test_cell_to_cell()
 {
     dirty_cell_tracker tracker;
@@ -37,9 +53,26 @@ void test_cell_to_cell()
     assert(res.count(abs_address_t(0, 2, 0)) > 0);
 }
 
+void test_cell_to_range()
+{
+    dirty_cell_tracker tracker;
+
+    // B2 listens to C1:D4.
+    tracker.add(abs_address_t(0, 1, 1), abs_range_t(0, 0, 2, 4, 2));
+
+    // D3 gets modified.  B2 should be updated.
+    abs_address_set_t mod_cells;
+    mod_cells.emplace(0, 2, 3);
+    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 1);
+    assert(res.count(abs_address_t(0, 1, 1)) > 0);
+}
+
 int main()
 {
+    test_empty_query();
     test_cell_to_cell();
+    test_cell_to_range();
 
     return EXIT_SUCCESS;
 }

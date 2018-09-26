@@ -281,6 +281,17 @@ abs_range_t::abs_range_t(init_invalid) :
 abs_range_t::abs_range_t(sheet_t _sheet, row_t _row, col_t _col) :
     first(_sheet, _row, _col), last(_sheet, _row, _col) {}
 
+abs_range_t::abs_range_t(sheet_t _sheet, row_t _row, col_t _col, row_t _row_span, col_t _col_span) :
+    first(_sheet, _row, _col), last(_sheet, _row + _row_span - 1, _col + _col_span - 1)
+{
+    if (_row_span < 1 || _col_span < 1)
+    {
+        std::ostringstream os;
+        os << "abs_range_t: invalid span (row=" << _row_span << ", col=" << _col_span << ")";
+        throw std::range_error(os.str());
+    }
+}
+
 abs_range_t::abs_range_t(const abs_address_t& addr) :
     first(addr), last(addr) {}
 
@@ -292,7 +303,10 @@ size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 
 bool abs_range_t::valid() const
 {
-    return first.valid() && last.valid();
+    return first.valid() && last.valid() &&
+        first.sheet == last.sheet &&
+        first.column <= last.column &&
+        first.row <= last.row;
 }
 
 void abs_range_t::set_all_columns()

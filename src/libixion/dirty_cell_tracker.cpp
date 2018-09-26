@@ -15,8 +15,12 @@
 
 namespace ixion {
 
+namespace {
+
 using rtree_type = mdds::rtree<rc_t, abs_range_set_t>;
 using rtree_array_type = std::deque<rtree_type>;
+
+} // anonymous namespace
 
 struct dirty_cell_tracker::impl
 {
@@ -33,15 +37,18 @@ struct dirty_cell_tracker::impl
         return m_grids[n];
     }
 
-    const rtree_type& fetch_grid(size_t n) const
+    const rtree_type* fetch_grid(size_t n) const
     {
-        return m_grids.at(n);
+        return (n < m_grids.size()) ? &m_grids[n] : nullptr;
     }
 
     abs_range_set_t get_affected_cell_ranges(const abs_range_t& range) const
     {
-        const rtree_type& grid = fetch_grid(range.first.sheet);
-        rtree_type::const_search_results res = grid.search(
+        const rtree_type* grid = fetch_grid(range.first.sheet);
+        if (!grid)
+            return abs_range_set_t();
+
+        rtree_type::const_search_results res = grid->search(
             {{range.first.row, range.first.column}, {range.last.row, range.last.column}},
             rtree_type::search_type::overlap);
 
@@ -65,6 +72,13 @@ void dirty_cell_tracker::add(const abs_address_t& src, const abs_address_t& dest
         return;
     }
 
+    if (!dest.valid())
+    {
+        std::ostringstream os;
+        os << "dirty_cell_tracker::add: invalid destination range " << dest;
+        throw std::invalid_argument(os.str());
+    }
+
     rtree_type& tree = mp_impl->fetch_grid_or_resize(dest.sheet);
     rtree_type::search_results res = tree.search(
         {dest.row, dest.column}, rtree_type::search_type::match);
@@ -84,9 +98,34 @@ void dirty_cell_tracker::add(const abs_address_t& src, const abs_address_t& dest
     }
 }
 
-void dirty_cell_tracker::add(const abs_address_t& cell, const abs_range_t& range)
+void dirty_cell_tracker::add(const abs_address_t& src, const abs_range_t& range)
 {
-    assert(!"TESTME");
+    if (range.first.sheet < 0)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << range.first.sheet << ")";
+        return;
+    }
+
+    rtree_type& tree = mp_impl->fetch_grid_or_resize(range.first.sheet);
+
+    rtree_type::extent_type search_box(
+        {{range.first.row, range.first.column}, {range.last.row, range.last.column}});
+
+    rtree_type::search_results res = tree.search(search_box, rtree_type::search_type::match);
+
+    if (res.begin() == res.end())
+    {
+        // No listener for this destination range.  Insert a new one.
+        abs_range_set_t listener;
+        listener.emplace(src);
+        tree.insert(search_box, std::move(listener));
+    }
+    else
+    {
+        // A listener already exists for this destination cell.
+        abs_range_set_t& listener = *res.begin();
+        listener.emplace(src);
+    }
 }
 
 void dirty_cell_tracker::remove(const abs_address_t& src, const abs_address_t& dest)

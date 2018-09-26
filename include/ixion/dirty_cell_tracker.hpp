@@ -29,20 +29,23 @@ public:
     /**
      * Add a reference relationship between two single cells.
      *
-     * @param src cell that references (therefore listens to) dest cell.
-     * @param dest cell being referenced (therefore being listened to) by dest
-     *             cell.
+     * @param src source cell that references (therefore listens to) the
+     *            destination cell.
+     * @param dest destination cell being referenced (therefore being listened
+     *             to) by the source cell.
      */
     void add(const abs_address_t& src, const abs_address_t& dest);
 
     /**
      * Add a reference relationship from a single cell to a range.  The cell
-     * references the range.  Duplicates are silently ignored.
+     * references the range i.e. the cell listens to the range.
      *
-     * @param cell cell that includes reference to the range.
-     * @param range range referenced by the cell.
+     * @param src source cell that includes reference to (therefore listens
+     *             to) the range.
+     * @param range destination range referenced by (therefore listened to by)
+     *              the cell.
      */
-    void add(const abs_address_t& cell, const abs_range_t& range);
+    void add(const abs_address_t& src, const abs_range_t& range);
 
     void remove(const abs_address_t& src, const abs_address_t& dest);
 
