@@ -54,6 +54,12 @@ void test_cell_to_cell()
 
     assert(res.count(A2) > 0);
     assert(res.count(A3) > 0);
+
+    // A2 no longer tracks A1, and because of this, a modification of A1
+    // should not trigger any updates.
+    tracker.remove(A2, A1);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.empty());
 }
 
 void test_cell_to_range()
