@@ -113,11 +113,60 @@ void test_cell_to_range()
     assert(res.count(E10) > 0);
 }
 
+void test_volatile_cells()
+{
+    dirty_cell_tracker tracker;
+
+    // We use sheet 2 in this test.
+    abs_address_t A1(1, 0, 0);
+    abs_address_t B2(1, 1, 1);
+    abs_address_t C3(1, 2, 2);
+
+    tracker.add_volatile(A1);
+
+    // No cells have been modified.
+    abs_address_set_t mod_cells;
+    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+
+    assert(res.size() == 1);
+    assert(res.count(A1) > 0);
+
+    tracker.add_volatile(B2);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 2);
+    assert(res.count(A1) > 0);
+    assert(res.count(B2) > 0);
+
+    tracker.add_volatile(C3);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 3);
+    assert(res.count(A1) > 0);
+    assert(res.count(B2) > 0);
+    assert(res.count(C3) > 0);
+
+    // Start removing the volatile cells one by one.
+    tracker.remove_volatile(B2);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 2);
+    assert(res.count(A1) > 0);
+    assert(res.count(C3) > 0);
+
+    tracker.remove_volatile(C3);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 1);
+    assert(res.count(A1) > 0);
+
+    tracker.remove_volatile(A1);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.empty());
+}
+
 int main()
 {
     test_empty_query();
     test_cell_to_cell();
     test_cell_to_range();
+    test_volatile_cells();
 
     return EXIT_SUCCESS;
 }

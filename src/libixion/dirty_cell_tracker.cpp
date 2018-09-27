@@ -232,13 +232,11 @@ void dirty_cell_tracker::remove(const abs_address_t& src, const abs_range_t& ran
 
 void dirty_cell_tracker::add_volatile(const abs_address_t& pos)
 {
-    assert(!"TESTME");
     mp_impl->m_volatile_cells.insert(pos);
 }
 
 void dirty_cell_tracker::remove_volatile(const abs_address_t& pos)
 {
-    assert(!"TESTME");
     mp_impl->m_volatile_cells.erase(pos);
 }
 
