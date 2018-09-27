@@ -184,9 +184,50 @@ void dirty_cell_tracker::remove(const abs_address_t& src, const abs_address_t& d
         tree->erase(it_listener);
 }
 
-void dirty_cell_tracker::remove(const abs_address_t& cell, const abs_range_t& range)
+void dirty_cell_tracker::remove(const abs_address_t& src, const abs_range_t& range)
 {
-    assert(!"TESTME");
+    if (range.first.sheet < 0)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << range.first.sheet << ")";
+        return;
+    }
+
+    if (!range.valid())
+    {
+        std::ostringstream os;
+        os << "dirty_cell_tracker::add: invalid destination range " << range;
+        throw std::invalid_argument(os.str());
+    }
+
+    rtree_type* tree = mp_impl->fetch_grid(range.first.sheet);
+    if (!tree)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "dirty_cell_tracker::remove: nothing is tracked on sheet " << range.first.sheet << ".";
+        return;
+    }
+
+    rtree_type::extent_type search_box(
+        {{range.first.row, range.first.column}, {range.last.row, range.last.column}});
+
+    rtree_type::search_results res = tree->search(search_box, rtree_type::search_type::match);
+
+    if (res.begin() == res.end())
+    {
+        // No listener for this destination cell. Nothing to remove.
+        BOOST_LOG_TRIVIAL(warning) << "dirty_cell_tracker::remove: cell " << range << " is not being tracked by anybody.";
+        return;
+    }
+
+    rtree_type::iterator it_listener = res.begin();
+    abs_range_set_t& listener = *it_listener;
+    size_t n_removed = listener.erase(src);
+
+    if (!n_removed)
+        BOOST_LOG_TRIVIAL(warning) << "dirty_cell_tracker::remove: cell " << src << " was not tracking cell " << range << ".";
+
+    if (listener.empty())
+        // Remove this from the R-tree.
+        tree->erase(it_listener);
 }
 
 void dirty_cell_tracker::add_volatile(const abs_address_t& pos)

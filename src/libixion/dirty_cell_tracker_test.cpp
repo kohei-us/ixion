@@ -76,7 +76,8 @@ void test_cell_to_range()
 
     // B2 listens to C1:D4.
     abs_address_t B2(0, 1, 1);
-    tracker.add(B2, abs_range_t(0, 0, 2, 4, 2));
+    abs_range_t C1_D4(0, 0, 2, 4, 2);
+    tracker.add(B2, C1_D4);
 
     // D3 gets modified.  B2 should be updated.
     abs_address_set_t mod_cells;
@@ -87,12 +88,28 @@ void test_cell_to_range()
 
     // E10 listens to A1:B4 which includes B2.
     abs_address_t E10(0, 9, 4);
-    tracker.add(E10, abs_range_t(0, 0, 0, 4, 2));
+    abs_range_t A1_B4(0, 0, 0, 4, 2);
+    tracker.add(E10, A1_B4);
 
     // D3 gets modified again. This time both B2 and E10 need updating.
     res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 2);
     assert(res.count(B2) > 0);
+    assert(res.count(E10) > 0);
+
+    // B2 no longer listens to C1:D4.
+    tracker.remove(B2, C1_D4);
+
+    // D3 gets modified again, but no cells need updating.
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.empty());
+
+    // B3 gets modified.  E10 should be updated.
+    mod_cells.clear();
+    abs_address_t B3(0, 2, 1);
+    mod_cells.insert(B3);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 1);
     assert(res.count(E10) > 0);
 }
 

@@ -53,10 +53,10 @@ public:
      * Remove an existing reference relationship from a single cell to a
      * range.  If no such relationship exists, it does nothing.
      *
-     * @param cell cell that includes reference to the range.
+     * @param src cell that includes reference to the range.
      * @param range range referenced by the cell.
      */
-    void remove(const abs_address_t& cell, const abs_range_t& range);
+    void remove(const abs_address_t& src, const abs_range_t& range);
 
     /**
      * Register a formula cell located at the specified position as volatile.
