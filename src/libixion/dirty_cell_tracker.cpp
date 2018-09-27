@@ -111,6 +111,13 @@ void dirty_cell_tracker::add(const abs_address_t& src, const abs_range_t& range)
         return;
     }
 
+    if (!range.valid())
+    {
+        std::ostringstream os;
+        os << "dirty_cell_tracker::add: invalid destination range " << range;
+        throw std::invalid_argument(os.str());
+    }
+
     rtree_type& tree = mp_impl->fetch_grid_or_resize(range.first.sheet);
 
     rtree_type::extent_type search_box(
