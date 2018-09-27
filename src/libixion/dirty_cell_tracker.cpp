@@ -69,59 +69,25 @@ struct dirty_cell_tracker::impl
 dirty_cell_tracker::dirty_cell_tracker() : mp_impl(ixion::make_unique<impl>()) {}
 dirty_cell_tracker::~dirty_cell_tracker() {}
 
-void dirty_cell_tracker::add(const abs_address_t& src, const abs_address_t& dest)
+void dirty_cell_tracker::add(const abs_address_t& src, const abs_range_t& dest)
 {
-    if (dest.sheet < 0)
+    if (dest.first.sheet < 0)
     {
-        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << dest.sheet << ")";
+        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << dest.first.sheet << ")";
         return;
     }
 
     if (!dest.valid())
     {
         std::ostringstream os;
-        os << "dirty_cell_tracker::add: invalid destination address " << dest;
+        os << "dirty_cell_tracker::add: invalid destination cell or range " << dest;
         throw std::invalid_argument(os.str());
     }
 
-    rtree_type& tree = mp_impl->fetch_grid_or_resize(dest.sheet);
-    rtree_type::search_results res = tree.search(
-        {dest.row, dest.column}, rtree_type::search_type::match);
-
-    if (res.begin() == res.end())
-    {
-        // No listener for this destination cell.  Insert a new one.
-        abs_range_set_t listener;
-        listener.emplace(src);
-        tree.insert({dest.row, dest.column}, std::move(listener));
-    }
-    else
-    {
-        // A listener already exists for this destination cell.
-        abs_range_set_t& listener = *res.begin();
-        listener.emplace(src);
-    }
-}
-
-void dirty_cell_tracker::add(const abs_address_t& src, const abs_range_t& range)
-{
-    if (range.first.sheet < 0)
-    {
-        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << range.first.sheet << ")";
-        return;
-    }
-
-    if (!range.valid())
-    {
-        std::ostringstream os;
-        os << "dirty_cell_tracker::add: invalid destination range " << range;
-        throw std::invalid_argument(os.str());
-    }
-
-    rtree_type& tree = mp_impl->fetch_grid_or_resize(range.first.sheet);
+    rtree_type& tree = mp_impl->fetch_grid_or_resize(dest.first.sheet);
 
     rtree_type::extent_type search_box(
-        {{range.first.row, range.first.column}, {range.last.row, range.last.column}});
+        {{dest.first.row, dest.first.column}, {dest.last.row, dest.last.column}});
 
     rtree_type::search_results res = tree.search(search_box, rtree_type::search_type::match);
 

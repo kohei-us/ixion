@@ -27,25 +27,15 @@ public:
     ~dirty_cell_tracker();
 
     /**
-     * Add a reference relationship between two single cells.
-     *
-     * @param src source cell that references (therefore listens to) the
-     *            destination cell.
-     * @param dest destination cell being referenced (therefore being listened
-     *             to) by the source cell.
-     */
-    void add(const abs_address_t& src, const abs_address_t& dest);
-
-    /**
      * Add a reference relationship from a single cell to a range.  The cell
      * references the range i.e. the cell listens to the range.
      *
      * @param src source cell that includes reference to (therefore listens
      *             to) the range.
-     * @param range destination range referenced by (therefore listened to by)
-     *              the cell.
+     * @param dest destination cell or range referenced by (therefore listened
+     *              to by) the source cell.
      */
-    void add(const abs_address_t& src, const abs_range_t& range);
+    void add(const abs_address_t& src, const abs_range_t& dest);
 
     void remove(const abs_address_t& src, const abs_address_t& dest);
 
