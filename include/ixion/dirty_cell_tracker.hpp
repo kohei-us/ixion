@@ -27,26 +27,24 @@ public:
     ~dirty_cell_tracker();
 
     /**
-     * Add a reference relationship from a single cell to a range.  The cell
-     * references the range i.e. the cell listens to the range.
+     * Add a tracking relationship from a source cell to a destination cell or
+     * a range of cells.
      *
      * @param src source cell that includes reference to (therefore listens
      *             to) the range.
-     * @param dest destination cell or range referenced by (therefore listened
-     *              to by) the source cell.
+     * @param dest destination cell or range referenced tracked by the source
+     *             cell.
      */
     void add(const abs_address_t& src, const abs_range_t& dest);
 
-    void remove(const abs_address_t& src, const abs_address_t& dest);
-
     /**
-     * Remove an existing reference relationship from a single cell to a
-     * range.  If no such relationship exists, it does nothing.
+     * Remove an existing tracking relationship from a source cell to a
+     * destination. If no such relationship exists, it does nothing.
      *
      * @param src cell that includes reference to the range.
-     * @param range range referenced by the cell.
+     * @param dest cell or range referenced by the cell.
      */
-    void remove(const abs_address_t& src, const abs_range_t& range);
+    void remove(const abs_address_t& src, const abs_range_t& dest);
 
     /**
      * Register a formula cell located at the specified position as volatile.
