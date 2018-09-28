@@ -45,7 +45,7 @@ public:
     virtual ~model_context() override;
 
     virtual const config& get_config() const override;
-    virtual cell_listener_tracker& get_cell_listener_tracker() override;
+    virtual dirty_cell_tracker& get_cell_tracker() override;
 
     virtual bool is_empty(const abs_address_t& addr) const override;
     virtual celltype_t get_celltype(const abs_address_t& addr) const override;

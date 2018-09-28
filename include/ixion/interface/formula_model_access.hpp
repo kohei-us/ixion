@@ -20,7 +20,7 @@ namespace ixion {
 
 class formula_cell;
 class formula_name_resolver;
-class cell_listener_tracker;
+class dirty_cell_tracker;
 class matrix;
 struct abs_address_t;
 struct abs_range_t;
@@ -47,7 +47,7 @@ public:
     virtual IXION_DLLPUBLIC ~formula_model_access();
 
     virtual const config& get_config() const = 0;
-    virtual cell_listener_tracker& get_cell_listener_tracker() = 0;
+    virtual dirty_cell_tracker& get_cell_tracker() = 0;
 
     virtual bool is_empty(const abs_address_t& addr) const = 0;
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;

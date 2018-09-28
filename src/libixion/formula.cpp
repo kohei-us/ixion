@@ -9,7 +9,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_function_opcode.hpp"
 #include "ixion/cell.hpp"
-#include "ixion/cell_listener_tracker.hpp"
+#include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/types.hpp"
 
 #include "formula_lexer.hpp"
@@ -193,7 +193,7 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
         // Not a formula cell. Bail out.
         return;
 
-    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+    dirty_cell_tracker& tracker = cxt.get_cell_tracker();
 
     std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
 
@@ -233,7 +233,7 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
         // Not a formula cell. Bail out.
         return;
 
-    cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+    dirty_cell_tracker& tracker = cxt.get_cell_tracker();
     tracker.remove_volatile(pos);
 
     // Go through all its existing references, and remove
@@ -266,7 +266,7 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
 
 abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_address_set_t& modified_cells)
 {
-    const cell_listener_tracker& tracker = cxt.get_cell_listener_tracker();
+    const dirty_cell_tracker& tracker = cxt.get_cell_tracker();
     return tracker.query_dirty_cells(modified_cells);
 }
 

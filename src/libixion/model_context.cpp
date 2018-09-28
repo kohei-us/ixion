@@ -11,7 +11,7 @@
 #include "ixion/config.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/table_handler.hpp"
-#include "ixion/cell_listener_tracker.hpp"
+#include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula.hpp"
 
@@ -51,7 +51,7 @@ public:
 
     model_context_impl(model_context& parent) :
         m_parent(parent),
-        m_cell_listener_tracker(parent),
+        m_tracker(parent),
         mp_table_handler(nullptr),
         mp_session_factory(&dummy_session_handler_factory)
     {
@@ -69,9 +69,9 @@ public:
         m_config = cfg;
     }
 
-    cell_listener_tracker& get_cell_listener_tracker()
+    dirty_cell_tracker& get_cell_tracker()
     {
-        return m_cell_listener_tracker;
+        return m_tracker;
     }
 
     std::unique_ptr<iface::session_handler> create_session_handler()
@@ -156,7 +156,7 @@ private:
     workbook m_sheets;
 
     config m_config;
-    cell_listener_tracker m_cell_listener_tracker;
+    dirty_cell_tracker m_tracker;
     iface::table_handler* mp_table_handler;
     detail::named_expressions_t m_named_expressions;
 
@@ -878,9 +878,9 @@ const config& model_context::get_config() const
     return mp_impl->get_config();
 }
 
-cell_listener_tracker& model_context::get_cell_listener_tracker()
+dirty_cell_tracker& model_context::get_cell_tracker()
 {
-    return mp_impl->get_cell_listener_tracker();
+    return mp_impl->get_cell_tracker();
 }
 
 void model_context::erase_cell(const abs_address_t& addr)

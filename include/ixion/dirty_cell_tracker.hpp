@@ -14,6 +14,8 @@
 
 namespace ixion {
 
+namespace iface { class formula_model_access; }
+
 class IXION_DLLPUBLIC dirty_cell_tracker
 {
     struct impl;
@@ -24,6 +26,7 @@ public:
     dirty_cell_tracker& operator= (const dirty_cell_tracker&) = delete;
 
     dirty_cell_tracker();
+    dirty_cell_tracker(const iface::formula_model_access& fma);
     ~dirty_cell_tracker();
 
     /**
