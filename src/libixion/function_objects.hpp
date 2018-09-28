@@ -20,7 +20,6 @@ class formula_model_access;
 
 }
 
-class cell_listener_tracker;
 class dependency_tracker;
 class formula_cell;
 class formula_token;
