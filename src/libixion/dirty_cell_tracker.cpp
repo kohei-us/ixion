@@ -47,6 +47,15 @@ struct dirty_cell_tracker::impl
         return (n < m_grids.size()) ? &m_grids[n] : nullptr;
     }
 
+    /**
+     * Given a modified cell range, return all ranges that are either directly
+     * or indirectly affected by it.
+     *
+     * @param range modified cell range.
+     *
+     * @return collection of ranges that are affected by the modified cell
+     *         range either directly or indirectly.
+     */
     abs_range_set_t get_affected_cell_ranges(const abs_range_t& range) const
     {
         const rtree_type* grid = fetch_grid(range.first.sheet);
