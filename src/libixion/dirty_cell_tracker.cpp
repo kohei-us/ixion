@@ -195,12 +195,17 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
     while (!cur_modified_cells.empty())
     {
         abs_range_set_t next_modified_cells;
+
         for (const abs_range_t& mc : cur_modified_cells)
         {
-            next_modified_cells = mp_impl->get_affected_cell_ranges(mc);
-
-            for (const abs_range_t& r : next_modified_cells)
-                dirty_formula_cells.insert(r.first);
+            for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
+            {
+                auto res = dirty_formula_cells.insert(r.first);
+                if (res.second)
+                    // This affected range has not yet been visited.  Put it
+                    // in the chain for the next round of checks.
+                    next_modified_cells.insert(r.first);
+            }
         }
 
         cur_modified_cells.swap(next_modified_cells);
