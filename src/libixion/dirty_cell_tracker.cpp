@@ -162,6 +162,13 @@ void dirty_cell_tracker::remove_volatile(const abs_address_t& pos)
     mp_impl->m_volatile_cells.erase(pos);
 }
 
+abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_t& modified_cell) const
+{
+    abs_address_set_t mod_cells;
+    mod_cells.insert(modified_cell);
+    return query_dirty_cells(mod_cells);
+}
+
 abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& modified_cells) const
 {
     abs_address_set_t dirty_formula_cells;

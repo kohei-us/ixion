@@ -161,12 +161,33 @@ void test_volatile_cells()
     assert(res.empty());
 }
 
+void test_multi_sheets()
+{
+    dirty_cell_tracker tracker;
+
+    // B2 on sheet 2 tracks A10 on sheet 1.
+    abs_address_t s2_B2(1, 1, 1);
+    abs_address_t s1_A10(0, 9, 0);
+    tracker.add(s2_B2, s1_A10);
+
+    // A10 on sheet 1 gets modified.
+    abs_address_set_t res = tracker.query_dirty_cells(s1_A10);
+    assert(res.size() == 1);
+    assert(res.count(s2_B2) > 0);
+
+    // A10 on sheet 2 gets modified. This should trigger no updates.
+    abs_address_t s2_A10(1, 9, 0);
+    res = tracker.query_dirty_cells(s2_A10);
+    assert(res.empty());
+}
+
 int main()
 {
     test_empty_query();
     test_cell_to_cell();
     test_cell_to_range();
     test_volatile_cells();
+    test_multi_sheets();
 
     return EXIT_SUCCESS;
 }
