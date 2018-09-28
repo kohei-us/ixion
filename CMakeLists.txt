@@ -32,7 +32,6 @@ set(LIBIXION_SRC_DIR ${PROJECT_SOURCE_DIR}/src/libixion)
 add_library(libixion SHARED
     ${LIBIXION_SRC_DIR}/address.cpp
     ${LIBIXION_SRC_DIR}/cell.cpp
-    ${LIBIXION_SRC_DIR}/cell_listener_tracker.cpp
     ${LIBIXION_SRC_DIR}/cell_queue_manager.cpp
     ${LIBIXION_SRC_DIR}/concrete_formula_tokens.cpp
     ${LIBIXION_SRC_DIR}/config.cpp

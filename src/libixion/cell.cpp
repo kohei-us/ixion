@@ -7,7 +7,6 @@
 
 #include "ixion/cell.hpp"
 #include "ixion/address.hpp"
-#include "ixion/cell_listener_tracker.hpp"
 #include "ixion/exceptions.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula_tokens.hpp"

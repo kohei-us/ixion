@@ -60,7 +60,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_context.cpp \
 	model_types.hpp \
 	module.cpp \
-	cell_listener_tracker.cpp \
 	table.cpp \
 	types.cpp \
 	workbook.hpp \

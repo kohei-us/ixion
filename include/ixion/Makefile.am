@@ -5,7 +5,6 @@ libixion_HEADERS = \
 	address.hpp \
 	address_iterator.hpp \
 	cell.hpp \
-	cell_listener_tracker.hpp \
 	column_store_type.hpp \
 	compute_engine.hpp \
 	config.hpp \

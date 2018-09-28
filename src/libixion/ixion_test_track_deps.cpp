@@ -9,7 +9,6 @@
 #include "ixion/macros.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula.hpp"
-#include "ixion/cell_listener_tracker.hpp"
 
 #include <cassert>
 #include <iostream>
