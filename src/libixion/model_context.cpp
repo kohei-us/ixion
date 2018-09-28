@@ -51,16 +51,13 @@ public:
 
     model_context_impl(model_context& parent) :
         m_parent(parent),
-        mp_cell_listener_tracker(new cell_listener_tracker(parent)),
+        m_cell_listener_tracker(parent),
         mp_table_handler(nullptr),
         mp_session_factory(&dummy_session_handler_factory)
     {
     }
 
-    ~model_context_impl()
-    {
-        delete mp_cell_listener_tracker;
-    }
+    ~model_context_impl() {}
 
     const config& get_config() const
     {
@@ -74,7 +71,7 @@ public:
 
     cell_listener_tracker& get_cell_listener_tracker()
     {
-        return *mp_cell_listener_tracker;
+        return m_cell_listener_tracker;
     }
 
     std::unique_ptr<iface::session_handler> create_session_handler()
@@ -159,7 +156,7 @@ private:
     workbook m_sheets;
 
     config m_config;
-    cell_listener_tracker* mp_cell_listener_tracker;
+    cell_listener_tracker m_cell_listener_tracker;
     iface::table_handler* mp_table_handler;
     detail::named_expressions_t m_named_expressions;
 
