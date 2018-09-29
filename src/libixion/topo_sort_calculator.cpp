@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "depends_tracker.hpp"
+#include "topo_sort_calculator.hpp"
 
 #if IXION_THREADS
 #include "cell_queue_manager.hpp"
@@ -25,30 +25,30 @@ using namespace std;
 
 namespace ixion {
 
-dependency_tracker::cell_back_inserter::cell_back_inserter(vector<abs_address_t> & sorted_cells) :
+topo_sort_calculator::cell_back_inserter::cell_back_inserter(vector<abs_address_t> & sorted_cells) :
     m_sorted_cells(sorted_cells) {}
 
-void dependency_tracker::cell_back_inserter::operator() (const abs_address_t& cell)
+void topo_sort_calculator::cell_back_inserter::operator() (const abs_address_t& cell)
 {
     m_sorted_cells.push_back(cell);
 }
 
-dependency_tracker::dependency_tracker(
+topo_sort_calculator::topo_sort_calculator(
     const abs_address_set_t& dirty_cells, iface::formula_model_access& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
 {
 }
 
-dependency_tracker::~dependency_tracker()
+topo_sort_calculator::~topo_sort_calculator()
 {
 }
 
-void dependency_tracker::insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell)
+void topo_sort_calculator::insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell)
 {
     m_deps.insert(origin_cell, depend_cell);
 }
 
-void dependency_tracker::interpret_all_cells(size_t thread_count)
+void topo_sort_calculator::interpret_all_cells(size_t thread_count)
 {
 #if IXION_THREADS == 0
     thread_count = 0;  // threads are disabled thus not to be used.
@@ -96,7 +96,7 @@ void dependency_tracker::interpret_all_cells(size_t thread_count)
 #endif
 }
 
-void dependency_tracker::topo_sort_cells(vector<abs_address_t>& sorted_cells) const
+void topo_sort_calculator::topo_sort_cells(vector<abs_address_t>& sorted_cells) const
 {
     cell_back_inserter handler(sorted_cells);
     vector<abs_address_t> all_cells;

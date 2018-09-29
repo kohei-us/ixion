@@ -28,8 +28,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	concrete_formula_tokens.hpp \
 	concrete_formula_tokens.cpp \
 	config.cpp \
-	depends_tracker.hpp \
-	depends_tracker.cpp \
 	dirty_cell_tracker.cpp \
 	exceptions.cpp \
 	formula.cpp \
@@ -59,6 +57,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_types.hpp \
 	module.cpp \
 	table.cpp \
+	topo_sort_calculator.hpp \
+	topo_sort_calculator.cpp \
 	types.cpp \
 	workbook.hpp \
 	workbook.cpp \

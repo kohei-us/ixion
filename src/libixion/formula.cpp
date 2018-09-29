@@ -15,7 +15,7 @@
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
-#include "depends_tracker.hpp"
+#include "topo_sort_calculator.hpp"
 
 #define DEBUG_FORMULA_API 0
 
@@ -271,7 +271,7 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
 
 void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count)
 {
-    dependency_tracker deptracker(formula_cells, cxt);
+    topo_sort_calculator deptracker(formula_cells, cxt);
 
     for (const abs_address_t& fcell : formula_cells)
     {

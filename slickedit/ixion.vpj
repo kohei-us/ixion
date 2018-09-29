@@ -272,8 +272,6 @@
 				<F N="../src/libixion/concrete_formula_tokens.hpp"/>
 				<F N="../src/libixion/config.cpp"/>
 				<F N="../src/libixion/constants.inl"/>
-				<F N="../src/libixion/depends_tracker.cpp"/>
-				<F N="../src/libixion/depends_tracker.hpp"/>
 				<F N="../src/libixion/dirty_cell_tracker.cpp"/>
 				<F N="../src/libixion/dirty_cell_tracker_test.cpp"/>
 				<F N="../src/libixion/exceptions.cpp"/>
@@ -310,6 +308,8 @@
 				<F N="../src/libixion/model_types.hpp"/>
 				<F N="../src/libixion/module.cpp"/>
 				<F N="../src/libixion/table.cpp"/>
+				<F N="../src/libixion/topo_sort_calculator.cpp"/>
+				<F N="../src/libixion/topo_sort_calculator.hpp"/>
 				<F N="../src/libixion/types.cpp"/>
 				<F N="../src/libixion/workbook.cpp"/>
 				<F N="../src/libixion/workbook.hpp"/>

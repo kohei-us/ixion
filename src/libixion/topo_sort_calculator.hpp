@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_DEPENDS_TRACKER_HPP
-#define INCLUDED_DEPENDS_TRACKER_HPP
+#ifndef INCLUDED_IXION_TOPO_SORT_CALCULATOR_HPP
+#define INCLUDED_IXION_TOPO_SORT_CALCULATOR_HPP
 
 #include "formula_parser.hpp"
 #include "ixion/depth_first_search.hpp"
@@ -26,11 +26,12 @@ class formula_model_access;
 }
 
 /**
- * This class keeps track of inter-cell dependencies.  Each formula cell
- * item stores pointers to other cells that it depends on (precedent cells).
- * This information is used to build a complete dependency tree.
+ * This class determines the global dependency order via topological sorting
+ * based on the reference relationships between formula cells, and perform
+ * calculations of all specified formula cells in the correct linear order
+ * with one or more threads.
  */
-class dependency_tracker
+class topo_sort_calculator
 {
     class cell_back_inserter : public std::unary_function<abs_address_t, void>
     {
@@ -44,8 +45,8 @@ class dependency_tracker
     typedef depth_first_search<abs_address_t, cell_back_inserter, abs_address_t::hash> dfs_type;
 
 public:
-    dependency_tracker(const abs_address_set_t& dirty_cells, iface::formula_model_access& cxt);
-    ~dependency_tracker();
+    topo_sort_calculator(const abs_address_set_t& dirty_cells, iface::formula_model_access& cxt);
+    ~topo_sort_calculator();
 
     /**
      * Insert a single dependency relationship.
