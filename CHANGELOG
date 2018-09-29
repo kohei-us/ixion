@@ -1,3 +1,6 @@
+* reworked the cell reference tracker to use R-tree.  This allows more
+  accurate tracking of references involving grouped formula.
+
 * fixed a resource leak with dynamic loading of compute engine modules.
 
 ixion 0.14.1
