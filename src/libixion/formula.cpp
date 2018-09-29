@@ -269,29 +269,6 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
     return tracker.query_dirty_cells(modified_cells);
 }
 
-namespace {
-
-class depcell_inserter : public std::unary_function<abs_address_t, void>
-{
-public:
-    depcell_inserter(dependency_tracker& tracker, const abs_address_set_t& dirty_cells, const abs_address_t& fcell) :
-        m_tracker(tracker),
-        m_dirty_cells(dirty_cells),
-        m_fcell(fcell) {}
-
-    void operator() (const abs_address_t& cell)
-    {
-        if (m_dirty_cells.count(cell) > 0)
-            m_tracker.insert_depend(m_fcell, cell);
-    }
-private:
-    dependency_tracker& m_tracker;
-    const abs_address_set_t& m_dirty_cells;
-    abs_address_t m_fcell;
-};
-
-}
-
 void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& cells, size_t thread_count)
 {
     dependency_tracker deptracker(cells, cxt);
@@ -348,7 +325,11 @@ void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& cells,
         // Register dependency information.  Only dirty cells should be
         // registered as precedent cells since non-dirty cells are equivalent
         // to constants.
-        for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, cells, fcell));
+        for (const abs_address_t& cell : deps)
+        {
+            if (cells.count(cell) > 0)
+                deptracker.insert_depend(fcell, cell);
+        }
     }
 
     deptracker.interpret_all_cells(thread_count);
