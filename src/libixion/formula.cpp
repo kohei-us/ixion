@@ -14,7 +14,6 @@
 
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
-#include "function_objects.hpp"
 #include "formula_functions.hpp"
 #include "depends_tracker.hpp"
 
@@ -270,11 +269,88 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
     return tracker.query_dirty_cells(modified_cells);
 }
 
+namespace {
+
+class depcell_inserter : public std::unary_function<abs_address_t, void>
+{
+public:
+    depcell_inserter(dependency_tracker& tracker, const abs_address_set_t& dirty_cells, const abs_address_t& fcell) :
+        m_tracker(tracker),
+        m_dirty_cells(dirty_cells),
+        m_fcell(fcell) {}
+
+    void operator() (const abs_address_t& cell)
+    {
+        if (m_dirty_cells.count(cell) > 0)
+            m_tracker.insert_depend(m_fcell, cell);
+    }
+private:
+    dependency_tracker& m_tracker;
+    const abs_address_set_t& m_dirty_cells;
+    abs_address_t m_fcell;
+};
+
+}
+
 void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& cells, size_t thread_count)
 {
     dependency_tracker deptracker(cells, cxt);
-    std::for_each(cells.begin(), cells.end(),
-                  cell_dependency_handler(cxt, deptracker, cells));
+
+    for (const abs_address_t& fcell : cells)
+    {
+        // Register cell dependencies.
+        formula_cell* fp = cxt.get_formula_cell(fcell);
+        assert(fp);
+        std::vector<const formula_token*> ref_tokens = fp->get_ref_tokens(cxt, fcell);
+
+        // Pick up the referenced cells from the ref tokens.  I should
+        // probably combine this with the above get_ref_tokens() call above
+        // for efficiency.
+        std::vector<abs_address_t> deps;
+
+        for (const formula_token* p : ref_tokens)
+        {
+            switch (p->get_opcode())
+            {
+                case fop_single_ref:
+                {
+                    abs_address_t addr = p->get_single_ref().to_abs(fcell);
+                    if (cxt.get_celltype(addr) != celltype_t::formula)
+                        break;
+
+                    deps.push_back(addr);
+                    break;
+                }
+                case fop_range_ref:
+                {
+                    abs_range_t range = p->get_range_ref().to_abs(fcell);
+                    for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
+                    {
+                        for (col_t col = range.first.column; col <= range.last.column; ++col)
+                        {
+                            for (row_t row = range.first.row; row <= range.last.row; ++row)
+                            {
+                                abs_address_t addr(sheet, row, col);
+                                if (cxt.get_celltype(addr) != celltype_t::formula)
+                                    continue;
+
+                                deps.push_back(addr);
+                            }
+                        }
+                    }
+                    break;
+                }
+                default:
+                    ; // ignore the rest.
+            }
+        }
+
+        // Register dependency information.  Only dirty cells should be
+        // registered as precedent cells since non-dirty cells are equivalent
+        // to constants.
+        for_each(deps.begin(), deps.end(), depcell_inserter(deptracker, cells, fcell));
+    }
+
     deptracker.interpret_all_cells(thread_count);
 }
 
