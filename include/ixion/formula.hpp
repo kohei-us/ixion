@@ -86,7 +86,7 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
  * Calculate all dirty cells in order of dependency.
  *
  * @param cxt model context.
- * @param cells all dirty cells to be calculated.
+ * @param formula_cells all formula cells to be calculated.
  * @param thread_count number of calculation threads to use.  Note that
  *                     passing 0 will make the process use the main thread
  *                     only, while passing any number greater than 0 will
@@ -95,7 +95,7 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
  *                     manage the calculation threads.
  */
 void IXION_DLLPUBLIC calculate_cells(
-    iface::formula_model_access& cxt, abs_address_set_t& cells, size_t thread_count);
+    iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count);
 
 }
 

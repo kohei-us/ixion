@@ -269,11 +269,11 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
     return tracker.query_dirty_cells(modified_cells);
 }
 
-void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& cells, size_t thread_count)
+void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count)
 {
-    dependency_tracker deptracker(cells, cxt);
+    dependency_tracker deptracker(formula_cells, cxt);
 
-    for (const abs_address_t& fcell : cells)
+    for (const abs_address_t& fcell : formula_cells)
     {
         // Register cell dependencies.
         formula_cell* fp = cxt.get_formula_cell(fcell);
@@ -327,7 +327,7 @@ void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& cells,
         // to constants.
         for (const abs_address_t& cell : deps)
         {
-            if (cells.count(cell) > 0)
+            if (formula_cells.count(cell) > 0)
                 deptracker.insert_depend(fcell, cell);
         }
     }
