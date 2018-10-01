@@ -43,9 +43,10 @@ topo_sort_calculator::~topo_sort_calculator()
 {
 }
 
-void topo_sort_calculator::insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell)
+void topo_sort_calculator::set_reference_relation(
+    const abs_address_t& src, const abs_address_t& dest)
 {
-    m_deps.insert(origin_cell, depend_cell);
+    m_deps.insert(src, dest);
 }
 
 void topo_sort_calculator::interpret_all_cells(size_t thread_count)

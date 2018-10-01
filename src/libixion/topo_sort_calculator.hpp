@@ -49,12 +49,13 @@ public:
     ~topo_sort_calculator();
 
     /**
-     * Insert a single dependency relationship.
+     * Define a reference relationship between two cells.
+     * dependency relationship.
      *
-     * @param origin_cell* cell that depends on <code>depend_cell</code>.
-     * @param depend_cell* cell that <code>origin_cell</code> depends on.
+     * @param src source cell that references the <code>dest</code> cell.
+     * @param dest destination cell referenced by the source cell.
      */
-    void insert_depend(const abs_address_t& origin_cell, const abs_address_t& depend_cell);
+    void set_reference_relation(const abs_address_t& src, const abs_address_t& dest);
 
     void interpret_all_cells(size_t thread_count);
 

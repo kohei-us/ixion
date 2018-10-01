@@ -328,7 +328,7 @@ void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& formul
         for (const abs_address_t& cell : deps)
         {
             if (formula_cells.count(cell) > 0)
-                deptracker.insert_depend(fcell, cell);
+                deptracker.set_reference_relation(fcell, cell);
         }
     }
 
