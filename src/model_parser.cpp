@@ -220,20 +220,20 @@ void model_parser::parse_command()
     {
         // Perform full calculation on currently stored cells.
 
-        for (const abs_address_t& pos : m_dirty_cells)
+        for (const abs_address_t& pos : m_dirty_formula_cells)
             register_formula_cell(m_context, pos);
 
-        calculate_cells(m_context, m_dirty_cells, m_thread_count);
+        calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
     }
     else if (buf_com.equals("recalc"))
     {
         cout << get_formula_result_output_separator() << endl
             << "recalculating" << endl;
 
-        abs_address_set_t res = query_dirty_cells(m_context, m_dirty_cell_addrs);
-        m_dirty_cells.insert(res.begin(), res.end());
+        abs_address_set_t res = query_dirty_cells(m_context, m_modified_cells);
+        m_dirty_formula_cells.insert(res.begin(), res.end());
 
-        calculate_cells(m_context, m_dirty_cells, m_thread_count);
+        calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
     }
     else if (buf_com.equals("check"))
     {
@@ -280,8 +280,8 @@ void model_parser::parse_command()
             << "editing" << endl;
 
         m_parse_mode = parse_mode_edit;
-        m_dirty_cells.clear();
-        m_dirty_cell_addrs.clear();
+        m_dirty_formula_cells.clear();
+        m_modified_cells.clear();
         m_print_separator = true;
     }
     else if (buf_com.equals("mode table"))
@@ -381,7 +381,7 @@ void model_parser::parse_init()
                 m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
-        m_dirty_cells.insert(pos);
+        m_dirty_formula_cells.insert(pos);
 
         cout << "{" << get_display_range_string(cell_def.pos) << "}: (m) " << cell_def.value.str() << endl;
         return;
@@ -391,7 +391,7 @@ void model_parser::parse_init()
 
     for (const abs_address_t& pos : iter)
     {
-        m_dirty_cell_addrs.insert(pos);
+        m_modified_cells.insert(pos);
 
         switch (cell_def.type)
         {
@@ -402,7 +402,7 @@ void model_parser::parse_init()
                         m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
                 m_context.set_formula_cell(pos, std::move(tokens));
-                m_dirty_cells.insert(pos);
+                m_dirty_formula_cells.insert(pos);
 
                 cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
                 break;
@@ -447,7 +447,7 @@ void model_parser::parse_edit()
         assert(cell_def.type == ct_formula);
         const abs_address_t& pos = cell_def.pos.first;
 
-        m_dirty_cell_addrs.insert(pos);
+        m_modified_cells.insert(pos);
         unregister_formula_cell(m_context, pos);
 
         formula_tokens_t tokens =
@@ -455,7 +455,7 @@ void model_parser::parse_edit()
                 m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
-        m_dirty_cells.insert(pos);
+        m_dirty_formula_cells.insert(pos);
         register_formula_cell(m_context, pos);
         return;
     }
@@ -464,7 +464,7 @@ void model_parser::parse_edit()
 
     for (const abs_address_t& pos : iter)
     {
-        m_dirty_cell_addrs.insert(pos);
+        m_modified_cells.insert(pos);
         unregister_formula_cell(m_context, pos);
 
         if (cell_def.value.empty())
@@ -484,7 +484,7 @@ void model_parser::parse_edit()
                         m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
                 m_context.set_formula_cell(pos, std::move(tokens));
-                m_dirty_cells.insert(pos);
+                m_dirty_formula_cells.insert(pos);
                 register_formula_cell(m_context, pos);
                 cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
             }
