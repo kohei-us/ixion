@@ -62,7 +62,7 @@ public:
      * Perform topological sort on all cell instances, and returns an array of
      * cells that are sorted in order of dependency.
      */
-    void topo_sort_cells(std::vector<abs_address_t>& sorted_cells) const;
+    std::vector<abs_address_t> sort_cells() const;
 
 private:
     dfs_type::precedent_set m_deps;

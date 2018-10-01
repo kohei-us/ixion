@@ -54,8 +54,7 @@ void topo_sort_calculator::interpret_all_cells(size_t thread_count)
     thread_count = 0;  // threads are disabled thus not to be used.
 #endif
 
-    vector<abs_address_t> sorted_cells;
-    topo_sort_cells(sorted_cells);
+    std::vector<abs_address_t> sorted_cells = sort_cells();
 
     // Reset cell status.
     std::for_each(sorted_cells.begin(), sorted_cells.end(),
@@ -96,9 +95,11 @@ void topo_sort_calculator::interpret_all_cells(size_t thread_count)
 #endif
 }
 
-void topo_sort_calculator::topo_sort_cells(vector<abs_address_t>& sorted_cells) const
+std::vector<abs_address_t> topo_sort_calculator::sort_cells() const
 {
+    std::vector<abs_address_t> sorted_cells;
     cell_back_inserter handler(sorted_cells);
+
     vector<abs_address_t> all_cells;
     all_cells.reserve(m_dirty_cells.size());
     abs_address_set_t::const_iterator itr = m_dirty_cells.begin(), itr_end = m_dirty_cells.end();
@@ -107,7 +108,10 @@ void topo_sort_calculator::topo_sort_cells(vector<abs_address_t>& sorted_cells) 
 
     dfs_type dfs(all_cells, m_deps.get(), handler);
     dfs.run();
+
+    return sorted_cells;
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
