@@ -21,6 +21,8 @@
 #include <cassert>
 #include <memory>
 
+#include <mdds/sorted_string_map.hpp>
+
 using namespace std;
 
 #define DEBUG_MODEL_PARSER 0
@@ -105,9 +107,53 @@ public:
     }
 };
 
+namespace commands {
+
+enum class type
+{
+    unknown,
+    comment,
+    calc,
+    recalc,
+    check,
+    exit,
+    push,
+    mode_init,
+    mode_edit,
+    mode_result,
+    mode_table,
+    mode_session,
+    mode_named_expression,
+};
+
+typedef mdds::sorted_string_map<type> map_type;
+
+// Keys must be sorted.
+const std::vector<map_type::entry> entries =
+{
+    { IXION_ASCII("%"),                     type::comment               },
+    { IXION_ASCII("calc"),                  type::calc                  },
+    { IXION_ASCII("check"),                 type::check                 },
+    { IXION_ASCII("exit"),                  type::exit                  },
+    { IXION_ASCII("mode edit"),             type::mode_edit             },
+    { IXION_ASCII("mode init"),             type::mode_init             },
+    { IXION_ASCII("mode named-expression"), type::mode_named_expression },
+    { IXION_ASCII("mode result"),           type::mode_result           },
+    { IXION_ASCII("mode session"),          type::mode_session          },
+    { IXION_ASCII("mode table"),            type::mode_table            },
+    { IXION_ASCII("push"),                  type::push                  },
+    { IXION_ASCII("recalc"),                type::recalc                },
+};
+
+const map_type& get()
+{
+    static map_type mt(entries.data(), entries.size(), type::unknown);
+    return mt;
 }
 
-// ============================================================================
+} // namespace commands
+
+} // anonymous namespace
 
 model_parser::parse_error::parse_error(const string& msg) : general_error()
 {
@@ -210,104 +256,119 @@ void model_parser::init_model()
 void model_parser::parse_command()
 {
     // This line contains a command.
-    mem_str_buf buf_com = parse_command_to_buffer(mp_char, mp_end);
+    mem_str_buf buf_cmd = parse_command_to_buffer(mp_char, mp_end);
+    commands::type cmd = commands::get().find(buf_cmd.get(), buf_cmd.size());
 
-    if (buf_com.equals("%"))
+    switch (cmd)
     {
-        // This is a comment line.  Just ignore it.
-    }
-    else if (buf_com.equals("calc"))
-    {
-        // Perform full calculation on currently stored cells.
-
-        for (const abs_address_t& pos : m_dirty_formula_cells)
-            register_formula_cell(m_context, pos);
-
-        calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
-    }
-    else if (buf_com.equals("recalc"))
-    {
-        cout << get_formula_result_output_separator() << endl
-            << "recalculating" << endl;
-
-        abs_address_set_t res = query_dirty_cells(m_context, m_modified_cells);
-        m_dirty_formula_cells.insert(res.begin(), res.end());
-
-        calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
-    }
-    else if (buf_com.equals("check"))
-    {
-        // Check cell results.
-        check();
-    }
-    else if (buf_com.equals("exit"))
-    {
-        // Exit the loop.
-        m_parse_mode = parse_mode_exit;
-        return;
-    }
-    else if (buf_com.equals("push"))
-    {
-        switch (m_parse_mode)
+        case commands::type::comment:
+            // This is a comment line.  Just ignore it.
+            break;
+        case commands::type::calc:
         {
-            case parse_mode_table:
-                push_table();
-                break;
-            case parse_mode_named_expression:
-                push_named_expression();
-                break;
-            default:
-                throw parse_error("push command was used for wrong mode!");
+            // Perform full calculation on currently stored cells.
+
+            for (const abs_address_t& pos : m_dirty_formula_cells)
+                register_formula_cell(m_context, pos);
+
+            calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
+            break;
         }
-    }
-    else if (buf_com.equals("mode init"))
-    {
-        cout << get_formula_result_output_separator() << endl
-            << "initializing" << endl;
+        case commands::type::recalc:
+        {
+            cout << get_formula_result_output_separator() << endl
+                << "recalculating" << endl;
 
-        m_parse_mode = parse_mode_init;
-        m_print_separator = true;
-    }
-    else if (buf_com.equals("mode result"))
-    {
-        // Clear any previous result values.
-        m_formula_results.clear();
-        m_parse_mode = parse_mode_result;
-    }
-    else if (buf_com.equals("mode edit"))
-    {
-        cout << get_formula_result_output_separator() << endl
-            << "editing" << endl;
+            abs_address_set_t res = query_dirty_cells(m_context, m_modified_cells);
+            m_dirty_formula_cells.insert(res.begin(), res.end());
 
-        m_parse_mode = parse_mode_edit;
-        m_dirty_formula_cells.clear();
-        m_modified_cells.clear();
-        m_print_separator = true;
-    }
-    else if (buf_com.equals("mode table"))
-    {
-        m_parse_mode = parse_mode_table;
-        mp_table_entry.reset(new table_handler::entry);
-    }
-    else if (buf_com.equals("mode session"))
-    {
-        cout << get_formula_result_output_separator() << endl
-            << "session" << endl;
+            calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
+            break;
+        }
+        case commands::type::check:
+        {
+            // Check cell results.
+            check();
+            break;
+        }
+        case commands::type::exit:
+        {
+            // Exit the loop.
+            m_parse_mode = parse_mode_exit;
+            return;
+        }
+        case commands::type::push:
+        {
+            switch (m_parse_mode)
+            {
+                case parse_mode_table:
+                    push_table();
+                    break;
+                case parse_mode_named_expression:
+                    push_named_expression();
+                    break;
+                default:
+                    throw parse_error("push command was used for wrong mode!");
+            }
+            break;
+        }
+        case commands::type::mode_init:
+        {
+            cout << get_formula_result_output_separator() << endl
+                << "initializing" << endl;
 
-        m_print_separator = true;
-        m_parse_mode = parse_mode_session;
-    }
-    else if (buf_com.equals("mode named-expression"))
-    {
-        m_print_separator = true;
-        m_parse_mode = parse_mode_named_expression;
-        mp_named_expression = ixion::make_unique<named_expression_type>();
-    }
-    else
-    {
-        ostringstream os;
-        os << "unknown command: " << buf_com.str() << endl;
-        throw parse_error(os.str());
+            m_parse_mode = parse_mode_init;
+            m_print_separator = true;
+            break;
+        }
+        case commands::type::mode_result:
+        {
+            // Clear any previous result values.
+            m_formula_results.clear();
+            m_parse_mode = parse_mode_result;
+            break;
+        }
+        case commands::type::mode_edit:
+        {
+            cout << get_formula_result_output_separator() << endl
+                << "editing" << endl;
+
+            m_parse_mode = parse_mode_edit;
+            m_dirty_formula_cells.clear();
+            m_modified_cells.clear();
+            m_print_separator = true;
+            break;
+        }
+        case commands::type::mode_table:
+        {
+            m_parse_mode = parse_mode_table;
+            mp_table_entry.reset(new table_handler::entry);
+            break;
+        }
+        case commands::type::mode_session:
+        {
+            cout << get_formula_result_output_separator() << endl
+                << "session" << endl;
+
+            m_print_separator = true;
+            m_parse_mode = parse_mode_session;
+            break;
+        }
+        case commands::type::mode_named_expression:
+        {
+            m_print_separator = true;
+            m_parse_mode = parse_mode_named_expression;
+            mp_named_expression = ixion::make_unique<named_expression_type>();
+            break;
+        }
+        case commands::type::unknown:
+        {
+            ostringstream os;
+            os << "unknown command: " << buf_cmd.str() << endl;
+            throw parse_error(os.str());
+        }
+        default:
+            ;
     }
 }
 
