@@ -235,41 +235,27 @@ std::string dirty_cell_tracker::to_string() const
             const rtree_type::extent_type& ext = it.extent();
             const abs_range_set_t& srcs = *it;
 
-            if (ext.is_point())
+            range_t dest(
+                address_t(i, ext.start.d[0], ext.start.d[1]),
+                address_t(i, ext.end.d[0], ext.end.d[1]));
+
+            dest.set_absolute(false);
+
+            std::string dest_name = ext.is_point() ?
+                resolver->get_name(dest.first, origin, false) :
+                resolver->get_name(dest, origin, false);
+
+            for (range_t src : srcs) // conversion from abs_range_t to range_t.
             {
-                address_t dest(i, ext.start.d[0], ext.start.d[1]);
-                dest.set_absolute(false);
+                src.set_absolute(false);
+                std::ostringstream os;
+                if (src.first == src.last)
+                    os << resolver->get_name(src.first, origin, false);
+                else
+                    os << resolver->get_name(src, origin, false);
 
-                for (range_t src : srcs) // conversion from abs_range_t to range_t.
-                {
-                    src.set_absolute(false);
-                    std::ostringstream os;
-                    if (src.first == src.last)
-                        os << resolver->get_name(src.first, origin, false);
-                    else
-                        os << resolver->get_name(src, origin, false);
-
-                    os << " -> " << resolver->get_name(dest, origin, false);
-                    lines.push_back(os.str());
-                }
-            }
-            else
-            {
-                range_t dest(address_t(i, ext.start.d[0], ext.start.d[1]), address_t(i, ext.end.d[0], ext.end.d[1]));
-                dest.set_absolute(false);
-
-                for (range_t src : srcs) // conversion from abs_range_t to range_t.
-                {
-                    src.set_absolute(false);
-                    std::ostringstream os;
-                    if (src.first == src.last)
-                        os << resolver->get_name(src.first, origin, false);
-                    else
-                        os << resolver->get_name(src, origin, false);
-
-                    os << " -> " << resolver->get_name(dest, origin, false);
-                    lines.push_back(os.str());
-                }
+                os << " -> " << dest_name;
+                lines.push_back(os.str());
             }
         }
     }
