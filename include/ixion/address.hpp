@@ -306,6 +306,8 @@ struct IXION_DLLPUBLIC range_t
 
     abs_range_t to_abs(const abs_address_t& origin) const;
 
+    void set_absolute(bool abs);
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const range_t& range) const;

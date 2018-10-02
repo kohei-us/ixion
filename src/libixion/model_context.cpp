@@ -74,6 +74,11 @@ public:
         return m_tracker;
     }
 
+    const dirty_cell_tracker& get_cell_tracker() const
+    {
+        return m_tracker;
+    }
+
     std::unique_ptr<iface::session_handler> create_session_handler()
     {
         return mp_session_factory->create();
@@ -879,6 +884,11 @@ const config& model_context::get_config() const
 }
 
 dirty_cell_tracker& model_context::get_cell_tracker()
+{
+    return mp_impl->get_cell_tracker();
+}
+
+const dirty_cell_tracker& model_context::get_cell_tracker() const
 {
     return mp_impl->get_cell_tracker();
 }

@@ -457,6 +457,12 @@ abs_range_t range_t::to_abs(const abs_address_t& origin) const
     return ret;
 }
 
+void range_t::set_absolute(bool abs)
+{
+    first.set_absolute(abs);
+    last.set_absolute(abs);
+}
+
 size_t range_t::hash::operator() (const range_t& range) const
 {
     address_t::hash adr_hash;

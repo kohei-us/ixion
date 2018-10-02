@@ -109,6 +109,8 @@ private:
     void parse_named_expression();
     void push_named_expression();
 
+    void print_dependency();
+
     /**
      * Parse a simple left=right assignment line.
      */

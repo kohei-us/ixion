@@ -7,9 +7,11 @@
 
 #include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/global.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 #include <mdds/rtree.hpp>
 #include <deque>
+#include <limits>
 
 #include <boost/log/trivial.hpp>
 
@@ -212,6 +214,75 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
     }
 
     return dirty_formula_cells;
+}
+
+std::string dirty_cell_tracker::to_string() const
+{
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, nullptr);
+    const abs_address_t origin(0, 0, 0);
+
+    rc_t max_val = std::numeric_limits<rc_t>::max();
+    std::vector<std::string> lines;
+
+    for (rc_t i = 0, n = mp_impl->m_grids.size(); i < n; ++i)
+    {
+        const rtree_type& grid = mp_impl->m_grids[i];
+        rtree_type::const_search_results res =
+            grid.search({{0, 0}, {max_val, max_val}}, rtree_type::search_type::overlap);
+
+        for (auto it = res.cbegin(); it != res.cend(); ++it)
+        {
+            const rtree_type::extent_type& ext = it.extent();
+            const abs_range_set_t& srcs = *it;
+
+            if (ext.is_point())
+            {
+                address_t dest(i, ext.start.d[0], ext.start.d[1]);
+                dest.set_absolute(false);
+
+                for (range_t src : srcs) // conversion from abs_range_t to range_t.
+                {
+                    src.set_absolute(false);
+                    std::ostringstream os;
+                    if (src.first == src.last)
+                        os << resolver->get_name(src.first, origin, false);
+                    else
+                        os << resolver->get_name(src, origin, false);
+
+                    os << " -> " << resolver->get_name(dest, origin, false);
+                    lines.push_back(os.str());
+                }
+            }
+            else
+            {
+                range_t dest(address_t(i, ext.start.d[0], ext.start.d[1]), address_t(i, ext.end.d[0], ext.end.d[1]));
+                dest.set_absolute(false);
+
+                for (range_t src : srcs) // conversion from abs_range_t to range_t.
+                {
+                    src.set_absolute(false);
+                    std::ostringstream os;
+                    if (src.first == src.last)
+                        os << resolver->get_name(src.first, origin, false);
+                    else
+                        os << resolver->get_name(src, origin, false);
+
+                    os << " -> " << resolver->get_name(dest, origin, false);
+                    lines.push_back(os.str());
+                }
+            }
+        }
+    }
+
+    if (lines.empty())
+        return std::string();
+
+    std::ostringstream os;
+    auto it = lines.begin();
+    os << *it;
+    for (++it; it != lines.end(); ++it)
+        os << std::endl << *it;
+    return os.str();
 }
 
 }

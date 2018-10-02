@@ -12,6 +12,7 @@
 #include "ixion/formula_result.hpp"
 #include "ixion/macros.hpp"
 #include "ixion/address_iterator.hpp"
+#include "ixion/dirty_cell_tracker.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -107,6 +108,11 @@ public:
     }
 };
 
+void print_section_title(const char* title)
+{
+    std::cout << get_formula_result_output_separator() << std::endl << title << std::endl;
+}
+
 namespace commands {
 
 enum class type
@@ -124,6 +130,7 @@ enum class type
     mode_table,
     mode_session,
     mode_named_expression,
+    print_dependency,
 };
 
 typedef mdds::sorted_string_map<type> map_type;
@@ -141,6 +148,7 @@ const std::vector<map_type::entry> entries =
     { IXION_ASCII("mode result"),           type::mode_result           },
     { IXION_ASCII("mode session"),          type::mode_session          },
     { IXION_ASCII("mode table"),            type::mode_table            },
+    { IXION_ASCII("print dependency"),      type::print_dependency      },
     { IXION_ASCII("push"),                  type::push                  },
     { IXION_ASCII("recalc"),                type::recalc                },
 };
@@ -266,6 +274,8 @@ void model_parser::parse_command()
             break;
         case commands::type::calc:
         {
+            print_section_title("calculating");
+
             // Perform full calculation on currently stored cells.
 
             for (const abs_address_t& pos : m_dirty_formula_cells)
@@ -276,8 +286,7 @@ void model_parser::parse_command()
         }
         case commands::type::recalc:
         {
-            cout << get_formula_result_output_separator() << endl
-                << "recalculating" << endl;
+            print_section_title("recalculating");
 
             abs_address_set_t res = query_dirty_cells(m_context, m_modified_cells);
             m_dirty_formula_cells.insert(res.begin(), res.end());
@@ -314,8 +323,7 @@ void model_parser::parse_command()
         }
         case commands::type::mode_init:
         {
-            cout << get_formula_result_output_separator() << endl
-                << "initializing" << endl;
+            print_section_title("initializing");
 
             m_parse_mode = parse_mode_init;
             m_print_separator = true;
@@ -330,8 +338,7 @@ void model_parser::parse_command()
         }
         case commands::type::mode_edit:
         {
-            cout << get_formula_result_output_separator() << endl
-                << "editing" << endl;
+            print_section_title("editing");
 
             m_parse_mode = parse_mode_edit;
             m_dirty_formula_cells.clear();
@@ -347,8 +354,7 @@ void model_parser::parse_command()
         }
         case commands::type::mode_session:
         {
-            cout << get_formula_result_output_separator() << endl
-                << "session" << endl;
+            print_section_title("session");
 
             m_print_separator = true;
             m_parse_mode = parse_mode_session;
@@ -359,6 +365,12 @@ void model_parser::parse_command()
             m_print_separator = true;
             m_parse_mode = parse_mode_named_expression;
             mp_named_expression = ixion::make_unique<named_expression_type>();
+            break;
+        }
+        case commands::type::print_dependency:
+        {
+            print_section_title("print dependency");
+            print_dependency();
             break;
         }
         case commands::type::unknown:
@@ -744,6 +756,12 @@ void model_parser::push_named_expression()
     }
 
     mp_named_expression.reset();
+}
+
+void model_parser::print_dependency()
+{
+    std::cout << get_formula_result_output_separator() << std::endl;
+    std::cout << m_context.get_cell_tracker().to_string() << std::endl;
 }
 
 void model_parser::parse_table_columns(const mem_str_buf& str)
