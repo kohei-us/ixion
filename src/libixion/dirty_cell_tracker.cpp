@@ -81,7 +81,7 @@ dirty_cell_tracker::dirty_cell_tracker() : mp_impl(ixion::make_unique<impl>()) {
 dirty_cell_tracker::dirty_cell_tracker(const iface::formula_model_access& fma) : mp_impl(ixion::make_unique<impl>()) {}
 dirty_cell_tracker::~dirty_cell_tracker() {}
 
-void dirty_cell_tracker::add(const abs_address_t& src, const abs_range_t& dest)
+void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
 {
     if (dest.first.sheet < 0)
     {
@@ -118,7 +118,7 @@ void dirty_cell_tracker::add(const abs_address_t& src, const abs_range_t& dest)
     }
 }
 
-void dirty_cell_tracker::remove(const abs_address_t& src, const abs_range_t& dest)
+void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
 {
     if (dest.first.sheet < 0)
     {

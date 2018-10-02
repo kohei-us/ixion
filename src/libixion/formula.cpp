@@ -192,7 +192,16 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
         // Not a formula cell. Bail out.
         return;
 
+    formula_group_t fg_props = cell->get_group_properties();
     dirty_cell_tracker& tracker = cxt.get_cell_tracker();
+
+    abs_range_t src_pos = pos;
+    if (fg_props.grouped)
+    {
+        // Expand the source range for grouped formula cells.
+        src_pos.last.column += fg_props.size.column - 1;
+        src_pos.last.row += fg_props.size.row - 1;
+    }
 
     std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
 
@@ -203,13 +212,13 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(pos);
-                tracker.add(pos, addr);
+                tracker.add(src_pos, addr);
                 break;
             }
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(pos);
-                tracker.add(pos, range);
+                tracker.add(src_pos, range);
                 break;
             }
             default:

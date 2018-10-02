@@ -51,7 +51,9 @@ IXION_DLLPUBLIC std::string print_formula_tokens(
  * Regisiter a formula cell with cell dependency tracker.
  *
  * @param cxt model context.
- * @param pos address of the cell being registered.
+ * @param pos address of the cell being registered.  In case of grouped
+ *            cells, the position must be that of teh top-left cell of that
+ *            group.
  */
 void IXION_DLLPUBLIC register_formula_cell(
     iface::formula_model_access& cxt, const abs_address_t& pos);
