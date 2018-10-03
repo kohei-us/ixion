@@ -230,7 +230,6 @@
 				<F N="../include/ixion/column_store_type.hpp"/>
 				<F N="../include/ixion/compute_engine.hpp"/>
 				<F N="../include/ixion/config.hpp"/>
-				<F N="../include/ixion/depth_first_search.hpp"/>
 				<F N="../include/ixion/dirty_cell_tracker.hpp"/>
 				<F N="../include/ixion/env.hpp"/>
 				<F N="../include/ixion/exceptions.hpp"/>
@@ -256,6 +255,9 @@
 			</Folder>
 		</Folder>
 		<Folder Name="../src">
+			<Folder Name="include">
+				<F N="../src/include/depth_first_search.hpp"/>
+			</Folder>
 			<Folder Name="libixion">
 				<F N="../src/libixion/address.cpp"/>
 				<F N="../src/libixion/address_iterator.cpp"/>
