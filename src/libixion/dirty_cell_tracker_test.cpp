@@ -197,6 +197,25 @@ void test_recursive_tracking()
     assert(res.count(B1) > 0);
 }
 
+void test_listen_to_cell_in_range()
+{
+    dirty_cell_tracker tracker;
+
+    abs_address_t A2(0, 1, 0), E7(0, 6, 4), G11(0, 10, 6);
+    abs_range_t C5_E7(0, 4, 2, 3, 3);
+    abs_range_t A1_A3(0, 0, 0, 3, 1);
+    abs_range_t C1_E1(0, 0, 2, 1, 3);
+
+    tracker.add(G11, E7);
+    tracker.add(C5_E7, A1_A3);
+    tracker.add(C5_E7, C1_E1);
+
+    abs_address_set_t res = tracker.query_dirty_cells(A2);
+    assert(res.size() == 2);
+    assert(res.count(C5_E7.first) > 0);
+    assert(res.count(G11) > 0);
+}
+
 int main()
 {
     test_empty_query();
@@ -205,6 +224,7 @@ int main()
     test_volatile_cells();
     test_multi_sheets();
     test_recursive_tracking();
+    test_listen_to_cell_in_range();
 
     return EXIT_SUCCESS;
 }

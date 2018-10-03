@@ -206,7 +206,7 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
                 if (res.second)
                     // This affected range has not yet been visited.  Put it
                     // in the chain for the next round of checks.
-                    next_modified_cells.insert(r.first);
+                    next_modified_cells.insert(r);
             }
         }
 
