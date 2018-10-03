@@ -50,13 +50,13 @@ struct dirty_cell_tracker::impl
     }
 
     /**
-     * Given a modified cell range, return all ranges that are either directly
-     * or indirectly affected by it.
+     * Given a modified cell range, return all ranges that are directly
+     * affected by it.
      *
      * @param range modified cell range.
      *
-     * @return collection of ranges that are affected by the modified cell
-     *         range either directly or indirectly.
+     * @return collection of ranges that are directly affected by the modified
+     *         cell range.
      */
     abs_range_set_t get_affected_cell_ranges(const abs_range_t& range) const
     {
@@ -200,7 +200,8 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
 
         for (const abs_range_t& mc : cur_modified_cells)
         {
-            for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
+            abs_range_set_t affected_ranges = mp_impl->get_affected_cell_ranges(mc);
+            for (const abs_range_t& r : affected_ranges)
             {
                 auto res = dirty_formula_cells.insert(r.first);
                 if (res.second)
