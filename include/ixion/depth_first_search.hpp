@@ -28,7 +28,7 @@ public:
     typedef _ValueHashType      value_hash_type;
 
 private:
-    typedef std::unordered_map<value_type, size_t, value_hash_type> cell_index_map_type;
+    typedef std::unordered_map<value_type, size_t, value_hash_type> value_index_map_type;
 
     enum cell_color_type { white, gray, black };
 
@@ -52,18 +52,24 @@ public:
     typedef std::set<value_type> precedent_cells_type;
     typedef std::map<value_type, precedent_cells_type> precedent_map_type;
 
-    class precedent_set
+    /**
+     * Stores all precedent-dependent relations which are to be used to
+     * perform topological sort.
+     */
+    class relations
     {
+        friend class depth_first_search;
+
     public:
-        void insert(value_type cell, value_type dep)
+        void insert(value_type pre, value_type dep)
         {
-            typename precedent_map_type::iterator itr = m_map.find(cell);
+            typename precedent_map_type::iterator itr = m_map.find(pre);
             if (itr == m_map.end())
             {
-                // First dependent for this cell.
+                // First dependent for this precedent.
                 std::pair<typename precedent_map_type::iterator, bool> r =
                     m_map.insert(
-                        typename precedent_map_type::value_type(cell, precedent_cells_type()));
+                        typename precedent_map_type::value_type(pre, precedent_cells_type()));
 
                 if (!r.second)
                     throw dfs_error("failed to insert a new set instance");
@@ -74,15 +80,15 @@ public:
             itr->second.insert(dep);
         }
 
+    private:
         const precedent_map_type& get() const { return m_map; }
 
-    private:
         precedent_map_type m_map;
     };
 
     depth_first_search(
-        const ::std::vector<value_type>& cells,
-        const precedent_map_type& precedent_map, cell_handler_type& handler);
+        const std::vector<value_type>& values,
+        const relations& rels, cell_handler_type& handler);
 
     void init();
     void run();
@@ -93,45 +99,41 @@ private:
     const precedent_cells_type* get_precedent_cells(value_type cell);
 
 private:
-    const precedent_map_type&  m_precedent_map;
-    cell_handler_type&      m_handler;
-    size_t                  m_cell_count;
-    cell_index_map_type     m_cell_indices;
+    const precedent_map_type& m_precedent_map;
+    cell_handler_type& m_handler;
+    size_t m_value_count;
+    value_index_map_type m_value_indices;
 
-    size_t                  m_time_stamp;
-    ::std::vector<node_data> m_cells;
+    size_t m_time_stamp;
+    std::vector<node_data> m_values;
 };
 
 template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
 depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::depth_first_search(
-    const ::std::vector<value_type>& cells,
-    const precedent_map_type& precedent_map, cell_handler_type& handler) :
-    m_precedent_map(precedent_map),
+    const std::vector<value_type>& values,
+    const relations& rels, cell_handler_type& handler) :
+    m_precedent_map(rels.get()),
     m_handler(handler),
-    m_cell_count(cells.size()),
+    m_value_count(values.size()),
     m_time_stamp(0),
-    m_cells(m_cell_count)
+    m_values(m_value_count)
 {
-    typename ::std::vector<value_type>::const_iterator
-        itr = cells.begin(), itr_end = cells.end();
-
-    // Construct cell node to index mapping.
-    for (size_t index = 0; itr != itr_end; ++itr, ++index)
-        m_cell_indices.insert(
-            typename cell_index_map_type::value_type(*itr, index));
+    // Construct value node to index mapping.
+    for (size_t i = 0; i < m_value_count; ++i)
+        m_value_indices.insert(
+            typename value_index_map_type::value_type(values[i], i));
 }
 
 template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
 void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::init()
 {
-    ::std::vector<node_data> cells(m_cell_count);
-    typename cell_index_map_type::const_iterator
-        itr = m_cell_indices.begin(), itr_end = m_cell_indices.end();
+    std::vector<node_data> values(m_value_count);
 
     // Now, construct index to cell node mapping.
-    for (; itr != itr_end; ++itr)
-        cells[itr->second].node = itr->first;
-    m_cells.swap(cells);
+    for (const auto& vi : m_value_indices)
+        values[vi.second].node = vi.first;
+
+    m_values.swap(values);
     m_time_stamp = 0;
 }
 
@@ -139,25 +141,25 @@ template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType
 void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::run()
 {
     init();
+
     try
     {
-        for (size_t i = 0; i < m_cell_count; ++i)
-            if (m_cells[i].color == white)
+        for (size_t i = 0; i < m_value_count; ++i)
+            if (m_values[i].color == white)
                 visit(i);
     }
     catch(const dfs_error& e)
     {
-        using namespace std;
-        cout << "dfs error: " << e.what() << endl;
+        std::cout << "dfs error: " << e.what() << std::endl;
     }
 }
 
 template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
 void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_t cell_index)
 {
-    value_type p = m_cells[cell_index].node;
-    m_cells[cell_index].color = gray;
-    m_cells[cell_index].time_visited = ++m_time_stamp;
+    value_type p = m_values[cell_index].node;
+    m_values[cell_index].color = gray;
+    m_values[cell_index].time_visited = ++m_time_stamp;
 
     do
     {
@@ -171,7 +173,7 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_
         {
             value_type dcell = *itr;
             size_t dcell_id = get_cell_index(dcell);
-            if (m_cells[dcell_id].color == white)
+            if (m_values[dcell_id].color == white)
             {
                 visit(dcell_id);
             }
@@ -179,16 +181,16 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_
     }
     while (false);
 
-    m_cells[cell_index].color = black;
-    m_cells[cell_index].time_finished = ++m_time_stamp;
-    m_handler(m_cells[cell_index].node);
+    m_values[cell_index].color = black;
+    m_values[cell_index].time_finished = ++m_time_stamp;
+    m_handler(m_values[cell_index].node);
 }
 
 template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
 size_t depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_cell_index(value_type p) const
 {
-    typename cell_index_map_type::const_iterator itr = m_cell_indices.find(p);
-    if (itr == m_cell_indices.end())
+    typename value_index_map_type::const_iterator itr = m_value_indices.find(p);
+    if (itr == m_value_indices.end())
         throw dfs_error("cell ptr to index mapping failed.");
     return itr->second;
 }

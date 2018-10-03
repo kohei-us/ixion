@@ -66,7 +66,7 @@ public:
     std::vector<abs_address_t> sort_cells() const;
 
 private:
-    dfs_type::precedent_set m_deps;
+    dfs_type::relations m_deps;
     const abs_address_set_t& m_dirty_cells;
     iface::formula_model_access& m_context;
 };

@@ -107,7 +107,7 @@ std::vector<abs_address_t> topo_sort_calculator::sort_cells() const
     for (; itr != itr_end; ++itr)
         all_cells.push_back(*itr);
 
-    dfs_type dfs(all_cells, m_deps.get(), handler);
+    dfs_type dfs(all_cells, m_deps, handler);
     dfs.run();
 
     return sorted_cells;
