@@ -95,7 +95,7 @@ public:
 
 private:
     void visit(size_t cell_index);
-    size_t get_cell_index(value_type p) const;
+    size_t get_cell_index(const value_type& p) const;
     const precedent_cells_type* get_precedent_cells(value_type cell);
 
 private:
@@ -168,10 +168,8 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_
             // No dependent cells.
             break;
 
-        typename precedent_cells_type::const_iterator itr = depends->begin(), itr_end = depends->end();
-        for (; itr != itr_end; ++itr)
+        for (const value_type& dcell : *depends)
         {
-            value_type dcell = *itr;
             size_t dcell_id = get_cell_index(dcell);
             if (m_values[dcell_id].color == white)
             {
@@ -187,7 +185,7 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_
 }
 
 template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-size_t depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_cell_index(value_type p) const
+size_t depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_cell_index(const value_type& p) const
 {
     typename value_index_map_type::const_iterator itr = m_value_indices.find(p);
     if (itr == m_value_indices.end())
