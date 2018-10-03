@@ -29,6 +29,8 @@ struct dirty_cell_tracker::impl
     rtree_array_type m_grids;
     abs_address_set_t m_volatile_cells;
 
+    mutable std::unique_ptr<formula_name_resolver> m_resolver;
+
     impl() {}
 
     rtree_type& fetch_grid_or_resize(size_t n)
@@ -74,6 +76,21 @@ struct dirty_cell_tracker::impl
             ranges.insert(range_set.begin(), range_set.end());
 
         return ranges;
+    }
+
+    std::string print(const abs_range_t& range) const
+    {
+        if (!m_resolver)
+            m_resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, nullptr);
+
+        abs_address_t origin(0, 0, 0);
+        range_t rrange = range;
+        rrange.set_absolute(false);
+
+        if (rrange.first == rrange.last)
+            return m_resolver->get_name(rrange.first, origin, false);
+
+        return m_resolver->get_name(rrange, origin, false);
     }
 };
 
@@ -217,6 +234,65 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
     return dirty_formula_cells;
 }
 
+std::vector<abs_address_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_address_set_t& modified_cells) const
+{
+    abs_address_set_t dirty_formula_cells;
+
+    // Volatile cells are in theory always formula cells and therefore always
+    // should be included.
+    dirty_formula_cells.insert(
+        mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
+
+    abs_range_set_t cur_modified_cells;
+    for (const abs_address_t& mc : modified_cells)
+        cur_modified_cells.emplace(mc);
+
+    if (!cur_modified_cells.empty())
+    {
+        abs_range_set_t next_modified_cells;
+        for (const abs_range_t& mc : cur_modified_cells)
+        {
+            for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
+            {
+                auto res = dirty_formula_cells.insert(r.first);
+                if (res.second)
+                    // This affected range has not yet been visited.  Put it
+                    // in the chain for the next round of checks.
+                    next_modified_cells.insert(r);
+            }
+        }
+
+        cur_modified_cells.swap(next_modified_cells);
+    }
+
+    while (!cur_modified_cells.empty())
+    {
+        abs_range_set_t next_modified_cells;
+        for (const abs_range_t& mc : cur_modified_cells)
+        {
+            for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
+            {
+                // TODO : Record each presedent-dependent relationship here.
+                // r = precedent; mc = dependent
+
+                auto res = dirty_formula_cells.insert(r.first);
+                if (res.second)
+                    // This affected range has not yet been visited.  Put it
+                    // in the chain for the next round of checks.
+                    next_modified_cells.insert(r);
+            }
+        }
+
+        cur_modified_cells.swap(next_modified_cells);
+    }
+
+    // TODO: perform topological sort here based on the recorded presedent-dependent relationships.
+    std::vector<abs_address_t> retval;
+    std::copy(dirty_formula_cells.begin(), dirty_formula_cells.end(), std::back_inserter(retval));
+
+    return retval;
+}
+
 std::string dirty_cell_tracker::to_string() const
 {
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, nullptr);
@@ -246,15 +322,10 @@ std::string dirty_cell_tracker::to_string() const
                 resolver->get_name(dest.first, origin, false) :
                 resolver->get_name(dest, origin, false);
 
-            for (range_t src : srcs) // conversion from abs_range_t to range_t.
+            for (const abs_range_t& src : srcs)
             {
-                src.set_absolute(false);
                 std::ostringstream os;
-                if (src.first == src.last)
-                    os << resolver->get_name(src.first, origin, false);
-                else
-                    os << resolver->get_name(src, origin, false);
-
+                os << mp_impl->print(src);
                 os << " -> " << dest_name;
                 lines.push_back(os.str());
             }
