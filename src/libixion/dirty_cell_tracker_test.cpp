@@ -10,6 +10,7 @@
 #include <iostream>
 
 using namespace ixion;
+using namespace std;
 
 void test_empty_query()
 {
@@ -205,14 +206,32 @@ void test_listen_to_cell_in_range()
     abs_range_t C5_E7(0, 4, 2, 3, 3);
     abs_range_t A1_A3(0, 0, 0, 3, 1);
     abs_range_t C1_E1(0, 0, 2, 1, 3);
+    abs_range_t G5_H7(0, 4, 6, 3, 2);
+    abs_range_t E7_G9(0, 6, 4, 3, 3);
 
     tracker.add(G11, E7);
     tracker.add(C5_E7, A1_A3);
     tracker.add(C5_E7, C1_E1);
 
+    cout << "--" << endl;
+    cout << tracker.to_string() << endl;
+
     abs_address_set_t res = tracker.query_dirty_cells(A2);
     assert(res.size() == 2);
     assert(res.count(C5_E7.first) > 0);
+    assert(res.count(G11) > 0);
+
+    tracker.add(G5_H7, A1_A3);
+    tracker.remove(G11, E7);
+    tracker.add(G11, E7_G9);
+
+    cout << "--" << endl;
+    cout << tracker.to_string() << endl;
+
+    res = tracker.query_dirty_cells(A2);
+    assert(res.size() == 3);
+    assert(res.count(C5_E7.first) > 0);
+    assert(res.count(G5_H7.first) > 0);
     assert(res.count(G11) > 0);
 }
 
