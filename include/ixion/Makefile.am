@@ -8,7 +8,6 @@ libixion_HEADERS = \
 	column_store_type.hpp \
 	compute_engine.hpp \
 	config.hpp \
-	depth_first_search.hpp \
 	dirty_cell_tracker.hpp \
 	env.hpp \
 	exceptions.hpp \

@@ -9,7 +9,7 @@
 #define INCLUDED_IXION_TOPO_SORT_CALCULATOR_HPP
 
 #include "formula_parser.hpp"
-#include "ixion/depth_first_search.hpp"
+#include "depth_first_search.hpp"
 
 #include <set>
 #include <string>

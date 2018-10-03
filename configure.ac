@@ -147,6 +147,7 @@ AC_CONFIG_FILES([Makefile
                  include/ixion/interface/Makefile
                  misc/libixion.spec
                  src/Makefile
+                 src/include/Makefile
                  src/libixion/Makefile
                  src/libixion/constants.inl
                  src/python/Makefile])

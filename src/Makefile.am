@@ -1,6 +1,9 @@
-SUBDIRS = libixion python
+SUBDIRS = include libixion python
 
-AM_CPPFLAGS = -I$(top_srcdir)/include $(MDDS_CFLAGS) $(BOOST_CPPFLAGS)
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/include \
+	$(MDDS_CFLAGS) $(BOOST_CPPFLAGS)
 
 bin_PROGRAMS = ixion-parser ixion-sorter ixion-formula-tokenizer
 
