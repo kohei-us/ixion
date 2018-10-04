@@ -234,9 +234,9 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
     return dirty_formula_cells;
 }
 
-std::vector<abs_address_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_address_set_t& modified_cells) const
+std::vector<abs_range_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_address_set_t& modified_cells) const
 {
-    abs_address_set_t dirty_formula_cells;
+    abs_range_set_t dirty_formula_cells;
 
     // Volatile cells are in theory always formula cells and therefore always
     // should be included.
@@ -254,7 +254,7 @@ std::vector<abs_address_t> dirty_cell_tracker::query_dirty_cells_sorted(const ab
         {
             for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
             {
-                auto res = dirty_formula_cells.insert(r.first);
+                auto res = dirty_formula_cells.insert(r);
                 if (res.second)
                     // This affected range has not yet been visited.  Put it
                     // in the chain for the next round of checks.
@@ -275,7 +275,7 @@ std::vector<abs_address_t> dirty_cell_tracker::query_dirty_cells_sorted(const ab
                 // TODO : Record each presedent-dependent relationship here.
                 // r = precedent; mc = dependent
 
-                auto res = dirty_formula_cells.insert(r.first);
+                auto res = dirty_formula_cells.insert(r);
                 if (res.second)
                     // This affected range has not yet been visited.  Put it
                     // in the chain for the next round of checks.
@@ -287,7 +287,7 @@ std::vector<abs_address_t> dirty_cell_tracker::query_dirty_cells_sorted(const ab
     }
 
     // TODO: perform topological sort here based on the recorded presedent-dependent relationships.
-    std::vector<abs_address_t> retval;
+    std::vector<abs_range_t> retval;
     std::copy(dirty_formula_cells.begin(), dirty_formula_cells.end(), std::back_inserter(retval));
 
     return retval;
