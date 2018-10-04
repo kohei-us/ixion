@@ -13,6 +13,18 @@
 using namespace ixion;
 using namespace std;
 
+using ranks_type = std::unordered_map<abs_range_t, size_t, abs_range_t::hash>;
+
+ranks_type create_ranks(const std::vector<abs_range_t>& sorted)
+{
+    ranks_type ranks;
+    size_t rank = 0;
+    for (const abs_range_t& r : sorted)
+        ranks.insert({r, rank++});
+
+    return ranks;
+}
+
 void test_empty_query()
 {
     dirty_cell_tracker tracker;
@@ -27,6 +39,9 @@ void test_empty_query()
     mod_cells.emplace(1, 1, 1);
     res = tracker.query_dirty_cells(mod_cells);
     assert(res.empty());
+
+    auto sorted = tracker.query_and_sort_dirty_cells(mod_cells);
+    assert(sorted.empty());
 }
 
 void test_cell_to_cell()
@@ -56,6 +71,11 @@ void test_cell_to_cell()
 
     assert(res.count(A2) > 0);
     assert(res.count(A3) > 0);
+
+    // A2 should be ranked lower than A3.
+    auto sorted = tracker.query_and_sort_dirty_cells(mod_cells);
+    auto ranks = create_ranks(sorted);
+    assert(ranks[A2] < ranks[A3]);
 
     // A2 no longer tracks A1, and because of this, a modification of A1
     // should not trigger any updates.
@@ -236,13 +256,9 @@ void test_listen_to_cell_in_range()
     assert(res.count(G11) > 0);
 
     // Test topological sort results, and make sure they are ranked correctly.
-    std::vector<abs_range_t> sorted = tracker.query_dirty_cells_sorted(A2);
+    std::vector<abs_range_t> sorted = tracker.query_and_sort_dirty_cells(A2);
 
-    std::unordered_map<abs_range_t, size_t, abs_range_t::hash> ranks;
-    size_t rank = 0;
-    for (const abs_range_t& r : sorted)
-        ranks.insert({r, rank++});
-
+    auto ranks = create_ranks(sorted);
     assert(ranks[C5_E7] < ranks[G11]);
     assert(ranks[G5_H7] < ranks[G11]);
 }

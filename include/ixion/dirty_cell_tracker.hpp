@@ -71,9 +71,9 @@ public:
 
     abs_address_set_t query_dirty_cells(const abs_address_set_t& modified_cells) const;
 
-    std::vector<abs_range_t> query_dirty_cells_sorted(const abs_address_t& modified_cell) const;
+    std::vector<abs_range_t> query_and_sort_dirty_cells(const abs_address_t& modified_cell) const;
 
-    std::vector<abs_range_t> query_dirty_cells_sorted(const abs_address_set_t& modified_cells) const;
+    std::vector<abs_range_t> query_and_sort_dirty_cells(const abs_address_set_t& modified_cells) const;
 
     std::string to_string() const;
 };
