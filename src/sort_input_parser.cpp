@@ -115,7 +115,7 @@ void sort_input_parser::print()
     vector<mem_str_buf> sorted;
     sorted.reserve(m_all_cells.size());
     dfs_type::back_inserter handler(sorted);
-    dfs_type dfs(m_all_cells, m_set, handler);
+    dfs_type dfs(m_all_cells.begin(), m_all_cells.end(), m_set, handler);
     dfs.run();
 
     // Print the result.

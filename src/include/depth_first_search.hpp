@@ -97,21 +97,23 @@ public:
         precedent_map_type m_map;
     };
 
+    template<typename _Iter>
     depth_first_search(
-        const std::vector<value_type>& values,
-        const relations& rels, back_inserter& handler);
+        const _Iter& begin, const _Iter& end,
+        const relations& rels, back_inserter handler);
 
-    void init();
     void run();
 
 private:
+    void init();
+
     void visit(size_t cell_index);
     size_t get_cell_index(const value_type& p) const;
     const precedent_cells_type* get_precedent_cells(value_type cell);
 
 private:
     const precedent_map_type& m_precedent_map;
-    back_inserter& m_handler;
+    back_inserter m_handler;
     size_t m_value_count;
     value_index_map_type m_value_indices;
 
@@ -120,19 +122,21 @@ private:
 };
 
 template<typename _ValueType, typename _ValueHashType>
+template<typename _Iter>
 depth_first_search<_ValueType,_ValueHashType>::depth_first_search(
-    const std::vector<value_type>& values,
-    const relations& rels, back_inserter& handler) :
+    const _Iter& begin, const _Iter& end,
+    const relations& rels, back_inserter handler) :
     m_precedent_map(rels.get()),
-    m_handler(handler),
-    m_value_count(values.size()),
+    m_handler(std::move(handler)),
+    m_value_count(std::distance(begin, end)),
     m_time_stamp(0),
     m_values(m_value_count)
 {
     // Construct value node to index mapping.
-    for (size_t i = 0; i < m_value_count; ++i)
+    size_t i = 0;
+    for (_Iter it = begin; it != end; ++it, ++i)
         m_value_indices.insert(
-            typename value_index_map_type::value_type(values[i], i));
+            typename value_index_map_type::value_type(*it, i));
 }
 
 template<typename _ValueType, typename _ValueHashType>

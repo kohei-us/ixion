@@ -9,6 +9,8 @@
 #include "ixion/global.hpp"
 #include "ixion/formula_name_resolver.hpp"
 
+#include "depth_first_search.hpp"
+
 #include <mdds/rtree.hpp>
 #include <deque>
 #include <limits>
@@ -265,6 +267,9 @@ std::vector<abs_range_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_
         cur_modified_cells.swap(next_modified_cells);
     }
 
+    using dfs_type = depth_first_search<abs_range_t, abs_range_t::hash>;
+    dfs_type::relations rels;
+
     while (!cur_modified_cells.empty())
     {
         abs_range_set_t next_modified_cells;
@@ -272,8 +277,9 @@ std::vector<abs_range_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_
         {
             for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
             {
-                // TODO : Record each presedent-dependent relationship here.
-                // r = precedent; mc = dependent
+                // Record each precedent-dependent relationship (r =
+                // precedent; mc = dependent).
+                rels.insert(r, mc);
 
                 auto res = dirty_formula_cells.insert(r);
                 if (res.second)
@@ -286,9 +292,10 @@ std::vector<abs_range_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_
         cur_modified_cells.swap(next_modified_cells);
     }
 
-    // TODO: perform topological sort here based on the recorded presedent-dependent relationships.
+    // Perform topological sort on the dirty formula cell ranges.
     std::vector<abs_range_t> retval;
-    std::copy(dirty_formula_cells.begin(), dirty_formula_cells.end(), std::back_inserter(retval));
+    dfs_type sorter(dirty_formula_cells.begin(), dirty_formula_cells.end(), rels, dfs_type::back_inserter(retval));
+    sorter.run();
 
     return retval;
 }
