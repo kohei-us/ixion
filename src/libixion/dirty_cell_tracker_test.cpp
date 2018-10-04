@@ -30,7 +30,7 @@ void test_empty_query()
     dirty_cell_tracker tracker;
 
     // Empty query.
-    abs_address_set_t mod_cells;
+    abs_range_set_t mod_cells;
     abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.empty());
 
@@ -54,7 +54,7 @@ void test_cell_to_cell()
     tracker.add(A2, A1);
 
     // A1 is modified.  A2 should be updated.
-    abs_address_set_t mod_cells;
+    abs_range_set_t mod_cells;
     mod_cells.insert(A1);
     abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 1);
@@ -102,7 +102,7 @@ void test_cell_to_range()
     tracker.add(B2, C1_D4);
 
     // D3 gets modified.  B2 should be updated.
-    abs_address_set_t mod_cells;
+    abs_range_set_t mod_cells;
     mod_cells.emplace(0, 2, 3);
     abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 1);
@@ -147,7 +147,7 @@ void test_volatile_cells()
     tracker.add_volatile(A1);
 
     // No cells have been modified.
-    abs_address_set_t mod_cells;
+    abs_range_set_t mod_cells;
     abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
 
     assert(res.size() == 1);

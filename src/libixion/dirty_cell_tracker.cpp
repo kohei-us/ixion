@@ -193,14 +193,14 @@ void dirty_cell_tracker::remove_volatile(const abs_address_t& pos)
     mp_impl->m_volatile_cells.erase(pos);
 }
 
-abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_t& modified_cell) const
+abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_range_t& modified_cell) const
 {
-    abs_address_set_t mod_cells;
+    abs_range_set_t mod_cells;
     mod_cells.insert(modified_cell);
     return query_dirty_cells(mod_cells);
 }
 
-abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& modified_cells) const
+abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_range_set_t& modified_cells) const
 {
     abs_range_set_t dirty_formula_cells;
 
@@ -209,9 +209,7 @@ abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& m
     dirty_formula_cells.insert(
         mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
 
-    abs_range_set_t cur_modified_cells;
-    for (const abs_address_t& mc : modified_cells)
-        cur_modified_cells.emplace(mc);
+    abs_range_set_t cur_modified_cells = modified_cells;
 
     while (!cur_modified_cells.empty())
     {
@@ -236,14 +234,14 @@ abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& m
     return dirty_formula_cells;
 }
 
-std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const abs_address_t& modified_cell) const
+std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const abs_range_t& modified_cell) const
 {
-    abs_address_set_t mod_cells;
+    abs_range_set_t mod_cells;
     mod_cells.insert(modified_cell);
     return query_and_sort_dirty_cells(mod_cells);
 }
 
-std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const abs_address_set_t& modified_cells) const
+std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const abs_range_set_t& modified_cells) const
 {
     abs_range_set_t dirty_formula_cells;
 
@@ -252,9 +250,7 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
     dirty_formula_cells.insert(
         mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
 
-    abs_range_set_t cur_modified_cells;
-    for (const abs_address_t& mc : modified_cells)
-        cur_modified_cells.emplace(mc);
+    abs_range_set_t cur_modified_cells = modified_cells;
 
     if (!cur_modified_cells.empty())
     {

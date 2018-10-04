@@ -84,6 +84,9 @@ void IXION_DLLPUBLIC unregister_formula_cell(
 IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
     iface::formula_model_access& cxt, const abs_address_set_t& modified_cells);
 
+IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
+    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells);
+
 /**
  * Calculate all dirty cells in order of dependency.
  *

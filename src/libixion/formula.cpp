@@ -274,8 +274,12 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
 
 abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_address_set_t& modified_cells)
 {
+    abs_range_set_t modified_ranges;
+    for (const abs_address_t& mc : modified_cells)
+        modified_ranges.insert(mc);
+
     const dirty_cell_tracker& tracker = cxt.get_cell_tracker();
-    abs_range_set_t dirty_ranges = tracker.query_dirty_cells(modified_cells);
+    abs_range_set_t dirty_ranges = tracker.query_dirty_cells(modified_ranges);
 
     // Convert a set of ranges to a set of addresses.
     abs_address_set_t dirty_cells;
@@ -286,6 +290,13 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
         }
     );
     return dirty_cells;
+}
+
+std::vector<abs_range_t> query_and_sort_dirty_cells(
+    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells)
+{
+    const dirty_cell_tracker& tracker = cxt.get_cell_tracker();
+    return tracker.query_and_sort_dirty_cells(modified_cells);
 }
 
 void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count)
