@@ -193,16 +193,16 @@ void dirty_cell_tracker::remove_volatile(const abs_address_t& pos)
     mp_impl->m_volatile_cells.erase(pos);
 }
 
-abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_t& modified_cell) const
+abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_t& modified_cell) const
 {
     abs_address_set_t mod_cells;
     mod_cells.insert(modified_cell);
     return query_dirty_cells(mod_cells);
 }
 
-abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& modified_cells) const
+abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t& modified_cells) const
 {
-    abs_address_set_t dirty_formula_cells;
+    abs_range_set_t dirty_formula_cells;
 
     // Volatile cells are in theory always formula cells and therefore always
     // should be included.
@@ -222,7 +222,7 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
             abs_range_set_t affected_ranges = mp_impl->get_affected_cell_ranges(mc);
             for (const abs_range_t& r : affected_ranges)
             {
-                auto res = dirty_formula_cells.insert(r.first);
+                auto res = dirty_formula_cells.insert(r);
                 if (res.second)
                     // This affected range has not yet been visited.  Put it
                     // in the chain for the next round of checks.

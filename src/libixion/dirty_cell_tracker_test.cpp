@@ -31,7 +31,7 @@ void test_empty_query()
 
     // Empty query.
     abs_address_set_t mod_cells;
-    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+    abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.empty());
 
     // A "modified" cell is outside existing sheet range. Make sure we don't
@@ -56,10 +56,10 @@ void test_cell_to_cell()
     // A1 is modified.  A2 should be updated.
     abs_address_set_t mod_cells;
     mod_cells.insert(A1);
-    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+    abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 1);
-    abs_address_t cell = *res.cbegin();
-    assert(cell == A2);
+    abs_range_t cell = *res.cbegin();
+    assert(cell.first == A2);
 
     // A3 to listen to A2.
     abs_address_t A3(0, 2, 0);
@@ -104,7 +104,7 @@ void test_cell_to_range()
     // D3 gets modified.  B2 should be updated.
     abs_address_set_t mod_cells;
     mod_cells.emplace(0, 2, 3);
-    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+    abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
     assert(res.size() == 1);
     assert(res.count(B2) > 0);
 
@@ -148,7 +148,7 @@ void test_volatile_cells()
 
     // No cells have been modified.
     abs_address_set_t mod_cells;
-    abs_address_set_t res = tracker.query_dirty_cells(mod_cells);
+    abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
 
     assert(res.size() == 1);
     assert(res.count(A1) > 0);
@@ -193,7 +193,7 @@ void test_multi_sheets()
     tracker.add(s2_B2, s1_A10);
 
     // A10 on sheet 1 gets modified.
-    abs_address_set_t res = tracker.query_dirty_cells(s1_A10);
+    abs_range_set_t res = tracker.query_dirty_cells(s1_A10);
     assert(res.size() == 1);
     assert(res.count(s2_B2) > 0);
 
@@ -213,7 +213,7 @@ void test_recursive_tracking()
     tracker.add(A1, B1);
     tracker.add(B1, A1);
 
-    abs_address_set_t res = tracker.query_dirty_cells(A1);
+    abs_range_set_t res = tracker.query_dirty_cells(A1);
     assert(res.size() == 2);
     assert(res.count(A1) > 0);
     assert(res.count(B1) > 0);
@@ -237,9 +237,9 @@ void test_listen_to_cell_in_range()
     cout << "--" << endl;
     cout << tracker.to_string() << endl;
 
-    abs_address_set_t res = tracker.query_dirty_cells(A2);
+    abs_range_set_t res = tracker.query_dirty_cells(A2);
     assert(res.size() == 2);
-    assert(res.count(C5_E7.first) > 0);
+    assert(res.count(C5_E7) > 0);
     assert(res.count(G11) > 0);
 
     tracker.add(G5_H7, A1_A3);
@@ -251,8 +251,8 @@ void test_listen_to_cell_in_range()
 
     res = tracker.query_dirty_cells(A2);
     assert(res.size() == 3);
-    assert(res.count(C5_E7.first) > 0);
-    assert(res.count(G5_H7.first) > 0);
+    assert(res.count(C5_E7) > 0);
+    assert(res.count(G5_H7) > 0);
     assert(res.count(G11) > 0);
 
     // Test topological sort results, and make sure they are ranked correctly.
