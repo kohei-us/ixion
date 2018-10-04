@@ -19,12 +19,11 @@
 
 namespace ixion {
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
+template<typename _ValueType, typename _ValueHashType>
 class depth_first_search
 {
 public:
     typedef _ValueType          value_type;
-    typedef _CellHandlerType    cell_handler_type;
     typedef _ValueHashType      value_hash_type;
 
 private:
@@ -51,6 +50,18 @@ private:
 public:
     typedef std::set<value_type> precedent_cells_type;
     typedef std::map<value_type, precedent_cells_type> precedent_map_type;
+
+    class back_inserter
+    {
+        std::vector<value_type>& m_sorted;
+    public:
+        back_inserter(std::vector<value_type>& sorted) : m_sorted(sorted) {}
+
+        void operator()(const value_type& v)
+        {
+            m_sorted.push_back(v);
+        }
+    };
 
     /**
      * Stores all precedent-dependent relations which are to be used to
@@ -88,7 +99,7 @@ public:
 
     depth_first_search(
         const std::vector<value_type>& values,
-        const relations& rels, cell_handler_type& handler);
+        const relations& rels, back_inserter& handler);
 
     void init();
     void run();
@@ -100,7 +111,7 @@ private:
 
 private:
     const precedent_map_type& m_precedent_map;
-    cell_handler_type& m_handler;
+    back_inserter& m_handler;
     size_t m_value_count;
     value_index_map_type m_value_indices;
 
@@ -108,10 +119,10 @@ private:
     std::vector<node_data> m_values;
 };
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::depth_first_search(
+template<typename _ValueType, typename _ValueHashType>
+depth_first_search<_ValueType,_ValueHashType>::depth_first_search(
     const std::vector<value_type>& values,
-    const relations& rels, cell_handler_type& handler) :
+    const relations& rels, back_inserter& handler) :
     m_precedent_map(rels.get()),
     m_handler(handler),
     m_value_count(values.size()),
@@ -124,8 +135,8 @@ depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::depth_first_sear
             typename value_index_map_type::value_type(values[i], i));
 }
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::init()
+template<typename _ValueType, typename _ValueHashType>
+void depth_first_search<_ValueType,_ValueHashType>::init()
 {
     std::vector<node_data> values(m_value_count);
 
@@ -137,8 +148,8 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::init()
     m_time_stamp = 0;
 }
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::run()
+template<typename _ValueType, typename _ValueHashType>
+void depth_first_search<_ValueType,_ValueHashType>::run()
 {
     init();
 
@@ -154,8 +165,8 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::run()
     }
 }
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_t cell_index)
+template<typename _ValueType, typename _ValueHashType>
+void depth_first_search<_ValueType,_ValueHashType>::visit(size_t cell_index)
 {
     value_type p = m_values[cell_index].node;
     m_values[cell_index].color = gray;
@@ -184,8 +195,8 @@ void depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::visit(size_
     m_handler(m_values[cell_index].node);
 }
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-size_t depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_cell_index(const value_type& p) const
+template<typename _ValueType, typename _ValueHashType>
+size_t depth_first_search<_ValueType,_ValueHashType>::get_cell_index(const value_type& p) const
 {
     typename value_index_map_type::const_iterator itr = m_value_indices.find(p);
     if (itr == m_value_indices.end())
@@ -193,9 +204,9 @@ size_t depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_cell_
     return itr->second;
 }
 
-template<typename _ValueType, typename _CellHandlerType, typename _ValueHashType>
-const typename depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::precedent_cells_type*
-depth_first_search<_ValueType,_CellHandlerType,_ValueHashType>::get_precedent_cells(value_type cell)
+template<typename _ValueType, typename _ValueHashType>
+const typename depth_first_search<_ValueType,_ValueHashType>::precedent_cells_type*
+depth_first_search<_ValueType,_ValueHashType>::get_precedent_cells(value_type cell)
 {
     typename precedent_map_type::const_iterator itr = m_precedent_map.find(cell);
     if (itr == m_precedent_map.end())

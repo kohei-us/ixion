@@ -33,16 +33,7 @@ class formula_model_access;
  */
 class topo_sort_calculator
 {
-    class cell_back_inserter : public std::unary_function<abs_address_t, void>
-    {
-    public:
-        cell_back_inserter(std::vector<abs_address_t>& sorted_cells);
-        void operator() (const abs_address_t& cell);
-    private:
-        ::std::vector<abs_address_t>& m_sorted_cells;
-    };
-
-    typedef depth_first_search<abs_address_t, cell_back_inserter, abs_address_t::hash> dfs_type;
+    using dfs_type = depth_first_search<abs_address_t, abs_address_t::hash>;
 
 public:
     topo_sort_calculator(const abs_address_set_t& dirty_cells, iface::formula_model_access& cxt);

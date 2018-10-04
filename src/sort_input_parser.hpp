@@ -26,16 +26,7 @@ class sort_input_parser
         virtual ~parse_error() throw();
     };
 
-    class cell_handler : public ::std::unary_function<mem_str_buf, void>
-    {
-    public:
-        cell_handler(::std::vector<mem_str_buf>& sorted);
-        void operator() (const mem_str_buf& s);
-    private:
-        ::std::vector<mem_str_buf>& m_sorted;
-    };
-
-    typedef depth_first_search<mem_str_buf, cell_handler, mem_str_buf::hash> dfs_type;
+    using dfs_type = depth_first_search<mem_str_buf, mem_str_buf::hash>;
 
 public:
     sort_input_parser(const ::std::string& filepath);

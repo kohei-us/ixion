@@ -39,16 +39,6 @@ struct mem_str_buf_printer : unary_function<mem_str_buf, void>
 
 }
 
-sort_input_parser::cell_handler::cell_handler(vector<mem_str_buf>& sorted) :
-    m_sorted(sorted) {}
-
-void sort_input_parser::cell_handler::operator() (const mem_str_buf& s)
-{
-    m_sorted.push_back(s);
-}
-
-// ============================================================================
-
 sort_input_parser::parse_error::parse_error(const string& msg) :
     general_error(msg) {}
 
@@ -124,7 +114,7 @@ void sort_input_parser::print()
     // Run the depth first search.
     vector<mem_str_buf> sorted;
     sorted.reserve(m_all_cells.size());
-    cell_handler handler(sorted);
+    dfs_type::back_inserter handler(sorted);
     dfs_type dfs(m_all_cells, m_set, handler);
     dfs.run();
 

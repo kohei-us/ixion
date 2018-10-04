@@ -25,14 +25,6 @@ using namespace std;
 
 namespace ixion {
 
-topo_sort_calculator::cell_back_inserter::cell_back_inserter(vector<abs_address_t> & sorted_cells) :
-    m_sorted_cells(sorted_cells) {}
-
-void topo_sort_calculator::cell_back_inserter::operator() (const abs_address_t& cell)
-{
-    m_sorted_cells.push_back(cell);
-}
-
 topo_sort_calculator::topo_sort_calculator(
     const abs_address_set_t& dirty_cells, iface::formula_model_access& cxt) :
     m_dirty_cells(dirty_cells), m_context(cxt)
@@ -99,7 +91,7 @@ void topo_sort_calculator::interpret_all_cells(size_t thread_count)
 std::vector<abs_address_t> topo_sort_calculator::sort_cells() const
 {
     std::vector<abs_address_t> sorted_cells;
-    cell_back_inserter handler(sorted_cells);
+    dfs_type::back_inserter handler(sorted_cells);
 
     vector<abs_address_t> all_cells;
     all_cells.reserve(m_dirty_cells.size());
