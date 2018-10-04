@@ -8,6 +8,7 @@
 #include <ixion/dirty_cell_tracker.hpp>
 #include <cassert>
 #include <iostream>
+#include <unordered_map>
 
 using namespace ixion;
 using namespace std;
@@ -233,6 +234,17 @@ void test_listen_to_cell_in_range()
     assert(res.count(C5_E7.first) > 0);
     assert(res.count(G5_H7.first) > 0);
     assert(res.count(G11) > 0);
+
+    // Test topological sort results, and make sure they are ranked correctly.
+    std::vector<abs_range_t> sorted = tracker.query_dirty_cells_sorted(A2);
+
+    std::unordered_map<abs_range_t, size_t, abs_range_t::hash> ranks;
+    size_t rank = 0;
+    for (const abs_range_t& r : sorted)
+        ranks.insert({r, rank++});
+
+    assert(ranks[C5_E7] < ranks[G11]);
+    assert(ranks[G5_H7] < ranks[G11]);
 }
 
 int main()

@@ -236,6 +236,13 @@ abs_address_set_t dirty_cell_tracker::query_dirty_cells(const abs_address_set_t&
     return dirty_formula_cells;
 }
 
+std::vector<abs_range_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_address_t& modified_cell) const
+{
+    abs_address_set_t mod_cells;
+    mod_cells.insert(modified_cell);
+    return query_dirty_cells_sorted(mod_cells);
+}
+
 std::vector<abs_range_t> dirty_cell_tracker::query_dirty_cells_sorted(const abs_address_set_t& modified_cells) const
 {
     abs_range_set_t dirty_formula_cells;
