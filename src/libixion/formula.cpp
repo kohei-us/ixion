@@ -365,5 +365,19 @@ void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& formul
     deptracker.interpret_all_cells(thread_count);
 }
 
+void calculate_sorted_cells(
+    iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)
+{
+    // Convert an array of ranges to an array of cells.  Be reminded that a
+    // range represents a grouped fromula cells whose top-left cell represents
+    // the whole group.
+    std::vector<abs_address_t> fcs;
+    for (const abs_range_t& r : formula_cells)
+        fcs.push_back(r.first);
+
+    topo_sort_calculator::calculate_sorted_cells(cxt, std::move(fcs), thread_count);
 }
+
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

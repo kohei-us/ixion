@@ -43,49 +43,7 @@ void topo_sort_calculator::set_reference_relation(
 
 void topo_sort_calculator::interpret_all_cells(size_t thread_count)
 {
-#if IXION_THREADS == 0
-    thread_count = 0;  // threads are disabled thus not to be used.
-#endif
-
-    std::vector<abs_address_t> sorted_cells = sort_cells();
-
-    // Reset cell status.
-    std::for_each(sorted_cells.begin(), sorted_cells.end(),
-        [&](const abs_address_t& pos)
-        {
-            formula_cell* p = m_context.get_formula_cell(pos);
-            p->reset();
-        }
-    );
-
-    // First, detect circular dependencies and mark those circular
-    // dependent cells with appropriate error flags.
-    std::for_each(sorted_cells.begin(), sorted_cells.end(),
-        [&](const abs_address_t& pos)
-        {
-            formula_cell* p = m_context.get_formula_cell(pos);
-            p->check_circular(m_context, pos);
-        }
-    );
-
-    if (!thread_count)
-    {
-        // Interpret cells using just a single thread.
-        std::for_each(sorted_cells.begin(), sorted_cells.end(),
-            [&](const abs_address_t& pos)
-            {
-                formula_cell* p = m_context.get_formula_cell(pos);
-                p->interpret(m_context, pos);
-            }
-        );
-        return;
-    }
-
-#if IXION_THREADS
-    // Interpret cells in topological order using threads.
-    formula_cell_queue queue(m_context, std::move(sorted_cells), thread_count);
-    queue.run();
-#endif
+    calculate_sorted_cells(m_context, sort_cells(), thread_count);
 }
 
 std::vector<abs_address_t> topo_sort_calculator::sort_cells() const
@@ -103,6 +61,52 @@ std::vector<abs_address_t> topo_sort_calculator::sort_cells() const
     dfs.run();
 
     return sorted_cells;
+}
+
+void topo_sort_calculator::calculate_sorted_cells(
+    iface::formula_model_access& cxt, std::vector<abs_address_t> sorted_cells, size_t thread_count)
+{
+#if IXION_THREADS == 0
+    thread_count = 0;  // threads are disabled thus not to be used.
+#endif
+
+    // Reset cell status.
+    std::for_each(sorted_cells.begin(), sorted_cells.end(),
+        [&](const abs_address_t& pos)
+        {
+            formula_cell* p = cxt.get_formula_cell(pos);
+            p->reset();
+        }
+    );
+
+    // First, detect circular dependencies and mark those circular
+    // dependent cells with appropriate error flags.
+    std::for_each(sorted_cells.begin(), sorted_cells.end(),
+        [&](const abs_address_t& pos)
+        {
+            formula_cell* p = cxt.get_formula_cell(pos);
+            p->check_circular(cxt, pos);
+        }
+    );
+
+    if (!thread_count)
+    {
+        // Interpret cells using just a single thread.
+        std::for_each(sorted_cells.begin(), sorted_cells.end(),
+            [&](const abs_address_t& pos)
+            {
+                formula_cell* p = cxt.get_formula_cell(pos);
+                p->interpret(cxt, pos);
+            }
+        );
+        return;
+    }
+
+#if IXION_THREADS
+    // Interpret cells in topological order using threads.
+    formula_cell_queue queue(cxt, std::move(sorted_cells), thread_count);
+    queue.run();
+#endif
 }
 
 }

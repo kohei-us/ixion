@@ -84,9 +84,6 @@ void IXION_DLLPUBLIC unregister_formula_cell(
 IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
     iface::formula_model_access& cxt, const abs_address_set_t& modified_cells);
 
-IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
-    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells);
-
 /**
  * Calculate all dirty cells in order of dependency.
  *
@@ -102,7 +99,14 @@ IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
 void IXION_DLLPUBLIC calculate_cells(
     iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count);
 
-}
+IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
+    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells);
+
+void IXION_DLLPUBLIC calculate_sorted_cells(
+    iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count);
+
+} // namespace ixion
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

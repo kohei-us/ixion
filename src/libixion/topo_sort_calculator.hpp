@@ -36,6 +36,9 @@ class topo_sort_calculator
     using dfs_type = depth_first_search<abs_address_t, abs_address_t::hash>;
 
 public:
+    static void calculate_sorted_cells(
+        iface::formula_model_access& cxt, std::vector<abs_address_t> sorted_cells, size_t thread_count);
+
     topo_sort_calculator(const abs_address_set_t& dirty_cells, iface::formula_model_access& cxt);
     ~topo_sort_calculator();
 
