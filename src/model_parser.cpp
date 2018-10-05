@@ -276,16 +276,15 @@ void model_parser::parse_command()
         {
             print_section_title("calculating");
 
-            // Perform full calculation on currently stored cells.
+            // Perform full calculation on all currently stored formula cells.
 
-            abs_address_set_t cells;
             for (const abs_range_t& pos : m_dirty_formula_cells)
-            {
                 register_formula_cell(m_context, pos.first);
-                cells.insert(pos.first);
-            }
 
-            calculate_cells(m_context, cells, m_thread_count);
+            abs_range_set_t empty;
+            std::vector<abs_range_t> sorted_cells =
+                query_and_sort_dirty_cells(m_context, empty, &m_dirty_formula_cells);
+            calculate_sorted_cells(m_context, sorted_cells, m_thread_count);
             break;
         }
         case commands::type::recalc:
