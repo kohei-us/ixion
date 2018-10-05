@@ -243,16 +243,12 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
     return query_and_sort_dirty_cells(mod_cells);
 }
 
-std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const abs_range_set_t& modified_cells) const
+std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(
+    const abs_range_set_t& modified_cells, const abs_range_set_t* dirty_formula_cells) const
 {
-    abs_range_set_t dirty_formula_cells;
-
-    // Volatile cells are in theory always formula cells and therefore always
-    // should be included.
-    dirty_formula_cells.insert(
-        mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
-
     abs_range_set_t cur_modified_cells = modified_cells;
+
+    abs_range_set_t final_dirty_formula_cells;
 
     // Get the initial set of formula cells affected by the modified cells.
     // Note that these modified cells are not dirty formula cells.
@@ -263,7 +259,7 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
         {
             for (const abs_range_t& r : mp_impl->get_affected_cell_ranges(mc))
             {
-                auto res = dirty_formula_cells.insert(r);
+                auto res = final_dirty_formula_cells.insert(r);
                 if (res.second)
                     // This affected range has not yet been visited.  Put it
                     // in the chain for the next round of checks.
@@ -277,8 +273,11 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
     // Because the modified cells in the subsequent rounds are all dirty
     // formula cells, we need to track precedent-dependent relationships for
     // later sorting.
-    for (const abs_range_t& r : mp_impl->m_volatile_cells)
-        cur_modified_cells.insert(r);
+
+    cur_modified_cells.insert(mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
+
+    if (dirty_formula_cells)
+        cur_modified_cells.insert(dirty_formula_cells->begin(), dirty_formula_cells->end());
 
     using dfs_type = depth_first_search<abs_range_t, abs_range_t::hash>;
     dfs_type::relations rels;
@@ -294,7 +293,7 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
                 // precedent; mc = dependent).
                 rels.insert(r, mc);
 
-                auto res = dirty_formula_cells.insert(r);
+                auto res = final_dirty_formula_cells.insert(r);
                 if (res.second)
                     // This affected range has not yet been visited.  Put it
                     // in the chain for the next round of checks.
@@ -305,9 +304,20 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
         cur_modified_cells.swap(next_modified_cells);
     }
 
+    // Volatile cells are always formula cells and therefore always should be
+    // included.
+    final_dirty_formula_cells.insert(
+        mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
+
+    if (dirty_formula_cells)
+    {
+        final_dirty_formula_cells.insert(
+            dirty_formula_cells->begin(), dirty_formula_cells->end());
+    }
+
     // Perform topological sort on the dirty formula cell ranges.
     std::vector<abs_range_t> retval;
-    dfs_type sorter(dirty_formula_cells.begin(), dirty_formula_cells.end(), rels, dfs_type::back_inserter(retval));
+    dfs_type sorter(final_dirty_formula_cells.begin(), final_dirty_formula_cells.end(), rels, dfs_type::back_inserter(retval));
     sorter.run();
 
     return retval;

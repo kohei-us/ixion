@@ -100,7 +100,8 @@ void IXION_DLLPUBLIC calculate_cells(
     iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count);
 
 IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
-    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells);
+    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells,
+    const abs_range_set_t* dirty_formula_cells = nullptr);
 
 void IXION_DLLPUBLIC calculate_sorted_cells(
     iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count);

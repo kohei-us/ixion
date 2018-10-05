@@ -42,6 +42,16 @@ void test_empty_query()
 
     auto sorted = tracker.query_and_sort_dirty_cells(mod_cells);
     assert(sorted.empty());
+
+    // Dirty cells are like newly entered formula cells that need to be
+    // calculated regardless.
+    abs_range_set_t dirty_cells;
+    dirty_cells.emplace(0, 0, 0); // A1
+    dirty_cells.emplace(0, 1, 0); // A2
+    dirty_cells.emplace(0, 0, 1); // B1
+    dirty_cells.emplace(0, 1, 1); // B2
+    sorted = tracker.query_and_sort_dirty_cells(mod_cells, &dirty_cells);
+    assert(sorted.size() == 4);
 }
 
 void test_cell_to_cell()
@@ -210,6 +220,17 @@ void test_volatile_cells_2()
     auto ranks = create_ranks(sorted);
     assert(ranks[A1] < ranks[B2]);
     assert(ranks[B2] < ranks[C3]);
+
+    // Remove A1 as volatile cell. Now no cells should be dirty.
+    tracker.remove_volatile(A1);
+    sorted = tracker.query_and_sort_dirty_cells(mod_cells);
+    assert(sorted.empty());
+
+    // Now, declare A1 as a dirty cell.
+    abs_range_set_t dirty_cells;
+    dirty_cells.insert(A1);
+    sorted = tracker.query_and_sort_dirty_cells(mod_cells, &dirty_cells);
+    assert(sorted.size() == 3);
 }
 
 void test_multi_sheets()

@@ -293,10 +293,11 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
 }
 
 std::vector<abs_range_t> query_and_sort_dirty_cells(
-    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells)
+    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells,
+    const abs_range_set_t* dirty_formula_cells)
 {
     const dirty_cell_tracker& tracker = cxt.get_cell_tracker();
-    return tracker.query_and_sort_dirty_cells(modified_cells);
+    return tracker.query_and_sort_dirty_cells(modified_cells, dirty_formula_cells);
 }
 
 void calculate_cells(iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count)

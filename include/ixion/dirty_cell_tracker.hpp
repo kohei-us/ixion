@@ -73,7 +73,8 @@ public:
 
     std::vector<abs_range_t> query_and_sort_dirty_cells(const abs_range_t& modified_cell) const;
 
-    std::vector<abs_range_t> query_and_sort_dirty_cells(const abs_range_set_t& modified_cells) const;
+    std::vector<abs_range_t> query_and_sort_dirty_cells(
+        const abs_range_set_t& modified_cells, const abs_range_set_t* dirty_formula_cells = nullptr) const;
 
     std::string to_string() const;
 };
