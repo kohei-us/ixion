@@ -183,6 +183,35 @@ void test_volatile_cells()
     assert(res.empty());
 }
 
+void test_volatile_cells_2()
+{
+    dirty_cell_tracker tracker;
+
+    abs_address_t A1(1, 0, 0);
+    abs_address_t B2(1, 1, 1);
+    abs_address_t C3(1, 2, 2);
+
+    // B2 tracks A1 and C3 tracks B2.
+    tracker.add(B2, A1);
+    tracker.add(C3, B2);
+
+    // No cells have been modified.
+    abs_range_set_t mod_cells;
+    abs_range_set_t res = tracker.query_dirty_cells(mod_cells);
+    assert(res.empty());
+
+    // Set A1 as volatile cell.  All of A2, B2 and C3 should be dirty.
+    tracker.add_volatile(A1);
+    res = tracker.query_dirty_cells(mod_cells);
+    assert(res.size() == 3);
+
+    auto sorted = tracker.query_and_sort_dirty_cells(mod_cells);
+    assert(sorted.size() == 3);
+    auto ranks = create_ranks(sorted);
+    assert(ranks[A1] < ranks[B2]);
+    assert(ranks[B2] < ranks[C3]);
+}
+
 void test_multi_sheets()
 {
     dirty_cell_tracker tracker;
@@ -269,6 +298,7 @@ int main()
     test_cell_to_cell();
     test_cell_to_range();
     test_volatile_cells();
+    test_volatile_cells_2();
     test_multi_sheets();
     test_recursive_tracking();
     test_listen_to_cell_in_range();

@@ -29,7 +29,7 @@ using rtree_array_type = std::deque<rtree_type>;
 struct dirty_cell_tracker::impl
 {
     rtree_array_type m_grids;
-    abs_address_set_t m_volatile_cells;
+    abs_range_set_t m_volatile_cells;
 
     mutable std::unique_ptr<formula_name_resolver> m_resolver;
 
@@ -183,12 +183,12 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
         tree->erase(it_listener);
 }
 
-void dirty_cell_tracker::add_volatile(const abs_address_t& pos)
+void dirty_cell_tracker::add_volatile(const abs_range_t& pos)
 {
     mp_impl->m_volatile_cells.insert(pos);
 }
 
-void dirty_cell_tracker::remove_volatile(const abs_address_t& pos)
+void dirty_cell_tracker::remove_volatile(const abs_range_t& pos)
 {
     mp_impl->m_volatile_cells.erase(pos);
 }
@@ -210,6 +210,8 @@ abs_range_set_t dirty_cell_tracker::query_dirty_cells(const abs_range_set_t& mod
         mp_impl->m_volatile_cells.begin(), mp_impl->m_volatile_cells.end());
 
     abs_range_set_t cur_modified_cells = modified_cells;
+    for (const abs_range_t& r : mp_impl->m_volatile_cells)
+        cur_modified_cells.insert(r);
 
     while (!cur_modified_cells.empty())
     {
@@ -252,6 +254,8 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
 
     abs_range_set_t cur_modified_cells = modified_cells;
 
+    // Get the initial set of formula cells affected by the modified cells.
+    // Note that these modified cells are not dirty formula cells.
     if (!cur_modified_cells.empty())
     {
         abs_range_set_t next_modified_cells;
@@ -269,6 +273,12 @@ std::vector<abs_range_t> dirty_cell_tracker::query_and_sort_dirty_cells(const ab
 
         cur_modified_cells.swap(next_modified_cells);
     }
+
+    // Because the modified cells in the subsequent rounds are all dirty
+    // formula cells, we need to track precedent-dependent relationships for
+    // later sorting.
+    for (const abs_range_t& r : mp_impl->m_volatile_cells)
+        cur_modified_cells.insert(r);
 
     using dfs_type = depth_first_search<abs_range_t, abs_range_t::hash>;
     dfs_type::relations rels;

@@ -57,7 +57,7 @@ public:
      *
      * @param pos position of the cell to register as a volatile cell.
      */
-    void add_volatile(const abs_address_t& pos);
+    void add_volatile(const abs_range_t& pos);
 
     /**
      * Remove the specified cell position from the internal set of registered
@@ -65,7 +65,7 @@ public:
      *
      * @param pos position of the cell to unregister as a volatile cell.
      */
-    void remove_volatile(const abs_address_t& pos);
+    void remove_volatile(const abs_range_t& pos);
 
     abs_range_set_t query_dirty_cells(const abs_range_t& modified_cell) const;
 
