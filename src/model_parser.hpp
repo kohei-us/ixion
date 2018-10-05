@@ -134,7 +134,7 @@ private:
     std::string m_filepath;
     std::string m_strm;
     size_t m_thread_count;
-    abs_address_set_t m_dirty_formula_cells;
+    abs_range_set_t m_dirty_formula_cells;
     abs_address_set_t m_modified_cells;
     results_type m_formula_results;
 

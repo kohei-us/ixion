@@ -278,10 +278,14 @@ void model_parser::parse_command()
 
             // Perform full calculation on currently stored cells.
 
-            for (const abs_address_t& pos : m_dirty_formula_cells)
-                register_formula_cell(m_context, pos);
+            abs_address_set_t cells;
+            for (const abs_range_t& pos : m_dirty_formula_cells)
+            {
+                register_formula_cell(m_context, pos.first);
+                cells.insert(pos.first);
+            }
 
-            calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
+            calculate_cells(m_context, cells, m_thread_count);
             break;
         }
         case commands::type::recalc:
@@ -291,7 +295,11 @@ void model_parser::parse_command()
             abs_address_set_t res = query_dirty_cells(m_context, m_modified_cells);
             m_dirty_formula_cells.insert(res.begin(), res.end());
 
-            calculate_cells(m_context, m_dirty_formula_cells, m_thread_count);
+            abs_address_set_t cells;
+            for (const abs_range_t& r : m_dirty_formula_cells)
+                cells.insert(r.first);
+
+            calculate_cells(m_context, cells, m_thread_count);
             break;
         }
         case commands::type::check:
@@ -454,7 +462,7 @@ void model_parser::parse_init()
                 m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
-        m_dirty_formula_cells.insert(pos);
+        m_dirty_formula_cells.insert(cell_def.pos);
 
         cout << "{" << get_display_range_string(cell_def.pos) << "}: (m) " << cell_def.value.str() << endl;
         return;
@@ -528,7 +536,7 @@ void model_parser::parse_edit()
                 m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
-        m_dirty_formula_cells.insert(pos);
+        m_dirty_formula_cells.insert(cell_def.pos);
         register_formula_cell(m_context, pos);
         return;
     }
