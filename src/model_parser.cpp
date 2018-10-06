@@ -291,14 +291,13 @@ void model_parser::parse_command()
         {
             print_section_title("recalculating");
 
-            abs_address_set_t res = query_dirty_cells(m_context, m_modified_cells);
-            m_dirty_formula_cells.insert(res.begin(), res.end());
+            // Perform partial recalculation only on those formula cells that
+            // need recalculation.
 
-            abs_address_set_t cells;
-            for (const abs_range_t& r : m_dirty_formula_cells)
-                cells.insert(r.first);
+            std::vector<abs_range_t> sorted_cells =
+                query_and_sort_dirty_cells(m_context, m_modified_cells, &m_dirty_formula_cells);
 
-            calculate_cells(m_context, cells, m_thread_count);
+            calculate_sorted_cells(m_context, sorted_cells, m_thread_count);
             break;
         }
         case commands::type::check:
