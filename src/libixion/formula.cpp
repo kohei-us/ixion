@@ -15,7 +15,6 @@
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
-#include "topo_sort_calculator.hpp"
 
 #define DEBUG_FORMULA_API 0
 
@@ -298,19 +297,6 @@ std::vector<abs_range_t> query_and_sort_dirty_cells(
 {
     const dirty_cell_tracker& tracker = cxt.get_cell_tracker();
     return tracker.query_and_sort_dirty_cells(modified_cells, dirty_formula_cells);
-}
-
-void calculate_sorted_cells(
-    iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)
-{
-    // Convert an array of ranges to an array of cells.  Be reminded that a
-    // range represents a grouped fromula cells whose top-left cell represents
-    // the whole group.
-    std::vector<abs_address_t> fcs;
-    for (const abs_range_t& r : formula_cells)
-        fcs.push_back(r.first);
-
-    topo_sort_calculator::calculate_sorted_cells(cxt, std::move(fcs), thread_count);
 }
 
 }

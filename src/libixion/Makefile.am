@@ -32,6 +32,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	dirty_cell_tracker.cpp \
 	exceptions.cpp \
 	formula.cpp \
+	formula_calc.cpp \
 	formula_function_opcode.cpp \
 	formula_functions.hpp \
 	formula_functions.cpp \
@@ -58,8 +59,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_types.hpp \
 	module.cpp \
 	table.cpp \
-	topo_sort_calculator.hpp \
-	topo_sort_calculator.cpp \
 	types.cpp \
 	workbook.hpp \
 	workbook.cpp \
