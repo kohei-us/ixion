@@ -99,10 +99,46 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
 void IXION_DLLPUBLIC calculate_cells(
     iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count);
 
+/**
+ * Get a sequence of the positions of all formula cells that track at least
+ * one of the specified modified cells directly or indirectly.  Such formula
+ * cells are referred to as "dirty" formula cells.  The sequence returned
+ * from this function is already sorted in topological order based on the
+ * dependency relationships between the affected formula cells.  Note that
+ * if the model contains volatile formula cells, they will be included in
+ * the returned sequence.
+ *
+ * @param cxt model context.
+ * @param modified_cells a collection of non-formula cells whose values have
+ *                       been updated.
+ * @param dirty_formula_cells (optional) a collection of formula cells that
+ *                            are already known to be dirty.  These formula
+ *                            cells will be added to the list of the
+ *                            affected formula cells returned from this
+ *                            function.
+ *
+ * @return an sequence containing the positions of the formula cells that
+ *         track at least one of the modified cells, as well as those
+ *         formula cells that are already known to be dirty.
+ */
 IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
     iface::formula_model_access& cxt, const abs_range_set_t& modified_cells,
     const abs_range_set_t* dirty_formula_cells = nullptr);
 
+/**
+ * Calculate all specified formula cells in the order they occur in the
+ * sequence.
+ *
+ * @param cxt model context.
+ * @param formula_cells formula cells to be calculated.  The cells will be
+ *                      calculated in the order they appear in the sequence.
+ * @param thread_count number of calculation threads to use.  Note that
+ *                     passing 0 will make the process use the main thread
+ *                     only, while passing any number greater than 0 will
+ *                     make the process spawn specified number of
+ *                     calculation threads plus one additional thread to
+ *                     manage the calculation threads.
+ */
 void IXION_DLLPUBLIC calculate_sorted_cells(
     iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count);
 
