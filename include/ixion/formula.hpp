@@ -85,21 +85,6 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
     iface::formula_model_access& cxt, const abs_address_set_t& modified_cells);
 
 /**
- * Calculate all dirty cells in order of dependency.
- *
- * @param cxt model context.
- * @param formula_cells all formula cells to be calculated.
- * @param thread_count number of calculation threads to use.  Note that
- *                     passing 0 will make the process use the main thread
- *                     only, while passing any number greater than 0 will
- *                     make the process spawn specified number of
- *                     calculation threads plus one additional thread to
- *                     manage the calculation threads.
- */
-void IXION_DLLPUBLIC calculate_cells(
-    iface::formula_model_access& cxt, abs_address_set_t& formula_cells, size_t thread_count);
-
-/**
  * Get a sequence of the positions of all formula cells that track at least
  * one of the specified modified cells directly or indirectly.  Such formula
  * cells are referred to as "dirty" formula cells.  The sequence returned
@@ -107,6 +92,9 @@ void IXION_DLLPUBLIC calculate_cells(
  * dependency relationships between the affected formula cells.  Note that
  * if the model contains volatile formula cells, they will be included in
  * the returned sequence.
+ *
+ * Use {@link ixion::query_dirty_cells} instead if you don't need the
+ * results to be sorted in order of dependency.
  *
  * @param cxt model context.
  * @param modified_cells a collection of non-formula cells whose values have
