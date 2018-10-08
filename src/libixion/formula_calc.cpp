@@ -24,44 +24,47 @@ void calculate_sorted_cells(
     thread_count = 0;  // threads are disabled thus not to be used.
 #endif
 
+    struct entry
+    {
+        formula_cell* p;
+        abs_address_t pos;
+
+        entry(formula_cell* _p, const abs_address_t& _pos) :
+            p(_p), pos(_pos) {}
+    };
+
+    std::vector<entry> entries;
+    entries.reserve(formula_cells.size());
+
+    for (const abs_range_t& r : formula_cells)
+        entries.emplace_back(cxt.get_formula_cell(r.first), r.first);
+
     // Reset cell status.
-    std::for_each(formula_cells.begin(), formula_cells.end(),
-        [&](const abs_range_t& pos)
-        {
-            formula_cell* p = cxt.get_formula_cell(pos.first);
-            p->reset();
-        }
-    );
+    for (entry& e : entries)
+        e.p->reset();
 
     // First, detect circular dependencies and mark those circular
     // dependent cells with appropriate error flags.
-    std::for_each(formula_cells.begin(), formula_cells.end(),
-        [&](const abs_range_t& pos)
-        {
-            formula_cell* p = cxt.get_formula_cell(pos.first);
-            p->check_circular(cxt, pos.first);
-        }
-    );
+    for (entry& e : entries)
+        e.p->check_circular(cxt, e.pos);
+
 
     if (!thread_count)
     {
         // Interpret cells using just a single thread.
-        std::for_each(formula_cells.begin(), formula_cells.end(),
-            [&](const abs_range_t& pos)
-            {
-                formula_cell* p = cxt.get_formula_cell(pos.first);
-                p->interpret(cxt, pos.first);
-            }
-        );
+        for (entry& e : entries)
+            e.p->interpret(cxt, e.pos);
+
         return;
     }
 
 #if IXION_THREADS
     // Interpret cells in topological order using threads.
-    std::vector<abs_address_t> fcs;
-    for (const abs_range_t& r : formula_cells)
-        fcs.push_back(r.first);
-    formula_cell_queue queue(cxt, std::move(fcs), thread_count);
+    std::vector<abs_address_t> addrs;
+    for (entry& e : entries)
+        addrs.push_back(e.pos);
+
+    formula_cell_queue queue(cxt, std::move(addrs), thread_count);
     queue.run();
 #endif
 }
