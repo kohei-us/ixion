@@ -160,17 +160,15 @@ PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwa
         return nullptr;
     }
 
-    model_context& cxt = self->m_data->m_global.m_cxt;
-    abs_address_set_t& mod_cells = self->m_data->m_global.m_modified_cells;
-    abs_address_set_t& dirty_fcells = self->m_data->m_global.m_dirty_formula_cells;
+    document_global& dg = self->m_data->m_global;
 
     // Query additional dirty formula cells and add them to the current set.
-    abs_address_set_t res = ixion::query_dirty_cells(cxt, mod_cells);
-    dirty_fcells.insert(res.begin(), res.end());
+    std::vector<abs_range_t> sorted = ixion::query_and_sort_dirty_cells(
+        dg.m_cxt, dg.m_modified_cells, &dg.m_dirty_formula_cells);
+    ixion::calculate_sorted_cells(dg.m_cxt, sorted, threads);
 
-    calculate_cells(cxt, dirty_fcells, threads);
-    mod_cells.clear();
-    dirty_fcells.clear();
+    dg.m_modified_cells.clear();
+    dg.m_dirty_formula_cells.clear();
 
     Py_INCREF(Py_None);
     return Py_None;
