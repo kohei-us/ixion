@@ -1,5 +1,12 @@
+* improved performance by removing repeated fetching of each formula
+  cell prior to interpretation.
+
+* reworked topological sorting of formula cells, to avoid having to
+  build dependency relations twice by performing it within
+  dirty_cell_tracker.
+
 * reworked the cell reference tracker to use R-tree.  This allows more
-  accurate tracking of references involving grouped formula.
+  accurate tracking of references involving grouped formulas.
 
 * fixed a resource leak with dynamic loading of compute engine modules.
 
