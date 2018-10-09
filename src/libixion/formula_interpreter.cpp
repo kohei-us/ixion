@@ -21,6 +21,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <boost/log/trivial.hpp>
 
 #define DEBUG_FORMULA_INTERPRETER 0
 
@@ -70,9 +71,7 @@ bool formula_interpreter::interpret()
 
         if (m_tokens.empty())
         {
-#if DEBUG_FORMULA_INTERPRETER
-            __IXION_DEBUG_OUT__ << "interpreter error: no tokens to interpret" << endl;
-#endif
+            BOOST_LOG_TRIVIAL(warning) << "Interpreter has no tokens to interpret";
             return false;
         }
 
@@ -81,17 +80,18 @@ bool formula_interpreter::interpret()
         m_result.reset();
 
         expression();
+
         if (m_cur_token_itr != m_tokens.end())
         {
             if (mp_handler)
                 mp_handler->set_invalid_expression("formula token interpretation ended prematurely.");
             return false;
         }
+
         pop_result();
 
-#if DEBUG_FORMULA_INTERPRETER
-        __IXION_DEBUG_OUT__ << "interpretation successfully finished" << endl;
-#endif
+        BOOST_LOG_TRIVIAL(trace) << "Interpretation successfully finished";
+
         if (mp_handler)
             mp_handler->end_cell_interpret();
 
@@ -106,9 +106,8 @@ bool formula_interpreter::interpret()
     }
     catch (const formula_error& e)
     {
-#if DEBUG_FORMULA_INTERPRETER
-        __IXION_DEBUG_OUT__ << "formula error: " << e.what() << endl;
-#endif
+        BOOST_LOG_TRIVIAL(debug) << "Formula error: " << e.what();
+
         if (mp_handler)
             mp_handler->set_formula_error(e.what());
 

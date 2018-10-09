@@ -20,14 +20,13 @@
 #undef min
 #endif
 
-#define DEBUG_FORMULA_FUNCTIONS 0
-
 #include <cassert>
 #include <iostream>
 #include <sstream>
 #include <thread>
 #include <chrono>
 
+#include <boost/log/trivial.hpp>
 #include <mdds/sorted_string_map.hpp>
 
 using namespace std;
@@ -243,9 +242,8 @@ void formula_functions::fnc_min(value_stack_t& args) const
 
 void formula_functions::fnc_sum(value_stack_t& args) const
 {
-#if DEBUG_FORMULA_FUNCTIONS
-    __IXION_DEBUG_OUT__ << "function: sum" << endl;
-#endif
+    BOOST_LOG_TRIVIAL(trace) << "function: sum";
+
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
 
@@ -267,9 +265,7 @@ void formula_functions::fnc_sum(value_stack_t& args) const
 
     args.push_value(ret);
 
-#if DEBUG_FORMULA_FUNCTIONS
-    __IXION_DEBUG_OUT__ << "function: sum end (result=" << ret << ")" << endl;
-#endif
+    BOOST_LOG_TRIVIAL(trace) << "function: sum end (result=" << ret << ")" << endl;
 }
 
 void formula_functions::fnc_counta(value_stack_t& args) const

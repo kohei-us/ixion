@@ -63,14 +63,10 @@ struct formula_cell::impl
      */
     void wait_for_interpreted_result(std::unique_lock<std::mutex>& lock) const
     {
-#if DEBUG_FORMULA_CELL
-        __IXION_DEBUG_OUT__ << "wait for interpreted result" << endl;
-#endif
+        BOOST_LOG_TRIVIAL(debug) << "Wait for the interpreted result";
         while (!m_calc_status->result)
         {
-#if DEBUG_FORMULA_CELL
-            __IXION_DEBUG_OUT__ << "waiting" << endl;
-#endif
+            BOOST_LOG_TRIVIAL(debug) << "Waiting...";
             m_calc_status->cond.wait(lock);
         }
     }
@@ -341,12 +337,11 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                 break;
             }
             default:
-#if DEBUG_FORMULA_CELL
-                __IXION_DEBUG_OUT__ << "check_circular: token type " << get_opcode_name((*itr)->get_opcode())
-                    << " was not processed." << endl;
-#else
-                ;
-#endif
+                BOOST_LOG_TRIVIAL(debug)
+                    << __FUNCTION__
+                    << " token type "
+                    << get_opcode_name(t->get_opcode())
+                    << " was not processed.";
         }
 
     }
