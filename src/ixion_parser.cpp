@@ -52,30 +52,38 @@ public:
     }
 };
 
-void init_log()
+void init_log(bool debug)
 {
-    namespace logging = boost::log;
-    logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::debug);
+    namespace log = boost::log;
+    log::core::get()->set_filter(
+        log::trivial::severity >= (debug ? log::trivial::debug : log::trivial::warning));
 }
+
+const char* help_thread =
+"Specify the number of threads to use for calculation.  Note that the number "
+"specified by this option corresponds with the number of calculation threads "
+"i.e. those child threads that perform cell interpretations. The main thread "
+"does not perform any calculations; instead, it creates a new child thread to "
+"manage the calculation threads, the number of which is specified by the arg. "
+"Therefore, the total number of threads used by this program will be arg + 1."
+;
 
 }
 
 int main (int argc, char** argv)
 {
-    init_log();
-
     namespace po = ::boost::program_options;
 
     size_t thread_count = 0;
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help,h", "print this help.")
-        ("thread,t", po::value<size_t>(),
-         "specify the number of threads to use for calculation.  Note that the number specified by this option corresponds with the number of calculation threads i.e. those child threads that perform cell interpretations.  The main thread does not perform any calculations; instead, it creates a new child thread to manage the calculation threads, the number of which is specified by the arg.  Therefore, the total number of threads used by this program will be arg + 1.");
+        ("help,h", "Print this help.")
+        ("thread,t", po::value<size_t>(), help_thread)
+        ("debug,d", "Turn on debug outputs.");
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
-        ("input-file", po::value< vector<string> >(), "input file");
+        ("input-file", po::value<std::vector<std::string>>(), "input file");
 
     po::options_description cmd_opt;
     cmd_opt.add(desc).add(hidden);
@@ -106,6 +114,8 @@ int main (int argc, char** argv)
             << desc;
         return EXIT_SUCCESS;
     }
+
+    init_log(vm.count("debug") > 0);
 
     if (vm.count("thread"))
         thread_count = vm["thread"].as<size_t>();
