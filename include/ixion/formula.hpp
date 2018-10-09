@@ -86,15 +86,16 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
 
 /**
  * Get a sequence of the positions of all formula cells that track at least
- * one of the specified modified cells directly or indirectly.  Such formula
- * cells are referred to as "dirty" formula cells.  The sequence returned
- * from this function is already sorted in topological order based on the
- * dependency relationships between the affected formula cells.  Note that
- * if the model contains volatile formula cells, they will be included in
- * the returned sequence.
+ * one of the specified modified cells either directly or indirectly.  Such
+ * formula cells are referred to as "dirty" formula cells.  The sequence
+ * returned from this function is already sorted in topological order based
+ * on the dependency relationships between the affected formula cells.  Note
+ * that if the model contains volatile formula cells, they will be included
+ * in the returned sequence each and every time.
  *
  * Use {@link ixion::query_dirty_cells} instead if you don't need the
- * results to be sorted in order of dependency.
+ * results to be sorted in order of dependency, to avoid the extra overhead
+ * incurred by the sorting.
  *
  * @param cxt model context.
  * @param modified_cells a collection of non-formula cells whose values have
