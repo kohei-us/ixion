@@ -58,6 +58,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_context.cpp \
 	model_types.hpp \
 	module.cpp \
+	queue_entry.hpp \
+	queue_entry.cpp \
 	table.cpp \
 	types.cpp \
 	workbook.hpp \

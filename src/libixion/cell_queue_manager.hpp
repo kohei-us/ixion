@@ -15,7 +15,8 @@
 
 namespace ixion {
 
-struct abs_address_t;
+class formula_cell;
+struct queue_entry;
 
 namespace iface {
 
@@ -36,7 +37,7 @@ public:
 
     formula_cell_queue(
         iface::formula_model_access& cxt,
-        std::vector<abs_address_t>&& cells,
+        std::vector<queue_entry>&& cells,
         size_t thread_count);
 
     ~formula_cell_queue();

@@ -310,6 +310,8 @@
 				<F N="../src/libixion/model_context.cpp"/>
 				<F N="../src/libixion/model_types.hpp"/>
 				<F N="../src/libixion/module.cpp"/>
+				<F N="../src/libixion/queue_entry.cpp"/>
+				<F N="../src/libixion/queue_entry.hpp"/>
 				<F N="../src/libixion/table.cpp"/>
 				<F N="../src/libixion/types.cpp"/>
 				<F N="../src/libixion/workbook.cpp"/>

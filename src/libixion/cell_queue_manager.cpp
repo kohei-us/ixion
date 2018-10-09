@@ -6,6 +6,7 @@
  */
 
 #include "cell_queue_manager.hpp"
+#include "queue_entry.hpp"
 #include "ixion/cell.hpp"
 
 #include "ixion/interface/formula_model_access.hpp"
@@ -107,23 +108,18 @@ public:
 struct formula_cell_queue::impl
 {
     iface::formula_model_access& m_context;
-    std::vector<abs_address_t> m_cells;
+    std::vector<queue_entry> m_cells;
     size_t m_thread_count;
 
-    impl(iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells, size_t thread_count) :
+    impl(iface::formula_model_access& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
         m_context(cxt),
         m_cells(cells),
         m_thread_count(thread_count) {}
 
     void thread_launch(interpreter_queue* queue)
     {
-        std::for_each(m_cells.begin(), m_cells.end(),
-            [&](const abs_address_t& pos)
-            {
-                formula_cell* p = m_context.get_formula_cell(pos);
-                queue->push(p, pos);
-            }
-        );
+        for (queue_entry& e : m_cells)
+            queue->push(e.p, e.pos);
     }
 
     void run()
@@ -139,7 +135,7 @@ struct formula_cell_queue::impl
 };
 
 formula_cell_queue::formula_cell_queue(
-    iface::formula_model_access& cxt, std::vector<abs_address_t>&& cells, size_t thread_count) :
+    iface::formula_model_access& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
     mp_impl(ixion::make_unique<impl>(cxt, std::move(cells), thread_count)) {}
 
 formula_cell_queue::~formula_cell_queue() {}
