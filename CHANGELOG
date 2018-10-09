@@ -1,9 +1,11 @@
 * improved performance by removing repeated fetching of each formula
   cell prior to interpretation.
 
-* reworked topological sorting of formula cells, to avoid having to
-  build dependency relations twice by performing it within
-  dirty_cell_tracker.
+* reworked topological sorting of formula cells to avoid having to
+  unnecessarily build dependency relations twice; once during the
+  dirty cell determination and twice prior to interpretation of
+  formula cells.  The new code performs topological sorting during the
+  dirty cell determination phase.
 
 * reworked the cell reference tracker to use R-tree.  This allows more
   accurate tracking of references involving grouped formulas.
