@@ -40,16 +40,13 @@ for both full and partial calculation modes.
   just need to implement more functions.
 * C++ API.
 * Python API.
+* Matrix support via grouped formulas.
 
 ## Planned features
-* Matrix support.
-  * Inline matrix.
-  * Matrix as formula out from a single function.
-  * Jump matrix - range input to function that expects a scalar input, and
-    generate matrix output.
 * More built-in functions.
 * Support for custom functions defined in the caller program.
 * Support for external references.
+* Implicit intersection.
 
 ## Documentation
 
