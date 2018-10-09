@@ -8,7 +8,9 @@ C1:4
 D1:5
 E1:6
 {C5:E7}{=MMULT(A1:A3,C1:E1)}
+E11=E7*10
 %calc
+%print dependency
 %mode result
 C5=4
 D5=5
@@ -19,6 +21,7 @@ E6=12
 C7=12
 D7=15
 E7=18
+E11=180
 %check
 %mode edit
 A1:2
