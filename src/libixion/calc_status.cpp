@@ -9,9 +9,9 @@
 
 namespace ixion {
 
-calc_status::calc_status() : result(nullptr), refcount(0) {}
+calc_status::calc_status() : result(nullptr), circular_safe(false), refcount(0) {}
 calc_status::calc_status(const rc_size_t& _group_size) :
-    result(nullptr), group_size(_group_size), refcount(0) {}
+    result(nullptr), group_size(_group_size), circular_safe(false), refcount(0) {}
 
 void calc_status::add_ref()
 {

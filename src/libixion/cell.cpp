@@ -46,8 +46,6 @@ struct formula_cell::impl
     formula_tokens_store_ptr_t m_tokens;
     rc_address_t m_group_pos;
 
-    bool m_circular_safe:1;
-
     impl() : impl(-1, -1, new calc_status, formula_tokens_store_ptr_t()) {}
 
     impl(const formula_tokens_store_ptr_t& tokens) : impl(-1, -1, new calc_status, tokens) {}
@@ -56,8 +54,7 @@ struct formula_cell::impl
         const formula_tokens_store_ptr_t& tokens) :
         m_calc_status(cs),
         m_tokens(tokens),
-        m_group_pos(row, col, false, false),
-        m_circular_safe(false) {}
+        m_group_pos(row, col, false, false) {}
 
     /**
      * Block until the result becomes available.
@@ -80,7 +77,7 @@ struct formula_cell::impl
 
     void reset_flag()
     {
-        m_circular_safe = false;
+        m_calc_status->circular_safe = false;
     }
 
     /**
@@ -91,7 +88,7 @@ struct formula_cell::impl
      */
     bool is_circular_safe() const
     {
-        return m_circular_safe;
+        return m_calc_status->circular_safe;
     }
 
     bool check_ref_for_circular_safety(const formula_cell& ref, const abs_address_t& pos)
@@ -355,7 +352,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
     }
 
     // No circular dependencies.  Good.
-    mp_impl->m_circular_safe = true;
+    mp_impl->m_calc_status->circular_safe = true;
 }
 
 void formula_cell::reset()

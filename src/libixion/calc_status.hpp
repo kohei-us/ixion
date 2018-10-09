@@ -27,6 +27,7 @@ struct calc_status
     std::unique_ptr<formula_result> result;
 
     const rc_size_t group_size;
+    bool circular_safe;
 
     size_t refcount;
 
