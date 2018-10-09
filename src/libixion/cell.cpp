@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <functional>
 
+#include <boost/log/trivial.hpp>
+
 #define DEBUG_FORMULA_CELL 0
 #if DEBUG_FORMULA_CELL
 #include "ixion/formula_name_resolver.hpp"
@@ -97,9 +99,7 @@ struct formula_cell::impl
         if (!ref.mp_impl->is_circular_safe())
         {
             // Circular dependency detected !!
-#if DEBUG_FORMULA_CELL
-            __IXION_DEBUG_OUT__ << "circular dependency detected !!" << endl;
-#endif
+            BOOST_LOG_TRIVIAL(debug) << "Circular dependency detected !!";
             assert(!m_calc_status->result);
             m_calc_status->result =
                 ixion::make_unique<formula_result>(formula_error_t::ref_result_not_available);
@@ -112,12 +112,18 @@ struct formula_cell::impl
     double fetch_value_from_result() const
     {
         if (!m_calc_status->result)
+        {
             // Result not cached yet.  Reference error.
+            BOOST_LOG_TRIVIAL(debug) << "Result not cached yet. This is a reference error.";
             throw formula_error(formula_error_t::ref_result_not_available);
+        }
 
         if (m_calc_status->result->get_type() == formula_result::result_type::error)
+        {
             // Error condition.
+            BOOST_LOG_TRIVIAL(debug) << "Error in result.";
             throw formula_error(m_calc_status->result->get_error());
+        }
 
         switch (m_calc_status->result->get_type())
         {
@@ -125,6 +131,7 @@ struct formula_cell::impl
                 return m_calc_status->result->get_value();
             case formula_result::result_type::matrix:
             {
+                BOOST_LOG_TRIVIAL(debug) << "Fetching a matrix result.";
                 const matrix& m = m_calc_status->result->get_matrix();
                 row_t row_size = m.row_size();
                 col_t col_size = m.col_size();
@@ -401,7 +408,10 @@ const formula_result& formula_cell::get_raw_result_cache() const
     std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
     mp_impl->wait_for_interpreted_result(lock);
     if (!mp_impl->m_calc_status->result)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Result not yet available.";
         throw formula_error(formula_error_t::ref_result_not_available);
+    }
 
     return *mp_impl->m_calc_status->result;
 }

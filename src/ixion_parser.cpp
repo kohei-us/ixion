@@ -10,9 +10,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <thread>
 
 #include <boost/program_options.hpp>
-#include <thread>
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 using namespace std;
 using namespace ixion;
@@ -49,10 +52,18 @@ public:
     }
 };
 
+void init_log()
+{
+    namespace logging = boost::log;
+    logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::debug);
+}
+
 }
 
 int main (int argc, char** argv)
 {
+    init_log();
+
     namespace po = ::boost::program_options;
 
     size_t thread_count = 0;

@@ -17,7 +17,9 @@ ixion_parser_SOURCES = \
 	table_handler.cpp
 
 ixion_parser_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
-					 $(BOOST_PROGRAM_OPTIONS_LIBS)
+	$(BOOST_PROGRAM_OPTIONS_LIBS) \
+	$(BOOST_SYSTEM_LIBS) \
+	$(BOOST_LOG_LIBS)
 
 ixion_sorter_SOURCES = \
 	ixion_sorter.cpp \
