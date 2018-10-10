@@ -166,6 +166,7 @@ IXION_DLLPUBLIC PyObject* PyInit_ixion()
     PyModule_AddObject(
         m, "FormulaError", ixion::python::get_python_formula_error());
 
+    ixion::init();
     return m;
 }
 

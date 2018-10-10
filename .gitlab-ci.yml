@@ -4,7 +4,7 @@ build:
   stage: build
   before_script: 
     - apt update
-    - apt -y install make autoconf automake libtool pkg-config git python3-dev
+    - apt -y install make autoconf automake libtool pkg-config git python3-dev libspdlog-dev
     - apt -y install libboost-all-dev || apt-get -y install libboost-all-dev
     - git clone https://gitlab.com/mdds/mdds.git /mdds && (cd /mdds && ./autogen.sh && make install)
   script: 

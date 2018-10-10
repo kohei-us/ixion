@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <functional>
 
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
 
 #define DEBUG_FORMULA_CELL 0
 #if DEBUG_FORMULA_CELL
@@ -63,10 +63,11 @@ struct formula_cell::impl
      */
     void wait_for_interpreted_result(std::unique_lock<std::mutex>& lock) const
     {
-        BOOST_LOG_TRIVIAL(debug) << "Wait for the interpreted result";
+        SPDLOG_TRACE(spdlog::get("ixion"), "Wait for the interpreted result");
+
         while (!m_calc_status->result)
         {
-            BOOST_LOG_TRIVIAL(debug) << "Waiting...";
+            SPDLOG_TRACE(spdlog::get("ixion"), "Waiting...");
             m_calc_status->cond.wait(lock);
         }
     }
@@ -92,7 +93,7 @@ struct formula_cell::impl
         if (!ref.mp_impl->is_circular_safe())
         {
             // Circular dependency detected !!
-            BOOST_LOG_TRIVIAL(debug) << "Circular dependency detected !!";
+            SPDLOG_DEBUG(spdlog::get("ixion"), "Circular dependency detected !!");
             assert(!m_calc_status->result);
             m_calc_status->result =
                 ixion::make_unique<formula_result>(formula_error_t::ref_result_not_available);
@@ -107,14 +108,14 @@ struct formula_cell::impl
         if (!m_calc_status->result)
         {
             // Result not cached yet.  Reference error.
-            BOOST_LOG_TRIVIAL(debug) << "Result not cached yet. This is a reference error.";
+            SPDLOG_DEBUG(spdlog::get("ixion"), "Result not cached yet. This is a reference error.");
             throw formula_error(formula_error_t::ref_result_not_available);
         }
 
         if (m_calc_status->result->get_type() == formula_result::result_type::error)
         {
             // Error condition.
-            BOOST_LOG_TRIVIAL(debug) << "Error in result.";
+            SPDLOG_DEBUG(spdlog::get("ixion"), "Error in result.");
             throw formula_error(m_calc_status->result->get_error());
         }
 
@@ -124,7 +125,7 @@ struct formula_cell::impl
                 return m_calc_status->result->get_value();
             case formula_result::result_type::matrix:
             {
-                BOOST_LOG_TRIVIAL(debug) << "Fetching a matrix result.";
+                SPDLOG_TRACE(spdlog::get("ixion"), "Fetching a matrix result.");
                 const matrix& m = m_calc_status->result->get_matrix();
                 row_t row_size = m.row_size();
                 col_t col_size = m.col_size();
@@ -337,11 +338,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                 break;
             }
             default:
-                BOOST_LOG_TRIVIAL(debug)
-                    << __FUNCTION__
-                    << " token type "
-                    << get_opcode_name(t->get_opcode())
-                    << " was not processed.";
+                SPDLOG_DEBUG(spdlog::get("ixion"), "Token type '{}' was not processed.", get_opcode_name(t->get_opcode()));
         }
 
     }
@@ -401,7 +398,7 @@ const formula_result& formula_cell::get_raw_result_cache() const
     mp_impl->wait_for_interpreted_result(lock);
     if (!mp_impl->m_calc_status->result)
     {
-        BOOST_LOG_TRIVIAL(debug) << "Result not yet available.";
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Result not yet available.");
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 

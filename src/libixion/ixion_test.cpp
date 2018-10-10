@@ -1050,6 +1050,8 @@ void test_volatile_function()
 
 int main()
 {
+    ixion::init();
+
     test_size();
     test_string_to_double();
     test_string_pool();

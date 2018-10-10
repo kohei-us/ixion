@@ -21,7 +21,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
 
 #define DEBUG_FORMULA_INTERPRETER 0
 
@@ -71,7 +71,7 @@ bool formula_interpreter::interpret()
 
         if (m_tokens.empty())
         {
-            BOOST_LOG_TRIVIAL(warning) << "Interpreter has no tokens to interpret";
+            SPDLOG_DEBUG(spdlog::get("ixion"), "Interpreter has no tokens to interpret");
             return false;
         }
 
@@ -90,7 +90,7 @@ bool formula_interpreter::interpret()
 
         pop_result();
 
-        BOOST_LOG_TRIVIAL(trace) << "Interpretation successfully finished";
+        SPDLOG_TRACE(spdlog::get("ixion"), "Interpretation successfully finished");
 
         if (mp_handler)
             mp_handler->end_cell_interpret();
@@ -106,7 +106,7 @@ bool formula_interpreter::interpret()
     }
     catch (const formula_error& e)
     {
-        BOOST_LOG_TRIVIAL(debug) << "Formula error: " << e.what();
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Formula error: {}", e.what());
 
         if (mp_handler)
             mp_handler->set_formula_error(e.what());

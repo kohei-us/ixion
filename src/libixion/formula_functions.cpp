@@ -26,7 +26,7 @@
 #include <thread>
 #include <chrono>
 
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
 #include <mdds/sorted_string_map.hpp>
 
 using namespace std;
@@ -242,7 +242,7 @@ void formula_functions::fnc_min(value_stack_t& args) const
 
 void formula_functions::fnc_sum(value_stack_t& args) const
 {
-    BOOST_LOG_TRIVIAL(trace) << "function: sum";
+    SPDLOG_TRACE(spdlog::get("ixion"), "function: sum");
 
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
@@ -265,7 +265,7 @@ void formula_functions::fnc_sum(value_stack_t& args) const
 
     args.push_value(ret);
 
-    BOOST_LOG_TRIVIAL(trace) << "function: sum end (result=" << ret << ")" << endl;
+    SPDLOG_TRACE(spdlog::get("ixion"), "function: sum end (result={})", ret);
 }
 
 void formula_functions::fnc_counta(value_stack_t& args) const

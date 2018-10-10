@@ -15,7 +15,8 @@
 #include <deque>
 #include <limits>
 
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/bundled/ostream.h>
 
 namespace ixion {
 
@@ -104,7 +105,7 @@ void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
 {
     if (dest.first.sheet < 0)
     {
-        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << dest.first.sheet << ")";
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Invalid sheet position ({}).", dest.first.sheet);
         return;
     }
 
@@ -141,7 +142,7 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
 {
     if (dest.first.sheet < 0)
     {
-        BOOST_LOG_TRIVIAL(warning) << "Invalid sheet position (" << dest.first.sheet << ")";
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Invalid sheet position ({}).", dest.first.sheet);
         return;
     }
 
@@ -155,7 +156,7 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
     rtree_type* tree = mp_impl->fetch_grid(dest.first.sheet);
     if (!tree)
     {
-        BOOST_LOG_TRIVIAL(warning) << "dirty_cell_tracker::remove: nothing is tracked on sheet " << dest.first.sheet << ".";
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Nothing is tracked on sheet {}.", dest.first.sheet);
         return;
     }
 
@@ -167,7 +168,7 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
     if (res.begin() == res.end())
     {
         // No listener for this destination cell. Nothing to remove.
-        BOOST_LOG_TRIVIAL(warning) << "dirty_cell_tracker::remove: cell " << dest << " is not being tracked by anybody.";
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Cell {} is not being tracked by anybody.", dest);
         return;
     }
 
@@ -176,7 +177,9 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
     size_t n_removed = listener.erase(src);
 
     if (!n_removed)
-        BOOST_LOG_TRIVIAL(warning) << "dirty_cell_tracker::remove: cell " << src << " was not tracking cell " << dest << ".";
+    {
+        SPDLOG_DEBUG(spdlog::get("ixion"), "Cell {} was not tracking cell {}.", src, dest);
+    }
 
     if (listener.empty())
         // Remove this from the R-tree.

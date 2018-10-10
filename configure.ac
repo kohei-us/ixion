@@ -99,8 +99,6 @@ AC_FUNC_STRTOD
 
 BOOST_REQUIRE([1.36])
 BOOST_FILESYSTEM
-BOOST_SYSTEM
-BOOST_LOG
 
 # =====
 # Debug
@@ -117,8 +115,9 @@ AS_IF([test "x$enable_debug" != "xno"], [
 	AC_DEFINE([NDEBUG], [], [Disable debugging information])
 ])
 
-# Check for mdds.
 PKG_CHECK_MODULES([MDDS],[mdds-1.4 >= 1.4.0])
+PKG_CHECK_MODULES([SPDLOG], [spdlog >= 0.16.0])
+CXXFLAGS="$CXXFLAGS -DSPDLOG_DEBUG_ON"
 
 # Check for python.
 AS_IF([test "x$enable_python" != "xno"], [

@@ -13,9 +13,6 @@
 #include <thread>
 
 #include <boost/program_options.hpp>
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
 
 using namespace std;
 using namespace ixion;
@@ -52,13 +49,6 @@ public:
     }
 };
 
-void init_log(bool debug)
-{
-    namespace log = boost::log;
-    log::core::get()->set_filter(
-        log::trivial::severity >= (debug ? log::trivial::debug : log::trivial::warning));
-}
-
 const char* help_thread =
 "Specify the number of threads to use for calculation.  Note that the number "
 "specified by this option corresponds with the number of calculation threads "
@@ -78,8 +68,7 @@ int main (int argc, char** argv)
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "Print this help.")
-        ("thread,t", po::value<size_t>(), help_thread)
-        ("debug,d", "Turn on debug outputs.");
+        ("thread,t", po::value<size_t>(), help_thread);
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
@@ -115,7 +104,7 @@ int main (int argc, char** argv)
         return EXIT_SUCCESS;
     }
 
-    init_log(vm.count("debug") > 0);
+    ixion::init();
 
     if (vm.count("thread"))
         thread_count = vm["thread"].as<size_t>();
