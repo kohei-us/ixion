@@ -117,7 +117,26 @@ AS_IF([test "x$enable_debug" != "xno"], [
 
 PKG_CHECK_MODULES([MDDS],[mdds-1.4 >= 1.4.0])
 PKG_CHECK_MODULES([SPDLOG], [spdlog >= 0.16.0])
-CXXFLAGS="$CXXFLAGS -DSPDLOG_DEBUG_ON"
+
+AC_ARG_ENABLE(log-debug,
+	AS_HELP_STRING([--enable-log-debug], [Enable debug outputs.])],
+	[enable_log_debug="$enableval"],
+	[enable_log_debug=no    ]
+)
+
+AS_IF([test "x$enable_log_debug" != "xno"], [
+        CXXFLAGS="$CXXFLAGS -DSPDLOG_DEBUG_ON"
+],)
+
+AC_ARG_ENABLE(log-trace,
+	AS_HELP_STRING([--enable-log-trace], [Enable trace outputs.])],
+	[enable_log_trace="$enableval"],
+	[enable_log_trace=no]
+)
+
+AS_IF([test "x$enable_log_trace" != "xno"], [
+        CXXFLAGS="$CXXFLAGS -DSPDLOG_TRACE_ON"
+],)
 
 # Check for python.
 AS_IF([test "x$enable_python" != "xno"], [
@@ -159,5 +178,7 @@ Build configuration:
         python:               $enable_python
         threads:              $enable_threads
         cuda:                 $enable_cuda
+        log (debug)           $enable_log_debug
+        log (trace)           $enable_log_trace
 ==============================================================================
 ])
