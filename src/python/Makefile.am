@@ -22,7 +22,7 @@ TESTS = ../../bin/run-python-test-osx.sh
 
 else
 
-AM_TESTS_ENVIRONMENT = PYTHONPATH=.libs$${PYTHONPATH:+:$${PYTHONPATH}}; export PYTHONPATH;
+AM_TESTS_ENVIRONMENT = . test-env.sh;
 
 TESTS = \
 	../../test/python/document.py \
