@@ -21,7 +21,7 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AX_CXX_COMPILE_STDCXX_11
-CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -Wshadow -pthread"
+CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -Wshadow -Wno-write-strings -pthread"
 
 AC_CANONICAL_HOST
 
@@ -156,6 +156,22 @@ AM_CONDITIONAL([BUILD_CUDA], [test "x$enable_cuda" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
 
 BOOST_PROGRAM_OPTIONS
+
+# ==============
+# Werror support
+# ==============
+
+# NB: This must come at the end of all the other header detections, as enabling
+# it may cause some header detections to fail.
+
+AC_ARG_ENABLE([werror],
+	[AS_HELP_STRING([--enable-werror], [Treat all warnings as errors, useful for development])],
+	[enable_werror="$enableval"],
+	[enable_werror=no]
+)
+AS_IF([test x"$enable_werror" == "xyes"], [
+	CXXFLAGS="$CXXFLAGS -Werror"
+])
 
 AC_CONFIG_FILES([Makefile
                  libixion-$IXION_API_VERSION.pc:libixion.pc.in
