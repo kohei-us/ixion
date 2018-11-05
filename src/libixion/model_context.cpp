@@ -486,7 +486,7 @@ abs_address_set_t model_context_impl::get_all_formula_cells() const
             column_store_t::const_iterator ite = col.end();
             for (; it != ite; ++it)
             {
-                if (it->type != ixion::element_type_formula)
+                if (it->type != element_type_formula)
                     continue;
 
                 row_t row_id = it->position;
@@ -543,7 +543,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, const char* 
     string_id_t str_id = add_string(p, n);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, static_cast<unsigned long>(str_id));
+    pos_hint = col_store.set(pos_hint, addr.row, str_id);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
@@ -551,7 +551,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, static_cast<unsigned long>(identifier));
+    pos_hint = col_store.set(pos_hint, addr.row, identifier);
 }
 
 void model_context_impl::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
@@ -638,7 +638,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
             column_store_t::const_iterator it = col.begin(), it_end = col.end();
             assert(it != it_end);
-            if (it->type == mdds::mtv::element_type_empty)
+            if (it->type == element_type_empty)
             {
                 // First block is empty.
                 row_t offset = it->size;
@@ -651,7 +651,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                     continue;
                 }
 
-                assert(it->type != mdds::mtv::element_type_empty);
+                assert(it->type != element_type_empty);
                 if (range.first.row > offset)
                     range.first.row = offset;
             }
@@ -666,7 +666,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 
             column_store_t::const_reverse_iterator it = col.rbegin(), it_end = col.rend();
             assert(it != it_end);
-            if (it->type == mdds::mtv::element_type_empty)
+            if (it->type == element_type_empty)
             {
                 // Last block is empty.
                 size_t size_last_block = it->size;
@@ -679,7 +679,7 @@ abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
                     continue;
                 }
 
-                assert(it->type != mdds::mtv::element_type_empty);
+                assert(it->type != element_type_empty);
                 row_t last_data_row = static_cast<row_t>(col.size() - size_last_block - 1);
                 if (range.last.row < last_data_row)
                     range.last.row = last_data_row;
@@ -712,13 +712,13 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
         m_sheets.at(addr.sheet).at(addr.column).get_type(addr.row);
     switch (gmcell_type)
     {
-        case mdds::mtv::element_type_empty:
+        case element_type_empty:
             return celltype_t::empty;
-        case mdds::mtv::element_type_numeric:
+        case element_type_numeric:
             return celltype_t::numeric;
-        case mdds::mtv::element_type_boolean:
+        case element_type_boolean:
             return celltype_t::boolean;
-        case mdds::mtv::element_type_ulong:
+        case element_type_string:
             return celltype_t::string;
         case element_type_formula:
             return celltype_t::formula;
@@ -738,9 +738,9 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     switch (col_store.get_type(addr.row))
     {
-        case mdds::mtv::element_type_numeric:
+        case element_type_numeric:
             return col_store.get<double>(addr.row);
-        case mdds::mtv::element_type_boolean:
+        case element_type_boolean:
             return col_store.get<bool>(addr.row);
         case element_type_formula:
         {
@@ -761,7 +761,7 @@ double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) c
     {
         case element_type_numeric:
             return col_store.get<double>(addr.row);
-        case mdds::mtv::element_type_boolean:
+        case element_type_boolean:
             return col_store.get<bool>(addr.row);
         case element_type_formula:
         {
@@ -780,9 +780,9 @@ bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     switch (col_store.get_type(addr.row))
     {
-        case mdds::mtv::element_type_numeric:
+        case element_type_numeric:
             return col_store.get<double>(addr.row) != 0.0 ? true : false;
-        case mdds::mtv::element_type_boolean:
+        case element_type_boolean:
             return col_store.get<bool>(addr.row);
         case element_type_formula:
         {
@@ -801,8 +801,8 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     switch (col_store.get_type(addr.row))
     {
-        case ixion::element_type_string:
-            return col_store.get<unsigned long>(addr.row);
+        case element_type_string:
+            return col_store.get<string_id_t>(addr.row);
         default:
             ;
     }
@@ -814,9 +814,9 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     switch (col_store.get_type(addr.row))
     {
-        case ixion::element_type_string:
-            return col_store.get<unsigned long>(addr.row);
-        case ixion::element_type_formula:
+        case element_type_string:
+            return col_store.get<string_id_t>(addr.row);
+        case element_type_formula:
         {
             const formula_cell* p = col_store.get<formula_cell*>(addr.row);
             formula_result res_cache = p->get_result_cache_nowait();
