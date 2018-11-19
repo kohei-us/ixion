@@ -45,10 +45,10 @@ Address Types
 .. doxygenstruct:: ixion::abs_range_t
    :members:
 
-.. doxygentypedef:: ixion::cell_address_set_t
+.. doxygentypedef:: ixion::abs_address_set_t
 
-.. doxygentypedef:: ixion::dirty_formula_cells_t
+.. doxygentypedef:: ixion::abs_range_set_t
 
-.. doxygentypedef:: ixion::modified_cells_t
+.. doxygentypedef:: ixion::abs_rc_range_set_t
 
 
