@@ -94,8 +94,8 @@ enum table_area_t
     table_area_all     = 0x07
 };
 
-/** type that stores a mixture of {@link table_area_t} values. */
-typedef int table_areas_t;
+/** type that stores a mixture of ixion::table_area_t values. */
+using table_areas_t = int32_t;
 
 /**
  * Formula name resolver type specifies how name tokens are resolved.
@@ -112,7 +112,7 @@ enum class formula_name_resolver_t
 /**
  * Formula error types.
  *
- * @see get_formula_error_name
+ * @see ixion::get_formula_error_name
  */
 enum class formula_error_t : uint8_t
 {
