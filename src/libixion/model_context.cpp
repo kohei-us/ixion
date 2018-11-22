@@ -14,6 +14,7 @@
 #include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula.hpp"
+#include "ixion/model_iterator.hpp"
 
 #include "workbook.hpp"
 #include "model_types.hpp"
@@ -1123,6 +1124,11 @@ const column_store_t* model_context::get_column(sheet_t sheet, col_t col) const
 const column_stores_t* model_context::get_columns(sheet_t sheet) const
 {
     return mp_impl->get_columns(sheet);
+}
+
+model_iterator model_context::get_model_iterator(sheet_t sheet, model_iterator_direction_t dir) const
+{
+    return model_iterator(*this, sheet, dir);
 }
 
 abs_address_set_t model_context::get_all_formula_cells() const

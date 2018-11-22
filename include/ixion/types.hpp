@@ -130,6 +130,17 @@ enum class formula_error_t : uint8_t
 };
 
 /**
+ * Specifies iterator direction of a model_context.
+ */
+enum class model_iterator_direction_t
+{
+    /** Flows left to right first then top to bottom. */
+    horizontal,
+    /** Flows top to bottom first then left to right. */
+    vertical
+};
+
+/**
  * This structure stores a 2-dimensional size information.
  */
 struct IXION_DLLPUBLIC rc_size_t

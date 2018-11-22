@@ -46,7 +46,8 @@ public:
     enum error_type
     {
         circular_dependency,
-        sheet_name_conflict
+        sheet_name_conflict,
+        not_implemented
     };
 
     explicit model_context_error(const std::string& msg, error_type type);
