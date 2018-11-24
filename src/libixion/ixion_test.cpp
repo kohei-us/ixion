@@ -981,7 +981,7 @@ void test_model_context_iterator()
     // Insert an actual sheet and try again.
     const row_t row_size = 5;
     const col_t col_size = 2;
-    cxt.append_sheet(IXION_ASCII("test"), row_size, col_size);
+    cxt.append_sheet(IXION_ASCII("empty sheet"), row_size, col_size);
     iter = cxt.get_model_iterator(0, rc_direction_t::horizontal);
 
     // Make sure the cell position iterates correctly.
@@ -999,6 +999,101 @@ void test_model_context_iterator()
 
     assert(!iter.has()); // There should be no more cells on this sheet.
     assert(cell_count = 10);
+
+    cxt.append_sheet(IXION_ASCII("values"), row_size, col_size);
+    cxt.set_string_cell(abs_address_t(1, 0, 0), IXION_ASCII("F1"));
+    cxt.set_string_cell(abs_address_t(1, 0, 1), IXION_ASCII("F2"));
+    cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
+    cxt.set_boolean_cell(abs_address_t(1, 1, 1), false);
+    cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
+    cxt.set_numeric_cell(abs_address_t(1, 2, 1), -12.5);
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    abs_range_set_t modified_cells;
+    abs_address_t pos(1, 3, 0);
+    formula_tokens_t tokens = parse_formula_string(
+        cxt, pos, *resolver, IXION_ASCII("SUM(1, 2, 3)"));
+    cxt.set_formula_cell(pos, std::move(tokens));
+    register_formula_cell(cxt, pos);
+    modified_cells.insert(pos);
+
+    pos.column = 1;
+    tokens = parse_formula_string(
+        cxt, pos, *resolver, IXION_ASCII("5 + 6 - 7"));
+    cxt.set_formula_cell(pos, std::move(tokens));
+    register_formula_cell(cxt, pos);
+    modified_cells.insert(pos);
+
+    // Calculate the formula cells.
+    auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &modified_cells);
+    calculate_sorted_cells(cxt, sorted, 1);
+
+    // Iterator and check the individual cell values.
+    iter = cxt.get_model_iterator(1, rc_direction_t::horizontal);
+    model_iterator::cell expected;
+    expected.row = 0;
+    expected.col = 0;
+    expected.type = celltype_t::string;
+    expected.value.string = cxt.get_string_identifier(IXION_ASCII("F1"));
+
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.col = 1;
+    expected.value.string = cxt.get_string_identifier(IXION_ASCII("F2"));
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.row += 1;
+    expected.col = 0;
+    expected.type = celltype_t::boolean;
+    expected.value.boolean = true;
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.col = 1;
+    expected.value.boolean = false;
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.row += 1;
+    expected.col = 0;
+    expected.type = celltype_t::numeric;
+    expected.value.numeric = 3.14;
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.col = 1;
+    expected.value.numeric = -12.5;
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.row += 1;
+    expected.col = 0;
+    expected.type = celltype_t::formula;
+    expected.value.formula = cxt.get_formula_cell(abs_address_t(1, expected.row, expected.col));
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    iter.next();
+    expected.col = 1;
+    expected.value.formula = cxt.get_formula_cell(abs_address_t(1, expected.row, expected.col));
+    assert(iter.has());
+    assert(expected == iter.get());
+
+    // From this point on the cells should all be empty.
+    iter.next();
+    expected.row += 1;
+    expected.col = 0;
+    expected.type = celltype_t::empty;
+    assert(iter.has());
+    assert(expected == iter.get());
 }
 
 void test_volatile_function()

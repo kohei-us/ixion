@@ -40,6 +40,9 @@ public:
             const formula_cell* formula;
 
         } value;
+
+        cell();
+        bool operator== (const cell& other) const;
     };
 
     model_iterator();

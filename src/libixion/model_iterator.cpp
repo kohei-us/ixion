@@ -17,6 +17,33 @@ namespace ixion {
 
 using collection_type = mdds::mtv::collection<column_store_t>;
 
+model_iterator::cell::cell() : row(0), col(0), type(celltype_t::empty) {}
+
+bool model_iterator::cell::operator== (const cell& other) const
+{
+    if (type != other.type || row != other.row || col != other.col)
+        return false;
+
+    switch (type)
+    {
+        case celltype_t::empty:
+            return true;
+        case celltype_t::numeric:
+            return value.numeric == other.value.numeric;
+        case celltype_t::boolean:
+            return value.boolean == other.value.boolean;
+        case celltype_t::string:
+            return value.string == other.value.string;
+        case celltype_t::formula:
+            // Compare by the formula cell memory address.
+            return value.formula == other.value.formula;
+        default:
+            ;
+    }
+
+    return false;
+}
+
 struct model_iterator::impl
 {
     collection_type collection;
