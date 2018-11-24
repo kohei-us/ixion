@@ -14,6 +14,7 @@
 namespace ixion {
 
 class model_context;
+class formula_cell;
 
 class IXION_DLLPUBLIC model_iterator
 {
@@ -33,14 +34,21 @@ public:
 
         union
         {
+            bool boolean;
             double numeric;
+            string_id_t string;
+            const formula_cell* formula;
 
         } value;
     };
 
+    model_iterator();
     model_iterator(const model_iterator&) = delete;
     model_iterator(model_iterator&& other);
     ~model_iterator();
+
+    model_iterator& operator= (const model_iterator&) = delete;
+    model_iterator& operator= (model_iterator&& other);
 
     bool has() const;
 

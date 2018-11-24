@@ -9,6 +9,7 @@
 #include "ixion/address.hpp"
 #include "ixion/formula.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/model_iterator.hpp"
 #include "ixion/global.hpp"
 #include "ixion/macros.hpp"
 #include "ixion/interface/table_handler.hpp"
@@ -968,6 +969,38 @@ void test_model_context_storage()
     }
 }
 
+void test_model_context_iterator()
+{
+    model_context cxt;
+    model_iterator iter;
+
+    // It should not crash or throw an exception on empty model.
+    iter = cxt.get_model_iterator(0, model_iterator_direction_t::horizontal);
+    assert(!iter.has());
+
+    // Insert an actual sheet and try again.
+    const row_t row_size = 5;
+    const col_t col_size = 2;
+    cxt.append_sheet(IXION_ASCII("test"), row_size, col_size);
+    iter = cxt.get_model_iterator(0, model_iterator_direction_t::horizontal);
+
+    // Make sure the cell position iterates correctly.
+    size_t cell_count = 0;
+    for (row_t row = 0; row < row_size; ++row)
+    {
+        for (col_t col = 0; col < col_size; ++cell_count, ++col, iter.next())
+        {
+            assert(iter.has());
+            assert(iter.get().row == row);
+            assert(iter.get().col == col);
+            assert(iter.get().type == celltype_t::empty);
+        }
+    }
+
+    assert(!iter.has()); // There should be no more cells on this sheet.
+    assert(cell_count = 10);
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -1046,7 +1079,7 @@ void test_volatile_function()
     assert(0.2 <= delta && delta <= 0.3);
 }
 
-}
+} // anonymous namespace
 
 int main()
 {
@@ -1067,6 +1100,7 @@ int main()
     test_parse_and_print_expressions();
     test_function_name_resolution();
     test_model_context_storage();
+    test_model_context_iterator();
     test_volatile_function();
 
     return EXIT_SUCCESS;
