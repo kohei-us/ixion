@@ -975,14 +975,14 @@ void test_model_context_iterator()
     model_iterator iter;
 
     // It should not crash or throw an exception on empty model.
-    iter = cxt.get_model_iterator(0, model_iterator_direction_t::horizontal);
+    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal);
     assert(!iter.has());
 
     // Insert an actual sheet and try again.
     const row_t row_size = 5;
     const col_t col_size = 2;
     cxt.append_sheet(IXION_ASCII("test"), row_size, col_size);
-    iter = cxt.get_model_iterator(0, model_iterator_direction_t::horizontal);
+    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal);
 
     // Make sure the cell position iterates correctly.
     size_t cell_count = 0;

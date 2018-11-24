@@ -132,7 +132,7 @@ enum class formula_error_t : uint8_t
 /**
  * Specifies iterator direction of a model_context.
  */
-enum class model_iterator_direction_t
+enum class rc_direction_t
 {
     /** Flows left to right first then top to bottom. */
     horizontal,

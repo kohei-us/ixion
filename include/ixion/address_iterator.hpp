@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_ADDRESS_ITERATOR_HPP
 
 #include "ixion/env.hpp"
+#include "ixion/types.hpp"
 
 #include <memory>
 
@@ -23,8 +24,6 @@ class IXION_DLLPUBLIC abs_address_iterator
     std::unique_ptr<impl> mp_impl;
 
 public:
-    enum class direction_type { horizontal, vertical };
-
     class IXION_DLLPUBLIC const_iterator
     {
         friend class abs_address_iterator;
@@ -32,7 +31,7 @@ public:
         struct impl_node;
         std::unique_ptr<impl_node> mp_impl;
 
-        const_iterator(const abs_range_t& range, direction_type dir, bool end);
+        const_iterator(const abs_range_t& range, rc_direction_t dir, bool end);
     public:
         using value_type = abs_address_t;
 
@@ -53,7 +52,7 @@ public:
         bool operator!= (const const_iterator& r) const;
     };
 
-    abs_address_iterator(const abs_range_t& range, direction_type dir);
+    abs_address_iterator(const abs_range_t& range, rc_direction_t dir);
     ~abs_address_iterator();
 
     const_iterator begin() const;

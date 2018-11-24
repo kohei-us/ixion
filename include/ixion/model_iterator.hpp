@@ -23,7 +23,7 @@ class IXION_DLLPUBLIC model_iterator
     struct impl;
     std::unique_ptr<impl> mp_impl;
 
-    model_iterator(const model_context& cxt, sheet_t sheet, model_iterator_direction_t dir);
+    model_iterator(const model_context& cxt, sheet_t sheet, rc_direction_t dir);
 public:
 
     struct cell

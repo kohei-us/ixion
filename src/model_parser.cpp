@@ -466,7 +466,7 @@ void model_parser::parse_init()
         return;
     }
 
-    abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
+    abs_address_iterator iter(cell_def.pos, rc_direction_t::vertical);
 
     for (const abs_address_t& pos : iter)
     {
@@ -539,7 +539,7 @@ void model_parser::parse_edit()
         return;
     }
 
-    abs_address_iterator iter(cell_def.pos, abs_address_iterator::direction_type::vertical);
+    abs_address_iterator iter(cell_def.pos, rc_direction_t::vertical);
 
     for (const abs_address_t& pos : iter)
     {

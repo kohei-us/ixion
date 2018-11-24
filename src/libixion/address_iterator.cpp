@@ -165,9 +165,9 @@ using update_func_type = std::function<void(const abs_range_t&,abs_address_t&,bo
 struct abs_address_iterator::impl
 {
     const abs_range_t m_range;
-    abs_address_iterator::direction_type m_dir;
+    rc_direction_t m_dir;
 
-    impl(const abs_range_t& range, abs_address_iterator::direction_type dir) :
+    impl(const abs_range_t& range, rc_direction_t dir) :
         m_range(range), m_dir(dir) {}
 };
 
@@ -182,18 +182,18 @@ struct abs_address_iterator::const_iterator::impl_node
 
     impl_node() : mp_range(nullptr), m_pos(abs_address_t::invalid), m_end_pos(false) {}
 
-    impl_node(const abs_range_t& range, abs_address_iterator::direction_type dir, bool end) :
+    impl_node(const abs_range_t& range, rc_direction_t dir, bool end) :
         mp_range(&range),
         m_pos(end ? range.last : range.first),
         m_end_pos(end)
     {
         switch (dir)
         {
-            case abs_address_iterator::direction_type::horizontal:
+            case rc_direction_t::horizontal:
                 m_func_inc = inc_horizontal;
                 m_func_dec = dec_horizontal;
                 break;
-            case abs_address_iterator::direction_type::vertical:
+            case rc_direction_t::vertical:
                 m_func_inc = inc_vertical;
                 m_func_dec = dec_vertical;
                 break;
@@ -229,7 +229,7 @@ abs_address_iterator::const_iterator::const_iterator() :
     mp_impl(ixion::make_unique<impl_node>()) {}
 
 abs_address_iterator::const_iterator::const_iterator(
-    const abs_range_t& range, abs_address_iterator::direction_type dir, bool end) :
+    const abs_range_t& range, rc_direction_t dir, bool end) :
     mp_impl(ixion::make_unique<impl_node>(range, dir, end)) {}
 
 abs_address_iterator::const_iterator::const_iterator(const const_iterator& r) :
@@ -286,7 +286,7 @@ bool abs_address_iterator::const_iterator::operator!= (const const_iterator& r) 
     return !operator==(r);
 }
 
-abs_address_iterator::abs_address_iterator(const abs_range_t& range, direction_type dir) :
+abs_address_iterator::abs_address_iterator(const abs_range_t& range, rc_direction_t dir) :
     mp_impl(ixion::make_unique<impl>(range, dir)) {}
 
 abs_address_iterator::~abs_address_iterator() {}

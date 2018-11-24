@@ -157,7 +157,7 @@ public:
      */
     const column_stores_t* get_columns(sheet_t sheet) const;
 
-    model_iterator get_model_iterator(sheet_t sheet, model_iterator_direction_t dir) const;
+    model_iterator get_model_iterator(sheet_t sheet, rc_direction_t dir) const;
 
     abs_address_set_t get_all_formula_cells() const;
 

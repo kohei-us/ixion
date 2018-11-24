@@ -1126,7 +1126,7 @@ const column_stores_t* model_context::get_columns(sheet_t sheet) const
     return mp_impl->get_columns(sheet);
 }
 
-model_iterator model_context::get_model_iterator(sheet_t sheet, model_iterator_direction_t dir) const
+model_iterator model_context::get_model_iterator(sheet_t sheet, rc_direction_t dir) const
 {
     return model_iterator(*this, sheet, dir);
 }

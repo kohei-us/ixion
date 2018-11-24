@@ -26,9 +26,9 @@ struct model_iterator::impl
 
     impl() {}
 
-    impl(const model_context& cxt, sheet_t sheet, model_iterator_direction_t dir)
+    impl(const model_context& cxt, sheet_t sheet, rc_direction_t dir)
     {
-        if (dir != model_iterator_direction_t::horizontal)
+        if (dir != rc_direction_t::horizontal)
         {
             std::ostringstream os;
             os << "Only horizontal iterator is implemented for now.";
@@ -78,7 +78,7 @@ struct model_iterator::impl
 };
 
 model_iterator::model_iterator() : mp_impl(ixion::make_unique<impl>()) {}
-model_iterator::model_iterator(const model_context& cxt, sheet_t sheet, model_iterator_direction_t dir) :
+model_iterator::model_iterator(const model_context& cxt, sheet_t sheet, rc_direction_t dir) :
     mp_impl(ixion::make_unique<impl>(cxt, sheet, dir)) {}
 
 model_iterator::model_iterator(model_iterator&& other) : mp_impl(std::move(other.mp_impl)) {}
