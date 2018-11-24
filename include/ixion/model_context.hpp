@@ -157,6 +157,17 @@ public:
      */
     const column_stores_t* get_columns(sheet_t sheet) const;
 
+    /**
+     * Get an immutable iterator that lets you iterate cell values in one
+     * sheet one at a time.  <i>The caller has to ensure that the model
+     * content does not change for the duration of the iteration.</i>
+     *
+     * @param sheet sheet index.
+     * @param dir direction of the iteration.  Currently, only horizontal
+     *            direction is supported.
+     *
+     * @return model iterator instance.
+     */
     model_iterator get_model_iterator(sheet_t sheet, rc_direction_t dir) const;
 
     abs_address_set_t get_all_formula_cells() const;
