@@ -170,6 +170,11 @@ public:
      */
     model_iterator get_model_iterator(sheet_t sheet, rc_direction_t dir) const;
 
+    /**
+     * @deprecated This is not generic enough and should be replaced.  This
+     *             functionality should be realized via model_iterator in the
+     *             future.
+     */
     abs_address_set_t get_all_formula_cells() const;
 
     bool empty() const;
