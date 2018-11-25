@@ -142,6 +142,7 @@ class iterator_core_vertical : public model_iterator::impl
     mutable model_iterator::cell m_current_cell;
 
     column_stores_t::const_iterator m_it_cols;
+    column_stores_t::const_iterator m_it_cols_begin;
     column_stores_t::const_iterator m_it_cols_end;
 
     column_store_t::const_position_type m_current_pos;
@@ -187,11 +188,12 @@ public:
         if (!m_cols)
             return;
 
-        m_it_cols = m_cols->begin();
+        m_it_cols_begin = m_cols->begin();
         m_it_cols_end = m_cols->end();
-        if (m_it_cols == m_it_cols_end)
+        if (m_it_cols_begin == m_it_cols_end)
             return;
 
+        m_it_cols = m_it_cols_begin;
         const column_store_t& col = **m_it_cols;
         m_current_pos = col.position(0);
     }
@@ -206,6 +208,8 @@ public:
 
     void next() override
     {
+        m_current_cell.row = column_store_t::logical_position(m_current_pos);
+        m_current_cell.col = std::distance(m_it_cols_begin, m_it_cols_end);
         column_store_t::advance_position(m_current_pos, 1);
 
         const column_store_t* col = *m_it_cols;
