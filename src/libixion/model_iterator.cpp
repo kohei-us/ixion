@@ -138,24 +138,96 @@ public:
 
 class iterator_core_vertical : public model_iterator::impl
 {
-    model_iterator::cell m_current_cell;
+    const column_stores_t* m_cols;
+    mutable model_iterator::cell m_current_cell;
+
+    column_stores_t::const_iterator m_it_cols;
+    column_stores_t::const_iterator m_it_cols_end;
+
+    column_store_t::const_position_type m_current_pos;
+    column_store_t::const_position_type m_end_pos;
+
+    void update_current() const
+    {
+        column_store_t::const_iterator blk_pos = m_current_pos.first;
+        size_t blk_offset = m_current_pos.second;
+
+        switch (blk_pos->type)
+        {
+            case element_type_empty:
+                m_current_cell.type = celltype_t::empty;
+                break;
+            case element_type_boolean:
+                m_current_cell.type = celltype_t::boolean;
+                break;
+            case element_type_numeric:
+                m_current_cell.type = celltype_t::numeric;
+                m_current_cell.value.numeric =
+                    numeric_element_block::at(*blk_pos->data, blk_offset);
+                break;
+            case element_type_string:
+                m_current_cell.type = celltype_t::string;
+                m_current_cell.value.string =
+                    string_element_block::at(*blk_pos->data, blk_offset);
+                break;
+            case element_type_formula:
+                m_current_cell.type = celltype_t::formula;
+                m_current_cell.value.formula =
+                    formula_element_block::at(*blk_pos->data, blk_offset);
+                break;
+            default:
+                throw std::logic_error("unhandled element type.");
+        }
+    }
 
 public:
     iterator_core_vertical(const model_context& cxt, sheet_t sheet)
     {
+        m_cols = cxt.get_columns(sheet);
+        if (!m_cols)
+            return;
+
+        m_it_cols = m_cols->begin();
+        m_it_cols_end = m_cols->end();
+        if (m_it_cols == m_it_cols_end)
+            return;
+
+        const column_store_t& col = **m_it_cols;
+        m_current_pos = col.position(0);
     }
 
     bool has() const override
     {
-        return false;
+        if (!m_cols)
+            return false;
+
+        return m_it_cols != m_it_cols_end;
     }
 
     void next() override
     {
+        column_store_t::advance_position(m_current_pos, 1);
+
+        const column_store_t* col = *m_it_cols;
+
+        // Check if the current position within the current column has reached
+        // its end, and if so, move to the first cell of the next column.
+        if (m_current_pos.first == col->cend())
+        {
+            ++m_it_cols;
+            if (m_it_cols == m_it_cols_end)
+                // We are past the last available column. Bail out.
+                return;
+
+            col = *m_it_cols;
+            m_current_pos = col->position(0);
+            return;
+        }
     }
 
     const model_iterator::cell& get() const override
     {
+        update_current();
         return m_current_cell;
     }
 };
