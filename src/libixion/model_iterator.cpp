@@ -66,10 +66,11 @@ public:
     }
 };
 
-using collection_type = mdds::mtv::collection<column_store_t>;
 
-class iterator_core_vertical : public model_iterator::impl
+class iterator_core_horizontal : public model_iterator::impl
 {
+    using collection_type = mdds::mtv::collection<column_store_t>;
+
     collection_type m_collection;
     mutable model_iterator::cell m_current_cell;
     collection_type::const_iterator m_current_pos;
@@ -105,7 +106,7 @@ class iterator_core_vertical : public model_iterator::impl
         }
     }
 public:
-    iterator_core_vertical(const model_context& cxt, sheet_t sheet)
+    iterator_core_horizontal(const model_context& cxt, sheet_t sheet)
     {
         const column_stores_t* cols = cxt.get_columns(sheet);
         if (cols)
@@ -147,7 +148,7 @@ model_iterator::model_iterator(const model_context& cxt, sheet_t sheet, rc_direc
         throw model_context_error(os.str(), model_context_error::not_implemented);
     }
 
-    mp_impl = ixion::make_unique<iterator_core_vertical>(cxt, sheet);
+    mp_impl = ixion::make_unique<iterator_core_horizontal>(cxt, sheet);
 }
 
 model_iterator::model_iterator(model_iterator&& other) : mp_impl(std::move(other.mp_impl)) {}
