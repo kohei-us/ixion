@@ -969,7 +969,7 @@ void test_model_context_storage()
     }
 }
 
-void test_model_context_iterator()
+void test_model_context_iterator_horizontal()
 {
     model_context cxt;
     model_iterator iter;
@@ -1096,6 +1096,35 @@ void test_model_context_iterator()
     assert(expected == iter.get());
 }
 
+void test_model_context_iterator_vertical()
+{
+    model_context cxt;
+    model_iterator iter;
+
+    // Insert an actual sheet and try again.
+    const row_t row_size = 5;
+    const col_t col_size = 2;
+    cxt.append_sheet(IXION_ASCII("empty sheet"), row_size, col_size);
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical);
+
+    // Make sure the cell position iterates correctly.
+    size_t cell_count = 0;
+    for (col_t col = 0; col < col_size; ++cell_count, ++col)
+    {
+        for (row_t row = 0; row < row_size; ++row, iter.next())
+        {
+            const model_iterator::cell& cell = iter.get();
+            assert(iter.has());
+            assert(cell.row == row);
+            assert(cell.col == col);
+            assert(cell.type == celltype_t::empty);
+        }
+    }
+
+    assert(!iter.has()); // There should be no more cells on this sheet.
+    assert(cell_count = 10);
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -1195,7 +1224,8 @@ int main()
     test_parse_and_print_expressions();
     test_function_name_resolution();
     test_model_context_storage();
-    test_model_context_iterator();
+    test_model_context_iterator_horizontal();
+    test_model_context_iterator_vertical();
     test_volatile_function();
 
     return EXIT_SUCCESS;

@@ -140,6 +140,7 @@ class iterator_core_vertical : public model_iterator::impl
 {
     const column_stores_t* m_cols;
     mutable model_iterator::cell m_current_cell;
+    mutable bool m_update_current_cell;
 
     column_stores_t::const_iterator m_it_cols;
     column_stores_t::const_iterator m_it_cols_begin;
@@ -147,6 +148,7 @@ class iterator_core_vertical : public model_iterator::impl
 
     column_store_t::const_position_type m_current_pos;
     column_store_t::const_position_type m_end_pos;
+
 
     void update_current() const
     {
@@ -179,10 +181,15 @@ class iterator_core_vertical : public model_iterator::impl
             default:
                 throw std::logic_error("unhandled element type.");
         }
+
+        m_current_cell.row = column_store_t::logical_position(m_current_pos);
+        m_current_cell.col = std::distance(m_it_cols_begin, m_it_cols);
+        m_update_current_cell = false;
     }
 
 public:
-    iterator_core_vertical(const model_context& cxt, sheet_t sheet)
+    iterator_core_vertical(const model_context& cxt, sheet_t sheet) :
+        m_update_current_cell(true)
     {
         m_cols = cxt.get_columns(sheet);
         if (!m_cols)
@@ -208,30 +215,27 @@ public:
 
     void next() override
     {
-        m_current_cell.row = column_store_t::logical_position(m_current_pos);
-        m_current_cell.col = std::distance(m_it_cols_begin, m_it_cols_end);
-        column_store_t::advance_position(m_current_pos, 1);
+        m_update_current_cell = true;
+        m_current_pos = column_store_t::advance_position(m_current_pos, 1);
 
         const column_store_t* col = *m_it_cols;
-
-        // Check if the current position within the current column has reached
-        // its end, and if so, move to the first cell of the next column.
-        if (m_current_pos.first == col->cend())
-        {
-            ++m_it_cols;
-            if (m_it_cols == m_it_cols_end)
-                // We are past the last available column. Bail out.
-                return;
-
-            col = *m_it_cols;
-            m_current_pos = col->position(0);
+        if (m_current_pos.first != col->cend())
+            // It hasn't reached the end of the current column yet.
             return;
-        }
+
+        ++m_it_cols; // Move to the next column.
+        if (m_it_cols == m_it_cols_end)
+            return;
+
+        // Reset the position to the first cell in the new column.
+        col = *m_it_cols;
+        m_current_pos = col->position(0);
     }
 
     const model_iterator::cell& get() const override
     {
-        update_current();
+        if (m_update_current_cell)
+            update_current();
         return m_current_cell;
     }
 };
