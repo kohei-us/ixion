@@ -73,6 +73,7 @@ class iterator_core_horizontal : public model_iterator::impl
 
     collection_type m_collection;
     mutable model_iterator::cell m_current_cell;
+    mutable bool m_update_current_cell;
     collection_type::const_iterator m_current_pos;
     collection_type::const_iterator m_end;
 
@@ -104,9 +105,12 @@ class iterator_core_horizontal : public model_iterator::impl
             default:
                 ;
         }
+
+        m_update_current_cell = false;
     }
 public:
-    iterator_core_horizontal(const model_context& cxt, sheet_t sheet)
+    iterator_core_horizontal(const model_context& cxt, sheet_t sheet) :
+        m_update_current_cell(true)
     {
         const column_stores_t* cols = cxt.get_columns(sheet);
         if (cols)
@@ -127,11 +131,13 @@ public:
     virtual void next() override
     {
         ++m_current_pos;
+        m_update_current_cell = true;
     }
 
     virtual const model_iterator::cell& get() const override
     {
-        update_current();
+        if (m_update_current_cell)
+            update_current();
         return m_current_cell;
     }
 };
