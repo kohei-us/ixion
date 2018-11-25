@@ -189,11 +189,11 @@ public:
             return;
 
         m_it_cols_begin = m_cols->begin();
+        m_it_cols = m_it_cols_begin;
         m_it_cols_end = m_cols->end();
         if (m_it_cols_begin == m_it_cols_end)
             return;
 
-        m_it_cols = m_it_cols_begin;
         const column_store_t& col = **m_it_cols;
         m_current_pos = col.position(0);
     }
