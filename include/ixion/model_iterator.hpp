@@ -18,10 +18,12 @@ class formula_cell;
 
 class IXION_DLLPUBLIC model_iterator
 {
-    friend class model_context;
+public:
+    class impl;
 
-    struct impl;
-    std::unique_ptr<impl> mp_impl;
+private:
+    friend class model_context;
+    std::unique_ptr<model_iterator::impl> mp_impl;
 
     model_iterator(const model_context& cxt, sheet_t sheet, rc_direction_t dir);
 public:
