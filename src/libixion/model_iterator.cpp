@@ -136,19 +136,44 @@ public:
     }
 };
 
+class iterator_core_vertical : public model_iterator::impl
+{
+    model_iterator::cell m_current_cell;
+
+public:
+    iterator_core_vertical(const model_context& cxt, sheet_t sheet)
+    {
+    }
+
+    bool has() const override
+    {
+        return false;
+    }
+
+    void next() override
+    {
+    }
+
+    const model_iterator::cell& get() const override
+    {
+        return m_current_cell;
+    }
+};
+
 } // anonymous namespace
 
 model_iterator::model_iterator() : mp_impl(ixion::make_unique<iterator_core_empty>()) {}
 model_iterator::model_iterator(const model_context& cxt, sheet_t sheet, rc_direction_t dir)
 {
-    if (dir != rc_direction_t::horizontal)
+    switch (dir)
     {
-        std::ostringstream os;
-        os << "Only horizontal iterator is implemented for now.";
-        throw model_context_error(os.str(), model_context_error::not_implemented);
+        case rc_direction_t::horizontal:
+            mp_impl = ixion::make_unique<iterator_core_horizontal>(cxt, sheet);
+            break;
+        case rc_direction_t::vertical:
+            mp_impl = ixion::make_unique<iterator_core_vertical>(cxt, sheet);
+            break;
     }
-
-    mp_impl = ixion::make_unique<iterator_core_horizontal>(cxt, sheet);
 }
 
 model_iterator::model_iterator(model_iterator&& other) : mp_impl(std::move(other.mp_impl)) {}
