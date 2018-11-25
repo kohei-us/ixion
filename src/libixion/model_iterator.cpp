@@ -15,8 +15,6 @@
 
 namespace ixion {
 
-using collection_type = mdds::mtv::collection<column_store_t>;
-
 model_iterator::cell::cell() : row(0), col(0), type(celltype_t::empty) {}
 
 bool model_iterator::cell::operator== (const cell& other) const
@@ -44,12 +42,92 @@ bool model_iterator::cell::operator== (const cell& other) const
     return false;
 }
 
+namespace {
+
+using collection_type = mdds::mtv::collection<column_store_t>;
+
+class iterator_core
+{
+public:
+    virtual bool has() const = 0;
+    virtual void next() = 0;
+    virtual const model_iterator::cell& get() const = 0;
+};
+
+class iterator_core_vertical : public iterator_core
+{
+    collection_type m_collection;
+    mutable model_iterator::cell m_current_cell;
+    collection_type::const_iterator m_current_pos;
+    collection_type::const_iterator m_end;
+
+    void update_current() const
+    {
+        m_current_cell.col = m_current_pos->index;
+        m_current_cell.row = m_current_pos->position;
+
+        switch (m_current_pos->type)
+        {
+            case element_type_boolean:
+                m_current_cell.type = celltype_t::boolean;
+                m_current_cell.value.boolean = m_current_pos->get<boolean_element_block>();
+                break;
+            case element_type_numeric:
+                m_current_cell.type = celltype_t::numeric;
+                m_current_cell.value.numeric = m_current_pos->get<numeric_element_block>();
+                break;
+            case element_type_string:
+                m_current_cell.type = celltype_t::string;
+                m_current_cell.value.string = m_current_pos->get<string_element_block>();
+                break;
+            case element_type_formula:
+                m_current_cell.type = celltype_t::formula;
+                m_current_cell.value.formula = m_current_pos->get<formula_element_block>();
+                break;
+            case element_type_empty:
+                m_current_cell.type = celltype_t::empty;
+            default:
+                ;
+        }
+    }
+public:
+    iterator_core_vertical(const model_context& cxt, sheet_t sheet)
+    {
+        const column_stores_t* cols = cxt.get_columns(sheet);
+        if (cols)
+        {
+            collection_type c = mdds::mtv::collection<column_store_t>(cols->begin(), cols->end());
+            m_collection.swap(c);
+        }
+
+        m_current_pos = m_collection.begin();
+        m_end = m_collection.end();
+    }
+
+    virtual bool has() const override
+    {
+        return m_current_pos != m_end;
+    }
+
+    virtual void next() override
+    {
+        ++m_current_pos;
+    }
+
+    virtual const model_iterator::cell& get() const override
+    {
+        update_current();
+        return m_current_cell;
+    }
+};
+
+} // anonymous namespace
+
 struct model_iterator::impl
 {
-    collection_type collection;
-    mutable model_iterator::cell current_cell;
-    collection_type::const_iterator current_pos;
-    collection_type::const_iterator end;
+    std::unique_ptr<iterator_core> core;
+
+    impl(const impl&) = delete;
 
     impl() {}
 
@@ -62,45 +140,7 @@ struct model_iterator::impl
             throw model_context_error(os.str(), model_context_error::not_implemented);
         }
 
-        const column_stores_t* cols = cxt.get_columns(sheet);
-        if (cols)
-        {
-            collection_type c = mdds::mtv::collection<column_store_t>(cols->begin(), cols->end());
-            collection.swap(c);
-        }
-
-        current_pos = collection.begin();
-        end = collection.end();
-    }
-
-    void update_current() const
-    {
-        current_cell.col = current_pos->index;
-        current_cell.row = current_pos->position;
-
-        switch (current_pos->type)
-        {
-            case element_type_boolean:
-                current_cell.type = celltype_t::boolean;
-                current_cell.value.boolean = current_pos->get<boolean_element_block>();
-                break;
-            case element_type_numeric:
-                current_cell.type = celltype_t::numeric;
-                current_cell.value.numeric = current_pos->get<numeric_element_block>();
-                break;
-            case element_type_string:
-                current_cell.type = celltype_t::string;
-                current_cell.value.string = current_pos->get<string_element_block>();
-                break;
-            case element_type_formula:
-                current_cell.type = celltype_t::formula;
-                current_cell.value.formula = current_pos->get<formula_element_block>();
-                break;
-            case element_type_empty:
-                current_cell.type = celltype_t::empty;
-            default:
-                ;
-        }
+        core = ixion::make_unique<iterator_core_vertical>(cxt, sheet);
     }
 };
 
@@ -121,18 +161,17 @@ model_iterator& model_iterator::operator= (model_iterator&& other)
 
 bool model_iterator::has() const
 {
-    return mp_impl->current_pos != mp_impl->end;
+    return mp_impl->core->has();
 }
 
 void model_iterator::next()
 {
-    ++mp_impl->current_pos;
+    mp_impl->core->next();
 }
 
 const model_iterator::cell& model_iterator::get() const
 {
-    mp_impl->update_current();
-    return mp_impl->current_cell;
+    return mp_impl->core->get();
 }
 
 } // namespace ixion
