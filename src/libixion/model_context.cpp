@@ -138,6 +138,7 @@ public:
     rc_size_t get_sheet_size(sheet_t sheet) const;
     size_t get_sheet_count() const;
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
+    sheet_t append_sheet(std::string&& name, row_t row_size, col_t col_size);
 
     string_id_t append_string(const char* p, size_t n);
     string_id_t add_string(const char* p, size_t n);
@@ -265,6 +266,28 @@ sheet_t model_context_impl::append_sheet(
     sheet_t sheet_index = m_sheets.size();
 
     m_sheet_names.emplace_back(p, n);
+    m_sheets.push_back(row_size, col_size);
+    return sheet_index;
+}
+
+sheet_t model_context_impl::append_sheet(
+    std::string&& name, row_t row_size, col_t col_size)
+{
+    // Check if the new sheet name already exists.
+    strings_type::const_iterator it =
+        std::find(m_sheet_names.begin(), m_sheet_names.end(), name);
+    if (it != m_sheet_names.end())
+    {
+        // This sheet name is already taken.
+        ostringstream os;
+        os << "Sheet name '" << name << "' already exists.";
+        throw model_context_error(os.str(), model_context_error::sheet_name_conflict);
+    }
+
+    // index of the new sheet.
+    sheet_t sheet_index = m_sheets.size();
+
+    m_sheet_names.push_back(std::move(name));
     m_sheets.push_back(row_size, col_size);
     return sheet_index;
 }
@@ -1094,6 +1117,11 @@ const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const
 sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
 {
     return mp_impl->append_sheet(p, n, row_size, col_size);
+}
+
+sheet_t model_context::append_sheet(std::string name, row_t row_size, col_t col_size)
+{
+    return mp_impl->append_sheet(std::move(name), row_size, col_size);
 }
 
 void model_context::set_session_handler_factory(session_handler_factory* factory)

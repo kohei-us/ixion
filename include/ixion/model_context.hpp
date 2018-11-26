@@ -127,6 +127,20 @@ public:
      */
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
 
+    /**
+     * Append a new sheet to the model.  The caller must ensure that the name
+     * of the new sheet is unique within the model context.  When the name
+     * being used for the new sheet already exists, it throws a {@link
+     * model_context_error} exception.
+     *
+     * @param name name of the sheet to be inserted.
+     * @param row_size number of rows in the inserted sheet.
+     * @param col_size number of columns in the inserted sheet.
+     *
+     * @return sheet index of the inserted sheet.
+     */
+    sheet_t append_sheet(std::string name, row_t row_size, col_t col_size);
+
     void set_session_handler_factory(session_handler_factory* factory);
 
     void set_table_handler(iface::table_handler* handler);

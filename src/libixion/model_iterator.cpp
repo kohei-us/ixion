@@ -12,10 +12,32 @@
 
 #include <mdds/multi_type_vector/collection.hpp>
 #include <sstream>
+#include <ostream>
 
 namespace ixion {
 
 model_iterator::cell::cell() : row(0), col(0), type(celltype_t::empty) {}
+
+model_iterator::cell::cell(row_t _row, col_t _col) :
+    row(_row), col(_col), type(celltype_t::empty) {}
+
+model_iterator::cell::cell(row_t _row, col_t _col, bool _b) :
+    row(_row), col(_col), type(celltype_t::boolean)
+{
+    value.boolean = _b;
+}
+
+model_iterator::cell::cell(row_t _row, col_t _col, string_id_t _s) :
+    row(_row), col(_col), type(celltype_t::string)
+{
+    value.string = _s;
+}
+
+model_iterator::cell::cell(row_t _row, col_t _col, double _v) :
+    row(_row), col(_col), type(celltype_t::numeric)
+{
+    value.numeric = _v;
+}
 
 bool model_iterator::cell::operator== (const cell& other) const
 {
@@ -155,7 +177,6 @@ class iterator_core_vertical : public model_iterator::impl
     column_store_t::const_position_type m_current_pos;
     column_store_t::const_position_type m_end_pos;
 
-
     void update_current() const
     {
         column_store_t::const_iterator blk_pos = m_current_pos.first;
@@ -167,8 +188,15 @@ class iterator_core_vertical : public model_iterator::impl
                 m_current_cell.type = celltype_t::empty;
                 break;
             case element_type_boolean:
+            {
+                // You can't use the at method with boolean element block due
+                // to the limitation of std::vector<bool>.
                 m_current_cell.type = celltype_t::boolean;
+                auto it = boolean_element_block::cbegin(*blk_pos->data);
+                std::advance(it, blk_offset);
+                m_current_cell.value.boolean = *it;
                 break;
+            }
             case element_type_numeric:
                 m_current_cell.type = celltype_t::numeric;
                 m_current_cell.value.numeric =
@@ -286,6 +314,34 @@ void model_iterator::next()
 const model_iterator::cell& model_iterator::get() const
 {
     return mp_impl->get();
+}
+
+std::ostream& operator<< (std::ostream& os, const model_iterator::cell& c)
+{
+    os << "(row=" << c.row << "; col=" << c.col << "; type=" << short(c.type);
+
+    switch (c.type)
+    {
+        case celltype_t::boolean:
+            os << "; boolean=" << c.value.boolean;
+            break;
+        case celltype_t::formula:
+            os << "; formula=" << c.value.formula;
+            break;
+        case celltype_t::numeric:
+            os << "; numeric=" << c.value.numeric;
+            break;
+        case celltype_t::string:
+            os << "; string=" << c.value.string;
+            break;
+        case celltype_t::empty:
+        case celltype_t::unknown:
+        default:
+            ;
+    }
+
+    os << ')';
+    return os;
 }
 
 } // namespace ixion

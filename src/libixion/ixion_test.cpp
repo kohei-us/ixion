@@ -1104,7 +1104,7 @@ void test_model_context_iterator_vertical()
     // Insert an actual sheet and try again.
     const row_t row_size = 5;
     const col_t col_size = 2;
-    cxt.append_sheet(IXION_ASCII("empty sheet"), row_size, col_size);
+    cxt.append_sheet("empty sheet", row_size, col_size);
     iter = cxt.get_model_iterator(0, rc_direction_t::vertical);
 
     // Make sure the cell position iterates correctly.
@@ -1123,6 +1123,39 @@ void test_model_context_iterator_vertical()
 
     assert(!iter.has()); // There should be no more cells on this sheet.
     assert(cell_count = 10);
+
+    cxt.append_sheet("values", row_size, col_size);
+    cxt.set_string_cell(abs_address_t(1, 0, 0), IXION_ASCII("F1"));
+    cxt.set_string_cell(abs_address_t(1, 0, 1), IXION_ASCII("F2"));
+    cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
+    cxt.set_boolean_cell(abs_address_t(1, 1, 1), false);
+    cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
+    cxt.set_numeric_cell(abs_address_t(1, 2, 1), -12.5);
+
+    std::vector<model_iterator::cell> checks =
+    {
+        // row, column, value
+        { 0, 0, cxt.get_string_identifier(IXION_ASCII("F1")) },
+        { 1, 0, true },
+        { 2, 0, 3.14 },
+        { 3, 0 },
+        { 4, 0 },
+
+        { 0, 1, cxt.get_string_identifier(IXION_ASCII("F2")) },
+        { 1, 1, false },
+        { 2, 1, -12.5 },
+        { 3, 1 },
+        { 4, 1 },
+    };
+
+    iter = cxt.get_model_iterator(1, rc_direction_t::vertical);
+
+    for (const model_iterator::cell& c : checks)
+    {
+        assert(iter.has());
+        assert(iter.get() == c);
+        iter.next();
+    }
 }
 
 void test_volatile_function()

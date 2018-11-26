@@ -9,7 +9,9 @@
 #define INCLUDED_IXION_MODEL_ITERATOR_HPP
 
 #include "ixion/types.hpp"
+
 #include <memory>
+#include <iosfwd>
 
 namespace ixion {
 
@@ -44,6 +46,11 @@ public:
         } value;
 
         cell();
+        cell(row_t _row, col_t _col);
+        cell(row_t _row, col_t _col, bool _b);
+        cell(row_t _row, col_t _col, string_id_t _s);
+        cell(row_t _row, col_t _col, double _v);
+
         bool operator== (const cell& other) const;
     };
 
@@ -62,7 +69,9 @@ public:
     const cell& get() const;
 };
 
-}
+IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const model_iterator::cell& c);
+
+} // namespace ixion
 
 #endif
 
