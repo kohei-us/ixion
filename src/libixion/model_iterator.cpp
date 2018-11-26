@@ -39,6 +39,12 @@ model_iterator::cell::cell(row_t _row, col_t _col, double _v) :
     value.numeric = _v;
 }
 
+model_iterator::cell::cell(row_t _row, col_t _col, const formula_cell* _f) :
+    row(_row), col(_col), type(celltype_t::formula)
+{
+    value.formula = _f;
+}
+
 bool model_iterator::cell::operator== (const cell& other) const
 {
     if (type != other.type || row != other.row || col != other.col)

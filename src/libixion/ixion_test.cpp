@@ -1132,19 +1132,39 @@ void test_model_context_iterator_vertical()
     cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
     cxt.set_numeric_cell(abs_address_t(1, 2, 1), -12.5);
 
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    abs_range_set_t modified_cells;
+    abs_address_t pos(1, 3, 0);
+    formula_tokens_t tokens = parse_formula_string(
+        cxt, pos, *resolver, IXION_ASCII("SUM(1, 2, 3)"));
+    cxt.set_formula_cell(pos, std::move(tokens));
+    register_formula_cell(cxt, pos);
+    modified_cells.insert(pos);
+
+    pos.column = 1;
+    tokens = parse_formula_string(
+        cxt, pos, *resolver, IXION_ASCII("5 + 6 - 7"));
+    cxt.set_formula_cell(pos, std::move(tokens));
+    register_formula_cell(cxt, pos);
+    modified_cells.insert(pos);
+
+    // Calculate the formula cells.
+    auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &modified_cells);
+    calculate_sorted_cells(cxt, sorted, 1);
+
     std::vector<model_iterator::cell> checks =
     {
         // row, column, value
         { 0, 0, cxt.get_string_identifier(IXION_ASCII("F1")) },
         { 1, 0, true },
         { 2, 0, 3.14 },
-        { 3, 0 },
+        { 3, 0, cxt.get_formula_cell(abs_address_t(1, 3, 0)) },
         { 4, 0 },
 
         { 0, 1, cxt.get_string_identifier(IXION_ASCII("F2")) },
         { 1, 1, false },
         { 2, 1, -12.5 },
-        { 3, 1 },
+        { 3, 1, cxt.get_formula_cell(abs_address_t(1, 3, 1)) },
         { 4, 1 },
     };
 

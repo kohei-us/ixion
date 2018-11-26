@@ -50,6 +50,7 @@ public:
         cell(row_t _row, col_t _col, bool _b);
         cell(row_t _row, col_t _col, string_id_t _s);
         cell(row_t _row, col_t _col, double _v);
+        cell(row_t _row, col_t _col, const formula_cell* _f);
 
         bool operator== (const cell& other) const;
     };
