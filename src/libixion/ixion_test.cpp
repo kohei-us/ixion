@@ -1052,6 +1052,8 @@ void test_model_context_iterator_horizontal()
         assert(iter.get() == c);
         iter.next();
     }
+
+    assert(!iter.has());
 }
 
 void test_model_context_iterator_vertical()
@@ -1138,6 +1140,8 @@ void test_model_context_iterator_vertical()
         assert(iter.get() == c);
         iter.next();
     }
+
+    assert(!iter.has());
 }
 
 void test_volatile_function()
