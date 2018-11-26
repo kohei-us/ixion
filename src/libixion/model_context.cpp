@@ -1154,9 +1154,10 @@ const column_stores_t* model_context::get_columns(sheet_t sheet) const
     return mp_impl->get_columns(sheet);
 }
 
-model_iterator model_context::get_model_iterator(sheet_t sheet, rc_direction_t dir) const
+model_iterator model_context::get_model_iterator(
+    sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {
-    return model_iterator(*this, sheet, dir);
+    return model_iterator(*this, sheet, range, dir);
 }
 
 abs_address_set_t model_context::get_all_formula_cells() const

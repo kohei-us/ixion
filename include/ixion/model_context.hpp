@@ -19,6 +19,7 @@
 namespace ixion {
 
 struct abs_address_t;
+struct abs_rc_range_t;
 struct config;
 class matrix;
 class model_context_impl;
@@ -179,10 +180,12 @@ public:
      * @param sheet sheet index.
      * @param dir direction of the iteration.  Currently, only horizontal
      *            direction is supported.
+     * @param range range on the specified sheet to iterate over.
      *
      * @return model iterator instance.
      */
-    model_iterator get_model_iterator(sheet_t sheet, rc_direction_t dir) const;
+    model_iterator get_model_iterator(
+        sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
 
     /**
      * @deprecated This is not generic enough and should be replaced.  This

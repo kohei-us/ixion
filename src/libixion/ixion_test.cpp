@@ -974,15 +974,20 @@ void test_model_context_iterator_horizontal()
     model_context cxt;
     model_iterator iter;
 
+    abs_rc_range_t whole_range;
+    whole_range.set_all_columns();
+    whole_range.set_all_rows();
+
     // It should not crash or throw an exception on empty model.
-    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal);
+    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, whole_range);
     assert(!iter.has());
 
     // Insert an actual sheet and try again.
     const row_t row_size = 5;
     const col_t col_size = 2;
+
     cxt.append_sheet(IXION_ASCII("empty sheet"), row_size, col_size);
-    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal);
+    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, whole_range);
 
     // Make sure the cell position iterates correctly.
     size_t cell_count = 0;
@@ -1044,7 +1049,7 @@ void test_model_context_iterator_horizontal()
     };
 
     // Iterator and check the individual cell values.
-    iter = cxt.get_model_iterator(1, rc_direction_t::horizontal);
+    iter = cxt.get_model_iterator(1, rc_direction_t::horizontal, whole_range);
 
     for (const model_iterator::cell& c : checks)
     {
@@ -1061,15 +1066,20 @@ void test_model_context_iterator_vertical()
     model_context cxt;
     model_iterator iter;
 
+    abs_rc_range_t whole_range;
+    whole_range.set_all_columns();
+    whole_range.set_all_rows();
+
     // It should not crash or throw an exception on empty model.
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical);
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, whole_range);
     assert(!iter.has());
 
     // Insert an actual sheet and try again.
     const row_t row_size = 5;
     const col_t col_size = 2;
+
     cxt.append_sheet("empty sheet", row_size, col_size);
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical);
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, whole_range);
 
     // Make sure the cell position iterates correctly.
     size_t cell_count = 0;
@@ -1132,7 +1142,7 @@ void test_model_context_iterator_vertical()
         { 4, 1 },
     };
 
-    iter = cxt.get_model_iterator(1, rc_direction_t::vertical);
+    iter = cxt.get_model_iterator(1, rc_direction_t::vertical, whole_range);
 
     for (const model_iterator::cell& c : checks)
     {
