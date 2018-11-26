@@ -1101,6 +1101,10 @@ void test_model_context_iterator_vertical()
     model_context cxt;
     model_iterator iter;
 
+    // It should not crash or throw an exception on empty model.
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical);
+    assert(!iter.has());
+
     // Insert an actual sheet and try again.
     const row_t row_size = 5;
     const col_t col_size = 2;
