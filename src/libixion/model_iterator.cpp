@@ -186,7 +186,6 @@ class iterator_core_vertical : public model_iterator::impl
     void update_current() const
     {
         column_store_t::const_iterator blk_pos = m_current_pos.first;
-        size_t blk_offset = m_current_pos.second;
 
         switch (blk_pos->type)
         {
@@ -194,29 +193,20 @@ class iterator_core_vertical : public model_iterator::impl
                 m_current_cell.type = celltype_t::empty;
                 break;
             case element_type_boolean:
-            {
-                // You can't use the at method with boolean element block due
-                // to the limitation of std::vector<bool>.
                 m_current_cell.type = celltype_t::boolean;
-                auto it = boolean_element_block::cbegin(*blk_pos->data);
-                std::advance(it, blk_offset);
-                m_current_cell.value.boolean = *it;
+                m_current_cell.value.boolean = column_store_t::get<boolean_element_block>(m_current_pos);
                 break;
-            }
             case element_type_numeric:
                 m_current_cell.type = celltype_t::numeric;
-                m_current_cell.value.numeric =
-                    numeric_element_block::at(*blk_pos->data, blk_offset);
+                m_current_cell.value.numeric = column_store_t::get<numeric_element_block>(m_current_pos);
                 break;
             case element_type_string:
                 m_current_cell.type = celltype_t::string;
-                m_current_cell.value.string =
-                    string_element_block::at(*blk_pos->data, blk_offset);
+                m_current_cell.value.string = column_store_t::get<string_element_block>(m_current_pos);
                 break;
             case element_type_formula:
                 m_current_cell.type = celltype_t::formula;
-                m_current_cell.value.formula =
-                    formula_element_block::at(*blk_pos->data, blk_offset);
+                m_current_cell.value.formula = column_store_t::get<formula_element_block>(m_current_pos);
                 break;
             default:
                 throw std::logic_error("unhandled element type.");
