@@ -54,6 +54,7 @@ public:
         cell(row_t _row, col_t _col, const formula_cell* _f);
 
         bool operator== (const cell& other) const;
+        bool operator!= (const cell& other) const;
     };
 
     model_iterator();

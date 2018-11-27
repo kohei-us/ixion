@@ -969,6 +969,22 @@ void test_model_context_storage()
     }
 }
 
+bool check_model_iterator_output(model_iterator& iter, const std::vector<model_iterator::cell>& checks)
+{
+    for (const model_iterator::cell& c : checks)
+    {
+        if (!iter.has())
+            return false;
+
+        if (iter.get() != c)
+            return false;
+
+        iter.next();
+    }
+
+    return !iter.has();
+}
+
 void test_model_context_iterator_horizontal()
 {
     model_context cxt;
@@ -1050,15 +1066,7 @@ void test_model_context_iterator_horizontal()
 
     // Iterator and check the individual cell values.
     iter = cxt.get_model_iterator(1, rc_direction_t::horizontal, whole_range);
-
-    for (const model_iterator::cell& c : checks)
-    {
-        assert(iter.has());
-        assert(iter.get() == c);
-        iter.next();
-    }
-
-    assert(!iter.has());
+    assert(check_model_iterator_output(iter, checks));
 }
 
 void test_model_context_iterator_horizontal_range()
@@ -1070,13 +1078,13 @@ void test_model_context_iterator_horizontal_range()
         { "F1",  "F2",  "F3",  "F4",  "F5" },
         {  1.0,  true,  "s1", empty, empty },
         {  1.1, false, empty,  "s2", empty },
-        {  1.2, false, empty,  "s2", empty },
-        {  1.3,  true, empty,  "s2", empty },
-        {  1.4, false, empty,  "s2", empty },
-        {  1.5,  "NA", empty,  "s2", empty },
-        {  1.6,  99.9, empty,  "s2", empty },
-        {  1.7, 199.9, empty,  "s2", empty },
-        {  1.8, 299.9, empty,  "s2", "end" },
+        {  1.2, false, empty,  "s3", empty },
+        {  1.3,  true, empty,  "s4", empty },
+        {  1.4, false, empty,  "s5", empty },
+        {  1.5,  "NA", empty,  "s6", empty },
+        {  1.6,  99.9, empty,  "s7", empty },
+        {  1.7, 199.9, empty,  "s8", empty },
+        {  1.8, 299.9, empty,  "s9", "end" },
     });
 
     // Only iterate over the first two rows.
@@ -1102,14 +1110,34 @@ void test_model_context_iterator_horizontal_range()
         { 1, 4 },
     };
 
-    for (const model_iterator::cell& c : checks)
-    {
-        assert(iter.has());
-        assert(iter.get() == c);
-        iter.next();
-    }
+    assert(check_model_iterator_output(iter, checks));
 
-    assert(!iter.has());
+    // Only iterate over rows 2:4.
+    range.first.row = 2;
+    range.last.row = 4;
+    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, range);
+
+    checks =
+    {
+        // row, column, value
+        { 2, 0, 1.1 },
+        { 2, 1, false },
+        { 2, 2 },
+        { 2, 3, cxt.get_string_identifier(IXION_ASCII("s2")) },
+        { 2, 4 },
+        { 3, 0, 1.2 },
+        { 3, 1, false },
+        { 3, 2 },
+        { 3, 3, cxt.get_string_identifier(IXION_ASCII("s3")) },
+        { 3, 4 },
+        { 4, 0, 1.3 },
+        { 4, 1, true },
+        { 4, 2 },
+        { 4, 3, cxt.get_string_identifier(IXION_ASCII("s4")) },
+        { 4, 4 },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
 }
 
 void test_model_context_iterator_vertical()
@@ -1194,15 +1222,7 @@ void test_model_context_iterator_vertical()
     };
 
     iter = cxt.get_model_iterator(1, rc_direction_t::vertical, whole_range);
-
-    for (const model_iterator::cell& c : checks)
-    {
-        assert(iter.has());
-        assert(iter.get() == c);
-        iter.next();
-    }
-
-    assert(!iter.has());
+    assert(check_model_iterator_output(iter, checks));
 }
 
 void test_volatile_function()
