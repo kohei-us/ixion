@@ -141,9 +141,36 @@ public:
         m_update_current_cell(true)
     {
         const column_stores_t* cols = cxt.get_columns(sheet);
-        if (cols)
+        if (cols && !cols->empty())
         {
             collection_type c = mdds::mtv::collection<column_store_t>(cols->begin(), cols->end());
+
+            if (range.valid())
+            {
+                if (!range.all_columns())
+                {
+                    col_t c1 = range.first.column == column_unset ? 0 : range.first.column;
+                    col_t c2 = range.last.column == column_unset ? (cols->size() - 1) : range.last.column;
+                    assert(c1 >= 0);
+                    assert(c1 <= c2);
+                    size_t start = c1;
+                    size_t size = c2 - c1 + 1;
+                    c.set_collection_range(start, size);
+                }
+
+                if (!range.all_rows())
+                {
+                    const column_store_t& col = *(*cols)[0];
+                    row_t r1 = range.first.row == row_unset ? 0 : range.first.row;
+                    row_t r2 = range.last.row == row_unset ? (col.size() - 1) : range.last.row;
+                    assert(r1 >= 0);
+                    assert(r1 <= r2);
+                    size_t start = r1;
+                    size_t size = r2 - r1 + 1;
+                    c.set_element_range(start, size);
+                }
+            }
+
             m_collection.swap(c);
         }
 

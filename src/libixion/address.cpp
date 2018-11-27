@@ -367,7 +367,22 @@ size_t abs_rc_range_t::hash::operator() (const abs_rc_range_t& range) const
 
 bool abs_rc_range_t::valid() const
 {
-    return first.valid() && last.valid();
+    if (!first.valid() || !last.valid())
+        return false;
+
+    if (first.row != row_unset && last.row != row_unset)
+    {
+        if (first.row > last.row)
+            return false;
+    }
+
+    if (first.column != column_unset && last.column != column_unset)
+    {
+        if (first.column > last.column)
+            return false;
+    }
+
+    return true;
 }
 
 void abs_rc_range_t::set_all_columns()
