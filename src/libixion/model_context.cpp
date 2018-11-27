@@ -26,6 +26,7 @@
 #include <vector>
 #include <deque>
 #include <iostream>
+#include <cstring>
 
 #define DEBUG_MODEL_CONTEXT 0
 
@@ -139,6 +140,8 @@ public:
     size_t get_sheet_count() const;
     sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
     sheet_t append_sheet(std::string&& name, row_t row_size, col_t col_size);
+
+    void set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows);
 
     string_id_t append_string(const char* p, size_t n);
     string_id_t add_string(const char* p, size_t n);
@@ -290,6 +293,44 @@ sheet_t model_context_impl::append_sheet(
     m_sheet_names.push_back(std::move(name));
     m_sheets.push_back(row_size, col_size);
     return sheet_index;
+}
+
+void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows)
+{
+    abs_address_t pos;
+    pos.sheet = sheet;
+    pos.row = 0;
+    pos.column = 0;
+
+    // TODO : This function is not optimized for speed as it is mainly for
+    // convenience.  Decide if we need to optimize this later.
+
+    for (const model_context::input_row& row : rows)
+    {
+        pos.column = 0;
+
+        for (const model_context::input_cell& c : row.cells())
+        {
+            switch (c.type)
+            {
+                case celltype_t::numeric:
+                    set_numeric_cell(pos, c.value.numeric);
+                    break;
+                case celltype_t::string:
+                    set_string_cell(pos, c.value.string, std::strlen(c.value.string));
+                    break;
+                case celltype_t::boolean:
+                    set_boolean_cell(pos, c.value.boolean);
+                    break;
+                default:
+                    ;
+            }
+
+            ++pos.column;
+        }
+
+        ++pos.row;
+    }
 }
 
 string_id_t model_context_impl::append_string(const char* p, size_t n)
@@ -890,6 +931,49 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
     return col_store.get<formula_cell*>(addr.row);
 }
 
+model_context::input_cell::input_cell(nullptr_t) : type(celltype_t::empty) {}
+model_context::input_cell::input_cell(bool b) : type(celltype_t::boolean)
+{
+    value.boolean = b;
+}
+
+model_context::input_cell::input_cell(const char* s) : type(celltype_t::string)
+{
+    value.string = s;
+}
+
+model_context::input_cell::input_cell(double v) : type(celltype_t::numeric)
+{
+    value.numeric = v;
+}
+
+model_context::input_cell::input_cell(const input_cell& other) :
+    type(other.type)
+{
+    switch (type)
+    {
+        case celltype_t::numeric:
+            value.numeric = other.value.numeric;
+            break;
+        case celltype_t::string:
+            value.string = other.value.string;
+            break;
+        case celltype_t::boolean:
+            value.boolean = other.value.boolean;
+            break;
+        default:
+            ;
+    }
+}
+
+model_context::input_row::input_row(std::initializer_list<input_cell> cells) :
+    m_cells(std::move(cells)) { }
+
+const std::initializer_list<model_context::input_cell>& model_context::input_row::cells() const
+{
+    return m_cells;
+}
+
 std::unique_ptr<iface::session_handler> model_context::session_handler_factory::create()
 {
     return std::unique_ptr<iface::session_handler>();
@@ -1122,6 +1206,11 @@ sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col
 sheet_t model_context::append_sheet(std::string name, row_t row_size, col_t col_size)
 {
     return mp_impl->append_sheet(std::move(name), row_size, col_size);
+}
+
+void model_context::set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows)
+{
+    mp_impl->set_cell_values(sheet, std::move(rows));
 }
 
 void model_context::set_session_handler_factory(session_handler_factory* factory)

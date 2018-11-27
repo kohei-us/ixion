@@ -43,6 +43,43 @@ public:
         virtual std::unique_ptr<iface::session_handler> create();
     };
 
+    /**
+     * Cell value only to be used to input a collection of cells to sheet.
+     * Formula cells are not supported.
+     */
+    struct IXION_DLLPUBLIC input_cell
+    {
+        celltype_t type;
+
+        union
+        {
+            bool boolean;
+            double numeric;
+            const char* string;
+
+        } value;
+
+        /** Initializes the cell to be empty. */
+        input_cell(nullptr_t);
+        /** Boolean cell value. */
+        input_cell(bool b);
+        /** The char array must be null-terminated. */
+        input_cell(const char* s);
+        /** Numeric cell value. */
+        input_cell(double v);
+
+        input_cell(const input_cell& other);
+    };
+
+    class IXION_DLLPUBLIC input_row
+    {
+        std::initializer_list<input_cell> m_cells;
+    public:
+        input_row(std::initializer_list<input_cell> cells);
+
+        const std::initializer_list<input_cell>& cells() const;
+    };
+
     model_context();
     virtual ~model_context() override;
 
@@ -141,6 +178,17 @@ public:
      * @return sheet index of the inserted sheet.
      */
     sheet_t append_sheet(std::string name, row_t row_size, col_t col_size);
+
+    /**
+     * A convenient way to mass-insert a range of cell values.  You can
+     * use a nested initializet list representing a range of cell values.  The
+     * outer list represents rows.
+     *
+     * @param sheet sheet index.
+     * @param rows nested list of cell values.  The outer list represents
+     *             rows.
+     */
+    void set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows);
 
     void set_session_handler_factory(session_handler_factory* factory);
 

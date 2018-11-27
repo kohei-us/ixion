@@ -1061,6 +1061,27 @@ void test_model_context_iterator_horizontal()
     assert(!iter.has());
 }
 
+void test_model_context_iterator_horizontal_range()
+{
+    nullptr_t empty = nullptr;
+    model_context cxt;
+    cxt.append_sheet("Values", 10, 5);
+    cxt.set_cell_values(0, {
+        { "F1",  "F2",  "F3",  "F4",  "F5" },
+        {  1.0,  true,  "s1", empty, empty },
+        {  1.1, false, empty,  "s2", empty },
+        {  1.2, false, empty,  "s2", empty },
+        {  1.3,  true, empty,  "s2", empty },
+        {  1.4, false, empty,  "s2", empty },
+        {  1.5,  "NA", empty,  "s2", empty },
+        {  1.6,  99.9, empty,  "s2", empty },
+        {  1.7, 199.9, empty,  "s2", empty },
+        {  1.8, 299.9, empty,  "s2", "end" },
+    });
+
+    // TODO : Add test for this.
+}
+
 void test_model_context_iterator_vertical()
 {
     model_context cxt;
@@ -1254,6 +1275,7 @@ int main()
     test_function_name_resolution();
     test_model_context_storage();
     test_model_context_iterator_horizontal();
+    test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();
     test_volatile_function();
 
