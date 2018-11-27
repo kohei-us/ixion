@@ -1138,6 +1138,35 @@ void test_model_context_iterator_horizontal_range()
     };
 
     assert(check_model_iterator_output(iter, checks));
+
+    // Only iterate over columns 1:3 and only down to row 4.
+    range.set_all_rows();
+    range.first.column = 1;
+    range.last.column = 3;
+    range.last.row = 4;
+    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, range);
+
+    checks =
+    {
+        // row, column, value
+        { 0, 1, cxt.get_string_identifier(IXION_ASCII("F2")) },
+        { 0, 2, cxt.get_string_identifier(IXION_ASCII("F3")) },
+        { 0, 3, cxt.get_string_identifier(IXION_ASCII("F4")) },
+        { 1, 1, true },
+        { 1, 2, cxt.get_string_identifier(IXION_ASCII("s1")) },
+        { 1, 3 },
+        { 2, 1, false },
+        { 2, 2 },
+        { 2, 3, cxt.get_string_identifier(IXION_ASCII("s2")) },
+        { 3, 1, false },
+        { 3, 2 },
+        { 3, 3, cxt.get_string_identifier(IXION_ASCII("s3")) },
+        { 4, 1, true },
+        { 4, 2 },
+        { 4, 3, cxt.get_string_identifier(IXION_ASCII("s4")) },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
 }
 
 void test_model_context_iterator_vertical()
