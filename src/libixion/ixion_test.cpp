@@ -1079,7 +1079,37 @@ void test_model_context_iterator_horizontal_range()
         {  1.8, 299.9, empty,  "s2", "end" },
     });
 
-    // TODO : Add test for this.
+    // Only iterate over the first two rows.
+    abs_rc_range_t range;
+    range.set_all_columns();
+    range.first.row = 0;
+    range.last.row = 1;
+
+    model_iterator iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, range);
+
+    std::vector<model_iterator::cell> checks =
+    {
+        // row, column, value
+        { 0, 0, cxt.get_string_identifier(IXION_ASCII("F1")) },
+        { 0, 1, cxt.get_string_identifier(IXION_ASCII("F2")) },
+        { 0, 2, cxt.get_string_identifier(IXION_ASCII("F3")) },
+        { 0, 3, cxt.get_string_identifier(IXION_ASCII("F4")) },
+        { 0, 4, cxt.get_string_identifier(IXION_ASCII("F5")) },
+        { 1, 0, 1.0 },
+        { 1, 1, true },
+        { 1, 2, cxt.get_string_identifier(IXION_ASCII("s1")) },
+        { 1, 3 },
+        { 1, 4 },
+    };
+
+    for (const model_iterator::cell& c : checks)
+    {
+        assert(iter.has());
+        assert(iter.get() == c);
+        iter.next();
+    }
+
+    assert(!iter.has());
 }
 
 void test_model_context_iterator_vertical()
