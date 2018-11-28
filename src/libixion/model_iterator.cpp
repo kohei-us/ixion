@@ -215,6 +215,9 @@ class iterator_core_vertical : public model_iterator::impl
     column_store_t::const_position_type m_current_pos;
     column_store_t::const_position_type m_end_pos;
 
+    row_t m_row_first;
+    row_t m_row_last;
+
     void update_current() const
     {
         column_store_t::const_iterator blk_pos = m_current_pos.first;
@@ -251,7 +254,9 @@ class iterator_core_vertical : public model_iterator::impl
 
 public:
     iterator_core_vertical(const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range) :
-        m_update_current_cell(true)
+        m_update_current_cell(true),
+        m_row_first(0),
+        m_row_last(row_unset)
     {
         m_cols = cxt.get_columns(sheet);
         if (!m_cols)
@@ -262,6 +267,8 @@ public:
         m_it_cols_end = m_cols->end();
         if (m_it_cols_begin == m_it_cols_end)
             return;
+
+        m_row_last = (*m_cols)[0]->size() - 1;
 
         if (range.valid())
         {
@@ -284,6 +291,25 @@ public:
                 else
                 {
                     // First column is past the last column.  Nothing to parse.
+                    m_it_cols_begin = m_it_cols_end;
+                    return;
+                }
+            }
+
+            if (range.last.row != row_unset && range.last.row < m_row_last)
+            {
+                // Shrink the tail end.
+                m_row_last = range.last.row;
+            }
+
+            if (range.first.row != row_unset)
+            {
+                if (range.first.row <= m_row_last)
+                    m_row_first = range.first.row;
+                else
+                {
+                    // First row is past the last row.  Set it to an empty
+                    // range and bail out.
                     m_it_cols_begin = m_it_cols_end;
                     return;
                 }
