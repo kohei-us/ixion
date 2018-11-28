@@ -1365,6 +1365,20 @@ void test_model_context_iterator_vertical_range()
     };
 
     assert(check_model_iterator_output(iter, checks));
+
+    // Iterate over only one cell in the middle.
+    range.first.row = 5;
+    range.last.row = 5;
+    range.first.column = 3;
+    range.last.column = 3;
+
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+    checks =
+    {
+        { 5, 3, cxt.get_string_identifier(IXION_ASCII("s5")) },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
 }
 
 void test_volatile_function()
