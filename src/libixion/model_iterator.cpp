@@ -287,7 +287,7 @@ public:
             if (range.first.column != column_unset)
             {
                 if (range.first.column <= last_col)
-                    std::advance(m_it_cols_begin, range.first.column);
+                    std::advance(m_it_cols, range.first.column);
                 else
                 {
                     // First column is past the last column.  Nothing to parse.

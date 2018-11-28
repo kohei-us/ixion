@@ -974,15 +974,27 @@ bool check_model_iterator_output(model_iterator& iter, const std::vector<model_i
     for (const model_iterator::cell& c : checks)
     {
         if (!iter.has())
+        {
+            cerr << "a cell value was expected, but none found." << endl;
             return false;
+        }
 
         if (iter.get() != c)
+        {
+            cerr << "unexpected cell value: expected=" << c << "; observed=" << iter.get() << endl;
             return false;
+        }
 
         iter.next();
     }
 
-    return !iter.has();
+    if (iter.has())
+    {
+        cerr << "an additional cell value was found, but none was expected." << endl;
+        return false;
+    }
+
+    return true;
 }
 
 void test_model_context_iterator_horizontal()
@@ -1254,6 +1266,107 @@ void test_model_context_iterator_vertical()
     assert(check_model_iterator_output(iter, checks));
 }
 
+void test_model_context_iterator_vertical_range()
+{
+    nullptr_t empty = nullptr;
+    model_context cxt;
+    cxt.append_sheet("Values", 10, 5);
+    cxt.set_cell_values(0, {
+        { "F1",  "F2",  "F3",  "F4",  "F5" },
+        {  1.0,  true,  "s1", empty, empty },
+        {  1.1, false, empty,  "s2", empty },
+        {  1.2, false, empty,  "s3", empty },
+        {  1.3,  true, empty,  "s4", empty },
+        {  1.4, false, empty,  "s5", empty },
+        {  1.5,  "NA", empty,  "s6", empty },
+        {  1.6,  99.9, empty,  "s7", empty },
+        {  1.7, 199.9, empty,  "s8", empty },
+        {  1.8, 299.9, empty,  "s9", "end" },
+    });
+
+    // Iterate over the top 2 rows.
+    abs_rc_range_t range;
+    range.set_all_columns();
+    range.set_all_rows();
+    range.last.row = 1;
+
+    model_iterator iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+
+    std::vector<model_iterator::cell> checks =
+    {
+        // row, column, value
+        { 0, 0, cxt.get_string_identifier(IXION_ASCII("F1")) },
+        { 1, 0, 1.0 },
+        { 0, 1, cxt.get_string_identifier(IXION_ASCII("F2")) },
+        { 1, 1, true },
+        { 0, 2, cxt.get_string_identifier(IXION_ASCII("F3")) },
+        { 1, 2, cxt.get_string_identifier(IXION_ASCII("s1")) },
+        { 0, 3, cxt.get_string_identifier(IXION_ASCII("F4")) },
+        { 1, 3 },
+        { 0, 4, cxt.get_string_identifier(IXION_ASCII("F5")) },
+        { 1, 4 },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
+
+    // Iterate over the bottom 2 rows.
+
+    range.set_all_rows();
+    range.first.row = 8;
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+
+    checks =
+    {
+        // row, column, value
+        { 8, 0, 1.7 },
+        { 9, 0, 1.8 },
+        { 8, 1, 199.9 },
+        { 9, 1, 299.9 },
+        { 8, 2 },
+        { 9, 2 },
+        { 8, 3, cxt.get_string_identifier(IXION_ASCII("s8")) },
+        { 9, 3, cxt.get_string_identifier(IXION_ASCII("s9")) },
+        { 8, 4 },
+        { 9, 4, cxt.get_string_identifier(IXION_ASCII("end")) },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
+
+    // Iterate over the bottom-left corners.
+    range.last.column = 2;
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+
+    checks =
+    {
+        // row, column, value
+        { 8, 0, 1.7 },
+        { 9, 0, 1.8 },
+        { 8, 1, 199.9 },
+        { 9, 1, 299.9 },
+        { 8, 2 },
+        { 9, 2 },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
+
+    // Iterate over the top-right corners.
+    range.first.column = 3;
+    range.last.column = column_unset;
+    range.first.row = row_unset;
+    range.last.row = 1;
+    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+
+    checks =
+    {
+        { 0, 3, cxt.get_string_identifier(IXION_ASCII("F4")) },
+        { 1, 3 },
+        { 0, 4, cxt.get_string_identifier(IXION_ASCII("F5")) },
+        { 1, 4 },
+    };
+
+    assert(check_model_iterator_output(iter, checks));
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -1356,6 +1469,7 @@ int main()
     test_model_context_iterator_horizontal();
     test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();
+    test_model_context_iterator_vertical_range();
     test_volatile_function();
 
     return EXIT_SUCCESS;
