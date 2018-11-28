@@ -263,6 +263,33 @@ public:
         if (m_it_cols_begin == m_it_cols_end)
             return;
 
+        if (range.valid())
+        {
+            col_t last_col = m_cols->size() - 1;
+
+            if (range.last.column != column_unset && range.last.column < last_col)
+            {
+                // Shrink the tail end.
+                col_t diff = range.last.column - last_col;
+                assert(diff < 0);
+                std::advance(m_it_cols_end, diff);
+
+                last_col += diff;
+            }
+
+            if (range.first.column != column_unset)
+            {
+                if (range.first.column <= last_col)
+                    std::advance(m_it_cols_begin, range.first.column);
+                else
+                {
+                    // First column is past the last column.  Nothing to parse.
+                    m_it_cols_begin = m_it_cols_end;
+                    return;
+                }
+            }
+        }
+
         const column_store_t& col = **m_it_cols;
         m_current_pos = col.position(0);
     }
