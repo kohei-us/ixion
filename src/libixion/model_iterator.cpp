@@ -317,7 +317,8 @@ public:
         }
 
         const column_store_t& col = **m_it_cols;
-        m_current_pos = col.position(0);
+        m_current_pos = col.position(m_row_first);
+        m_end_pos = col.position(m_row_last+1);
     }
 
     bool has() const override
@@ -331,10 +332,10 @@ public:
     void next() override
     {
         m_update_current_cell = true;
-        m_current_pos = column_store_t::advance_position(m_current_pos, 1);
+        m_current_pos = column_store_t::next_position(m_current_pos);
 
         const column_store_t* col = *m_it_cols;
-        if (m_current_pos.first != col->cend())
+        if (m_current_pos != m_end_pos)
             // It hasn't reached the end of the current column yet.
             return;
 
@@ -344,7 +345,8 @@ public:
 
         // Reset the position to the first cell in the new column.
         col = *m_it_cols;
-        m_current_pos = col->position(0);
+        m_current_pos = col->position(m_row_first);
+        m_end_pos = col->position(m_row_last+1);
     }
 
     const model_iterator::cell& get() const override
