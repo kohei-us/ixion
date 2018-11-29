@@ -694,6 +694,25 @@ void test_address()
     // These are invalid addresses.
     assert(!abs_address_t(abs_address_t::invalid).valid());
     assert(!abs_range_t(abs_range_t::invalid).valid());
+
+    {
+        abs_range_t range(1, 1, 2, 3, 3);
+        assert(range.first.sheet == 1);
+        assert(range.first.row == 1);
+        assert(range.first.column == 2);
+        assert(range.last.sheet == 1);
+        assert(range.last.row == 3);
+        assert(range.last.column == 4);
+
+        abs_range_t range2(range);
+        assert(range2 == range);
+
+        abs_rc_range_t rc_range(range);
+        assert(rc_range.first.row == 1);
+        assert(rc_range.first.column == 2);
+        assert(rc_range.last.row == 3);
+        assert(rc_range.last.column == 4);
+    }
 }
 
 bool check_formula_expression(

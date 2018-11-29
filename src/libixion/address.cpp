@@ -226,6 +226,9 @@ abs_rc_address_t::abs_rc_address_t(row_t _row, col_t _column) :
 abs_rc_address_t::abs_rc_address_t(const abs_rc_address_t& r) :
     row(r.row), column(r.column) {}
 
+abs_rc_address_t::abs_rc_address_t(const abs_address_t& r) :
+    row(r.row), column(r.column) {}
+
 bool abs_rc_address_t::valid() const
 {
     return row >= 0 && column >= 0 && row <= row_unset && column <= column_unset;
@@ -358,6 +361,12 @@ bool operator<(const abs_range_t& left, const abs_range_t& right)
 abs_rc_range_t::abs_rc_range_t() {}
 abs_rc_range_t::abs_rc_range_t(init_invalid) :
     first(abs_rc_address_t::invalid), last(abs_rc_address_t::invalid) {}
+
+abs_rc_range_t::abs_rc_range_t(const abs_rc_range_t& other) :
+    first(other.first), last(other.last) {}
+
+abs_rc_range_t::abs_rc_range_t(const abs_range_t& other) :
+    first(other.first), last(other.last) {}
 
 size_t abs_rc_range_t::hash::operator() (const abs_rc_range_t& range) const
 {
