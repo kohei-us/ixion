@@ -287,7 +287,7 @@ abs_range_t::abs_range_t(sheet_t _sheet, row_t _row, col_t _col, row_t _row_span
     if (_row_span < 1 || _col_span < 1)
     {
         std::ostringstream os;
-        os << "abs_range_t: invalid span (row=" << _row_span << ", col=" << _col_span << ")";
+        os << "abs_range_t: invalid span (row=" << _row_span << "; col=" << _col_span << ")";
         throw std::range_error(os.str());
     }
 }
@@ -496,15 +496,15 @@ bool operator!=(const range_t& left, const range_t& right)
 
 std::ostream& operator<<(std::ostream& os, const abs_address_t& addr)
 {
-    os << "(sheet:" << addr.sheet << ",row:" << addr.row << ",column:" << addr.column << ")";
+    os << "(sheet:" << addr.sheet << "; row:" << addr.row << "; column:" << addr.column << ")";
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const address_t& addr)
 {
     os << "(sheet:" << addr.sheet << " " << (addr.abs_sheet?"abs":"rel")
-        << ",row:" << addr.row << " " << (addr.abs_row?"abs":"rel")
-        <<",column:" << addr.column << " " << (addr.abs_column?"abs":"rel") << ")";
+        << "; row:" << addr.row << " " << (addr.abs_row?"abs":"rel")
+        <<"; column:" << addr.column << " " << (addr.abs_column?"abs":"rel") << ")";
     return os;
 }
 
