@@ -38,6 +38,7 @@ Run the following series of commands to configure your build.
 mkdir build
 cd build
 cmake .. -G "Visual Studio 15 Win64" \
+    -DCMAKE_INSTALL_PREFIX="/path/to/install" \
     -DBOOST_INCLUDEDIR="/path/to/boost" \
     -DBOOST_LIBRARYDIR="/path/to/boost/stage/x64/lib" \
     -DMDDS_INCLUDEDIR="/path/to/mdds/include" \
@@ -57,6 +58,11 @@ The ixion build process also requires Python 3 interpreter.  In case you have
 trouble getting python3 detected, try specifying the path to your Python 3
 installation via `Python3_ROOT_DIR` option.
 
+To install ixion to the location specified via `CMAKE_INSTALL_PREFIX`, simply run:
+
+```bash
+cmake --build . --config Release --target install
+```
 
 # Linux
 
