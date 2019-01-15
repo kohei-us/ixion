@@ -7,6 +7,7 @@ set(IXION_MICRO_VERSION 99)
 set(IXION_MAJOR_API_VERSION 0)
 set(IXION_MINOR_API_VERSION 15)
 set(IXION_VERSION ${IXION_MAJOR_VERSION}.${IXION_MINOR_VERSION}.${IXION_MICRO_VERSION})
+set(IXION_API_VERSION ${IXION_MAJOR_API_VERSION}.${IXION_MINOR_API_VERSION})
 
 project(ixion VERSION ${IXION_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
@@ -115,3 +116,15 @@ target_compile_definitions(libixion PRIVATE IXION_BUILD DLL_EXPORT)
 target_link_libraries(ixion-parser libixion)
 target_link_libraries(ixion-sorter libixion)
 target_link_libraries(ixion-formula-tokenizer libixion)
+
+install(DIRECTORY
+    ${PROJECT_SOURCE_DIR}/include/ixion
+    DESTINATION include/ixion-${IXION_API_VERSION}
+    FILES_MATCHING PATTERN "*.hpp"
+)
+
+install(TARGETS libixion ixion-parser ixion-sorter ixion-formula-tokenizer
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
