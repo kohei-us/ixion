@@ -31,7 +31,7 @@ private:
     model_iterator(const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir);
 public:
 
-    struct cell
+    struct IXION_DLLPUBLIC cell
     {
         row_t row;
         col_t col;

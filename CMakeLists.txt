@@ -17,6 +17,9 @@ find_package(Boost COMPONENTS program_options filesystem)
 find_package(Threads)
 find_package(Python3)
 
+enable_testing()
+set(CMAKE_CTEST_COMMAND ctest -V)
+
 if(MSVC)
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /MP")
 endif(MSVC)
@@ -128,3 +131,17 @@ install(TARGETS libixion ixion-parser ixion-sorter ixion-formula-tokenizer
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
+
+# test programs
+
+add_executable(ixion-test EXCLUDE_FROM_ALL
+    ${LIBIXION_SRC_DIR}/ixion_test.cpp
+)
+target_link_libraries(ixion-test libixion)
+
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+add_dependencies(check
+    ixion-test
+)
+
+add_test(ixion-test ixion-test)
