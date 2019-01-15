@@ -81,6 +81,7 @@ public:
     virtual bool has() const = 0;
     virtual void next() = 0;
     virtual const model_iterator::cell& get() const = 0;
+    virtual ~impl() {}
 };
 
 namespace {
