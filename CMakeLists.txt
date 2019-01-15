@@ -137,11 +137,17 @@ install(TARGETS libixion ixion-parser ixion-sorter ixion-formula-tokenizer
 add_executable(ixion-test EXCLUDE_FROM_ALL
     ${LIBIXION_SRC_DIR}/ixion_test.cpp
 )
+add_executable(ixion-test-track-deps EXCLUDE_FROM_ALL
+    ${LIBIXION_SRC_DIR}/ixion_test_track_deps.cpp
+)
 target_link_libraries(ixion-test libixion)
+target_link_libraries(ixion-test-track-deps libixion)
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
 add_dependencies(check
     ixion-test
+    ixion-test-track-deps
 )
 
 add_test(ixion-test ixion-test)
+add_test(ixion-test-track-deps ixion-test-track-deps)
