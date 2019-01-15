@@ -5,35 +5,58 @@
 
 First, open your MINGW64 shell.  You can simply use the MINGW64 shell that
 comes shipped with the Windows version of Git.  Once you are in it, change
-directory to the root of the boost library directory, and run the following
+directory to the root of the Boost library directory, and run the following
 command:
 
 ```bash
 ./bootstrap.bat
-mkdir -p stage/x64
-./b2 --stagedir=./stage/x64 address-model=64 --build-type=complete -j 8
+./b2 --stagedir=./stage/x64 address-model=64 link=static --build-type=complete -j 8
 ```
 
-where you may change the part `-j 8` which controls how many concurrent
-processes to use for the build.
+in order to build Boost as static libraries.  You may want to change the part
+`-j 8` which controls the number of concurrent processes to use for your build.
+Note that **you must build Boost as static libraries** in order to build Ixion
+on Windows.
+
+
+## Clone spdlog and mdds
+
+As ixion uses [spdlog](https://github.com/gabime/spdlog) as its logging facility,
+you need to clone its repository before building ixion.
+
+Likewise, you also need to clone [mdds](https://gitlab.com/mdds/mdds).  As both
+mdds and spdlog are header-only libraries, you don't need to go through any
+build process for these libraries.  Just make note of their respective header
+directory locations.
+
 
 ## Using CMake to build ixion
 
-While at the root of the source directory, run the following commands:
+Run the following series of commands to configure your build.
 
 ```bash
-cmake -G "Visual Studio 15 2017 Win64" -H. -Bbuild \
-    -DBOOST_INCLUDE_DIR="/path/to/boost" \
-    -DBOOST_LIB_DIR="/path/to/boost/lib" \
-    -DMDDS_INCLUDE_DIR="/path/to/mdds/include"
-cmake --build build
+mkdir build
+cd build
+cmake .. -G "Visual Studio 15 Win64" \
+    -DBOOST_INCLUDEDIR="/path/to/boost" \
+    -DBOOST_LIBRARYDIR="/path/to/boost/stage/x64/lib" \
+    -DMDDS_INCLUDEDIR="/path/to/mdds/include" \
+    -DSPDLOG_INCLUDEDIR="/path/to/spdlog/include"
 ```
 
-This will create a `build` directory along with a whole bunch of build-related
-files.  The final executables are found in `build/Debug`.
+Once the configuration is finished, start the build by running:
+
+```bash
+cmake --build . --config Release
+```
 
 You may choose a different generator name than what is shown in the above
-example.
+example to suit your need.
+
+The ixion build process also requires Python 3 interpreter.  In case you have
+trouble getting python3 detected, try specifying the path to your Python 3
+installation via `Python3_ROOT_DIR` option.
+
 
 # Linux
 
