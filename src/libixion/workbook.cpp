@@ -38,17 +38,14 @@ workbook::workbook() {}
 workbook::workbook(size_t sheet_size, size_t row_size, size_t col_size)
 {
     for (size_t i = 0; i < sheet_size; ++i)
-        m_sheets.push_back(new worksheet(row_size, col_size));
+        m_sheets.emplace_back(row_size, col_size);
 }
 
-workbook::~workbook()
-{
-    std::for_each(m_sheets.begin(), m_sheets.end(), default_deleter<worksheet>());
-}
+workbook::~workbook() {}
 
 void workbook::push_back(size_t row_size, size_t col_size)
 {
-    m_sheets.push_back(new worksheet(row_size, col_size));
+    m_sheets.emplace_back(row_size, col_size);
 }
 
 size_t workbook::size() const
@@ -62,4 +59,5 @@ bool workbook::empty() const
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

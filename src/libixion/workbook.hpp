@@ -59,11 +59,11 @@ public:
     workbook(size_t sheet_size, size_t row_size, size_t col_size);
     ~workbook();
 
-    worksheet& operator[](size_t n) { return *m_sheets[n]; }
-    const worksheet& operator[](size_t n) const { return *m_sheets[n]; }
+    worksheet& operator[](size_t n) { return m_sheets[n]; }
+    const worksheet& operator[](size_t n) const { return m_sheets[n]; }
 
-    worksheet& at(size_t n) { return *m_sheets.at(n); }
-    const worksheet& at(size_t n) const { return *m_sheets.at(n); }
+    worksheet& at(size_t n) { return m_sheets.at(n); }
+    const worksheet& at(size_t n) const { return m_sheets.at(n); }
 
     void push_back(size_t row_size, size_t col_size);
 
@@ -71,7 +71,7 @@ public:
     bool empty() const;
 
 private:
-    std::vector<worksheet*> m_sheets;
+    std::deque<worksheet> m_sheets;
 };
 
 }
