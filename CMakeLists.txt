@@ -137,17 +137,33 @@ install(TARGETS libixion ixion-parser ixion-sorter ixion-formula-tokenizer
 add_executable(ixion-test EXCLUDE_FROM_ALL
     ${LIBIXION_SRC_DIR}/ixion_test.cpp
 )
+
 add_executable(ixion-test-track-deps EXCLUDE_FROM_ALL
     ${LIBIXION_SRC_DIR}/ixion_test_track_deps.cpp
 )
+
+add_executable(dirty-cell-tracker-test EXCLUDE_FROM_ALL
+    ${LIBIXION_SRC_DIR}/dirty_cell_tracker_test.cpp
+)
+
+add_executable(compute-engine-test EXCLUDE_FROM_ALL
+    ${LIBIXION_SRC_DIR}/compute_engine_test.cpp
+)
+
 target_link_libraries(ixion-test libixion)
 target_link_libraries(ixion-test-track-deps libixion)
+target_link_libraries(dirty-cell-tracker-test libixion)
+target_link_libraries(compute-engine-test libixion)
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
 add_dependencies(check
     ixion-test
     ixion-test-track-deps
+    dirty-cell-tracker-test
+    compute-engine-test
 )
 
 add_test(ixion-test ixion-test)
 add_test(ixion-test-track-deps ixion-test-track-deps)
+add_test(dirty-cell-tracker-test dirty-cell-tracker-test)
+add_test(compute-engine-test compute-engine-test)
