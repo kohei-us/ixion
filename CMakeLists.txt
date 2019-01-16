@@ -150,6 +150,19 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
     ${LIBIXION_SRC_DIR}/compute_engine_test.cpp
 )
 
+file(GLOB PARSER_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.txt)
+
+add_custom_target(parser-test-t0 COMMAND ixion-parser -t 0 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t1 COMMAND ixion-parser -t 1 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t2 COMMAND ixion-parser -t 2 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t3 COMMAND ixion-parser -t 3 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t4 COMMAND ixion-parser -t 4 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t5 COMMAND ixion-parser -t 5 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t6 COMMAND ixion-parser -t 6 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t7 COMMAND ixion-parser -t 7 ${PARSER_TEST_FILES})
+add_custom_target(parser-test-t8 COMMAND ixion-parser -t 8 ${PARSER_TEST_FILES})
+
+
 target_link_libraries(ixion-test libixion)
 target_link_libraries(ixion-test-track-deps libixion)
 target_link_libraries(dirty-cell-tracker-test libixion)
@@ -161,6 +174,15 @@ add_dependencies(check
     ixion-test-track-deps
     dirty-cell-tracker-test
     compute-engine-test
+    parser-test-t0
+    parser-test-t1
+    parser-test-t2
+    parser-test-t3
+    parser-test-t4
+    parser-test-t5
+    parser-test-t6
+    parser-test-t7
+    parser-test-t8
 )
 
 add_test(ixion-test ixion-test)
