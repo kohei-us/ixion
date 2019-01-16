@@ -15,26 +15,22 @@ worksheet::worksheet() {}
 
 worksheet::worksheet(size_t row_size, size_t col_size)
 {
-    m_columns.reserve(col_size);
     m_pos_hints.reserve(col_size);
     for (size_t i = 0; i < col_size; ++i)
     {
-        m_columns.push_back(new column_store_t(row_size));
-        m_pos_hints.push_back(m_columns.back()->begin());
+        m_columns.emplace_back(row_size);
+        m_pos_hints.push_back(m_columns.back().begin());
     }
 }
 
-worksheet::~worksheet()
-{
-    std::for_each(m_columns.begin(), m_columns.end(), default_deleter<column_store_t>());
-}
+worksheet::~worksheet() {}
 
 rc_size_t worksheet::get_sheet_size() const
 {
     if (m_columns.empty())
         return rc_size_t(0, 0);
 
-    return rc_size_t(m_columns[0]->size(), m_columns.size());
+    return rc_size_t(m_columns[0].size(), m_columns.size());
 }
 
 workbook::workbook() {}

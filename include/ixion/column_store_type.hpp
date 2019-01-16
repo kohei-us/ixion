@@ -18,6 +18,8 @@
 #include <mdds/multi_type_vector_custom_func1.hpp>
 #include <mdds/multi_type_matrix.hpp>
 
+#include <deque>
+
 namespace ixion {
 
 // Element types
@@ -45,7 +47,7 @@ using ixion_element_block_func = mdds::mtv::custom_block_func1<formula_element_b
 using column_store_t = mdds::multi_type_vector<ixion_element_block_func>;
 
 /** Type that represents a collection of columns. */
-using column_stores_t = std::vector<column_store_t*>;
+using column_stores_t = std::deque<column_store_t>;
 
 /**
  * The integer element blocks are used to store string ID's.  The actual

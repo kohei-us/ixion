@@ -166,7 +166,7 @@ public:
 
                 if (!range.all_rows())
                 {
-                    const column_store_t& col = *(*cols)[0];
+                    const column_store_t& col = (*cols)[0];
                     row_t r1 = range.first.row == row_unset ? 0 : range.first.row;
                     row_t r2 = range.last.row == row_unset ? (col.size() - 1) : range.last.row;
                     assert(r1 >= 0);
@@ -269,7 +269,7 @@ public:
         if (m_it_cols_begin == m_it_cols_end)
             return;
 
-        m_row_last = (*m_cols)[0]->size() - 1;
+        m_row_last = (*m_cols)[0].size() - 1;
 
         if (range.valid())
         {
@@ -317,7 +317,7 @@ public:
             }
         }
 
-        const column_store_t& col = **m_it_cols;
+        const column_store_t& col = *m_it_cols;
         m_current_pos = col.position(m_row_first);
         m_end_pos = col.position(m_row_last+1);
     }
@@ -335,7 +335,7 @@ public:
         m_update_current_cell = true;
         m_current_pos = column_store_t::next_position(m_current_pos);
 
-        const column_store_t* col = *m_it_cols;
+        const column_store_t* col = &*m_it_cols;
         if (m_current_pos != m_end_pos)
             // It hasn't reached the end of the current column yet.
             return;
@@ -345,7 +345,7 @@ public:
             return;
 
         // Reset the position to the first cell in the new column.
-        col = *m_it_cols;
+        col = &*m_it_cols;
         m_current_pos = col->position(m_row_first);
         m_end_pos = col->position(m_row_last+1);
     }

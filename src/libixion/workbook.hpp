@@ -24,11 +24,11 @@ public:
     worksheet(size_type row_size, size_type col_size);
     ~worksheet();
 
-    column_store_t& operator[](size_type n) { return *m_columns[n]; }
-    const column_store_t& operator[](size_type n) const { return *m_columns[n]; }
+    column_store_t& operator[](size_type n) { return m_columns[n]; }
+    const column_store_t& operator[](size_type n) const { return m_columns[n]; }
 
-    column_store_t& at(size_type n) { return *m_columns.at(n); }
-    const column_store_t& at(size_type n) const { return *m_columns.at(n); }
+    column_store_t& at(size_type n) { return m_columns.at(n); }
+    const column_store_t& at(size_type n) const { return m_columns.at(n); }
 
     column_store_t::iterator& get_pos_hint(size_type n) { return m_pos_hints.at(n); }
 
