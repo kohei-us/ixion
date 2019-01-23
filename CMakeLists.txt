@@ -21,7 +21,7 @@ enable_testing()
 set(CMAKE_CTEST_COMMAND ctest -V)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /MP")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /wd4267 /MP")
 endif(MSVC)
 
 option(MDDS_INCLUDEDIR "path to mdds header directory.")
