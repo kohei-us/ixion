@@ -152,16 +152,16 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
 
 file(GLOB PARSER_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.txt)
 
-add_custom_target(parser-test-t0 COMMAND ixion-parser -t 0 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t1 COMMAND ixion-parser -t 1 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t2 COMMAND ixion-parser -t 2 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t3 COMMAND ixion-parser -t 3 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t4 COMMAND ixion-parser -t 4 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t5 COMMAND ixion-parser -t 5 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t6 COMMAND ixion-parser -t 6 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t7 COMMAND ixion-parser -t 7 ${PARSER_TEST_FILES})
-add_custom_target(parser-test-t8 COMMAND ixion-parser -t 8 ${PARSER_TEST_FILES})
+foreach(_I RANGE 8)
+    set(_IS "${_I}")
+    add_custom_target(parser-test-t${_IS} COMMAND ixion-parser -t ${_I} ${PARSER_TEST_FILES} DEPENDS ixion-parser)
+endforeach()
 
+foreach(_I RANGE 7)
+    set(_IS "${_I}")
+    math(EXPR _INEXT "${_I}+1")
+    add_dependencies(parser-test-t${_INEXT} parser-test-t${_IS})
+endforeach()
 
 target_link_libraries(ixion-test libixion)
 target_link_libraries(ixion-test-track-deps libixion)
