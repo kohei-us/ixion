@@ -49,8 +49,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	formula_value_stack.hpp \
 	formula_value_stack.cpp \
 	global.cpp \
-	grouped_ranges.hpp \
-	grouped_ranges.cpp \
 	info.cpp \
 	lexer_tokens.hpp \
 	lexer_tokens.cpp \
