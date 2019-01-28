@@ -21,11 +21,11 @@ enable_testing()
 set(CMAKE_CTEST_COMMAND ctest -V)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /wd4267 /MP")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /wd4267 /wd4244 /MP")
 endif(MSVC)
 
-option(MDDS_INCLUDEDIR "path to mdds header directory.")
-option(SPDLOG_INCLUDEDIR "path to spdlog header directory.")
+set(MDDS_INCLUDEDIR "" CACHE STRING "path to mdds header directory.")
+set(SPDLOG_INCLUDEDIR "" CACHE STRING "path to spdlog header directory.")
 
 add_definitions(
     -DIXION_THREADS=1
