@@ -37,20 +37,7 @@ add_library(libixion SHARED
     workbook.cpp
 )
 
-add_custom_target(
-    py_gen_files
-    COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/bin/gen-files.py
-        --properties
-            IXION_MAJOR_VERSION=${IXION_MAJOR_VERSION}
-            IXION_MINOR_VERSION=${IXION_MINOR_VERSION}
-            IXION_MICRO_VERSION=${IXION_MICRO_VERSION}
-            IXION_MAJOR_API_VERSION=${IXION_MAJOR_API_VERSION}
-            IXION_MINOR_API_VERSION=${IXION_MINOR_API_VERSION}
-        --files
-            ${CMAKE_CURRENT_SOURCE_DIR}/constants.inl
-)
-
-add_dependencies(libixion py_gen_files)
+configure_file(constants.inl.in constants.inl)
 
 target_compile_definitions(libixion PRIVATE IXION_BUILD DLL_EXPORT)
 
