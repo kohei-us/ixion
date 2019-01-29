@@ -12,7 +12,6 @@ set(IXION_API_VERSION ${IXION_MAJOR_API_VERSION}.${IXION_MINOR_API_VERSION})
 project(ixion VERSION ${IXION_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
 
-set(Boost_USE_STATIC_LIBS 1)
 find_package(Boost COMPONENTS program_options filesystem)
 find_package(Threads)
 find_package(Python3)

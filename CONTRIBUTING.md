@@ -15,8 +15,8 @@ command:
 
 in order to build Boost as static libraries.  You may want to change the part
 `-j 8` which controls the number of concurrent processes to use for your build.
-Note that **you must build Boost as static libraries** in order to build Ixion
-on Windows.
+Note that if you build Boost as dynamic libraries, make sure that the dll
+files are in your PATH.
 
 
 ## Clone spdlog and mdds
@@ -42,8 +42,12 @@ cmake .. -G "Visual Studio 15 Win64" \
     -DBOOST_INCLUDEDIR="/path/to/boost" \
     -DBOOST_LIBRARYDIR="/path/to/boost/stage/x64/lib" \
     -DMDDS_INCLUDEDIR="/path/to/mdds/include" \
-    -DSPDLOG_INCLUDEDIR="/path/to/spdlog/include"
+    -DSPDLOG_INCLUDEDIR="/path/to/spdlog/include" \
+    -DBoost_USE_STATIC_LIBS=1
 ```
+
+You may skip the last option `-DBoost_USE_STATIC_LIBS=1` if you have built
+Boost as dynamic libraries.
 
 Once the configuration is finished, start the build by running:
 
