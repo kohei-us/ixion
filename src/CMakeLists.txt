@@ -21,38 +21,22 @@ target_link_libraries(ixion-parser libixion)
 target_link_libraries(ixion-sorter libixion)
 target_link_libraries(ixion-formula-tokenizer libixion)
 
+# tests
+
+# Copy the binaries necessary for running the parser tests below.
 add_custom_command(TARGET ixion-parser POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    $<TARGET_FILE:libixion>
-    $<TARGET_FILE_DIR:ixion-parser>
+    $<TARGET_FILE:libixion> $<TARGET_FILE:ixion-parser>
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
-
-# test programs
 
 file(GLOB PARSER_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.txt)
 
+add_dependencies(check ixion-parser)
+
 foreach(_I RANGE 8)
-    set(_IS "${_I}")
-    add_custom_target(parser-test-t${_IS} COMMAND $<TARGET_FILE:ixion-parser> -t ${_I} ${PARSER_TEST_FILES} DEPENDS ixion-parser)
+    add_test(parser-test-t${_I} ${CMAKE_CURRENT_BINARY_DIR}/ixion-parser -t ${_I} ${PARSER_TEST_FILES})
 endforeach()
-
-foreach(_I RANGE 7)
-    set(_IS "${_I}")
-    math(EXPR _INEXT "${_I}+1")
-    add_dependencies(parser-test-t${_INEXT} parser-test-t${_IS})
-endforeach()
-
-add_dependencies(check
-    parser-test-t0
-    parser-test-t1
-    parser-test-t2
-    parser-test-t3
-    parser-test-t4
-    parser-test-t5
-    parser-test-t6
-    parser-test-t7
-    parser-test-t8
-)
 
 install(TARGETS ixion-parser ixion-sorter ixion-formula-tokenizer
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
