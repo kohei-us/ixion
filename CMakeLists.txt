@@ -19,7 +19,7 @@ find_package(Python3)
 include(GNUInstallDirs)
 
 enable_testing()
-set(CMAKE_CTEST_COMMAND ctest -V)
+set(CMAKE_CTEST_COMMAND ctest)
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /wd4267 /wd4244 /MP")
