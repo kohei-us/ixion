@@ -34,8 +34,12 @@ file(GLOB PARSER_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.txt)
 
 add_dependencies(check ixion-parser)
 
+# Register tests for all test files and all thread counts (0-8).
 foreach(_I RANGE 8)
-    add_test(parser-test-t${_I} ${CMAKE_CURRENT_BINARY_DIR}/ixion-parser -t ${_I} ${PARSER_TEST_FILES})
+    foreach(_TESTFILE ${PARSER_TEST_FILES})
+        get_filename_component(_TFNAME ${_TESTFILE} NAME_WE)
+        add_test(parser-test-t${_I}-${_TFNAME} ${CMAKE_CURRENT_BINARY_DIR}/ixion-parser -t ${_I} ${_TESTFILE})
+    endforeach()
 endforeach()
 
 install(TARGETS ixion-parser ixion-sorter ixion-formula-tokenizer
