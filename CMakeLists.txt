@@ -17,6 +17,8 @@ find_package(Boost COMPONENTS program_options filesystem)
 find_package(Threads)
 find_package(Python3)
 
+include(GNUInstallDirs)
+
 enable_testing()
 set(CMAKE_CTEST_COMMAND ctest -V)
 
@@ -42,150 +44,7 @@ include_directories(
 
 link_directories(${Boost_LIBRARY_DIRS})
 
-set(LIBIXION_SRC_DIR ${PROJECT_SOURCE_DIR}/src/libixion)
-
-add_library(libixion SHARED
-    ${LIBIXION_SRC_DIR}/address.cpp
-    ${LIBIXION_SRC_DIR}/address_iterator.cpp
-    ${LIBIXION_SRC_DIR}/calc_status.cpp
-    ${LIBIXION_SRC_DIR}/cell.cpp
-    ${LIBIXION_SRC_DIR}/cell_queue_manager.cpp
-    ${LIBIXION_SRC_DIR}/compute_engine.cpp
-    ${LIBIXION_SRC_DIR}/compute_engine_cuda.cpp
-    ${LIBIXION_SRC_DIR}/concrete_formula_tokens.cpp
-    ${LIBIXION_SRC_DIR}/config.cpp
-    ${LIBIXION_SRC_DIR}/dirty_cell_tracker.cpp
-    ${LIBIXION_SRC_DIR}/exceptions.cpp
-    ${LIBIXION_SRC_DIR}/formula.cpp
-    ${LIBIXION_SRC_DIR}/formula_calc.cpp
-    ${LIBIXION_SRC_DIR}/formula_functions.cpp
-    ${LIBIXION_SRC_DIR}/formula_function_opcode.cpp
-    ${LIBIXION_SRC_DIR}/formula_interpreter.cpp
-    ${LIBIXION_SRC_DIR}/formula_lexer.cpp
-    ${LIBIXION_SRC_DIR}/formula_name_resolver.cpp
-    ${LIBIXION_SRC_DIR}/formula_parser.cpp
-    ${LIBIXION_SRC_DIR}/formula_result.cpp
-    ${LIBIXION_SRC_DIR}/formula_tokens.cpp
-    ${LIBIXION_SRC_DIR}/formula_value_stack.cpp
-    ${LIBIXION_SRC_DIR}/global.cpp
-    ${LIBIXION_SRC_DIR}/grouped_ranges.cpp
-    ${LIBIXION_SRC_DIR}/info.cpp
-    ${LIBIXION_SRC_DIR}/interface.cpp
-    ${LIBIXION_SRC_DIR}/lexer_tokens.cpp
-    ${LIBIXION_SRC_DIR}/matrix.cpp
-    ${LIBIXION_SRC_DIR}/mem_str_buf.cpp
-    ${LIBIXION_SRC_DIR}/model_context.cpp
-    ${LIBIXION_SRC_DIR}/model_iterator.cpp
-    ${LIBIXION_SRC_DIR}/module.cpp
-    ${LIBIXION_SRC_DIR}/queue_entry.cpp
-    ${LIBIXION_SRC_DIR}/table.cpp
-    ${LIBIXION_SRC_DIR}/types.cpp
-    ${LIBIXION_SRC_DIR}/workbook.cpp
-)
-
-add_executable(ixion-parser
-	${PROJECT_SOURCE_DIR}/src/ixion_parser.cpp
-	${PROJECT_SOURCE_DIR}/src/model_parser.cpp
-	${PROJECT_SOURCE_DIR}/src/session_handler.cpp
-	${PROJECT_SOURCE_DIR}/src/table_handler.cpp
-)
-
-add_executable(ixion-sorter
-	${PROJECT_SOURCE_DIR}/src/ixion_sorter.cpp
-	${PROJECT_SOURCE_DIR}/src/sort_input_parser.cpp
-)
-
-add_executable(ixion-formula-tokenizer
-	${PROJECT_SOURCE_DIR}/src/ixion_formula_tokenizer.cpp
-)
-
-add_custom_target(
-    py_gen_files
-    COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/bin/gen-files.py
-        --properties
-            IXION_MAJOR_VERSION=${IXION_MAJOR_VERSION}
-            IXION_MINOR_VERSION=${IXION_MINOR_VERSION}
-            IXION_MICRO_VERSION=${IXION_MICRO_VERSION}
-            IXION_MAJOR_API_VERSION=${IXION_MAJOR_API_VERSION}
-            IXION_MINOR_API_VERSION=${IXION_MINOR_API_VERSION}
-        --files
-            ${LIBIXION_SRC_DIR}/constants.inl
-)
-
-add_dependencies(libixion py_gen_files)
-
-target_compile_definitions(libixion PRIVATE IXION_BUILD DLL_EXPORT)
-
-target_link_libraries(ixion-parser libixion)
-target_link_libraries(ixion-sorter libixion)
-target_link_libraries(ixion-formula-tokenizer libixion)
-
-install(DIRECTORY
-    ${PROJECT_SOURCE_DIR}/include/ixion
-    DESTINATION include/ixion-${IXION_API_VERSION}
-    FILES_MATCHING PATTERN "*.hpp"
-)
-
-install(TARGETS libixion ixion-parser ixion-sorter ixion-formula-tokenizer
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-
-# test programs
-
-add_executable(ixion-test EXCLUDE_FROM_ALL
-    ${LIBIXION_SRC_DIR}/ixion_test.cpp
-)
-
-add_executable(ixion-test-track-deps EXCLUDE_FROM_ALL
-    ${LIBIXION_SRC_DIR}/ixion_test_track_deps.cpp
-)
-
-add_executable(dirty-cell-tracker-test EXCLUDE_FROM_ALL
-    ${LIBIXION_SRC_DIR}/dirty_cell_tracker_test.cpp
-)
-
-add_executable(compute-engine-test EXCLUDE_FROM_ALL
-    ${LIBIXION_SRC_DIR}/compute_engine_test.cpp
-)
-
-file(GLOB PARSER_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.txt)
-
-foreach(_I RANGE 8)
-    set(_IS "${_I}")
-    add_custom_target(parser-test-t${_IS} COMMAND ixion-parser -t ${_I} ${PARSER_TEST_FILES} DEPENDS ixion-parser)
-endforeach()
-
-foreach(_I RANGE 7)
-    set(_IS "${_I}")
-    math(EXPR _INEXT "${_I}+1")
-    add_dependencies(parser-test-t${_INEXT} parser-test-t${_IS})
-endforeach()
-
-target_link_libraries(ixion-test libixion)
-target_link_libraries(ixion-test-track-deps libixion)
-target_link_libraries(dirty-cell-tracker-test libixion)
-target_link_libraries(compute-engine-test libixion)
-
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-add_dependencies(check
-    ixion-test
-    ixion-test-track-deps
-    dirty-cell-tracker-test
-    compute-engine-test
-    parser-test-t0
-    parser-test-t1
-    parser-test-t2
-    parser-test-t3
-    parser-test-t4
-    parser-test-t5
-    parser-test-t6
-    parser-test-t7
-    parser-test-t8
-)
 
-add_test(ixion-test ixion-test)
-add_test(ixion-test-track-deps ixion-test-track-deps)
-add_test(dirty-cell-tracker-test dirty-cell-tracker-test)
-add_test(compute-engine-test compute-engine-test)
+add_subdirectory(include)
+add_subdirectory(src)
