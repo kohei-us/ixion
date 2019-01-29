@@ -15,8 +15,8 @@ command:
 
 in order to build Boost as static libraries.  You may want to change the part
 `-j 8` which controls the number of concurrent processes to use for your build.
-Note that if you build Boost as dynamic libraries, make sure that the dll
-files are in your PATH.
+Note that if you build Boost as dynamic libraries, make sure that all the
+relevant dll files are in your PATH.
 
 
 ## Clone spdlog and mdds
