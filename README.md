@@ -50,7 +50,7 @@ for both full and partial calculation modes.
 
 ## Documentation
 
-* [Official API documentation](http://kohei.us/files/ixion/doc/)
+* [Official API documentation](https://ixion.readthedocs.io/en/latest/) for general users of the library.
 
 ## Installation
 
