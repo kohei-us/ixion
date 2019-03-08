@@ -111,6 +111,7 @@ public:
     void set_boolean_cell(const abs_address_t& addr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
+    void fill_down_cells(const abs_address_t& src, size_t n_dst);
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
     void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
@@ -611,6 +612,61 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, const char* 
     pos_hint = col_store.set(pos_hint, addr.row, str_id);
 }
 
+void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
+{
+    if (!n_dst)
+        // Destination cell length is 0.  Nothing to copy to.
+        return;
+
+    worksheet& sheet = m_sheets.at(src.sheet);
+    column_store_t& col_store = sheet.at(src.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(src.column);
+
+    column_store_t::const_position_type pos = col_store.position(pos_hint, src.row);
+    auto it = pos.first; // block iterator
+
+    switch (it->type)
+    {
+        case element_type_numeric:
+        {
+            double v = col_store.get<numeric_element_block>(pos);
+            std::vector<double> vs(n_dst, v);
+            pos_hint = col_store.set(pos_hint, src.row+1, vs.begin(), vs.end());
+            break;
+        }
+        case element_type_boolean:
+        {
+            bool b = col_store.get<boolean_element_block>(pos);
+            std::deque<bool> vs(n_dst, b);
+            pos_hint = col_store.set(pos_hint, src.row+1, vs.begin(), vs.end());
+            break;
+        }
+        case element_type_string:
+        {
+            string_id_t sid = col_store.get<string_element_block>(pos);
+            std::vector<string_id_t> vs(n_dst, sid);
+            pos_hint = col_store.set(pos_hint, src.row+1, vs.begin(), vs.end());
+            break;
+        }
+        case element_type_empty:
+        {
+            size_t start_pos = src.row + 1;
+            size_t end_pos = start_pos + n_dst - 1;
+            pos_hint = col_store.set_empty(pos_hint, start_pos, end_pos);
+            break;
+        }
+        case element_type_formula:
+            // TODO : support this.
+            throw not_implemented_error("filling down of a formula cell is not yet supported.");
+        default:
+        {
+            std::ostringstream os;
+            os << __FUNCTION__ << ": unhandled block type (" << it->type << ")";
+            throw general_error(os.str());
+        }
+    }
+}
+
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
@@ -1019,6 +1075,11 @@ void model_context::set_boolean_cell(const abs_address_t& addr, bool val)
 void model_context::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     mp_impl->set_string_cell(addr, p, n);
+}
+
+void model_context::fill_down_cells(const abs_address_t& src, size_t n_dst)
+{
+    mp_impl->fill_down_cells(src, n_dst);
 }
 
 void model_context::set_string_cell(const abs_address_t& addr, string_id_t identifier)

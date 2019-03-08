@@ -59,6 +59,13 @@ private:
     error_type m_type;
 };
 
+class IXION_DLLPUBLIC not_implemented_error : public general_error
+{
+public:
+    explicit not_implemented_error(const std::string& msg);
+    virtual ~not_implemented_error() throw();
+};
+
 }
 
 #endif

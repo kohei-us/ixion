@@ -1400,6 +1400,53 @@ void test_model_context_iterator_vertical_range()
     assert(check_model_iterator_output(iter, checks));
 }
 
+void test_model_context_fill_down()
+{
+    nullptr_t empty = nullptr;
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("test"), 100, 10);
+    cxt.set_cell_values(0, {
+        { "numeric", "bool", "string",  "empty" },
+        {      12.3,   true,    "foo",    empty },
+        {     empty,  empty,    empty,      1.1 },
+        {     empty,  empty,    empty,      1.1 },
+        {     empty,  empty,    empty,      1.1 },
+        {     empty,  empty,    empty,      1.1 },
+        {     empty,  empty,    empty,      1.1 },
+    });
+
+    abs_address_t pos(0, 1, 0);
+    cxt.fill_down_cells(pos, 2);
+
+    assert(cxt.get_numeric_value(abs_address_t(0, 1, 0)) == 12.3);
+    assert(cxt.get_numeric_value(abs_address_t(0, 2, 0)) == 12.3);
+    assert(cxt.get_numeric_value(abs_address_t(0, 3, 0)) == 12.3);
+    assert(cxt.is_empty(abs_address_t(0, 4, 0)));
+
+    pos.column = 1;
+    cxt.fill_down_cells(pos, 1);
+    assert(cxt.get_boolean_value(abs_address_t(0, 1, 1)) == true);
+    assert(cxt.get_boolean_value(abs_address_t(0, 2, 1)) == true);
+    assert(cxt.is_empty(abs_address_t(0, 3, 1)));
+
+    pos.column = 2;
+    string_id_t s_foo = cxt.get_string_identifier(pos);
+    const std::string* p = cxt.get_string(s_foo);
+    assert(p && *p == "foo");
+    cxt.fill_down_cells(pos, 3);
+    assert(cxt.get_string_identifier(abs_address_t(0, 2, 2)) == s_foo);
+    assert(cxt.get_string_identifier(abs_address_t(0, 3, 2)) == s_foo);
+    assert(cxt.get_string_identifier(abs_address_t(0, 4, 2)) == s_foo);
+    assert(cxt.is_empty(abs_address_t(0, 5, 2)));
+
+    pos.column = 3;
+    cxt.fill_down_cells(pos, 2);
+    assert(cxt.is_empty(pos));
+    assert(cxt.is_empty(abs_address_t(0, 2, 3)));
+    assert(cxt.is_empty(abs_address_t(0, 3, 3)));
+    assert(cxt.get_numeric_value(abs_address_t(0, 4, 3)) == 1.1);
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -1503,6 +1550,7 @@ int main()
     test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();
     test_model_context_iterator_vertical_range();
+    test_model_context_fill_down();
     test_volatile_function();
 
     return EXIT_SUCCESS;

@@ -125,6 +125,16 @@ public:
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
 
     /**
+     * Duplicate the value of the source cell to one or more cells located
+     * immediately below it.
+     *
+     * @param src position of the source cell to copy the value from.
+     * @param n_dst number of cells below to copy the value to.  It must be at
+     *              least one.
+     */
+    void fill_down_cells(const abs_address_t& src, size_t n_dst);
+
+    /**
      * Set a formula cell at a specified address.
      *
      * @param addr address at which to set a formula cell.

@@ -48,6 +48,15 @@ model_context_error::error_type model_context_error::get_error_type() const
     return m_type;
 }
 
+not_implemented_error::not_implemented_error(const std::string& msg)
+{
+    std::ostringstream os;
+    os << "not_implemented_error: " << msg;
+    set_message(os.str());
+}
+
+not_implemented_error::~not_implemented_error() {}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
