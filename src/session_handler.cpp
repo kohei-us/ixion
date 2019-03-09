@@ -22,6 +22,8 @@ namespace ixion {
 session_handler::factory::factory(const model_context& cxt) :
     m_context(cxt), m_show_sheet_name(false) {}
 
+session_handler::factory::~factory() {}
+
 std::unique_ptr<iface::session_handler> session_handler::factory::create()
 {
     return ixion::make_unique<session_handler>(m_context, m_show_sheet_name);

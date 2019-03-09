@@ -44,6 +44,7 @@ public:
         bool m_show_sheet_name;
     public:
         factory(const model_context& cxt);
+        virtual ~factory() override;
 
         virtual std::unique_ptr<iface::session_handler> create() override;
 

@@ -1035,6 +1035,8 @@ std::unique_ptr<iface::session_handler> model_context::session_handler_factory::
     return std::unique_ptr<iface::session_handler>();
 }
 
+model_context::session_handler_factory::~session_handler_factory() {}
+
 model_context::model_context() :
     mp_impl(new model_context_impl(*this)) {}
 

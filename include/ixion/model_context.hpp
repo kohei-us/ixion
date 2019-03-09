@@ -41,6 +41,7 @@ public:
     {
     public:
         virtual std::unique_ptr<iface::session_handler> create();
+        virtual ~session_handler_factory();
     };
 
     /**
