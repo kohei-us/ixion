@@ -4,5 +4,5 @@ add_subdirectory(interface)
 file(GLOB _HEADERS *.hpp)
 
 install(FILES ${_HEADERS}
-    DESTINATION include/ixion-${IXION_API_VERSION}
+    DESTINATION include/ixion-${IXION_API_VERSION}/ixion
 )
