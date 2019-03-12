@@ -17,16 +17,16 @@ add_executable(ixion-formula-tokenizer
 	ixion_formula_tokenizer.cpp
 )
 
-target_link_libraries(ixion-parser libixion)
-target_link_libraries(ixion-sorter libixion)
-target_link_libraries(ixion-formula-tokenizer libixion)
+target_link_libraries(ixion-parser libixion-${IXION_API_VERSION})
+target_link_libraries(ixion-sorter libixion-${IXION_API_VERSION})
+target_link_libraries(ixion-formula-tokenizer libixion-${IXION_API_VERSION})
 
 # tests
 
 # Copy the binaries necessary for running the parser tests below.
 add_custom_command(TARGET ixion-parser POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    $<TARGET_FILE:libixion> $<TARGET_FILE:ixion-parser>
+    $<TARGET_FILE:libixion-${IXION_API_VERSION}> $<TARGET_FILE:ixion-parser>
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
