@@ -16,7 +16,7 @@
 #include <limits>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/fmt/bundled/ostream.h>
+#include <spdlog/fmt/ostr.h>
 
 namespace ixion {
 
