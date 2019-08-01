@@ -37,7 +37,9 @@ add_library(libixion-${IXION_API_VERSION} SHARED
     workbook.cpp
 )
 
-configure_file(constants.inl.in constants.inl)
+configure_file(constants.inl.in ${CMAKE_CURRENT_BINARY_DIR}/inl/constants.inl)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/inl)
 
 target_compile_definitions(libixion-${IXION_API_VERSION} PRIVATE IXION_BUILD DLL_EXPORT)
 
