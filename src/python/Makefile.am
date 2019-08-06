@@ -1,5 +1,7 @@
 if BUILD_PYTHON
 
+EXTRA_DIST = test-env.sh
+
 pyexec_LTLIBRARIES = ixion.la
 ixion_la_SOURCES = \
 	document.hpp \
@@ -22,7 +24,7 @@ TESTS = ../../bin/run-python-test-osx.sh
 
 else
 
-AM_TESTS_ENVIRONMENT = . test-env.sh;
+AM_TESTS_ENVIRONMENT = . $(srcdir)/test-env.sh;
 
 TESTS = \
 	../../test/python/document.py \
