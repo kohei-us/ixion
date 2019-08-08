@@ -1,3 +1,5 @@
+ixion 0.15.0
+
 * fill_down_cells() method has been added to model_context, to fill duplicate
   values downward from an arbitrary cell position.  For now, it always
   duplicate the value of the source cell; cell value enumerations are not
