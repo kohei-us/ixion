@@ -62,6 +62,8 @@ installation instructions.
 
 | Version | API Version | Release Date | Download | Check Sum | File Size (bytes) |
 |---------|-------------|--------------|----------|-----------|-------------------|
+| 0.15.0 | 0.15   | 2019-08-08 | [libixion-0.15.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.15.0.tar.xz) | sha256sum: b1f60af61be875e3bfa7ad18203a6c8ccdeb9922a531e196029fc42fbfa0b9e6 | 447388 |
+|        |        |            | [libixion-0.15.0.tar.gz](http://kohei.us/files/ixion/src/libixion-0.15.0.tar.gz) | sha256sum: 3d58b77373f9c5d56b11f2b9b07996a5b5b55bec7c2ede74c67d0885b6263dd0 | 691668 |
 | 0.14.1 | 0.14   | 2018-09-14 | [libixion-0.14.1.tar.xz](http://kohei.us/files/ixion/src/libixion-0.14.1.tar.xz) | sha256sum: 6ad1384fcf813083c6d981a16b2643c953f9bac4c2caf1ed1682921d9b69ed91 | 452249 |
 |        |        |            | [libixion-0.14.1.tar.gz](http://kohei.us/files/ixion/src/libixion-0.14.1.tar.gz) | sha256sum: 1b951da168cd55d22f59b28e66e0606c9a6bfe18ef637cb9ef81d146559f74e1 | 578708 |
 | 0.14.0 | 0.14   | 2018-08-22 | [libixion-0.14.0.tar.xz](http://kohei.us/files/ixion/src/libixion-0.14.0.tar.xz) | sha256sum: 5805d49bb110e53eeb4224cdbcbcdba91928315dcb5672af8f90942ad34afe5e | 427100 |
