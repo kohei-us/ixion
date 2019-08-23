@@ -61,7 +61,7 @@ public:
         } value;
 
         /** Initializes the cell to be empty. */
-        input_cell(nullptr_t);
+        input_cell(std::nullptr_t);
         /** Boolean cell value. */
         input_cell(bool b);
         /** The char array must be null-terminated. */
