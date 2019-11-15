@@ -821,9 +821,6 @@ void formula_interpreter::function()
 
     next();
 
-#if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "function: " << formula_functions::get_function_name(func_oc) << endl;
-#endif
     // Function call pops all stack values pushed onto the stack this far, and
     // pushes the result onto the stack.
     formula_functions(m_context).interpret(func_oc, m_stack);
