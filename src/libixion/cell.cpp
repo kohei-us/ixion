@@ -14,6 +14,7 @@
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/global.hpp"
 #include "ixion/matrix.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 #include "formula_interpreter.hpp"
 
@@ -25,11 +26,6 @@
 #include <functional>
 
 #include <spdlog/spdlog.h>
-
-#define DEBUG_FORMULA_CELL 0
-#if DEBUG_FORMULA_CELL
-#include "ixion/formula_name_resolver.hpp"
-#endif
 
 #include "calc_status.hpp"
 
@@ -247,10 +243,11 @@ double formula_cell::get_value_nowait() const
 
 void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
 {
-#if DEBUG_FORMULA_CELL
-    const formula_name_resolver& resolver = context.get_name_resolver();
-    __IXION_DEBUG_OUT__ << resolver.get_name(pos, false) << ": interpreting" << endl;
-#endif
+    SPDLOG_DEBUG(
+        spdlog::get("ixion"), "{}: interpreting",
+        formula_name_resolver::get(formula_name_resolver_t::excel_a1, &context)->get_name(pos, pos, false)
+    );
+
     if (!mp_impl->calc_allowed())
         throw std::logic_error("Calculation on this formula cell is not allowed.");
 
