@@ -23,8 +23,6 @@
 #include <sstream>
 #include <spdlog/spdlog.h>
 
-#define DEBUG_FORMULA_INTERPRETER 0
-
 using namespace std;
 
 namespace ixion {
@@ -71,7 +69,7 @@ bool formula_interpreter::interpret()
 
         if (m_tokens.empty())
         {
-            SPDLOG_DEBUG(spdlog::get("ixion"), "Interpreter has no tokens to interpret");
+            SPDLOG_DEBUG(spdlog::get("ixion"), "interpret: interpreter has no tokens to interpret");
             return false;
         }
 
@@ -90,7 +88,7 @@ bool formula_interpreter::interpret()
 
         pop_result();
 
-        SPDLOG_TRACE(spdlog::get("ixion"), "Interpretation successfully finished");
+        SPDLOG_TRACE(spdlog::get("ixion"), "interpret: interpretation successfully finished");
 
         if (mp_handler)
             mp_handler->end_cell_interpret();
@@ -106,7 +104,7 @@ bool formula_interpreter::interpret()
     }
     catch (const formula_error& e)
     {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Formula error: {}", e.what());
+        SPDLOG_DEBUG(spdlog::get("ixion"), "interpret: formula error: {}", e.what());
 
         if (mp_handler)
             mp_handler->set_formula_error(e.what());
@@ -215,9 +213,7 @@ void formula_interpreter::pop_result()
             m_result.set_string(res.get_string());
             break;
         case stack_value_t::value:
-#if DEBUG_FORMULA_INTERPRETER
-            __IXION_DEBUG_OUT__ << "result: " << res.get_value() << endl;
-#endif
+            SPDLOG_TRACE(spdlog::get("ixion"), "pop_result: value={}", res.get_value());
             m_result.set_value(res.get_value());
             break;
         case stack_value_t::matrix:
@@ -627,10 +623,8 @@ void formula_interpreter::factor()
             paren();
             return;
         case fop_named_expression:
-#if DEBUG_FORMULA_INTERPRETER
-            __IXION_DEBUG_OUT__ << "named expression encountered in factor" << endl;
-#endif
             // All named expressions are supposed to be expanded prior to interpretation.
+            SPDLOG_DEBUG(spdlog::get("ixion"), "factor: named expression encountered in factor.");
             throw formula_error(formula_error_t::general_error);
         case fop_value:
             constant();
@@ -678,17 +672,13 @@ void formula_interpreter::paren()
 void formula_interpreter::single_ref()
 {
     address_t addr = token().get_single_ref();
-#if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: ref=" << addr.get_name() << endl;
-    __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: origin=" << m_pos.get_name() << endl;
-#endif
+    SPDLOG_TRACE(spdlog::get("ixion"), "single_ref: ref={}; origin={}", addr.get_name(), m_pos.get_name());
+
     if (mp_handler)
         mp_handler->push_single_ref(addr, m_pos);
 
     abs_address_t abs_addr = addr.to_abs(m_pos);
-#if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "formula_interpreter::single_ref: ref=" << abs_addr.get_name() << " (converted to absolute)" << endl;
-#endif
+    SPDLOG_TRACE(spdlog::get("ixion"), "single_ref: ref={} (converted to absolute)", abs_addr.get_name());
 
     if (abs_addr == m_pos)
     {
@@ -703,18 +693,16 @@ void formula_interpreter::single_ref()
 void formula_interpreter::range_ref()
 {
     range_t range = token().get_range_ref();
-#if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: ref=" << range.first.get_name() << ":" << range.last.get_name() << endl;
-    __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: origin=" << m_pos.get_name() << endl;
-#endif
+    SPDLOG_TRACE(spdlog::get("ixion"), "range_ref: ref-start={}; ref-end={}; origin={}",
+        range.first.get_name(), range.last.get_name(), m_pos.get_name());
+
     if (mp_handler)
         mp_handler->push_range_ref(range, m_pos);
 
     abs_range_t abs_range = range.to_abs(m_pos);
 
-#if DEBUG_FORMULA_INTERPRETER
-    __IXION_DEBUG_OUT__ << "formula_interpreter::range_ref: ref=" << abs_range.first.get_name() << ":" << abs_range.last.get_name() << " (converted to absolute)" << endl;
-#endif
+    SPDLOG_TRACE(spdlog::get("ixion"), "range_ref: ref-start={}; ref-end={} (converted to absolute)",
+        abs_range.first.get_name(), abs_range.last.get_name(), m_pos.get_name());
 
     // Check the reference range to make sure it doesn't include the parent cell.
     if (abs_range.contains(m_pos))
@@ -732,9 +720,7 @@ void formula_interpreter::table_ref()
     const iface::table_handler* table_hdl = m_context.get_table_handler();
     if (!table_hdl)
     {
-#if DEBUG_FORMULA_INTERPRETER
-        __IXION_DEBUG_OUT__ << "formula_interpreter::table_ref: failed to get a table_handler instance." << endl;
-#endif
+        SPDLOG_DEBUG(spdlog::get("ixion"), "table_ref: failed to get a table_handler instance.");
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 
@@ -785,7 +771,7 @@ void formula_interpreter::function()
     if (mp_handler)
         mp_handler->push_function(func_oc);
 
-    SPDLOG_TRACE(spdlog::get("ixion"), "function '{}'", get_formula_function_name(func_oc));
+    SPDLOG_TRACE(spdlog::get("ixion"), "function: function='{}'", get_formula_function_name(func_oc));
     assert(m_stack.empty());
 
     if (next_token().get_opcode() != fop_open)
