@@ -15,6 +15,7 @@
 
 #include <string>
 #include <sstream>
+#include <spdlog/spdlog.h>
 
 namespace ixion {
 
@@ -212,31 +213,37 @@ double value_stack_t::get_value(size_t pos) const
 
 void value_stack_t::push_back(value_type&& val)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "push_back");
     m_stack.push_back(std::move(val));
 }
 
 void value_stack_t::push_value(double val)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "push_value: val={}", val);
     m_stack.push_back(make_unique<stack_value>(val));
 }
 
 void value_stack_t::push_string(size_t sid)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "push_string: sid={}", sid);
     m_stack.push_back(make_unique<stack_value>(sid));
 }
 
 void value_stack_t::push_single_ref(const abs_address_t& val)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "push_single_ref: val={}", val.get_name());
     m_stack.push_back(make_unique<stack_value>(val));
 }
 
 void value_stack_t::push_range_ref(const abs_range_t& val)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "push_range_ref: start={}; end={}", val.first.get_name(), val.last.get_name());
     m_stack.push_back(make_unique<stack_value>(val));
 }
 
 void value_stack_t::push_matrix(matrix mtx)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "push_matrix");
     m_stack.emplace_back(make_unique<stack_value>(std::move(mtx)));
 }
 
@@ -249,11 +256,14 @@ double value_stack_t::pop_value()
     const stack_value& v = *m_stack.back();
     ret = get_numeric_value(m_context, v);
     m_stack.pop_back();
+    SPDLOG_TRACE(spdlog::get("ixion"), "pop_value: ret={}", ret);
     return ret;
 }
 
 const std::string value_stack_t::pop_string()
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "pop_string");
+
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
@@ -340,6 +350,7 @@ const std::string value_stack_t::pop_string()
 
 abs_address_t value_stack_t::pop_single_ref()
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "pop_single_ref");
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
@@ -354,6 +365,8 @@ abs_address_t value_stack_t::pop_single_ref()
 
 abs_range_t value_stack_t::pop_range_ref()
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "pop_range_ref");
+
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
@@ -368,6 +381,8 @@ abs_range_t value_stack_t::pop_range_ref()
 
 matrix value_stack_t::pop_range_value()
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "pop_range_value");
+
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
