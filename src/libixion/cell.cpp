@@ -243,10 +243,7 @@ double formula_cell::get_value_nowait() const
 
 void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
 {
-    SPDLOG_DEBUG(
-        spdlog::get("ixion"), "{}: interpreting",
-        formula_name_resolver::get(formula_name_resolver_t::excel_a1, &context)->get_name(pos, pos, false)
-    );
+    SPDLOG_DEBUG(spdlog::get("ixion"), "Interpreting {} ...", pos.get_name());
 
     if (!mp_impl->calc_allowed())
         throw std::logic_error("Calculation on this formula cell is not allowed.");

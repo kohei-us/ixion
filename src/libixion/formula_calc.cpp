@@ -41,7 +41,6 @@ void calculate_sorted_cells(
     for (queue_entry& e : entries)
         e.p->check_circular(cxt, e.pos);
 
-
     if (!thread_count)
     {
         // Interpret cells using just a single thread.
