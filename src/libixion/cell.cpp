@@ -15,6 +15,7 @@
 #include "ixion/global.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/formula.hpp"
 
 #include "formula_interpreter.hpp"
 
@@ -35,6 +36,18 @@
 using namespace std;
 
 namespace ixion {
+
+namespace {
+
+std::string gen_trace_output(const formula_cell& fc, const iface::formula_model_access& cxt, const abs_address_t& pos)
+{
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    std::ostringstream os;
+    os << "pos=" << pos.get_name() << "; formula='" << print_formula_tokens(cxt, pos, *resolver, fc.get_tokens()->get()) << "'";
+    return os.str();
+}
+
+}
 
 struct formula_cell::impl
 {
@@ -243,7 +256,7 @@ double formula_cell::get_value_nowait() const
 
 void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
 {
-    SPDLOG_DEBUG(spdlog::get("ixion"), "Interpreting {} ...", pos.get_name());
+    SPDLOG_TRACE(spdlog::get("ixion"), "{}", gen_trace_output(*this, context, pos));
 
     if (!mp_impl->calc_allowed())
         throw std::logic_error("Calculation on this formula cell is not allowed.");
