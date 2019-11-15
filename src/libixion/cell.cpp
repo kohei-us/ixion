@@ -345,7 +345,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                 break;
             }
             default:
-                SPDLOG_DEBUG(spdlog::get("ixion"), "Token type '{}' was not processed.", get_opcode_name(t->get_opcode()));
+                ;
         }
 
     }
