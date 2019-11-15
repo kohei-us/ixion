@@ -781,10 +781,12 @@ void formula_interpreter::function()
 {
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     assert(token().get_opcode() == fop_function);
-    assert(m_stack.empty());
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
     if (mp_handler)
         mp_handler->push_function(func_oc);
+
+    SPDLOG_TRACE(spdlog::get("ixion"), "function '{}'", get_formula_function_name(func_oc));
+    assert(m_stack.empty());
 
     if (next_token().get_opcode() != fop_open)
         throw invalid_expression("expecting a '(' after a function name.");
