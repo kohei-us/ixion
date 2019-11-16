@@ -302,7 +302,7 @@ bool valid_expression_op(fopcode_t oc)
 }
 
 bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
-    value_stack_t& stack, stack_value_t& vt, double& val, string& str)
+    formula_value_stack& stack, stack_value_t& vt, double& val, string& str)
 {
     vt = stack.get_type();
     switch (vt)
@@ -387,7 +387,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
     return true;
 }
 
-void compare_values(value_stack_t& vs, fopcode_t oc, double val1, double val2)
+void compare_values(formula_value_stack& vs, fopcode_t oc, double val1, double val2)
 {
     switch (oc)
     {
@@ -420,7 +420,7 @@ void compare_values(value_stack_t& vs, fopcode_t oc, double val1, double val2)
     }
 }
 
-void compare_strings(value_stack_t& vs, fopcode_t oc, const std::string& str1, const std::string& str2)
+void compare_strings(formula_value_stack& vs, fopcode_t oc, const std::string& str1, const std::string& str2)
 {
     switch (oc)
     {
@@ -451,7 +451,7 @@ void compare_strings(value_stack_t& vs, fopcode_t oc, const std::string& str1, c
 }
 
 void compare_value_to_string(
-    value_stack_t& vs, fopcode_t oc, double /*val1*/, const std::string& /*str2*/)
+    formula_value_stack& vs, fopcode_t oc, double /*val1*/, const std::string& /*str2*/)
 {
     // Value 1 is numeric while value 2 is string.  String is
     // always greater than numeric value.
@@ -482,7 +482,7 @@ void compare_value_to_string(
 }
 
 void compare_string_to_value(
-    value_stack_t& vs, fopcode_t oc, const std::string& /*str1*/, double /*val2*/)
+    formula_value_stack& vs, fopcode_t oc, const std::string& /*str1*/, double /*val2*/)
 {
     switch (oc)
     {

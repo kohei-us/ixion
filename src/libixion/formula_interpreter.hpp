@@ -98,7 +98,7 @@ private:
     std::unique_ptr<iface::session_handler> mp_handler;
     abs_address_t m_pos;
 
-    value_stack_t m_stack;
+    formula_value_stack m_stack;
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;

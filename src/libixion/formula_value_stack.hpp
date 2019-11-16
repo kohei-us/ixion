@@ -78,15 +78,16 @@ public:
     matrix pop_matrix();
 };
 
-class value_stack_t
+class formula_value_stack
 {
     typedef std::vector<std::unique_ptr<stack_value>> store_type;
     store_type m_stack;
     const iface::formula_model_access& m_context;
 
-    value_stack_t(); // disabled
 public:
-    explicit value_stack_t(const iface::formula_model_access& cxt);
+    formula_value_stack() = delete;
+
+    explicit formula_value_stack(const iface::formula_model_access& cxt);
 
     typedef store_type::value_type value_type;
     typedef store_type::iterator iterator;
@@ -99,7 +100,7 @@ public:
     bool empty() const;
     size_t size() const;
     void clear();
-    void swap(value_stack_t& other);
+    void swap(formula_value_stack& other);
 
     stack_value& back();
     const stack_value& back() const;

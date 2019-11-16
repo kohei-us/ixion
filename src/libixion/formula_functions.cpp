@@ -164,7 +164,7 @@ formula_functions::~formula_functions()
 {
 }
 
-void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
+void formula_functions::interpret(formula_function_t oc, formula_value_stack& args)
 {
     switch (oc)
     {
@@ -210,7 +210,7 @@ void formula_functions::interpret(formula_function_t oc, value_stack_t& args)
     }
 }
 
-void formula_functions::fnc_max(value_stack_t& args) const
+void formula_functions::fnc_max(formula_value_stack& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MAX requires one or more arguments.");
@@ -225,7 +225,7 @@ void formula_functions::fnc_max(value_stack_t& args) const
     args.push_value(ret);
 }
 
-void formula_functions::fnc_min(value_stack_t& args) const
+void formula_functions::fnc_min(formula_value_stack& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("MIN requires one or more arguments.");
@@ -240,7 +240,7 @@ void formula_functions::fnc_min(value_stack_t& args) const
     args.push_value(ret);
 }
 
-void formula_functions::fnc_sum(value_stack_t& args) const
+void formula_functions::fnc_sum(formula_value_stack& args) const
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "function: sum");
 
@@ -268,7 +268,7 @@ void formula_functions::fnc_sum(value_stack_t& args) const
     SPDLOG_TRACE(spdlog::get("ixion"), "function: sum end (result={})", ret);
 }
 
-void formula_functions::fnc_counta(value_stack_t& args) const
+void formula_functions::fnc_counta(formula_value_stack& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("COUNTA requires one or more arguments.");
@@ -306,7 +306,7 @@ void formula_functions::fnc_counta(value_stack_t& args) const
     args.push_value(ret);
 }
 
-void formula_functions::fnc_average(value_stack_t& args) const
+void formula_functions::fnc_average(formula_value_stack& args) const
 {
     if (args.empty())
         throw formula_functions::invalid_arg("AVERAGE requires one or more arguments.");
@@ -348,7 +348,7 @@ void formula_functions::fnc_average(value_stack_t& args) const
     args.push_value(ret/count);
 }
 
-void formula_functions::fnc_mmult(value_stack_t& args) const
+void formula_functions::fnc_mmult(formula_value_stack& args) const
 {
     matrix mx[2];
     matrix* mxp = mx;
@@ -401,24 +401,24 @@ void formula_functions::fnc_mmult(value_stack_t& args) const
     args.push_matrix(ans);
 }
 
-void formula_functions::fnc_if(value_stack_t& args) const
+void formula_functions::fnc_if(formula_value_stack& args) const
 {
     if (args.size() != 3)
         throw formula_functions::invalid_arg("IF requires exactly 3 arguments.");
 
-    value_stack_t::iterator pos = args.begin();
+    formula_value_stack::iterator pos = args.begin();
     bool eval = args.get_value(0) != 0.0;
     if (eval)
         std::advance(pos, 1);
     else
         std::advance(pos, 2);
 
-    value_stack_t ret(m_context);
+    formula_value_stack ret(m_context);
     ret.push_back(args.release(pos));
     args.swap(ret);
 }
 
-void formula_functions::fnc_len(value_stack_t& args) const
+void formula_functions::fnc_len(formula_value_stack& args) const
 {
     if (args.size() != 1)
         throw formula_functions::invalid_arg("LEN requires exactly one argument.");
@@ -428,7 +428,7 @@ void formula_functions::fnc_len(value_stack_t& args) const
     args.push_value(s.size());
 }
 
-void formula_functions::fnc_concatenate(value_stack_t& args)
+void formula_functions::fnc_concatenate(formula_value_stack& args)
 {
     string s;
     while (!args.empty())
@@ -437,7 +437,7 @@ void formula_functions::fnc_concatenate(value_stack_t& args)
     args.push_string(sid);
 }
 
-void formula_functions::fnc_now(value_stack_t& args) const
+void formula_functions::fnc_now(formula_value_stack& args) const
 {
     if (!args.empty())
         throw formula_functions::invalid_arg("NOW takes no argument.");
@@ -449,14 +449,14 @@ void formula_functions::fnc_now(value_stack_t& args) const
     args.push_value(cur_time);
 }
 
-void formula_functions::fnc_wait(value_stack_t& args) const
+void formula_functions::fnc_wait(formula_value_stack& args) const
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     args.clear();
     args.push_value(1);
 }
 
-void formula_functions::fnc_subtotal(value_stack_t& args) const
+void formula_functions::fnc_subtotal(formula_value_stack& args) const
 {
     if (args.size() != 2)
         throw formula_functions::invalid_arg("SUBTOTAL requires exactly 2 arguments.");

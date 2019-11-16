@@ -49,26 +49,26 @@ public:
     static formula_function_t get_function_opcode(const char* p, size_t n);
     static const char* get_function_name(formula_function_t oc);
 
-    void interpret(formula_function_t oc, value_stack_t& args);
+    void interpret(formula_function_t oc, formula_value_stack& args);
 
 private:
-    void fnc_max(value_stack_t& args) const;
-    void fnc_min(value_stack_t& args) const;
-    void fnc_sum(value_stack_t& args) const;
-    void fnc_counta(value_stack_t& args) const;
-    void fnc_average(value_stack_t& args) const;
-    void fnc_mmult(value_stack_t& args) const;
+    void fnc_max(formula_value_stack& args) const;
+    void fnc_min(formula_value_stack& args) const;
+    void fnc_sum(formula_value_stack& args) const;
+    void fnc_counta(formula_value_stack& args) const;
+    void fnc_average(formula_value_stack& args) const;
+    void fnc_mmult(formula_value_stack& args) const;
 
-    void fnc_if(value_stack_t& args) const;
+    void fnc_if(formula_value_stack& args) const;
 
-    void fnc_len(value_stack_t& args) const;
-    void fnc_concatenate(value_stack_t& args);
+    void fnc_len(formula_value_stack& args) const;
+    void fnc_concatenate(formula_value_stack& args);
 
-    void fnc_now(value_stack_t& args) const;
+    void fnc_now(formula_value_stack& args) const;
 
-    void fnc_wait(value_stack_t& args) const;
+    void fnc_wait(formula_value_stack& args) const;
 
-    void fnc_subtotal(value_stack_t& args) const;
+    void fnc_subtotal(formula_value_stack& args) const;
 
 private:
     iface::formula_model_access& m_context;

@@ -141,113 +141,113 @@ matrix stack_value::pop_matrix()
     }
 }
 
-value_stack_t::value_stack_t(const iface::formula_model_access& cxt) : m_context(cxt) {}
+formula_value_stack::formula_value_stack(const iface::formula_model_access& cxt) : m_context(cxt) {}
 
-value_stack_t::iterator value_stack_t::begin()
+formula_value_stack::iterator formula_value_stack::begin()
 {
     return m_stack.begin();
 }
 
-value_stack_t::iterator value_stack_t::end()
+formula_value_stack::iterator formula_value_stack::end()
 {
     return m_stack.end();
 }
 
-value_stack_t::const_iterator value_stack_t::begin() const
+formula_value_stack::const_iterator formula_value_stack::begin() const
 {
     return m_stack.begin();
 }
 
-value_stack_t::const_iterator value_stack_t::end() const
+formula_value_stack::const_iterator formula_value_stack::end() const
 {
     return m_stack.end();
 }
 
-value_stack_t::value_type value_stack_t::release(iterator pos)
+formula_value_stack::value_type formula_value_stack::release(iterator pos)
 {
     stack_value* p = pos->release();
     m_stack.erase(pos);
     return value_type(p);
 }
 
-bool value_stack_t::empty() const
+bool formula_value_stack::empty() const
 {
     return m_stack.empty();
 }
 
-size_t value_stack_t::size() const
+size_t formula_value_stack::size() const
 {
     return m_stack.size();
 }
 
-void value_stack_t::clear()
+void formula_value_stack::clear()
 {
     return m_stack.clear();
 }
 
-void value_stack_t::swap(value_stack_t& other)
+void formula_value_stack::swap(formula_value_stack& other)
 {
     m_stack.swap(other.m_stack);
 }
 
-stack_value& value_stack_t::back()
+stack_value& formula_value_stack::back()
 {
     return *m_stack.back();
 }
 
-const stack_value& value_stack_t::back() const
+const stack_value& formula_value_stack::back() const
 {
     return *m_stack.back();
 }
 
-const stack_value& value_stack_t::operator[](size_t pos) const
+const stack_value& formula_value_stack::operator[](size_t pos) const
 {
     return *m_stack[pos];
 }
 
-double value_stack_t::get_value(size_t pos) const
+double formula_value_stack::get_value(size_t pos) const
 {
     const stack_value& v = *m_stack[pos];
     return get_numeric_value(m_context, v);
 }
 
-void value_stack_t::push_back(value_type&& val)
+void formula_value_stack::push_back(value_type&& val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_back");
     m_stack.push_back(std::move(val));
 }
 
-void value_stack_t::push_value(double val)
+void formula_value_stack::push_value(double val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_value: val={}", val);
     m_stack.push_back(make_unique<stack_value>(val));
 }
 
-void value_stack_t::push_string(size_t sid)
+void formula_value_stack::push_string(size_t sid)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_string: sid={}", sid);
     m_stack.push_back(make_unique<stack_value>(sid));
 }
 
-void value_stack_t::push_single_ref(const abs_address_t& val)
+void formula_value_stack::push_single_ref(const abs_address_t& val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_single_ref: val={}", val.get_name());
     m_stack.push_back(make_unique<stack_value>(val));
 }
 
-void value_stack_t::push_range_ref(const abs_range_t& val)
+void formula_value_stack::push_range_ref(const abs_range_t& val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_range_ref: start={}; end={}", val.first.get_name(), val.last.get_name());
     m_stack.push_back(make_unique<stack_value>(val));
 }
 
-void value_stack_t::push_matrix(matrix mtx)
+void formula_value_stack::push_matrix(matrix mtx)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_matrix");
     m_stack.emplace_back(make_unique<stack_value>(std::move(mtx)));
 }
 
-double value_stack_t::pop_value()
+double formula_value_stack::pop_value()
 {
     double ret = 0.0;
     if (m_stack.empty())
@@ -260,7 +260,7 @@ double value_stack_t::pop_value()
     return ret;
 }
 
-const std::string value_stack_t::pop_string()
+const std::string formula_value_stack::pop_string()
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "pop_string");
 
@@ -348,7 +348,7 @@ const std::string value_stack_t::pop_string()
     throw formula_error(formula_error_t::stack_error);
 }
 
-abs_address_t value_stack_t::pop_single_ref()
+abs_address_t formula_value_stack::pop_single_ref()
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "pop_single_ref");
     if (m_stack.empty())
@@ -363,7 +363,7 @@ abs_address_t value_stack_t::pop_single_ref()
     return addr;
 }
 
-abs_range_t value_stack_t::pop_range_ref()
+abs_range_t formula_value_stack::pop_range_ref()
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "pop_range_ref");
 
@@ -379,7 +379,7 @@ abs_range_t value_stack_t::pop_range_ref()
     return range;
 }
 
-matrix value_stack_t::pop_range_value()
+matrix formula_value_stack::pop_range_value()
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "pop_range_value");
 
@@ -395,7 +395,7 @@ matrix value_stack_t::pop_range_value()
     return ret;
 }
 
-stack_value_t value_stack_t::get_type() const
+stack_value_t formula_value_stack::get_type() const
 {
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
