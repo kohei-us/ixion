@@ -92,6 +92,9 @@ private:
     void literal();
     void function();
 
+    void clear_stack();
+    formula_value_stack& get_stack();
+
 private:
     const formula_cell* m_parent_cell;
     iface::formula_model_access& m_context;

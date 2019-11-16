@@ -130,9 +130,10 @@ formula_error_t formula_interpreter::get_error() const
 
 void formula_interpreter::init_tokens()
 {
+    clear_stack();
+
     name_set used_names;
     m_tokens.clear();
-    m_stack.clear();
 
     const formula_tokens_store_ptr_t& ts = m_parent_cell->get_tokens();
     if (!ts)
@@ -194,8 +195,8 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
 void formula_interpreter::pop_result()
 {
     // there should only be one stack value left for the result value.
-    assert(m_stack.size() == 1);
-    stack_value& res = m_stack.back();
+    assert(get_stack().size() == 1);
+    stack_value& res = get_stack().back();
     switch (res.get_type())
     {
         case stack_value_t::range_ref:
@@ -529,7 +530,7 @@ void formula_interpreter::expression()
         bool is_val1 = true, is_val2 = true;
 
         stack_value_t vt;
-        if (!pop_stack_value_or_string(m_context, m_stack, vt, val1, str1))
+        if (!pop_stack_value_or_string(m_context, get_stack(), vt, val1, str1))
             throw formula_error(formula_error_t::general_error);
         is_val1 = vt == stack_value_t::value;
 
@@ -539,7 +540,7 @@ void formula_interpreter::expression()
         next();
         term();
 
-        if (!pop_stack_value_or_string(m_context, m_stack, vt, val2, str2))
+        if (!pop_stack_value_or_string(m_context, get_stack(), vt, val2, str2))
             throw formula_error(formula_error_t::general_error);
         is_val2 = vt == stack_value_t::value;
 
@@ -548,11 +549,11 @@ void formula_interpreter::expression()
             if (is_val2)
             {
                 // Both are numeric values.
-                compare_values(m_stack, oc, val1, val2);
+                compare_values(get_stack(), oc, val1, val2);
             }
             else
             {
-                compare_value_to_string(m_stack, oc, val1, str2);
+                compare_value_to_string(get_stack(), oc, val1, str2);
             }
         }
         else
@@ -560,12 +561,12 @@ void formula_interpreter::expression()
             if (is_val2)
             {
                 // Value 1 is string while value 2 is numeric.
-                compare_string_to_value(m_stack, oc, str1, val2);
+                compare_string_to_value(get_stack(), oc, str1, val2);
             }
             else
             {
                 // Both are strings.
-                compare_strings(m_stack, oc, str1, str2);
+                compare_strings(get_stack(), oc, str1, str2);
             }
         }
     }
@@ -588,9 +589,9 @@ void formula_interpreter::term()
                 mp_handler->push_token(oc);
 
             next();
-            double val = m_stack.pop_value();
+            double val = get_stack().pop_value();
             term();
-            m_stack.push_value(val*m_stack.pop_value());
+            get_stack().push_value(val*get_stack().pop_value());
             return;
         }
         case fop_divide:
@@ -599,12 +600,12 @@ void formula_interpreter::term()
                 mp_handler->push_token(oc);
 
             next();
-            double val = m_stack.pop_value();
+            double val = get_stack().pop_value();
             term();
-            double val2 = m_stack.pop_value();
+            double val2 = get_stack().pop_value();
             if (val2 == 0.0)
                 throw formula_error(formula_error_t::division_by_zero);
-            m_stack.push_value(val/val2);
+            get_stack().push_value(val/val2);
             return;
         }
         default:
@@ -686,7 +687,7 @@ void formula_interpreter::single_ref()
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 
-    m_stack.push_single_ref(abs_addr);
+    get_stack().push_single_ref(abs_addr);
     next();
 }
 
@@ -711,7 +712,7 @@ void formula_interpreter::range_ref()
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 
-    m_stack.push_range_ref(abs_range);
+    get_stack().push_range_ref(abs_range);
     next();
 }
 
@@ -741,7 +742,7 @@ void formula_interpreter::table_ref()
         range = table_hdl->get_range(m_pos, table.column_first, table.column_last, table.areas);
     }
 
-    m_stack.push_range_ref(range);
+    get_stack().push_range_ref(range);
     next();
 }
 
@@ -749,7 +750,7 @@ void formula_interpreter::constant()
 {
     double val = token().get_value();
     next();
-    m_stack.push_value(val);
+    get_stack().push_value(val);
     if (mp_handler)
         mp_handler->push_value(val);
 }
@@ -758,7 +759,7 @@ void formula_interpreter::literal()
 {
     size_t sid = token().get_index();
     next();
-    m_stack.push_string(sid);
+    get_stack().push_string(sid);
     if (mp_handler)
         mp_handler->push_string(sid);
 }
@@ -772,7 +773,7 @@ void formula_interpreter::function()
         mp_handler->push_function(func_oc);
 
     SPDLOG_TRACE(spdlog::get("ixion"), "function: function='{}'", get_formula_function_name(func_oc));
-    assert(m_stack.empty());
+    assert(get_stack().empty());
 
     if (next_token().get_opcode() != fop_open)
         throw invalid_expression("expecting a '(' after a function name.");
@@ -809,9 +810,20 @@ void formula_interpreter::function()
 
     // Function call pops all stack values pushed onto the stack this far, and
     // pushes the result onto the stack.
-    formula_functions(m_context).interpret(func_oc, m_stack);
-    assert(m_stack.size() == 1);
+    formula_functions(m_context).interpret(func_oc, get_stack());
+    assert(get_stack().size() == 1);
+}
+
+void formula_interpreter::clear_stack()
+{
+    m_stack.clear();
+}
+
+formula_value_stack& formula_interpreter::get_stack()
+{
+    return m_stack;
 }
 
 }
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
