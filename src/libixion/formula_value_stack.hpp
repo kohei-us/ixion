@@ -86,6 +86,8 @@ class formula_value_stack
 
 public:
     formula_value_stack() = delete;
+    formula_value_stack(const formula_value_stack&) = delete;
+    formula_value_stack& operator= (const formula_value_stack&) = delete;
 
     explicit formula_value_stack(const iface::formula_model_access& cxt);
 
