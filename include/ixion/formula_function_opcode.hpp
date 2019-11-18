@@ -26,7 +26,12 @@ enum class formula_function_t
     // logical functions
     func_if,
 
+    // mathematical functions,
+    func_int,
+    func_rand,
+
     // string functions
+    func_left,
     func_len,
     func_concatenate,
 
