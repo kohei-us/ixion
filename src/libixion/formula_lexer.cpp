@@ -12,8 +12,6 @@
 #include <iostream>
 #include <sstream>
 
-#define IXION_DEBUG_LEXER 0
-
 using namespace std;
 
 namespace ixion {
@@ -335,15 +333,9 @@ formula_lexer::~formula_lexer() {}
 
 void formula_lexer::tokenize()
 {
-#if IXION_DEBUG_LEXER
-    __IXION_DEBUG_OUT__ << "formula string: '" << std::string(mp_first, m_size) << "'" << endl;
-#endif
     tokenizer tkr(m_tokens, mp_first, m_size);
     tkr.set_sep_arg(m_config.sep_function_arg);
     tkr.run();
-#if IXION_DEBUG_LEXER
-    __IXION_DEBUG_OUT__ << print_tokens(m_tokens, true) << endl;
-#endif
 }
 
 void formula_lexer::swap_tokens(lexer_tokens_t& tokens)

@@ -39,6 +39,8 @@ namespace ixion {
 
 namespace {
 
+#if IXION_DEBUG
+
 std::string gen_trace_output(const formula_cell& fc, const iface::formula_model_access& cxt, const abs_address_t& pos)
 {
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
@@ -46,6 +48,8 @@ std::string gen_trace_output(const formula_cell& fc, const iface::formula_model_
     os << "pos=" << pos.get_name() << "; formula='" << print_formula_tokens(cxt, pos, *resolver, fc.get_tokens()->get()) << "'";
     return os.str();
 }
+
+#endif
 
 }
 

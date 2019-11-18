@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 #if DEBUG_FORMULA_API
 #include <iostream>
@@ -28,20 +29,46 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+#if IXION_DEBUG
+
+std::string debug_print_formula_tokens(const formula_tokens_t& tokens)
+{
+    std::ostringstream os;
+
+    for (const std::unique_ptr<formula_token>& t : tokens)
+    {
+        os << std::endl << "  * " << *t;
+    }
+
+    return os.str();
+}
+
+#endif
+
+}
+
 formula_tokens_t parse_formula_string(
     iface::formula_model_access& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const char* p, size_t n)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "pos={}; formula='{}'", pos.get_name(), std::string(p, n));
     lexer_tokens_t lxr_tokens;
     formula_lexer lexer(cxt.get_config(), p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
+
+    SPDLOG_TRACE(spdlog::get("ixion"), "lexer tokens: {}", print_tokens(lxr_tokens, true));
 
     formula_tokens_t tokens;
     formula_parser parser(lxr_tokens, cxt, resolver);
     parser.set_origin(pos);
     parser.parse();
     parser.get_tokens().swap(tokens);
+
+    SPDLOG_TRACE(spdlog::get("ixion"), "formula tokens (string): {}", print_formula_tokens(cxt, pos, resolver, tokens));
+    SPDLOG_TRACE(spdlog::get("ixion"), "formula tokens (individual): {}", debug_print_formula_tokens(tokens));
 
     return tokens;
 }
