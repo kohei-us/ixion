@@ -209,7 +209,13 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_unknown:
         default:
-            throw formula_functions::invalid_arg("unknown function opcode");
+        {
+            std::ostringstream os;
+            os << "formula function not implemented yet (name="
+                << get_formula_function_name(oc)
+                << ")";
+            throw not_implemented_error(os.str());
+        }
     }
 }
 

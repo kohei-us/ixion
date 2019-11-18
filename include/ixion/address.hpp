@@ -209,6 +209,11 @@ struct IXION_DLLPUBLIC abs_range_t
      * Check whether or not a given address is contained within this range.
      */
     bool contains(const abs_address_t& addr) const;
+
+    /**
+     * Reorder range values as needed to ensure the range is valid.
+     */
+    void reorder();
 };
 
 IXION_DLLPUBLIC bool operator==(const abs_range_t& left, const abs_range_t& right);

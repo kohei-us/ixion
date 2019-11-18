@@ -341,6 +341,18 @@ bool abs_range_t::contains(const abs_address_t& addr) const
         first.column <= addr.column && addr.column <= last.column;
 }
 
+void abs_range_t::reorder()
+{
+    if (first.sheet > last.sheet)
+        std::swap(first.sheet, last.sheet);
+
+    if (first.row > last.row)
+        std::swap(first.row, last.row);
+
+    if (first.column > last.column)
+        std::swap(first.column, last.column);
+}
+
 bool operator==(const abs_range_t& left, const abs_range_t& right)
 {
     return left.first == right.first && left.last == right.last;

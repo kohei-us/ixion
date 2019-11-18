@@ -253,6 +253,7 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(pos);
+                range.reorder();
                 tracker.add(src_pos, range);
                 break;
             }
