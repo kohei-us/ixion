@@ -226,9 +226,9 @@ formula_value_stack::const_iterator formula_value_stack::end() const
 
 formula_value_stack::value_type formula_value_stack::release(iterator pos)
 {
-    stack_value* p = pos->release();
+    auto tmp = std::move(*pos);
     m_stack.erase(pos);
-    return value_type(p);
+    return tmp;
 }
 
 formula_value_stack::value_type formula_value_stack::release_back()
@@ -261,22 +261,22 @@ void formula_value_stack::swap(formula_value_stack& other)
 
 stack_value& formula_value_stack::back()
 {
-    return *m_stack.back();
+    return m_stack.back();
 }
 
 const stack_value& formula_value_stack::back() const
 {
-    return *m_stack.back();
+    return m_stack.back();
 }
 
 const stack_value& formula_value_stack::operator[](size_t pos) const
 {
-    return *m_stack[pos];
+    return m_stack[pos];
 }
 
 double formula_value_stack::get_value(size_t pos) const
 {
-    const stack_value& v = *m_stack[pos];
+    const stack_value& v = m_stack[pos];
     return get_numeric_value(m_context, v);
 }
 
@@ -289,31 +289,31 @@ void formula_value_stack::push_back(value_type&& val)
 void formula_value_stack::push_value(double val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_value: val={}", val);
-    m_stack.push_back(make_unique<stack_value>(val));
+    m_stack.emplace_back(val);
 }
 
 void formula_value_stack::push_string(size_t sid)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_string: sid={}", sid);
-    m_stack.push_back(make_unique<stack_value>(sid));
+    m_stack.emplace_back(sid);
 }
 
 void formula_value_stack::push_single_ref(const abs_address_t& val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_single_ref: val={}", val.get_name());
-    m_stack.push_back(make_unique<stack_value>(val));
+    m_stack.emplace_back(val);
 }
 
 void formula_value_stack::push_range_ref(const abs_range_t& val)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_range_ref: start={}; end={}", val.first.get_name(), val.last.get_name());
-    m_stack.push_back(make_unique<stack_value>(val));
+    m_stack.emplace_back(val);
 }
 
 void formula_value_stack::push_matrix(matrix mtx)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_matrix");
-    m_stack.emplace_back(make_unique<stack_value>(std::move(mtx)));
+    m_stack.emplace_back(std::move(mtx));
 }
 
 double formula_value_stack::pop_value()
@@ -322,7 +322,7 @@ double formula_value_stack::pop_value()
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
-    const stack_value& v = *m_stack.back();
+    const stack_value& v = m_stack.back();
     ret = get_numeric_value(m_context, v);
     m_stack.pop_back();
     SPDLOG_TRACE(spdlog::get("ixion"), "pop_value: ret={}", ret);
@@ -336,7 +336,7 @@ const std::string formula_value_stack::pop_string()
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
-    const stack_value& v = *m_stack.back();
+    const stack_value& v = m_stack.back();
     switch (v.get_type())
     {
         case stack_value_t::string:
@@ -423,7 +423,7 @@ abs_address_t formula_value_stack::pop_single_ref()
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
-    const stack_value& v = *m_stack.back();
+    const stack_value& v = m_stack.back();
     if (v.get_type() != stack_value_t::single_ref)
         throw formula_error(formula_error_t::stack_error);
 
@@ -439,7 +439,7 @@ abs_range_t formula_value_stack::pop_range_ref()
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
-    const stack_value& v = *m_stack.back();
+    const stack_value& v = m_stack.back();
     if (v.get_type() != stack_value_t::range_ref)
         throw formula_error(formula_error_t::stack_error);
 
@@ -455,7 +455,7 @@ matrix formula_value_stack::pop_range_value()
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
-    const stack_value& v = *m_stack.back();
+    const stack_value& v = m_stack.back();
     if (v.get_type() != stack_value_t::range_ref)
         throw formula_error(formula_error_t::stack_error);
 
@@ -469,7 +469,7 @@ stack_value_t formula_value_stack::get_type() const
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
-    return m_stack.back()->get_type();
+    return m_stack.back().get_type();
 }
 
 }

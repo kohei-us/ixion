@@ -5,12 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef IXION_FORMULA_VALUE_STACK_HPP
-#define IXION_FORMULA_VALUE_STACK_HPP
+#ifndef INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
+#define INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
 
 #include "ixion/global.hpp"
 
-#include <vector>
+#include <deque>
 
 namespace ixion {
 
@@ -83,7 +83,7 @@ public:
 
 class formula_value_stack
 {
-    typedef std::vector<std::unique_ptr<stack_value>> store_type;
+    typedef std::deque<stack_value> store_type;
     store_type m_stack;
     const iface::formula_model_access& m_context;
 
