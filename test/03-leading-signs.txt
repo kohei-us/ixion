@@ -1,0 +1,22 @@
+%% Test case for handling leading signs.
+%mode init
+B2=-3
+B4=-4*5
+B5=-2*-3
+B6=+4
+B7=+4+6
+A2=-B2
+A3=A2*-B7
+A4=+B5+B6
+%calc
+%mode result
+B2=-3
+B4=-20
+B5=6
+B6=4
+B7=10
+A2=3
+A3=-30
+A4=10
+%check
+
