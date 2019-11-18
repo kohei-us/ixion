@@ -52,6 +52,8 @@ void tokenize_formula(const std::string& formula)
 
 int main (int argc, char** argv)
 {
+    ixion::init();
+
     namespace po = ::boost::program_options;
 
     po::options_description desc("Allowed options");

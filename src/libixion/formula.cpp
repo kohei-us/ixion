@@ -152,6 +152,9 @@ public:
             case fop_equal:
                 m_os << "=";
                 break;
+            case fop_not_equal:
+                m_os << "<>";
+                break;
             case fop_named_expression:
                 m_os << token->get_name();
                 break;
@@ -163,7 +166,13 @@ public:
                 break;
             case fop_unknown:
             default:
-                ;
+            {
+                std::ostringstream repr;
+                token->write_string(repr);
+                SPDLOG_DEBUG(
+                    spdlog::get("ixion"), "token not printed (repr=\"{}\"; name=\"{}\"; opcode=\"{}\")",
+                    repr.str(), get_opcode_name(token->get_opcode()), get_formula_opcode_string(token->get_opcode()));
+            }
         }
     }
 };
