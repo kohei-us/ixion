@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_FORMULA_INTERPRETER_HPP__
-#define __IXION_FORMULA_INTERPRETER_HPP__
+#ifndef INCLUDED_IXION_FORMULA_INTERPRETER_HPP
+#define INCLUDED_IXION_FORMULA_INTERPRETER_HPP
 
 #include "ixion/global.hpp"
 #include "ixion/formula_tokens.hpp"
@@ -16,6 +16,7 @@
 
 #include <sstream>
 #include <unordered_set>
+#include <deque>
 
 namespace ixion {
 
@@ -43,7 +44,8 @@ class session_handler;
  */
 class formula_interpreter
 {
-    typedef std::unordered_set< ::std::string> name_set;
+    using name_set = std::unordered_set<std::string>;
+    using fv_stacks_type = std::deque<formula_value_stack>;
 
 public:
     typedef ::std::vector<const formula_token*> local_tokens_type;
@@ -101,7 +103,7 @@ private:
     std::unique_ptr<iface::session_handler> mp_handler;
     abs_address_t m_pos;
 
-    formula_value_stack m_stack;
+    fv_stacks_type m_stacks;
     local_tokens_type m_tokens;
     local_tokens_type::const_iterator m_cur_token_itr;
     local_tokens_type::const_iterator m_end_token_pos;

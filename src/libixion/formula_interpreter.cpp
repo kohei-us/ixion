@@ -43,7 +43,6 @@ opcode_token paren_close = opcode_token(fop_close);
 formula_interpreter::formula_interpreter(const formula_cell* cell, iface::formula_model_access& cxt) :
     m_parent_cell(cell),
     m_context(cxt),
-    m_stack(cxt),
     m_error(formula_error_t::no_error)
 {
 }
@@ -816,12 +815,14 @@ void formula_interpreter::function()
 
 void formula_interpreter::clear_stack()
 {
-    m_stack.clear();
+    m_stacks.clear();
+    m_stacks.emplace_back(m_context);
 }
 
 formula_value_stack& formula_interpreter::get_stack()
 {
-    return m_stack;
+    assert(!m_stacks.empty());
+    return m_stacks.back();
 }
 
 }
