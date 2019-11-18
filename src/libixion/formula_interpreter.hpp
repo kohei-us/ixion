@@ -86,6 +86,7 @@ private:
     void expression();
     void term();
     void factor();
+    bool sign();
     void paren();
     void single_ref();
     void range_ref();

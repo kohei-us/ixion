@@ -616,41 +616,81 @@ void formula_interpreter::factor()
 {
     // <constant> || <variable> || '(' <expression> ')' || <function>
 
+    bool negative_sign = sign(); // NB: may be precedeed by a '+' or '-' sign.
     fopcode_t oc = token().get_opcode();
+
     switch (oc)
     {
         case fop_open:
             paren();
-            return;
+            break;
         case fop_named_expression:
+        {
             // All named expressions are supposed to be expanded prior to interpretation.
             SPDLOG_DEBUG(spdlog::get("ixion"), "factor: named expression encountered in factor.");
             throw formula_error(formula_error_t::general_error);
+        }
         case fop_value:
+        {
             constant();
-            return;
+            break;
+        }
         case fop_single_ref:
             single_ref();
-            return;
+            break;
         case fop_range_ref:
             range_ref();
-            return;
+            break;
         case fop_table_ref:
             table_ref();
-            return;
+            break;
         case fop_function:
             function();
-            return;
+            break;
         case fop_string:
             literal();
-            return;
+            break;
+        default:
+            ostringstream os;
+            os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
+            throw invalid_expression(os.str());
+    }
+
+    if (negative_sign)
+    {
+        double v = get_stack().pop_value();
+        get_stack().push_value(v * -1.0);
+    }
+}
+
+bool formula_interpreter::sign()
+{
+    if (!has_token())
+        throw invalid_expression("TODO");
+
+    fopcode_t oc = token().get_opcode();
+    bool sign_set = false;
+
+    switch (oc)
+    {
+        case fop_minus:
+            sign_set = true;
+            // fall through
+        case fop_plus:
+        {
+            if (mp_handler)
+                mp_handler->push_token(oc);
+
+            next();
+
+            if (!has_token())
+                throw invalid_expression("sign: a sign cannot be the last token");
+        }
         default:
             ;
     }
 
-    ostringstream os;
-    os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
-    throw invalid_expression(os.str());
+    return sign_set;
 }
 
 void formula_interpreter::paren()
