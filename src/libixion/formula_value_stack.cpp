@@ -63,6 +63,36 @@ stack_value::stack_value(const abs_range_t& val) :
 stack_value::stack_value(matrix mtx) :
     m_type(stack_value_t::matrix), m_matrix(new matrix(std::move(mtx))) {}
 
+stack_value::stack_value(stack_value&& other) :
+    m_type(other.m_type)
+{
+    other.m_type = stack_value_t::value;
+
+    switch (m_type)
+    {
+        case stack_value_t::matrix:
+            m_matrix = other.m_matrix;
+            other.m_matrix = nullptr;
+            break;
+        case stack_value_t::range_ref:
+            m_range = other.m_range;
+            other.m_range = nullptr;
+            break;
+        case stack_value_t::single_ref:
+            m_address = other.m_address;
+            other.m_address = nullptr;
+            break;
+        case stack_value_t::string:
+            m_str_identifier = other.m_str_identifier;
+            break;
+        case stack_value_t::value:
+            m_value = other.m_value;
+            break;
+        default:
+            ;
+    }
+}
+
 stack_value::~stack_value()
 {
     switch (m_type)
@@ -81,6 +111,37 @@ stack_value::~stack_value()
         default:
             ; // do nothing
     }
+}
+
+stack_value& stack_value::operator= (stack_value&& other)
+{
+    other.m_type = stack_value_t::value;
+
+    switch (m_type)
+    {
+        case stack_value_t::matrix:
+            m_matrix = other.m_matrix;
+            other.m_matrix = nullptr;
+            break;
+        case stack_value_t::range_ref:
+            m_range = other.m_range;
+            other.m_range = nullptr;
+            break;
+        case stack_value_t::single_ref:
+            m_address = other.m_address;
+            other.m_address = nullptr;
+            break;
+        case stack_value_t::string:
+            m_str_identifier = other.m_str_identifier;
+            break;
+        case stack_value_t::value:
+            m_value = other.m_value;
+            break;
+        default:
+            ;
+    }
+
+    return *this;
 }
 
 stack_value_t stack_value::get_type() const
@@ -168,6 +229,14 @@ formula_value_stack::value_type formula_value_stack::release(iterator pos)
     stack_value* p = pos->release();
     m_stack.erase(pos);
     return value_type(p);
+}
+
+formula_value_stack::value_type formula_value_stack::release_back()
+{
+    assert(!m_stack.empty());
+    auto tmp = std::move(m_stack.back());
+    m_stack.pop_back();
+    return tmp;
 }
 
 bool formula_value_stack::empty() const

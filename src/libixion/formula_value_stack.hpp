@@ -56,14 +56,17 @@ class stack_value
 public:
     stack_value() = delete;
     stack_value(const stack_value&) = delete;
-    stack_value& operator= (stack_value) = delete;
+    stack_value& operator= (const stack_value&) = delete;
 
     explicit stack_value(double val);
     explicit stack_value(size_t sid);
     explicit stack_value(const abs_address_t& val);
     explicit stack_value(const abs_range_t& val);
     explicit stack_value(matrix mtx);
+    stack_value(stack_value&& other);
     ~stack_value();
+
+    stack_value& operator= (stack_value&& other);
 
     stack_value_t get_type() const;
     double get_value() const;
@@ -99,6 +102,7 @@ public:
     const_iterator begin() const;
     const_iterator end() const;
     value_type release(iterator pos);
+    value_type release_back();
     bool empty() const;
     size_t size() const;
     void clear();

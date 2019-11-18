@@ -129,7 +129,7 @@ formula_error_t formula_interpreter::get_error() const
 
 void formula_interpreter::init_tokens()
 {
-    clear_stack();
+    clear_stacks();
 
     name_set used_names;
     m_tokens.clear();
@@ -771,6 +771,8 @@ void formula_interpreter::function()
     if (mp_handler)
         mp_handler->push_function(func_oc);
 
+    push_stack();
+
     SPDLOG_TRACE(spdlog::get("ixion"), "function: function='{}'", get_formula_function_name(func_oc));
     assert(get_stack().empty());
 
@@ -811,12 +813,28 @@ void formula_interpreter::function()
     // pushes the result onto the stack.
     formula_functions(m_context).interpret(func_oc, get_stack());
     assert(get_stack().size() == 1);
+
+    pop_stack();
 }
 
-void formula_interpreter::clear_stack()
+void formula_interpreter::clear_stacks()
 {
     m_stacks.clear();
     m_stacks.emplace_back(m_context);
+}
+
+void formula_interpreter::push_stack()
+{
+    m_stacks.emplace_back(m_context);
+}
+
+void formula_interpreter::pop_stack()
+{
+    assert(m_stacks.size() >= 2);
+    assert(m_stacks.back().size() == 1);
+    auto tmp = m_stacks.back().release_back();
+    m_stacks.pop_back();
+    m_stacks.back().push_back(std::move(tmp));
 }
 
 formula_value_stack& formula_interpreter::get_stack()

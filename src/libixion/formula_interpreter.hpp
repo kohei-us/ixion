@@ -94,7 +94,10 @@ private:
     void literal();
     void function();
 
-    void clear_stack();
+    void clear_stacks();
+    void push_stack();
+    void pop_stack();
+
     formula_value_stack& get_stack();
 
 private:
