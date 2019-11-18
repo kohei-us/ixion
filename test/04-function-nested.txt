@@ -1,0 +1,8 @@
+%% Test case for nested functions.
+%mode init
+A5=MIN(MIN(2, 4), MAX(1,8))
+%calc
+%mode result
+A5=2
+%check
+%exit
