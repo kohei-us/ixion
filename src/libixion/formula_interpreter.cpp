@@ -255,6 +255,12 @@ void formula_interpreter::expand_named_expression(const formula_tokens_t* expr, 
     m_tokens.push_back(&paren_close);
 }
 
+void formula_interpreter::ensure_token_exists() const
+{
+    if (!has_token())
+        throw invalid_expression("formula expression ended prematurely");
+}
+
 bool formula_interpreter::has_token() const
 {
     return m_cur_token_itr != m_end_token_pos;
@@ -665,8 +671,7 @@ void formula_interpreter::factor()
 
 bool formula_interpreter::sign()
 {
-    if (!has_token())
-        throw invalid_expression("TODO");
+    ensure_token_exists();
 
     fopcode_t oc = token().get_opcode();
     bool sign_set = false;
