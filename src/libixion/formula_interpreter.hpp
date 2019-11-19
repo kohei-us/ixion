@@ -77,6 +77,7 @@ private:
     bool has_token() const;
     void next();
     const formula_token& token() const;
+    const formula_token& token_or_throw() const;
     const formula_token& next_token();
 
     // The following methods are handlers.  In each handler, the initial

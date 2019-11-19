@@ -277,6 +277,12 @@ const formula_token& formula_interpreter::token() const
     return *(*m_cur_token_itr);
 }
 
+const formula_token& formula_interpreter::token_or_throw() const
+{
+    ensure_token_exists();
+    return *(*m_cur_token_itr);
+}
+
 const formula_token& formula_interpreter::next_token()
 {
     next();
@@ -705,7 +711,7 @@ void formula_interpreter::paren()
 
     next();
     expression();
-    if (token().get_opcode() != fop_close)
+    if (token_or_throw().get_opcode() != fop_close)
         throw invalid_expression("paren: expected close paren");
 
     if (mp_handler)
@@ -811,6 +817,7 @@ void formula_interpreter::literal()
 void formula_interpreter::function()
 {
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
+    ensure_token_exists();
     assert(token().get_opcode() == fop_function);
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
     if (mp_handler)
@@ -846,7 +853,7 @@ void formula_interpreter::function()
             expression();
             expect_sep = true;
         }
-        oc = token().get_opcode();
+        oc = token_or_throw().get_opcode();
     }
 
     if (mp_handler)
