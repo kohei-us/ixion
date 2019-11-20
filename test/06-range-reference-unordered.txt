@@ -1,0 +1,17 @@
+%% Test case for handling disordered range reference.
+%mode init
+A1:1
+A2:2
+A3:3
+A4=SUM(A3:A1)
+%calc
+%mode result
+A4=6
+%check
+%mode edit
+A2:4
+%recalc
+%mode result
+A4=8
+%check
+

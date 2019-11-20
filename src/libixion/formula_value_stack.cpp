@@ -306,6 +306,7 @@ void formula_value_stack::push_single_ref(const abs_address_t& val)
 
 void formula_value_stack::push_range_ref(const abs_range_t& val)
 {
+    assert(val.valid());
     SPDLOG_TRACE(spdlog::get("ixion"), "push_range_ref: start={}; end={}", val.first.get_name(), val.last.get_name());
     m_stack.emplace_back(val);
 }

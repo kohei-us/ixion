@@ -751,6 +751,7 @@ void formula_interpreter::range_ref()
         mp_handler->push_range_ref(range, m_pos);
 
     abs_range_t abs_range = range.to_abs(m_pos);
+    abs_range.reorder();
 
     SPDLOG_TRACE(spdlog::get("ixion"), "range_ref: ref-start={}; ref-end={} (converted to absolute)",
         abs_range.first.get_name(), abs_range.last.get_name(), m_pos.get_name());

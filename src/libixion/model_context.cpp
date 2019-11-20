@@ -1176,6 +1176,13 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     if (range.first.sheet != range.last.sheet)
         throw general_error("multi-sheet range is not allowed.");
 
+    if (!range.valid())
+    {
+        std::ostringstream os;
+        os << "invalid range: " << range;
+        throw std::invalid_argument(os.str());
+    }
+
     row_t rows = range.last.row - range.first.row + 1;
     col_t cols = range.last.column - range.first.column + 1;
 
