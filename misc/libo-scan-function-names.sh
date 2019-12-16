@@ -6,4 +6,4 @@ cat $1 \
     | sed -e "s/.*_FUNCTION_NAMES\",\ \"//g" -e "s/\").*//g" \
     | grep -v "#" \
     | grep -v "\." \
-    | grep -v "_OOO"
+    | grep -v "_OOO" | sort | uniq
