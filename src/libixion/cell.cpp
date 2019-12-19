@@ -332,9 +332,25 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                 abs_range_t range = t->get_range_ref().to_abs(pos);
                 for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
-                    for (col_t col = range.first.column; col <= range.last.column; ++col)
+                    rc_size_t sheet_size = cxt.get_sheet_size(sheet);
+                    col_t col_first = range.first.column, col_last = range.last.column;
+                    if (range.all_columns())
                     {
-                        for (row_t row = range.first.row; row <= range.last.row; ++row)
+                        col_first = 0;
+                        col_last = sheet_size.column - 1;
+                    }
+
+                    for (col_t col = col_first; col <= col_last; ++col)
+                    {
+                        row_t row_first = range.first.row, row_last = range.last.row;
+                        if (range.all_rows())
+                        {
+                            assert(row_last == row_unset);
+                            row_first = 0;
+                            row_last = sheet_size.row - 1;
+                        }
+
+                        for (row_t row = row_first; row <= row_last; ++row)
                         {
                             abs_address_t addr(sheet, row, col);
                             if (cxt.get_celltype(addr) != celltype_t::formula)

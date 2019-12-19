@@ -116,6 +116,13 @@ void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
         throw std::invalid_argument(os.str());
     }
 
+    if (dest.all_columns() || dest.all_rows())
+    {
+        std::ostringstream os;
+        os << "dirty_cell_tracker::add: unset column or row range is not allowed " << dest;
+        throw std::invalid_argument(os.str());
+    }
+
     rtree_type& tree = mp_impl->fetch_grid_or_resize(dest.first.sheet);
 
     rtree_type::extent_type search_box(
@@ -149,7 +156,14 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
     if (!dest.valid())
     {
         std::ostringstream os;
-        os << "dirty_cell_tracker::add: invalid destination range " << dest;
+        os << "dirty_cell_tracker::remove: invalid destination range " << dest;
+        throw std::invalid_argument(os.str());
+    }
+
+    if (dest.all_columns() || dest.all_rows())
+    {
+        std::ostringstream os;
+        os << "dirty_cell_tracker::remove: unset column or row range is not allowed " << dest;
         throw std::invalid_argument(os.str());
     }
 

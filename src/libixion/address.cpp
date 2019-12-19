@@ -136,10 +136,10 @@ abs_address_t address_t::to_abs(const abs_address_t& origin) const
     if (!abs_sheet)
         abs_addr.sheet += origin.sheet;
 
-    if (!abs_row)
+    if (!abs_row && row <= row_upper_bound)
         abs_addr.row += origin.row;
 
-    if (!abs_column)
+    if (!abs_column && column <= column_upper_bound)
         abs_addr.column += origin.column;
 
     return abs_addr;

@@ -255,6 +255,17 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(pos);
+                rc_size_t sheet_size = cxt.get_sheet_size(range.first.sheet);
+                if (range.all_columns())
+                {
+                    range.first.column = 0;
+                    range.last.column = sheet_size.column - 1;
+                }
+                if (range.all_rows())
+                {
+                    range.first.row = 0;
+                    range.last.row = sheet_size.row - 1;
+                }
                 range.reorder();
                 tracker.add(src_pos, range);
                 break;

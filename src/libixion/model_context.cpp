@@ -1183,17 +1183,30 @@ matrix model_context::get_range_value(const abs_range_t& range) const
         throw std::invalid_argument(os.str());
     }
 
-    row_t rows = range.last.row - range.first.row + 1;
-    col_t cols = range.last.column - range.first.column + 1;
+    rc_size_t sheet_size = get_sheet_size(range.first.sheet);
+    abs_range_t range_clipped = range;
+    if (range_clipped.all_rows())
+    {
+        range_clipped.first.row = 0;
+        range_clipped.last.row = sheet_size.row - 1;
+    }
+    if (range_clipped.all_columns())
+    {
+        range_clipped.first.column = 0;
+        range_clipped.last.column = sheet_size.column - 1;
+    }
+
+    row_t rows = range_clipped.last.row - range_clipped.first.row + 1;
+    col_t cols = range_clipped.last.column - range_clipped.first.column + 1;
 
     matrix ret(rows, cols);
     for (row_t i = 0; i < rows; ++i)
     {
         for (col_t j = 0; j < cols; ++j)
         {
-            row_t row = i + range.first.row;
-            col_t col = j + range.first.column;
-            double val = get_numeric_value(abs_address_t(range.first.sheet, row, col));
+            row_t row = i + range_clipped.first.row;
+            col_t col = j + range_clipped.first.column;
+            double val = get_numeric_value(abs_address_t(range_clipped.first.sheet, row, col));
 
             // TODO: we need to handle string types when that becomes available.
             ret.set(i, j, val);
