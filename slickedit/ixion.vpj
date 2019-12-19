@@ -275,6 +275,8 @@
                 <F N="../src/libixion/concrete_formula_tokens.hpp"/>
                 <F N="../src/libixion/config.cpp"/>
                 <F N="../src/libixion/constants.inl"/>
+                <F N="../src/libixion/debug.cpp"/>
+                <F N="../src/libixion/debug.hpp"/>
                 <F N="../src/libixion/dirty_cell_tracker.cpp"/>
                 <F N="../src/libixion/dirty_cell_tracker_test.cpp"/>
                 <F N="../src/libixion/exceptions.cpp"/>

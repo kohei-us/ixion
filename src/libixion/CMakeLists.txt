@@ -9,6 +9,7 @@ add_library(libixion-${IXION_API_VERSION} SHARED
     compute_engine_cuda.cpp
     concrete_formula_tokens.cpp
     config.cpp
+    debug.cpp
     dirty_cell_tracker.cpp
     exceptions.cpp
     formula.cpp

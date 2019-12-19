@@ -8,14 +8,17 @@
 #include "ixion/formula.hpp"
 #include "ixion/address.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/formula_name_resolver.hpp"
 
 #include "queue_entry.hpp"
+#include "debug.hpp"
 
 #if IXION_THREADS
 #include "cell_queue_manager.hpp"
 #endif
 
 #include <algorithm>
+#include <spdlog/spdlog.h>
 
 namespace ixion {
 
@@ -34,7 +37,13 @@ void calculate_sorted_cells(
 
     // Reset cell status.
     for (queue_entry& e : entries)
+    {
         e.p->reset();
+        SPDLOG_TRACE(
+            spdlog::get("ixion"), "calculate_sorted_cells: pos={} formula={}",
+            e.pos.get_name(),
+            detail::print_formula_expression(cxt, e.pos, *e.p));
+    }
 
     // First, detect circular dependencies and mark those circular
     // dependent cells with appropriate error flags.

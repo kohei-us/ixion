@@ -31,6 +31,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	concrete_formula_tokens.hpp \
 	concrete_formula_tokens.cpp \
 	config.cpp \
+	debug.hpp \
+	debug.cpp \
 	dirty_cell_tracker.cpp \
 	exceptions.cpp \
 	formula.cpp \
