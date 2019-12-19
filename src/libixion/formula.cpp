@@ -127,13 +127,15 @@ public:
             case fop_single_ref:
             {
                 address_t addr = token->get_single_ref();
-                m_os << m_resolver.get_name(addr, m_pos, false);
+                bool sheet_name = addr.to_abs(m_pos).sheet != m_pos.sheet;
+                m_os << m_resolver.get_name(addr, m_pos, sheet_name);
                 break;
             }
             case fop_range_ref:
             {
                 range_t range = token->get_range_ref();
-                m_os << m_resolver.get_name(range, m_pos, false);
+                bool sheet_name = range.to_abs(m_pos).first.sheet != m_pos.sheet;
+                m_os << m_resolver.get_name(range, m_pos, sheet_name);
                 break;
             }
             case fop_table_ref:
