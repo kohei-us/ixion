@@ -27,8 +27,7 @@
 #include <deque>
 #include <iostream>
 #include <cstring>
-
-#define DEBUG_MODEL_CONTEXT 0
+#include <spdlog/spdlog.h>
 
 using namespace std;
 
@@ -253,6 +252,8 @@ size_t model_context_impl::get_sheet_count() const
 sheet_t model_context_impl::append_sheet(
     std::string&& name, row_t row_size, col_t col_size)
 {
+    SPDLOG_TRACE(spdlog::get("ixion"), "append_sheet: name='{}'", name);
+
     // Check if the new sheet name already exists.
     strings_type::const_iterator it =
         std::find(m_sheet_names.begin(), m_sheet_names.end(), name);
