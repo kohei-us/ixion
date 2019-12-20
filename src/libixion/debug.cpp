@@ -11,6 +11,8 @@
 #include "ixion/cell.hpp"
 #include "ixion/formula.hpp"
 
+#include <sstream>
+
 namespace ixion { namespace detail {
 
 std::string print_formula_expression(const iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell& cell)
@@ -19,6 +21,13 @@ std::string print_formula_expression(const iface::formula_model_access& cxt, con
     assert(resolver);
     const formula_tokens_t& tokens = cell.get_tokens()->get();
     return print_formula_tokens(cxt, pos, *resolver, tokens);
+}
+
+std::string print_formula_token_repr(const formula_token& t)
+{
+    std::ostringstream os;
+    os << t;
+    return os.str();
 }
 
 }}

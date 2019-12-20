@@ -15,6 +15,7 @@
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
+#include "debug.hpp"
 
 #define DEBUG_FORMULA_API 0
 
@@ -240,10 +241,13 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
         src_pos.last.row += fg_props.size.row - 1;
     }
 
+    SPDLOG_TRACE(spdlog::get("ixion"), "register_formula_cell: pos={}; formula='{}'", pos.get_name(), detail::print_formula_expression(cxt, pos, *cell));
     std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
 
     for (const formula_token* p : ref_tokens)
     {
+        SPDLOG_TRACE(spdlog::get("ixion"), "register_formula_cell: ref token: {}", detail::print_formula_token_repr(*p));
+
         switch (p->get_opcode())
         {
             case fop_single_ref:
