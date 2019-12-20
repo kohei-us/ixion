@@ -908,9 +908,9 @@ void to_relative_address(address_t& addr, const abs_address_t& pos)
 {
     if (!addr.abs_sheet)
         addr.sheet -= pos.sheet;
-    if (!addr.abs_row)
+    if (!addr.abs_row && addr.row <= row_upper_bound)
         addr.row -= pos.row;
-    if (!addr.abs_column)
+    if (!addr.abs_column && addr.column <= column_upper_bound)
         addr.column -= pos.column;
 }
 

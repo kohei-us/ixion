@@ -1,0 +1,17 @@
+%% Test case for handling a range reference with whole row.
+%mode init
+A2:1
+B2:2
+C2:3
+E3=SUM(2:2)
+%calc
+%mode result
+E3=6
+%check
+%mode edit
+A2:10
+%recalc
+%mode result
+E3=15
+%check
+%exit
