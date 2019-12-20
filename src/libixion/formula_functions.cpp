@@ -787,10 +787,14 @@ void formula_functions::fnc_subtotal(formula_value_stack& args) const
             // SUM
             matrix mx = m_context.get_range_value(range);
             args.push_value(sum_matrix_elements(mx));
+            break;
         }
-        break;
         default:
-            throw formula_functions::invalid_arg("not implemented yet");
+        {
+            std::ostringstream os;
+            os << "SUBTOTAL: function type " << subtype << " not implemented yet";
+            throw formula_functions::invalid_arg(os.str());
+        }
     }
 }
 
