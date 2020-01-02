@@ -3,10 +3,13 @@
 %mode init
 D2=RAND()
 E6=RAND()+12
+F7=145/RAND()
 %mode result-cache
 D2=12
 E6=145
+F7=#DIV/0!
 %mode result
 D2=12
 E6=145
+F7=#DIV/0!
 %check
