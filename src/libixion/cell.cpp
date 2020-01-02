@@ -444,6 +444,12 @@ formula_result formula_cell::get_result_cache() const
     return mp_impl->get_single_formula_result(src);
 }
 
+void formula_cell::set_result_cache(formula_result result)
+{
+    std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
+    mp_impl->m_calc_status->result = ixion::make_unique<formula_result>(std::move(result));
+}
+
 formula_result formula_cell::get_result_cache_nowait() const
 {
     const formula_result* src = get_raw_result_cache_nowait();

@@ -29,6 +29,7 @@ class model_parser
         parse_mode_unknown = 0,
         parse_mode_init,
         parse_mode_result,
+        parse_mode_result_cache,
         parse_mode_edit,
         parse_mode_table,
         parse_mode_session,
@@ -101,6 +102,7 @@ private:
     void parse_init();
     void parse_edit();
     void parse_result();
+    void parse_result_cache();
 
     void parse_table();
     void parse_table_columns(const mem_str_buf& str);

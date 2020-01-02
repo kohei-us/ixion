@@ -1,0 +1,12 @@
+%% Test case for formula cells with cached results. This test case intentionally
+%% does not calculate formula cells before checking their results.
+%mode init
+D2=RAND()
+E6=RAND()+12
+%mode result-cache
+D2=12
+E6=145
+%mode result
+D2=12
+E6=145
+%check

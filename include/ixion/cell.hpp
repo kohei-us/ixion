@@ -89,13 +89,21 @@ public:
     /**
      * Get the cached result as a single cell.  For a non-grouped formula
      * cell, it should be identical to the value from the {@link
-     * get_result_cache} call.  For a grouped formula cell, you'll get a
+     * get_raw_result_cache} call.  For a grouped formula cell, you'll get a
      * single value assigned to the position of the cell in case the original
      * result is a matrix value.
      *
      * @return formula result.
      */
     formula_result get_result_cache() const;
+
+    /**
+     * Set a cached result to this formula cell instance.
+     *
+     *
+     * @param result cached result.
+     */
+    void set_result_cache(formula_result result);
 
     formula_result get_result_cache_nowait() const;
 

@@ -110,7 +110,8 @@ enum class formula_name_resolver_t
 };
 
 /**
- * Formula error types.
+ * Formula error types.  Note that only the official (i.e. non-internal)
+ * error types have their corresponding error strings.
  *
  * @see ixion::get_formula_error_name
  */

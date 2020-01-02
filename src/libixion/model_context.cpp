@@ -112,7 +112,8 @@ public:
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void fill_down_cells(const abs_address_t& src, size_t n_dst);
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
-    void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
+    void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens, formula_result result);
+    formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
@@ -661,6 +662,16 @@ void model_context_impl::set_formula_cell(const abs_address_t& addr, formula_tok
 }
 
 void model_context_impl::set_formula_cell(
+    const abs_address_t& addr, formula_tokens_t tokens, formula_result result)
+{
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+
+    formula_cell* fc = set_formula_cell(addr, ts);
+    fc->set_result_cache(std::move(result));
+}
+
+formula_cell* model_context_impl::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
     std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(tokens);
@@ -668,7 +679,9 @@ void model_context_impl::set_formula_cell(
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, fcell.release());
+    formula_cell* p = fcell.release();
+    pos_hint = col_store.set(pos_hint, addr.row, p);
+    return p;
 }
 
 void model_context_impl::set_grouped_formula_cells(
@@ -950,7 +963,7 @@ const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& ad
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     if (col_store.get_type(addr.row) != element_type_formula)
-        return NULL;
+        return nullptr;
 
     return col_store.get<formula_cell*>(addr.row);
 }
@@ -959,7 +972,7 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
     column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     if (col_store.get_type(addr.row) != element_type_formula)
-        return NULL;
+        return nullptr;
 
     return col_store.get<formula_cell*>(addr.row);
 }
@@ -1069,6 +1082,11 @@ void model_context::set_string_cell(const abs_address_t& addr, string_id_t ident
 void model_context::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
 {
     mp_impl->set_formula_cell(addr, std::move(tokens));
+}
+
+void model_context::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens, formula_result result)
+{
+    mp_impl->set_formula_cell(addr, std::move(tokens), std::move(result));
 }
 
 void model_context::set_formula_cell(

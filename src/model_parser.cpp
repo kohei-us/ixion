@@ -127,6 +127,7 @@ enum class type
     mode_init,
     mode_edit,
     mode_result,
+    mode_result_cache,
     mode_table,
     mode_session,
     mode_named_expression,
@@ -146,6 +147,7 @@ const std::vector<map_type::entry> entries =
     { IXION_ASCII("mode init"),             type::mode_init             },
     { IXION_ASCII("mode named-expression"), type::mode_named_expression },
     { IXION_ASCII("mode result"),           type::mode_result           },
+    { IXION_ASCII("mode result-cache"),     type::mode_result_cache     },
     { IXION_ASCII("mode session"),          type::mode_session          },
     { IXION_ASCII("mode table"),            type::mode_table            },
     { IXION_ASCII("print dependency"),      type::print_dependency      },
@@ -239,6 +241,9 @@ void model_parser::parse()
                 break;
             case parse_mode_result:
                 parse_result();
+                break;
+            case parse_mode_result_cache:
+                parse_result_cache();
                 break;
             case parse_mode_table:
                 parse_table();
@@ -340,6 +345,14 @@ void model_parser::parse_command()
             // Clear any previous result values.
             m_formula_results.clear();
             m_parse_mode = parse_mode_result;
+            break;
+        }
+        case commands::type::mode_result_cache:
+        {
+            print_section_title("caching formula results");
+
+            m_parse_mode = parse_mode_result_cache;
+            m_print_separator = true;
             break;
         }
         case commands::type::mode_edit:
@@ -606,6 +619,47 @@ void model_parser::parse_result()
     }
     else
         itr->second = fres;
+}
+
+void model_parser::parse_result_cache()
+{
+    parsed_assignment_type res = parse_assignment();
+
+    string name_s = res.first.str();
+
+    formula_result fres;
+    fres.parse(m_context, res.second.get(), res.second.size());
+
+    formula_name_t fnt = mp_name_resolver->resolve(
+        name_s.data(), name_s.size(), abs_address_t(m_current_sheet,0,0));
+
+    switch (fnt.type)
+    {
+        case formula_name_t::cell_reference:
+        {
+            abs_address_t pos = to_address(fnt.address).to_abs(abs_address_t());
+            formula_cell* fc = m_context.get_formula_cell(pos);
+            if (!fc)
+            {
+                std::ostringstream os;
+                os << name_s << " is not a formula cell";
+                throw model_parser::parse_error(name_s);
+            }
+
+            fc->set_result_cache(fres);
+
+            cout << get_display_cell_string(pos) << ": " << fres.str(m_context) << endl;
+            break;
+        }
+        case formula_name_t::range_reference:
+            throw model_parser::parse_error("TODO: we do not support setting result cache to range just yet.");
+        default:
+        {
+            std::ostringstream os;
+            os << "invalid cell name: " << name_s;
+            throw model_parser::parse_error(os.str());
+        }
+    }
 }
 
 void model_parser::parse_table()
@@ -1054,7 +1108,7 @@ void model_parser::check()
             throw check_error("empty cell name");
 
         const formula_result& res = itr->second;
-        cout << name << " : " << res.str(m_context) << endl;
+        cout << name << ": " << res.str(m_context) << endl;
 
         formula_name_t name_type = mp_name_resolver->resolve(&name[0], name.size(), abs_address_t());
         if (name_type.type != formula_name_t::cell_reference)
