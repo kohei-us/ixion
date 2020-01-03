@@ -114,6 +114,7 @@ public:
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
     void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens, formula_result result);
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
+    formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
@@ -684,6 +685,20 @@ formula_cell* model_context_impl::set_formula_cell(
     return p;
 }
 
+formula_cell* model_context_impl::set_formula_cell(
+    const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result)
+{
+    std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(tokens);
+
+    worksheet& sheet = m_sheets.at(addr.sheet);
+    column_store_t& col_store = sheet.at(addr.column);
+    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    formula_cell* p = fcell.release();
+    p->set_result_cache(std::move(result));
+    pos_hint = col_store.set(pos_hint, addr.row, p);
+    return p;
+}
+
 void model_context_impl::set_grouped_formula_cells(
     const abs_range_t& group_range, formula_tokens_t tokens)
 {
@@ -1093,6 +1108,12 @@ void model_context::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
     mp_impl->set_formula_cell(addr, tokens);
+}
+
+void model_context::set_formula_cell(
+    const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result)
+{
+    mp_impl->set_formula_cell(addr, tokens, std::move(result));
 }
 
 void model_context::set_grouped_formula_cells(

@@ -163,6 +163,17 @@ public:
      */
     void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
 
+    /**
+     * Set a formula cell at a specified address.  This variant takes a
+     * formula tokens store that can be shared between multiple formula cell
+     * instances.
+     *
+     * @param addr address at which to set a formula cell.
+     * @param tokens formula tokens to put into the formula cell.
+     * @param result cached result of this formula cell.
+     */
+    void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
+
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 
     abs_range_t get_data_range(sheet_t sheet) const;
