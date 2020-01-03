@@ -856,7 +856,9 @@ formula_cell* insert_formula(
     const formula_name_resolver& resolver)
 {
     formula_tokens_t tokens = parse_formula_string(cxt, pos, resolver, exp, strlen(exp));
-    cxt.set_formula_cell(pos, std::move(tokens));
+    auto ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+    cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
     formula_cell* p = cxt.get_formula_cell(pos);
     assert(p);
@@ -891,7 +893,9 @@ void test_model_context_storage()
         abs_address_t pos(0,3,0);
         const char* exp = "SUM(1,2,3)";
         formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp, strlen(exp));
-        cxt.set_formula_cell(pos, std::move(tokens));
+        auto ts = formula_tokens_store::create();
+        ts->get() = std::move(tokens);
+        cxt.set_formula_cell(pos, ts);
         formula_cell* p = cxt.get_formula_cell(pos);
         assert(p);
     }

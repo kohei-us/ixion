@@ -71,14 +71,18 @@ void test_range_dependency()
     // C5
     abs_address_t pos(0,4,2);
     formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("SUM(A1:A3,C1:E1)"));
-    cxt.set_formula_cell(pos, std::move(tokens));
+    auto ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+    cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
 
     // A10
     pos.row = 9;
     pos.column = 0;
     tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("C5*2"));
-    cxt.set_formula_cell(pos, std::move(tokens));
+    ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+    cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, both C5 and A10 should get updated.
@@ -118,7 +122,9 @@ void test_matrix_dependency()
     // A10
     abs_address_t pos(0,9,0);
     tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("C5*2"));
-    cxt.set_formula_cell(pos, std::move(tokens));
+    auto ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+    cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
 
     // If A1 is modified, both C5 and A10 should get updated.

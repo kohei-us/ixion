@@ -156,7 +156,9 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
         ixion::parse_formula_string(
             cxt, pos, *sd->m_global->m_resolver, formula, strlen(formula));
 
-    cxt.set_formula_cell(pos, std::move(tokens));
+    auto ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
+    cxt.set_formula_cell(pos, ts);
 
     // Put this formula cell in a dependency chain.
     ixion::register_formula_cell(cxt, pos);
