@@ -136,7 +136,30 @@ void test_matrix()
         assert(e.type == matrix::element_type::numeric);
         assert(e.numeric == c.val);
     }
-};
+}
+
+void test_matrix_non_numeric_values()
+{
+    matrix mtx(2, 2);
+    mtx.set(0, 0, 1.1);
+    mtx.set(1, 0, formula_error_t::division_by_zero);
+    mtx.set(0, 1, string_id_t(3));
+    mtx.set(1, 1, true);
+
+    assert(mtx.get_numeric(0, 0) == 1.1);
+
+    matrix::element elem = mtx.get(1, 0);
+    assert(elem.type == matrix::element_type::error);
+    assert(elem.error == formula_error_t::division_by_zero);
+
+    elem = mtx.get(0, 1);
+    assert(elem.type == matrix::element_type::string);
+    assert(elem.string_id == 3u);
+
+    elem = mtx.get(1, 1);
+    assert(elem.type == matrix::element_type::boolean);
+    assert(elem.boolean == true);
+}
 
 struct ref_name_entry
 {
@@ -1540,6 +1563,7 @@ int main()
     test_string_pool();
     test_formula_tokens_store();
     test_matrix();
+    test_matrix_non_numeric_values();
 
     test_name_resolver_excel_a1();
     test_name_resolver_named_expression();
