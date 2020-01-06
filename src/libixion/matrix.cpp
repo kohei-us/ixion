@@ -11,7 +11,6 @@
 #include <limits>
 #include <cstring>
 #include <functional>
-#include <iostream>
 
 namespace ixion {
 
@@ -92,7 +91,6 @@ bool matrix::is_numeric(size_t row, size_t col) const
     switch (mp_impl->m_data.get_type(row, col))
     {
         case mdds::mtm::element_numeric:
-        case mdds::mtm::element_integer:
         case mdds::mtm::element_boolean:
             return true;
         default:
@@ -124,10 +122,23 @@ matrix::element matrix::get(size_t row, size_t col) const
             me.numeric = mp_impl->m_data.get_numeric(row, col);
             break;
         case mdds::mtm::element_integer:
-            // This is a string ID.
-            me.type = element_type::string;
-            me.string_id = mp_impl->m_data.get_integer(row, col);
+        {
+            // This is either a string ID or an error.  A negative value means
+            // it's an error value.
+            auto v = mp_impl->m_data.get_integer(row, col);
+
+            if (v >= 0)
+            {
+                me.type = element_type::string;
+                me.string_id = v;
+            }
+            else
+            {
+                me.type = element_type::error;
+                me.error = static_cast<formula_error_t>(-v);
+            }
             break;
+        }
         case mdds::mtm::element_boolean:
             me.type = element_type::boolean;
             me.boolean = mp_impl->m_data.get_boolean(row, col);
@@ -169,12 +180,12 @@ numeric_matrix matrix::as_numeric() const
             {
                 case mdds::mtm::element_integer:
                 {
-                    using block_type = matrix_store_t::integer_block_type;
-                    auto it  = block_type::begin(*node.data);
-                    auto ite = block_type::end(*node.data);
-
-                    for (; it != ite; ++it)
-                        *dest++ = *it;
+                    // String and error values will be handled as numeric values of 0.0.
+#ifndef __STDC_IEC_559__
+                    throw std::runtime_error("IEEE 754 is not fully supported.");
+#endif
+                    std::memset(dest, 0, sizeof(double)*node.size); // IEEE 754 defines 0.0 to be 8 zero bytes.
+                    std::advance(dest, node.size);
                     break;
                 }
                 case mdds::mtm::element_boolean:

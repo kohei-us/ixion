@@ -30,7 +30,7 @@ class IXION_DLLPUBLIC matrix
 
 public:
 
-    enum class element_type { numeric, string, boolean, empty };
+    enum class element_type { numeric, string, boolean, error, empty };
 
     struct element
     {
@@ -41,6 +41,7 @@ public:
             double numeric;
             bool boolean;
             string_id_t string_id;
+            formula_error_t error;
         };
     };
 

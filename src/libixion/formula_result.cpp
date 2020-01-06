@@ -201,6 +201,11 @@ struct formula_result::impl
 
                                 break;
                             }
+                            case matrix::element_type::error:
+                            {
+                                os << get_formula_error_name(e.error);
+                                break;
+                            }
                             case matrix::element_type::boolean:
                             {
                                 os << e.boolean;

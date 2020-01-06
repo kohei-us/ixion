@@ -157,6 +157,7 @@ struct formula_cell::impl
                     case matrix::element_type::boolean:
                         return elem.boolean ? 1.0 : 0.0;
                     case matrix::element_type::string:
+                    case matrix::element_type::error:
                     default:
                         throw formula_error(formula_error_t::invalid_value_type);
                 }
@@ -210,6 +211,8 @@ struct formula_cell::impl
                 return formula_result(elem.numeric);
             case matrix::element_type::string:
                 return formula_result(elem.string_id);
+            case matrix::element_type::error:
+                return formula_result(elem.error);
             case matrix::element_type::empty:
                 return formula_result();
             case matrix::element_type::boolean:

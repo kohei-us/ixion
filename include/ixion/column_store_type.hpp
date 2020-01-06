@@ -55,7 +55,7 @@ using column_stores_t = std::deque<column_store_t>;
  */
 struct matrix_store_trait
 {
-    typedef mdds::mtv::uint64_element_block integer_element_block;
+    typedef mdds::mtv::int64_element_block integer_element_block;
     typedef mdds::mtv::string_element_block string_element_block;
 
     typedef mdds::mtv::element_block_func element_block_func;
