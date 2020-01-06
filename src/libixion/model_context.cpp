@@ -37,6 +37,34 @@ namespace {
 
 model_context::session_handler_factory dummy_session_handler_factory;
 
+rc_size_t to_group_size(const abs_range_t& group_range)
+{
+    rc_size_t group_size;
+    group_size.row    = group_range.last.row - group_range.first.row + 1;
+    group_size.column = group_range.last.column - group_range.first.column + 1;
+    return group_size;
+}
+
+void set_grouped_formula_cells_to_workbook(
+    workbook& wb, const abs_address_t& top_left, const rc_size_t& group_size,
+    const calc_status_ptr_t& cs, const formula_tokens_store_ptr_t& ts)
+{
+    worksheet& sheet = wb.at(top_left.sheet);
+
+    for (col_t col_offset = 0; col_offset < group_size.column; ++col_offset)
+    {
+        col_t col = top_left.column + col_offset;
+        column_store_t& col_store = sheet.at(col);
+        column_store_t::iterator& pos_hint = sheet.get_pos_hint(col);
+
+        for (row_t row_offset = 0; row_offset < group_size.row; ++row_offset)
+        {
+            row_t row = top_left.row + row_offset;
+            pos_hint = col_store.set(pos_hint, row, new formula_cell(row_offset, col_offset, cs, ts));
+        }
+    }
+}
+
 } // anonymous namespace
 
 class model_context_impl
@@ -114,6 +142,7 @@ public:
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
+    void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens, formula_result result);
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
@@ -682,31 +711,31 @@ formula_cell* model_context_impl::set_formula_cell(
 void model_context_impl::set_grouped_formula_cells(
     const abs_range_t& group_range, formula_tokens_t tokens)
 {
-    const abs_address_t& top_left = group_range.first;
-
-    rc_size_t group_size;
-    group_size.row    = group_range.last.row - group_range.first.row + 1;
-    group_size.column = group_range.last.column - group_range.first.column + 1;
-
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
 
+    rc_size_t group_size = to_group_size(group_range);
     calc_status_ptr_t cs(new calc_status(group_size));
+    set_grouped_formula_cells_to_workbook(m_sheets, group_range.first, group_size, cs, ts);
+}
 
-    worksheet& sheet = m_sheets.at(top_left.sheet);
+void model_context_impl::set_grouped_formula_cells(
+    const abs_range_t& group_range, formula_tokens_t tokens, formula_result result)
+{
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
+    ts->get() = std::move(tokens);
 
-    for (col_t col_offset = 0; col_offset < group_size.column; ++col_offset)
-    {
-        col_t col = top_left.column + col_offset;
-        column_store_t& col_store = sheet.at(col);
-        column_store_t::iterator& pos_hint = sheet.get_pos_hint(col);
+    rc_size_t group_size = to_group_size(group_range);
 
-        for (row_t row_offset = 0; row_offset < group_size.row; ++row_offset)
-        {
-            row_t row = top_left.row + row_offset;
-            pos_hint = col_store.set(pos_hint, row, new formula_cell(row_offset, col_offset, cs, ts));
-        }
-    }
+    if (result.get_type() != formula_result::result_type::matrix)
+        throw std::invalid_argument("cached result for grouped formula cells must be of matrix type.");
+
+    if (row_t(result.get_matrix().row_size()) != group_size.row || col_t(result.get_matrix().col_size()) != group_size.column)
+        throw std::invalid_argument("dimension of the cached result differs from the size of the group.");
+
+    calc_status_ptr_t cs(new calc_status(group_size));
+    cs->result = ixion::make_unique<formula_result>(std::move(result));
+    set_grouped_formula_cells_to_workbook(m_sheets, group_range.first, group_size, cs, ts);
 }
 
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
@@ -1098,6 +1127,12 @@ void model_context::set_grouped_formula_cells(
     const abs_range_t& group_range, formula_tokens_t tokens)
 {
     mp_impl->set_grouped_formula_cells(group_range, std::move(tokens));
+}
+
+void model_context::set_grouped_formula_cells(
+    const abs_range_t& group_range, formula_tokens_t tokens, formula_result result)
+{
+    mp_impl->set_grouped_formula_cells(group_range, std::move(tokens), std::move(result));
 }
 
 abs_range_t model_context::get_data_range(sheet_t sheet) const
