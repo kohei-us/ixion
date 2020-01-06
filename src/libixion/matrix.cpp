@@ -110,6 +110,22 @@ void matrix::set(size_t row, size_t col, double val)
     mp_impl->m_data.set(row, col, val);
 }
 
+void matrix::set(size_t row, size_t col, bool val)
+{
+    mp_impl->m_data.set(row, col, val);
+}
+
+void matrix::set(size_t row, size_t col, string_id_t val)
+{
+    mp_impl->m_data.set(row, col, static_cast<int64_t>(val));
+}
+
+void matrix::set(size_t row, size_t col, formula_error_t val)
+{
+    int64_t encoded = -static_cast<uint8_t>(val);
+    mp_impl->m_data.set(row, col, encoded);
+}
+
 matrix::element matrix::get(size_t row, size_t col) const
 {
     element me;

@@ -41,6 +41,7 @@ public:
     formula_result(double v);
     formula_result(string_id_t strid);
     formula_result(formula_error_t e);
+    formula_result(matrix mtx);
     ~formula_result();
 
     void reset();
@@ -81,6 +82,8 @@ public:
      * @return matrix result value.
      */
     const matrix& get_matrix() const;
+
+    matrix& get_matrix();
 
     /**
      * Get the type of result.

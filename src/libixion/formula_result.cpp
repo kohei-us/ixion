@@ -42,6 +42,7 @@ struct formula_result::impl
     impl(double v) : m_type(result_type::value), m_value(v) {}
     impl(string_id_t strid) : m_type(result_type::string), m_str_identifier(strid) {}
     impl(formula_error_t e) : m_type(result_type::error), m_error(e) {}
+    impl(matrix mtx) : m_type(result_type::matrix), m_matrix(new matrix(std::move(mtx))) {}
 
     impl(const impl& other) : m_type(other.m_type)
     {
@@ -134,6 +135,12 @@ struct formula_result::impl
     }
 
     const matrix& get_matrix() const
+    {
+        assert(m_type == result_type::matrix);
+        return *m_matrix;
+    }
+
+    matrix& get_matrix()
     {
         assert(m_type == result_type::matrix);
         return *m_matrix;
@@ -435,6 +442,8 @@ formula_result::formula_result(string_id_t strid) : mp_impl(ixion::make_unique<i
 
 formula_result::formula_result(formula_error_t e) : mp_impl(ixion::make_unique<impl>(e)) {}
 
+formula_result::formula_result(matrix mtx) : mp_impl(ixion::make_unique<impl>(std::move(mtx))) {}
+
 formula_result::~formula_result() {}
 
 void formula_result::reset()
@@ -478,6 +487,11 @@ formula_error_t formula_result::get_error() const
 }
 
 const matrix& formula_result::get_matrix() const
+{
+    return mp_impl->get_matrix();
+}
+
+matrix& formula_result::get_matrix()
 {
     return mp_impl->get_matrix();
 }

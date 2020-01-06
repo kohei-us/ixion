@@ -65,6 +65,9 @@ public:
     bool is_numeric(size_t row, size_t col) const;
     double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
+    void set(size_t row, size_t col, bool val);
+    void set(size_t row, size_t col, string_id_t val);
+    void set(size_t row, size_t col, formula_error_t val);
 
     element get(size_t row, size_t col) const;
 

@@ -221,6 +221,45 @@ struct formula_cell::impl
                 throw std::logic_error("unhandled element type of a matrix result value.");
         }
     }
+
+    void set_single_formula_result(formula_result result)
+    {
+        if (is_grouped())
+        {
+            std::unique_lock<std::mutex> lock(m_calc_status->mtx);
+
+            if (!m_calc_status->result)
+            {
+                m_calc_status->result =
+                    ixion::make_unique<formula_result>(
+                        matrix(m_calc_status->group_size.row, m_calc_status->group_size.column));
+            }
+
+            matrix& m = m_calc_status->result->get_matrix();
+            assert(m_group_pos.row < row_t(m.row_size()));
+            assert(m_group_pos.column < col_t(m.col_size()));
+
+            switch (result.get_type())
+            {
+                case formula_result::result_type::value:
+                    m.set(m_group_pos.row, m_group_pos.column, result.get_value());
+                    break;
+                case formula_result::result_type::string:
+                    m.set(m_group_pos.row, m_group_pos.column, result.get_string());
+                    break;
+                case formula_result::result_type::error:
+                    m.set(m_group_pos.row, m_group_pos.column, result.get_error());
+                    break;
+                case formula_result::result_type::matrix:
+                    throw std::logic_error("setting a cached result of matrix value directly is not yet supported.");
+            }
+
+            return;
+        }
+
+        std::unique_lock<std::mutex> lock(m_calc_status->mtx);
+        m_calc_status->result = ixion::make_unique<formula_result>(std::move(result));
+    }
 };
 
 formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
@@ -449,8 +488,7 @@ formula_result formula_cell::get_result_cache() const
 
 void formula_cell::set_result_cache(formula_result result)
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
-    mp_impl->m_calc_status->result = ixion::make_unique<formula_result>(std::move(result));
+    mp_impl->set_single_formula_result(result);
 }
 
 formula_result formula_cell::get_result_cache_nowait() const
