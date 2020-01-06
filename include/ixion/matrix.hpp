@@ -47,6 +47,7 @@ public:
 
     matrix();
     matrix(size_t rows, size_t cols);
+    matrix(size_t rows, size_t cols, formula_error_t error);
     matrix(const matrix& other);
     matrix(matrix&& other);
     matrix(const numeric_matrix& other);

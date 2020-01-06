@@ -24,6 +24,9 @@ struct matrix::impl
 
     impl(size_t rows, size_t cols) : m_data(rows, cols) {}
 
+    impl(size_t rows, size_t cols, formula_error_t error) :
+        m_data(rows, cols, -static_cast<int64_t>(error)) {}
+
     impl(const std::vector<double>& array, size_t rows, size_t cols) :
         m_data(rows, cols, array.begin(), array.end()) {}
 
@@ -55,6 +58,9 @@ matrix::matrix() :
 
 matrix::matrix(size_t rows, size_t cols) :
     mp_impl(ixion::make_unique<impl>(rows, cols)) {}
+
+matrix::matrix(size_t rows, size_t cols, formula_error_t error) :
+    mp_impl(ixion::make_unique<impl>(rows, cols, error)) {}
 
 matrix::matrix(const matrix& other) :
     mp_impl(ixion::make_unique<impl>(*other.mp_impl))
