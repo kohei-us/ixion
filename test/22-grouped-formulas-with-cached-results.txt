@@ -1,0 +1,38 @@
+%mode init
+A1=RAND()
+A2=RAND()
+B1=RAND()
+B2=RAND()
+D1=RAND()
+D2=RAND()
+E1=RAND()
+E2=RAND()
+{G1:H2}{=MMULT(A1:B2,D1:E2)}
+%mode result-cache
+A1=1
+A2=2
+B1=3
+B2=4
+D1=5
+D2=6
+E1=7
+E2=8
+G1=23
+G2=34
+H1=31
+H2=46
+%mode result
+A1=1
+A2=2
+B1=3
+B2=4
+D1=5
+D2=6
+E1=7
+E2=8
+G1=23
+G2=34
+H1=31
+H2=46
+%check
+%exit
