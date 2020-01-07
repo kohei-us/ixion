@@ -26,6 +26,8 @@ const char* get_opcode_name(fopcode_t oc)
             return "minus";
         case fop_multiply:
             return "multiply";
+        case fop_exponent:
+            return "exponent";
         case fop_open:
             return "open";
         case fop_plus:
@@ -62,6 +64,8 @@ const char* get_formula_opcode_string(fopcode_t oc)
             return "-";
         case fop_multiply:
             return "*";
+        case fop_exponent:
+            return "^";
         case fop_open:
             return "(";
         case fop_plus:
@@ -125,6 +129,7 @@ bool formula_token::operator== (const formula_token& r) const
         case fop_divide:
         case fop_minus:
         case fop_multiply:
+        case fop_exponent:
         case fop_open:
         case fop_plus:
         case fop_sep:

@@ -55,6 +55,7 @@ const char* get_opcode_name(lexer_opcode_t oc)
         case lexer_opcode_t::divide:     return "divide";
         case lexer_opcode_t::minus:      return "minus";
         case lexer_opcode_t::multiply:   return "multiply";
+        case lexer_opcode_t::exponent:   return "exponent";
         case lexer_opcode_t::equal:      return "equal";
         case lexer_opcode_t::less:       return "less";
         case lexer_opcode_t::greater:    return "greater";
@@ -122,6 +123,8 @@ string lexer_token::print() const
             return "/";
         case lexer_opcode_t::multiply:
             return "*";
+        case lexer_opcode_t::exponent:
+            return "^";
         case lexer_opcode_t::equal:
             return "=";
         case lexer_opcode_t::less:

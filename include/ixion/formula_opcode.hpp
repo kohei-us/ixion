@@ -27,6 +27,7 @@ enum fopcode_t
     fop_minus,
     fop_divide,
     fop_multiply,
+    fop_exponent,
 
     // relational operators
     fop_equal,

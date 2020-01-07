@@ -1,0 +1,17 @@
+%% Test case for the exponent (^) operator.
+%mode init
+A4=2^3
+B1:5
+B2=A4^B1
+%calc
+%mode result
+A4=8
+B2=32768
+%check
+%mode edit
+B1:4
+%recalc
+%mode result
+B2=4096
+%check
+%exit

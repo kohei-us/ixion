@@ -107,6 +107,9 @@ public:
             case fop_multiply:
                 m_os << "*";
                 break;
+            case fop_exponent:
+                m_os << "^";
+                break;
             case fop_open:
                 m_os << "(";
                 break;

@@ -605,6 +605,18 @@ void formula_interpreter::term()
             get_stack().push_value(val*get_stack().pop_value());
             return;
         }
+        case fop_exponent:
+        {
+            if (mp_handler)
+                mp_handler->push_token(oc);
+
+            next();
+            double base = get_stack().pop_value();
+            term();
+            double exp = get_stack().pop_value();
+            get_stack().push_value(std::pow(base, exp));
+            return;
+        }
         case fop_divide:
         {
             if (mp_handler)

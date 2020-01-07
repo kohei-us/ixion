@@ -36,6 +36,7 @@ enum class lexer_opcode_t
     minus,
     divide,
     multiply,
+    exponent,
 
     // relational operators
     equal,
