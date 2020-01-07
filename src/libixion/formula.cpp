@@ -96,25 +96,25 @@ public:
         switch (token->get_opcode())
         {
             case fop_close:
-                m_os << ")";
+                m_os << ')';
                 break;
             case fop_divide:
-                m_os << "/";
+                m_os << '/';
                 break;
             case fop_minus:
-                m_os << "-";
+                m_os << '-';
                 break;
             case fop_multiply:
-                m_os << "*";
+                m_os << '*';
                 break;
             case fop_exponent:
-                m_os << "^";
+                m_os << '^';
                 break;
             case fop_open:
-                m_os << "(";
+                m_os << '(';
                 break;
             case fop_plus:
-                m_os << "+";
+                m_os << '+';
                 break;
             case fop_value:
                 m_os << token->get_value();
