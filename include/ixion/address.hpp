@@ -173,6 +173,7 @@ struct IXION_DLLPUBLIC abs_range_t
      */
     abs_range_t(sheet_t _sheet, row_t _row, col_t _col, row_t _row_span, col_t _col_span);
     abs_range_t(const abs_address_t& addr);
+    abs_range_t(const abs_address_t& addr, row_t row_span, col_t col_span);
 
     struct hash
     {

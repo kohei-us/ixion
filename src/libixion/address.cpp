@@ -295,6 +295,15 @@ abs_range_t::abs_range_t(sheet_t _sheet, row_t _row, col_t _col, row_t _row_span
     }
 }
 
+abs_range_t::abs_range_t(const abs_address_t& addr, row_t row_span, col_t col_span) :
+    first(addr), last(addr)
+{
+    if (row_span > 0)
+        last.row += row_span - 1;
+    if (col_span > 0)
+        last.column += col_span - 1;
+}
+
 abs_range_t::abs_range_t(const abs_address_t& addr) :
     first(addr), last(addr) {}
 
