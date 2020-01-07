@@ -20,8 +20,6 @@ const char* get_opcode_name(fopcode_t oc)
             return "close";
         case fop_divide:
             return "divide";
-        case fop_err_no_ref:
-            return "error no ref";
         case fop_minus:
             return "minus";
         case fop_multiply:
@@ -87,7 +85,6 @@ const char* get_formula_opcode_string(fopcode_t oc)
         case fop_string:
         case fop_value:
         case fop_function:
-        case fop_err_no_ref:
         case fop_single_ref:
         case fop_range_ref:
         case fop_named_expression:

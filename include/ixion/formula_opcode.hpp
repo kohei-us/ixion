@@ -42,10 +42,6 @@ enum fopcode_t
     fop_close,
     fop_sep,
 
-    // error conditions
-    fop_err_no_ref,   // #REF!
-    fop_err_no_name,  // #NAME?
-
     fop_unknown
 };
 
