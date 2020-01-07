@@ -1404,7 +1404,7 @@ public:
         --p_last;
 
         // Use the sheet where the cell is unless sheet name is explicitly given.
-        address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
+        address_t parsed_addr(pos.sheet, 0, 0, true, false, false);
 
         parse_address_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
 
