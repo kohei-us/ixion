@@ -512,6 +512,8 @@ void parse_sheet_name_quoted(
 
 void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
+    assert(p <= p_last);
+
     if (*p == '\'')
     {
         parse_sheet_name_quoted(cxt, sep, p, p_last, sheet);
@@ -869,21 +871,33 @@ parse_address_result parse_address_excel_r1c1(
 parse_address_result parse_address_odff(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
+    assert(p <= p_last);
+
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = false;
     addr.abs_row = false;
     addr.abs_column = false;
 
     if (*p == '.')
     {
-        // This address doesn't contain sheet name.
+        // This address doesn't contain a sheet name.
         ++p;
     }
     else if (cxt)
     {
+        // This address DOES contain a sheet name.
+        addr.abs_sheet = false;
+        addr.sheet = invalid_sheet;
+
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
+        if (*p == '$')
+        {
+            addr.abs_sheet = true;
+            ++p;
+        }
+
+        if (p <= p_last)
+            parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
     }
 
     return parse_address_a1(p, p_last, addr);
@@ -1414,16 +1428,13 @@ public:
             to_relative_address(parsed_addr, pos);
             set_address(ret.range.first, parsed_addr);
 
-            // For now, we assume the sheet index of the end address is identical
-            // to that of the begin address.
-            parse_res = parse_address_odff(NULL, p, p_last, parsed_addr);
+            parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
             if (parse_res != valid_address)
                 // The 2nd part after the ':' is not valid.
                 return ret;
 
             to_relative_address(parsed_addr, pos);
             set_address(ret.range.last, parsed_addr);
-            ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
             ret.type = formula_name_t::range_reference;
             return ret;
         }
@@ -1435,14 +1446,21 @@ public:
 
     virtual string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
+        if (!mp_cxt)
+            sheet_name = false;
+
         ostringstream os;
         os << '[';
         if (sheet_name)
+        {
+            if (addr.abs_sheet)
+                os << '$';
             append_address_a1(os, mp_cxt, addr, pos, '.');
+        }
         else
         {
             os << '.';
-            append_address_a1(os, NULL, addr, pos, 0);
+            append_address_a1(os, nullptr, addr, pos, 0);
         }
         os << ']';
         return os.str();
@@ -1450,21 +1468,43 @@ public:
 
     virtual string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
+        if (!mp_cxt)
+            sheet_name = false;
+
         ostringstream os;
         os << '[';
 
         if (sheet_name)
         {
-            append_address_a1(os, mp_cxt, range.first, pos, '.');
+            const iface::formula_model_access* cxt = mp_cxt;
+
+            if (range.first.abs_sheet)
+                os << '$';
+            append_address_a1(os, cxt, range.first, pos, '.');
+
             os << ':';
-            append_address_a1(os, mp_cxt, range.last, pos, '.');
+
+            if (range.last.sheet != range.first.sheet || range.last.abs_sheet != range.first.abs_sheet)
+            {
+                // sheet indices differ between the first and last addresses.
+                if (range.last.abs_sheet)
+                    os << '$';
+            }
+            else
+            {
+                // sheet indices are identical.
+                cxt = nullptr;
+                os << '.';
+            }
+
+            append_address_a1(os, cxt, range.last, pos, '.');
         }
         else
         {
             os << '.';
-            append_address_a1(os, NULL, range.first, pos, 0);
+            append_address_a1(os, nullptr, range.first, pos, 0);
             os << ":.";
-            append_address_a1(os, NULL, range.last, pos, 0);
+            append_address_a1(os, nullptr, range.last, pos, 0);
         }
 
         os << ']';

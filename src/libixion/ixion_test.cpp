@@ -700,6 +700,76 @@ void test_name_resolver_odff()
             assert(false);
         }
     }
+
+    // single cell addresses with sheet names
+    ref_name_entry addr_with_sheet_names[] =
+    {
+        { "[One.$B$1]", true },
+        { "[$One.$B$1]", true },
+        { "[Two.$B$2]", true },
+        { "[$Two.$B$4]", true },
+        { "['A B C'.$B$4]", true },
+        { "[$'A B C'.$B$4]", true },
+        { 0, false },
+    };
+
+    for (size_t i = 0; addr_with_sheet_names[i].name; ++i)
+    {
+        const char* p = addr_with_sheet_names[i].name;
+        std::string name_a1(p);
+
+        formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+        if (res.type != formula_name_t::cell_reference)
+        {
+            cerr << "failed to resolve cell address: " << name_a1 << endl;
+            assert(false);
+        }
+
+        address_t addr = to_address(res.address);
+        std::string test_name = resolver->get_name(addr, abs_address_t(), addr_with_sheet_names[i].sheet_name);
+
+        if (name_a1 != test_name)
+        {
+            cerr << "failed to compile name from cell address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
+
+    // range addresses with sheet names
+    ref_name_entry ref_with_sheet_names[] =
+    {
+        { "[One.$B$1:.$B$30]", true },
+        { "[$One.$B$1:.$B$30]", true },
+        { "[Two.$B$2:.$D30]", true },
+        { "[$Two.$B$4:.F$35]", true },
+        { "['A B C'.$B$4:.F$35]", true },
+        { "[$'A B C'.$B$4:.F$35]", true },
+        { "[$One.B$4:$Two.F35]", true },
+        { "[$One.B$4:'A B C'.F35]", true },
+        { 0, false },
+    };
+
+    for (size_t i = 0; ref_with_sheet_names[i].name; ++i)
+    {
+        const char* p = ref_with_sheet_names[i].name;
+        std::string name_a1(p);
+
+        formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+        if (res.type != formula_name_t::range_reference)
+        {
+            cerr << "failed to resolve range address: " << name_a1 << endl;
+            assert(false);
+        }
+
+        range_t range = to_range(res.range);
+        std::string test_name = resolver->get_name(range, abs_address_t(), ref_with_sheet_names[i].sheet_name);
+
+        if (name_a1 != test_name)
+        {
+            cerr << "failed to compile name from range: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
 }
 
 void test_address()
