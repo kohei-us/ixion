@@ -264,7 +264,7 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
                     std::ostringstream os;
                     os << "failed to register formula cell at " << pos.get_name()
                         << ": formula='" << detail::print_formula_expression(cxt, pos, *cell) << "'";
-                    throw ixion::general_error(os.str());
+                    throw ixion::formula_registration_error(os.str());
                 }
 
                 rc_size_t sheet_size = cxt.get_sheet_size(range.first.sheet);

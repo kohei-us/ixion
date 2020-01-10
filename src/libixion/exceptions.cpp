@@ -28,6 +28,15 @@ void general_error::set_message(const std::string& msg)
     m_msg = msg;
 }
 
+formula_registration_error::formula_registration_error(const std::string& msg)
+{
+    std::ostringstream os;
+    os << "formula_registration_error: " << msg;
+    set_message(os.str());
+}
+
+formula_registration_error::~formula_registration_error() {}
+
 file_not_found::file_not_found(const std::string& fpath) :
     general_error(fpath)
 {

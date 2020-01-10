@@ -21,7 +21,7 @@ public:
     general_error();
     explicit general_error(const std::string& msg);
     virtual ~general_error() throw();
-    virtual const char* what() const throw();
+    virtual const char* what() const throw() override;
 
 protected:
     void set_message(const std::string& msg);
@@ -34,7 +34,14 @@ class IXION_DLLPUBLIC file_not_found : public general_error
 {
 public:
     explicit file_not_found(const std::string& fpath);
-    virtual ~file_not_found() throw();
+    virtual ~file_not_found() throw() override;
+};
+
+class IXION_DLLPUBLIC formula_registration_error : public general_error
+{
+public:
+    explicit formula_registration_error(const std::string& msg);
+    virtual ~formula_registration_error() throw() override;
 };
 
 /**
@@ -51,7 +58,7 @@ public:
     };
 
     explicit model_context_error(const std::string& msg, error_type type);
-    virtual ~model_context_error() throw();
+    virtual ~model_context_error() throw() override;
 
     error_type get_error_type() const;
 
@@ -63,7 +70,7 @@ class IXION_DLLPUBLIC not_implemented_error : public general_error
 {
 public:
     explicit not_implemented_error(const std::string& msg);
-    virtual ~not_implemented_error() throw();
+    virtual ~not_implemented_error() throw() override;
 };
 
 }
