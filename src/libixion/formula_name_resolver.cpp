@@ -439,7 +439,7 @@ char append_table_areas(ostringstream& os, const table_t& table)
     return count;
 }
 
-enum parse_address_result
+enum parse_address_result_type
 {
     invalid = 0,
     valid_address,
@@ -600,7 +600,7 @@ T parse_number(const char*&p, const char* p_last)
  *
  * @return parsing result.
  */
-parse_address_result parse_address_a1(const char*& p, const char* p_last, address_t& addr)
+parse_address_result_type parse_address_a1(const char*& p, const char* p_last, address_t& addr)
 {
     // NOTE: Row and column IDs are 1-based during parsing, while 0 is used as
     // the state of a value-not-set.  They are subtracted by one before
@@ -733,7 +733,7 @@ parse_address_result parse_address_a1(const char*& p, const char* p_last, addres
     return valid_address;
 }
 
-parse_address_result parse_address_r1c1(const char*& p, const char* p_last, address_t& addr)
+parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = row_unset;
     addr.column = column_unset;
@@ -745,7 +745,7 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
 
         if (p == p_last)
             // Just 'R'.  Not sure if this is valid or invalid, but let's call it invalid for now.
-            return parse_address_result::invalid;
+            return parse_address_result_type::invalid;
 
         ++p;
         if (*p != 'C' && *p != 'c')
@@ -756,12 +756,12 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
                 // Relative row address.
                 ++p;
                 if (!is_digit(*p) && *p != '-' && *p != '+')
-                    return parse_address_result::invalid;
+                    return parse_address_result_type::invalid;
 
                 addr.row = parse_number<row_t>(p, p_last);
                 ++p;
                 if (p == p_last)
-                    return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
+                    return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
                 ++p;
             }
             else if (is_digit(*p))
@@ -770,13 +770,13 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
                 addr.row = parse_number<row_t>(p, p_last);
                 if (addr.row <= 0)
                     // absolute address with 0 or negative value is invalid.
-                    return parse_address_result::invalid;
+                    return parse_address_result_type::invalid;
 
                 --addr.row; // 1-based to 0-based.
 
                 if (p == p_last && is_digit(*p))
                     // 'R' followed by a number without 'C' is valid.
-                    return parse_address_result::valid_address;
+                    return parse_address_result_type::valid_address;
                 ++p;
             }
         }
@@ -791,13 +791,13 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
         {
             if (addr.row == row_unset)
                 // Just 'C'.  Row must be set.
-                return parse_address_result::invalid;
+                return parse_address_result_type::invalid;
 
             if (!addr.abs_row && addr.row == 0)
                 // 'RC' is invalid as it references itself.
-                return parse_address_result::invalid;
+                return parse_address_result_type::invalid;
 
-            return parse_address_result::valid_address;
+            return parse_address_result_type::valid_address;
         }
 
         ++p;
@@ -806,12 +806,12 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
             // Relative column address.
             ++p;
             if (!is_digit(*p) && *p != '-' && *p != '+')
-                return parse_address_result::invalid;
+                return parse_address_result_type::invalid;
 
             addr.column = parse_number<col_t>(p, p_last);
             ++p;
             if (p == p_last)
-                return (*p == ']') ? parse_address_result::valid_address : parse_address_result::invalid;
+                return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
 
             ++p;
         }
@@ -822,24 +822,24 @@ parse_address_result parse_address_r1c1(const char*& p, const char* p_last, addr
             addr.column = parse_number<col_t>(p, p_last);
             if (addr.column <= 0)
                 // absolute address with 0 or negative value is invalid.
-                return parse_address_result::invalid;
+                return parse_address_result_type::invalid;
 
             --addr.column; // 1-based to 0-based.
 
             if (p == p_last)
-                return parse_address_result::valid_address;
+                return parse_address_result_type::valid_address;
 
             ++p;
         }
     }
 
     if (*p == ':')
-        return (p == p_last) ? parse_address_result::invalid : parse_address_result::range_expected;
+        return (p == p_last) ? parse_address_result_type::invalid : parse_address_result_type::range_expected;
 
-    return parse_address_result::invalid;
+    return parse_address_result_type::invalid;
 }
 
-parse_address_result parse_address_excel_a1(
+parse_address_result_type parse_address_excel_a1(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = 0;
@@ -855,7 +855,7 @@ parse_address_result parse_address_excel_a1(
     return parse_address_a1(p, p_last, addr);
 }
 
-parse_address_result parse_address_excel_r1c1(
+parse_address_result_type parse_address_excel_r1c1(
     const iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = 0;
@@ -871,9 +871,16 @@ parse_address_result parse_address_excel_r1c1(
     return parse_address_r1c1(p, p_last, addr);
 }
 
-parse_address_result parse_address_odff(
+struct parse_address_odff_result
+{
+    parse_address_result_type result;
+    bool sheet_name = false;
+};
+
+parse_address_odff_result parse_address_odff(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
+    parse_address_odff_result res;
     assert(p <= p_last);
 
     addr.row = 0;
@@ -889,6 +896,7 @@ parse_address_result parse_address_odff(
     else if (cxt)
     {
         // This address DOES contain a sheet name.
+        res.sheet_name = true;
         addr.abs_sheet = false;
         addr.sheet = invalid_sheet;
 
@@ -903,7 +911,8 @@ parse_address_result parse_address_odff(
             parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
     }
 
-    return parse_address_a1(p, p_last, addr);
+    res.result = parse_address_a1(p, p_last, addr);
+    return res;
 }
 
 string abs_or_rel(bool _abs)
@@ -921,9 +930,9 @@ string _to_string(const formula_name_t::address_type& addr)
     return os.str();
 }
 
-void to_relative_address(address_t& addr, const abs_address_t& pos)
+void to_relative_address(address_t& addr, const abs_address_t& pos, bool sheet)
 {
-    if (!addr.abs_sheet)
+    if (!addr.abs_sheet && sheet)
         addr.sheet -= pos.sheet;
     if (!addr.abs_row && addr.row <= row_upper_bound)
         addr.row -= pos.row;
@@ -1104,7 +1113,7 @@ public:
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
-        parse_address_result parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result_type parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
 
 #if DEBUG_NAME_RESOLVER
         __IXION_DEBUG_OUT__ << "parse address result: " << parse_address_result_names[parse_res] << endl;
@@ -1126,7 +1135,7 @@ public:
         if (parse_res == valid_address && parsed_addr.row != row_unset)
         {
             // This is a single cell address.
-            to_relative_address(parsed_addr, pos);
+            to_relative_address(parsed_addr, pos, true);
             set_cell_reference(ret, parsed_addr);
 
 #if DEBUG_NAME_RESOLVER
@@ -1146,7 +1155,7 @@ public:
 
             ++p; // skip ':'
 
-            to_relative_address(parsed_addr, pos);
+            to_relative_address(parsed_addr, pos, true);
             set_address(ret.range.first, parsed_addr);
 
             // For now, we assume the sheet index of the end address is identical
@@ -1156,7 +1165,7 @@ public:
                 // The 2nd part after the ':' is not valid.
                 return ret;
 
-            to_relative_address(parsed_addr, pos);
+            to_relative_address(parsed_addr, pos, true);
             set_address(ret.range.last, parsed_addr);
             ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
             ret.type = formula_name_t::range_reference;
@@ -1286,7 +1295,7 @@ public:
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0);
 
-        parse_address_result parse_res = parse_address_excel_r1c1(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result_type parse_res = parse_address_excel_r1c1(mp_cxt, p, p_last, parsed_addr);
 
         if (parse_res != invalid)
         {
@@ -1302,20 +1311,20 @@ public:
 
         switch (parse_res)
         {
-            case parse_address_result::valid_address:
+            case parse_address_result_type::valid_address:
             {
                 set_cell_reference(ret, parsed_addr);
                 return ret;
             }
-            case parse_address_result::range_expected:
+            case parse_address_result_type::range_expected:
             {
                 ++p; // skip ':'
                 if (p == p_end)
                     return ret;
 
                 address_t parsed_addr2(0, 0, 0);
-                parse_address_result parse_res2 = parse_address_excel_r1c1(nullptr, p, p_last, parsed_addr2);
-                if (parse_res2 != parse_address_result::valid_address)
+                parse_address_result_type parse_res2 = parse_address_excel_r1c1(nullptr, p, p_last, parsed_addr2);
+                if (parse_res2 != parse_address_result_type::valid_address)
                     return ret;
 
                 // For now, we assume the sheet index of the end address is identical
@@ -1409,18 +1418,18 @@ public:
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, true, false, false);
 
-        parse_address_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
+        parse_address_odff_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
 
         // prevent for example H to be recognized as column address
-        if (parse_res == valid_address && parsed_addr.row != row_unset)
+        if (parse_res.result == valid_address && parsed_addr.row != row_unset)
         {
             // This is a single cell address.
-            to_relative_address(parsed_addr, pos);
+            to_relative_address(parsed_addr, pos, true);
             set_cell_reference(ret, parsed_addr);
             return ret;
         }
 
-        if (parse_res == range_expected)
+        if (parse_res.result == range_expected)
         {
             if (p == p_last)
                 // ':' occurs as the last character.  This is not allowed.
@@ -1428,15 +1437,16 @@ public:
 
             ++p; // skip ':'
 
-            to_relative_address(parsed_addr, pos);
+            to_relative_address(parsed_addr, pos, true);
             set_address(ret.range.first, parsed_addr);
 
             parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
-            if (parse_res != valid_address)
+            if (parse_res.result != valid_address)
                 // The 2nd part after the ':' is not valid.
                 return ret;
 
-            to_relative_address(parsed_addr, pos);
+            to_relative_address(parsed_addr, pos, parse_res.sheet_name);
+
             set_address(ret.range.last, parsed_addr);
             ret.type = formula_name_t::range_reference;
             return ret;

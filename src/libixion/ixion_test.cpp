@@ -780,6 +780,16 @@ void test_name_resolver_odff()
         abs_range_t range_expected(abs_address_t(pos.sheet, 1, 7), 1, 2);
         assert(range == range_expected);
     }
+
+    {
+        std::string name = "[Two.$B$2:.$B$10]";
+        abs_address_t pos(3, 2, 1);
+        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        assert(res.type == formula_name_t::range_reference);
+        abs_range_t range = to_range(res.range).to_abs(pos);
+        abs_range_t range_expected(abs_address_t(1, 1, 1), 9, 1);
+        assert(range == range_expected);
+    }
 }
 
 void test_address()
