@@ -133,7 +133,10 @@ abs_address_t address_t::to_abs(const abs_address_t& origin) const
     abs_addr.row = row;
     abs_addr.column = column;
 
-    if (!abs_sheet)
+    if (!is_valid_sheet(origin.sheet))
+        // If the origin sheet is invalid, then any sheet position relative to that should be invalid.
+        abs_addr.sheet = origin.sheet;
+    else if (!abs_sheet)
         abs_addr.sheet += origin.sheet;
 
     if (!abs_row && row <= row_upper_bound)

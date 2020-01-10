@@ -261,6 +261,9 @@ enum class resolver_parse_mode { column, row };
 
 void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
 {
+    if (!is_valid_sheet(sheet))
+        return;
+
     string sheet_name = cxt.get_sheet_name(sheet);
     string buffer; // used only when the sheet name contains at least one single quote.
 

@@ -785,10 +785,19 @@ void test_name_resolver_odff()
 void test_address()
 {
     cout << "test address" << endl;
-    address_t addr(-1, 0, 0, false, false, false);
-    abs_address_t pos(1, 0, 0);
-    abs_address_t abs_addr = addr.to_abs(pos);
-    assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
+    {
+        address_t addr(-1, 0, 0, false, false, false);
+        abs_address_t pos(1, 0, 0);
+        abs_address_t abs_addr = addr.to_abs(pos);
+        assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
+
+        abs_address_t pos_invalid_sheet(invalid_sheet, 2, 3);
+        auto test = addr.to_abs(pos_invalid_sheet);
+        assert(test.sheet == invalid_sheet);
+        assert(test.row == 2);
+        assert(test.column == 3);
+    }
+
 
     // Default constructor makes valid address.
     assert(abs_address_t().valid());
