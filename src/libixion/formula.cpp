@@ -218,6 +218,20 @@ bool has_volatile(const formula_tokens_t& tokens)
     return false;
 }
 
+void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell& cell)
+{
+    if (is_valid_sheet(sheet))
+        return;
+
+    SPDLOG_DEBUG(spdlog::get("ixion"), "{}: invalid range reference: pos={}; formula='{}'",
+        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell));
+
+    std::ostringstream os;
+    os << func_name << ": invalid sheet index in " << pos.get_name()
+        << ": formula='" << detail::print_formula_expression(cxt, pos, cell) << "'";
+    throw ixion::formula_registration_error(os.str());
+}
+
 }
 
 void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)
@@ -250,23 +264,14 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(pos);
+                check_sheet_or_throw("register_formula_cell", addr.sheet, cxt, pos, *cell);
                 tracker.add(src_pos, addr);
                 break;
             }
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(pos);
-                if (!is_valid_sheet(range.first.sheet))
-                {
-                    SPDLOG_DEBUG(spdlog::get("ixion"), "register_formula_cell: invalid range reference: pos={}; formula='{}'",
-                        pos.get_name(), detail::print_formula_token_repr(*p));
-
-                    std::ostringstream os;
-                    os << "failed to register formula cell at " << pos.get_name()
-                        << ": formula='" << detail::print_formula_expression(cxt, pos, *cell) << "'";
-                    throw ixion::formula_registration_error(os.str());
-                }
-
+                check_sheet_or_throw("register_formula_cell", range.first.sheet, cxt, pos, *cell);
                 rc_size_t sheet_size = cxt.get_sheet_size(range.first.sheet);
                 if (range.all_columns())
                 {
@@ -318,12 +323,14 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
             case fop_single_ref:
             {
                 abs_address_t addr = p->get_single_ref().to_abs(pos);
+                check_sheet_or_throw("unregister_formula_cell", addr.sheet, cxt, pos, *fcell);
                 tracker.remove(pos, addr);
                 break;
             }
             case fop_range_ref:
             {
                 abs_range_t range = p->get_range_ref().to_abs(pos);
+                check_sheet_or_throw("unregister_formula_cell", range.first.sheet, cxt, pos, *fcell);
                 tracker.remove(pos, range);
                 break;
             }
