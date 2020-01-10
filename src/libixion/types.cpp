@@ -17,6 +17,11 @@ const sheet_t invalid_sheet = -2;
 
 const string_id_t empty_string_id = std::numeric_limits<string_id_t>::max();
 
+bool is_valid_sheet(sheet_t sheet)
+{
+    return sheet >= 0;
+}
+
 rc_size_t::rc_size_t() : row(0), column(0) {}
 rc_size_t::rc_size_t(const rc_size_t& other) : row(other.row), column(other.column) {}
 rc_size_t::rc_size_t(row_t _row, col_t _column) : row(_row), column(_column) {}

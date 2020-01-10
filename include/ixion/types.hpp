@@ -50,6 +50,15 @@ IXION_DLLPUBLIC_VAR const sheet_t global_scope;
  */
 IXION_DLLPUBLIC_VAR const sheet_t invalid_sheet;
 
+/**
+ * Determine whether or not a given sheet index is valid.
+ *
+ * @param sheet sheet index to test.
+ *
+ * @return true if the sheet index is valid, false otherwise.
+ */
+IXION_DLLPUBLIC bool is_valid_sheet(sheet_t sheet);
+
 /** Global string ID representing an empty string. */
 IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 
