@@ -313,6 +313,19 @@ void test_listen_to_cell_in_range()
     assert(ranks[G5_H7] < ranks[G11]);
 }
 
+void test_listen_to_3d_range()
+{
+    dirty_cell_tracker tracker;
+
+    abs_address_t E7(0, 6, 4);
+    abs_range_t C1_E5_sheets_0_2(0, 0, 2, 5, 3);
+    C1_E5_sheets_0_2.last.sheet += 2;
+    tracker.add(E7, C1_E5_sheets_0_2);
+
+    cout << "--" << endl;
+    cout << tracker.to_string() << endl;
+}
+
 int main()
 {
     test_empty_query();
@@ -323,6 +336,7 @@ int main()
     test_multi_sheets();
     test_recursive_tracking();
     test_listen_to_cell_in_range();
+    test_listen_to_3d_range();
 
     return EXIT_SUCCESS;
 }

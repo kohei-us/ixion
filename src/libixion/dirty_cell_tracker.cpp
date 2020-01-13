@@ -90,10 +90,15 @@ struct dirty_cell_tracker::impl
         range_t rrange = range;
         rrange.set_absolute(false);
 
-        if (rrange.first == rrange.last)
-            return m_resolver->get_name(rrange.first, origin, false);
+        std::ostringstream os;
+        os << "Sheet" << (rrange.first.sheet+1) << '!';
 
-        return m_resolver->get_name(rrange, origin, false);
+        if (rrange.first == rrange.last)
+            os << m_resolver->get_name(rrange.first, origin, false);
+        else
+            os << m_resolver->get_name(rrange, origin, false);
+
+        return os.str();
     }
 };
 
@@ -383,7 +388,7 @@ std::string dirty_cell_tracker::to_string() const
             {
                 std::ostringstream os;
                 os << mp_impl->print(src);
-                os << " -> " << dest_name;
+                os << " -> Sheet" << (dest.first.sheet+1) << '!' << dest_name;
                 lines.push_back(os.str());
             }
         }
