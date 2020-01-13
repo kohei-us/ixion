@@ -103,12 +103,6 @@ dirty_cell_tracker::~dirty_cell_tracker() {}
 
 void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
 {
-    if (dest.first.sheet < 0)
-    {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Invalid sheet position ({}).", dest.first.sheet);
-        return;
-    }
-
     if (!dest.valid())
     {
         std::ostringstream os;
@@ -152,12 +146,6 @@ void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
 
 void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
 {
-    if (dest.first.sheet < 0)
-    {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Invalid sheet position ({}).", dest.first.sheet);
-        return;
-    }
-
     if (!dest.valid())
     {
         std::ostringstream os;
