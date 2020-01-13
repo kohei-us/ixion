@@ -112,7 +112,7 @@ void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
     if (!dest.valid())
     {
         std::ostringstream os;
-        os << "dirty_cell_tracker::add: invalid destination cell or range " << dest;
+        os << "dirty_cell_tracker::add: invalid destination range: src=" << src << "; dest=" << dest;
         throw std::invalid_argument(os.str());
     }
 
