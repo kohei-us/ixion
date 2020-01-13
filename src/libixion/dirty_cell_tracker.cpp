@@ -103,16 +103,19 @@ dirty_cell_tracker::~dirty_cell_tracker() {}
 
 void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
 {
+    if (!src.valid() || src.first.sheet != src.last.sheet)
+    {
+        // source range must be on one sheet.
+        std::ostringstream os;
+        os << "dirty_cell_tracker::add: invalid source range: src=" << src;
+        throw std::invalid_argument(os.str());
+    }
+
     if (!dest.valid())
     {
         std::ostringstream os;
         os << "dirty_cell_tracker::add: invalid destination range: src=" << src << "; dest=" << dest;
         throw std::invalid_argument(os.str());
-    }
-
-    if (dest.first.sheet != dest.last.sheet)
-    {
-        throw std::runtime_error("TODO: implement this.");
     }
 
     if (dest.all_columns() || dest.all_rows())
@@ -122,40 +125,46 @@ void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
         throw std::invalid_argument(os.str());
     }
 
-    rtree_type& tree = mp_impl->fetch_grid_or_resize(dest.first.sheet);
-
-    rtree_type::extent_type search_box(
-        {{dest.first.row, dest.first.column}, {dest.last.row, dest.last.column}});
-
-    rtree_type::search_results res = tree.search(search_box, rtree_type::search_type::match);
-
-    if (res.begin() == res.end())
+    for (sheet_t sheet = dest.first.sheet; sheet <= dest.last.sheet; ++sheet)
     {
-        // No listener for this destination range.  Insert a new one.
-        abs_range_set_t listener;
-        listener.emplace(src);
-        tree.insert(search_box, std::move(listener));
-    }
-    else
-    {
-        // A listener already exists for this destination cell.
-        abs_range_set_t& listener = *res.begin();
-        listener.emplace(src);
+        rtree_type& tree = mp_impl->fetch_grid_or_resize(sheet);
+
+        rtree_type::extent_type search_box(
+            {{dest.first.row, dest.first.column}, {dest.last.row, dest.last.column}});
+
+        rtree_type::search_results res = tree.search(search_box, rtree_type::search_type::match);
+
+        if (res.begin() == res.end())
+        {
+            // No listener for this destination range.  Insert a new one.
+            abs_range_set_t listener;
+            listener.emplace(src);
+            tree.insert(search_box, std::move(listener));
+        }
+        else
+        {
+            // A listener already exists for this destination cell.
+            abs_range_set_t& listener = *res.begin();
+            listener.emplace(src);
+        }
     }
 }
 
 void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
 {
+    if (!src.valid() || src.first.sheet != src.last.sheet)
+    {
+        // source range must be on one sheet.
+        std::ostringstream os;
+        os << "dirty_cell_tracker::add: invalid source range: src=" << src;
+        throw std::invalid_argument(os.str());
+    }
+
     if (!dest.valid())
     {
         std::ostringstream os;
         os << "dirty_cell_tracker::remove: invalid destination range: src=" << src << "; dest=" << dest;
         throw std::invalid_argument(os.str());
-    }
-
-    if (dest.first.sheet != dest.last.sheet)
-    {
-        throw std::runtime_error("TODO: implement this.");
     }
 
     if (dest.all_columns() || dest.all_rows())
@@ -165,37 +174,40 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
         throw std::invalid_argument(os.str());
     }
 
-    rtree_type* tree = mp_impl->fetch_grid(dest.first.sheet);
-    if (!tree)
+    for (sheet_t sheet = dest.first.sheet; sheet <= dest.last.sheet; ++sheet)
     {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Nothing is tracked on sheet {}.", dest.first.sheet);
-        return;
+        rtree_type* tree = mp_impl->fetch_grid(sheet);
+        if (!tree)
+        {
+            SPDLOG_DEBUG(spdlog::get("ixion"), "Nothing is tracked on sheet {}.", sheet);
+            continue;
+        }
+
+        rtree_type::extent_type search_box(
+            {{dest.first.row, dest.first.column}, {dest.last.row, dest.last.column}});
+
+        rtree_type::search_results res = tree->search(search_box, rtree_type::search_type::match);
+
+        if (res.begin() == res.end())
+        {
+            // No listener for this destination cell. Nothing to remove.
+            SPDLOG_DEBUG(spdlog::get("ixion"), "{} is not being tracked by anybody on sheet {}.", dest, sheet);
+            continue;
+        }
+
+        rtree_type::iterator it_listener = res.begin();
+        abs_range_set_t& listener = *it_listener;
+        size_t n_removed = listener.erase(src);
+
+        if (!n_removed)
+        {
+            SPDLOG_DEBUG(spdlog::get("ixion"), "{} was not tracking {} on sheet {}.", src, dest, sheet);
+        }
+
+        if (listener.empty())
+            // Remove this from the R-tree.
+            tree->erase(it_listener);
     }
-
-    rtree_type::extent_type search_box(
-        {{dest.first.row, dest.first.column}, {dest.last.row, dest.last.column}});
-
-    rtree_type::search_results res = tree->search(search_box, rtree_type::search_type::match);
-
-    if (res.begin() == res.end())
-    {
-        // No listener for this destination cell. Nothing to remove.
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Cell {} is not being tracked by anybody.", dest);
-        return;
-    }
-
-    rtree_type::iterator it_listener = res.begin();
-    abs_range_set_t& listener = *it_listener;
-    size_t n_removed = listener.erase(src);
-
-    if (!n_removed)
-    {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Cell {} was not tracking cell {}.", src, dest);
-    }
-
-    if (listener.empty())
-        // Remove this from the R-tree.
-        tree->erase(it_listener);
 }
 
 void dirty_cell_tracker::add_volatile(const abs_range_t& pos)
