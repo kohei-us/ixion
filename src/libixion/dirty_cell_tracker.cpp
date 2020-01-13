@@ -116,6 +116,11 @@ void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)
         throw std::invalid_argument(os.str());
     }
 
+    if (dest.first.sheet != dest.last.sheet)
+    {
+        throw std::runtime_error("TODO: implement this.");
+    }
+
     if (dest.all_columns() || dest.all_rows())
     {
         std::ostringstream os;
@@ -156,8 +161,13 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
     if (!dest.valid())
     {
         std::ostringstream os;
-        os << "dirty_cell_tracker::remove: invalid destination range " << dest;
+        os << "dirty_cell_tracker::remove: invalid destination range: src=" << src << "; dest=" << dest;
         throw std::invalid_argument(os.str());
+    }
+
+    if (dest.first.sheet != dest.last.sheet)
+    {
+        throw std::runtime_error("TODO: implement this.");
     }
 
     if (dest.all_columns() || dest.all_rows())

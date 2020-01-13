@@ -319,7 +319,7 @@ size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 bool abs_range_t::valid() const
 {
     return first.valid() && last.valid() &&
-        first.sheet == last.sheet &&
+        first.sheet <= last.sheet &&
         first.column <= last.column &&
         first.row <= last.row;
 }
