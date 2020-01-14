@@ -12,6 +12,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <spdlog/spdlog.h>
+
 using namespace std;
 
 namespace ixion {
@@ -223,9 +225,11 @@ void tokenizer::numeral()
 
     if (sep_count > 1)
     {
-        ostringstream os;
-        os << "error parsing numeral: " << std::string(p, len);
-        throw formula_lexer::tokenize_error(os.str());
+        // failed to parse this as a numeral. Treat this as a name.
+        SPDLOG_TRACE(spdlog::get("ixion"), "error parsing '{}' as a numeral, treating it as a name.", std::string(p, len));
+        pop_pos();
+        name();
+        return;
     }
     double val = global::to_double(p, len);
     m_tokens.push_back(make_unique<lexer_value_token>(val));
