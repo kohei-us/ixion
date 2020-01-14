@@ -17,7 +17,7 @@ namespace ixion { namespace detail {
 
 std::string print_formula_expression(const iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell& cell)
 {
-    static auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
     const formula_tokens_t& tokens = cell.get_tokens()->get();
     return print_formula_tokens(cxt, pos, *resolver, tokens);
