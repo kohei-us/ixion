@@ -405,6 +405,17 @@ std::string dirty_cell_tracker::to_string() const
     return os.str();
 }
 
+bool dirty_cell_tracker::empty() const
+{
+    for (const rtree_type& grid : mp_impl->m_grids)
+    {
+        if (!grid.empty())
+            return false;
+    }
+
+    return true;
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

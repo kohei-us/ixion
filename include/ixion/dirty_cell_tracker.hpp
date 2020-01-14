@@ -77,6 +77,8 @@ public:
         const abs_range_set_t& modified_cells, const abs_range_set_t* dirty_formula_cells = nullptr) const;
 
     std::string to_string() const;
+
+    bool empty() const;
 };
 
 }

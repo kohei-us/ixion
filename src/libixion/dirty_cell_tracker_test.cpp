@@ -27,6 +27,8 @@ ranks_type create_ranks(const std::vector<abs_range_t>& sorted)
 
 void test_empty_query()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     // Empty query.
@@ -56,6 +58,8 @@ void test_empty_query()
 
 void test_cell_to_cell()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     // A2 to listen to A1.
@@ -104,6 +108,8 @@ void test_cell_to_cell()
 
 void test_cell_to_range()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     // B2 listens to C1:D4.
@@ -147,6 +153,8 @@ void test_cell_to_range()
 
 void test_volatile_cells()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     // We use sheet 2 in this test.
@@ -195,6 +203,8 @@ void test_volatile_cells()
 
 void test_volatile_cells_2()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     abs_address_t A1(1, 0, 0);
@@ -235,6 +245,8 @@ void test_volatile_cells_2()
 
 void test_multi_sheets()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     // B2 on sheet 2 tracks A10 on sheet 1.
@@ -255,6 +267,8 @@ void test_multi_sheets()
 
 void test_recursive_tracking()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     abs_address_t A1(0, 0, 0), B1(0, 0, 1);
@@ -271,6 +285,8 @@ void test_recursive_tracking()
 
 void test_listen_to_cell_in_range()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     abs_address_t A2(0, 1, 0), E7(0, 6, 4), G11(0, 10, 6);
@@ -315,6 +331,8 @@ void test_listen_to_cell_in_range()
 
 void test_listen_to_3d_range()
 {
+    cout << "--" << endl << __FUNCTION__ << endl;
+
     dirty_cell_tracker tracker;
 
     abs_address_t E7(0, 6, 4);
@@ -324,6 +342,38 @@ void test_listen_to_3d_range()
 
     cout << "--" << endl;
     cout << tracker.to_string() << endl;
+
+    abs_address_t D3(0, 2, 3);
+    for (sheet_t s = 0; s <= 4; ++s)
+    {
+        D3.sheet = s;
+        auto cells = tracker.query_dirty_cells(D3);
+        if (s <= 2)
+        {
+            assert(cells.size() == 1);
+            assert(E7 == *cells.begin());
+        }
+        else
+            assert(cells.empty());
+    }
+
+    for (sheet_t s = 0; s <= 4; ++s)
+    {
+        abs_range_t E5_F6(0, 4, 4, 2, 2);
+        E5_F6.first.sheet = E5_F6.last.sheet = s;
+        auto cells = tracker.query_dirty_cells(E5_F6);
+        if (s <= 2)
+        {
+            assert(cells.size() == 1);
+            assert(E7 == *cells.begin());
+        }
+        else
+            assert(cells.empty());
+    }
+
+    // Remove the multi-sheet listener, and make sure the tracker is empty.
+    tracker.remove(E7, C1_E5_sheets_0_2);
+    assert(tracker.empty());
 }
 
 int main()
