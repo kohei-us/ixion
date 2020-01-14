@@ -1,0 +1,31 @@
+%% Test case for concat (&) operator.
+%mode init
+A1@left
+A2@-right
+A3=A1&A2
+B1@left
+B2@&
+B3@right
+B4@&
+B5@forward
+B6=B1&B2&B3&B4&B5
+C1="("&A3&" : "&B6&")"
+C2=1&2
+%calc
+%mode result
+A3="left-right"
+B6="left&right&forward"
+C1="(left-right : left&right&forward)"
+C2="12"
+%check
+%mode edit
+A2@_or_right
+B2@_and_
+B4@_and_
+%recalc
+%mode result
+A3="left_or_right"
+B6="left_and_right_and_forward"
+C1="(left_or_right : left_and_right_and_forward)"
+%check
+%exit
