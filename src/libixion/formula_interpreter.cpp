@@ -617,6 +617,20 @@ void formula_interpreter::term()
             get_stack().push_value(std::pow(base, exp));
             return;
         }
+        case fop_concat:
+        {
+            if (mp_handler)
+                mp_handler->push_token(oc);
+
+            next();
+            std::string s1 = get_stack().pop_string();
+            term();
+            std::string s2 = get_stack().pop_string();
+            std::string s = s1 + s2;
+            string_id_t sid = m_context.add_string(s.data(), s.size());
+            get_stack().push_string(sid);
+            return;
+        }
         case fop_divide:
         {
             if (mp_handler)

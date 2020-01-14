@@ -110,6 +110,9 @@ public:
             case fop_exponent:
                 m_os << '^';
                 break;
+            case fop_concat:
+                m_os << '&';
+                break;
             case fop_open:
                 m_os << '(';
                 break;

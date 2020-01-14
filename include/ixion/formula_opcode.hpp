@@ -29,6 +29,9 @@ enum fopcode_t
     fop_multiply,
     fop_exponent,
 
+    // string operators
+    fop_concat,
+
     // relational operators
     fop_equal,
     fop_not_equal,

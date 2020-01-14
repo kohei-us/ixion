@@ -38,6 +38,9 @@ enum class lexer_opcode_t
     multiply,
     exponent,
 
+    // string operators
+    concat,
+
     // relational operators
     equal,
     less,

@@ -137,6 +137,9 @@ void tokenizer::run()
             case '^':
                 op(lexer_opcode_t::exponent);
                 break;
+            case '&':
+                op(lexer_opcode_t::concat);
+                break;
             case '=':
                 op(lexer_opcode_t::equal);
                 break;
@@ -193,6 +196,7 @@ bool tokenizer::is_op(char c) const
         case '<':
         case '>':
         case '^':
+        case '&':
             return true;
     }
     return false;

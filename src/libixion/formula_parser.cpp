@@ -73,6 +73,7 @@ void formula_parser::parse()
                 case lexer_opcode_t::minus:
                 case lexer_opcode_t::multiply:
                 case lexer_opcode_t::exponent:
+                case lexer_opcode_t::concat:
                 case lexer_opcode_t::equal:
                 case lexer_opcode_t::divide:
                 case lexer_opcode_t::sep:
@@ -129,6 +130,9 @@ void formula_parser::primitive(lexer_opcode_t oc)
             break;
         case lexer_opcode_t::exponent:
             foc = fop_exponent;
+            break;
+        case lexer_opcode_t::concat:
+            foc = fop_concat;
             break;
         case lexer_opcode_t::equal:
             foc = fop_equal;
