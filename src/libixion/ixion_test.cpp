@@ -842,14 +842,32 @@ bool check_formula_expression(
 {
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;
+
     formula_tokens_t tokens = parse_formula_string(
         cxt, abs_address_t(), resolver, p, n);
-    std::string str = print_formula_tokens(cxt, abs_address_t(), resolver, tokens);
-    int res = strcmp(p, str.c_str());
-    if (res)
-        cout << "formula expressions differ: '" << p << "' (before) -> '" << str << "' (after)" << endl;
+    std::string expression = print_formula_tokens(cxt, abs_address_t(), resolver, tokens);
 
-    return res == 0;
+    int res = strcmp(p, expression.data());
+    if (res)
+    {
+        cout << "formula expressions differ: '" << p << "' (before) -> '" << expression << "' (after)" << endl;
+        return false;
+    }
+
+    std::ostringstream os;
+    for (const auto& t : tokens)
+        os << print_formula_token(cxt, abs_address_t(), resolver, *t);
+    std::string individual_tokens = os.str();
+
+    if (expression != individual_tokens)
+    {
+        cout << "whole expression differs from individual token strings:" << endl
+             << "  * expression='" << expression << "'" << endl
+             << "  * individual-tokens='" << individual_tokens << "'" << endl;
+        return false;
+    }
+
+    return true;
 }
 
 /**

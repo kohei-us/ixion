@@ -48,6 +48,21 @@ IXION_DLLPUBLIC std::string print_formula_tokens(
     const formula_name_resolver& resolver, const formula_tokens_t& tokens);
 
 /**
+ * Convert an individual formula token intoa human-readable string
+ * representation.
+ *
+ * @param cxt model context.
+ * @param pos address of the cell that has the formula tokens.
+ * @param resolver name resolver object used to print name tokens.
+ * @param token formula token to convert.
+ *
+ * @return string representation of the formula token.
+ */
+IXION_DLLPUBLIC std::string print_formula_token(
+    const iface::formula_model_access& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_token& token);
+
+/**
  * Regisiter a formula cell with cell dependency tracker.
  *
  * @param cxt model context.

@@ -76,14 +76,14 @@ formula_tokens_t parse_formula_string(
 
 namespace {
 
-class print_formula_token : std::unary_function<formula_tokens_t::value_type, void>
+class func_print_formula_token
 {
     const iface::formula_model_access& m_cxt;
     const abs_address_t& m_pos;
     const formula_name_resolver& m_resolver;
     std::ostringstream& m_os;
 public:
-    print_formula_token(
+    func_print_formula_token(
         const iface::formula_model_access& cxt, const abs_address_t& pos,
         const formula_name_resolver& resolver, std::ostringstream& os) :
         m_cxt(cxt),
@@ -93,7 +93,12 @@ public:
 
     void operator() (const formula_tokens_t::value_type& token)
     {
-        switch (token->get_opcode())
+        operator() (*token);
+    }
+
+    void operator() (const formula_token& token)
+    {
+        switch (token.get_opcode())
         {
             case fop_close:
                 m_os << ')';
@@ -120,40 +125,40 @@ public:
                 m_os << '+';
                 break;
             case fop_value:
-                m_os << token->get_value();
+                m_os << token.get_value();
                 break;
             case fop_sep:
                 m_os << m_cxt.get_config().sep_function_arg;
                 break;
             case fop_function:
             {
-                formula_function_t fop = static_cast<formula_function_t>(token->get_index());
+                formula_function_t fop = static_cast<formula_function_t>(token.get_index());
                 m_os << formula_functions::get_function_name(fop);
                 break;
             }
             case fop_single_ref:
             {
-                address_t addr = token->get_single_ref();
+                address_t addr = token.get_single_ref();
                 bool sheet_name = addr.to_abs(m_pos).sheet != m_pos.sheet;
                 m_os << m_resolver.get_name(addr, m_pos, sheet_name);
                 break;
             }
             case fop_range_ref:
             {
-                range_t range = token->get_range_ref();
+                range_t range = token.get_range_ref();
                 bool sheet_name = range.to_abs(m_pos).first.sheet != m_pos.sheet;
                 m_os << m_resolver.get_name(range, m_pos, sheet_name);
                 break;
             }
             case fop_table_ref:
             {
-                table_t tbl = token->get_table_ref();
+                table_t tbl = token.get_table_ref();
                 m_os << m_resolver.get_name(tbl);
                 break;
             }
             case fop_string:
             {
-                const std::string* p = m_cxt.get_string(token->get_index());
+                const std::string* p = m_cxt.get_string(token.get_index());
                 if (p)
                     m_os << "\"" << *p << "\"";
                 break;
@@ -165,16 +170,16 @@ public:
                 m_os << "<>";
                 break;
             case fop_named_expression:
-                m_os << token->get_name();
+                m_os << token.get_name();
                 break;
             case fop_unknown:
             default:
             {
                 std::ostringstream repr;
-                token->write_string(repr);
+                token.write_string(repr);
                 SPDLOG_DEBUG(
                     spdlog::get("ixion"), "token not printed (repr=\"{}\"; name=\"{}\"; opcode=\"{}\")",
-                    repr.str(), get_opcode_name(token->get_opcode()), get_formula_opcode_string(token->get_opcode()));
+                    repr.str(), get_opcode_name(token.get_opcode()), get_formula_opcode_string(token.get_opcode()));
             }
         }
     }
@@ -187,7 +192,17 @@ std::string print_formula_tokens(
     const formula_name_resolver& resolver, const formula_tokens_t& tokens)
 {
     std::ostringstream os;
-    std::for_each(tokens.begin(), tokens.end(), print_formula_token(cxt, pos, resolver, os));
+    std::for_each(tokens.begin(), tokens.end(), func_print_formula_token(cxt, pos, resolver, os));
+    return os.str();
+}
+
+std::string print_formula_token(
+    const iface::formula_model_access& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_token& token)
+{
+    std::ostringstream os;
+    func_print_formula_token func(cxt, pos, resolver, os);
+    func(token);
     return os.str();
 }
 
