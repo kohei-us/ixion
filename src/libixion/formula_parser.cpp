@@ -58,48 +58,43 @@ void formula_parser::set_origin(const abs_address_t& pos)
 
 void formula_parser::parse()
 {
-    try
+    for (m_itr_cur = m_tokens.begin(); has_token(); next())
     {
-        m_itr_cur = m_tokens.begin();
-        for (m_itr_cur = m_tokens.begin(); has_token(); next())
+        const lexer_token_base& t = get_token();
+        lexer_opcode_t oc = t.get_opcode();
+        switch (oc)
         {
-            const lexer_token_base& t = get_token();
-            lexer_opcode_t oc = t.get_opcode();
-            switch (oc)
-            {
-                case lexer_opcode_t::open:
-                case lexer_opcode_t::close:
-                case lexer_opcode_t::plus:
-                case lexer_opcode_t::minus:
-                case lexer_opcode_t::multiply:
-                case lexer_opcode_t::exponent:
-                case lexer_opcode_t::concat:
-                case lexer_opcode_t::equal:
-                case lexer_opcode_t::divide:
-                case lexer_opcode_t::sep:
-                    primitive(oc);
-                    break;
-                case lexer_opcode_t::name:
-                    name(t);
-                    break;
-                case lexer_opcode_t::string:
-                    literal(t);
-                    break;
-                case lexer_opcode_t::value:
-                    value(t);
-                    break;
-                case lexer_opcode_t::less:
-                    less(t);
-                    break;
-                case lexer_opcode_t::greater:
-                    greater(t);
-                    break;
-                default:
-                    ;
-            }
+            case lexer_opcode_t::open:
+            case lexer_opcode_t::close:
+            case lexer_opcode_t::plus:
+            case lexer_opcode_t::minus:
+            case lexer_opcode_t::multiply:
+            case lexer_opcode_t::exponent:
+            case lexer_opcode_t::concat:
+            case lexer_opcode_t::equal:
+            case lexer_opcode_t::divide:
+            case lexer_opcode_t::sep:
+                primitive(oc);
+                break;
+            case lexer_opcode_t::name:
+                name(t);
+                break;
+            case lexer_opcode_t::string:
+                literal(t);
+                break;
+            case lexer_opcode_t::value:
+                value(t);
+                break;
+            case lexer_opcode_t::less:
+                less(t);
+                break;
+            case lexer_opcode_t::greater:
+                greater(t);
+                break;
+            default:
+                ;
         }
     }
-    catch (const general_error&) {}
 }
 
 void formula_parser::print_tokens() const
