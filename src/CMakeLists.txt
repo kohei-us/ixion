@@ -17,9 +17,9 @@ add_executable(ixion-formula-tokenizer
 	ixion_formula_tokenizer.cpp
 )
 
-target_link_libraries(ixion-parser libixion-${IXION_API_VERSION})
-target_link_libraries(ixion-sorter libixion-${IXION_API_VERSION})
-target_link_libraries(ixion-formula-tokenizer libixion-${IXION_API_VERSION})
+target_link_libraries(ixion-parser ${Boost_LIBRARIES} libixion-${IXION_API_VERSION})
+target_link_libraries(ixion-sorter ${Boost_LIBRARIES} libixion-${IXION_API_VERSION})
+target_link_libraries(ixion-formula-tokenizer ${Boost_LIBRARIES} libixion-${IXION_API_VERSION})
 
 # tests
 
