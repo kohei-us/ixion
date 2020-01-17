@@ -169,6 +169,18 @@ public:
             case fop_not_equal:
                 m_os << "<>";
                 break;
+            case fop_less:
+                m_os << "<";
+                break;
+            case fop_greater:
+                m_os << ">";
+                break;
+            case fop_less_equal:
+                m_os << "<=";
+                break;
+            case fop_greater_equal:
+                m_os << ">=";
+                break;
             case fop_named_expression:
                 m_os << token.get_name();
                 break;
