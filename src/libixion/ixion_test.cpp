@@ -976,6 +976,7 @@ void test_name_resolver_odff()
         { "[$'A B C'.$B$4:.F$35]", true },
         { "[$One.B$4:$Two.F35]", true },
         { "[$One.B$4:'A B C'.F35]", true },
+        { "[One.B$4:$'A B C'.F35]", true },
         { 0, false },
     };
 
