@@ -897,7 +897,6 @@ parse_address_result parse_address_calc_a1(
 
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = false;
     addr.abs_row = false;
     addr.abs_column = false;
 
@@ -906,8 +905,8 @@ parse_address_result parse_address_calc_a1(
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
         const char* p0 = p;
         res.sheet_name = parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
-        if (res.sheet_name && *p0 == '$')
-            addr.abs_sheet = true;
+        if (res.sheet_name)
+            addr.abs_sheet = (*p0 == '$');
     }
 
     res.result = parse_address_a1(p, p_last, addr);
@@ -1431,6 +1430,16 @@ public:
 class calc_a1_resolver : public formula_name_resolver
 {
     const iface::formula_model_access* mp_cxt;
+
+    static bool display_last_sheet(const range_t& range, const abs_address_t& pos)
+    {
+        if (range.first.abs_sheet != range.last.abs_sheet)
+            return true;
+
+        abs_range_t abs = range.to_abs(pos);
+        return abs.first.sheet != abs.last.sheet;
+    }
+
 public:
     calc_a1_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
 
@@ -1544,7 +1553,7 @@ public:
 
         os << ":";
 
-        if (sheet_name && mp_cxt && range.first.sheet != range.last.sheet)
+        if (sheet_name && mp_cxt && display_last_sheet(range, pos))
         {
             sheet_t last_sheet = range.last.sheet;
             if (range.last.abs_sheet)

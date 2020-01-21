@@ -248,6 +248,9 @@ void test_name_resolver_calc_a1()
             { "'A B C'.$C4:$Z256", true },
             { "$'A B C'.$C4:$Z256", true },
             { "One.C4:Three.Z100", true },
+            { "One.C4:$Three.Z100", true },
+            { "$One.C4:Three.Z100", true },
+            { "$One.C4:$Three.Z100", true },
             { 0, false },
         };
 
@@ -270,7 +273,7 @@ void test_name_resolver_calc_a1()
 
                 if (name_a1 != test_name)
                 {
-                    cerr << "failed to compile name from range: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+                    cerr << "failed to compile name from range: (pos: " << pos << "; name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
                     assert(false);
                 }
             }
