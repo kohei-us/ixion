@@ -19,6 +19,8 @@
 #include <limits>
 #include <algorithm>
 
+#include <spdlog/spdlog.h>
+
 #define DEBUG_NAME_RESOLVER 0
 
 using namespace std;
@@ -1447,11 +1449,16 @@ public:
             // This is a valid A1-style address syntax-wise.
 
             if (parsed_addr.sheet == invalid_sheet)
-                // sheet name is not found in the model.  Report back as invalid.
+            {
+                SPDLOG_DEBUG(spdlog::get("ixion"), "Sheet name is not found in the model context.");
                 return ret;
+            }
 
             if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
+            {
+                SPDLOG_DEBUG(spdlog::get("ixion"), "Address is outside the sheet bounds.");
                 parse_res = invalid;
+            }
         }
 
         // prevent for example H to be recognized as column address
@@ -1467,8 +1474,10 @@ public:
         if (parse_res == range_expected)
         {
             if (p == p_last)
-                // ':' occurs as the last character.  This is not allowed.
+            {
+                SPDLOG_DEBUG(spdlog::get("ixion"), "':' occurs as the last character.  This is not allowed.");
                 return ret;
+            }
 
             ++p; // skip ':'
 
@@ -1477,14 +1486,15 @@ public:
 
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
-            parse_res = parse_address_calc_a1(nullptr, p, p_last, parsed_addr);
+            parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
             if (parse_res != valid_address)
-                // The 2nd part after the ':' is not valid.
+            {
+                SPDLOG_DEBUG(spdlog::get("ixion"), "2nd part after the ':' is not valid.");
                 return ret;
+            }
 
             to_relative_address(parsed_addr, pos, true);
             set_address(ret.range.last, parsed_addr);
-            ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
             ret.type = formula_name_t::range_reference;
             return ret;
         }
@@ -1527,6 +1537,18 @@ public:
         append_row_address_a1(os, row, pos.row, range.first.abs_row);
 
         os << ":";
+
+        if (sheet_name && mp_cxt && range.first.sheet != range.last.sheet)
+        {
+            sheet_t last_sheet = range.last.sheet;
+            if (range.last.abs_sheet)
+                os << '$';
+            else
+                last_sheet += pos.sheet;
+            append_sheet_name(os, *mp_cxt, last_sheet);
+            os << '.';
+        }
+
         col = range.last.column;
         row = range.last.row;
 

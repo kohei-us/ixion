@@ -247,6 +247,7 @@ void test_name_resolver_calc_a1()
             { "$Three.$C1:Z$400", true },
             { "'A B C'.$C4:$Z256", true },
             { "$'A B C'.$C4:$Z256", true },
+            { "One.C4:Three.Z100", true },
             { 0, false },
         };
 
