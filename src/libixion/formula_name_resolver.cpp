@@ -264,7 +264,10 @@ enum class resolver_parse_mode { column, row };
 void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
 {
     if (!is_valid_sheet(sheet))
+    {
+        SPDLOG_DEBUG(spdlog::get("ixion"), "invalid sheet index ({})", sheet);
         return;
+    }
 
     string sheet_name = cxt.get_sheet_name(sheet);
     string buffer; // used only when the sheet name contains at least one single quote.
@@ -472,6 +475,12 @@ enum parse_address_result_type
     invalid = 0,
     valid_address,
     range_expected /// valid address followed by a ':'.
+};
+
+struct parse_address_result
+{
+    parse_address_result_type result;
+    bool sheet_name = false;
 };
 
 #if DEBUG_NAME_RESOLVER
@@ -881,9 +890,11 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
     return parse_address_result_type::invalid;
 }
 
-parse_address_result_type parse_address_calc_a1(
+parse_address_result parse_address_calc_a1(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
+    parse_address_result res;
+
     addr.row = 0;
     addr.column = 0;
     addr.abs_sheet = false;
@@ -894,12 +905,13 @@ parse_address_result_type parse_address_calc_a1(
     {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
         const char* p0 = p;
-        bool success = parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
-        if (success && *p0 == '$')
+        res.sheet_name = parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
+        if (res.sheet_name && *p0 == '$')
             addr.abs_sheet = true;
     }
 
-    return parse_address_a1(p, p_last, addr);
+    res.result = parse_address_a1(p, p_last, addr);
+    return res;
 }
 
 parse_address_result_type parse_address_excel_a1(
@@ -934,16 +946,10 @@ parse_address_result_type parse_address_excel_r1c1(
     return parse_address_r1c1(p, p_last, addr);
 }
 
-struct parse_address_odff_result
-{
-    parse_address_result_type result;
-    bool sheet_name = false;
-};
-
-parse_address_odff_result parse_address_odff(
+parse_address_result parse_address_odff(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
-    parse_address_odff_result res;
+    parse_address_result res;
     assert(p <= p_last);
 
     addr.row = 0;
@@ -1442,9 +1448,9 @@ public:
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
-        parse_address_result_type parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
 
-        if (parse_res != invalid)
+        if (parse_res.result != invalid)
         {
             // This is a valid A1-style address syntax-wise.
 
@@ -1457,12 +1463,12 @@ public:
             if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
             {
                 SPDLOG_DEBUG(spdlog::get("ixion"), "Address is outside the sheet bounds.");
-                parse_res = invalid;
+                parse_res.result = invalid;
             }
         }
 
         // prevent for example H to be recognized as column address
-        if (parse_res == valid_address && parsed_addr.row != row_unset)
+        if (parse_res.result == valid_address && parsed_addr.row != row_unset)
         {
             // This is a single cell address.
             to_relative_address(parsed_addr, pos, true);
@@ -1471,7 +1477,7 @@ public:
             return ret;
         }
 
-        if (parse_res == range_expected)
+        if (parse_res.result == range_expected)
         {
             if (p == p_last)
             {
@@ -1487,13 +1493,13 @@ public:
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
             parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
-            if (parse_res != valid_address)
+            if (parse_res.result != valid_address)
             {
                 SPDLOG_DEBUG(spdlog::get("ixion"), "2nd part after the ':' is not valid.");
                 return ret;
             }
 
-            to_relative_address(parsed_addr, pos, true);
+            to_relative_address(parsed_addr, pos, parse_res.sheet_name);
             set_address(ret.range.last, parsed_addr);
             ret.type = formula_name_t::range_reference;
             return ret;
@@ -1607,7 +1613,7 @@ public:
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, true, false, false);
 
-        parse_address_odff_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result parse_res = parse_address_odff(mp_cxt, p, p_last, parsed_addr);
 
         // prevent for example H to be recognized as column address
         if (parse_res.result == valid_address && parsed_addr.row != row_unset)

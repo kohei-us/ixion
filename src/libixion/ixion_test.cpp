@@ -251,25 +251,28 @@ void test_name_resolver_calc_a1()
             { 0, false },
         };
 
-        for (size_t i = 0; names[i].name; ++i)
+        for (sheet_t sheet = 0; sheet <= 3; ++sheet)
         {
-            const char* p = names[i].name;
-            string name_a1(p);
-            cout << "range address: " << name_a1 << endl;
-            formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
-            if (res.type != formula_name_t::range_reference)
+            for (size_t i = 0; names[i].name; ++i)
             {
-                cerr << "failed to resolve range address: " << name_a1 << endl;
-                assert(false);
-            }
+                abs_address_t pos{sheet, 0, 0};
+                string name_a1(names[i].name);
+                cout << "range address: " << name_a1 << endl;
+                formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), pos);
+                if (res.type != formula_name_t::range_reference)
+                {
+                    cerr << "failed to resolve range address: " << name_a1 << endl;
+                    assert(false);
+                }
 
-            range_t range = to_range(res.range);
-            std::string test_name = resolver->get_name(range, abs_address_t(), names[i].sheet_name);
+                range_t range = to_range(res.range);
+                std::string test_name = resolver->get_name(range, pos, names[i].sheet_name);
 
-            if (name_a1 != test_name)
-            {
-                cerr << "failed to compile name from range: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
-                assert(false);
+                if (name_a1 != test_name)
+                {
+                    cerr << "failed to compile name from range: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+                    assert(false);
+                }
             }
         }
     }
@@ -289,7 +292,7 @@ void test_name_resolver_calc_a1()
     {
         string name_a1(range_tests[i].name);
         cout << "range address: " << name_a1 << endl;
-        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
         assert(res.type == formula_name_t::range_reference);
         assert(res.range.first.sheet == range_tests[i].sheet1);
         assert(res.range.first.row == range_tests[i].row1);
@@ -316,6 +319,39 @@ void test_name_resolver_calc_a1()
         assert(res.range.last.sheet == 0);
         assert(res.range.last.row == 3);
         assert(res.range.last.col == -2);
+    }
+
+    {
+        formula_name_t res = resolver->resolve(IXION_ASCII("Three.B2"), abs_address_t(2,0,0));
+        assert(res.type == formula_name_t::cell_reference);
+        assert(!res.address.abs_sheet);
+        assert(!res.address.abs_row);
+        assert(!res.address.abs_col);
+        assert(res.address.sheet == 0);
+        assert(res.address.row == 1);
+        assert(res.address.col == 1);
+    }
+
+    {
+        abs_address_t pos(2, 0, 0);
+        std::string name("One.B2:Three.C4");
+        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        assert(res.type == formula_name_t::range_reference);
+        assert(!res.range.first.abs_sheet);
+        assert(!res.range.first.abs_row);
+        assert(!res.range.first.abs_col);
+        assert(res.range.first.sheet == -2);
+        assert(res.range.first.row == 1);
+        assert(res.range.first.col == 1);
+        assert(!res.range.last.abs_sheet);
+        assert(!res.range.last.abs_row);
+        assert(!res.range.last.abs_col);
+        assert(res.range.last.sheet == 0);
+        assert(res.range.last.row == 3);
+        assert(res.range.last.col == 2);
+
+        std::string s = resolver->get_name(to_range(res.range), pos, true);
+        assert(s == name);
     }
 }
 
