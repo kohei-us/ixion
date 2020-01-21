@@ -331,7 +331,7 @@ void append_column_name_a1(ostringstream& os, col_t col)
 }
 
 void append_address_a1(
-    ostringstream& os, const ixion::iface::formula_model_access* cxt,
+    std::ostringstream& os, const ixion::iface::formula_model_access* cxt,
     const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
 {
     col_t col = addr.column;
@@ -454,10 +454,9 @@ const char* parse_address_result_names[] = {
 };
 #endif
 
-void parse_sheet_name_quoted(
+bool parse_sheet_name_quoted(
     const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
-    const char* p_old = p;
     ++p; // skip the open quote.
     size_t len = 0;
     string buffer; // used only when the name contains at least one single quote.
@@ -500,7 +499,7 @@ void parse_sheet_name_quoted(
             ++p; // skip the closing quote.
             if (p != p_last)
                 ++p; // skip the separator.
-            return;
+            return true;
         }
 
         if (p == p_last)
@@ -510,20 +509,34 @@ void parse_sheet_name_quoted(
         ++len;
     }
 
-    p = p_old;
+    return false;
 }
 
-void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+/**
+ * Try to parse a sheet name prefix in the string.  If this fails, revert
+ * the current position back to the original position prior to the call.
+ *
+ * @return true if the string contains a valid sheet name, false otherwise.
+ */
+bool parse_sheet_name(
+    const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     assert(p <= p_last);
 
+    const char* p_old = p; // old position to revert to in case we fail to parse a sheet name.
+
+    if (*p == '$')
+        ++p;
+
     if (*p == '\'')
     {
-        parse_sheet_name_quoted(cxt, sep, p, p_last, sheet);
-        return;
+        bool success = parse_sheet_name_quoted(cxt, sep, p, p_last, sheet);
+        if (!success)
+            p = p_old;
+        return success;
     }
 
-    const char* p_old = p;
+    const char* p0 = p;
     size_t len = 0;
 
     // parse until we hit the sheet-address separator.
@@ -531,10 +544,10 @@ void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char 
     {
         if (*p == sep)
         {
-            sheet = cxt.get_sheet_index(p_old, len);
+            sheet = cxt.get_sheet_index(p0, len);
             if (p != p_last)
                 ++p; // skip the separator.
-            return;
+            return true;
         }
 
         if (p == p_last)
@@ -545,6 +558,7 @@ void parse_sheet_name(const ixion::iface::formula_model_access& cxt, const char 
     }
 
     p = p_old;
+    return false;
 }
 
 /**
@@ -844,13 +858,18 @@ parse_address_result_type parse_address_calc_a1(
 {
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = false; // TODO : handle absolute sheet reference.
+    addr.abs_sheet = false;
     addr.abs_row = false;
     addr.abs_column = false;
 
     if (cxt)
+    {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
+        const char* p0 = p;
+        bool success = parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
+        if (success && *p0 == '$')
+            addr.abs_sheet = true;
+    }
 
     return parse_address_a1(p, p_last, addr);
 }
@@ -1472,15 +1491,73 @@ public:
 
     virtual std::string get_name(const address_t &addr, const abs_address_t &pos, bool sheet_name) const override
     {
-        ostringstream os;
+        std::ostringstream os;
         char sheet_name_sep = sheet_name ? '.' : 0;
+        if (sheet_name && addr.abs_sheet)
+            os << '$';
         append_address_a1(os, mp_cxt, addr, pos, sheet_name_sep);
         return os.str();
     }
 
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const override
     {
-        return std::string();
+        // For now, sheet index of the end-range address is ignored.
+
+        ostringstream os;
+        col_t col = range.first.column;
+        row_t row = range.first.row;
+        sheet_t sheet = range.first.sheet;
+
+        if (!range.first.abs_sheet)
+            sheet += pos.sheet;
+
+        if (sheet_name && mp_cxt)
+        {
+            append_sheet_name(os, *mp_cxt, sheet);
+            os << '.';
+        }
+
+        if (col != column_unset)
+        {
+            if (range.first.abs_column)
+                os << '$';
+            else
+                col += pos.column;
+            append_column_name_a1(os, col);
+        }
+
+        if (row != row_unset)
+        {
+            if (range.first.abs_row)
+                os << '$';
+            else
+                row += pos.row;
+            os << (row + 1);
+        }
+
+        os << ":";
+        col = range.last.column;
+        row = range.last.row;
+
+        if (col != column_unset)
+        {
+            if (range.last.abs_column)
+                os << '$';
+            else
+                col += pos.column;
+            append_column_name_a1(os, col);
+        }
+
+        if (row != row_unset)
+        {
+            if (range.last.abs_row)
+                os << '$';
+            else
+                row += pos.row;
+            os << (row + 1);
+        }
+
+        return os.str();
     }
 
     virtual std::string get_name(const table_t &table) const override
