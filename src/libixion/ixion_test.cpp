@@ -241,9 +241,10 @@ void test_name_resolver_calc_a1()
         {
             { "A1:B2", false },
             { "$D10:G$24", false },
-            { "One.C1:Z400", true },
-            { "Two.C1:Z400", true },
-            { "Three.C1:Z400", true },
+            { "One.C$1:Z$400", true },
+            { "Two.$C1:$Z400", true },
+            { "Three.$C1:Z$400", true },
+            { "'A B C'.$C4:$Z256", true },
             { 0, false },
         };
 
