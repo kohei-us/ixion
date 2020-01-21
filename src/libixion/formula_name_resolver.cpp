@@ -839,6 +839,22 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
     return parse_address_result_type::invalid;
 }
 
+parse_address_result_type parse_address_calc_a1(
+    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+{
+    addr.row = 0;
+    addr.column = 0;
+    addr.abs_sheet = false; // TODO : handle absolute sheet reference.
+    addr.abs_row = false;
+    addr.abs_column = false;
+
+    if (cxt)
+        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
+        parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
+
+    return parse_address_a1(p, p_last, addr);
+}
+
 parse_address_result_type parse_address_excel_a1(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
@@ -1381,6 +1397,104 @@ public:
     }
 };
 
+class calc_a1_resolver : public formula_name_resolver
+{
+    const iface::formula_model_access* mp_cxt;
+public:
+    calc_a1_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
+
+    virtual formula_name_t resolve(const char *p, size_t n, const abs_address_t &pos) const override
+    {
+        formula_name_t ret;
+        if (!n)
+            return ret;
+
+        if (resolve_function(p, n, ret))
+            return ret;
+
+        const char* p_last = p + n -1;
+
+        // Use the sheet where the cell is unless sheet name is explicitly given.
+        address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
+
+        parse_address_result_type parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
+
+        if (parse_res != invalid)
+        {
+            // This is a valid A1-style address syntax-wise.
+
+            if (parsed_addr.sheet == invalid_sheet)
+                // sheet name is not found in the model.  Report back as invalid.
+                return ret;
+
+            if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
+                parse_res = invalid;
+        }
+
+        // prevent for example H to be recognized as column address
+        if (parse_res == valid_address && parsed_addr.row != row_unset)
+        {
+            // This is a single cell address.
+            to_relative_address(parsed_addr, pos, true);
+            set_cell_reference(ret, parsed_addr);
+
+            return ret;
+        }
+
+        if (parse_res == range_expected)
+        {
+            if (p == p_last)
+                // ':' occurs as the last character.  This is not allowed.
+                return ret;
+
+            ++p; // skip ':'
+
+            to_relative_address(parsed_addr, pos, true);
+            set_address(ret.range.first, parsed_addr);
+
+            // For now, we assume the sheet index of the end address is identical
+            // to that of the begin address.
+            parse_res = parse_address_calc_a1(nullptr, p, p_last, parsed_addr);
+            if (parse_res != valid_address)
+                // The 2nd part after the ':' is not valid.
+                return ret;
+
+            to_relative_address(parsed_addr, pos, true);
+            set_address(ret.range.last, parsed_addr);
+            ret.range.last.sheet = ret.range.first.sheet; // re-use the sheet index of the begin address.
+            ret.type = formula_name_t::range_reference;
+            return ret;
+        }
+
+        resolve_function_or_name(p, n, ret);
+        return ret;
+    }
+
+    virtual std::string get_name(const address_t &addr, const abs_address_t &pos, bool sheet_name) const override
+    {
+        ostringstream os;
+        char sheet_name_sep = sheet_name ? '.' : 0;
+        append_address_a1(os, mp_cxt, addr, pos, sheet_name_sep);
+        return os.str();
+    }
+
+    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const override
+    {
+        return std::string();
+    }
+
+    virtual std::string get_name(const table_t &table) const override
+    {
+        // TODO : find out how Calc A1 handles table reference.
+        return std::string();
+    }
+
+    virtual std::string get_column_name(col_t col) const override
+    {
+        return get_column_name_a1(col);
+    }
+};
+
 /**
  * Name resolver for ODFF formula expressions.
  */
@@ -1554,6 +1668,7 @@ std::unique_ptr<formula_name_resolver> formula_name_resolver::get(
         case formula_name_resolver_t::odff:
             return std::unique_ptr<formula_name_resolver>(new odff_resolver(cxt));
         case formula_name_resolver_t::calc_a1:
+            return std::unique_ptr<formula_name_resolver>(new calc_a1_resolver(cxt));
         case formula_name_resolver_t::unknown:
         default:
             ;

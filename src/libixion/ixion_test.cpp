@@ -167,6 +167,115 @@ struct ref_name_entry
     bool sheet_name;
 };
 
+void test_name_resolver_calc_a1()
+{
+    cout << "test name resolver calc a1" << endl;
+
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("One"), 1048576, 16384);
+    cxt.append_sheet(IXION_ASCII("Two"), 1048576, 16384);
+    cxt.append_sheet(IXION_ASCII("Three"), 1048576, 16384);
+    cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 16384); // name with space
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    assert(resolver);
+
+    // Parse single cell addresses.
+    ref_name_entry names[] =
+    {
+        { "A1", false },
+        { "$A1", false },
+        { "A$1", false },
+        { "$A$1", false },
+        { "Z1", false },
+        { "AA23", false },
+        { "AB23", false },
+        { "$AB23", false },
+        { "AB$23", false },
+        { "$AB$23", false },
+        { "BA1", false },
+        { "AAA2", false },
+        { "ABA1", false },
+        { "BAA1", false },
+        { "XFD1048576", false },
+        { "One.A1", true },
+        { "One.XFD1048576", true },
+        { "Two.B10", true },
+        { "Two.$B10", true },
+        { "Two.B$10", true },
+        { "Two.$B$10", true },
+        { "Three.CFD234", true },
+        { "'A B C'.Z12", true },
+        { 0, false }
+    };
+
+    for (size_t i = 0; names[i].name; ++i)
+    {
+        const char* p = names[i].name;
+        string name_a1(p);
+        cout << "single cell address: " << name_a1 << endl;
+        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        if (res.type != formula_name_t::cell_reference)
+        {
+            cerr << "failed to resolve cell address: " << name_a1 << endl;
+            assert(false);
+        }
+
+        address_t addr = to_address(res.address);
+        string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
+
+        if (name_a1 != test_name)
+        {
+            cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+            assert(false);
+        }
+    }
+
+    // Parse range addresses.
+    struct {
+        const char* name; sheet_t sheet1; row_t row1; col_t col1; sheet_t sheet2; row_t row2; col_t col2;
+    } range_tests[] = {
+        { "A1:B2", 0, 0, 0, 0, 1, 1 },
+        { "D10:G24", 0, 9, 3, 0, 23, 6 },
+        { "One.C1:Z400", 0, 0, 2, 0, 399, 25 },
+        { "Two.C1:Z400", 1, 0, 2, 1, 399, 25 },
+        { "Three.C1:Z400", 2, 0, 2, 2, 399, 25 },
+        { 0, 0, 0, 0, 0, 0, 0 }
+    };
+
+    for (size_t i = 0; range_tests[i].name; ++i)
+    {
+        string name_a1(range_tests[i].name);
+        cout << "range address: " << name_a1 << endl;
+        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        assert(res.type == formula_name_t::range_reference);
+        assert(res.range.first.sheet == range_tests[i].sheet1);
+        assert(res.range.first.row == range_tests[i].row1);
+        assert(res.range.first.col == range_tests[i].col1);
+        assert(res.range.last.sheet == range_tests[i].sheet2);
+        assert(res.range.last.row == range_tests[i].row2);
+        assert(res.range.last.col == range_tests[i].col2);
+    }
+
+    {
+        formula_name_t res = resolver->resolve("B1", 2, abs_address_t(0,1,1));
+        assert(res.type == formula_name_t::cell_reference);
+        assert(res.address.sheet == 0);
+        assert(res.address.row == -1);
+        assert(res.address.col == 0);
+    }
+
+    {
+        formula_name_t res = resolver->resolve("B2:B4", 5, abs_address_t(0,0,3));
+        assert(res.type == formula_name_t::range_reference);
+        assert(res.range.first.sheet == 0);
+        assert(res.range.first.row == 1);
+        assert(res.range.first.col == -2);
+        assert(res.range.last.sheet == 0);
+        assert(res.range.last.row == 3);
+        assert(res.range.last.col == -2);
+    }
+}
+
 void test_name_resolver_excel_a1()
 {
     cout << "test name resolver excel a1" << endl;
@@ -1688,6 +1797,7 @@ int main()
     test_matrix();
     test_matrix_non_numeric_values();
 
+    test_name_resolver_calc_a1();
     test_name_resolver_excel_a1();
     test_name_resolver_named_expression();
     test_name_resolver_table_excel_a1();
