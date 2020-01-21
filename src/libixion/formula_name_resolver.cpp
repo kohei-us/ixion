@@ -1517,6 +1517,8 @@ public:
 
         if (sheet_name && mp_cxt)
         {
+            if (range.first.abs_sheet)
+                os << '$';
             append_sheet_name(os, *mp_cxt, sheet);
             os << '.';
         }
