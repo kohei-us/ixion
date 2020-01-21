@@ -330,6 +330,32 @@ void append_column_name_a1(ostringstream& os, col_t col)
     os << col_name;
 }
 
+void append_column_address_a1(std::ostringstream& os, col_t col, col_t origin, bool absolute)
+{
+    if (col == column_unset)
+        return;
+
+    if (absolute)
+        os << '$';
+    else
+        col += origin;
+
+    append_column_name_a1(os, col);
+}
+
+void append_row_address_a1(std::ostringstream& os, row_t row, row_t origin, bool absolute)
+{
+    if (row == row_unset)
+        return;
+
+    if (absolute)
+        os << '$';
+    else
+        row += origin;
+
+    os << (row + 1);
+}
+
 void append_address_a1(
     std::ostringstream& os, const ixion::iface::formula_model_access* cxt,
     const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
@@ -1237,36 +1263,14 @@ public:
             os << '!';
         }
 
-        if (col != column_unset)
-        {
-            if (range.first.abs_column)
-                os << '$';
-            else
-                col += pos.column;
-            append_column_name_a1(os, col);
-        }
-
-        if (row != row_unset)
-        {
-            if (range.first.abs_row)
-                os << '$';
-            else
-                row += pos.row;
-            os << (row + 1);
-        }
+        append_column_address_a1(os, col, pos.column, range.first.abs_column);
+        append_row_address_a1(os, row, pos.row, range.first.abs_row);
 
         os << ":";
         col = range.last.column;
         row = range.last.row;
 
-        if (col != column_unset)
-        {
-            if (range.last.abs_column)
-                os << '$';
-            else
-                col += pos.column;
-            append_column_name_a1(os, col);
-        }
+        append_column_address_a1(os, col, pos.column, range.last.abs_column);
 
         if (row != row_unset)
         {
@@ -1517,45 +1521,15 @@ public:
             os << '.';
         }
 
-        if (col != column_unset)
-        {
-            if (range.first.abs_column)
-                os << '$';
-            else
-                col += pos.column;
-            append_column_name_a1(os, col);
-        }
-
-        if (row != row_unset)
-        {
-            if (range.first.abs_row)
-                os << '$';
-            else
-                row += pos.row;
-            os << (row + 1);
-        }
+        append_column_address_a1(os, col, pos.column, range.first.abs_column);
+        append_row_address_a1(os, row, pos.row, range.first.abs_row);
 
         os << ":";
         col = range.last.column;
         row = range.last.row;
 
-        if (col != column_unset)
-        {
-            if (range.last.abs_column)
-                os << '$';
-            else
-                col += pos.column;
-            append_column_name_a1(os, col);
-        }
-
-        if (row != row_unset)
-        {
-            if (range.last.abs_row)
-                os << '$';
-            else
-                row += pos.row;
-            os << (row + 1);
-        }
+        append_column_address_a1(os, col, pos.column, range.last.abs_column);
+        append_row_address_a1(os, row, pos.row, range.last.abs_row);
 
         return os.str();
     }
