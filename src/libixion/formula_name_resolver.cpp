@@ -1499,8 +1499,6 @@ public:
             to_relative_address(parsed_addr, pos, true);
             set_address(ret.range.first, parsed_addr);
 
-            // For now, we assume the sheet index of the end address is identical
-            // to that of the begin address.
             parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
             if (parse_res.result != valid_address)
             {
