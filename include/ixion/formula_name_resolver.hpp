@@ -116,6 +116,19 @@ public:
     formula_name_resolver();
     virtual ~formula_name_resolver() = 0;
 
+    /**
+     * Parse and resolve a reference string.
+     *
+     * @param p pointer to the buffer that stores the reference string to be
+     *          parsed.
+     * @param n length of the buffer that stores the reference string.
+     * @param pos base cell position, which influences the resolved reference
+     *            position(s) containing relative address(es).  When the
+     *            reference string does not contain an explicit sheet name,
+     *            the sheet address of the base cell position is used.
+     *
+     * @return result of the resovled reference.
+     */
     virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const = 0;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
