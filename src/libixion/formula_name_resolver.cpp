@@ -21,8 +21,6 @@
 
 #include <spdlog/spdlog.h>
 
-#define DEBUG_NAME_RESOLVER 0
-
 using namespace std;
 
 namespace ixion {
@@ -483,13 +481,24 @@ struct parse_address_result
     bool sheet_name = false;
 };
 
-#if DEBUG_NAME_RESOLVER
-const char* parse_address_result_names[] = {
-    "invalid",
-    "valid address",
-    "range expected"
-};
-#endif
+std::ostream& operator<< (std::ostream& os, parse_address_result_type rt)
+{
+    static const char* names[] = {
+        "invalid",
+        "valid address",
+        "range expected"
+    };
+
+    os << names[rt];
+    return os;
+}
+
+std::string to_string(parse_address_result_type rt)
+{
+    std::ostringstream os;
+    os << rt;
+    return os.str();
+}
 
 bool parse_sheet_name_quoted(
     const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
@@ -1162,9 +1171,6 @@ public:
 
     virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
     {
-#if DEBUG_NAME_RESOLVER
-        __IXION_DEBUG_OUT__ << "name=" << string(p,n) << "; origin=" << pos.get_name() << endl;
-#endif
         formula_name_t ret;
         if (!n)
             return ret;
@@ -1182,10 +1188,6 @@ public:
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
         parse_address_result_type parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
-
-#if DEBUG_NAME_RESOLVER
-        __IXION_DEBUG_OUT__ << "parse address result: " << parse_address_result_names[parse_res] << endl;
-#endif
 
         if (parse_res != invalid)
         {
@@ -1206,12 +1208,6 @@ public:
             to_relative_address(parsed_addr, pos, true);
             set_cell_reference(ret, parsed_addr);
 
-#if DEBUG_NAME_RESOLVER
-            string abs_row_s = parsed_addr.abs_row ? "abs" : "rel";
-            string abs_col_s = parsed_addr.abs_column ? "abs" : "rel";
-            cout << "resolve: " << string(p,n) << "=(row=" << parsed_addr.row
-                << " [" << abs_row_s << "]; column=" << parsed_addr.column << " [" << abs_col_s << "])" << endl;
-#endif
             return ret;
         }
 
