@@ -191,8 +191,8 @@ void formula_parser::name(const lexer_token_base& t)
         break;
         default:
         {
-            ostringstream os;
-            os << "failed to resolve a name '" << name.str() << "'.";
+            std::ostringstream os;
+            os << "failed to resolve a name token '" << name.str() << "'.";
             throw parse_error(os.str());
         }
     }

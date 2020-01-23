@@ -1021,6 +1021,13 @@ void test_name_resolver_odff()
         abs_range_t range_expected(abs_address_t(1, 1, 1), 9, 1);
         assert(range == range_expected);
     }
+
+    {
+        std::string name = "MyRange";
+        abs_address_t pos(3, 2, 1);
+        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        assert(res.type == formula_name_t::named_expression);
+    }
 }
 
 void test_name_resolver_odf_cra()

@@ -1673,9 +1673,12 @@ public:
             // Empty string.
             return ret;
 
-        // First character must be '['.
+        // First character must be '[' for this to be a reference.
         if (*p != '[')
+        {
+            ret.type = formula_name_t::named_expression;
             return ret;
+        }
 
         ++p;
         const char* p_last = p;
