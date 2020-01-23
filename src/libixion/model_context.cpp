@@ -209,6 +209,7 @@ private:
 void model_context_impl::set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
 {
     string name(p, n);
+    SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
     m_named_expressions.insert(
         detail::named_expressions_t::value_type(std::move(name), std::move(expr)));
 }
@@ -218,6 +219,7 @@ void model_context_impl::set_named_expression(
 {
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     string name(p, n);
+    SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
     ns.insert(
         detail::named_expressions_t::value_type(std::move(name), std::move(expr)));
 }
