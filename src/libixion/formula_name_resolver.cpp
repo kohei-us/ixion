@@ -1544,6 +1544,7 @@ public:
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
         parse_address_result parse_res = m_func_parse_address(mp_cxt, p, p_last, parsed_addr);
+        SPDLOG_TRACE(spdlog::get("ixion"), "parse address result on 1st address ({})", to_string(parse_res.result));
 
         if (parse_res.result != invalid)
         {
@@ -1586,6 +1587,8 @@ public:
             set_address(ret.range.first, parsed_addr);
 
             parse_res = m_func_parse_address(mp_cxt, p, p_last, parsed_addr);
+            SPDLOG_TRACE(spdlog::get("ixion"), "parse address result on 2nd address ({})", to_string(parse_res.result));
+
             if (parse_res.result != valid_address)
             {
                 SPDLOG_DEBUG(spdlog::get("ixion"), "2nd part after the ':' is not valid.");
