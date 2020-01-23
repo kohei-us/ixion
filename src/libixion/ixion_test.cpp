@@ -1258,6 +1258,7 @@ void test_parse_and_print_expressions()
         "Table1[#Headers]",
         "Table1[[#Headers],[Category]:[Value]]",
         "Table1[[#Headers],[#Data],[Category]:[Value]]",
+        "IF(A1=\"\",\"empty\",\"not empty\")",
     };
 
     model_context cxt;

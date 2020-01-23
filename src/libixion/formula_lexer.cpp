@@ -301,8 +301,7 @@ void tokenizer::string()
     for (; *mp_char != '"' && has_char(); ++len)
         next();
 
-    if (len)
-        m_tokens.push_back(make_unique<lexer_string_token>(p, len));
+    m_tokens.push_back(make_unique<lexer_string_token>(p, len));
 
     if (*mp_char == '"')
         next();
