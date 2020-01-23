@@ -1023,6 +1023,120 @@ void test_name_resolver_odff()
     }
 }
 
+void test_name_resolver_odf_cra()
+{
+    cout << "test name resolver odf-cra" << endl;
+
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("One"), 1048576, 16384);
+    cxt.append_sheet(IXION_ASCII("Two"), 1048576, 16384);
+    cxt.append_sheet(IXION_ASCII("Three"), 1048576, 16384);
+    cxt.append_sheet(IXION_ASCII("A B C"), 1048576, 16384); // name with space
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::odf_cra, &cxt);
+    assert(resolver);
+
+    {
+        // Parse single cell addresses.
+        ref_name_entry names[] =
+        {
+            { ".A1", false },
+            { ".$A1", false },
+            { ".A$1", false },
+            { ".$A$1", false },
+            { ".Z1", false },
+            { ".AA23", false },
+            { ".AB23", false },
+            { ".$AB23", false },
+            { ".AB$23", false },
+            { ".$AB$23", false },
+            { ".BA1", false },
+            { ".AAA2", false },
+            { ".ABA1", false },
+            { ".BAA1", false },
+            { ".XFD1048576", false },
+            { "One.A1", true },
+            { "One.XFD1048576", true },
+            { "Two.B10", true },
+            { "Two.$B10", true },
+            { "Two.B$10", true },
+            { "Two.$B$10", true },
+            { "Three.CFD234", true },
+            { "$Three.CFD234", true },
+            { "'A B C'.Z12", true },
+            { "$'A B C'.Z12", true },
+            { 0, false }
+        };
+
+        for (size_t i = 0; names[i].name; ++i)
+        {
+            const char* p = names[i].name;
+            string name_a1(p);
+            cout << "single cell address: " << name_a1 << endl;
+            formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+            if (res.type != formula_name_t::cell_reference)
+            {
+                cerr << "failed to resolve cell address: " << name_a1 << endl;
+                assert(false);
+            }
+
+            address_t addr = to_address(res.address);
+            string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
+
+            if (name_a1 != test_name)
+            {
+                cerr << "failed to compile name from address: (name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+                assert(false);
+            }
+        }
+    }
+
+    {
+        // Parse range addresses.
+
+        ref_name_entry names[] =
+        {
+            { ".A1:.B2", false },
+            { ".$D10:.G$24", false },
+            { "One.C$1:.Z$400", true },
+            { "Two.$C1:.$Z400", true },
+            { "Three.$C1:.Z$400", true },
+            { "$Three.$C1:.Z$400", true },
+            { "'A B C'.$C4:.$Z256", true },
+            { "$'A B C'.$C4:.$Z256", true },
+            { "One.C4:Three.Z100", true },
+            { "One.C4:$Three.Z100", true },
+            { "$One.C4:Three.Z100", true },
+            { "$One.C4:$Three.Z100", true },
+            { 0, false },
+        };
+
+        for (sheet_t sheet = 0; sheet <= 3; ++sheet)
+        {
+            for (size_t i = 0; names[i].name; ++i)
+            {
+                abs_address_t pos{sheet, 0, 0};
+                string name_a1(names[i].name);
+                cout << "range address: " << name_a1 << endl;
+                formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), pos);
+                if (res.type != formula_name_t::range_reference)
+                {
+                    cerr << "failed to resolve range address: " << name_a1 << endl;
+                    assert(false);
+                }
+
+                range_t range = to_range(res.range);
+                std::string test_name = resolver->get_name(range, pos, names[i].sheet_name);
+
+                if (name_a1 != test_name)
+                {
+                    cerr << "failed to compile name from range: (pos: " << pos << "; name expected: " << name_a1 << "; actual name created: " << test_name << ")" << endl;
+                    assert(false);
+                }
+            }
+        }
+    }
+}
+
 void test_address()
 {
     cout << "test address" << endl;
@@ -1925,6 +2039,7 @@ int main()
     test_name_resolver_table_excel_a1();
     test_name_resolver_excel_r1c1();
     test_name_resolver_odff();
+    test_name_resolver_odf_cra();
     test_address();
     test_parse_and_print_expressions();
     test_function_name_resolution();
