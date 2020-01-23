@@ -312,6 +312,36 @@ void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_acce
         os << '\'';
 }
 
+void append_sheet_name_calc_a1(
+    std::ostringstream& os, const ixion::iface::formula_model_access* cxt, const address_t& addr, const abs_address_t& origin)
+{
+    if (!cxt)
+        return;
+
+    sheet_t sheet = addr.sheet;
+    if (addr.abs_sheet)
+        os << '$';
+    else
+        sheet += origin.sheet;
+    append_sheet_name(os, *cxt, sheet);
+    os << '.';
+}
+
+void append_sheet_name_odf_cra(
+    std::ostringstream& os, const ixion::iface::formula_model_access* cxt, const address_t& addr, const abs_address_t& origin)
+{
+    if (cxt)
+    {
+        sheet_t sheet = addr.sheet;
+        if (addr.abs_sheet)
+            os << '$';
+        else
+            sheet += origin.sheet;
+        append_sheet_name(os, *cxt, sheet);
+    }
+    os << '.';
+}
+
 void append_column_name_a1(ostringstream& os, col_t col)
 {
     const col_t div = 26;
@@ -363,6 +393,8 @@ void append_address_a1(
     std::ostringstream& os, const ixion::iface::formula_model_access* cxt,
     const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
 {
+    assert(sheet_name_sep);
+
     col_t col = addr.column;
     row_t row = addr.row;
     sheet_t sheet = addr.sheet;
@@ -373,7 +405,7 @@ void append_address_a1(
     if (!addr.abs_sheet)
         sheet += pos.sheet;
 
-    if (sheet_name_sep && cxt)
+    if (cxt)
     {
         append_sheet_name(os, *cxt, sheet);
         os << sheet_name_sep;
@@ -386,6 +418,20 @@ void append_address_a1(
     if (addr.abs_row)
         os << '$';
     os << (row + 1);
+}
+
+/**
+ * Almost identical to append_address_a1, but it always appends a sheet name
+ * separator even if a sheet name is not appended.
+ */
+void append_address_a1_with_sheet_name_sep(
+    std::ostringstream& os, const ixion::iface::formula_model_access* cxt,
+    const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
+{
+    if (!cxt)
+        os << sheet_name_sep;
+
+    append_address_a1(os, cxt, addr, pos, sheet_name_sep);
 }
 
 void append_address_r1c1(
@@ -922,6 +968,24 @@ parse_address_result parse_address_calc_a1(
     return res;
 }
 
+/**
+ * Parse a single cell address in ODF cell-range-address syntax.  This is
+ * almost identical to Calc A1 except that it allows a leading '.' as in
+ * '.E1' as opposed to just 'E1'.
+ */
+parse_address_result parse_address_odf_cra(
+    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+{
+    if (*p == '.')
+    {
+        // Skip the '.', and assume absence of sheet name.
+        ++p;
+        cxt = nullptr;
+    }
+
+    return parse_address_calc_a1(cxt, p, p_last, addr);
+}
+
 parse_address_result_type parse_address_excel_a1(
     const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
 {
@@ -1243,8 +1307,7 @@ public:
     virtual string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
         ostringstream os;
-        char sheet_name_sep = sheet_name ? '!' : 0;
-        append_address_a1(os, mp_cxt, addr, pos, sheet_name_sep);
+        append_address_a1(os, sheet_name ? mp_cxt : nullptr, addr, pos, '!');
         return os.str();
     }
 
@@ -1423,9 +1486,27 @@ public:
     }
 };
 
-class calc_a1_resolver : public formula_name_resolver
+class dot_a1_resolver : public formula_name_resolver
 {
+    using func_parse_address_type =
+        std::function<parse_address_result(
+            const ixion::iface::formula_model_access*,
+            const char*&, const char*, address_t&)>;
+
+    using func_append_address_type =
+        std::function<void(
+            std::ostringstream&, const ixion::iface::formula_model_access*,
+            const address_t&, const abs_address_t&, char)>;
+
+    using func_append_sheet_name_type =
+        std::function<void(
+            std::ostringstream&, const ixion::iface::formula_model_access*,
+            const address_t&, const abs_address_t&)>;
+
     const iface::formula_model_access* mp_cxt;
+    func_parse_address_type m_func_parse_address;
+    func_append_address_type m_func_append_address;
+    func_append_sheet_name_type m_func_append_sheet_name;
 
     static bool display_last_sheet(const range_t& range, const abs_address_t& pos)
     {
@@ -1437,7 +1518,16 @@ class calc_a1_resolver : public formula_name_resolver
     }
 
 public:
-    calc_a1_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
+    dot_a1_resolver(
+        const iface::formula_model_access* cxt,
+        func_parse_address_type func_parse_address,
+        func_append_address_type func_append_address,
+        func_append_sheet_name_type func_append_sheet_name) :
+        formula_name_resolver(),
+        mp_cxt(cxt),
+        m_func_parse_address(func_parse_address),
+        m_func_append_address(func_append_address),
+        m_func_append_sheet_name(func_append_sheet_name) {}
 
     virtual formula_name_t resolve(const char *p, size_t n, const abs_address_t &pos) const override
     {
@@ -1453,7 +1543,7 @@ public:
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
-        parse_address_result parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result parse_res = m_func_parse_address(mp_cxt, p, p_last, parsed_addr);
 
         if (parse_res.result != invalid)
         {
@@ -1495,7 +1585,7 @@ public:
             to_relative_address(parsed_addr, pos, true);
             set_address(ret.range.first, parsed_addr);
 
-            parse_res = parse_address_calc_a1(mp_cxt, p, p_last, parsed_addr);
+            parse_res = m_func_parse_address(mp_cxt, p, p_last, parsed_addr);
             if (parse_res.result != valid_address)
             {
                 SPDLOG_DEBUG(spdlog::get("ixion"), "2nd part after the ':' is not valid.");
@@ -1515,48 +1605,29 @@ public:
     virtual std::string get_name(const address_t &addr, const abs_address_t &pos, bool sheet_name) const override
     {
         std::ostringstream os;
-        char sheet_name_sep = sheet_name ? '.' : 0;
         if (sheet_name && addr.abs_sheet)
             os << '$';
-        append_address_a1(os, mp_cxt, addr, pos, sheet_name_sep);
+        m_func_append_address(os, sheet_name ? mp_cxt : nullptr, addr, pos, '.');
         return os.str();
     }
 
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const override
     {
-        // For now, sheet index of the end-range address is ignored.
-
         ostringstream os;
         col_t col = range.first.column;
         row_t row = range.first.row;
-        sheet_t sheet = range.first.sheet;
 
-        if (!range.first.abs_sheet)
-            sheet += pos.sheet;
-
-        if (sheet_name && mp_cxt)
-        {
-            if (range.first.abs_sheet)
-                os << '$';
-            append_sheet_name(os, *mp_cxt, sheet);
-            os << '.';
-        }
+        m_func_append_sheet_name(os, sheet_name ? mp_cxt : nullptr, range.first, pos);
 
         append_column_address_a1(os, col, pos.column, range.first.abs_column);
         append_row_address_a1(os, row, pos.row, range.first.abs_row);
 
         os << ":";
 
-        if (sheet_name && mp_cxt && display_last_sheet(range, pos))
-        {
-            sheet_t last_sheet = range.last.sheet;
-            if (range.last.abs_sheet)
-                os << '$';
-            else
-                last_sheet += pos.sheet;
-            append_sheet_name(os, *mp_cxt, last_sheet);
-            os << '.';
-        }
+        if (!display_last_sheet(range, pos))
+            sheet_name = false;
+
+        m_func_append_sheet_name(os, sheet_name ? mp_cxt : nullptr, range.last, pos);
 
         col = range.last.column;
         row = range.last.row;
@@ -1671,7 +1742,7 @@ public:
         else
         {
             os << '.';
-            append_address_a1(os, nullptr, addr, pos, 0);
+            append_address_a1(os, nullptr, addr, pos, '.');
         }
         os << ']';
         return os.str();
@@ -1713,9 +1784,9 @@ public:
         else
         {
             os << '.';
-            append_address_a1(os, nullptr, range.first, pos, 0);
+            append_address_a1(os, nullptr, range.first, pos, '.');
             os << ":.";
-            append_address_a1(os, nullptr, range.last, pos, 0);
+            append_address_a1(os, nullptr, range.last, pos, '.');
         }
 
         os << ']';
@@ -1752,7 +1823,13 @@ std::unique_ptr<formula_name_resolver> formula_name_resolver::get(
         case formula_name_resolver_t::odff:
             return std::unique_ptr<formula_name_resolver>(new odff_resolver(cxt));
         case formula_name_resolver_t::calc_a1:
-            return std::unique_ptr<formula_name_resolver>(new calc_a1_resolver(cxt));
+            return std::unique_ptr<formula_name_resolver>(
+                new dot_a1_resolver(
+                    cxt, parse_address_calc_a1, append_address_a1, append_sheet_name_calc_a1));
+        case formula_name_resolver_t::odf_cra:
+            return std::unique_ptr<formula_name_resolver>(
+                new dot_a1_resolver(
+                    cxt, parse_address_odf_cra, append_address_a1_with_sheet_name_sep, append_sheet_name_odf_cra));
         case formula_name_resolver_t::unknown:
         default:
             ;
