@@ -1,0 +1,11 @@
+%mode init
+A1=INT(PI()*100000)
+B1=INT(7.89)
+C1=INT(-23.45)
+%calc
+%mode result
+A1=314159
+B1=7
+C1=-24
+%check
+%exit

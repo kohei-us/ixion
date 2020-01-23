@@ -58,6 +58,8 @@ private:
     void fnc_counta(formula_value_stack& args) const;
     void fnc_average(formula_value_stack& args) const;
     void fnc_mmult(formula_value_stack& args) const;
+    void fnc_pi(formula_value_stack& args) const;
+    void fnc_int(formula_value_stack& args) const;
 
     void fnc_if(formula_value_stack& args) const;
 

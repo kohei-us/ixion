@@ -373,7 +373,6 @@ const map_type& get()
     return mt;
 }
 
-
 } // anonymous namespace
 
 const char* unknown_func_name = "unknown";
@@ -514,6 +513,12 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_mmult:
             fnc_mmult(args);
+            break;
+        case formula_function_t::func_pi:
+            fnc_pi(args);
+            break;
+        case formula_function_t::func_int:
+            fnc_int(args);
             break;
         case formula_function_t::func_unknown:
         default:
@@ -716,6 +721,23 @@ void formula_functions::fnc_mmult(formula_value_stack& args) const
     numeric_matrix ans = multiply_matrices(mx[0], mx[1]);
 
     args.push_matrix(ans);
+}
+
+void formula_functions::fnc_pi(formula_value_stack& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("PI takes no arguments.");
+
+    args.push_value(M_PI);
+}
+
+void formula_functions::fnc_int(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("INT requires exactly 1 argument.");
+
+    double v = args.pop_value();
+    args.push_value(std::floor(v));
 }
 
 void formula_functions::fnc_if(formula_value_stack& args) const
