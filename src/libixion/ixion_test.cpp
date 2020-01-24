@@ -1259,6 +1259,7 @@ void test_parse_and_print_expressions()
         "Table1[[#Headers],[Category]:[Value]]",
         "Table1[[#Headers],[#Data],[Category]:[Value]]",
         "IF(A1=\"\",\"empty\",\"not empty\")",
+        "$'Ying & Yang'.$A$1:$H$54",
     };
 
     model_context cxt;
@@ -1266,6 +1267,7 @@ void test_parse_and_print_expressions()
     cxt.append_string(IXION_ASCII("Table1"));
     cxt.append_string(IXION_ASCII("Category"));
     cxt.append_string(IXION_ASCII("Value"));
+    cxt.append_sheet(IXION_ASCII("Ying & Yang"), 1048576, 16384); // name with '&'
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);

@@ -38,9 +38,8 @@ public:
         mp_char(NULL),
         m_size(n),
         m_pos(0),
-        mp_char_stored(NULL),
-        m_pos_stored(0),
-        m_scope(0)
+        mp_char_stored(nullptr),
+        m_pos_stored(0)
     {
     }
 
@@ -79,7 +78,6 @@ private:
 
     const char* mp_char_stored;
     size_t m_pos_stored;
-    size_t m_scope;
 };
 
 void tokenizer::init()
@@ -179,7 +177,7 @@ bool tokenizer::is_decimal_sep(char c) const
 
 bool tokenizer::is_op(char c) const
 {
-    if (m_scope == 0 && is_arg_sep(c))
+    if (is_arg_sep(c))
         return true;
 
     switch (*mp_char)
@@ -247,40 +245,34 @@ void tokenizer::space()
 
 void tokenizer::name()
 {
-    assert(m_scope == 0);
+    std::vector<char> scopes;
 
     const char* p = mp_char;
-    char c = *mp_char;
-    if (c == '[')
-        ++m_scope;
-    else if (c == ']')
-    {
-        m_tokens.push_back(make_unique<lexer_name_token>(p, 1));
-        next();
-        return;
-    }
+    size_t len = 0;
 
-    size_t len = 1;
-    for (next(); has_char(); next(), ++len)
+    for (; has_char(); next(), ++len)
     {
-        c = *mp_char;
-        if (c == '[')
-        {
-            ++m_scope;
-        }
-        else if (c == ']')
-        {
-            if (!m_scope)
-                break;
+        char c = *mp_char;
 
-            --m_scope;
-        }
-        else if (m_scope)
+        switch (c)
         {
-            // Anything goes between '[' and ']' for now.
+            case '[':
+                scopes.push_back(']');
+                continue;
+            case '\'':
+                scopes.push_back('\'');
+                continue;
         }
-        else if (is_op(c))
-            // An operator is not part of a name. Bail out.
+
+        if (!scopes.empty())
+        {
+            // inside quoted segment or '[]', where anything goes.
+            if (scopes.back() == c)
+                scopes.pop_back();
+            continue;
+        }
+
+        if (is_op(c))
             break;
     }
 
