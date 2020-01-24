@@ -254,6 +254,12 @@ void tokenizer::name()
     {
         char c = *mp_char;
 
+        if (!scopes.empty() && scopes.back() == c)
+        {
+            scopes.pop_back();
+            continue;
+        }
+
         switch (c)
         {
             case '[':
@@ -265,12 +271,7 @@ void tokenizer::name()
         }
 
         if (!scopes.empty())
-        {
-            // inside quoted segment or '[]', where anything goes.
-            if (scopes.back() == c)
-                scopes.pop_back();
             continue;
-        }
 
         if (is_op(c))
             break;

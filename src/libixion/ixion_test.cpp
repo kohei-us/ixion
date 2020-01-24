@@ -1299,6 +1299,7 @@ void test_parse_and_print_expressions()
         "\" \"",
         "SUM([.A1];[.B1])",
         "CONCATENATE([.A6];\" \";[.B6])",
+        "IF(['Ying & Yang'.$A$1:.$O$200];2;0)",
     };
 
     resolver = formula_name_resolver::get(formula_name_resolver_t::odff, &cxt);
