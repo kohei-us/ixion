@@ -28,6 +28,8 @@ class IXION_DLLPUBLIC named_expressions_iterator
     named_expressions_iterator(const model_context& cxt, sheet_t scope);
 
 public:
+    named_expressions_iterator();
+    named_expressions_iterator(const named_expressions_iterator& other);
     ~named_expressions_iterator();
 
     struct named_expression
@@ -40,6 +42,8 @@ public:
     void next();
 
     named_expression get() const;
+
+    named_expressions_iterator& operator= (const named_expressions_iterator& other);
 };
 
 }

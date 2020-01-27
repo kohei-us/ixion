@@ -10,6 +10,7 @@
 #include "ixion/formula.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/model_iterator.hpp"
+#include "ixion/named_expressions_iterator.hpp"
 #include "ixion/global.hpp"
 #include "ixion/macros.hpp"
 #include "ixion/interface/table_handler.hpp"
@@ -1906,6 +1907,88 @@ void test_model_context_iterator_vertical_range()
     assert(check_model_iterator_output(iter, checks));
 }
 
+void test_model_context_iterator_named_exps()
+{
+    struct check
+    {
+        std::string name;
+        const formula_tokens_t* tokens;
+    };
+
+    model_context cxt;
+    cxt.append_sheet(IXION_ASCII("test sheet"), 100, 10);
+
+    named_expressions_iterator iter;
+    assert(!iter.has());
+
+    iter = cxt.get_named_expressions_iterator();
+    assert(!iter.has());
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    assert(resolver);
+
+    auto tokenize = [&](const char* p) -> formula_tokens_t
+    {
+        size_t n = strlen(p);
+        return parse_formula_string(cxt, abs_address_t(), *resolver, p, n);
+    };
+
+    auto validate = [](named_expressions_iterator _iter, const std::vector<check>& _expected) -> bool
+    {
+        for (const check& c : _expected)
+        {
+            if (!_iter.has())
+            {
+                cout << "iterator has no more element, but it is expected to." << endl;
+                return false;
+            }
+
+            if (c.name != *_iter.get().name)
+            {
+                cout << "names differ: expected='" << c.name << "'; actual='" << *_iter.get().name << endl;
+                return false;
+            }
+
+            if (c.tokens != _iter.get().tokens)
+            {
+                cout << "tokens differ." << endl;
+                return false;
+            }
+
+            _iter.next();
+        }
+
+        if (_iter.has())
+        {
+            cout << "the iterator has more elements, but it is not expected to." << endl;
+            return false;
+        }
+
+        return true;
+    };
+
+    cxt.set_named_expression(IXION_ASCII("MyCalc"), tokenize("(1+2)/3"));
+
+    std::vector<check> expected =
+    {
+        { "MyCalc", cxt.get_named_expression(0, "MyCalc") },
+    };
+
+    iter = cxt.get_named_expressions_iterator();
+    assert(validate(iter, expected));
+
+    cxt.set_named_expression(IXION_ASCII("RefToRight"), tokenize("B1"));
+
+    expected =
+    {
+        { "MyCalc", cxt.get_named_expression(0, "MyCalc") },
+        { "RefToRight", cxt.get_named_expression(0, "RefToRight") },
+    };
+
+    iter = cxt.get_named_expressions_iterator();
+    assert(validate(iter, expected));
+}
+
 void test_model_context_fill_down()
 {
     nullptr_t empty = nullptr;
@@ -2059,6 +2142,7 @@ int main()
     test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();
     test_model_context_iterator_vertical_range();
+    test_model_context_iterator_named_exps();
     test_model_context_fill_down();
     test_volatile_function();
 

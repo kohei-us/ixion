@@ -772,15 +772,13 @@ void model_parser::push_named_expression()
 {
     assert(mp_named_expression);
 
-    std::unique_ptr<formula_tokens_t> tokens =
-        ixion::make_unique<formula_tokens_t>(
-            parse_formula_string(
-                m_context, mp_named_expression->origin, *mp_name_resolver,
-                mp_named_expression->expression.data(),
-                mp_named_expression->expression.size()));
+    formula_tokens_t tokens = parse_formula_string(
+        m_context, mp_named_expression->origin, *mp_name_resolver,
+        mp_named_expression->expression.data(),
+        mp_named_expression->expression.size());
 
     std::string exp_s = print_formula_tokens(
-        m_context, mp_named_expression->origin, *mp_name_resolver, *tokens);
+        m_context, mp_named_expression->origin, *mp_name_resolver, tokens);
 
     cout << "name: " << mp_named_expression->name << endl;
     cout << "expression: " << exp_s << endl;

@@ -14,18 +14,31 @@ namespace ixion {
 
 struct named_expressions_iterator::impl
 {
-    const detail::named_expressions_t& named_exps;
+    const detail::named_expressions_t* named_exps;
     detail::named_expressions_t::const_iterator it;
     detail::named_expressions_t::const_iterator it_end;
 
+    impl() : named_exps(nullptr) {}
+
     impl(const model_context& cxt, sheet_t scope) :
-        named_exps(scope >=0 ? cxt.mp_impl->get_named_expressions(scope) : cxt.mp_impl->get_named_expressions()),
-        it(named_exps.cbegin()),
-        it_end(named_exps.cend()) {}
+        named_exps(scope >=0 ? &cxt.mp_impl->get_named_expressions(scope) : &cxt.mp_impl->get_named_expressions()),
+        it(named_exps->cbegin()),
+        it_end(named_exps->cend()) {}
+
+    impl(const impl& other) :
+        named_exps(other.named_exps),
+        it(other.it),
+        it_end(other.it_end) {}
 };
+
+named_expressions_iterator::named_expressions_iterator() :
+    mp_impl(ixion::make_unique<impl>()) {}
 
 named_expressions_iterator::named_expressions_iterator(const model_context& cxt, sheet_t scope) :
     mp_impl(ixion::make_unique<impl>(cxt, scope)) {}
+
+named_expressions_iterator::named_expressions_iterator(const named_expressions_iterator& other) :
+    mp_impl(ixion::make_unique<impl>(*other.mp_impl)) {}
 
 named_expressions_iterator::~named_expressions_iterator()
 {
@@ -33,6 +46,9 @@ named_expressions_iterator::~named_expressions_iterator()
 
 bool named_expressions_iterator::has() const
 {
+    if (!mp_impl->named_exps)
+        return false;
+
     return mp_impl->it != mp_impl->it_end;
 }
 
@@ -47,6 +63,12 @@ named_expressions_iterator::named_expression named_expressions_iterator::get() c
     ret.name = &mp_impl->it->first;
     ret.tokens = mp_impl->it->second.get();
     return ret;
+}
+
+named_expressions_iterator& named_expressions_iterator::operator= (const named_expressions_iterator& other)
+{
+    mp_impl = ixion::make_unique<impl>(*other.mp_impl);
+    return *this;
 }
 
 }

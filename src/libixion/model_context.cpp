@@ -10,6 +10,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/model_iterator.hpp"
 #include "ixion/interface/session_handler.hpp"
+#include "ixion/named_expressions_iterator.hpp"
 
 #include "model_context_impl.hpp"
 
@@ -308,15 +309,17 @@ size_t model_context::get_sheet_count() const
     return mp_impl->get_sheet_count();
 }
 
-void model_context::set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
+void model_context::set_named_expression(const char* p, size_t n, formula_tokens_t expr)
 {
-    mp_impl->set_named_expression(p, n, std::move(expr));
+    auto p_expr = ixion::make_unique<formula_tokens_t>(std::move(expr));
+    mp_impl->set_named_expression(p, n, std::move(p_expr));
 }
 
 void model_context::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
+    sheet_t sheet, const char* p, size_t n, formula_tokens_t expr)
 {
-    mp_impl->set_named_expression(sheet, p, n, std::move(expr));
+    auto p_expr = ixion::make_unique<formula_tokens_t>(std::move(expr));
+    mp_impl->set_named_expression(sheet, p, n, std::move(p_expr));
 }
 
 const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const std::string& name) const
@@ -373,6 +376,11 @@ model_iterator model_context::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {
     return model_iterator(*this, sheet, range, dir);
+}
+
+named_expressions_iterator model_context::get_named_expressions_iterator() const
+{
+    return named_expressions_iterator(*this, -1);
 }
 
 abs_address_set_t model_context::get_all_formula_cells() const

@@ -178,8 +178,29 @@ public:
 
     abs_range_t get_data_range(sheet_t sheet) const;
 
-    void set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
-    void set_named_expression(sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
+    /**
+     * Set a named expression associated with a string name in the global
+     * scope.
+     *
+     * @param p pointer to the string buffer that contains the name of the
+     *          expression.
+     * @param n length of the buffer containing the name.
+     * @param expr formula tokens to use for the named expression.
+     */
+    void set_named_expression(const char* p, size_t n, formula_tokens_t expr);
+
+    /**
+     * Set a named expression associated with a string name in a sheet-local
+     * scope.
+     *
+     * @param sheet 0-based index of the sheet to register this expression
+     *              with.
+     * @param p pointer to the string buffer that contains the name of the
+     *          expression.
+     * @param n length of the buffer containing the name.
+     * @param expr formula tokens to use for the named expression.
+     */
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_tokens_t expr);
 
     /**
      * Append a new sheet to the model.  The caller must ensure that the name
@@ -266,6 +287,8 @@ public:
      */
     model_iterator get_model_iterator(
         sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
+
+    named_expressions_iterator get_named_expressions_iterator() const;
 
     /**
      * @deprecated This is not generic enough and should be replaced.  This
