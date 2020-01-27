@@ -251,6 +251,7 @@
                 <F N="../include/ixion/model_context.hpp"/>
                 <F N="../include/ixion/model_iterator.hpp"/>
                 <F N="../include/ixion/module.hpp"/>
+                <F N="../include/ixion/named_expressions_iterator.hpp"/>
                 <F N="../include/ixion/table.hpp"/>
                 <F N="../include/ixion/types.hpp"/>
             </Folder>
@@ -309,9 +310,12 @@
                 <F N="../src/libixion/matrix.cpp"/>
                 <F N="../src/libixion/mem_str_buf.cpp"/>
                 <F N="../src/libixion/model_context.cpp"/>
+                <F N="../src/libixion/model_context_impl.cpp"/>
+                <F N="../src/libixion/model_context_impl.hpp"/>
                 <F N="../src/libixion/model_iterator.cpp"/>
                 <F N="../src/libixion/model_types.hpp"/>
                 <F N="../src/libixion/module.cpp"/>
+                <F N="../src/libixion/named_expressions_iterator.cpp"/>
                 <F N="../src/libixion/queue_entry.cpp"/>
                 <F N="../src/libixion/queue_entry.hpp"/>
                 <F N="../src/libixion/table.cpp"/>

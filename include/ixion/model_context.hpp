@@ -22,8 +22,14 @@ struct abs_address_t;
 struct abs_rc_range_t;
 struct config;
 class matrix;
-class model_context_impl;
 class model_iterator;
+class named_expressions_iterator;
+
+namespace detail {
+
+class model_context_impl;
+
+}
 
 /**
  * This class stores all data relevant to current session.  You can think of
@@ -34,7 +40,9 @@ class model_iterator;
  */
 class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 {
-    std::unique_ptr<model_context_impl> mp_impl;
+    friend class named_expressions_iterator;
+
+    std::unique_ptr<detail::model_context_impl> mp_impl;
 
 public:
     class IXION_DLLPUBLIC session_handler_factory

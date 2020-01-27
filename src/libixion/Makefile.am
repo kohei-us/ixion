@@ -58,9 +58,12 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	matrix.cpp \
 	mem_str_buf.cpp \
 	model_context.cpp \
+	model_context_impl.hpp \
+	model_context_impl.cpp \
 	model_iterator.cpp \
 	model_types.hpp \
 	module.cpp \
+	named_expressions_iterator.cpp \
 	queue_entry.hpp \
 	queue_entry.cpp \
 	table.cpp \

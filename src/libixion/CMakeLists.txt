@@ -30,8 +30,10 @@ add_library(libixion-${IXION_API_VERSION} SHARED
     matrix.cpp
     mem_str_buf.cpp
     model_context.cpp
+    model_context_impl.cpp
     model_iterator.cpp
     module.cpp
+    named_expressions_iterator.cpp
     queue_entry.cpp
     table.cpp
     types.cpp
