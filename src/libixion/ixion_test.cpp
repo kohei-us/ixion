@@ -1916,7 +1916,8 @@ void test_model_context_iterator_named_exps()
     };
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("test sheet"), 100, 10);
+    cxt.append_sheet(IXION_ASCII("test1"), 100, 10);
+    cxt.append_sheet(IXION_ASCII("test2"), 100, 10);
 
     named_expressions_iterator iter;
     assert(!iter.has());
@@ -1986,6 +1987,22 @@ void test_model_context_iterator_named_exps()
     };
 
     iter = cxt.get_named_expressions_iterator();
+    assert(validate(iter, expected));
+
+    cxt.set_named_expression(1, IXION_ASCII("MyCalc2"), tokenize("(B1+C1)/D1"));
+    cxt.set_named_expression(1, IXION_ASCII("MyCalc3"), tokenize("B1/(PI()*2)"));
+
+    iter = cxt.get_named_expressions_iterator(0);
+    assert(!iter.has());
+
+    iter = cxt.get_named_expressions_iterator(1);
+
+    expected =
+    {
+        { "MyCalc2", cxt.get_named_expression(1, "MyCalc2") },
+        { "MyCalc3", cxt.get_named_expression(1, "MyCalc3") },
+    };
+
     assert(validate(iter, expected));
 }
 

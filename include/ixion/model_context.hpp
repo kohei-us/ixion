@@ -288,7 +288,18 @@ public:
     model_iterator get_model_iterator(
         sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
 
+    /**
+     * Get an iterator for global named expressions.
+     */
     named_expressions_iterator get_named_expressions_iterator() const;
+
+    /**
+     * Get an interator for sheet-local named expressions.
+     *
+     * @param sheet 0-based index of the sheet where the named expressions are
+     *              stored.
+     */
+    named_expressions_iterator get_named_expressions_iterator(sheet_t sheet) const;
 
     /**
      * @deprecated This is not generic enough and should be replaced.  This
