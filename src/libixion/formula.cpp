@@ -221,6 +221,23 @@ std::string print_formula_tokens(
     const formula_name_resolver& resolver, const formula_tokens_t& tokens)
 {
     std::ostringstream os;
+
+    if (tokens.size() == 3 && tokens[0]->get_opcode() == fop_error && tokens[0]->get_index() >= 2)
+    {
+        const std::string* p = cxt.get_string(tokens[1]->get_index());
+        os << "{\"formula\": \"";
+        if (p)
+            os << *p;
+        os << "\", \"error\": \"";
+
+        p = cxt.get_string(tokens[2]->get_index());
+        if (p)
+            os << *p;
+
+        os << "\"}";
+        return os.str();
+    }
+
     std::for_each(tokens.begin(), tokens.end(), func_print_formula_token(cxt, pos, resolver, os));
     return os.str();
 }
