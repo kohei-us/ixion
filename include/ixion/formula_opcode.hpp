@@ -46,7 +46,7 @@ enum fopcode_t
     fop_sep,
 
     // special conditions
-    fop_error,
+    fop_error, //< used to signify a special set of tokens representing formula cell with error.
     fop_unknown
 };
 

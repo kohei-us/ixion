@@ -80,8 +80,7 @@ formula_tokens_t create_formula_error_tokens(
     const char* p_error, size_t n_error)
 {
     formula_tokens_t tokens;
-    tokens.reserve(3);
-    tokens.push_back(ixion::make_unique<opcode_token>(fop_error));
+    tokens.push_back(ixion::make_unique<error_token>(2));
 
     string_id_t sid_src_formula = cxt.add_string(p_src_formula, n_src_formula);
     tokens.push_back(make_unique<string_token>(sid_src_formula));

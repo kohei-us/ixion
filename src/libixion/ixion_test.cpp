@@ -2140,8 +2140,8 @@ void test_invalid_formula_tokens()
     formula_tokens_t tokens = create_formula_error_tokens(
         cxt, invalid_formula.get(), invalid_formula.size(), error_msg.get(), error_msg.size());
 
-    assert(tokens.size() == 3);
     assert(tokens[0]->get_opcode() == fop_error);
+    assert(tokens.size() == (tokens[0]->get_index() + 1));
 
     assert(tokens[1]->get_opcode() == fop_string);
     string_id_t sid = tokens[1]->get_index();

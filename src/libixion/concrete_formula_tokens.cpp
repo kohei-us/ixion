@@ -197,6 +197,21 @@ void function_token::write_string(std::ostream& os) const
         << "')";
 }
 
+error_token::error_token(size_t n_msgs) :
+    formula_token(fop_error),
+    m_n_msgs(n_msgs) {}
+
+error_token::error_token(const error_token& other) :
+    formula_token(fop_error),
+    m_n_msgs(other.m_n_msgs) {}
+
+error_token::~error_token() {}
+
+size_t error_token::get_index() const
+{
+    return m_n_msgs;
 }
+
+} // namespace ixion
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

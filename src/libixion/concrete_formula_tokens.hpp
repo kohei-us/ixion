@@ -139,6 +139,24 @@ private:
     size_t m_func_oc;
 };
 
+/**
+ * Token that signifies an invalid formula.  It contains the number of
+ * tokens that follow, and those tokens store the invalid formula string and
+ * an error string.
+ */
+class error_token : public formula_token
+{
+public:
+    error_token(size_t n_msgs);
+    error_token(const error_token& other);
+    virtual ~error_token() override;
+
+    virtual size_t get_index() const override;
+
+private:
+    size_t m_n_msgs;
+};
+
 }
 
 #endif
