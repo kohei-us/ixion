@@ -2131,6 +2131,29 @@ void test_volatile_function()
     assert(0.2 <= delta && delta <= 0.3);
 }
 
+void test_invalid_formula_tokens()
+{
+    model_context cxt;
+    mem_str_buf invalid_formula("invalid formula");
+    mem_str_buf error_msg("failed to parse formula");
+
+    formula_tokens_t tokens = create_formula_error_tokens(
+        cxt, invalid_formula.get(), invalid_formula.size(), error_msg.get(), error_msg.size());
+
+    assert(tokens.size() == 3);
+    assert(tokens[0]->get_opcode() == fop_error);
+
+    assert(tokens[1]->get_opcode() == fop_string);
+    string_id_t sid = tokens[1]->get_index();
+    const std::string* s = cxt.get_string(sid);
+    assert(invalid_formula.str() == *s);
+
+    assert(tokens[2]->get_opcode() == fop_string);
+    sid = tokens[2]->get_index();
+    s = cxt.get_string(sid);
+    assert(error_msg.str() == *s);
+}
+
 } // anonymous namespace
 
 int main()
@@ -2162,6 +2185,7 @@ int main()
     test_model_context_iterator_named_exps();
     test_model_context_fill_down();
     test_volatile_function();
+    test_invalid_formula_tokens();
 
     return EXIT_SUCCESS;
 }

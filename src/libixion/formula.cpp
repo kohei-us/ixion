@@ -16,6 +16,7 @@
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
 #include "debug.hpp"
+#include "concrete_formula_tokens.hpp"
 
 #define DEBUG_FORMULA_API 0
 
@@ -70,6 +71,23 @@ formula_tokens_t parse_formula_string(
 
     SPDLOG_TRACE(spdlog::get("ixion"), "formula tokens (string): {}", print_formula_tokens(cxt, pos, resolver, tokens));
     SPDLOG_TRACE(spdlog::get("ixion"), "formula tokens (individual): {}", debug_print_formula_tokens(tokens));
+
+    return tokens;
+}
+
+formula_tokens_t create_formula_error_tokens(
+    iface::formula_model_access& cxt, const char* p_src_formula, size_t n_src_formula,
+    const char* p_error, size_t n_error)
+{
+    formula_tokens_t tokens;
+    tokens.reserve(3);
+    tokens.push_back(ixion::make_unique<opcode_token>(fop_error));
+
+    string_id_t sid_src_formula = cxt.add_string(p_src_formula, n_src_formula);
+    tokens.push_back(make_unique<string_token>(sid_src_formula));
+
+    string_id_t sid_error = cxt.add_string(p_error, n_error);
+    tokens.push_back(make_unique<string_token>(sid_error));
 
     return tokens;
 }

@@ -45,6 +45,8 @@ enum fopcode_t
     fop_close,
     fop_sep,
 
+    // special conditions
+    fop_error,
     fop_unknown
 };
 

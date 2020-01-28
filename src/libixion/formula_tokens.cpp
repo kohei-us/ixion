@@ -7,6 +7,7 @@
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/exceptions.hpp"
+#include "ixion/global.hpp"
 
 using ::std::string;
 
