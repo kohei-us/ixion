@@ -38,9 +38,7 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
             break;
         }
         default:
-#if IXION_DEBUG_GLOBAL
-            __IXION_DEBUG_OUT__ << "value is being popped, but the stack value type is not appropriate." << endl;
-#endif
+            SPDLOG_DEBUG(spdlog::get("ixion"), "value is being popped, but the stack value type is not appropriate.");
             throw formula_error(formula_error_t::stack_error);
     }
     return ret;

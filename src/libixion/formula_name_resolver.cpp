@@ -527,6 +527,8 @@ struct parse_address_result
     bool sheet_name = false;
 };
 
+#if IXION_DEBUG
+
 std::ostream& operator<< (std::ostream& os, parse_address_result_type rt)
 {
     static const char* names[] = {
@@ -545,6 +547,8 @@ std::string to_string(parse_address_result_type rt)
     os << rt;
     return os.str();
 }
+
+#endif
 
 bool parse_sheet_name_quoted(
     const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)

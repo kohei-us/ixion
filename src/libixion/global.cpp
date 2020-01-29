@@ -20,12 +20,10 @@
 #include <fstream>
 #include <chrono>
 
-#if defined(SPDLOG_TRACE_ON) || defined(SPDLOG_DEBUG_ON)
+#if IXION_DEBUG
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #endif
-
-#define IXION_DEBUG_GLOBAL 0
 
 using namespace std;
 
@@ -33,7 +31,7 @@ namespace ixion {
 
 void init()
 {
-#if defined(SPDLOG_TRACE_ON) || defined(SPDLOG_DEBUG_ON)
+#if IXION_DEBUG
     auto console = spdlog::stdout_logger_mt("ixion");
     spdlog::set_level(spdlog::level::trace);
 #endif
