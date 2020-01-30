@@ -222,21 +222,9 @@ std::string print_formula_tokens(
 {
     std::ostringstream os;
 
-    if (tokens.size() == 3 && tokens[0]->get_opcode() == fop_error && tokens[0]->get_index() >= 2)
-    {
-        const std::string* p = cxt.get_string(tokens[1]->get_index());
-        os << "{\"formula\": \"";
-        if (p)
-            os << *p;
-        os << "\", \"error\": \"";
-
-        p = cxt.get_string(tokens[2]->get_index());
-        if (p)
-            os << *p;
-
-        os << "\"}";
-        return os.str();
-    }
+    if (!tokens.empty() && tokens[0]->get_opcode() == fop_error)
+        // Let's not print anything on error tokens.
+        return std::string();
 
     std::for_each(tokens.begin(), tokens.end(), func_print_formula_token(cxt, pos, resolver, os));
     return os.str();
