@@ -15,88 +15,76 @@ namespace ixion {
 
 const char* get_opcode_name(fopcode_t oc)
 {
-    switch (oc)
-    {
-        case fop_close:
-            return "close";
-        case fop_divide:
-            return "divide";
-        case fop_minus:
-            return "minus";
-        case fop_multiply:
-            return "multiply";
-        case fop_exponent:
-            return "exponent";
-        case fop_concat:
-            return "concat";
-        case fop_open:
-            return "open";
-        case fop_plus:
-            return "plus";
-        case fop_sep:
-            return "separator";
-        case fop_single_ref:
-            return "single ref";
-        case fop_range_ref:
-            return "range ref";
-        case fop_named_expression:
-            return "named expression";
-        case fop_string:
-            return "string";
-        case fop_value:
-            return "value";
-        case fop_function:
-            return "function";
-        default:
-            ;
-    }
-    return "unknown";
+    // Make sure the names are ordered identically to the ordering of the enum members.
+    static const std::vector<const char*> names = {
+        "unknown", // fop_unknown
+        "single ref", // fop_single_ref
+        "range ref", // fop_range_ref
+        "table ref", // fop_table_ref
+        "named expression", // fop_named_expression
+        "string", // fop_string
+        "value", // fop_value
+        "function", // fop_function
+        "plus", // fop_plus
+        "minus", // fop_minus
+        "divide", // fop_divide
+        "multiply", // fop_multiply
+        "exponent", // fop_exponent
+        "concat", // fop_concat
+        "equal", // fop_equal
+        "not equal", // fop_not_equal
+        "less", // fop_less
+        "greater", // fop_greater
+        "less equal", // fop_less_equal
+        "greater equal", // fop_greater_equal
+        "open", // fop_open
+        "close", // fop_close
+        "sep", // fop_sep
+        "error", // fop_error
+    };
+
+    if (size_t(oc) >= names.size())
+        return "???";
+
+    return names[oc];
 }
 
 const char* get_formula_opcode_string(fopcode_t oc)
 {
-    switch (oc)
-    {
-        case fop_close:
-            return ")";
-        case fop_divide:
-            return "/";
-        case fop_minus:
-            return "-";
-        case fop_multiply:
-            return "*";
-        case fop_exponent:
-            return "^";
-        case fop_concat:
-            return "&";
-        case fop_open:
-            return "(";
-        case fop_plus:
-            return "+";
-        case fop_sep:
-            return ",";
-        case fop_equal:
-            return "=";
-        case fop_not_equal:
-            return "<>";
-        case fop_less:
-            return "<";
-        case fop_less_equal:
-            return "<=";
-        case fop_greater:
-            return ">";
-        case fop_greater_equal:
-            return ">=";
-        case fop_string:
-        case fop_value:
-        case fop_function:
-        case fop_single_ref:
-        case fop_range_ref:
-        case fop_named_expression:
-        default:
-            ;
-    }
-    return "";
+    static const char* empty = "";
+
+    // Make sure the names are ordered identically to the ordering of the enum members.
+    static const std::vector<const char*> names = {
+        empty, // fop_unknown
+        empty, // fop_single_ref
+        empty, // fop_range_ref
+        empty, // fop_table_ref
+        empty, // fop_named_expression
+        empty, // fop_string
+        empty, // fop_value
+        empty, // fop_function
+        "+", // fop_plus
+        "-", // fop_minus
+        "/", // fop_divide
+        "*", // fop_multiply
+        "^", // fop_exponent
+        "&", // fop_concat
+        "=", // fop_equal
+        "<>", // fop_not_equal
+        "<", // fop_less
+        ">", // fop_greater
+        "<=", // fop_less_equal
+        ">=", // fop_greater_equal
+        "(", // fop_open
+        ")", // fop_close
+        empty, // fop_sep
+        empty, // fop_error
+    };
+
+    if (size_t(oc) >= names.size())
+        return empty;
+
+    return names[oc];
 }
 
 // ============================================================================

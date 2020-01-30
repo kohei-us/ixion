@@ -18,7 +18,8 @@
 namespace ixion {
 
 /**
- * Get a printable name for a formula opcode.
+ * Get a printable name for a formula opcode.  The printable name is to be
+ * used only for informational purposes.
  *
  * @param oc formula opcode
  *
@@ -26,6 +27,14 @@ namespace ixion {
  */
 IXION_DLLPUBLIC const char* get_opcode_name(fopcode_t oc);
 
+/**
+ * Get the string representation of a simple formula opcode.  This function
+ * will return a non-empty string only for operator opcodes.
+ *
+ * @param oc formula opcode
+ *
+ * @return string representation of a formula opcode.
+ */
 IXION_DLLPUBLIC const char* get_formula_opcode_string(fopcode_t oc);
 
 class IXION_DLLPUBLIC formula_token

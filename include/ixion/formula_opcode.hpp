@@ -13,6 +13,8 @@ namespace ixion {
 /** formula opcode type */
 enum fopcode_t
 {
+    fop_unknown = 0,
+
     // data types
     fop_single_ref,
     fop_range_ref,
@@ -47,10 +49,10 @@ enum fopcode_t
 
     // special conditions
     fop_error, //< used to signify a special set of tokens representing formula cell with error.
-    fop_unknown
 };
 
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
