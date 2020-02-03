@@ -1495,6 +1495,46 @@ void test_model_context_storage()
     }
 }
 
+void test_model_context_named_expression()
+{
+    model_context cxt{{400, 20}};
+    cxt.append_sheet("test");
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    assert(resolver);
+
+    abs_address_t B3(0, 2, 1);
+
+    struct test_case
+    {
+        std::string name;
+        std::string formula;
+        abs_address_t origin;
+    };
+
+    std::vector<test_case> tcs = {
+        { "LeftAndAbove", "A3+B2", B3 },
+        { "SumAboveRow", "SUM(A2:D2)", B3 },
+    };
+
+    for (const test_case& tc : tcs)
+    {
+        formula_tokens_t tokens = parse_formula_string(cxt, tc.origin, *resolver, tc.formula.data(), tc.formula.size());
+        std::string test = print_formula_tokens(cxt, tc.origin, *resolver, tokens);
+        assert(test == tc.formula);
+
+        cxt.set_named_expression(tc.name.data(), tc.name.size(), tc.origin, std::move(tokens));
+    }
+
+    for (const test_case& tc : tcs)
+    {
+        const named_expression_t* exp = cxt.get_named_expression(0, tc.name);
+        assert(exp);
+        assert(exp->origin == tc.origin);
+        std::string test = print_formula_tokens(cxt, exp->origin, *resolver, exp->tokens);
+        assert(test == tc.formula);
+    }
+}
+
 bool check_model_iterator_output(model_iterator& iter, const std::vector<model_iterator::cell>& checks)
 {
     for (const model_iterator::cell& c : checks)
@@ -2178,6 +2218,7 @@ int main()
     test_parse_and_print_expressions();
     test_function_name_resolution();
     test_model_context_storage();
+    test_model_context_named_expression();
     test_model_context_iterator_horizontal();
     test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();
