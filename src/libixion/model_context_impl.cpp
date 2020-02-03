@@ -95,22 +95,22 @@ void model_context_impl::set_named_expression(
     );
 }
 
-const formula_tokens_t* model_context_impl::get_named_expression(const std::string& name) const
+const named_expression_t* model_context_impl::get_named_expression(const std::string& name) const
 {
-    detail::named_expressions_t::const_iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? nullptr : &itr->second.tokens;
+    named_expressions_t::const_iterator itr = m_named_expressions.find(name);
+    return itr == m_named_expressions.end() ? nullptr : &itr->second;
 }
 
-const formula_tokens_t* model_context_impl::get_named_expression(sheet_t sheet, const std::string& name) const
+const named_expression_t* model_context_impl::get_named_expression(sheet_t sheet, const std::string& name) const
 {
     const worksheet* ws = fetch_sheet(sheet);
 
     if (ws)
     {
-        const detail::named_expressions_t& ns = ws->get_named_expressions();
+        const named_expressions_t& ns = ws->get_named_expressions();
         auto it = ns.find(name);
         if (it != ns.end())
-            return &it->second.tokens;
+            return &it->second;
     }
 
     // Search the global scope if not found in the sheet local scope.

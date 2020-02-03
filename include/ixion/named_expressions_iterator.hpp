@@ -36,8 +36,7 @@ public:
     struct named_expression
     {
         const std::string* name;
-        const abs_address_t* origin;
-        const formula_tokens_t* tokens;
+        const named_expression_t* expression;
     };
 
     bool has() const;

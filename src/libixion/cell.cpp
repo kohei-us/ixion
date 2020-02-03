@@ -438,7 +438,7 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
                 break;
             case fop_named_expression:
             {
-                const formula_tokens_t* named_exp =
+                const named_expression_t* named_exp =
                     cxt.get_named_expression(pos.sheet, t->get_name());
 
                 if (!named_exp)
@@ -446,7 +446,7 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
                     break;
 
                 // recursive call.
-                std::for_each(named_exp->begin(), named_exp->end(), get_refs);
+                std::for_each(named_exp->tokens.begin(), named_exp->tokens.end(), get_refs);
                 break;
             }
             default:

@@ -230,6 +230,15 @@ const formula_tokens_t& formula_tokens_store::get() const
     return mp_impl->m_tokens;
 }
 
+named_expression_t::named_expression_t() {}
+named_expression_t::named_expression_t(const abs_address_t& _origin, formula_tokens_t _tokens) :
+    origin(_origin), tokens(std::move(_tokens)) {}
+
+named_expression_t::named_expression_t(named_expression_t&& other) :
+    origin(other.origin), tokens(std::move(other.tokens)) {}
+
+named_expression_t::~named_expression_t() {}
+
 bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
 {
     size_t n = left.size();

@@ -71,7 +71,7 @@ private:
 
     void pop_result();
 
-    void expand_named_expression(const formula_tokens_t* expr, name_set& used_names);
+    void expand_named_expression(const named_expression_t* expr, name_set& used_names);
 
     void ensure_token_exists() const;
     bool has_token() const;

@@ -145,8 +145,9 @@ void formula_interpreter::init_tokens()
         if (p->get_opcode() == fop_named_expression)
         {
             // Named expression.  Expand it.
-            const formula_tokens_t* expr = m_context.get_named_expression(
+            const named_expression_t* expr = m_context.get_named_expression(
                 m_pos.sheet, p->get_name());
+
             used_names.insert(p->get_name());
             expand_named_expression(expr, used_names);
         }
@@ -227,16 +228,15 @@ void formula_interpreter::pop_result()
         mp_handler->set_result(m_result);
 }
 
-void formula_interpreter::expand_named_expression(const formula_tokens_t* expr, name_set& used_names)
+void formula_interpreter::expand_named_expression(const named_expression_t* expr, name_set& used_names)
 {
     if (!expr)
         throw formula_error(formula_error_t::name_not_found);
 
     m_tokens.push_back(&paren_open);
-    formula_tokens_t::const_iterator itr = expr->begin(), itr_end = expr->end();
-    for (; itr != itr_end; ++itr)
+    for (const auto& token : expr->tokens)
     {
-        const formula_token& t = **itr;
+        const formula_token& t = *token;
         if (t.get_opcode() == fop_named_expression)
         {
             string expr_name = t.get_name();
@@ -245,7 +245,7 @@ void formula_interpreter::expand_named_expression(const formula_tokens_t* expr, 
                 // Circular reference detected.
                 throw invalid_expression("circular referencing of named expressions");
             }
-            const formula_tokens_t* this_expr = m_context.get_named_expression(m_pos.sheet, expr_name);
+            const named_expression_t* this_expr = m_context.get_named_expression(m_pos.sheet, expr_name);
             used_names.insert(expr_name);
             expand_named_expression(this_expr, used_names);
         }

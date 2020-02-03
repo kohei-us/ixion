@@ -1912,7 +1912,7 @@ void test_model_context_iterator_named_exps()
     struct check
     {
         std::string name;
-        const formula_tokens_t* tokens;
+        const named_expression_t* exp;
     };
 
     model_context cxt{{100, 10}};
@@ -1950,9 +1950,9 @@ void test_model_context_iterator_named_exps()
                 return false;
             }
 
-            if (c.tokens != _iter.get().tokens)
+            if (c.exp != _iter.get().expression)
             {
-                cout << "tokens differ." << endl;
+                cout << "expressions differ." << endl;
                 return false;
             }
 

@@ -100,6 +100,18 @@ inline void intrusive_ptr_release(formula_tokens_store* p)
     p->release_ref();
 }
 
+struct IXION_DLLPUBLIC named_expression_t
+{
+    abs_address_t origin;
+    formula_tokens_t tokens;
+
+    named_expression_t();
+    named_expression_t(const abs_address_t& _origin, formula_tokens_t _tokens);
+    named_expression_t(const named_expression_t&) = delete;
+    named_expression_t(named_expression_t&& other);
+    ~named_expression_t();
+};
+
 IXION_DLLPUBLIC bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
 
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const formula_token& ft);
