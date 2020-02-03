@@ -68,28 +68,38 @@ model_context_impl::model_context_impl(model_context& parent, const rc_size_t& s
 
 model_context_impl::~model_context_impl() {}
 
-void model_context_impl::set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
+void model_context_impl::set_named_expression(const char* p, size_t n, formula_tokens_t&& expr)
 {
     std::string name(p, n);
+    abs_address_t origin(0, 0, 0);
     SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
     m_named_expressions.insert(
-        detail::named_expressions_t::value_type(std::move(name), std::move(expr)));
+        detail::named_expressions_t::value_type(
+            std::move(name),
+            named_expression_t(origin, std::move(expr))
+        )
+    );
 }
 
 void model_context_impl::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr)
+    sheet_t sheet, const char* p, size_t n, formula_tokens_t&& expr)
 {
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     std::string name(p, n);
+    abs_address_t origin(0, 0, 0);
     SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
     ns.insert(
-        detail::named_expressions_t::value_type(std::move(name), std::move(expr)));
+        detail::named_expressions_t::value_type(
+            std::move(name),
+            named_expression_t(origin, std::move(expr))
+        )
+    );
 }
 
 const formula_tokens_t* model_context_impl::get_named_expression(const std::string& name) const
 {
     detail::named_expressions_t::const_iterator itr = m_named_expressions.find(name);
-    return itr == m_named_expressions.end() ? nullptr : itr->second.get();
+    return itr == m_named_expressions.end() ? nullptr : &itr->second.tokens;
 }
 
 const formula_tokens_t* model_context_impl::get_named_expression(sheet_t sheet, const std::string& name) const
@@ -101,7 +111,7 @@ const formula_tokens_t* model_context_impl::get_named_expression(sheet_t sheet, 
         const detail::named_expressions_t& ns = ws->get_named_expressions();
         auto it = ns.find(name);
         if (it != ns.end())
-            return it->second.get();
+            return &it->second.tokens;
     }
 
     // Search the global scope if not found in the sheet local scope.

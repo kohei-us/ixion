@@ -17,6 +17,7 @@
 namespace ixion {
 
 class model_context;
+struct abs_address_t;
 
 class IXION_DLLPUBLIC named_expressions_iterator
 {
@@ -35,6 +36,7 @@ public:
     struct named_expression
     {
         const std::string* name;
+        const abs_address_t* origin;
         const formula_tokens_t* tokens;
     };
 

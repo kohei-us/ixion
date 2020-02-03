@@ -105,8 +105,8 @@ public:
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
-    void set_named_expression(const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
-    void set_named_expression(sheet_t sheet, const char* p, size_t n, std::unique_ptr<formula_tokens_t>&& expr);
+    void set_named_expression(const char* p, size_t n, formula_tokens_t&& expr);
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_tokens_t&& expr);
 
     const formula_tokens_t* get_named_expression(const std::string& name) const;
     const formula_tokens_t* get_named_expression(sheet_t sheet, const std::string& name) const;

@@ -313,6 +313,7 @@
                 <F N="../src/libixion/model_context_impl.cpp"/>
                 <F N="../src/libixion/model_context_impl.hpp"/>
                 <F N="../src/libixion/model_iterator.cpp"/>
+                <F N="../src/libixion/model_types.cpp"/>
                 <F N="../src/libixion/model_types.hpp"/>
                 <F N="../src/libixion/module.cpp"/>
                 <F N="../src/libixion/named_expressions_iterator.cpp"/>

@@ -32,6 +32,7 @@ add_library(libixion-${IXION_API_VERSION} SHARED
     model_context.cpp
     model_context_impl.cpp
     model_iterator.cpp
+    model_types.cpp
     module.cpp
     named_expressions_iterator.cpp
     queue_entry.cpp

@@ -319,15 +319,13 @@ size_t model_context::get_sheet_count() const
 
 void model_context::set_named_expression(const char* p, size_t n, formula_tokens_t expr)
 {
-    auto p_expr = ixion::make_unique<formula_tokens_t>(std::move(expr));
-    mp_impl->set_named_expression(p, n, std::move(p_expr));
+    mp_impl->set_named_expression(p, n, std::move(expr));
 }
 
 void model_context::set_named_expression(
     sheet_t sheet, const char* p, size_t n, formula_tokens_t expr)
 {
-    auto p_expr = ixion::make_unique<formula_tokens_t>(std::move(expr));
-    mp_impl->set_named_expression(sheet, p, n, std::move(p_expr));
+    mp_impl->set_named_expression(sheet, p, n, std::move(expr));
 }
 
 const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const std::string& name) const

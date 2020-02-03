@@ -20,7 +20,15 @@ class formula_cell;
 
 namespace detail {
 
-typedef std::map<std::string, std::unique_ptr<formula_tokens_t>> named_expressions_t;
+struct named_expression_t
+{
+    abs_address_t origin;
+    formula_tokens_t tokens;
+
+    named_expression_t(const abs_address_t& _origin, formula_tokens_t _tokens);
+};
+
+typedef std::map<std::string, named_expression_t> named_expressions_t;
 
 }}
 

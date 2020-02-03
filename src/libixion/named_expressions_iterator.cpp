@@ -61,7 +61,8 @@ named_expressions_iterator::named_expression named_expressions_iterator::get() c
 {
     named_expression ret;
     ret.name = &mp_impl->it->first;
-    ret.tokens = mp_impl->it->second.get();
+    ret.origin = &mp_impl->it->second.origin;
+    ret.tokens = &mp_impl->it->second.tokens;
     return ret;
 }
 
