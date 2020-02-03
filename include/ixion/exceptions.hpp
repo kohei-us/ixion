@@ -54,6 +54,7 @@ public:
     {
         circular_dependency,
         sheet_name_conflict,
+        sheet_size_locked,
         not_implemented
     };
 

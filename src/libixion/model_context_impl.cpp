@@ -459,6 +459,16 @@ const detail::named_expressions_t& model_context_impl::get_named_expressions(she
     return sh.get_named_expressions();
 }
 
+void model_context_impl::set_sheet_size(const rc_size_t& sheet_size)
+{
+    if (!m_sheets.empty())
+        throw model_context_error(
+            "You cannot change the sheet size if you already have at least one existing sheet.",
+            model_context_error::sheet_size_locked);
+
+    m_sheet_size = sheet_size;
+}
+
 std::unique_ptr<iface::session_handler> model_context_impl::create_session_handler()
 {
     return mp_session_factory->create();

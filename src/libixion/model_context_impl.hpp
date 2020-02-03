@@ -42,15 +42,12 @@ public:
         return m_config;
     }
 
-    void set_sheet_size(const rc_size_t& sheet_size)
-    {
-        m_sheet_size = sheet_size;
-    }
-
     void set_config(const config& cfg)
     {
         m_config = cfg;
     }
+
+    void set_sheet_size(const rc_size_t& sheet_size);
 
     dirty_cell_tracker& get_cell_tracker()
     {
