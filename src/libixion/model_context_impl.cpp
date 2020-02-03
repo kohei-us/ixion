@@ -68,10 +68,10 @@ model_context_impl::model_context_impl(model_context& parent, const rc_size_t& s
 
 model_context_impl::~model_context_impl() {}
 
-void model_context_impl::set_named_expression(const char* p, size_t n, formula_tokens_t&& expr)
+void model_context_impl::set_named_expression(
+    const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
 {
     std::string name(p, n);
-    abs_address_t origin(0, 0, 0);
     SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
     m_named_expressions.insert(
         detail::named_expressions_t::value_type(
@@ -82,11 +82,10 @@ void model_context_impl::set_named_expression(const char* p, size_t n, formula_t
 }
 
 void model_context_impl::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, formula_tokens_t&& expr)
+    sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
 {
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     std::string name(p, n);
-    abs_address_t origin(0, 0, 0);
     SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
     ns.insert(
         detail::named_expressions_t::value_type(

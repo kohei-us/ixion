@@ -319,13 +319,26 @@ size_t model_context::get_sheet_count() const
 
 void model_context::set_named_expression(const char* p, size_t n, formula_tokens_t expr)
 {
-    mp_impl->set_named_expression(p, n, std::move(expr));
+    abs_address_t origin(0, 0, 0);
+    mp_impl->set_named_expression(p, n, origin, std::move(expr));
+}
+
+void model_context::set_named_expression(const char* p, size_t n, const abs_address_t& origin, formula_tokens_t expr)
+{
+    mp_impl->set_named_expression(p, n, origin, std::move(expr));
 }
 
 void model_context::set_named_expression(
     sheet_t sheet, const char* p, size_t n, formula_tokens_t expr)
 {
-    mp_impl->set_named_expression(sheet, p, n, std::move(expr));
+    abs_address_t origin(0, 0, 0);
+    mp_impl->set_named_expression(sheet, p, n, origin, std::move(expr));
+}
+
+void model_context::set_named_expression(
+    sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t expr)
+{
+    mp_impl->set_named_expression(sheet, p, n, origin, std::move(expr));
 }
 
 const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const std::string& name) const

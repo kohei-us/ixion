@@ -192,6 +192,20 @@ public:
     void set_named_expression(const char* p, size_t n, formula_tokens_t expr);
 
     /**
+     * Set a named expression associated with a string name in the global
+     * scope.
+     *
+     * @param p pointer to the string buffer that contains the name of the
+     *          expression.
+     * @param n length of the buffer containing the name.
+     * @param origin position of the origin cell.  Origin cell is relevant
+     *               only when you need to convert the tokens into a string
+     *               representation.
+     * @param expr formula tokens to use for the named expression.
+     */
+    void set_named_expression(const char* p, size_t n, const abs_address_t& origin, formula_tokens_t expr);
+
+    /**
      * Set a named expression associated with a string name in a sheet-local
      * scope.
      *
@@ -203,6 +217,22 @@ public:
      * @param expr formula tokens to use for the named expression.
      */
     void set_named_expression(sheet_t sheet, const char* p, size_t n, formula_tokens_t expr);
+
+    /**
+     * Set a named expression associated with a string name in a sheet-local
+     * scope.
+     *
+     * @param sheet 0-based index of the sheet to register this expression
+     *              with.
+     * @param p pointer to the string buffer that contains the name of the
+     *          expression.
+     * @param n length of the buffer containing the name.
+     * @param origin position of the origin cell.  Origin cell is relevant
+     *               only when you need to convert the tokens into a string
+     *               representation.
+     * @param expr formula tokens to use for the named expression.
+     */
+    void set_named_expression(sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t expr);
 
     /**
      * Append a new sheet to the model.  The caller must ensure that the name
