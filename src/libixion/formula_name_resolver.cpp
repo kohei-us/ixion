@@ -34,7 +34,7 @@ bool check_address_by_sheet_bounds(const iface::formula_model_access* cxt, const
     if (cxt && pos.sheet >= 0 && size_t(pos.sheet) < cxt->get_sheet_count())
     {
         // Make sure the address is within the sheet size.
-        ss = cxt->get_sheet_size(pos.sheet);
+        ss = cxt->get_sheet_size();
     }
 
     row_t row_check = pos.row >= 0 ? pos.row : -pos.row;

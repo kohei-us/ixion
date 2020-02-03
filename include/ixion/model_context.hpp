@@ -90,6 +90,7 @@ public:
     };
 
     model_context();
+    model_context(const rc_size_t& sheet_size);
     virtual ~model_context() override;
 
     virtual const config& get_config() const override;
@@ -118,9 +119,10 @@ public:
     virtual const std::string* get_string(string_id_t identifier) const override;
     virtual sheet_t get_sheet_index(const char* p, size_t n) const override;
     virtual std::string get_sheet_name(sheet_t sheet) const override;
-    virtual rc_size_t get_sheet_size(sheet_t sheet) const override;
+    virtual rc_size_t get_sheet_size() const override;
     virtual size_t get_sheet_count() const override;
 
+    void set_sheet_size(const rc_size_t& sheet_size);
     void set_config(const config& cfg);
 
     double get_numeric_value_nowait(const abs_address_t& addr) const;
@@ -211,12 +213,10 @@ public:
      * @param p pointer to the char array storing the name of the inserted
      *          sheet.
      * @param n size of the sheet name char array.
-     * @param row_size number of rows in the inserted sheet.
-     * @param col_size number of columns in the inserted sheet.
      *
      * @return sheet index of the inserted sheet.
      */
-    sheet_t append_sheet(const char* p, size_t n, row_t row_size, col_t col_size);
+    sheet_t append_sheet(const char* p, size_t n);
 
     /**
      * Append a new sheet to the model.  The caller must ensure that the name
@@ -225,12 +225,10 @@ public:
      * model_context_error} exception.
      *
      * @param name name of the sheet to be inserted.
-     * @param row_size number of rows in the inserted sheet.
-     * @param col_size number of columns in the inserted sheet.
      *
      * @return sheet index of the inserted sheet.
      */
-    sheet_t append_sheet(std::string name, row_t row_size, col_t col_size);
+    sheet_t append_sheet(std::string name);
 
     /**
      * A convenient way to mass-insert a range of cell values.  You can

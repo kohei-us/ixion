@@ -18,8 +18,8 @@ using namespace std;
 
 void test_single_cell_dependency()
 {
-    model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"), 400, 200);
+    model_context cxt{{400, 200}};
+    cxt.append_sheet(IXION_ASCII("One"));
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
 
@@ -55,8 +55,8 @@ void test_single_cell_dependency()
 
 void test_range_dependency()
 {
-    model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"), 400, 200);
+    model_context cxt{{400, 200}};
+    cxt.append_sheet(IXION_ASCII("One"));
 
     cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);  // A1
     cxt.set_numeric_cell(abs_address_t(0,0,0), 2.0);  // A2
@@ -95,8 +95,8 @@ void test_range_dependency()
 
 void test_matrix_dependency()
 {
-    model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"), 400, 200);
+    model_context cxt{{400, 200}};
+    cxt.append_sheet(IXION_ASCII("One"));
 
     cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);  // A1
     cxt.set_numeric_cell(abs_address_t(0,0,0), 2.0);  // A2

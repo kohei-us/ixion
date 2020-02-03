@@ -137,13 +137,11 @@ public:
     virtual std::string get_sheet_name(sheet_t sheet) const = 0;
 
     /**
-     * Get the size of specified sheet.
+     * Get the size of a sheet.
      *
-     * @param sheet sheet index.
-     *
-     * @return size of the sheet.
+     * @return sheet size.
      */
-    virtual rc_size_t get_sheet_size(sheet_t sheet) const = 0;
+    virtual rc_size_t get_sheet_size() const = 0;
 
     /**
      * Return the number of sheets.

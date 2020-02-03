@@ -25,14 +25,6 @@ worksheet::worksheet(size_t row_size, size_t col_size)
 
 worksheet::~worksheet() {}
 
-rc_size_t worksheet::get_sheet_size() const
-{
-    if (m_columns.empty())
-        return rc_size_t(0, 0);
-
-    return rc_size_t(m_columns[0].size(), m_columns.size());
-}
-
 workbook::workbook() {}
 
 workbook::workbook(size_t sheet_size, size_t row_size, size_t col_size)

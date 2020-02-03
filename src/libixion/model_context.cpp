@@ -67,7 +67,10 @@ std::unique_ptr<iface::session_handler> model_context::session_handler_factory::
 model_context::session_handler_factory::~session_handler_factory() {}
 
 model_context::model_context() :
-    mp_impl(new detail::model_context_impl(*this)) {}
+    mp_impl(new detail::model_context_impl(*this, {1048576, 16384})) {}
+
+model_context::model_context(const rc_size_t& sheet_size) :
+    mp_impl(new detail::model_context_impl(*this, sheet_size)) {}
 
 model_context::~model_context()
 {
@@ -175,6 +178,11 @@ bool model_context::get_boolean_value(const abs_address_t& addr) const
     return mp_impl->get_boolean_value(addr);
 }
 
+void model_context::set_sheet_size(const rc_size_t& sheet_size)
+{
+    mp_impl->set_sheet_size(sheet_size);
+}
+
 void model_context::set_config(const config& cfg)
 {
     mp_impl->set_config(cfg);
@@ -227,7 +235,7 @@ matrix model_context::get_range_value(const abs_range_t& range) const
         throw std::invalid_argument(os.str());
     }
 
-    rc_size_t sheet_size = get_sheet_size(range.first.sheet);
+    rc_size_t sheet_size = get_sheet_size();
     abs_range_t range_clipped = range;
     if (range_clipped.all_rows())
     {
@@ -299,9 +307,9 @@ std::string model_context::get_sheet_name(sheet_t sheet) const
     return mp_impl->get_sheet_name(sheet);
 }
 
-rc_size_t model_context::get_sheet_size(sheet_t sheet) const
+rc_size_t model_context::get_sheet_size() const
 {
-    return mp_impl->get_sheet_size(sheet);
+    return mp_impl->get_sheet_size();
 }
 
 size_t model_context::get_sheet_count() const
@@ -327,14 +335,14 @@ const formula_tokens_t* model_context::get_named_expression(sheet_t sheet, const
     return mp_impl->get_named_expression(sheet, name);
 }
 
-sheet_t model_context::append_sheet(const char* p, size_t n, row_t row_size, col_t col_size)
+sheet_t model_context::append_sheet(const char* p, size_t n)
 {
-    return mp_impl->append_sheet(std::string(p, n), row_size, col_size);
+    return mp_impl->append_sheet(std::string(p, n));
 }
 
-sheet_t model_context::append_sheet(std::string name, row_t row_size, col_t col_size)
+sheet_t model_context::append_sheet(std::string name)
 {
-    return mp_impl->append_sheet(std::move(name), row_size, col_size);
+    return mp_impl->append_sheet(std::move(name));
 }
 
 void model_context::set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows)

@@ -104,7 +104,7 @@ PyObject* document_append_sheet(pyobj_document* self, PyObject* args)
     ixion::model_context& cxt = sd->m_global->m_cxt;
     try
     {
-        sd->m_sheet_index = cxt.append_sheet(sheet_name, strlen(sheet_name), 1048576, 1024);
+        sd->m_sheet_index = cxt.append_sheet(sheet_name, strlen(sheet_name));
     }
     catch (const model_context_error& e)
     {

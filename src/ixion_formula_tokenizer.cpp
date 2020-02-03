@@ -59,7 +59,7 @@ void tokenize_formula(const std::string& formula, const std::string& sheets)
     model_context cxt;
 
     for (const std::string& name : parse_sheet_names(sheets))
-        cxt.append_sheet(name, 1048576, 16384);
+        cxt.append_sheet(name);
 
     std::unique_ptr<formula_name_resolver> resolver =
         formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);

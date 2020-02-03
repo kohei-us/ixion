@@ -374,7 +374,7 @@ void formula_cell::check_circular(const iface::formula_model_access& cxt, const 
                 abs_range_t range = t->get_range_ref().to_abs(pos);
                 for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
-                    rc_size_t sheet_size = cxt.get_sheet_size(sheet);
+                    rc_size_t sheet_size = cxt.get_sheet_size();
                     col_t col_first = range.first.column, col_last = range.last.column;
                     if (range.all_columns())
                     {

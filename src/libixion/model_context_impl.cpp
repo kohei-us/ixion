@@ -57,8 +57,9 @@ void set_grouped_formula_cells_to_workbook(
 
 }
 
-model_context_impl::model_context_impl(model_context& parent) :
+model_context_impl::model_context_impl(model_context& parent, const rc_size_t& sheet_size) :
     m_parent(parent),
+    m_sheet_size(sheet_size),
     m_tracker(parent),
     mp_table_handler(nullptr),
     mp_session_factory(&dummy_session_handler_factory)
@@ -131,9 +132,9 @@ std::string model_context_impl::get_sheet_name(sheet_t sheet) const
     return m_sheet_names[sheet];
 }
 
-rc_size_t model_context_impl::get_sheet_size(sheet_t sheet) const
+rc_size_t model_context_impl::get_sheet_size() const
 {
-    return m_sheets.at(sheet).get_sheet_size();
+    return m_sheet_size;
 }
 
 size_t model_context_impl::get_sheet_count() const
@@ -141,8 +142,7 @@ size_t model_context_impl::get_sheet_count() const
     return m_sheets.size();
 }
 
-sheet_t model_context_impl::append_sheet(
-    std::string&& name, row_t row_size, col_t col_size)
+sheet_t model_context_impl::append_sheet(std::string&& name)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "append_sheet: name='{}'", name);
 
@@ -161,7 +161,7 @@ sheet_t model_context_impl::append_sheet(
     sheet_t sheet_index = m_sheets.size();
 
     m_sheet_names.push_back(std::move(name));
-    m_sheets.push_back(row_size, col_size);
+    m_sheets.push_back(m_sheet_size.row, m_sheet_size.column);
     return sheet_index;
 }
 

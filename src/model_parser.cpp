@@ -180,7 +180,7 @@ model_parser::check_error::check_error(const string& msg) :
 // ============================================================================
 
 model_parser::model_parser(const string& filepath, size_t thread_count) :
-    m_context(),
+    m_context({1048576, 1024}),
     m_table_handler(),
     m_session_handler_factory(m_context),
     mp_table_entry(nullptr),
@@ -190,8 +190,6 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     mp_head(nullptr),
     mp_end(nullptr),
     mp_char(nullptr),
-    m_row_limit(1048576),
-    m_col_limit(1024),
     m_current_sheet(0),
     m_parse_mode(parse_mode_unknown),
     m_print_separator(false),
@@ -263,7 +261,7 @@ void model_parser::parse()
 void model_parser::init_model()
 {
     if (m_context.empty())
-        m_context.append_sheet(IXION_ASCII("sheet"), m_row_limit, m_col_limit);
+        m_context.append_sheet(IXION_ASCII("sheet"));
 }
 
 void model_parser::parse_command()
@@ -426,13 +424,21 @@ void model_parser::parse_session()
     }
 
     if (cmd == "row-limit")
-        m_row_limit = to_long(value);
+    {
+        rc_size_t ss = m_context.get_sheet_size();
+        ss.row = to_long(value);
+        m_context.set_sheet_size(ss);
+    }
     else if (cmd == "column-limit")
-        m_col_limit = to_long(value);
+    {
+        rc_size_t ss = m_context.get_sheet_size();
+        ss.column = to_long(value);
+        m_context.set_sheet_size(ss);
+    }
     else if (cmd == "insert-sheet")
     {
-        m_context.append_sheet(value.get(), value.size(), m_row_limit, m_col_limit);
-        cout << "sheet: (name: " << value << ", rows: " << m_row_limit << ", columns: " << m_col_limit << ")" << endl;
+        m_context.append_sheet(value.get(), value.size());
+        cout << "sheet: (name: " << value << ")" << endl;
     }
     else if (cmd == "current-sheet")
     {

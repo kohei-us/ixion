@@ -144,8 +144,6 @@ private:
     const char* mp_end;
     const char* mp_char;
 
-    row_t m_row_limit;
-    col_t m_col_limit;
     sheet_t m_current_sheet;
 
     parse_mode_type m_parse_mode;

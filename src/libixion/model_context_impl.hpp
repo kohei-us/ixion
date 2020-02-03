@@ -34,12 +34,17 @@ public:
     model_context_impl(const model_context_impl&) = delete;
     model_context_impl& operator= (model_context_impl) = delete;
 
-    model_context_impl(model_context& parent);
+    model_context_impl(model_context& parent, const rc_size_t& sheet_size);
     ~model_context_impl();
 
     const config& get_config() const
     {
         return m_config;
+    }
+
+    void set_sheet_size(const rc_size_t& sheet_size)
+    {
+        m_sheet_size = sheet_size;
     }
 
     void set_config(const config& cfg)
@@ -111,9 +116,9 @@ public:
 
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;
-    rc_size_t get_sheet_size(sheet_t sheet) const;
+    rc_size_t get_sheet_size() const;
     size_t get_sheet_count() const;
-    sheet_t append_sheet(std::string&& name, row_t row_size, col_t col_size);
+    sheet_t append_sheet(std::string&& name);
 
     void set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows);
 
@@ -140,6 +145,7 @@ public:
 private:
     model_context& m_parent;
 
+    rc_size_t m_sheet_size;
     workbook m_sheets;
 
     config m_config;

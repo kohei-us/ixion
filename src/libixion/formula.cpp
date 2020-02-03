@@ -324,7 +324,7 @@ void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t
             {
                 abs_range_t range = p->get_range_ref().to_abs(pos);
                 check_sheet_or_throw("register_formula_cell", range.first.sheet, cxt, pos, *cell);
-                rc_size_t sheet_size = cxt.get_sheet_size(range.first.sheet);
+                rc_size_t sheet_size = cxt.get_sheet_size();
                 if (range.all_columns())
                 {
                     range.first.column = 0;
