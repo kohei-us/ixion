@@ -39,6 +39,7 @@ public:
         const named_expression_t* expression;
     };
 
+    size_t size() const;
     bool has() const;
     void next();
 

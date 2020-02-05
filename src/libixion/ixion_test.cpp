@@ -1961,9 +1961,11 @@ void test_model_context_iterator_named_exps()
 
     named_expressions_iterator iter;
     assert(!iter.has());
+    assert(iter.size() == 0);
 
     iter = cxt.get_named_expressions_iterator();
     assert(!iter.has());
+    assert(iter.size() == 0);
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
     assert(resolver);
@@ -1976,6 +1978,12 @@ void test_model_context_iterator_named_exps()
 
     auto validate = [](named_expressions_iterator _iter, const std::vector<check>& _expected) -> bool
     {
+        if (_iter.size() != _expected.size())
+        {
+            cout << "iterator's size() returns wrong value." << endl;
+            return false;
+        }
+
         for (const check& c : _expected)
         {
             if (!_iter.has())

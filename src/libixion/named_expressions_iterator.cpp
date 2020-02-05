@@ -44,6 +44,14 @@ named_expressions_iterator::~named_expressions_iterator()
 {
 }
 
+size_t named_expressions_iterator::size() const
+{
+    if (!mp_impl->named_exps)
+        return 0;
+
+    return mp_impl->named_exps->size();
+}
+
 bool named_expressions_iterator::has() const
 {
     if (!mp_impl->named_exps)
