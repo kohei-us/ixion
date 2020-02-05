@@ -73,6 +73,15 @@ named_expressions_iterator::named_expression named_expressions_iterator::get() c
     return ret;
 }
 
+const named_expression_t* named_expressions_iterator::get(const std::string& name) const
+{
+    if (!mp_impl->named_exps)
+        return nullptr;
+
+    auto it = mp_impl->named_exps->find(name);
+    return it == mp_impl->named_exps->cend() ? nullptr : &it->second;
+}
+
 named_expressions_iterator& named_expressions_iterator::operator= (const named_expressions_iterator& other)
 {
     mp_impl = ixion::make_unique<impl>(*other.mp_impl);

@@ -2013,6 +2013,22 @@ void test_model_context_iterator_named_exps()
             return false;
         }
 
+        for (const check& c : _expected)
+        {
+            const named_expression_t* exp = _iter.get(c.name);
+            if (!exp)
+            {
+                cout << "expression was expected for '" << c.name << "', but not found." << endl;
+                return false;
+            }
+
+            if (exp != c.exp)
+            {
+                cout << "expressions differ." << endl;
+                return false;
+            }
+        }
+
         return true;
     };
 
