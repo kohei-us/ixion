@@ -45,8 +45,6 @@ public:
 
     named_expression get() const;
 
-    const named_expression_t* get(const std::string& name) const;
-
     named_expressions_iterator& operator= (const named_expressions_iterator& other);
 };
 
