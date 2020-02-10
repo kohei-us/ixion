@@ -20,14 +20,35 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <mutex>
 
 namespace ixion { namespace detail {
+
+class safe_string_pool
+{
+    using string_pool_type = std::vector<std::unique_ptr<std::string>>;
+    using string_map_type = std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash>;
+
+    std::mutex m_mtx;
+    string_pool_type m_strings;
+    string_map_type m_string_map;
+    std::string m_empty_string;
+
+    string_id_t append_string_unsafe(const char* p, size_t n);
+
+public:
+    string_id_t append_string(const char* p, size_t n);
+    string_id_t add_string(const char* p, size_t n);
+    const std::string* get_string(string_id_t identifier) const;
+
+    size_t size() const;
+    void dump_strings() const;
+    string_id_t get_string_identifier(const char* p, size_t n) const;
+};
 
 class model_context_impl
 {
     typedef std::vector<std::string> strings_type;
-    typedef std::vector<std::unique_ptr<std::string>> string_pool_type;
-    typedef std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash> string_map_type;
 
 public:
     model_context_impl() = delete;
@@ -153,9 +174,8 @@ private:
     model_context::session_handler_factory* mp_session_factory;
 
     strings_type m_sheet_names; ///< index to sheet name map.
-    string_pool_type m_strings;
-    string_map_type m_string_map;
-    std::string m_empty_string;
+
+    safe_string_pool m_str_pool;
 };
 
 }}

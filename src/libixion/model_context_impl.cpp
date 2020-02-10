@@ -23,6 +23,88 @@ using std::endl;
 
 namespace ixion { namespace detail {
 
+string_id_t safe_string_pool::append_string_unsafe(const char* p, size_t n)
+{
+    assert(p);
+    assert(n);
+
+    string_id_t str_id = m_strings.size();
+    m_strings.push_back(make_unique<std::string>(p, n));
+    p = m_strings.back()->data();
+    mem_str_buf key(p, n);
+    m_string_map.insert(string_map_type::value_type(key, str_id));
+    return str_id;
+}
+
+string_id_t safe_string_pool::append_string(const char* p, size_t n)
+{
+    if (!p || !n)
+        // Never add an empty or invalid string.
+        return empty_string_id;
+
+    std::unique_lock<std::mutex> lock(m_mtx);
+    return append_string_unsafe(p, n);
+}
+
+string_id_t safe_string_pool::add_string(const char* p, size_t n)
+{
+    if (!p || !n)
+        // Never add an empty or invalid string.
+        return empty_string_id;
+
+    std::unique_lock<std::mutex> lock(m_mtx);
+    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
+    if (itr != m_string_map.end())
+        return itr->second;
+
+    return append_string_unsafe(p, n);
+}
+
+const std::string* safe_string_pool::get_string(string_id_t identifier) const
+{
+    if (identifier == empty_string_id)
+        return &m_empty_string;
+
+    if (identifier >= m_strings.size())
+        return nullptr;
+
+    return m_strings[identifier].get();
+}
+
+size_t safe_string_pool::size() const
+{
+    return m_strings.size();
+}
+
+void safe_string_pool::dump_strings() const
+{
+    {
+        cout << "string count: " << m_strings.size() << endl;
+        auto it = m_strings.begin(), ite = m_strings.end();
+        for (string_id_t sid = 0; it != ite; ++it, ++sid)
+        {
+            const std::string& s = **it;
+            cout << "* " << sid << ": '" << s << "' (" << (void*)s.data() << ")" << endl;
+        }
+    }
+
+    {
+        cout << "string map count: " << m_string_map.size() << endl;
+        auto it = m_string_map.begin(), ite = m_string_map.end();
+        for (; it != ite; ++it)
+        {
+            mem_str_buf key = it->first;
+            cout << "* key: '" << key << "' (" << (void*)key.get() << "; " << key.size() << "), value: " << it->second << endl;
+        }
+    }
+}
+
+string_id_t safe_string_pool::get_string_identifier(const char* p, size_t n) const
+{
+    string_map_type::const_iterator it = m_string_map.find(mem_str_buf(p, n));
+    return it == m_string_map.end() ? empty_string_id : it->second;
+}
+
 namespace {
 
 model_context::session_handler_factory dummy_session_handler_factory;
@@ -214,64 +296,27 @@ void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<mo
 
 string_id_t model_context_impl::append_string(const char* p, size_t n)
 {
-    if (!p || !n)
-        // Never add an empty or invalid string.
-        return empty_string_id;
-
-    string_id_t str_id = m_strings.size();
-    m_strings.push_back(make_unique<std::string>(p, n));
-    p = m_strings.back()->data();
-    mem_str_buf key(p, n);
-    m_string_map.insert(string_map_type::value_type(key, str_id));
-    return str_id;
+    return m_str_pool.append_string(p, n);
 }
 
 string_id_t model_context_impl::add_string(const char* p, size_t n)
 {
-    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
-    if (itr != m_string_map.end())
-        return itr->second;
-
-    return append_string(p, n);
+    return m_str_pool.add_string(p, n);
 }
 
 const std::string* model_context_impl::get_string(string_id_t identifier) const
 {
-    if (identifier == empty_string_id)
-        return &m_empty_string;
-
-    if (identifier >= m_strings.size())
-        return nullptr;
-
-    return m_strings[identifier].get();
+    return m_str_pool.get_string(identifier);
 }
 
 size_t model_context_impl::get_string_count() const
 {
-    return m_strings.size();
+    return m_str_pool.size();
 }
 
 void model_context_impl::dump_strings() const
 {
-    {
-        cout << "string count: " << m_strings.size() << endl;
-        auto it = m_strings.begin(), ite = m_strings.end();
-        for (string_id_t sid = 0; it != ite; ++it, ++sid)
-        {
-            const std::string& s = **it;
-            cout << "* " << sid << ": '" << s << "' (" << (void*)s.data() << ")" << endl;
-        }
-    }
-
-    {
-        cout << "string map count: " << m_string_map.size() << endl;
-        auto it = m_string_map.begin(), ite = m_string_map.end();
-        for (; it != ite; ++it)
-        {
-            mem_str_buf key = it->first;
-            cout << "* key: '" << key << "' (" << (void*)key.get() << "; " << key.size() << "), value: " << it->second << endl;
-        }
-    }
+    m_str_pool.dump_strings();
 }
 
 const column_store_t* model_context_impl::get_column(sheet_t sheet, col_t col) const
@@ -877,8 +922,7 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
 
 string_id_t model_context_impl::get_string_identifier(const char* p, size_t n) const
 {
-    string_map_type::const_iterator it = m_string_map.find(mem_str_buf(p, n));
-    return it == m_string_map.end() ? empty_string_id : it->second;
+    return m_str_pool.get_string_identifier(p, n);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
