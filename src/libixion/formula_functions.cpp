@@ -772,8 +772,7 @@ void formula_functions::fnc_concatenate(formula_value_stack& args)
     string s;
     while (!args.empty())
         s = args.pop_string() + s;
-    size_t sid = m_context.add_string(&s[0], s.size());
-    args.push_string(sid);
+    args.push_string(std::move(s));
 }
 
 void formula_functions::fnc_now(formula_value_stack& args) const

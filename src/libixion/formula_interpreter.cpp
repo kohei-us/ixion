@@ -211,8 +211,12 @@ void formula_interpreter::pop_result()
             break;
         }
         case stack_value_t::string:
-            m_result.set_string(res.get_string());
+        {
+            const std::string& s = res.get_string();
+            string_id_t sid = m_context.add_string(s.data(), s.size());
+            m_result.set_string(sid);
             break;
+        }
         case stack_value_t::value:
             SPDLOG_TRACE(spdlog::get("ixion"), "pop_result: value={}", res.get_value());
             m_result.set_value(res.get_value());
@@ -627,8 +631,7 @@ void formula_interpreter::term()
             term();
             std::string s2 = get_stack().pop_string();
             std::string s = s1 + s2;
-            string_id_t sid = m_context.add_string(s.data(), s.size());
-            get_stack().push_string(sid);
+            get_stack().push_string(std::move(s));
             return;
         }
         case fop_divide:
@@ -835,8 +838,12 @@ void formula_interpreter::constant()
 void formula_interpreter::literal()
 {
     size_t sid = token().get_index();
+    const std::string* p = m_context.get_string(sid);
+    if (!p)
+        throw general_error("no string found for the specified string ID.");
+
     next();
-    get_stack().push_string(sid);
+    get_stack().push_string(*p);
     if (mp_handler)
         mp_handler->push_string(sid);
 }

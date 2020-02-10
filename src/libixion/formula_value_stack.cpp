@@ -49,8 +49,8 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
 stack_value::stack_value(double val) :
     m_type(stack_value_t::value), m_value(val) {}
 
-stack_value::stack_value(size_t sid) :
-    m_type(stack_value_t::string), m_str_identifier(sid) {}
+stack_value::stack_value(std::string str) :
+    m_type(stack_value_t::string), m_str(new std::string(std::move(str))) {}
 
 stack_value::stack_value(const abs_address_t& val) :
     m_type(stack_value_t::single_ref), m_address(new abs_address_t(val)) {}
@@ -81,7 +81,8 @@ stack_value::stack_value(stack_value&& other) :
             other.m_address = nullptr;
             break;
         case stack_value_t::string:
-            m_str_identifier = other.m_str_identifier;
+            m_str = other.m_str;
+            other.m_str = nullptr;
             break;
         case stack_value_t::value:
             m_value = other.m_value;
@@ -105,6 +106,8 @@ stack_value::~stack_value()
             delete m_matrix;
             break;
         case stack_value_t::string:
+            delete m_str;
+            break;
         case stack_value_t::value:
         default:
             ; // do nothing
@@ -130,7 +133,8 @@ stack_value& stack_value::operator= (stack_value&& other)
             other.m_address = nullptr;
             break;
         case stack_value_t::string:
-            m_str_identifier = other.m_str_identifier;
+            m_str = other.m_str;
+            other.m_str = nullptr;
             break;
         case stack_value_t::value:
             m_value = other.m_value;
@@ -162,11 +166,9 @@ double stack_value::get_value() const
     return 0.0;
 }
 
-size_t stack_value::get_string() const
+const std::string& stack_value::get_string() const
 {
-    if (m_type == stack_value_t::string)
-        return m_str_identifier;
-    return 0;
+    return *m_str;
 }
 
 const abs_address_t& stack_value::get_address() const
@@ -290,10 +292,10 @@ void formula_value_stack::push_value(double val)
     m_stack.emplace_back(val);
 }
 
-void formula_value_stack::push_string(size_t sid)
+void formula_value_stack::push_string(std::string str)
 {
     SPDLOG_TRACE(spdlog::get("ixion"), "push_string: sid={}", sid);
-    m_stack.emplace_back(sid);
+    m_stack.emplace_back(std::move(str));
 }
 
 void formula_value_stack::push_single_ref(const abs_address_t& val)
@@ -340,9 +342,9 @@ const std::string formula_value_stack::pop_string()
     {
         case stack_value_t::string:
         {
-            const std::string* p = m_context.get_string(v.get_string());
+            const std::string str = v.get_string();
             m_stack.pop_back();
-            return p ? *p : std::string();
+            return str;
         }
         break;
         case stack_value_t::value:
