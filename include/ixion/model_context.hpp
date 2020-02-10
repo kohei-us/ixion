@@ -102,7 +102,6 @@ public:
     virtual double get_numeric_value(const abs_address_t& addr) const override;
     virtual bool get_boolean_value(const abs_address_t& addr) const override;
     virtual string_id_t get_string_identifier(const abs_address_t& addr) const override;
-    virtual string_id_t get_string_identifier(const char* p, size_t n) const override;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const override;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) override;
 
@@ -278,6 +277,8 @@ public:
     size_t get_string_count() const;
 
     void dump_strings() const;
+
+    string_id_t get_identifier_from_string(const char* p, size_t n) const;
 
     /**
      * Get column storage.

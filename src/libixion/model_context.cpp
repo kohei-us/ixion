@@ -203,11 +203,6 @@ string_id_t model_context::get_string_identifier_nowait(const abs_address_t& add
     return mp_impl->get_string_identifier_nowait(addr);
 }
 
-string_id_t model_context::get_string_identifier(const char* p, size_t n) const
-{
-    return mp_impl->get_string_identifier(p, n);
-}
-
 const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const
 {
     return mp_impl->get_formula_cell(addr);
@@ -379,6 +374,11 @@ size_t model_context::get_string_count() const
 void model_context::dump_strings() const
 {
     mp_impl->dump_strings();
+}
+
+string_id_t model_context::get_identifier_from_string(const char* p, size_t n) const
+{
+    return mp_impl->get_identifier_from_string(p, n);
 }
 
 const column_store_t* model_context::get_column(sheet_t sheet, col_t col) const

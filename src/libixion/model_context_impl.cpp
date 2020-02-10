@@ -99,7 +99,7 @@ void safe_string_pool::dump_strings() const
     }
 }
 
-string_id_t safe_string_pool::get_string_identifier(const char* p, size_t n) const
+string_id_t safe_string_pool::get_identifier_from_string(const char* p, size_t n) const
 {
     string_map_type::const_iterator it = m_string_map.find(mem_str_buf(p, n));
     return it == m_string_map.end() ? empty_string_id : it->second;
@@ -920,9 +920,9 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
     return empty_string_id;
 }
 
-string_id_t model_context_impl::get_string_identifier(const char* p, size_t n) const
+string_id_t model_context_impl::get_identifier_from_string(const char* p, size_t n) const
 {
-    return m_str_pool.get_string_identifier(p, n);
+    return m_str_pool.get_identifier_from_string(p, n);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
