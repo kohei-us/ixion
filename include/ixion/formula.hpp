@@ -89,9 +89,13 @@ IXION_DLLPUBLIC std::string print_formula_token(
  * @param pos address of the cell being registered.  In case of grouped
  *            cells, the position must be that of teh top-left cell of that
  *            group.
+ * @param cell (optional) pointer to the formula cell object to register.
+ *             You can skip this parameter, in which case the formula cell
+ *             object will be fetched from the address of the cell.  But
+ *             passing a pointer will save the overhead of fetching.
  */
 void IXION_DLLPUBLIC register_formula_cell(
-    iface::formula_model_access& cxt, const abs_address_t& pos);
+    iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell* cell = nullptr);
 
 /**
  * Unregister a formula cell with cell dependency tracker if a formula cell

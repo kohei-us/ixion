@@ -286,12 +286,16 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::for
 
 }
 
-void register_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)
+void register_formula_cell(
+    iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell* cell)
 {
-    formula_cell* cell = cxt.get_formula_cell(pos);
     if (!cell)
-        // Not a formula cell. Bail out.
-        return;
+    {
+        cell = cxt.get_formula_cell(pos);
+        if (!cell)
+            // Not a formula cell. Bail out.
+            return;
+    }
 
     formula_group_t fg_props = cell->get_group_properties();
     dirty_cell_tracker& tracker = cxt.get_cell_tracker();

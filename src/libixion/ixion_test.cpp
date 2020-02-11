@@ -1620,14 +1620,14 @@ void test_model_context_iterator_horizontal()
     assert(p);
     const formula_tokens_t& t = p->get_tokens()->get();
     assert(t.size() == 8); // there should be 8 tokens.
-    register_formula_cell(cxt, pos);
+    register_formula_cell(cxt, pos, p);
     modified_cells.insert(pos);
 
     pos.column = 1;
     tokens = parse_formula_string(
         cxt, pos, *resolver, IXION_ASCII("5 + 6 - 7"));
-    cxt.set_formula_cell(pos, std::move(tokens));
-    register_formula_cell(cxt, pos);
+    p = cxt.set_formula_cell(pos, std::move(tokens));
+    register_formula_cell(cxt, pos, p);
     modified_cells.insert(pos);
 
     // Calculate the formula cells.
