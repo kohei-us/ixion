@@ -176,6 +176,7 @@ AS_IF([test x"$enable_werror" == "xyes"], [
 AC_CONFIG_FILES([Makefile
                  libixion-$IXION_API_VERSION.pc:libixion.pc.in
                  bin/env.sh
+                 doc_example/Makefile
                  include/Makefile
                  include/ixion/Makefile
                  include/ixion/interface/Makefile

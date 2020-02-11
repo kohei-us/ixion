@@ -1,4 +1,4 @@
-SUBDIRS = src include
+SUBDIRS = src include doc_example
 ACLOCAL_AMFLAGS = -I m4
 
 pcfiles = libixion-@IXION_API_VERSION@.pc
