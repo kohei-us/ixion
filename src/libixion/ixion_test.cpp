@@ -1361,10 +1361,12 @@ formula_cell* insert_formula(
     formula_tokens_t tokens = parse_formula_string(cxt, pos, resolver, exp, strlen(exp));
     auto ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
-    cxt.set_formula_cell(pos, ts);
+    formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
+    assert(p_inserted);
     register_formula_cell(cxt, pos);
     formula_cell* p = cxt.get_formula_cell(pos);
     assert(p);
+    assert(p == p_inserted);
     return p;
 }
 
@@ -1398,9 +1400,11 @@ void test_model_context_storage()
         formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp, strlen(exp));
         auto ts = formula_tokens_store::create();
         ts->get() = std::move(tokens);
-        cxt.set_formula_cell(pos, ts);
+        formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
+        assert(p_inserted);
         formula_cell* p = cxt.get_formula_cell(pos);
         assert(p);
+        assert(p_inserted == p);
     }
 
     {
@@ -1612,7 +1616,10 @@ void test_model_context_iterator_horizontal()
     abs_address_t pos(1, 3, 0);
     formula_tokens_t tokens = parse_formula_string(
         cxt, pos, *resolver, IXION_ASCII("SUM(1, 2, 3)"));
-    cxt.set_formula_cell(pos, std::move(tokens));
+    formula_cell* p = cxt.set_formula_cell(pos, std::move(tokens));
+    assert(p);
+    const formula_tokens_t& t = p->get_tokens()->get();
+    assert(t.size() == 8); // there should be 8 tokens.
     register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
 

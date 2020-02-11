@@ -149,8 +149,10 @@ public:
      *
      * @param addr address at which to set a formula cell.
      * @param tokens formula tokens to put into the formula cell.
+     *
+     * @return pointer to the formula cell instance inserted into the model.
      */
-    void set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
+    formula_cell* set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
 
     /**
      * Set a formula cell at a specified address.  This variant takes a
@@ -159,8 +161,10 @@ public:
      *
      * @param addr address at which to set a formula cell.
      * @param tokens formula tokens to put into the formula cell.
+     *
+     * @return pointer to the formula cell instance inserted into the model.
      */
-    void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
+    formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
 
     /**
      * Set a formula cell at a specified address.  This variant takes a
@@ -170,8 +174,10 @@ public:
      * @param addr address at which to set a formula cell.
      * @param tokens formula tokens to put into the formula cell.
      * @param result cached result of this formula cell.
+     *
+     * @return pointer to the formula cell instance inserted into the model.
      */
-    void set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
+    formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
 
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 

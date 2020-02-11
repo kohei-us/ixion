@@ -121,24 +121,24 @@ void model_context::set_string_cell(const abs_address_t& addr, string_id_t ident
     mp_impl->set_string_cell(addr, identifier);
 }
 
-void model_context::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
+formula_cell* model_context::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
 {
     formula_tokens_store_ptr_t ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
 
-    mp_impl->set_formula_cell(addr, ts);
+    return mp_impl->set_formula_cell(addr, ts);
 }
 
-void model_context::set_formula_cell(
+formula_cell*  model_context::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
-    mp_impl->set_formula_cell(addr, tokens);
+    return mp_impl->set_formula_cell(addr, tokens);
 }
 
-void model_context::set_formula_cell(
+formula_cell*  model_context::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result)
 {
-    mp_impl->set_formula_cell(addr, tokens, std::move(result));
+    return mp_impl->set_formula_cell(addr, tokens, std::move(result));
 }
 
 void model_context::set_grouped_formula_cells(
