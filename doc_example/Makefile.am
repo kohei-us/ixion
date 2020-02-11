@@ -7,13 +7,13 @@ AM_CPPFLAGS = \
 bin_PROGRAMS =
 
 EXTRA_PROGRAMS = \
-	model-context
+	model-context-simple
 
-model_context_SOURCES = model_context.cpp
-model_context_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
+model_context_simple_SOURCES = model_context_simple.cpp
+model_context_simple_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 
 TESTS = \
-	model-context
+	model-context-simple
 
 distclean-local:
 	rm -rf $(TESTS)
