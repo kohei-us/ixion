@@ -52,10 +52,13 @@ int main(int argc, char** argv)
     ixion::register_formula_cell(cxt, A11, cell);
 
     // Build a set of modified cells, to determine which formula cells depend
-    // on them eithe directly or indirectly.
+    // on them eithe directly or indirectly.  Since we are performing initial
+    // calculation, we can flag the entire sheet to be "modified" to trigger
+    // all formula cells to be calculated.
 
-    ixion::abs_range_t A1_A10(0, 0, 0, 10, 1); // sheet, row, column, row span, column span
-    ixion::abs_range_set_t modified_cells{A1_A10};
+    ixion::rc_size_t sheet_size = cxt.get_sheet_size();
+    ixion::abs_range_t entire_sheet(0, 0, 0, sheet_size.row, sheet_size.column); // sheet, row, column, row span, column span
+    ixion::abs_range_set_t modified_cells{entire_sheet};
 
     // Determine formula cells that need re-calculation given the modified cells.
     // There should be only one formula cell in this example.
@@ -68,17 +71,19 @@ int main(int argc, char** argv)
     double value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
 
-    // When removing a formula cell, make sure to unregister it BEFORE removing
-    // it from the model.
-    ixion::unregister_formula_cell(cxt, A11);
-    cxt.erase_cell(A11);
-
+    // Insert a new formula to A11.
     s = "AVERAGE(A1:A10)";
     tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
 
+    // Before overwriting, make sure to UN-register the old cell.
+    ixion::unregister_formula_cell(cxt, A11);
+
+    // Set and register the new formula cell.
     cell = cxt.set_formula_cell(A11, std::move(tokens));
     ixion::register_formula_cell(cxt, A11, cell);
 
+    // This time, we know that none of the cell values have changed, but the
+    // formula A11 is updated & needs recalculation.
     ixion::abs_range_set_t modified_formula_cells{A11};
     dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
