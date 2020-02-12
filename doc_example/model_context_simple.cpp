@@ -68,5 +68,26 @@ int main(int argc, char** argv)
     double value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
 
+    // When removing a formula cell, make sure to unregister it BEFORE removing
+    // it from the model.
+    ixion::unregister_formula_cell(cxt, A11);
+    cxt.erase_cell(A11);
+
+    s = "AVERAGE(A1:A10)";
+    tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
+
+    cell = cxt.set_formula_cell(A11, std::move(tokens));
+    ixion::register_formula_cell(cxt, A11, cell);
+
+    ixion::abs_range_set_t modified_formula_cells{A11};
+    dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
+    cout << "number of dirty cells: " << dirty_cells.size() << endl;
+
+    // Perform calculation again.
+    ixion::calculate_sorted_cells(cxt, dirty_cells, 0);
+
+    value = cxt.get_numeric_value(A11);
+    cout << "value of A11: " << value << endl;
+
     return EXIT_SUCCESS;
 }
