@@ -46,10 +46,10 @@ int main(int argc, char** argv)
     ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
 
     // Set the tokens into the model.
-    cxt.set_formula_cell(A11, std::move(tokens));
+    const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
 
     // Register this formula cell for automatic dependency tracking.
-    ixion::register_formula_cell(cxt, A11);
+    ixion::register_formula_cell(cxt, A11, cell);
 
     // Build a set of modified cells, to determine which formula cells depend
     // on them eithe directly or indirectly.
