@@ -289,6 +289,18 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::for
 void register_formula_cell(
     iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell* cell)
 {
+#ifdef __IXION_DEBUG_UTILS
+    if (cell)
+    {
+        const formula_cell* check = cxt.get_formula_cell(pos);
+        if (cell != check)
+        {
+            throw std::runtime_error(
+                "The cell instance passed to this call does not match the cell instance found at the specified position.");
+        }
+    }
+#endif
+
     if (!cell)
     {
         cell = cxt.get_formula_cell(pos);

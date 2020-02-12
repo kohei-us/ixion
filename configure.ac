@@ -36,6 +36,15 @@ case $host_os in
     ;;
 esac
 
+# =====================
+# Development Utilities
+# =====================
+AC_ARG_ENABLE(debug-utils,
+        AC_HELP_STRING([--enable-debug-utils], [Build with extra checks useful during development.]),
+        [enable_debug_utils="$enableval"],
+        [enable_debug_utils=no]
+)
+
 AC_ARG_ENABLE([python],
     [AS_HELP_STRING([--disable-python], [Disable python bindings])],
     [enable_python="$enableval"],
@@ -150,6 +159,10 @@ AS_IF([test "x$enable_threads" != "xno"], [
         CXXFLAGS="$CXXFLAGS -DIXION_THREADS=0"
 ])
 
+AS_IF([test "x$enable_debug_utils" != "xno"], [
+        CXXFLAGS="$CXXFLAGS -D__IXION_DEBUG_UTILS"
+])
+
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([IXION_THREADS], [test "x$enable_threads" != "xno"])
 AM_CONDITIONAL([BUILD_CUDA], [test "x$enable_cuda" != "xno"])
@@ -191,6 +204,7 @@ AC_OUTPUT
 AC_MSG_NOTICE([
 ==============================================================================
 Build configuration:
+        debug-utils           $enable_debug_utils
         host os:              $host_os
         python:               $enable_python
         threads:              $enable_threads
