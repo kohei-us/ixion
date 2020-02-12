@@ -527,7 +527,7 @@ struct parse_address_result
     bool sheet_name = false;
 };
 
-#if IXION_DEBUG
+#if IXION_LOGGING
 
 std::ostream& operator<< (std::ostream& os, parse_address_result_type rt)
 {

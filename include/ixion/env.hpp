@@ -34,9 +34,9 @@
 #endif
 
 #if defined(SPDLOG_TRACE_ON) || defined(SPDLOG_DEBUG_ON)
-#define IXION_DEBUG 1
+#define IXION_LOGGING 1
 #else
-#define IXION_DEBUG 0
+#define IXION_LOGGING 0
 #endif
 
 #endif

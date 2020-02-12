@@ -39,7 +39,7 @@ namespace ixion {
 
 namespace {
 
-#if IXION_DEBUG
+#if IXION_LOGGING
 
 std::string gen_trace_output(const formula_cell& fc, const iface::formula_model_access& cxt, const abs_address_t& pos)
 {

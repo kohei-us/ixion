@@ -33,7 +33,7 @@ namespace ixion {
 
 namespace {
 
-#if IXION_DEBUG
+#if IXION_LOGGING
 
 std::string debug_print_formula_tokens(const formula_tokens_t& tokens)
 {

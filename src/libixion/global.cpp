@@ -20,7 +20,7 @@
 #include <fstream>
 #include <chrono>
 
-#if IXION_DEBUG
+#if IXION_LOGGING
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #endif
@@ -31,7 +31,7 @@ namespace ixion {
 
 void init()
 {
-#if IXION_DEBUG
+#if IXION_LOGGING
     auto console = spdlog::stdout_logger_mt("ixion");
     spdlog::set_level(spdlog::level::trace);
 #endif
