@@ -9,6 +9,9 @@ config.log
 config.status
 config.sub
 depcomp
+doc/_build
+doc/_doxygen
+doc_example/model-context-simple
 INSTALL
 install-sh
 libtool
@@ -38,6 +41,9 @@ src/ixion-parser
 src/ixion-parser.exe
 src/ixion-sorter
 src/ixion-sorter.exe
+src/libixion/compute-engine-test
 src/libixion/constants.inl
+src/libixion/dirty-cell-tracker-test
 src/libixion/ixion-test
+src/libixion/ixion-test-track-deps
 libixion-*.*.*.tar.*
