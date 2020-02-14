@@ -1,18 +1,32 @@
 
-#include <ixion/model_context.hpp>
-#include <ixion/macros.hpp>
-#include <ixion/formula_name_resolver.hpp>
-#include <ixion/formula.hpp>
-#include <iostream>
+.. highlight:: cpp
 
-using namespace std;
+Overview
+========
 
-int main(int argc, char** argv)
-{
+Create a model context instance
+-------------------------------
+
+TBD
+
+::
+
     ixion::model_context cxt;
+
+TBD
+
+::
 
     // First and foremost, insert a sheet.
     cxt.append_sheet("MySheet");
+
+
+Populate model context with values
+----------------------------------
+
+TBD
+
+::
 
     // Now, populate it with some numeric values in A1:A10.
     for (ixion::abs_address_t pos(0, 0, 0); pos.row <= 9; ++pos.row)
@@ -21,14 +35,26 @@ int main(int argc, char** argv)
         cxt.set_numeric_cell(pos, value);
     }
 
+TBD
+
+::
+
     // Insert a string value into B2.
     ixion::abs_address_t B2(0, 1, 1);
     std::string s = "This cell contains a string value.";
     cxt.set_string_cell(B2, s.data(), s.size());
 
+TBD
+
+::
+
     // Insert a literal string value into B3.
     ixion::abs_address_t B3(0, 2, 1);
     cxt.set_string_cell(B3, IXION_ASCII("This too contains a string value."));
+
+TBD
+
+::
 
     // Insert a string value into B4 via string identifier.
     s = "Yet another string value.";
@@ -36,35 +62,60 @@ int main(int argc, char** argv)
     ixion::abs_address_t B4(0, 3, 1);
     cxt.set_string_cell(B4, sid);
 
-    // Now, let's insert a formula into A11 to sum up values in A1:A10.
+
+Insert a formula cell into model context
+----------------------------------------
+
+TBD
+
+::
 
     // Tokenize formula string first.
     std::unique_ptr<ixion::formula_name_resolver> resolver =
         ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     s = "SUM(A1:A10)";
 
+TBD
+
+::
+
     ixion::abs_address_t A11(0, 10, 0);
     ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
+
+TBD
+
+::
 
     // Set the tokens into the model.
     const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
 
+TBD
+
+::
+
     // Register this formula cell for automatic dependency tracking.
     ixion::register_formula_cell(cxt, A11, cell);
 
-    // Build a set of modified cells, to determine which formula cells depend
-    // on them eithe directly or indirectly.  Since we are performing initial
-    // calculation, we can flag the entire sheet to be "modified" to trigger
-    // all formula cells to be calculated.
+TBD
+
+::
 
     ixion::rc_size_t sheet_size = cxt.get_sheet_size();
     ixion::abs_range_t entire_sheet(0, 0, 0, sheet_size.row, sheet_size.column); // sheet, row, column, row span, column span
     ixion::abs_range_set_t modified_cells{entire_sheet};
 
+TBD
+
+::
+
     // Determine formula cells that need re-calculation given the modified cells.
     // There should be only one formula cell in this example.
     std::vector<ixion::abs_range_t> dirty_cells = ixion::query_and_sort_dirty_cells(cxt, modified_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
+
+TBD
+
+::
 
     // Now perform calculation.
     ixion::calculate_sorted_cells(cxt, dirty_cells, 0);
@@ -72,7 +123,14 @@ int main(int argc, char** argv)
     double value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
 
-    // Insert a new formula to A11.
+
+Modify formula cell
+-------------------
+
+TBD
+
+::
+
     s = "AVERAGE(A1:A10)";
     tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
 
@@ -82,6 +140,10 @@ int main(int argc, char** argv)
     // Set and register the new formula cell.
     cell = cxt.set_formula_cell(A11, std::move(tokens));
     ixion::register_formula_cell(cxt, A11, cell);
+
+TBD
+
+::
 
     // This time, we know that none of the cell values have changed, but the
     // formula A11 is updated & needs recalculation.
@@ -95,5 +157,5 @@ int main(int argc, char** argv)
     value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
 
-    return EXIT_SUCCESS;
-}
+TBD
+
