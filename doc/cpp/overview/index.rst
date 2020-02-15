@@ -7,18 +7,28 @@ Overview
 Create a model context instance
 -------------------------------
 
-TBD
-
-::
+When using ixion, the very first step is to create a :cpp:class:`~ixion::model_context`
+instance::
 
     ixion::model_context cxt;
 
-TBD
-
-::
+The :cpp:class:`~ixion::model_context` class represents a document model data
+store that stores cell values spanning over one or more sheets.  At the time of construction,
+the model contains no sheets. So the obvious next step is to insert at least one sheet::
 
     // First and foremost, insert a sheet.
     cxt.append_sheet("MySheet");
+
+The :cpp:func:`~ixion::model_context::append_sheet` method will append a new sheet to
+the model.  You need to give a name when appending a sheet, and the name must be unique
+for each sheet.
+
+.. note::
+
+    Each sheet has a fixed size which cannot be changed once the :cpp:class:`~ixion::model_context`
+    object is instantiated.  The default sheet size is 1048576 rows by 16384 columns.  You can
+    specify a custom sheet size by passing a desired sheet size value to the
+    :cpp:class:`~ixion::model_context` constructor at the time of instantiation.
 
 
 Populate model context with values
