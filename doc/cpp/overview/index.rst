@@ -13,8 +13,8 @@ instance::
     ixion::model_context cxt;
 
 The :cpp:class:`~ixion::model_context` class represents a document model data
-store that stores cell values spanning over one or more sheets.  At the time of construction,
-the model contains no sheets. So the obvious next step is to insert at least one sheet::
+store that stores cell values spreading over one or more sheets.  At the time of construction,
+the model contains no sheets. So the obvious next step is to insert a sheet::
 
     // First and foremost, insert a sheet.
     cxt.append_sheet("MySheet");
@@ -34,7 +34,11 @@ for each sheet.
 Populate model context with values
 ----------------------------------
 
-TBD
+Now that you have your first sheet inserted, let's put in some numeric values.  In this example,
+we'll insert into A1:A10 their respective row positions.  To insert a numeric value, you use
+:cpp:func:`~ixion::model_context::set_numeric_cell` which takes the position of the cell as its
+first argument and the value to set as its second argument.  You need to use :cpp:class:`~ixion::abs_address_t`
+to specify a cell position.
 
 ::
 
@@ -45,32 +49,46 @@ TBD
         cxt.set_numeric_cell(pos, value);
     }
 
-TBD
+Note that, since row and column positions are internally 0-based, we add one to emulate how the row
+positions are presented in typical spreadsheet program.
 
-::
+Inserting a string value can be done via :cpp:func:`~ixion::model_context::set_string_cell`.  You can choose
+one of three ways.
+
+The first way is to store the string value to an outside buffer (like std::string), and pass a pointer to
+that buffer and the size of the string value as in the following::
 
     // Insert a string value into B2.
     ixion::abs_address_t B2(0, 1, 1);
     std::string s = "This cell contains a string value.";
     cxt.set_string_cell(B2, s.data(), s.size());
 
-TBD
-
-::
+Alternatively, you can use this convenience macro :c:macro:`IXION_ASCII` which expands to a char pointer and
+its length if you are passing a string literal::
 
     // Insert a literal string value into B3.
     ixion::abs_address_t B3(0, 2, 1);
     cxt.set_string_cell(B3, IXION_ASCII("This too contains a string value."));
 
-TBD
+But when you do, please be aware that you can only use this macro in conjunction with string literal only.
 
-::
+The third way is to add your string to the model_context's internal string pool first which will return its
+string ID, then store that ID to the model::
 
     // Insert a string value into B4 via string identifier.
     s = "Yet another string value.";
     ixion::string_id_t sid = cxt.add_string(s.data(), s.size());
     ixion::abs_address_t B4(0, 3, 1);
     cxt.set_string_cell(B4, sid);
+
+The model_context class has two methods for inserting a string to the string pool:
+:cpp:func:`~ixion::model_context::add_string` and :cpp:func:`~ixion::model_context::append_string`.  The
+:cpp:func:`~ixion::model_context::add_string` method checks for an existing entry with the same string value
+upon each insertion attempt, and it will not insert the new value if the value already exists in the pool.
+The :cpp:func:`~ixion::model_context::append_string` method, on the other hand, does not check the pool for
+an existing value and always inserts the value.  The :cpp:func:`~ixion::model_context::append_string` method
+is appropriate if you know all your string entries ahead of time and wish to bulk-insert them.  Otherwise the
+:cpp:func:`~ixion::model_context::add_string` method is the right one to use.
 
 
 Insert a formula cell into model context

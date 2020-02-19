@@ -1,4 +1,10 @@
 
+Macros
+======
+
+.. doxygendefine:: IXION_ASCII
+
+
 Primitive Types
 ===============
 
