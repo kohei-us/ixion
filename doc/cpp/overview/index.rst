@@ -94,25 +94,39 @@ is appropriate if you know all your string entries ahead of time and wish to bul
 Insert a formula cell into model context
 ----------------------------------------
 
-TBD
-
-::
+Inserting a formula cell requires a few extra steps.  First, you need to tokenize your formula string, and
+to do that, you need to create an instance of :cpp:class:`~ixion::formula_name_resolver`.  The
+formula_name_resolver class is responsible for resolving "names" into references, functions, and named
+expressions names.  Ixion provides multiple types of name resolvers, and you specify its type when passing
+an enum value of type :cpp:enum:`~ixion::formula_name_resolver_t` when calling its static
+:cpp:func:`ixion::formula_name_resolver::get` function.  In this example, we'll be using the Excel A1
+syntax::
 
     // Tokenize formula string first.
     std::unique_ptr<ixion::formula_name_resolver> resolver =
         ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+
+You can also optionally pass a memory address of your :cpp:class:`~ixion::model_context` instance which is
+required for resolving sheet names.  You can pass a nullptr if you don't need to resolve sheet names.
+
+Next, let's create a formula string we want to tokenize.  Here, we are inserting a formula expression
+**SUM(A1:A10)** into cell A11::
+
     s = "SUM(A1:A10)";
-
-TBD
-
-::
 
     ixion::abs_address_t A11(0, 10, 0);
     ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
 
-TBD
+To tokenize a formula string, you call the :cpp:func:`ixion::parse_formula_string` function and pass
 
-::
+* a model_context instance
+* the position of the cell to insert the formula into,
+* a formula_name_resolver instance, and
+* the formula string to tokenize.
+
+The function will then return a sequence of tokens representing the original formula string.  Once you
+have the tokens, you can finally pass them to your model_context instance via
+:cpp:func:`~ixion::model_context::set_formula_cell`::
 
     // Set the tokens into the model.
     const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
