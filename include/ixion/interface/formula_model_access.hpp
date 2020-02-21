@@ -57,7 +57,7 @@ public:
      * Get a numeric representation of the cell value at specified position.
      * If the cell at the specified position is a formula cell and its result
      * has not yet been computed, it will block until the result becomes
-     * available.  Call this only during formula (re-)calculation.
+     * available.
      *
      * @param addr position of the cell.
      *
