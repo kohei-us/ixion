@@ -20,8 +20,7 @@ Primitive Types
 .. doxygentypedef:: ixion::rc_t
 .. doxygentypedef:: ixion::string_id_t
 .. doxygentypedef:: ixion::table_areas_t
-
-.. doxygenclass:: ixion::values_t
+.. doxygentypedef:: ixion::formula_tokens_t
 
 .. doxygenvariable:: ixion::empty_string_id
 .. doxygenvariable:: ixion::global_scope

@@ -107,7 +107,7 @@ syntax::
         ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
 
 You can also optionally pass a memory address of your :cpp:class:`~ixion::model_context` instance which is
-required for resolving sheet names.  You can pass a nullptr if you don't need to resolve sheet names.
+required for resolving sheet names.  You can pass a ``nullptr`` if you don't need to resolve sheet names.
 
 Next, let's create a formula string we want to tokenize.  Here, we are inserting a formula expression
 **SUM(A1:A10)** into cell A11::
@@ -131,14 +131,27 @@ have the tokens, you can finally pass them to your model_context instance via
     // Set the tokens into the model.
     const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
 
-TBD
+There is a few things to note. First, you need to *move* your tokens to the method since instances of
+type :cpp:type:`ixion::formula_tokens_t` are non-copyable and only movable.  Second, the method returns
+a pointer to the formula cell instance that just got inserted into the model. We are saving it here
+to use it in the next step below.
 
-::
+When inserting a formula cell, you need to "register" it so that the model can record its reference
+dependencies via :cpp:func:`~ixion::register_formula_cell`::
 
     // Register this formula cell for automatic dependency tracking.
     ixion::register_formula_cell(cxt, A11, cell);
 
-TBD
+Without registering formula cells, you won't be able to query formula cells to re-calculate
+given modified cells.  Here we are passing the pointer to the formula cell returned from the previous
+call.  This is optional, and you can pass a ``nullptr`` instead. But by passing it you will avoid the
+overhead of searching for the cell instance from the model.
+
+
+Calculate formula cell
+----------------------
+
+Now that we have the formula cell in, let's run our first calculation.
 
 ::
 
