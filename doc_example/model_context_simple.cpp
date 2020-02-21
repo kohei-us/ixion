@@ -65,6 +65,7 @@ int main(int argc, char** argv)
     // There should be only one formula cell in this example.
     std::vector<ixion::abs_range_t> dirty_cells = ixion::query_and_sort_dirty_cells(cxt, modified_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
+    cout << "dirty cell: " << dirty_cells[0] << endl;
 
     // Now perform calculation.
     ixion::calculate_sorted_cells(cxt, dirty_cells, 0);

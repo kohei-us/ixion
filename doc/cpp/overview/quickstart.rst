@@ -151,32 +151,57 @@ overhead of searching for the cell instance from the model.
 Calculate formula cell
 ----------------------
 
-Now that we have the formula cell in, let's run our first calculation.
-
-::
+Now that we have the formula cell in, let's run our first calculation.  To calcualte formula cells, you
+need to first specify a range of modified cells in order to query for all formula cells affected by it
+either directly or indirectly, which we refer to as "dirty" formula cells.  Since this is our initial
+calculation, we can simply specify the entire sheet to be "modified" which will effectively trigger all
+formula cells::
 
     ixion::rc_size_t sheet_size = cxt.get_sheet_size();
     ixion::abs_range_t entire_sheet(0, 0, 0, sheet_size.row, sheet_size.column); // sheet, row, column, row span, column span
     ixion::abs_range_set_t modified_cells{entire_sheet};
 
-TBD
-
-::
+We will then pass it to :cpp:func:`~ixion::query_and_sort_dirty_cells` to get a sequence of formula cell
+addresses to calculate::
 
     // Determine formula cells that need re-calculation given the modified cells.
     // There should be only one formula cell in this example.
     std::vector<ixion::abs_range_t> dirty_cells = ixion::query_and_sort_dirty_cells(cxt, modified_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
 
-TBD
+Since so far we only have one formula cell, this should only return one range with the size of one row and one column.  You
+will see the following output:
 
-::
+.. code-block:: text
+
+    number of dirty cells: 1
+
+Let's inspect which cell it actually refers to::
+
+    cout << "dirty cell: " << dirty_cells[0] << endl;
+
+which will print:
+
+.. code-block:: text
+
+    dirty cell: (sheet:0; row:10; column:0)-(sheet:0; row:10; column:0)
+
+confirming that it certainly points to cell A11.  Finally, pass this to :cpp:func:`~ixion::calculate_sorted_cells`::
 
     // Now perform calculation.
     ixion::calculate_sorted_cells(cxt, dirty_cells, 0);
 
+to calculate cell A11.  After that, you can retrieve the result of the calculation by calling
+:cpp:func:`~ixion::model_context::get_numeric_value` for A11::
+
     double value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
+
+You will see the following output:
+
+.. code-block:: text
+
+    value of A11: 55
 
 
 Modify formula cell
