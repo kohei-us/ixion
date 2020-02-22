@@ -261,3 +261,5 @@ You should see the following output when finished:
 
     value of A11: 5.5
 
+The complete source code of this example is avaiable `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/model_context_simple.cpp>`_.
+
