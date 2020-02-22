@@ -207,23 +207,32 @@ You will see the following output:
 Modify formula cell
 -------------------
 
-TBD
+Let's say you need to overwrite the formula in A11 to something else.  The steps you need to take
+are very similar to the steps for inserting a brand-new formula cell, the only difference being
+that you need to "unregister" the old formula cell before overwriting it.
 
-::
+Let's go through this step by step.  First, create new tokens to insert::
 
     s = "AVERAGE(A1:A10)";
     tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
 
+This time we are inserting the formula **AVERAGE(A1:A10)** in A11 to overwrite the previous one
+**SUM(A1:A10)**.  Before inserting these tokens, first unregister the current formula cell::
+
     // Before overwriting, make sure to UN-register the old cell.
     ixion::unregister_formula_cell(cxt, A11);
+
+This will remove the dependency information of the old formula from the model's internal tracker.
+Once that's done, the rest is the same as inserting a new formula::
 
     // Set and register the new formula cell.
     cell = cxt.set_formula_cell(A11, std::move(tokens));
     ixion::register_formula_cell(cxt, A11, cell);
 
-TBD
-
-::
+Let's re-calculate the new formula cell.  The re-calculation steps are also very similar to the initial
+calculation steps.  The first step is to query for all dirty formula cells.  This time, however, we don't
+query based on which formula cells are affected by modified cells, which we'll specify as none.  Instead,
+we query based on which formula cells have been modified, which in this case is A11::
 
     // This time, we know that none of the cell values have changed, but the
     // formula A11 is updated & needs recalculation.
@@ -231,11 +240,24 @@ TBD
     dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
 
+As is the first calculation, you should only get one dirty cell address from the :cpp:func:`~ixion::query_and_sort_dirty_cells`
+call.  Running the above code should produce:
+
+.. code-block:: text
+
+    number of dirty cells: 1
+
+The rest should be familiar::
+
     // Perform calculation again.
     ixion::calculate_sorted_cells(cxt, dirty_cells, 0);
 
     value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
 
-TBD
+You should see the following output when finished:
+
+.. code-block:: text
+
+    value of A11: 5.5
 
