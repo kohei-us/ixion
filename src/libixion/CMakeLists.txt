@@ -47,6 +47,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/inl)
 
 target_compile_definitions(libixion-${IXION_API_VERSION} PRIVATE IXION_BUILD DLL_EXPORT)
 
+if(MSVC)
+    target_compile_definitions(libixion-${IXION_API_VERSION} PRIVATE _USE_MATH_DEFINES)
+endif()
+
 install(TARGETS libixion-${IXION_API_VERSION}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

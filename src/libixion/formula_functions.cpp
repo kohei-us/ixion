@@ -25,6 +25,7 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 #include <spdlog/spdlog.h>
 #include <mdds/sorted_string_map.hpp>
