@@ -28,9 +28,8 @@ opcode_token::~opcode_token()
 
 void opcode_token::write_string(std::ostream& os) const
 {
-    os << "opcode token: '";
-    os << get_formula_opcode_string(get_opcode());
-    os << "'";
+    os << "opcode token: (name=" << get_opcode_name(get_opcode()) << "; s='"
+        << get_formula_opcode_string(get_opcode()) << "')";
 }
 
 // ============================================================================
