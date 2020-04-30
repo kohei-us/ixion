@@ -60,14 +60,17 @@ private:
 
 class IXION_DLLPUBLIC formula_error : public std::exception
 {
+    struct impl;
+    std::unique_ptr<impl> mp_impl;
 public:
     explicit formula_error(formula_error_t fe);
-    ~formula_error() throw();
+    explicit formula_error(formula_error_t fe, std::string msg);
+    formula_error(formula_error&& other);
+
+    virtual ~formula_error() throw();
     virtual const char* what() const throw();
 
     formula_error_t get_error() const;
-private:
-    formula_error_t m_ferror;
 };
 
 template<typename _T>

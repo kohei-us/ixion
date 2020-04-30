@@ -140,9 +140,28 @@ bool global::to_bool(const char* p, size_t n)
 
 // ============================================================================
 
-formula_error::formula_error(formula_error_t fe) :
-    m_ferror(fe)
+struct formula_error::impl
 {
+    formula_error_t error;
+    std::string msg;
+
+    impl(formula_error_t _error) :
+        error(_error) {}
+
+    impl(formula_error_t _error, std::string _msg) :
+        error(_error), msg(std::move(_msg)) {}
+};
+
+formula_error::formula_error(formula_error_t fe) :
+    mp_impl(ixion::make_unique<impl>(fe)) {}
+
+formula_error::formula_error(formula_error_t fe, std::string msg) :
+    mp_impl(ixion::make_unique<impl>(fe, std::move(msg))) {}
+
+formula_error::formula_error(formula_error&& other) :
+    mp_impl(std::move(other.mp_impl))
+{
+    other.mp_impl = ixion::make_unique<impl>(formula_error_t::no_error);
 }
 
 formula_error::~formula_error() throw()
@@ -151,12 +170,12 @@ formula_error::~formula_error() throw()
 
 const char* formula_error::what() const throw()
 {
-    return get_formula_error_name(m_ferror);
+    return get_formula_error_name(mp_impl->error);
 }
 
 formula_error_t formula_error::get_error() const
 {
-    return m_ferror;
+    return mp_impl->error;
 }
 
 }
