@@ -163,7 +163,15 @@ struct formula_cell::impl
                 }
             }
             default:
-                throw formula_error(formula_error_t::invalid_value_type);
+            {
+                std::ostringstream os;
+                os << "numeric result was requested, but the actual result is of "
+                    << m_calc_status->result->get_type() << " type.";
+                throw formula_error(
+                    formula_error_t::invalid_value_type,
+                    os.str()
+                );
+            }
         }
     }
 

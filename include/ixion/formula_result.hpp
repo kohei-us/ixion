@@ -12,6 +12,7 @@
 
 #include <string>
 #include <memory>
+#include <iosfwd>
 
 namespace ixion {
 
@@ -112,6 +113,8 @@ public:
     bool operator== (const formula_result& r) const;
     bool operator!= (const formula_result& r) const;
 };
+
+IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, formula_result::result_type v);
 
 }
 

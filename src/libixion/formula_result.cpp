@@ -15,6 +15,7 @@
 #include <cassert>
 #include <sstream>
 #include <iomanip>
+#include <ostream>
 
 #define DEBUG_FORMULA_RESULT 0
 
@@ -527,5 +528,30 @@ bool formula_result::operator!= (const formula_result& r) const
     return !operator== (r);
 }
 
+std::ostream& operator<< (std::ostream& os, formula_result::result_type v)
+{
+
+    switch (v)
+    {
+        case formula_result::result_type::error:
+            os << "error";
+            break;
+        case formula_result::result_type::matrix:
+            os << "matrix";
+            break;
+        case formula_result::result_type::string:
+            os << "string";
+            break;
+        case formula_result::result_type::value:
+            os << "value";
+            break;
+        default:
+            ;
+    }
+
+    return os;
 }
+
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

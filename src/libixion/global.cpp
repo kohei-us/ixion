@@ -144,6 +144,7 @@ struct formula_error::impl
 {
     formula_error_t error;
     std::string msg;
+    std::string buffer;
 
     impl(formula_error_t _error) :
         error(_error) {}
@@ -170,7 +171,14 @@ formula_error::~formula_error() throw()
 
 const char* formula_error::what() const throw()
 {
-    return get_formula_error_name(mp_impl->error);
+    const char* error_name = get_formula_error_name(mp_impl->error);
+    if (mp_impl->msg.empty())
+        return error_name;
+
+    std::ostringstream os;
+    os << mp_impl->msg << " (type: " << error_name << ")";
+    mp_impl->buffer = os.str();
+    return mp_impl->buffer.data();
 }
 
 formula_error_t formula_error::get_error() const
