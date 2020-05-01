@@ -158,6 +158,8 @@ public:
 
     const worksheet* fetch_sheet(sheet_t sheet_index) const;
 
+    column_store_t::const_position_type get_cell_position(const abs_address_t& addr) const;
+
     const detail::named_expressions_t& get_named_expressions() const;
     const detail::named_expressions_t& get_named_expressions(sheet_t sheet) const;
 

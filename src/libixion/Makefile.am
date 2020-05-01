@@ -27,6 +27,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	calc_status.hpp \
 	calc_status.cpp \
 	cell.cpp \
+	cell_access.cpp \
 	compute_engine.cpp \
 	concrete_formula_tokens.hpp \
 	concrete_formula_tokens.cpp \
@@ -69,6 +70,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	queue_entry.cpp \
 	table.cpp \
 	types.cpp \
+	utils.hpp \
+	utils.cpp \
 	workbook.hpp \
 	workbook.cpp \
 	interface.cpp

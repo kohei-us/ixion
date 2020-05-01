@@ -4,6 +4,7 @@ add_library(libixion-${IXION_API_VERSION} SHARED
     address_iterator.cpp
     calc_status.cpp
     cell.cpp
+    cell_access.cpp
     cell_queue_manager.cpp
     compute_engine.cpp
     compute_engine_cuda.cpp
@@ -38,6 +39,7 @@ add_library(libixion-${IXION_API_VERSION} SHARED
     queue_entry.cpp
     table.cpp
     types.cpp
+    utils.cpp
     workbook.cpp
 )
 

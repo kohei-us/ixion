@@ -227,6 +227,7 @@
                 <F N="../include/ixion/address.hpp"/>
                 <F N="../include/ixion/address_iterator.hpp"/>
                 <F N="../include/ixion/cell.hpp"/>
+                <F N="../include/ixion/cell_access.hpp"/>
                 <F N="../include/ixion/column_store_type.hpp"/>
                 <F N="../include/ixion/compute_engine.hpp"/>
                 <F N="../include/ixion/config.hpp"/>
@@ -266,6 +267,7 @@
                 <F N="../src/libixion/calc_status.cpp"/>
                 <F N="../src/libixion/calc_status.hpp"/>
                 <F N="../src/libixion/cell.cpp"/>
+                <F N="../src/libixion/cell_access.cpp"/>
                 <F N="../src/libixion/cell_queue_manager.cpp"/>
                 <F N="../src/libixion/cell_queue_manager.hpp"/>
                 <F N="../src/libixion/compute_engine.cpp"/>
@@ -321,6 +323,8 @@
                 <F N="../src/libixion/queue_entry.hpp"/>
                 <F N="../src/libixion/table.cpp"/>
                 <F N="../src/libixion/types.cpp"/>
+                <F N="../src/libixion/utils.cpp"/>
+                <F N="../src/libixion/utils.hpp"/>
                 <F N="../src/libixion/workbook.cpp"/>
                 <F N="../src/libixion/workbook.hpp"/>
             </Folder>

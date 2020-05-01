@@ -11,6 +11,7 @@
 #include "ixion/model_iterator.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/named_expressions_iterator.hpp"
+#include "ixion/cell_access.hpp"
 
 #include "model_context_impl.hpp"
 
@@ -109,6 +110,11 @@ void model_context::set_boolean_cell(const abs_address_t& addr, bool val)
 void model_context::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     mp_impl->set_string_cell(addr, p, n);
+}
+
+cell_access model_context::get_cell_access(const abs_address_t& addr) const
+{
+    return cell_access(*this, addr);
 }
 
 void model_context::fill_down_cells(const abs_address_t& src, size_t n_dst)

@@ -24,6 +24,7 @@ struct config;
 class matrix;
 class model_iterator;
 class named_expressions_iterator;
+class cell_access;
 
 namespace detail {
 
@@ -41,6 +42,7 @@ class model_context_impl;
 class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 {
     friend class named_expressions_iterator;
+    friend class cell_access;
 
     std::unique_ptr<detail::model_context_impl> mp_impl;
 
@@ -134,6 +136,8 @@ public:
     void set_boolean_cell(const abs_address_t& adr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
+
+    cell_access get_cell_access(const abs_address_t& addr) const;
 
     /**
      * Duplicate the value of the source cell to one or more cells located

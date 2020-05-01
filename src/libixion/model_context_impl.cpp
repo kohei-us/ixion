@@ -6,6 +6,7 @@
  */
 
 #include "model_context_impl.hpp"
+#include "utils.hpp"
 #include "ixion/address.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/formula_result.hpp"
@@ -502,6 +503,12 @@ const worksheet* model_context_impl::fetch_sheet(sheet_t sheet_index) const
     return &m_sheets[sheet_index];
 }
 
+column_store_t::const_position_type model_context_impl::get_cell_position(const abs_address_t& addr) const
+{
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    return col_store.position(addr.row);
+}
+
 const detail::named_expressions_t& model_context_impl::get_named_expressions() const
 {
     return m_named_expressions;
@@ -788,27 +795,8 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
     mdds::mtv::element_t gmcell_type =
         m_sheets.at(addr.sheet).at(addr.column).get_type(addr.row);
-    switch (gmcell_type)
-    {
-        case element_type_empty:
-            return celltype_t::empty;
-        case element_type_numeric:
-            return celltype_t::numeric;
-        case element_type_boolean:
-            return celltype_t::boolean;
-        case element_type_string:
-            return celltype_t::string;
-        case element_type_formula:
-            return celltype_t::formula;
-        default:
-        {
-            std::ostringstream os;
-            os << "ixion::model_context_impl::get_celltype: unknown cell type (" << gmcell_type << ")";
-            throw general_error(os.str());
-        }
-    }
 
-    return celltype_t::unknown;
+    return detail::to_celltype(gmcell_type);
 }
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
