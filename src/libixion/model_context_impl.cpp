@@ -814,18 +814,23 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    switch (col_store.get_type(addr.row))
+    auto pos = col_store.position(addr.row);
+
+    switch (pos.first->type)
     {
         case element_type_numeric:
-            return col_store.get<double>(addr.row);
+            return numeric_element_block::at(*pos.first->data, pos.second);
         case element_type_boolean:
-            return col_store.get<bool>(addr.row);
+        {
+            auto it = boolean_element_block::cbegin(*pos.first->data);
+            std::advance(it, pos.second);
+            return *it ? 1.0 : 0.0;
+        }
         case element_type_formula:
         {
-            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
+            const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
             return p->get_value();
         }
-        break;
         default:
             ;
     }
@@ -835,18 +840,23 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    switch (col_store.get_type(addr.row))
+    auto pos = col_store.position(addr.row);
+
+    switch (pos.first->type)
     {
         case element_type_numeric:
-            return col_store.get<double>(addr.row);
+            return numeric_element_block::at(*pos.first->data, pos.second);
         case element_type_boolean:
-            return col_store.get<bool>(addr.row);
+        {
+            auto it = boolean_element_block::cbegin(*pos.first->data);
+            std::advance(it, pos.second);
+            return *it ? 1.0 : 0.0;
+        }
         case element_type_formula:
         {
-            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
+            const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
             return p->get_value_nowait();
         }
-        break;
         default:
             ;
     }
@@ -856,18 +866,23 @@ double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) c
 bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    switch (col_store.get_type(addr.row))
+    auto pos = col_store.position(addr.row);
+
+    switch (pos.first->type)
     {
         case element_type_numeric:
-            return col_store.get<double>(addr.row) != 0.0 ? true : false;
+            return numeric_element_block::at(*pos.first->data, pos.second) != 0.0 ? true : false;
         case element_type_boolean:
-            return col_store.get<bool>(addr.row);
+        {
+            auto it = boolean_element_block::cbegin(*pos.first->data);
+            std::advance(it, pos.second);
+            return *it;
+        }
         case element_type_formula:
         {
-            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
+            const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
             return p->get_value() != 0.0 ? true : false;
         }
-        break;
         default:
             ;
     }
@@ -877,10 +892,12 @@ bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    switch (col_store.get_type(addr.row))
+    auto pos = col_store.position(addr.row);
+
+    switch (pos.first->type)
     {
         case element_type_string:
-            return col_store.get<string_id_t>(addr.row);
+            return string_element_block::at(*pos.first->data, pos.second);
         default:
             ;
     }
@@ -955,19 +972,23 @@ string_id_t model_context_impl::get_identifier_from_string(const char* p, size_t
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != element_type_formula)
+    auto pos = col_store.position(addr.row);
+
+    if (pos.first->type != element_type_formula)
         return nullptr;
 
-    return col_store.get<formula_cell*>(addr.row);
+    return formula_element_block::at(*pos.first->data, pos.second);
 }
 
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
     column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    if (col_store.get_type(addr.row) != element_type_formula)
+    auto pos = col_store.position(addr.row);
+
+    if (pos.first->type != element_type_formula)
         return nullptr;
 
-    return col_store.get<formula_cell*>(addr.row);
+    return formula_element_block::at(*pos.first->data, pos.second);
 }
 
 }}
