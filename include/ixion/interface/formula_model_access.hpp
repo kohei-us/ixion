@@ -66,6 +66,19 @@ public:
     virtual double get_numeric_value(const abs_address_t& addr) const = 0;
     virtual bool get_boolean_value(const abs_address_t& addr) const = 0;
     virtual string_id_t get_string_identifier(const abs_address_t& addr) const = 0;
+
+    /**
+     * Get a string value associated with the cell at the specified position.
+     * It returns a valid string value only when the cell is a string cell, or
+     * is a formula cell containing a string result.  Otherwise, it returns a
+     * nullptr.
+     *
+     * @param addr position of the cell.
+     *
+     * @return pointer to a string value if the cell stores a valid string
+     *         value, else nullptr.
+     */
+    virtual const std::string* get_string_value(const abs_address_t& addr) const = 0;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 

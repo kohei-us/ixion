@@ -198,6 +198,11 @@ string_id_t model_context::get_string_identifier(const abs_address_t& addr) cons
     return mp_impl->get_string_identifier(addr);
 }
 
+const std::string* model_context::get_string_value(const abs_address_t& addr) const
+{
+    return mp_impl->get_string_value(addr);
+}
+
 string_id_t model_context::get_string_identifier_nowait(const abs_address_t& addr) const
 {
     return mp_impl->get_string_identifier_nowait(addr);

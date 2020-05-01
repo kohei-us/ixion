@@ -1499,6 +1499,41 @@ void test_model_context_storage()
     }
 }
 
+void test_model_context_direct_string_access()
+{
+    cout << "test model context direct string access" << endl;
+
+    model_context cxt{{400, 20}};
+    cxt.append_sheet("test");
+
+    // regular string cell
+    abs_address_t B2(0, 1, 1);
+    cxt.set_string_cell(B2, IXION_ASCII("string cell"));
+    const std::string* p = cxt.get_string_value(B2);
+    assert(p);
+    assert(*p == "string cell");
+
+    // formula cell containing a string result.
+    abs_address_t C4(0, 3, 2);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    assert(resolver);
+
+    // Insert a formula containing one literal string token.
+    formula_tokens_t tokens = parse_formula_string(
+        cxt, C4, *resolver, IXION_ASCII("\"string value in formula\""));
+    assert(tokens.size() == 1);
+    cxt.set_formula_cell(C4, std::move(tokens));
+    // no need to register formula cell since it does not reference other cells.
+
+    abs_range_set_t formula_cells{C4};
+    auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &formula_cells);
+    calculate_sorted_cells(cxt, sorted, 1);
+
+    p = cxt.get_string_value(C4);
+    assert(p);
+    assert(*p == "string value in formula");
+}
+
 void test_model_context_named_expression()
 {
     model_context cxt{{400, 20}};
@@ -2233,6 +2268,7 @@ int main()
     test_parse_and_print_expressions();
     test_function_name_resolution();
     test_model_context_storage();
+    test_model_context_direct_string_access();
     test_model_context_named_expression();
     test_model_context_iterator_horizontal();
     test_model_context_iterator_horizontal_range();

@@ -887,6 +887,33 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
     return empty_string_id;
 }
 
+const std::string* model_context_impl::get_string_value(const abs_address_t& addr) const
+{
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    auto pos = col_store.position(addr.row);
+
+    switch (pos.first->type)
+    {
+        case element_type_string:
+        {
+            string_id_t sid = string_element_block::at(*pos.first->data, pos.second);
+            return m_str_pool.get_string(sid);
+        }
+        case element_type_formula:
+        {
+            const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
+            assert(p);
+            formula_result res = p->get_result_cache();
+            string_id_t sid = res.get_string();
+            return m_str_pool.get_string(sid);
+        }
+        default:
+            ;
+    }
+
+    return nullptr;
+}
+
 string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
