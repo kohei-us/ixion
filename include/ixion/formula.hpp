@@ -138,12 +138,17 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
  *
  * @param cxt model context.
  * @param modified_cells a collection of non-formula cells whose values have
- *                       been updated.
+ *                       been updated.  You can specify one or more ranges
+ *                       of cells rather than individual cell positions.
  * @param dirty_formula_cells (optional) a collection of formula cells that
  *                            are already known to be dirty.  These formula
  *                            cells will be added to the list of the
  *                            affected formula cells returned from this
- *                            function.
+ *                            function.  Note that even though this
+ *                            parameter is a set of cell ranges, regular
+ *                            formula cell positions must be given as single
+ *                            cell addresses.  Only the positions of grouped
+ *                            formula cells must be given as ranges.
  *
  * @return an sequence containing the positions of the formula cells that
  *         track at least one of the modified cells, as well as those
