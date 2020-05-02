@@ -165,6 +165,9 @@ IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
  * @param cxt model context.
  * @param formula_cells formula cells to be calculated.  The cells will be
  *                      calculated in the order they appear in the sequence.
+ *                      In a typical use case, this will be the returned
+ *                      value from {@link
+ *                      ixion::query_and_sort_dirty_cells}.
  * @param thread_count number of calculation threads to use.  Note that
  *                     passing 0 will make the process use the main thread
  *                     only, while passing any number greater than 0 will
