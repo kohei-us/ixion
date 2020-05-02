@@ -62,12 +62,27 @@ IXION_DLLPUBLIC bool is_valid_sheet(sheet_t sheet);
 /** Global string ID representing an empty string. */
 IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 
-enum class celltype_t
+enum class celltype_t : uint8_t
 {
     unknown = 0,
     string,
     numeric,
     formula,
+    boolean,
+    empty
+};
+
+/**
+ * Similar to {@link celltype_t}, except that it does not include a formula
+ * type, as it infers its type from the formula result. The error type
+ * refers to an error value in formula cell.
+ */
+enum class cell_value_t : uint8_t
+{
+    unknown = 0,
+    string,
+    numeric,
+    error,
     boolean,
     empty
 };

@@ -1381,6 +1381,11 @@ void test_model_context_storage()
 
         cxt.append_sheet(IXION_ASCII("test"));
 
+        // Test empty cell access.
+        cell_access ca = cxt.get_cell_access(abs_address_t(0, 0, 0));
+        assert(ca.get_type() == celltype_t::empty);
+        assert(ca.get_value_type() == cell_value_t::empty);
+
         // Test storage of numeric values.
         volatile double val = 0.1;
         for (col_t col = 0; col < 3; ++col)
@@ -1391,6 +1396,13 @@ void test_model_context_storage()
                 cxt.set_numeric_cell(pos, val);
                 double test = cxt.get_numeric_value(pos);
                 assert(test == val);
+
+                ca = cxt.get_cell_access(pos);
+                assert(ca.get_type() == celltype_t::numeric);
+                assert(ca.get_value_type() == cell_value_t::numeric);
+                test = ca.get_numeric_value();
+                assert(test == val);
+
                 val += 0.2;
             }
         }
@@ -1406,6 +1418,12 @@ void test_model_context_storage()
         formula_cell* p = cxt.get_formula_cell(pos);
         assert(p);
         assert(p_inserted == p);
+        p->interpret(cxt, pos);
+
+        ca = cxt.get_cell_access(pos);
+        assert(ca.get_type() == celltype_t::formula);
+        assert(ca.get_value_type() == cell_value_t::numeric);
+        assert(ca.get_numeric_value() == 6.0);
     }
 
     {
@@ -1515,6 +1533,8 @@ void test_model_context_direct_string_access()
     assert(*p == "string cell");
 
     cell_access ca = cxt.get_cell_access(B2);
+    assert(ca.get_type() == celltype_t::string);
+    assert(ca.get_value_type() == cell_value_t::string);
     p = ca.get_string_value();
     assert(p);
     assert(*p == "string cell");
@@ -1540,6 +1560,8 @@ void test_model_context_direct_string_access()
     assert(*p == "string value in formula");
 
     ca = cxt.get_cell_access(C4);
+    assert(ca.get_type() == celltype_t::formula);
+    assert(ca.get_value_type() == cell_value_t::string);
     p = ca.get_string_value();
     assert(p);
     assert(*p == "string value in formula");
@@ -2154,6 +2176,28 @@ void test_model_context_fill_down()
     assert(cxt.get_numeric_value(abs_address_t(0, 4, 3)) == 1.1);
 }
 
+void test_model_context_error_value()
+{
+    cout << "test model context error value" << endl;
+
+    model_context cxt{{100, 10}};
+    cxt.append_sheet(IXION_ASCII("test"));
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    abs_address_t pos(0,3,0);
+    const char* exp = "10/0";
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp, strlen(exp));
+    formula_cell* fc = cxt.set_formula_cell(pos, std::move(tokens));
+    fc->interpret(cxt, pos);
+
+    cell_access ca = cxt.get_cell_access(pos);
+    assert(ca.get_type() == celltype_t::formula);
+    assert(ca.get_value_type() == cell_value_t::error);
+    assert(ca.get_error_value() == formula_error_t::division_by_zero);
+}
+
 void test_volatile_function()
 {
     cout << "test volatile function" << endl;
@@ -2287,6 +2331,7 @@ int main()
     test_model_context_iterator_vertical_range();
     test_model_context_iterator_named_exps();
     test_model_context_fill_down();
+    test_model_context_error_value();
     test_volatile_function();
     test_invalid_formula_tokens();
 

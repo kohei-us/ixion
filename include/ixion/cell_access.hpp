@@ -33,6 +33,8 @@ public:
 
     celltype_t get_type() const;
 
+    cell_value_t get_value_type() const;
+
     const formula_cell* get_formula_cell() const;
 
     double get_numeric_value() const;
@@ -42,6 +44,8 @@ public:
     const std::string* get_string_value() const;
 
     string_id_t get_string_identifier() const;
+
+    formula_error_t get_error_value() const;
 };
 
 }

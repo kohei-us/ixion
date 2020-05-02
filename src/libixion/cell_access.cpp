@@ -49,6 +49,32 @@ celltype_t cell_access::get_type() const
     return detail::to_celltype(mp_impl->pos.first->type);
 }
 
+cell_value_t cell_access::get_value_type() const
+{
+    celltype_t raw_type = get_type();
+
+    if (raw_type != celltype_t::formula)
+        // celltype_t and cell_result_t are numerically equivalent except for the formula slot.
+        return static_cast<cell_value_t>(raw_type);
+
+    const formula_cell* fc = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+    formula_result res = fc->get_result_cache(); // by calling this we should not get a matrix result.
+
+    switch (res.get_type())
+    {
+        case formula_result::result_type::value:
+            return cell_value_t::numeric;
+        case formula_result::result_type::string:
+            return cell_value_t::string;
+        case formula_result::result_type::error:
+            return cell_value_t::error;
+        case formula_result::result_type::matrix:
+            throw std::logic_error("we shouldn't be getting a matrix result type here.");
+    }
+
+    return cell_value_t::unknown;
+}
+
 const formula_cell* cell_access::get_formula_cell() const
 {
     if (mp_impl->pos.first->type != element_type_formula)
@@ -137,6 +163,21 @@ string_id_t cell_access::get_string_identifier() const
             ;
     }
     return empty_string_id;
+}
+
+formula_error_t cell_access::get_error_value() const
+{
+    if (mp_impl->pos.first->type != element_type_formula)
+        // this is not a formula cell.
+        return formula_error_t::no_error;
+
+    const formula_cell* fc = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+    formula_result res = fc->get_result_cache();
+    if (res.get_type() != formula_result::result_type::error)
+        // this formula cell doesn't have an error result.
+        return formula_error_t::no_error;
+
+    return res.get_error();
 }
 
 }
