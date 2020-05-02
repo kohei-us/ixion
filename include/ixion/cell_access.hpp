@@ -11,6 +11,7 @@
 #include "ixion/types.hpp"
 
 #include <memory>
+#include <string>
 
 namespace ixion {
 
