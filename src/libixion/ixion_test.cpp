@@ -16,6 +16,7 @@
 #include "ixion/interface/table_handler.hpp"
 #include "ixion/config.hpp"
 #include "ixion/matrix.hpp"
+#include "ixion/cell_access.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -1513,6 +1514,11 @@ void test_model_context_direct_string_access()
     assert(p);
     assert(*p == "string cell");
 
+    cell_access ca = cxt.get_cell_access(B2);
+    p = ca.get_string_value();
+    assert(p);
+    assert(*p == "string cell");
+
     // formula cell containing a string result.
     abs_address_t C4(0, 3, 2);
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
@@ -1530,6 +1536,11 @@ void test_model_context_direct_string_access()
     calculate_sorted_cells(cxt, sorted, 1);
 
     p = cxt.get_string_value(C4);
+    assert(p);
+    assert(*p == "string value in formula");
+
+    ca = cxt.get_cell_access(C4);
+    p = ca.get_string_value();
     assert(p);
     assert(*p == "string value in formula");
 }
