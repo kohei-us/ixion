@@ -19,6 +19,14 @@ class model_context;
 class formula_cell;
 struct abs_address_t;
 
+/**
+ * This class provides a read-only access to a single cell.  It's more
+ * efficient to use this class if you need to make multiple successive
+ * queries to the same cell.
+ *
+ * Note that an instance of this class will get invalidated when the content
+ * of {@link ixion::model_context} is modified.
+ */
 class IXION_DLLPUBLIC cell_access
 {
     friend class model_context;

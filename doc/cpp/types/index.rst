@@ -9,6 +9,7 @@ Primitive Types
 ===============
 
 .. doxygenenum:: ixion::celltype_t
+.. doxygenenum:: ixion::cell_value_t
 .. doxygenenum:: ixion::value_t
 .. doxygenenum:: ixion::table_area_t
 .. doxygenenum:: ixion::formula_name_resolver_t
