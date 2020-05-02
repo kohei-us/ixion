@@ -8,6 +8,7 @@
 #include "ixion/cell_access.hpp"
 #include "ixion/global.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/formula_result.hpp"
 
 #include "model_context_impl.hpp"
 #include "workbook.hpp"
@@ -17,12 +18,13 @@ namespace ixion {
 
 struct cell_access::impl
 {
+    const model_context& cxt;
     column_store_t::const_position_type pos;
-    impl() {}
+    impl(const model_context& _cxt) : cxt(_cxt) {}
 };
 
 cell_access::cell_access(const model_context& cxt, const abs_address_t& addr) :
-    mp_impl(ixion::make_unique<impl>())
+    mp_impl(ixion::make_unique<impl>(cxt))
 {
     mp_impl->pos = cxt.mp_impl->get_cell_position(addr);
 }
@@ -30,13 +32,13 @@ cell_access::cell_access(const model_context& cxt, const abs_address_t& addr) :
 cell_access::cell_access(cell_access&& other) :
     mp_impl(std::move(other.mp_impl))
 {
-    other.mp_impl = ixion::make_unique<impl>();
+    other.mp_impl = ixion::make_unique<impl>(mp_impl->cxt);
 }
 
 cell_access& cell_access::operator= (cell_access&& other)
 {
     mp_impl = std::move(other.mp_impl);
-    other.mp_impl = ixion::make_unique<impl>();
+    other.mp_impl = ixion::make_unique<impl>(mp_impl->cxt);
     return *this;
 }
 
@@ -99,6 +101,30 @@ bool cell_access::get_boolean_value() const
             ;
     }
     return false;
+}
+
+const std::string* cell_access::get_string_value() const
+{
+    switch (mp_impl->pos.first->type)
+    {
+        case element_type_string:
+        {
+            string_id_t sid = string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+            return mp_impl->cxt.get_string(sid);
+        }
+        case element_type_formula:
+        {
+            const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+            assert(p);
+            formula_result res = p->get_result_cache();
+            string_id_t sid = res.get_string();
+            return mp_impl->cxt.get_string(sid);
+        }
+        default:
+            ;
+    }
+
+    return nullptr;
 }
 
 string_id_t cell_access::get_string_identifier() const
