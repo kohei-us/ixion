@@ -15,6 +15,7 @@
 namespace ixion {
 
 class model_context;
+class formula_cell;
 struct abs_address_t;
 
 class IXION_DLLPUBLIC cell_access
@@ -31,6 +32,14 @@ public:
     ~cell_access();
 
     celltype_t get_type() const;
+
+    const formula_cell* get_formula_cell() const;
+
+    double get_numeric_value() const;
+
+    bool get_boolean_value() const;
+
+    string_id_t get_string_identifier() const;
 };
 
 }

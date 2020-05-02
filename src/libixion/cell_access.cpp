@@ -47,6 +47,72 @@ celltype_t cell_access::get_type() const
     return detail::to_celltype(mp_impl->pos.first->type);
 }
 
+const formula_cell* cell_access::get_formula_cell() const
+{
+    if (mp_impl->pos.first->type != element_type_formula)
+        return nullptr;
+
+    return formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+}
+
+double cell_access::get_numeric_value() const
+{
+    switch (mp_impl->pos.first->type)
+    {
+        case element_type_numeric:
+            return numeric_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+        case element_type_boolean:
+        {
+            auto it = boolean_element_block::cbegin(*mp_impl->pos.first->data);
+            std::advance(it, mp_impl->pos.second);
+            return *it ? 1.0 : 0.0;
+        }
+        case element_type_formula:
+        {
+            const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+            return p->get_value();
+        }
+        default:
+            ;
+    }
+    return 0.0;
+}
+
+bool cell_access::get_boolean_value() const
+{
+    switch (mp_impl->pos.first->type)
+    {
+        case element_type_numeric:
+            return numeric_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second) != 0.0 ? true : false;
+        case element_type_boolean:
+        {
+            auto it = boolean_element_block::cbegin(*mp_impl->pos.first->data);
+            std::advance(it, mp_impl->pos.second);
+            return *it;
+        }
+        case element_type_formula:
+        {
+            const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+            return p->get_value() != 0.0 ? true : false;
+        }
+        default:
+            ;
+    }
+    return false;
+}
+
+string_id_t cell_access::get_string_identifier() const
+{
+    switch (mp_impl->pos.first->type)
+    {
+        case element_type_string:
+            return string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+        default:
+            ;
+    }
+    return empty_string_id;
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

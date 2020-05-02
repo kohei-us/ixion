@@ -13,6 +13,7 @@
 #include "ixion/macros.hpp"
 #include "ixion/address_iterator.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
+#include "ixion/cell_access.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -1128,12 +1129,13 @@ void model_parser::check()
 
         const formula_name_t::address_type& _addr = name_type.address;
         abs_address_t addr(_addr.sheet, _addr.row, _addr.col);
+        cell_access ca = m_context.get_cell_access(addr);
 
-        switch (m_context.get_celltype(addr))
+        switch (ca.get_type())
         {
             case celltype_t::formula:
             {
-                const formula_cell* fcell = m_context.get_formula_cell(addr);
+                const formula_cell* fcell = ca.get_formula_cell();
                 formula_result res_cell = fcell->get_result_cache();
 
                 if (res_cell != res)
@@ -1146,7 +1148,7 @@ void model_parser::check()
             }
             case celltype_t::numeric:
             {
-                double actual_val = m_context.get_numeric_value(addr);
+                double actual_val = ca.get_numeric_value();
                 if (actual_val != res.get_value())
                 {
                     ostringstream os;
@@ -1157,7 +1159,7 @@ void model_parser::check()
             }
             case celltype_t::boolean:
             {
-                bool actual = m_context.get_boolean_value(addr);
+                bool actual = ca.get_boolean_value();
                 bool expected = res.get_value() ? true : false;
                 if (actual != expected)
                 {
@@ -1169,7 +1171,7 @@ void model_parser::check()
             }
             case celltype_t::string:
             {
-                string_id_t str_id = m_context.get_string_identifier(addr);
+                string_id_t str_id = ca.get_string_identifier();
 
                 if (str_id != res.get_string())
                 {
