@@ -96,5 +96,22 @@ int main(int argc, char** argv)
     value = cxt.get_numeric_value(A11);
     cout << "value of A11: " << value << endl;
 
+    // Overwrite A10 with a formula cell with no references.
+    s = "(100+50)/2";
+    ixion::abs_address_t A10(0, 9, 0);
+    tokens = ixion::parse_formula_string(cxt, A10, *resolver, s.data(), s.size());
+    cxt.set_formula_cell(A10, std::move(tokens));
+    // No need to register this cell since it does not reference any other cells.
+
+    modified_formula_cells = {A10};
+    dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
+    cout << "number of dirty cells: " << dirty_cells.size() << endl;
+
+    ixion::calculate_sorted_cells(cxt, dirty_cells, 0);
+    value = cxt.get_numeric_value(A10);
+    cout << "value of A10: " << value << endl;
+    value = cxt.get_numeric_value(A11);
+    cout << "value of A11: " << value << endl;
+
     return EXIT_SUCCESS;
 }

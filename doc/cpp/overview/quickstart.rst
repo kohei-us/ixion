@@ -261,5 +261,53 @@ You should see the following output when finished:
 
     value of A11: 5.5
 
+
+Formula cell with no references
+-------------------------------
+
+Next example shows a scenario where you want to overwrite a cell in A10, which
+currently stores a numeric value, with a formula cell that references no other
+cells.  Let's add the new formula cell first::
+
+    // Overwrite A10 with a formula cell with no references.
+    s = "(100+50)/2";
+    ixion::abs_address_t A10(0, 9, 0);
+    tokens = ixion::parse_formula_string(cxt, A10, *resolver, s.data(), s.size());
+    cxt.set_formula_cell(A10, std::move(tokens));
+
+Here, we are not registering this cell since it contains no references hence it
+does not need to be tracked by dependency tracker.  Also, since the previous
+cell in A10 is not a formula cell, there is no cell to unregister.
+
+Let's obtain all formula cells in need to re-calculation::
+
+    modified_formula_cells = {A10};
+    dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
+    cout << "number of dirty cells: " << dirty_cells.size() << endl;
+
+Here, we are only passing one modified formula cell which is A10, and no other
+cells being modified.  Since cell A11 references ``A1:A10`` and A10's value has
+changed, this should also trigger A11 for re-calculation.  Running this code
+should produce the following output:
+
+.. code-block:: text
+
+    number of dirty cells: 2
+
+Let's calculate all affected formula cells and check the results of A10 and A11::
+
+    ixion::calculate_sorted_cells(cxt, dirty_cells, 0);
+    value = cxt.get_numeric_value(A10);
+    cout << "value of A10: " << value << endl;
+    value = cxt.get_numeric_value(A11);
+    cout << "value of A11: " << value << endl;
+
+Running this code should produce the following output:
+
+.. code-block:: text
+
+    value of A10: 75
+    value of A11: 12
+
 The complete source code of this example is avaiable `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/model_context_simple.cpp>`_.
 
