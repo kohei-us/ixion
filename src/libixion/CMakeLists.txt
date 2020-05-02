@@ -1,5 +1,5 @@
 
-add_library(libixion-${IXION_API_VERSION} SHARED
+add_library(ixion-${IXION_API_VERSION} SHARED
     address.cpp
     address_iterator.cpp
     calc_status.cpp
@@ -47,13 +47,13 @@ configure_file(constants.inl.in ${CMAKE_CURRENT_BINARY_DIR}/inl/constants.inl)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/inl)
 
-target_compile_definitions(libixion-${IXION_API_VERSION} PRIVATE IXION_BUILD DLL_EXPORT)
+target_compile_definitions(ixion-${IXION_API_VERSION} PRIVATE IXION_BUILD DLL_EXPORT)
 
 if(MSVC)
-    target_compile_definitions(libixion-${IXION_API_VERSION} PRIVATE _USE_MATH_DEFINES)
+    target_compile_definitions(ixion-${IXION_API_VERSION} PRIVATE _USE_MATH_DEFINES)
 endif()
 
-install(TARGETS libixion-${IXION_API_VERSION}
+install(TARGETS ixion-${IXION_API_VERSION}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -77,10 +77,10 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
     compute_engine_test.cpp
 )
 
-target_link_libraries(ixion-test libixion-${IXION_API_VERSION})
-target_link_libraries(ixion-test-track-deps libixion-${IXION_API_VERSION})
-target_link_libraries(dirty-cell-tracker-test libixion-${IXION_API_VERSION})
-target_link_libraries(compute-engine-test libixion-${IXION_API_VERSION})
+target_link_libraries(ixion-test ixion-${IXION_API_VERSION})
+target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION})
+target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION})
+target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION})
 
 add_dependencies(check
     ixion-test
