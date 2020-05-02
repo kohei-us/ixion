@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_CELL_ACCESS_HPP
-#define INCLUDED_CELL_ACCESS_HPP
+#ifndef INCLUDED_IXION_CELL_ACCESS_HPP
+#define INCLUDED_IXION_CELL_ACCESS_HPP
 
 #include "ixion/types.hpp"
 
