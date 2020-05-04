@@ -35,6 +35,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	debug.hpp \
 	debug.cpp \
 	dirty_cell_tracker.cpp \
+	document.cpp \
 	exceptions.cpp \
 	formula.cpp \
 	formula_calc.cpp \

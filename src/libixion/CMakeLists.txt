@@ -12,6 +12,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     config.cpp
     debug.cpp
     dirty_cell_tracker.cpp
+    document.cpp
     exceptions.cpp
     formula.cpp
     formula_calc.cpp
