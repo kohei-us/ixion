@@ -14,6 +14,8 @@
 
 namespace ixion {
 
+struct abs_address_t;
+
 /**
  * Higher level document representation designed to handle both cell value
  * storage as well as formula cell calculations.
@@ -25,6 +27,29 @@ class IXION_DLLPUBLIC document
 public:
     document();
     ~document();
+
+    struct IXION_DLLPUBLIC cell_pos
+    {
+        enum class cp_type { string, address };
+        cp_type type;
+
+        union
+        {
+            struct { const char* str; size_t n; };
+            struct { sheet_t sheet; row_t row; col_t column; };
+
+        } value;
+
+        cell_pos(const char* p);
+        cell_pos(const char* p, size_t n);
+        cell_pos(const abs_address_t& addr);
+    };
+
+    void append_sheet(std::string name);
+
+    void set_numeric_cell(cell_pos pos, double val);
+
+    double get_numeric_value(cell_pos pos) const;
 };
 
 }

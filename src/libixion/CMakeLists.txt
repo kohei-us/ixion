@@ -62,6 +62,10 @@ install(TARGETS ixion-${IXION_API_VERSION}
 
 # test programs
 
+add_executable(document-test EXCLUDE_FROM_ALL
+    document_test.cpp
+)
+
 add_executable(ixion-test EXCLUDE_FROM_ALL
     ixion_test.cpp
 )
@@ -78,18 +82,21 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
     compute_engine_test.cpp
 )
 
+target_link_libraries(document-test ixion-${IXION_API_VERSION})
 target_link_libraries(ixion-test ixion-${IXION_API_VERSION})
 target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION})
 target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION})
 target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION})
 
 add_dependencies(check
+    document-test
     ixion-test
     ixion-test-track-deps
     dirty-cell-tracker-test
     compute-engine-test
 )
 
+add_test(document-test document-test)
 add_test(ixion-test ixion-test)
 add_test(ixion-test-track-deps ixion-test-track-deps)
 add_test(dirty-cell-tracker-test dirty-cell-tracker-test)

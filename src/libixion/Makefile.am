@@ -15,6 +15,7 @@ AM_CPPFLAGS += -DBUILD_CUDA
 endif # BUILD_CUDA
 
 check_PROGRAMS = \
+	document-test \
 	ixion-test \
 	ixion-test-track-deps \
 	compute-engine-test \
@@ -109,6 +110,10 @@ libixion_@IXION_API_VERSION@_la_LIBADD = \
 
 EXTRA_DIST = makefile.mk
 
+document_test_SOURCES = document_test.cpp
+document_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la
+
 ixion_test_SOURCES = ixion_test.cpp
 ixion_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
@@ -130,6 +135,7 @@ dirty_cell_tracker_test_LDADD = \
 AM_TESTS_ENVIRONMENT = IXION_MODULE_PATH=.libs; export IXION_MODULE_PATH;
 
 TESTS = \
+	document-test \
 	ixion-test \
 	ixion-test-track-deps \
 	compute-engine-test \
