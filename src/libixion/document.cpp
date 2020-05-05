@@ -101,6 +101,7 @@ struct document::impl
     void set_numeric_cell(cell_pos pos, double val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
+        unregister_formula_cell(cxt, addr);
         cxt.set_numeric_cell(addr, val);
         modified_cells.insert(addr);
     }
@@ -108,6 +109,7 @@ struct document::impl
     void set_string_cell(cell_pos pos, const char* p, size_t n)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
+        unregister_formula_cell(cxt, addr);
         cxt.set_string_cell(addr, p, n);
         modified_cells.insert(addr);
     }
@@ -115,6 +117,7 @@ struct document::impl
     void set_string_cell(cell_pos pos, const std::string& s)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
+        unregister_formula_cell(cxt, addr);
         cxt.set_string_cell(addr, s.data(), s.size());
         modified_cells.insert(addr);
     }
@@ -122,6 +125,7 @@ struct document::impl
     void set_boolean_cell(cell_pos pos, bool val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
+        unregister_formula_cell(cxt, addr);
         cxt.set_boolean_cell(addr, val);
         modified_cells.insert(addr);
     }
@@ -141,6 +145,7 @@ struct document::impl
     void set_formula_cell(cell_pos pos, const std::string& formula)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
+        unregister_formula_cell(cxt, addr);
         auto tokens = parse_formula_string(cxt, addr, *resolver, formula.data(), formula.size());
         formula_cell* fc = cxt.set_formula_cell(addr, std::move(tokens));
         register_formula_cell(cxt, addr, fc);
