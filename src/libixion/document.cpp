@@ -10,6 +10,7 @@
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula.hpp"
+#include "ixion/cell_access.hpp"
 
 #include <cstring>
 #include <sstream>
@@ -91,6 +92,12 @@ struct document::impl
         cxt.append_sheet(std::move(name));
     }
 
+    cell_access get_cell_access(cell_pos pos) const
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        return cxt.get_cell_access(addr);
+    }
+
     void set_numeric_cell(cell_pos pos, double val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
@@ -109,6 +116,13 @@ struct document::impl
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         cxt.set_string_cell(addr, s.data(), s.size());
+        modified_cells.insert(addr);
+    }
+
+    void set_boolean_cell(cell_pos pos, bool val)
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        cxt.set_boolean_cell(addr, val);
         modified_cells.insert(addr);
     }
 
@@ -152,6 +166,11 @@ void document::append_sheet(std::string name)
     mp_impl->append_sheet(std::move(name));
 }
 
+cell_access document::get_cell_access(cell_pos pos) const
+{
+    return mp_impl->get_cell_access(pos);
+}
+
 void document::set_numeric_cell(cell_pos pos, double val)
 {
     mp_impl->set_numeric_cell(pos, val);
@@ -165,6 +184,11 @@ void document::set_string_cell(cell_pos pos, const char* p, size_t n)
 void document::set_string_cell(cell_pos pos, const std::string& s)
 {
     mp_impl->set_string_cell(pos, s);
+}
+
+void document::set_boolean_cell(cell_pos pos, bool val)
+{
+    mp_impl->set_boolean_cell(pos, val);
 }
 
 double document::get_numeric_value(cell_pos pos) const

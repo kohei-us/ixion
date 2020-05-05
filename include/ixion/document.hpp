@@ -15,6 +15,7 @@
 namespace ixion {
 
 struct abs_address_t;
+class cell_access;
 
 /**
  * Higher level document representation designed to handle both cell value
@@ -48,11 +49,15 @@ public:
 
     void append_sheet(std::string name);
 
+    cell_access get_cell_access(cell_pos pos) const;
+
     void set_numeric_cell(cell_pos pos, double val);
 
     void set_string_cell(cell_pos pos, const char* p, size_t n);
 
     void set_string_cell(cell_pos pos, const std::string& s);
+
+    void set_boolean_cell(cell_pos pos, bool val);
 
     double get_numeric_value(cell_pos pos) const;
 

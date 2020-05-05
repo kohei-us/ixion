@@ -8,6 +8,7 @@
 #include "ixion/document.hpp"
 #include "ixion/address.hpp"
 #include "ixion/macros.hpp"
+#include "ixion/cell_access.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -79,10 +80,40 @@ void test_string_io()
     assert(*p == "Cell B3 and Cell C4");
 }
 
+void test_boolean_io()
+{
+    document doc;
+    doc.append_sheet("test1");
+    doc.append_sheet("test2");
+
+    doc.set_boolean_cell("test2!B2", true);
+    doc.set_boolean_cell("test2!C3", false);
+
+    doc.set_formula_cell("test1!A1", "SUM(test2!A1:D4)");
+    doc.calculate(0);
+    double v = doc.get_numeric_value("test1!A1");
+    assert(v == 1.0);
+
+    // Trigger recalculation.
+    doc.set_boolean_cell("test2!C4", true);
+    doc.calculate(0);
+    v = doc.get_numeric_value("test1!A1");
+    assert(v == 2.0);
+
+    cell_access ca = doc.get_cell_access("test2!B2");
+    assert(ca.get_type() == celltype_t::boolean);
+    assert(ca.get_value_type() == cell_value_t::boolean);
+
+    ca = doc.get_cell_access("test2!C3");
+    assert(ca.get_type() == celltype_t::boolean);
+    assert(ca.get_value_type() == cell_value_t::boolean);
+}
+
 int main()
 {
     test_basic_calc();
     test_string_io();
+    test_boolean_io();
 
     return EXIT_SUCCESS;
 }
