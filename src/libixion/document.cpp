@@ -9,6 +9,7 @@
 #include "ixion/global.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/formula_name_resolver.hpp"
+#include "ixion/formula.hpp"
 
 #include <cstring>
 #include <sstream>
@@ -70,6 +71,9 @@ struct document::impl
     model_context cxt;
     std::unique_ptr<formula_name_resolver> resolver;
 
+    abs_range_set_t modified_cells;
+    abs_range_set_t modified_formula_cells;
+
     impl() :
         cxt(),
         resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt))
@@ -84,12 +88,30 @@ struct document::impl
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         cxt.set_numeric_cell(addr, val);
+        modified_cells.insert(addr);
     }
 
     double get_numeric_value(cell_pos pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         return cxt.get_numeric_value(addr);
+    }
+
+    void set_formula_cell(cell_pos pos, const std::string& formula)
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        auto tokens = parse_formula_string(cxt, addr, *resolver, formula.data(), formula.size());
+        formula_cell* fc = cxt.set_formula_cell(addr, std::move(tokens));
+        register_formula_cell(cxt, addr, fc);
+        modified_formula_cells.insert(addr);
+    }
+
+    void calculate(size_t thread_count)
+    {
+        auto sorted_cells = query_and_sort_dirty_cells(cxt, modified_cells, &modified_formula_cells);
+        calculate_sorted_cells(cxt, sorted_cells, thread_count);
+        modified_cells.clear();
+        modified_formula_cells.clear();
     }
 };
 
@@ -111,6 +133,16 @@ void document::set_numeric_cell(cell_pos pos, double val)
 double document::get_numeric_value(cell_pos pos) const
 {
     return mp_impl->get_numeric_value(pos);
+}
+
+void document::set_formula_cell(cell_pos pos, const std::string& formula)
+{
+    mp_impl->set_formula_cell(pos, formula);
+}
+
+void document::calculate(size_t thread_count)
+{
+    mp_impl->calculate(thread_count);
 }
 
 }

@@ -50,6 +50,10 @@ public:
     void set_numeric_cell(cell_pos pos, double val);
 
     double get_numeric_value(cell_pos pos) const;
+
+    void set_formula_cell(cell_pos pos, const std::string& formula);
+
+    void calculate(size_t thread_count);
 };
 
 }

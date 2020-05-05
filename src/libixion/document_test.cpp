@@ -15,6 +15,17 @@
 using namespace std;
 using namespace ixion;
 
+namespace {
+
+bool equal(double v1, double v2, double multiplier)
+{
+    long i1 = v1 * multiplier;
+    long i2 = v2 * multiplier;
+    return i1 == i2;
+}
+
+}
+
 void test_document()
 {
     abs_address_t A1(0, 0, 0);
@@ -30,6 +41,12 @@ void test_document()
     assert(doc.get_numeric_value(A1) == 1.1);
     assert(doc.get_numeric_value("A2") == 1.2);
     assert(doc.get_numeric_value(A3) == 1.3);
+
+    doc.set_formula_cell("B4", "SUM(A1:A3)");
+    doc.calculate(0);
+
+    double v = doc.get_numeric_value("B4");
+    assert(equal(v, 3.6, 10.0));
 }
 
 int main()
