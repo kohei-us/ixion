@@ -42,6 +42,7 @@ public:
 
         cell_pos(const char* p);
         cell_pos(const char* p, size_t n);
+        cell_pos(const std::string& s);
         cell_pos(const abs_address_t& addr);
     };
 
@@ -49,7 +50,13 @@ public:
 
     void set_numeric_cell(cell_pos pos, double val);
 
+    void set_string_cell(cell_pos pos, const char* p, size_t n);
+
+    void set_string_cell(cell_pos pos, const std::string& s);
+
     double get_numeric_value(cell_pos pos) const;
+
+    const std::string* get_string_value(cell_pos pos) const;
 
     void set_formula_cell(cell_pos pos, const std::string& formula);
 

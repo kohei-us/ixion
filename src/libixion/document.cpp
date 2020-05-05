@@ -58,6 +58,13 @@ document::cell_pos::cell_pos(const char* p, size_t n) :
     value.n = n;
 }
 
+document::cell_pos::cell_pos(const std::string& s) :
+    type(cp_type::string)
+{
+    value.str = s.data();
+    value.n = s.size();
+}
+
 document::cell_pos::cell_pos(const abs_address_t& addr) :
     type(cp_type::address)
 {
@@ -91,10 +98,30 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
+    void set_string_cell(cell_pos pos, const char* p, size_t n)
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        cxt.set_string_cell(addr, p, n);
+        modified_cells.insert(addr);
+    }
+
+    void set_string_cell(cell_pos pos, const std::string& s)
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        cxt.set_string_cell(addr, s.data(), s.size());
+        modified_cells.insert(addr);
+    }
+
     double get_numeric_value(cell_pos pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         return cxt.get_numeric_value(addr);
+    }
+
+    const std::string* get_string_value(cell_pos pos) const
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        return cxt.get_string_value(addr);
     }
 
     void set_formula_cell(cell_pos pos, const std::string& formula)
@@ -130,9 +157,24 @@ void document::set_numeric_cell(cell_pos pos, double val)
     mp_impl->set_numeric_cell(pos, val);
 }
 
+void document::set_string_cell(cell_pos pos, const char* p, size_t n)
+{
+    mp_impl->set_string_cell(pos, p, n);
+}
+
+void document::set_string_cell(cell_pos pos, const std::string& s)
+{
+    mp_impl->set_string_cell(pos, s);
+}
+
 double document::get_numeric_value(cell_pos pos) const
 {
     return mp_impl->get_numeric_value(pos);
+}
+
+const std::string* document::get_string_value(cell_pos pos) const
+{
+    return mp_impl->get_string_value(pos);
 }
 
 void document::set_formula_cell(cell_pos pos, const std::string& formula)
