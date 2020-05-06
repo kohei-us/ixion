@@ -48,6 +48,11 @@ void test_basic_calc()
 
     double v = doc.get_numeric_value("B4");
     assert(equal(v, 3.6, 10.0));
+
+    doc.empty_cell(A2);
+    doc.calculate(0);
+    v = doc.get_numeric_value("B4");
+    assert(equal(v, 2.4, 10.0));
 }
 
 void test_string_io()
@@ -78,6 +83,13 @@ void test_string_io()
     p = doc.get_string_value("A10");
     assert(p);
     assert(*p == "Cell B3 and Cell C4");
+
+    doc.empty_cell(C4);
+    doc.calculate(0);
+
+    p = doc.get_string_value("A10");
+    assert(p);
+    assert(*p == "Cell B3 and ");
 }
 
 void test_boolean_io()

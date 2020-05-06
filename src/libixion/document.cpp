@@ -130,6 +130,14 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
+    void empty_cell(cell_pos pos)
+    {
+        abs_address_t addr = to_address(cxt, *resolver, pos);
+        unregister_formula_cell(cxt, addr);
+        cxt.empty_cell(addr);
+        modified_cells.insert(addr);
+    }
+
     double get_numeric_value(cell_pos pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
@@ -194,6 +202,11 @@ void document::set_string_cell(cell_pos pos, const std::string& s)
 void document::set_boolean_cell(cell_pos pos, bool val)
 {
     mp_impl->set_boolean_cell(pos, val);
+}
+
+void document::empty_cell(cell_pos pos)
+{
+    mp_impl->empty_cell(pos);
 }
 
 double document::get_numeric_value(cell_pos pos) const

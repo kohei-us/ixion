@@ -59,6 +59,8 @@ public:
 
     void set_boolean_cell(cell_pos pos, bool val);
 
+    void empty_cell(cell_pos pos);
+
     double get_numeric_value(cell_pos pos) const;
 
     const std::string* get_string_value(cell_pos pos) const;
