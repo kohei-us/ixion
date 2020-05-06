@@ -8,5 +8,6 @@ Overview
    :maxdepth: 1
 
    quickstart.rst
+   using_document.rst
 
 
