@@ -279,6 +279,20 @@ Here, we are not registering this cell since it contains no references hence it
 does not need to be tracked by dependency tracker.  Also, since the previous
 cell in A10 is not a formula cell, there is no cell to unregister.
 
+.. warning::
+
+    Technically speaking, every formula cell that contains references to other
+    cells or contains at least one volatile function needs to be registered.
+    Since registering a formula cell that doesn't need to be registered is
+    entirely harmless (albeit a slight overhead), it's generally a good idea to
+    register every new formula cell regardless of its content.
+
+    Likewise, unregistering a formula cell that didn't need to be registered
+    (or wasn't registered) is entirely harmless.  Even unregistering a cell
+    that didn't contain a formula cell is harmless, and essentially does
+    nothing.  As such, it's probably a good practice to unregister a cell
+    whenever a new cell value is being placed.
+
 Let's obtain all formula cells in need to re-calculation::
 
     modified_formula_cells = {A10};
