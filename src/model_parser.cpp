@@ -572,7 +572,7 @@ void model_parser::parse_edit()
         {
             // A valid name is given but with empty definition.  Just remove the
             // existing cell.
-            m_context.erase_cell(pos);
+            m_context.empty_cell(pos);
             continue;
         }
 

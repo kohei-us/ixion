@@ -102,7 +102,7 @@ public:
         mp_table_handler = handler;
     }
 
-    void erase_cell(const abs_address_t& addr);
+    void empty_cell(const abs_address_t& addr);
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_boolean_cell(const abs_address_t& addr, bool val);
     void set_string_cell(const abs_address_t& addr, const char* p, size_t n);

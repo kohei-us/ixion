@@ -151,7 +151,7 @@ class DocumentTest(unittest.TestCase):
         self.assertEqual(34.0, val)
 
         # Delete B5 and check.
-        sh1.erase_cell(4, 1)
+        sh1.empty_cell(4, 1)
         self.doc.calculate()
         val = sh1.get_numeric_value(4, 1)
         self.assertEqual(0.0, val)
@@ -214,7 +214,7 @@ class DocumentTest(unittest.TestCase):
             pass # expected
 
         try:
-            sh.erase_cell(2, 1)
+            sh.empty_cell(2, 1)
             self.assertTrue(False, "failed to raise a SheetError.")
         except ixion.SheetError:
             pass # expected

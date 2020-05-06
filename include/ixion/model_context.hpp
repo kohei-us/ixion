@@ -130,7 +130,8 @@ public:
     double get_numeric_value_nowait(const abs_address_t& addr) const;
     string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
 
-    void erase_cell(const abs_address_t& addr);
+    IXION_DEPRECATED void erase_cell(const abs_address_t& addr);
+    void empty_cell(const abs_address_t& addr);
 
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_boolean_cell(const abs_address_t& adr, bool val);

@@ -267,6 +267,12 @@ PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kw
 
 PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
 {
+    PyErr_SetString(PyExc_RuntimeError, "erase_cell() method has been deprecated. Please use empty_cell() instead.");
+    return nullptr;
+}
+
+PyObject* sheet_empty_cell(sheet* self, PyObject* args, PyObject* kwargs)
+{
     int col = -1;
     int row = -1;
 
@@ -285,7 +291,7 @@ PyObject* sheet_erase_cell(sheet* self, PyObject* args, PyObject* kwargs)
     ixion::model_context& cxt = sd->m_global->m_cxt;
     abs_address_t pos(sd->m_sheet_index, row, col);
     sd->m_global->m_modified_cells.insert(pos);
-    cxt.erase_cell(pos);
+    cxt.empty_cell(pos);
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -299,6 +305,7 @@ PyMethodDef sheet_methods[] =
     { "get_numeric_value", (PyCFunction)sheet_get_numeric_value, METH_VARARGS | METH_KEYWORDS, "get numeric value from specified cell" },
     { "get_string_value",  (PyCFunction)sheet_get_string_value,  METH_VARARGS | METH_KEYWORDS, "get string value from specified cell" },
     { "get_formula_expression", (PyCFunction)sheet_get_formula_expression, METH_VARARGS | METH_KEYWORDS, "get formula expression string from specified cell position" },
+    { "empty_cell", (PyCFunction)sheet_empty_cell, METH_VARARGS | METH_KEYWORDS, "empty cell at specified position" },
     { "erase_cell", (PyCFunction)sheet_erase_cell, METH_VARARGS | METH_KEYWORDS, "erase cell at specified position" },
     { nullptr }
 };

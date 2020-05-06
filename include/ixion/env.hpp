@@ -39,6 +39,14 @@
 #define IXION_LOGGING 0
 #endif
 
+#ifdef __GNUC__
+  #define IXION_DEPRECATED __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+  #define IXION_DEPRECATED __declspec(deprecated)
+#else
+  #define IXION_DEPRECATED
+#endif
+
 #endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -535,7 +535,7 @@ std::unique_ptr<iface::session_handler> model_context_impl::create_session_handl
     return mp_session_factory->create();
 }
 
-void model_context_impl::erase_cell(const abs_address_t& addr)
+void model_context_impl::empty_cell(const abs_address_t& addr)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
