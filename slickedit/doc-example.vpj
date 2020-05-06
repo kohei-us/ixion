@@ -45,50 +45,32 @@
                 MenuCaption="E&amp;xecute"
                 SaveOption="SaveNone"
                 RunFromDir="%rw">
-                <Exec CmdLine='"cmake.exe"'/>
+                <Exec CmdLine='"doc-example.exe"'/>
             </Target>
         </Menu>
     </Config>
-    <CustomFolders>
+    <Files>
         <Folder
             Name="Source Files"
             Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
-            GUID="{0CC8AFF5-5706-4BAC-57F7-DED734ECF4B8}"/>
+            GUID="{BF0C782E-1E96-4B87-98D5-D6BF2AE25068}">
+            <F N="../doc_example/model_context_simple.cpp"/>
+        </Folder>
         <Folder
             Name="Header Files"
             Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
-            GUID="{E6B7E614-AAFA-42D8-6FE7-A0082FACAD8E}"/>
+            GUID="{F09E84E3-42F0-427A-8291-C2BA0F6413AD}"/>
         <Folder
             Name="Resource Files"
             Filters="*.ico;*.cur;*.dlg"
-            GUID="{97CF7EC9-D6EB-445D-5974-3B44392042B0}"/>
+            GUID="{6F039038-65E5-41D2-A872-2F5C10D2A2D6}"/>
         <Folder
             Name="Bitmaps"
             Filters="*.bmp"
-            GUID="{8FE7A755-7803-4F26-307F-B0A76003CDA0}"/>
+            GUID="{565636CD-8525-4E3C-9FE7-EC1366C26F65}"/>
         <Folder
             Name="Other Files"
             Filters=""
-            GUID="{EEE5816B-3E30-4A5F-356E-91A01D02E88B}"></Folder>
-    </CustomFolders>
-    <Files AutoFolders="DirectoryView">
-        <Folder Name="..">
-            <F N="../CMakeLists.txt"/>
-        </Folder>
-        <Folder Name="../include">
-            <Folder Name="ixion">
-                <Folder Name="interface">
-                    <F N="../include/ixion/interface/CMakeLists.txt"/>
-                </Folder>
-                <F N="../include/ixion/CMakeLists.txt"/>
-            </Folder>
-            <F N="../include/CMakeLists.txt"/>
-        </Folder>
-        <Folder Name="../src">
-            <Folder Name="libixion">
-                <F N="../src/libixion/CMakeLists.txt"/>
-            </Folder>
-            <F N="../src/CMakeLists.txt"/>
-        </Folder>
+            GUID="{779CEE7A-D5AA-49E9-89F3-58A3531C64CF}"/>
     </Files>
 </Project>
