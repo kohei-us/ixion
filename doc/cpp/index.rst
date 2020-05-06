@@ -10,7 +10,7 @@ C++ API
    formula/index.rst
    types/index.rst
    formula_name_resolver/index.rst
-   model_context/index.rst
+   data_store/index.rst
    formula_cell/index.rst
    interface/index.rst
 
