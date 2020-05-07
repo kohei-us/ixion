@@ -87,6 +87,11 @@ struct document::impl
         resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt))
     {}
 
+    impl(formula_name_resolver_t cell_address_type) :
+        cxt(),
+        resolver(formula_name_resolver::get(cell_address_type, &cxt))
+    {}
+
     void append_sheet(std::string name)
     {
         cxt.append_sheet(std::move(name));
@@ -171,6 +176,9 @@ struct document::impl
 
 document::document() :
     mp_impl(ixion::make_unique<impl>()) {}
+
+document::document(formula_name_resolver_t cell_address_type) :
+    mp_impl(ixion::make_unique<impl>(cell_address_type)) {}
 
 document::~document() {}
 

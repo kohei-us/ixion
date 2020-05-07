@@ -127,11 +127,16 @@ using table_areas_t = int32_t;
 enum class formula_name_resolver_t
 {
     unknown    = 0,
-    excel_a1   = 1,  // Default A1 syntax used in Excel
-    excel_r1c1 = 2,  // R1C1 syntax available in Excel
-    calc_a1    = 3,  // Default A1 syntax used in Calc
-    odff       = 4,  // OpenFormula syntax
-    odf_cra    = 5,  // ODF cell-range-address syntax
+    /** Default A1 syntax used in Excel */
+    excel_a1   = 1,
+    /** R1C1 syntax available in Excel */
+    excel_r1c1 = 2,
+    /** Default A1 syntax used in Calc */
+    calc_a1    = 3,
+    /** OpenFormula syntax */
+    odff       = 4,
+    /** ODF cell-range-address syntax */
+    odf_cra    = 5,
 };
 
 /**

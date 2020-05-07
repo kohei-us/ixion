@@ -27,6 +27,14 @@ class IXION_DLLPUBLIC document
     std::unique_ptr<impl> mp_impl;
 public:
     document();
+
+    /**
+     * Constructor with custom cell address type.
+     *
+     * @param cell_address_type cell address type to use for cell addresses
+     *                          represented by string values.
+     */
+    document(formula_name_resolver_t cell_address_type);
     ~document();
 
     struct IXION_DLLPUBLIC cell_pos
@@ -67,6 +75,12 @@ public:
 
     void set_formula_cell(cell_pos pos, const std::string& formula);
 
+    /**
+     * Calculate all the "dirty" formula cells in the document.
+     *
+     * @param thread_count number of threads to use to perform calculation.
+     *                     When 0 is specified, it only uses the main thread.
+     */
     void calculate(size_t thread_count);
 };
 

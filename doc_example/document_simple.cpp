@@ -24,13 +24,12 @@ int main(int argc, char** argv)
         doc.set_numeric_cell(pos, value);
     }
 
-    // Insert a string value into B2.
+    // Insert string values.
     std::string s = "This cell contains a string value.";
     doc.set_string_cell("B2", s.data(), s.size());
+    doc.set_string_cell("B3", IXION_ASCII("This too contains a string value."));
 
-    // Insert literal string values into B3 and B4.
-    doc.set_string_cell("MySheet!B3", IXION_ASCII("This too contains a string value."));
-    doc.set_string_cell("B4", "Yet another string value.");
+    doc.set_string_cell("MySheet!B4", "Yet another string value.");
 
     // Now, let's insert a formula into A11 to sum up values in A1:A10, and calculate it afterward.
     doc.set_formula_cell("A11", "SUM(A1:A10)");

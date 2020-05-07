@@ -121,11 +121,23 @@ void test_boolean_io()
     assert(ca.get_value_type() == cell_value_t::boolean);
 }
 
+void test_custom_cell_address_syntax()
+{
+    document doc(formula_name_resolver_t::excel_r1c1);
+    doc.append_sheet("MySheet");
+
+    doc.set_numeric_cell("R3C3", 345.0);
+    abs_address_t R3C3(0, 2, 2);
+    double v = doc.get_numeric_value(R3C3);
+    assert(v == 345.0);
+}
+
 int main()
 {
     test_basic_calc();
     test_string_io();
     test_boolean_io();
+    test_custom_cell_address_syntax();
 
     return EXIT_SUCCESS;
 }

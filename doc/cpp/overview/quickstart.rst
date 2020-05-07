@@ -1,6 +1,8 @@
 
 .. highlight:: cpp
 
+.. _quickstart-model-context:
+
 Quickstart
 ==========
 

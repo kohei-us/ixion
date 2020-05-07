@@ -284,6 +284,7 @@
                 <F N="../src/libixion/dirty_cell_tracker.cpp"/>
                 <F N="../src/libixion/dirty_cell_tracker_test.cpp"/>
                 <F N="../src/libixion/document.cpp"/>
+                <F N="../src/libixion/document_test.cpp"/>
                 <F N="../src/libixion/exceptions.cpp"/>
                 <F N="../src/libixion/formula.cpp"/>
                 <F N="../src/libixion/formula_calc.cpp"/>
