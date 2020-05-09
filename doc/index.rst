@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   overview/index.rst
+   quickstart/index.rst
    cpp/index.rst
    python/index.rst
 
