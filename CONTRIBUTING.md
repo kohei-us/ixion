@@ -37,7 +37,7 @@ Run the following series of commands to configure your build.
 ```bash
 mkdir build
 cd build
-cmake .. -G "Visual Studio 15 Win64" \
+cmake .. \
     -DCMAKE_INSTALL_PREFIX="/path/to/install" \
     -DBOOST_INCLUDEDIR="/path/to/boost" \
     -DBOOST_LIBRARYDIR="/path/to/boost/stage/x64/lib" \
