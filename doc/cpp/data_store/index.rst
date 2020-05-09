@@ -6,7 +6,7 @@ Data Store
    :maxdepth: 2
 
    model_context.rst
-   cell_access.rst
    document.rst
+   cell_access.rst
    types.rst
 
