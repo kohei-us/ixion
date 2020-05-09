@@ -3,8 +3,8 @@
 
 .. _quickstart-model-context:
 
-Quickstart
-==========
+Using model_context class
+=========================
 
 Create a model context instance
 -------------------------------
