@@ -1,12 +1,15 @@
 
+Types
+=====
+
 Macros
-======
+------
 
 .. doxygendefine:: IXION_ASCII
 
 
 Primitive Types
-===============
+---------------
 
 .. doxygenenum:: ixion::celltype_t
 .. doxygenenum:: ixion::cell_value_t
@@ -29,8 +32,9 @@ Primitive Types
 
 .. doxygenfunction:: ixion::get_formula_error_name
 
-Store Types
-===========
+
+Column Store Types
+------------------
 
 .. doxygentypedef:: ixion::boolean_element_block
 .. doxygentypedef:: ixion::numeric_element_block
@@ -51,12 +55,18 @@ Store Types
 
 
 Address Types
-=============
+-------------
 
 .. doxygenstruct:: ixion::address_t
    :members:
 
+.. doxygenstruct:: ixion::rc_address_t
+   :members:
+
 .. doxygenstruct:: ixion::abs_address_t
+   :members:
+
+.. doxygenstruct:: ixion::abs_rc_address_t
    :members:
 
 .. doxygenstruct:: ixion::range_t
@@ -65,10 +75,11 @@ Address Types
 .. doxygenstruct:: ixion::abs_range_t
    :members:
 
+.. doxygenstruct:: ixion::abs_rc_range_t
+   :members:
+
 .. doxygentypedef:: ixion::abs_address_set_t
 
 .. doxygentypedef:: ixion::abs_range_set_t
 
 .. doxygentypedef:: ixion::abs_rc_range_set_t
-
-
