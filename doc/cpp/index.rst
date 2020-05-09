@@ -4,7 +4,7 @@ C++ API
 =======
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    quickstart/index.rst
    formula/index.rst

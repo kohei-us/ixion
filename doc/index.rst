@@ -9,7 +9,7 @@ Welcome to Ixion's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    overview/index.rst
    cpp/index.rst
