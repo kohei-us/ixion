@@ -17,6 +17,7 @@ Primitive Types
 .. doxygenenum:: ixion::table_area_t
 .. doxygenenum:: ixion::formula_name_resolver_t
 .. doxygenenum:: ixion::formula_error_t
+.. doxygenenum:: ixion::rc_direction_t
 
 .. doxygentypedef:: ixion::col_t
 .. doxygentypedef:: ixion::row_t
@@ -30,7 +31,8 @@ Primitive Types
 .. doxygenvariable:: ixion::global_scope
 .. doxygenvariable:: ixion::invalid_sheet
 
-.. doxygenfunction:: ixion::get_formula_error_name
+.. doxygenstruct:: ixion::rc_size_t
+.. doxygenstruct:: ixion::formula_group_t
 
 
 Column Store Types
@@ -83,3 +85,9 @@ Address Types
 .. doxygentypedef:: ixion::abs_range_set_t
 
 .. doxygentypedef:: ixion::abs_rc_range_set_t
+
+
+Utility Functions
+-----------------
+
+.. doxygenfunction:: ixion::get_formula_error_name

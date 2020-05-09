@@ -62,28 +62,57 @@ IXION_DLLPUBLIC bool is_valid_sheet(sheet_t sheet);
 /** Global string ID representing an empty string. */
 IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 
+/**
+ * This type represents a raw cell type as stored in {@link model_context}.
+ */
 enum class celltype_t : uint8_t
 {
+    /** unknown cell type.*/
     unknown = 0,
+    /** cell contains a raw string value.*/
     string,
+    /** cell contains a raw numeric value.*/
     numeric,
+    /** cell contains a formula object. */
     formula,
+    /** cell contains a raw boolean value. */
     boolean,
+    /** cell is empty and contains absolutely nothing. */
     empty
 };
 
 /**
  * Similar to {@link celltype_t}, except that it does not include a formula
- * type, as it infers its type from the formula result. The error type
- * refers to an error value in formula cell.
+ * type. Instead it uses the formula result type to classify its type. The
+ * error type refers to an error value in formula cell.
  */
 enum class cell_value_t : uint8_t
 {
+    /** unknown cell value type. */
     unknown = 0,
+    /**
+     * either the cell contains a raw string value, or a calculated formula
+     * cell whose result is of string type.
+     */
     string,
+    /**
+     * either the cell contains a raw numeric value, or a calculated formula
+     * cell whose result is of numeric type.
+     */
     numeric,
+    /**
+     * this type corresponds with a formula cell whose result contains an
+     * error.
+     */
     error,
+    /**
+     * either the cell contains a raw boolean value type, or a calculated
+     * formula cell whose result is of boolean type.
+     */
     boolean,
+    /**
+     * the cell is empty and contains nothing whatsoever.
+     */
     empty
 };
 
@@ -126,6 +155,7 @@ using table_areas_t = int32_t;
  */
 enum class formula_name_resolver_t
 {
+    /** Unknown syntax. */
     unknown    = 0,
     /** Default A1 syntax used in Excel */
     excel_a1   = 1,
@@ -141,9 +171,9 @@ enum class formula_name_resolver_t
 
 /**
  * Formula error types.  Note that only the official (i.e. non-internal)
- * error types have their corresponding error strings.
- *
- * @see ixion::get_formula_error_name
+ * error types have their corresponding error strings.  Use the {@link
+ * ixion::get_formula_error_name} function to convert an enum member value
+ * of this type to its string representation.
  */
 enum class formula_error_t : uint8_t
 {
@@ -161,7 +191,7 @@ enum class formula_error_t : uint8_t
 };
 
 /**
- * Specifies iterator direction of a model_context.
+ * Specifies iterator direction of a {@link model_context}.
  */
 enum class rc_direction_t
 {
@@ -194,8 +224,14 @@ struct IXION_DLLPUBLIC rc_size_t
  */
 struct IXION_DLLPUBLIC formula_group_t
 {
+    /** Size of the formula group. */
     rc_size_t size;
+    /**
+     * Unique value identifying the group a cell belongs to.  Cells belonging
+     * to the same formula group should have the same value.
+     */
     uintptr_t identity;
+    /** Boolean value indicating whether or not a cell is grouped.   */
     bool grouped;
 
     formula_group_t();
