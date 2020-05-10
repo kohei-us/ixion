@@ -1,21 +1,20 @@
-Ixion is a general purpose formula parser & interpreter that can calculate
-multiple named targets, or "cells".
+Ixion is a general purpose formula parser, interpreter, formula cell dependency
+tracker and spreadsheet document model backend all in one package.
 
 ## Overview
 The goal of this project is to create a library for calculating the
-results of formula expressions stored in multiple named targets, or
-"cells".  The cells can be referenced from each other, and the library
-takes care of resolving their dependencies automatically upon calculation.
-The caller can run the calculation routine either in a single-threaded
-mode, or a multi-threaded mode.  The library also supports re-calculations
-where the contents of one or more cells have been modified since the last
-calculation, and a partial calculation of only the affected cells need to
-be calculated.
+results of formula expressions stored in multiple fomrula cells.  The cells
+can be referenced by each other, and Ixion resolves their dependencies
+automatically upon calculation.  The caller can run the calculation routine
+either in a single-threaded mode, or a multi-threaded mode. Ixion also supports
+re-calculations where the contents of one or more cells have been modified
+since the last calculation, and a partial calculation of only the affected
+cells need to be calculated.
 
 ## Portability
 This library is written with portability in mind; platform specific calls
-are avoided as much as possible.  It makes use of the [boost library](http://boost.org)
-to achieve portability in some places.
+are avoided as much as possible.  It makes use of modern C++ features and the
+[boost library](http://boost.org) to achieve portability.
 
 ## Performance
 Achieving good performance is one of the goals of this project.  As much
