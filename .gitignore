@@ -11,6 +11,7 @@ config.sub
 depcomp
 doc/_build
 doc/_doxygen
+doc_example/document-simple
 doc_example/model-context-simple
 INSTALL
 install-sh

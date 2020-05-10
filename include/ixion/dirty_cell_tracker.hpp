@@ -16,6 +16,18 @@ namespace ixion {
 
 namespace iface { class formula_model_access; }
 
+/**
+ * This class is designed to track in-direct dependencies of dirty formula
+ * cells.  A "dirty" formula cell is a formula cell whose result needs to be
+ * re-calculated because at least one of its references have their values
+ * updated.
+ *
+ * This class also takes volatile functions into account when determining
+ * the status of the formula cel result.  A volatile function is a cell
+ * function whose value needs to get re-calculated unconditionally on every
+ * re-calculation.  One example of a volatile function is NOW(), which
+ * returns the current time at the time of calculation.
+ */
 class IXION_DLLPUBLIC dirty_cell_tracker
 {
     struct impl;

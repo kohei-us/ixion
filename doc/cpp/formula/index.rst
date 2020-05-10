@@ -7,4 +7,6 @@ Formula
 
    formula_engine.rst
    formula_cell.rst
+   formula_tokens.rst
    formula_name_resolver.rst
+   matrix.rst

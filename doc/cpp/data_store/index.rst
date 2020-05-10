@@ -8,5 +8,6 @@ Data Store
    model_context.rst
    document.rst
    cell_access.rst
+   dirty_cell_tracker.rst
    types.rst
 

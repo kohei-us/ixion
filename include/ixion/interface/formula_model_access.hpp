@@ -35,7 +35,7 @@ class table_handler;
  * Interface for allowing access to the model mostly from ixion's formula
  * interpreter and its related classes. The client code needs to provide
  * concrete implementation of this interface in order to provide access to
- * its content.
+ * its content to the interpreter.
  */
 class formula_model_access
 {
