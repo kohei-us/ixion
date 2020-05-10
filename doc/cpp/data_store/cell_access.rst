@@ -69,6 +69,9 @@ print the value of the cell as follows::
             cout << "???" << endl;
     }
 
+The complete source code of this example is avaiable
+`here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/section_examples/cell_access.cpp>`_.
+
 
 API Reference
 -------------
