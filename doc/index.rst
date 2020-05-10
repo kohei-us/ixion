@@ -3,8 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Ixion's documentation!
-=================================
+Ixion library documentation
+===========================
+
+Ixion is a general purpose formula parser, interpreter, formula cell dependency
+tracker and spreadsheet document model backend all in one package.  You can use
+Ixion to build a formula engine backend with spreadsheet-like multi-sheet cell
+storage management, or simply to parse and tokenize formula expressions.
 
 Contents:
 
