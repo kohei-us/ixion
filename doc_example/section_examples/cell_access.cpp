@@ -1,39 +1,13 @@
+#include <iostream>
+#include <ixion/document.hpp>
+#include <ixion/model_context.hpp>
+#include <ixion/cell_access.hpp>
+#include <ixion/address.hpp>
 
-.. highlight:: cpp
+using namespace std;
 
-Cell Access
-===========
-
-Examples
---------
-
-You can obtain a :cpp:class:`~ixion::cell_access` instance either from
-:cpp:class:`~ixion::model_context` or :cpp:class:`~ixion::document` class.
-
-Here is an example of how to obtain it from a :cpp:class:`~ixion::model_context` instance::
-
-    ixion::model_context cxt;
-    cxt.append_sheet("Sheet");
-
-    // fill this model context
-
-    ixion::abs_address_t A1(0, 0, 0);
-    ixion::cell_access ca = cxt.get_cell_access(A1);
-
-
-Here is an example of how to obtain it from a :cpp:class:`~ixion::document` instance::
-
-    ixion::document doc;
-    doc.append_sheet("Sheet");
-
-    // fill this document
-
-    ixion::cell_access ca = doc.get_cell_access("A1");
-
-
-Once you have your :cpp:class:`~ixion::cell_access` instance, you can, for instance,
-print the value of the cell as follows::
-
+void access(const ixion::cell_access& ca)
+{
     switch (ca.get_value_type())
     {
         case ixion::cell_value_t::numeric:
@@ -68,10 +42,37 @@ print the value of the cell as follows::
         default:
             cout << "???" << endl;
     }
+}
 
+void from_document()
+{
+    ixion::document doc;
+    doc.append_sheet("Sheet");
 
-API Reference
--------------
+    // fill this document
 
-.. doxygenclass:: ixion::cell_access
-   :members:
+    ixion::cell_access ca = doc.get_cell_access("A1");
+
+    access(ca);
+}
+
+void from_model_context()
+{
+    ixion::model_context cxt;
+    cxt.append_sheet("Sheet");
+
+    // fill this model context
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::cell_access ca = cxt.get_cell_access(A1);
+
+    access(ca);
+}
+
+int main(int argc, char** argv)
+{
+    from_document();
+    from_model_context();
+
+    return EXIT_SUCCESS;
+}

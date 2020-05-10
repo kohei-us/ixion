@@ -1,3 +1,4 @@
+SUBDIRS = section_examples
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \

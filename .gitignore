@@ -13,6 +13,7 @@ doc/_build
 doc/_doxygen
 doc_example/document-simple
 doc_example/model-context-simple
+doc_example/section_examples/cell-access
 INSTALL
 install-sh
 libtool

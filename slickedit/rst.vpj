@@ -71,11 +71,13 @@
             Filters=""
             GUID="{91984266-E0E1-4526-B501-83A117FAD18C}">
             <F N="../doc/cpp/data_store/cell_access.rst"/>
+            <F N="../doc/cpp/data_store/dirty_cell_tracker.rst"/>
             <F N="../doc/cpp/data_store/document.rst"/>
             <F N="../doc/python/document.rst"/>
             <F N="../doc/cpp/formula/formula_cell.rst"/>
             <F N="../doc/cpp/formula/formula_engine.rst"/>
             <F N="../doc/cpp/formula/formula_name_resolver.rst"/>
+            <F N="../doc/cpp/formula/formula_tokens.rst"/>
             <F N="../doc/index.rst"/>
             <F N="../doc/cpp/index.rst"/>
             <F N="../doc/cpp/data_store/index.rst"/>
@@ -84,6 +86,7 @@
             <F N="../doc/cpp/quickstart/index.rst"/>
             <F N="../doc/overview/index.rst"/>
             <F N="../doc/python/index.rst"/>
+            <F N="../doc/cpp/formula/matrix.rst"/>
             <F N="../doc/cpp/data_store/model_context.rst"/>
             <F N="../doc/python/quickstart.rst"/>
             <F N="../doc/python/sheet.rst"/>
