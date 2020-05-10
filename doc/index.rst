@@ -9,7 +9,8 @@ Ixion library documentation
 Ixion is a general purpose formula parser, interpreter, formula cell dependency
 tracker and spreadsheet document model backend all in one package.  You can use
 Ixion to build a formula engine backend with spreadsheet-like multi-sheet cell
-storage management, or simply to parse and tokenize formula expressions.
+storage management, or simply use to handle parsing and tokenization of formula
+expressions.
 
 Contents:
 
