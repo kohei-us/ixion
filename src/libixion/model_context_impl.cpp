@@ -143,7 +143,7 @@ void set_grouped_formula_cells_to_workbook(
 model_context_impl::model_context_impl(model_context& parent, const rc_size_t& sheet_size) :
     m_parent(parent),
     m_sheet_size(sheet_size),
-    m_tracker(parent),
+    m_tracker(),
     mp_table_handler(nullptr),
     mp_session_factory(&dummy_session_handler_factory)
 {
