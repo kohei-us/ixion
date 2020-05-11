@@ -1,6 +1,8 @@
 
 .. highlight:: cpp
 
+.. _quickstart-document:
+
 Using document class
 ====================
 
