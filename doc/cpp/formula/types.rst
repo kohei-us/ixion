@@ -1,6 +1,9 @@
 
+Types
+=====
+
 Matrix
-======
+------
 
 .. doxygenclass:: ixion::matrix
    :members:
