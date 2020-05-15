@@ -182,7 +182,7 @@ AC_ARG_ENABLE([werror],
 	[enable_werror="$enableval"],
 	[enable_werror=no]
 )
-AS_IF([test x"$enable_werror" == "xyes"], [
+AS_IF([test x"$enable_werror" = "xyes"], [
 	CXXFLAGS="$CXXFLAGS -Werror"
 ])
 
