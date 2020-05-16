@@ -16,5 +16,11 @@ const char* get_formula_function_name(formula_function_t func)
     return formula_functions::get_function_name(func);
 }
 
+formula_function_t get_formula_function_opcode(const char* p, size_t n)
+{
+    return formula_functions::get_function_opcode(p, n);
 }
+
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
