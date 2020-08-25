@@ -34,7 +34,7 @@ class IXION_DLLPUBLIC formula_result
     std::unique_ptr<impl> mp_impl;
 
 public:
-    enum class result_type { value, string, error, matrix };
+    enum class result_type { value, string, string_value, error, matrix };
 
     formula_result();
     formula_result(const formula_result& r);
@@ -66,6 +66,8 @@ public:
      * @return string ID.
      */
     string_id_t get_string() const;
+
+    const std::string& get_string_value() const;
 
     /**
      * Get an error value of the result.  The caller must make sure that the

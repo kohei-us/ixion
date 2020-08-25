@@ -325,10 +325,10 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
     {
         case stack_value_t::value:
             val = stack.pop_value();
-        break;
+            break;
         case stack_value_t::string:
             str = stack.pop_string();
-        break;
+            break;
         case stack_value_t::single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
@@ -386,6 +386,12 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                             str = *ps;
                             return true;
                         }
+                        case formula_result::result_type::string_value:
+                        {
+                            vt = stack_value_t::string;
+                            str = res.get_string_value();
+                            return true;
+                        }
                         case formula_result::result_type::error:
                         default:
                             return false;
@@ -394,8 +400,8 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                 default:
                     return false;
             }
+            break;
         }
-        break;
         case stack_value_t::range_ref:
         default:
             return false;

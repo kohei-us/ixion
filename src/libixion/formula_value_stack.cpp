@@ -381,7 +381,8 @@ const std::string formula_value_stack::pop_string()
                                 throw formula_error(formula_error_t::stack_error);
                             return *ps;
                         }
-                        break;
+                        case formula_result::result_type::string_value:
+                            return res.get_string_value();
                         case formula_result::result_type::value:
                         {
                             std::ostringstream os;

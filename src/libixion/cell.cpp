@@ -255,6 +255,9 @@ struct formula_cell::impl
                 case formula_result::result_type::string:
                     m.set(m_group_pos.row, m_group_pos.column, result.get_string());
                     break;
+                case formula_result::result_type::string_value:
+                    throw std::runtime_error("TODO");
+                    break;
                 case formula_result::result_type::error:
                     m.set(m_group_pos.row, m_group_pos.column, result.get_error());
                     break;
