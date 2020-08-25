@@ -908,10 +908,7 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            assert(p);
-            formula_result res = p->get_result_cache();
-            string_id_t sid = res.get_string();
-            return m_str_pool.get_string(sid);
+            return p->get_string();
         }
         default:
             ;

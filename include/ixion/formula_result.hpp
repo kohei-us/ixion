@@ -40,7 +40,6 @@ public:
     formula_result(const formula_result& r);
     formula_result(formula_result&& r);
     formula_result(double v);
-    formula_result(string_id_t strid);
     formula_result(std::string str);
     formula_result(formula_error_t e);
     formula_result(matrix mtx);
@@ -48,7 +47,6 @@ public:
 
     void reset();
     void set_value(double v);
-    void set_string(string_id_t strid);
     void set_string_value(std::string str);
     void set_error(formula_error_t e);
     void set_matrix(matrix mtx);

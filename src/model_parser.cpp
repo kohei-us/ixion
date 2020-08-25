@@ -1171,26 +1171,18 @@ void model_parser::check()
             }
             case celltype_t::string:
             {
-                string_id_t str_id = ca.get_string_identifier();
+                const std::string* actual = ca.get_string_value();
+                if (!actual)
+                    throw check_error("failed to retrieve a string value from the cell.");
 
-                if (str_id != res.get_string())
+                const std::string& s_expected = res.get_string_value();
+                if (*actual != s_expected)
                 {
-                    const string* ps = m_context.get_string(str_id);
-                    if (!ps)
-                        throw check_error("failed to retrieve a string value for a string cell.");
-
-                    const string* ps_expected = m_context.get_string(res.get_string());
-                    if (!ps_expected)
-                    {
-                        std::ostringstream os;
-                        os << "no string value for the string ID of " << res.get_string();
-                        throw check_error(os.str());
-                    }
-
-                    ostringstream os;
-                    os << "unexpected string result: (expected: '" << *ps_expected << "'; actual: '" << *ps << "')";
+                    std::ostringstream os;
+                    os << "unexpected string result: (expected: '" << s_expected << "'; actual: '" << *actual << "')";
                     throw check_error(os.str());
                 }
+
                 break;
             }
             default:

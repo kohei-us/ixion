@@ -217,14 +217,9 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    string_id_t sid = cxt.get_string_identifier_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
-    const std::string* ps = cxt.get_string(sid);
+    const std::string* ps = cxt.get_string_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
     if (!ps)
-    {
-        PyErr_SetString(PyExc_RuntimeError,
-            "Failed to get a string object associated with a string ID.");
-        return nullptr;
-    }
+        return PyUnicode_FromStringAndSize(nullptr, 0);
 
     return PyUnicode_FromStringAndSize(ps->data(), ps->size());
 }

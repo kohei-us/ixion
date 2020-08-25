@@ -55,6 +55,8 @@ public:
 
     double get_value() const;
     double get_value_nowait() const;
+    const std::string* get_string() const;
+
     void interpret(iface::formula_model_access& context, const abs_address_t& pos);
 
     /**

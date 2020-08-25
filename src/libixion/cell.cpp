@@ -116,7 +116,7 @@ struct formula_cell::impl
         return true;
     }
 
-    double fetch_value_from_result() const
+    void check_calc_status_or_throw() const
     {
         if (!m_calc_status->result)
         {
@@ -131,6 +131,11 @@ struct formula_cell::impl
             SPDLOG_DEBUG(spdlog::get("ixion"), "Error in result.");
             throw formula_error(m_calc_status->result->get_error());
         }
+    }
+
+    double fetch_value_from_result() const
+    {
+        check_calc_status_or_throw();
 
         switch (m_calc_status->result->get_type())
         {
@@ -174,6 +179,33 @@ struct formula_cell::impl
                 );
             }
         }
+    }
+
+    const std::string* fetch_string_from_result() const
+    {
+        check_calc_status_or_throw();
+
+        switch (m_calc_status->result->get_type())
+        {
+            case formula_result::result_type::string_value:
+                return &m_calc_status->result->get_string_value();
+            case formula_result::result_type::matrix:
+            {
+                throw std::runtime_error("TODO");
+            }
+            default:
+            {
+                std::ostringstream os;
+                os << "string result was requested, but the actual result is of "
+                    << m_calc_status->result->get_type() << " type.";
+                throw formula_error(
+                    formula_error_t::invalid_value_type,
+                    os.str()
+                );
+            }
+        }
+
+        return nullptr;
     }
 
     bool is_grouped() const
@@ -312,6 +344,13 @@ double formula_cell::get_value_nowait() const
 {
     std::lock_guard<std::mutex> lock(mp_impl->m_calc_status->mtx);
     return mp_impl->fetch_value_from_result();
+}
+
+const std::string* formula_cell::get_string() const
+{
+    std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
+    mp_impl->wait_for_interpreted_result(lock);
+    return mp_impl->fetch_string_from_result();
 }
 
 void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)

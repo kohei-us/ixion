@@ -182,8 +182,12 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
             res.set_value(cxt.get_numeric_value(addr));
             break;
         case celltype_t::string:
-            res.set_string(cxt.get_string_identifier(addr));
+        {
+            const std::string* p = cxt.get_string_value(addr);
+            assert(p);
+            res.set_string_value(*p);
             break;
+        }
         case celltype_t::unknown:
         default:
             ;
@@ -212,9 +216,7 @@ void formula_interpreter::pop_result()
         }
         case stack_value_t::string:
         {
-            const std::string& s = res.get_string();
-            string_id_t sid = m_context.add_string(s.data(), s.size());
-            m_result.set_string(sid);
+            m_result.set_string_value(res.get_string());
             break;
         }
         case stack_value_t::value:

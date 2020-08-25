@@ -468,8 +468,8 @@ struct formula_result::impl
             throw general_error("failed to parse string result.");
 
         delete_buffer();
-        m_type = result_type::string;
-        m_str_identifier = cxt.add_string(p_first, len);
+        m_type = result_type::string_value;
+        m_str = new std::string(p_first, len);
     }
 };
 
@@ -482,8 +482,6 @@ formula_result::formula_result(const formula_result& r) :
 formula_result::formula_result(formula_result&& r) : mp_impl(std::move(r.mp_impl)) {}
 
 formula_result::formula_result(double v) : mp_impl(ixion::make_unique<impl>(v)) {}
-
-formula_result::formula_result(string_id_t strid) : mp_impl(ixion::make_unique<impl>(strid)) {}
 
 formula_result::formula_result(std::string str) : mp_impl(ixion::make_unique<impl>(std::move(str))) {}
 
@@ -501,11 +499,6 @@ void formula_result::reset()
 void formula_result::set_value(double v)
 {
     mp_impl->set_value(v);
-}
-
-void formula_result::set_string(string_id_t strid)
-{
-    mp_impl->set_string(strid);
 }
 
 void formula_result::set_string_value(std::string str)

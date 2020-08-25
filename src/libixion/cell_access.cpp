@@ -143,10 +143,7 @@ const std::string* cell_access::get_string_value() const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            assert(p);
-            formula_result res = p->get_result_cache();
-            string_id_t sid = res.get_string();
-            return mp_impl->cxt.get_string(sid);
+            return p->get_string();
         }
         default:
             ;
