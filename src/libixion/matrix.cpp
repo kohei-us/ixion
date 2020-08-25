@@ -33,6 +33,9 @@ struct matrix::impl
     impl(size_t rows, size_t cols, string_id_t si) :
         m_data(rows, cols, si) {}
 
+    impl(size_t rows, size_t cols, const std::string& str) :
+        m_data(rows, cols, str) {}
+
     impl(size_t rows, size_t cols, formula_error_t error) :
         m_data(rows, cols, -static_cast<int64_t>(error)) {}
 
@@ -76,6 +79,9 @@ matrix::matrix(size_t rows, size_t cols, bool boolean) :
 
 matrix::matrix(size_t rows, size_t cols, string_id_t si) :
     mp_impl(ixion::make_unique<impl>(rows, cols, si)) {}
+
+matrix::matrix(size_t rows, size_t cols, const std::string& str) :
+    mp_impl(ixion::make_unique<impl>(rows, cols, str)) {}
 
 matrix::matrix(size_t rows, size_t cols, formula_error_t error) :
     mp_impl(ixion::make_unique<impl>(rows, cols, error)) {}
@@ -144,6 +150,11 @@ void matrix::set(size_t row, size_t col, string_id_t val)
     mp_impl->m_data.set(row, col, static_cast<int64_t>(val));
 }
 
+void matrix::set(size_t row, size_t col, const std::string& str)
+{
+    mp_impl->m_data.set(row, col, str);
+}
+
 void matrix::set(size_t row, size_t col, formula_error_t val)
 {
     int64_t encoded = -static_cast<uint8_t>(val);
@@ -177,6 +188,12 @@ matrix::element matrix::get(size_t row, size_t col) const
                 me.type = element_type::error;
                 me.error = static_cast<formula_error_t>(-v);
             }
+            break;
+        }
+        case mdds::mtm::element_string:
+        {
+            me.type = element_type::string_value;
+            me.str = &mp_impl->m_data.get_string(row, col);
             break;
         }
         case mdds::mtm::element_boolean:

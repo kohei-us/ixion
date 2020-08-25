@@ -157,6 +157,7 @@ struct formula_cell::impl
                     case matrix::element_type::boolean:
                         return elem.boolean ? 1.0 : 0.0;
                     case matrix::element_type::string:
+                    case matrix::element_type::string_value:
                     case matrix::element_type::error:
                     default:
                         throw formula_error(formula_error_t::invalid_value_type);
@@ -219,6 +220,8 @@ struct formula_cell::impl
                 return formula_result(elem.numeric);
             case matrix::element_type::string:
                 return formula_result(elem.string_id);
+            case matrix::element_type::string_value:
+                return formula_result(*elem.str);
             case matrix::element_type::error:
                 return formula_result(elem.error);
             case matrix::element_type::empty:
@@ -256,7 +259,7 @@ struct formula_cell::impl
                     m.set(m_group_pos.row, m_group_pos.column, result.get_string());
                     break;
                 case formula_result::result_type::string_value:
-                    throw std::runtime_error("TODO");
+                    m.set(m_group_pos.row, m_group_pos.column, result.get_string_value());
                     break;
                 case formula_result::result_type::error:
                     m.set(m_group_pos.row, m_group_pos.column, result.get_error());

@@ -245,6 +245,11 @@ struct formula_result::impl
 
                                 break;
                             }
+                            case matrix::element_type::string_value:
+                            {
+                                os << '"' << *e.str << '"';
+                                break;
+                            }
                             case matrix::element_type::error:
                             {
                                 os << get_formula_error_name(e.error);
@@ -480,6 +485,8 @@ formula_result::formula_result(double v) : mp_impl(ixion::make_unique<impl>(v)) 
 
 formula_result::formula_result(string_id_t strid) : mp_impl(ixion::make_unique<impl>(strid)) {}
 
+formula_result::formula_result(std::string str) : mp_impl(ixion::make_unique<impl>(std::move(str))) {}
+
 formula_result::formula_result(formula_error_t e) : mp_impl(ixion::make_unique<impl>(e)) {}
 
 formula_result::formula_result(matrix mtx) : mp_impl(ixion::make_unique<impl>(std::move(mtx))) {}
@@ -499,6 +506,11 @@ void formula_result::set_value(double v)
 void formula_result::set_string(string_id_t strid)
 {
     mp_impl->set_string(strid);
+}
+
+void formula_result::set_string_value(std::string str)
+{
+    mp_impl->set_string_value(std::move(str));
 }
 
 void formula_result::set_error(formula_error_t e)
