@@ -919,34 +919,9 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
 string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    switch (col_store.get_type(addr.row))
-    {
-        case element_type_string:
-            return col_store.get<string_id_t>(addr.row);
-        case element_type_formula:
-        {
-            const formula_cell* p = col_store.get<formula_cell*>(addr.row);
-            formula_result res_cache = p->get_result_cache_nowait();
-            formula_result::result_type rt = res_cache.get_type();
-            if (rt == formula_result::result_type::error &&
-                res_cache.get_error() == formula_error_t::no_result_error)
-                break;
+    auto pos = col_store.position(addr.row);
 
-            switch (rt)
-            {
-                case formula_result::result_type::string:
-                    throw std::runtime_error("WIP");
-                case formula_result::result_type::error:
-                    // TODO : perhaps we should return the error string here.
-                default:
-                    ;
-            }
-            break;
-        }
-        default:
-            ;
-    }
-    return empty_string_id;
+    return pos.first->type == element_type_string ? col_store.get<string_id_t>(addr.row) : empty_string_id;
 }
 
 string_id_t model_context_impl::get_identifier_from_string(const char* p, size_t n) const
