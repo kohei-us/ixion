@@ -66,8 +66,6 @@ cell_value_t cell_access::get_value_type() const
             return cell_value_t::numeric;
         case formula_result::result_type::string:
             return cell_value_t::string;
-        case formula_result::result_type::string_value:
-            return cell_value_t::string;
         case formula_result::result_type::error:
             return cell_value_t::error;
         case formula_result::result_type::matrix:

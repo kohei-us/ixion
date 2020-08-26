@@ -381,16 +381,6 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                         case formula_result::result_type::string:
                         {
                             vt = stack_value_t::string;
-                            string_id_t strid = res.get_string();
-                            const string* ps = cxt.get_string(strid);
-                            if (!ps)
-                                return false;
-                            str = *ps;
-                            return true;
-                        }
-                        case formula_result::result_type::string_value:
-                        {
-                            vt = stack_value_t::string;
                             str = res.get_string_value();
                             return true;
                         }

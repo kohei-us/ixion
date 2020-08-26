@@ -364,7 +364,6 @@ double count_formula_block(
                     ++ret;
                 break;
             case formula_result::result_type::string:
-            case formula_result::result_type::string_value:
                 if (vt.is_string())
                     ++ret;
                 break;
@@ -936,8 +935,6 @@ string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t
             switch (rt)
             {
                 case formula_result::result_type::string:
-                    return res_cache.get_string();
-                case formula_result::result_type::string_value:
                     throw std::runtime_error("WIP");
                 case formula_result::result_type::error:
                     // TODO : perhaps we should return the error string here.

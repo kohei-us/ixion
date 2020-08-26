@@ -33,7 +33,6 @@ struct formula_result::impl
 
     union
     {
-        string_id_t m_str_identifier;
         double m_value;
         formula_error_t m_error;
         matrix* m_matrix;
@@ -42,8 +41,7 @@ struct formula_result::impl
 
     impl() : m_type(result_type::value), m_value(0.0) {}
     impl(double v) : m_type(result_type::value), m_value(v) {}
-    impl(string_id_t strid) : m_type(result_type::string), m_str_identifier(strid) {}
-    impl(std::string str) : m_type(result_type::string_value), m_str(new std::string(std::move(str))) {}
+    impl(std::string str) : m_type(result_type::string), m_str(new std::string(std::move(str))) {}
     impl(formula_error_t e) : m_type(result_type::error), m_error(e) {}
     impl(matrix mtx) : m_type(result_type::matrix), m_matrix(new matrix(std::move(mtx))) {}
 
@@ -55,9 +53,6 @@ struct formula_result::impl
                 m_value = other.m_value;
                 break;
             case result_type::string:
-                m_str_identifier = other.m_str_identifier;
-                break;
-            case result_type::string_value:
                 m_str = new std::string(*other.m_str);
                 break;
             case result_type::error:
@@ -83,7 +78,7 @@ struct formula_result::impl
             case result_type::matrix:
                 delete m_matrix;
                 break;
-            case result_type::string_value:
+            case result_type::string:
                 delete m_str;
                 break;
             default:
@@ -105,23 +100,16 @@ struct formula_result::impl
         m_value = v;
     }
 
-    void set_string(string_id_t strid)
-    {
-        delete_buffer();
-        m_type = result_type::string;
-        m_str_identifier = strid;
-    }
-
     void set_string_value(std::string str)
     {
-        if (m_type == result_type::string_value)
+        if (m_type == result_type::string)
         {
             *m_str = std::move(str);
             return;
         }
 
         delete_buffer();
-        m_type = result_type::string_value;
+        m_type = result_type::string;
         m_str = new std::string(std::move(str));
     }
 
@@ -151,15 +139,9 @@ struct formula_result::impl
         return m_value;
     }
 
-    string_id_t get_string() const
-    {
-        assert(m_type == result_type::string);
-        return m_str_identifier;
-    }
-
     const std::string& get_string_value() const
     {
-        assert(m_type == result_type::string_value);
+        assert(m_type == result_type::string);
         return *m_str;
     }
 
@@ -193,11 +175,6 @@ struct formula_result::impl
             case result_type::error:
                 return string(get_formula_error_name(m_error));
             case result_type::string:
-            {
-                const string* p = cxt.get_string(m_str_identifier);
-                return p ? *p : string();
-            }
-            case result_type::string_value:
                 return *m_str;
             case result_type::value:
             {
@@ -323,9 +300,6 @@ struct formula_result::impl
                 m_value = r.mp_impl->m_value;
                 break;
             case result_type::string:
-                m_str_identifier = r.mp_impl->m_str_identifier;
-                break;
-            case result_type::string_value:
                 m_str = r.mp_impl->m_str;
                 r.mp_impl->m_str = nullptr;
                 break;
@@ -351,8 +325,6 @@ struct formula_result::impl
             case result_type::value:
                 return m_value == r.mp_impl->m_value;
             case result_type::string:
-                return m_str_identifier == r.mp_impl->m_str_identifier;
-            case result_type::string_value:
                 return *m_str == *r.mp_impl->m_str;
             case result_type::error:
                 return m_error == r.mp_impl->m_error;
@@ -468,7 +440,7 @@ struct formula_result::impl
             throw general_error("failed to parse string result.");
 
         delete_buffer();
-        m_type = result_type::string_value;
+        m_type = result_type::string;
         m_str = new std::string(p_first, len);
     }
 };
@@ -519,11 +491,6 @@ void formula_result::set_matrix(matrix mtx)
 double formula_result::get_value() const
 {
     return mp_impl->get_value();
-}
-
-string_id_t formula_result::get_string() const
-{
-    return mp_impl->get_string();
 }
 
 const std::string& formula_result::get_string_value() const
@@ -590,9 +557,6 @@ std::ostream& operator<< (std::ostream& os, formula_result::result_type v)
             break;
         case formula_result::result_type::string:
             os << "string";
-            break;
-        case formula_result::result_type::string_value:
-            os << "string-value";
             break;
         case formula_result::result_type::value:
             os << "value";

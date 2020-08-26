@@ -375,13 +375,6 @@ const std::string formula_value_stack::pop_string()
                         case formula_result::result_type::error:
                             throw formula_error(res.get_error());
                         case formula_result::result_type::string:
-                        {
-                            const std::string* ps = m_context.get_string(res.get_string());
-                            if (!ps)
-                                throw formula_error(formula_error_t::stack_error);
-                            return *ps;
-                        }
-                        case formula_result::result_type::string_value:
                             return res.get_string_value();
                         case formula_result::result_type::value:
                         {

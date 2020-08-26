@@ -34,7 +34,7 @@ class IXION_DLLPUBLIC formula_result
     std::unique_ptr<impl> mp_impl;
 
 public:
-    enum class result_type { value, string, string_value, error, matrix };
+    enum class result_type { value, string, error, matrix };
 
     formula_result();
     formula_result(const formula_result& r);
@@ -60,13 +60,11 @@ public:
     double get_value() const;
 
     /**
-     * Get a string ID for textural result value.  The caller must make sure
-     * the result is of textural type, else the behavior is undefined.
+     * Get a string value for textural result.  The caller must make
+     * sure the result is of textural type, else the behavior is undefined.
      *
-     * @return string ID.
+     * @return string value.
      */
-    string_id_t get_string() const;
-
     const std::string& get_string_value() const;
 
     /**
@@ -86,6 +84,12 @@ public:
      */
     const matrix& get_matrix() const;
 
+    /**
+     * Get a matrix value of the result.  The caller must make sure that the
+     * result is of matrix type, else the behavior is undefined.
+     *
+     * @return matrix result value.
+     */
     matrix& get_matrix();
 
     /**
