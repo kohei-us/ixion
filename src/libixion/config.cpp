@@ -13,13 +13,16 @@ config::config() :
     sep_function_arg(','),
     sep_matrix_column(','),
     sep_matrix_row(';'),
-    output_precision(-1) {}
+    output_precision(-1),
+    wait_policy(formula_result_wait_policy_t::block_until_done)
+{}
 
 config::config(const config& r) :
     sep_function_arg(r.sep_function_arg),
     sep_matrix_column(r.sep_matrix_column),
     sep_matrix_row(r.sep_matrix_row),
-    output_precision(r.output_precision) {}
+    output_precision(r.output_precision),
+    wait_policy(r.wait_policy) {}
 
 }
 

@@ -345,7 +345,7 @@ const column_stores_t* model_context_impl::get_columns(sheet_t sheet) const
 namespace {
 
 double count_formula_block(
-    const column_store_t::const_iterator& itb, size_t offset, size_t len, const values_t& vt)
+    const config& cfg, const column_store_t::const_iterator& itb, size_t offset, size_t len, const values_t& vt)
 {
     double ret = 0.0;
 
@@ -355,7 +355,7 @@ double count_formula_block(
     for (; pp != pp_end; ++pp)
     {
         const formula_cell& fc = **pp;
-        formula_result res = fc.get_result_cache();
+        formula_result res = fc.get_result_cache(cfg.wait_policy);
 
         switch (res.get_type())
         {
@@ -436,7 +436,7 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
                         match = values_type.is_empty();
                         break;
                     case element_type_formula:
-                        ret += count_formula_block(itb, offset, len, values_type);
+                        ret += count_formula_block(m_parent.get_config(), itb, offset, len, values_type);
                         break;
                     default:
                     {
@@ -817,33 +817,7 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_value();
-        }
-        default:
-            ;
-    }
-    return 0.0;
-}
-
-double model_context_impl::get_numeric_value_nowait(const abs_address_t& addr) const
-{
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
-
-    switch (pos.first->type)
-    {
-        case element_type_numeric:
-            return numeric_element_block::at(*pos.first->data, pos.second);
-        case element_type_boolean:
-        {
-            auto it = boolean_element_block::cbegin(*pos.first->data);
-            std::advance(it, pos.second);
-            return *it ? 1.0 : 0.0;
-        }
-        case element_type_formula:
-        {
-            const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_value_nowait();
+            return p->get_value(m_config.wait_policy);
         }
         default:
             ;
@@ -869,7 +843,7 @@ bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_value() != 0.0 ? true : false;
+            return p->get_value(m_config.wait_policy) == 0.0 ? false : true;
         }
         default:
             ;
@@ -907,7 +881,7 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_string();
+            return p->get_string(m_config.wait_policy);
         }
         default:
             ;

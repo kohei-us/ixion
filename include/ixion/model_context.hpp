@@ -127,8 +127,6 @@ public:
     void set_sheet_size(const rc_size_t& sheet_size);
     void set_config(const config& cfg);
 
-    double get_numeric_value_nowait(const abs_address_t& addr) const;
-
     IXION_DEPRECATED void erase_cell(const abs_address_t& addr);
     void empty_cell(const abs_address_t& addr);
 

@@ -5,11 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_CONFIG_HPP__
-#define __IXION_CONFIG_HPP__
+#ifndef INCLUDED_IXION_CONFIG_HPP
+#define INCLUDED_IXION_CONFIG_HPP
 
-#include "ixion/env.hpp"
-#include <cstdint>
+#include "ixion/types.hpp"
 
 namespace ixion {
 
@@ -40,6 +39,8 @@ struct IXION_DLLPUBLIC config
      */
     int8_t output_precision;
 
+    formula_result_wait_policy_t wait_policy;
+
     config();
     config(const config& r);
 };
@@ -47,4 +48,5 @@ struct IXION_DLLPUBLIC config
 }
 
 #endif
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

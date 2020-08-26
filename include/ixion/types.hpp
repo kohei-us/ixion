@@ -191,6 +191,16 @@ enum class formula_error_t : uint8_t
 };
 
 /**
+ * Type of policy on what to do when querying for the result of a formula
+ * cell whose result has not yet been calculated.
+ */
+enum class formula_result_wait_policy_t
+{
+    block_until_done,
+    throw_exception,
+};
+
+/**
  * Specifies iterator direction of a {@link model_context}.
  */
 enum class rc_direction_t

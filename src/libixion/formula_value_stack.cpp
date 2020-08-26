@@ -12,6 +12,7 @@
 #include "ixion/matrix.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/interface/formula_model_access.hpp"
+#include "ixion/config.hpp"
 
 #include <string>
 #include <sstream>
@@ -368,7 +369,7 @@ const std::string formula_value_stack::pop_string()
                 case celltype_t::formula:
                 {
                     const formula_cell* fc = m_context.get_formula_cell(addr);
-                    formula_result res = fc->get_result_cache();
+                    formula_result res = fc->get_result_cache(m_context.get_config().wait_policy);
 
                     switch (res.get_type())
                     {

@@ -53,9 +53,8 @@ public:
     const formula_tokens_store_ptr_t& get_tokens() const;
     void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
-    double get_value() const;
-    double get_value_nowait() const;
-    const std::string* get_string() const;
+    double get_value(formula_result_wait_policy_t policy) const;
+    const std::string* get_string(formula_result_wait_policy_t policy) const;
 
     void interpret(iface::formula_model_access& context, const abs_address_t& pos);
 
@@ -85,8 +84,7 @@ public:
     std::vector<const formula_token*> get_ref_tokens(
         const iface::formula_model_access& cxt, const abs_address_t& pos) const;
 
-    const formula_result& get_raw_result_cache() const;
-    const formula_result* get_raw_result_cache_nowait() const;
+    const formula_result& get_raw_result_cache(formula_result_wait_policy_t policy) const;
 
     /**
      * Get the cached result as a single cell.  For a non-grouped formula
@@ -97,7 +95,7 @@ public:
      *
      * @return formula result.
      */
-    formula_result get_result_cache() const;
+    formula_result get_result_cache(formula_result_wait_policy_t policy) const;
 
     /**
      * Set a cached result to this formula cell instance.
@@ -106,8 +104,6 @@ public:
      * @param result cached result.
      */
     void set_result_cache(formula_result result);
-
-    formula_result get_result_cache_nowait() const;
 
     formula_group_t get_group_properties() const;
 

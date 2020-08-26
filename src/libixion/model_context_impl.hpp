@@ -118,7 +118,6 @@ public:
     bool is_empty(const abs_address_t& addr) const;
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
-    double get_numeric_value_nowait(const abs_address_t& addr) const;
     bool get_boolean_value(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const abs_address_t& addr) const;
     const std::string* get_string_value(const abs_address_t& addr) const;

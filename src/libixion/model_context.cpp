@@ -199,11 +199,6 @@ void model_context::set_config(const config& cfg)
     mp_impl->set_config(cfg);
 }
 
-double model_context::get_numeric_value_nowait(const abs_address_t& addr) const
-{
-    return mp_impl->get_numeric_value_nowait(addr);
-}
-
 string_id_t model_context::get_string_identifier(const abs_address_t& addr) const
 {
     return mp_impl->get_string_identifier(addr);

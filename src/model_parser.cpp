@@ -14,6 +14,7 @@
 #include "ixion/address_iterator.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/cell_access.hpp"
+#include "ixion/config.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -1136,7 +1137,7 @@ void model_parser::check()
             case celltype_t::formula:
             {
                 const formula_cell* fcell = ca.get_formula_cell();
-                formula_result res_cell = fcell->get_result_cache();
+                formula_result res_cell = fcell->get_result_cache(m_context.get_config().wait_policy);
 
                 if (res_cell != res)
                 {

@@ -330,23 +330,19 @@ void formula_cell::set_tokens(const formula_tokens_store_ptr_t& tokens)
     mp_impl->m_tokens = tokens;
 }
 
-double formula_cell::get_value() const
+double formula_cell::get_value(formula_result_wait_policy_t policy) const
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
-    mp_impl->wait_for_interpreted_result(lock);
+    if (policy == formula_result_wait_policy_t::block_until_done)
+        mp_impl->wait_for_interpreted_result(lock);
     return mp_impl->fetch_value_from_result();
 }
 
-double formula_cell::get_value_nowait() const
-{
-    std::lock_guard<std::mutex> lock(mp_impl->m_calc_status->mtx);
-    return mp_impl->fetch_value_from_result();
-}
-
-const std::string* formula_cell::get_string() const
+const std::string* formula_cell::get_string(formula_result_wait_policy_t policy) const
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
-    mp_impl->wait_for_interpreted_result(lock);
+    if (policy == formula_result_wait_policy_t::block_until_done)
+        mp_impl->wait_for_interpreted_result(lock);
     return mp_impl->fetch_string_from_result();
 }
 
@@ -511,10 +507,13 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
     return ret;
 }
 
-const formula_result& formula_cell::get_raw_result_cache() const
+const formula_result& formula_cell::get_raw_result_cache(formula_result_wait_policy_t policy) const
 {
     std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
-    mp_impl->wait_for_interpreted_result(lock);
+
+    if (policy == formula_result_wait_policy_t::block_until_done)
+        mp_impl->wait_for_interpreted_result(lock);
+
     if (!mp_impl->m_calc_status->result)
     {
         SPDLOG_DEBUG(spdlog::get("ixion"), "Result not yet available.");
@@ -524,30 +523,15 @@ const formula_result& formula_cell::get_raw_result_cache() const
     return *mp_impl->m_calc_status->result;
 }
 
-const formula_result* formula_cell::get_raw_result_cache_nowait() const
+formula_result formula_cell::get_result_cache(formula_result_wait_policy_t policy) const
 {
-    std::unique_lock<std::mutex> lock(mp_impl->m_calc_status->mtx);
-    return mp_impl->m_calc_status->result.get();
-}
-
-formula_result formula_cell::get_result_cache() const
-{
-    const formula_result& src = get_raw_result_cache();
+    const formula_result& src = get_raw_result_cache(policy);
     return mp_impl->get_single_formula_result(src);
 }
 
 void formula_cell::set_result_cache(formula_result result)
 {
     mp_impl->set_single_formula_result(result);
-}
-
-formula_result formula_cell::get_result_cache_nowait() const
-{
-    const formula_result* src = get_raw_result_cache_nowait();
-    if (!src)
-        return formula_result(formula_error_t::no_result_error);
-
-    return mp_impl->get_single_formula_result(*src);
 }
 
 formula_group_t formula_cell::get_group_properties() const

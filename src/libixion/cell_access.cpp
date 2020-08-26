@@ -58,7 +58,7 @@ cell_value_t cell_access::get_value_type() const
         return static_cast<cell_value_t>(raw_type);
 
     const formula_cell* fc = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-    formula_result res = fc->get_result_cache(); // by calling this we should not get a matrix result.
+    formula_result res = fc->get_result_cache(mp_impl->cxt.get_config().wait_policy); // by calling this we should not get a matrix result.
 
     switch (res.get_type())
     {
@@ -98,7 +98,7 @@ double cell_access::get_numeric_value() const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return p->get_value();
+            return p->get_value(mp_impl->cxt.get_config().wait_policy);
         }
         default:
             ;
@@ -121,7 +121,7 @@ bool cell_access::get_boolean_value() const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return p->get_value() != 0.0 ? true : false;
+            return p->get_value(mp_impl->cxt.get_config().wait_policy) == 0.0 ? false : true;
         }
         default:
             ;
@@ -141,7 +141,7 @@ const std::string* cell_access::get_string_value() const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return p->get_string();
+            return p->get_string(mp_impl->cxt.get_config().wait_policy);
         }
         default:
             ;
@@ -169,7 +169,7 @@ formula_error_t cell_access::get_error_value() const
         return formula_error_t::no_error;
 
     const formula_cell* fc = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-    formula_result res = fc->get_result_cache();
+    formula_result res = fc->get_result_cache(mp_impl->cxt.get_config().wait_policy);
     if (res.get_type() != formula_result::result_type::error)
         // this formula cell doesn't have an error result.
         return formula_error_t::no_error;

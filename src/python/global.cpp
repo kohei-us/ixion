@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "ixion/config.hpp"
 #include "global.hpp"
 
 namespace ixion { namespace python {
@@ -12,7 +13,11 @@ namespace ixion { namespace python {
 document_global::document_global() :
     m_cxt(),
     m_resolver(ixion::formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_cxt))
-{}
+{
+    config cfg = m_cxt.get_config();
+    cfg.wait_policy = formula_result_wait_policy_t::throw_exception;
+    m_cxt.set_config(cfg);
+}
 
 PyObject* get_python_document_error()
 {

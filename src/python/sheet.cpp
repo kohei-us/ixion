@@ -188,7 +188,7 @@ PyObject* sheet_get_numeric_value(sheet* self, PyObject* args, PyObject* kwargs)
     double val = 0.0;
     try
     {
-        val = cxt.get_numeric_value_nowait(ixion::abs_address_t(sd->m_sheet_index, row, col));
+        val = cxt.get_numeric_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
     }
     catch (const formula_error&)
     {

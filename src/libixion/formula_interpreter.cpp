@@ -16,6 +16,7 @@
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/table_handler.hpp"
+#include "ixion/config.hpp"
 
 #include <cassert>
 #include <string>
@@ -171,7 +172,7 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
             if (!fcell)
                 return;
 
-            res = fcell->get_result_cache();
+            res = fcell->get_result_cache(cxt.get_config().wait_policy);
             break;
         }
         case celltype_t::boolean:
@@ -368,7 +369,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                 {
                     const formula_cell* fc = cxt.get_formula_cell(addr);
                     assert(fc);
-                    formula_result res = fc->get_result_cache();
+                    formula_result res = fc->get_result_cache(cxt.get_config().wait_policy);
 
                     switch (res.get_type())
                     {
