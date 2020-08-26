@@ -916,14 +916,6 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
     return nullptr;
 }
 
-string_id_t model_context_impl::get_string_identifier_nowait(const abs_address_t& addr) const
-{
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
-
-    return pos.first->type == element_type_string ? col_store.get<string_id_t>(addr.row) : empty_string_id;
-}
-
 string_id_t model_context_impl::get_identifier_from_string(const char* p, size_t n) const
 {
     return m_str_pool.get_identifier_from_string(p, n);

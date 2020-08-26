@@ -128,7 +128,6 @@ public:
     void set_config(const config& cfg);
 
     double get_numeric_value_nowait(const abs_address_t& addr) const;
-    string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
 
     IXION_DEPRECATED void erase_cell(const abs_address_t& addr);
     void empty_cell(const abs_address_t& addr);

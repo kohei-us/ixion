@@ -122,7 +122,6 @@ public:
     bool get_boolean_value(const abs_address_t& addr) const;
     string_id_t get_string_identifier(const abs_address_t& addr) const;
     const std::string* get_string_value(const abs_address_t& addr) const;
-    string_id_t get_string_identifier_nowait(const abs_address_t& addr) const;
     string_id_t get_identifier_from_string(const char* p, size_t n) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
