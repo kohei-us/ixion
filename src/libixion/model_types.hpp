@@ -22,6 +22,8 @@ namespace detail {
 
 typedef std::map<std::string, named_expression_t> named_expressions_t;
 
+extern const std::string empty_string;
+
 }}
 
 #endif

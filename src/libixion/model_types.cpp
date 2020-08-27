@@ -9,6 +9,8 @@
 
 namespace ixion { namespace detail {
 
+const std::string empty_string = "";
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

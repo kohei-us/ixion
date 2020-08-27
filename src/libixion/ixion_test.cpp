@@ -1386,6 +1386,16 @@ void test_model_context_storage()
         assert(ca.get_type() == celltype_t::empty);
         assert(ca.get_value_type() == cell_value_t::empty);
 
+        // String value on an empty cell should be an empty string.
+        const std::string* ps = ca.get_string_value();
+        assert(ps);
+        assert(ps->empty());
+
+        // Likewise...
+        ps = cxt.get_string_value(abs_address_t(0, 0, 0));
+        assert(ps);
+        assert(ps->empty());
+
         // Test storage of numeric values.
         volatile double val = 0.1;
         for (col_t col = 0; col < 3; ++col)

@@ -14,6 +14,7 @@
 #include "ixion/interface/session_handler.hpp"
 
 #include "calc_status.hpp"
+#include "model_types.hpp"
 
 #include <spdlog/spdlog.h>
 #include <sstream>
@@ -894,6 +895,8 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
             return p->get_string(m_formula_res_wait_policy);
         }
+        case element_type_empty:
+            return &empty_string;
         default:
             ;
     }

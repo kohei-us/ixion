@@ -13,6 +13,7 @@
 #include "model_context_impl.hpp"
 #include "workbook.hpp"
 #include "utils.hpp"
+#include "model_types.hpp"
 
 namespace ixion {
 
@@ -152,6 +153,8 @@ const std::string* cell_access::get_string_value() const
             const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
             return p->get_string(mp_impl->cxt.get_formula_result_wait_policy());
         }
+        case element_type_empty:
+            return &detail::empty_string;
         default:
             ;
     }
