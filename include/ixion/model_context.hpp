@@ -97,8 +97,7 @@ public:
     model_context(const rc_size_t& sheet_size);
     virtual ~model_context() override;
 
-    virtual void start_calculation() override;
-    virtual void end_calculation() override;
+    virtual void notify(formula_event_t event) override;
 
     virtual const config& get_config() const override;
     virtual dirty_cell_tracker& get_cell_tracker() override;

@@ -30,17 +30,16 @@ class calc_scope
 public:
     calc_scope(iface::formula_model_access& cxt) : m_cxt(cxt)
     {
-        m_cxt.start_calculation();
+        m_cxt.notify(formula_event_t::calculation_begins);
     }
 
     ~calc_scope()
     {
-        m_cxt.end_calculation();
+        m_cxt.notify(formula_event_t::calculation_ends);
     }
 };
 
 }
-
 
 void calculate_sorted_cells(
     iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)

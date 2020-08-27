@@ -153,14 +153,17 @@ model_context_impl::model_context_impl(model_context& parent, const rc_size_t& s
 
 model_context_impl::~model_context_impl() {}
 
-void model_context_impl::start_calculation()
+void model_context_impl::notify(formula_event_t event)
 {
-    m_formula_res_wait_policy = formula_result_wait_policy_t::block_until_done;
-}
-
-void model_context_impl::end_calculation()
-{
-    m_formula_res_wait_policy = formula_result_wait_policy_t::throw_exception;
+    switch (event)
+    {
+        case formula_event_t::calculation_begins:
+            m_formula_res_wait_policy = formula_result_wait_policy_t::block_until_done;
+            break;
+        case formula_event_t::calculation_ends:
+            m_formula_res_wait_policy = formula_result_wait_policy_t::throw_exception;
+            break;
+    }
 }
 
 void model_context_impl::set_named_expression(

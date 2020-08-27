@@ -63,8 +63,7 @@ public:
         return m_formula_res_wait_policy;
     }
 
-    void start_calculation();
-    void end_calculation();
+    void notify(formula_event_t event);
 
     const config& get_config() const
     {

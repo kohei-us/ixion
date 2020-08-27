@@ -200,6 +200,12 @@ enum class formula_result_wait_policy_t
     throw_exception,
 };
 
+enum class formula_event_t
+{
+    calculation_begins,
+    calculation_ends,
+};
+
 /**
  * Specifies iterator direction of a {@link model_context}.
  */

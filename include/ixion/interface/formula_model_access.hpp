@@ -47,8 +47,12 @@ public:
     IXION_DLLPUBLIC formula_model_access();
     virtual IXION_DLLPUBLIC ~formula_model_access();
 
-    virtual void start_calculation() = 0;
-    virtual void end_calculation() = 0;
+    /**
+     * This method is used to notify the model access implementer of events.
+     *
+     * @param event event type.
+     */
+    virtual void notify(formula_event_t event) = 0;
 
     virtual const config& get_config() const = 0;
     virtual dirty_cell_tracker& get_cell_tracker() = 0;

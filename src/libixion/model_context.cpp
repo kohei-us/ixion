@@ -82,14 +82,9 @@ formula_result_wait_policy_t model_context::get_formula_result_wait_policy() con
     return mp_impl->get_formula_result_wait_policy();
 }
 
-void model_context::start_calculation()
+void model_context::notify(formula_event_t event)
 {
-    mp_impl->start_calculation();
-}
-
-void model_context::end_calculation()
-{
-    mp_impl->end_calculation();
+    mp_impl->notify(event);
 }
 
 const config& model_context::get_config() const
