@@ -1175,7 +1175,7 @@ void model_parser::check()
                 if (!actual)
                     throw check_error("failed to retrieve a string value from the cell.");
 
-                const std::string& s_expected = res.get_string_value();
+                const std::string& s_expected = res.get_string();
                 if (*actual != s_expected)
                 {
                     std::ostringstream os;

@@ -493,7 +493,7 @@ double formula_result::get_value() const
     return mp_impl->get_value();
 }
 
-const std::string& formula_result::get_string_value() const
+const std::string& formula_result::get_string() const
 {
     return mp_impl->get_string_value();
 }

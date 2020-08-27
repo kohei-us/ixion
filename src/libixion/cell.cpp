@@ -188,7 +188,7 @@ struct formula_cell::impl
         switch (m_calc_status->result->get_type())
         {
             case formula_result::result_type::string:
-                return &m_calc_status->result->get_string_value();
+                return &m_calc_status->result->get_string();
             case formula_result::result_type::matrix:
             {
                 throw std::runtime_error("TODO");
@@ -288,7 +288,7 @@ struct formula_cell::impl
                     m.set(m_group_pos.row, m_group_pos.column, result.get_value());
                     break;
                 case formula_result::result_type::string:
-                    m.set(m_group_pos.row, m_group_pos.column, result.get_string_value());
+                    m.set(m_group_pos.row, m_group_pos.column, result.get_string());
                     break;
                 case formula_result::result_type::error:
                     m.set(m_group_pos.row, m_group_pos.column, result.get_error());

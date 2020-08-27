@@ -65,7 +65,7 @@ public:
      *
      * @return string value.
      */
-    const std::string& get_string_value() const;
+    const std::string& get_string() const;
 
     /**
      * Get an error value of the result.  The caller must make sure that the

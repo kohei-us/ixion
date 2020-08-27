@@ -376,7 +376,7 @@ bool pop_stack_value_or_string(const iface::formula_model_access& cxt,
                         case formula_result::result_type::string:
                         {
                             vt = stack_value_t::string;
-                            str = res.get_string_value();
+                            str = res.get_string();
                             return true;
                         }
                         case formula_result::result_type::error:
