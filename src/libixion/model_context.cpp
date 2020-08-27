@@ -77,6 +77,21 @@ model_context::~model_context()
 {
 }
 
+formula_result_wait_policy_t model_context::get_formula_result_wait_policy() const
+{
+    return mp_impl->get_formula_result_wait_policy();
+}
+
+void model_context::start_calculation()
+{
+    mp_impl->start_calculation();
+}
+
+void model_context::end_calculation()
+{
+    mp_impl->end_calculation();
+}
+
 const config& model_context::get_config() const
 {
     return mp_impl->get_config();
@@ -217,6 +232,11 @@ const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) c
 formula_cell* model_context::get_formula_cell(const abs_address_t& addr)
 {
     return mp_impl->get_formula_cell(addr);
+}
+
+formula_result model_context::get_formula_result(const abs_address_t& addr) const
+{
+    return mp_impl->get_formula_result(addr);
 }
 
 double model_context::count_range(const abs_range_t& range, const values_t& values_type) const

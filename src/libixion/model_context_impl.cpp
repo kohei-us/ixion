@@ -145,11 +145,22 @@ model_context_impl::model_context_impl(model_context& parent, const rc_size_t& s
     m_sheet_size(sheet_size),
     m_tracker(),
     mp_table_handler(nullptr),
-    mp_session_factory(&dummy_session_handler_factory)
+    mp_session_factory(&dummy_session_handler_factory),
+    m_formula_res_wait_policy(formula_result_wait_policy_t::throw_exception)
 {
 }
 
 model_context_impl::~model_context_impl() {}
+
+void model_context_impl::start_calculation()
+{
+    m_formula_res_wait_policy = formula_result_wait_policy_t::block_until_done;
+}
+
+void model_context_impl::end_calculation()
+{
+    m_formula_res_wait_policy = formula_result_wait_policy_t::throw_exception;
+}
 
 void model_context_impl::set_named_expression(
     const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
@@ -345,7 +356,7 @@ const column_stores_t* model_context_impl::get_columns(sheet_t sheet) const
 namespace {
 
 double count_formula_block(
-    const config& cfg, const column_store_t::const_iterator& itb, size_t offset, size_t len, const values_t& vt)
+    formula_result_wait_policy_t wait_policy, const column_store_t::const_iterator& itb, size_t offset, size_t len, const values_t& vt)
 {
     double ret = 0.0;
 
@@ -355,7 +366,7 @@ double count_formula_block(
     for (; pp != pp_end; ++pp)
     {
         const formula_cell& fc = **pp;
-        formula_result res = fc.get_result_cache(cfg.wait_policy);
+        formula_result res = fc.get_result_cache(wait_policy);
 
         switch (res.get_type())
         {
@@ -436,7 +447,7 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
                         match = values_type.is_empty();
                         break;
                     case element_type_formula:
-                        ret += count_formula_block(m_parent.get_config(), itb, offset, len, values_type);
+                        ret += count_formula_block(m_formula_res_wait_policy, itb, offset, len, values_type);
                         break;
                     default:
                     {
@@ -817,7 +828,7 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_value(m_config.wait_policy);
+            return p->get_value(m_formula_res_wait_policy);
         }
         default:
             ;
@@ -843,7 +854,7 @@ bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_value(m_config.wait_policy) == 0.0 ? false : true;
+            return p->get_value(m_formula_res_wait_policy) == 0.0 ? false : true;
         }
         default:
             ;
@@ -881,7 +892,7 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);
-            return p->get_string(m_config.wait_policy);
+            return p->get_string(m_formula_res_wait_policy);
         }
         default:
             ;
@@ -915,6 +926,15 @@ formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
         return nullptr;
 
     return formula_element_block::at(*pos.first->data, pos.second);
+}
+
+formula_result model_context_impl::get_formula_result(const abs_address_t& addr) const
+{
+    const formula_cell* fc = get_formula_cell(addr);
+    if (!fc)
+        throw general_error("not a formula cell.");
+
+    return fc->get_result_cache(m_formula_res_wait_policy);
 }
 
 }}

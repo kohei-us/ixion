@@ -46,6 +46,8 @@ class IXION_DLLPUBLIC model_context : public iface::formula_model_access
 
     std::unique_ptr<detail::model_context_impl> mp_impl;
 
+    formula_result_wait_policy_t get_formula_result_wait_policy() const;
+
 public:
     class IXION_DLLPUBLIC session_handler_factory
     {
@@ -95,6 +97,9 @@ public:
     model_context(const rc_size_t& sheet_size);
     virtual ~model_context() override;
 
+    virtual void start_calculation() override;
+    virtual void end_calculation() override;
+
     virtual const config& get_config() const override;
     virtual dirty_cell_tracker& get_cell_tracker() override;
     virtual const dirty_cell_tracker& get_cell_tracker() const override;
@@ -107,6 +112,8 @@ public:
     virtual const std::string* get_string_value(const abs_address_t& addr) const override;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const override;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) override;
+
+    virtual formula_result get_formula_result(const abs_address_t& addr) const override;
 
     virtual const named_expression_t* get_named_expression(sheet_t sheet, const std::string& name) const override;
 

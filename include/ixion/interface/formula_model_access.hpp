@@ -19,6 +19,7 @@
 namespace ixion {
 
 class formula_cell;
+class formula_result;
 class formula_name_resolver;
 class dirty_cell_tracker;
 class matrix;
@@ -45,6 +46,9 @@ class formula_model_access
 public:
     IXION_DLLPUBLIC formula_model_access();
     virtual IXION_DLLPUBLIC ~formula_model_access();
+
+    virtual void start_calculation() = 0;
+    virtual void end_calculation() = 0;
 
     virtual const config& get_config() const = 0;
     virtual dirty_cell_tracker& get_cell_tracker() = 0;
@@ -82,6 +86,7 @@ public:
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 
+    virtual formula_result get_formula_result(const abs_address_t& addr) const = 0;
     /**
      * Get a named expression token set associated with specified name if
      * present.  It first searches the local sheet scope for the name, then if

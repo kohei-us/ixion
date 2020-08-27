@@ -58,6 +58,14 @@ public:
     model_context_impl(model_context& parent, const rc_size_t& sheet_size);
     ~model_context_impl();
 
+    formula_result_wait_policy_t get_formula_result_wait_policy() const
+    {
+        return m_formula_res_wait_policy;
+    }
+
+    void start_calculation();
+    void end_calculation();
+
     const config& get_config() const
     {
         return m_config;
@@ -125,6 +133,8 @@ public:
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
+    formula_result get_formula_result(const abs_address_t& addr) const;
+
     void set_named_expression(const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr);
     void set_named_expression(sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr);
 
@@ -177,6 +187,8 @@ private:
     strings_type m_sheet_names; ///< index to sheet name map.
 
     safe_string_pool m_str_pool;
+
+    formula_result_wait_policy_t m_formula_res_wait_policy;
 };
 
 }}

@@ -163,13 +163,6 @@ PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwa
 
     document_global& dg = self->m_data->m_global;
 
-    // Temporarily change the wait policy to block before the calculation begins.
-    // TODO: replace this with a scoped switch.
-    config old_cfg = dg.m_cxt.get_config();
-    config cfg = old_cfg;
-    cfg.wait_policy = formula_result_wait_policy_t::block_until_done;
-    dg.m_cxt.set_config(cfg);
-
     // Query additional dirty formula cells and add them to the current set.
     std::vector<abs_range_t> sorted = ixion::query_and_sort_dirty_cells(
         dg.m_cxt, dg.m_modified_cells, &dg.m_dirty_formula_cells);
@@ -177,8 +170,6 @@ PyObject* document_calculate(pyobj_document* self, PyObject* args, PyObject* kwa
 
     dg.m_modified_cells.clear();
     dg.m_dirty_formula_cells.clear();
-
-    dg.m_cxt.set_config(old_cfg); // set the old configuration back.
 
     Py_INCREF(Py_None);
     return Py_None;

@@ -1136,8 +1136,7 @@ void model_parser::check()
         {
             case celltype_t::formula:
             {
-                const formula_cell* fcell = ca.get_formula_cell();
-                formula_result res_cell = fcell->get_result_cache(m_context.get_config().wait_policy);
+                formula_result res_cell = ca.get_formula_result();
 
                 if (res_cell != res)
                 {

@@ -39,8 +39,6 @@ struct IXION_DLLPUBLIC config
      */
     int8_t output_precision;
 
-    formula_result_wait_policy_t wait_policy;
-
     config();
     config(const config& r);
 };

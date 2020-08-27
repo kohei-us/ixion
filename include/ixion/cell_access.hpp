@@ -17,6 +17,7 @@ namespace ixion {
 
 class model_context;
 class formula_cell;
+class formula_result;
 struct abs_address_t;
 
 /**
@@ -45,6 +46,8 @@ public:
     cell_value_t get_value_type() const;
 
     const formula_cell* get_formula_cell() const;
+
+    formula_result get_formula_result() const;
 
     double get_numeric_value() const;
 

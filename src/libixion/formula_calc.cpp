@@ -22,12 +22,34 @@
 
 namespace ixion {
 
+namespace {
+
+class calc_scope
+{
+    iface::formula_model_access& m_cxt;
+public:
+    calc_scope(iface::formula_model_access& cxt) : m_cxt(cxt)
+    {
+        m_cxt.start_calculation();
+    }
+
+    ~calc_scope()
+    {
+        m_cxt.end_calculation();
+    }
+};
+
+}
+
+
 void calculate_sorted_cells(
     iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)
 {
 #if IXION_THREADS == 0
     thread_count = 0;  // threads are disabled thus not to be used.
 #endif
+
+    calc_scope cs(cxt);
 
     std::vector<queue_entry> entries;
     entries.reserve(formula_cells.size());
