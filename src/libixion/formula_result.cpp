@@ -213,17 +213,6 @@ struct formula_result::impl
                             }
                             case matrix::element_type::string:
                             {
-                                const std::string* p = cxt.get_string(e.string_id);
-
-                                if (p)
-                                    os << '"' << *p << '"';
-                                else
-                                    os << "\"#ERR!\"";
-
-                                break;
-                            }
-                            case matrix::element_type::string_value:
-                            {
                                 os << '"' << *e.str << '"';
                                 break;
                             }

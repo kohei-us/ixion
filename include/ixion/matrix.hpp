@@ -30,7 +30,7 @@ class IXION_DLLPUBLIC matrix
 
 public:
 
-    enum class element_type { numeric, string, string_value, boolean, error, empty };
+    enum class element_type { numeric, string, boolean, error, empty };
 
     struct element
     {
@@ -40,7 +40,6 @@ public:
         {
             double numeric;
             bool boolean;
-            string_id_t string_id;
             const std::string* str;
             formula_error_t error;
         };
@@ -50,7 +49,6 @@ public:
     matrix(size_t rows, size_t cols);
     matrix(size_t rows, size_t cols, double numeric);
     matrix(size_t rows, size_t cols, bool boolean);
-    matrix(size_t rows, size_t cols, string_id_t si);
     matrix(size_t rows, size_t cols, const std::string& str);
     matrix(size_t rows, size_t cols, formula_error_t error);
     matrix(const matrix& other);
@@ -72,7 +70,6 @@ public:
     double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
     void set(size_t row, size_t col, bool val);
-    void set(size_t row, size_t col, string_id_t val);
     void set(size_t row, size_t col, const std::string& str);
     void set(size_t row, size_t col, formula_error_t val);
 

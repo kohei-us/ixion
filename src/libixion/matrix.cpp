@@ -30,9 +30,6 @@ struct matrix::impl
     impl(size_t rows, size_t cols, bool boolean) :
         m_data(rows, cols, boolean) {}
 
-    impl(size_t rows, size_t cols, string_id_t si) :
-        m_data(rows, cols, si) {}
-
     impl(size_t rows, size_t cols, const std::string& str) :
         m_data(rows, cols, str) {}
 
@@ -76,9 +73,6 @@ matrix::matrix(size_t rows, size_t cols, double numeric) :
 
 matrix::matrix(size_t rows, size_t cols, bool boolean) :
     mp_impl(ixion::make_unique<impl>(rows, cols, boolean)) {}
-
-matrix::matrix(size_t rows, size_t cols, string_id_t si) :
-    mp_impl(ixion::make_unique<impl>(rows, cols, si)) {}
 
 matrix::matrix(size_t rows, size_t cols, const std::string& str) :
     mp_impl(ixion::make_unique<impl>(rows, cols, str)) {}
@@ -145,11 +139,6 @@ void matrix::set(size_t row, size_t col, bool val)
     mp_impl->m_data.set(row, col, val);
 }
 
-void matrix::set(size_t row, size_t col, string_id_t val)
-{
-    mp_impl->m_data.set(row, col, static_cast<int64_t>(val));
-}
-
 void matrix::set(size_t row, size_t col, const std::string& str)
 {
     mp_impl->m_data.set(row, col, str);
@@ -174,25 +163,18 @@ matrix::element matrix::get(size_t row, size_t col) const
             break;
         case mdds::mtm::element_integer:
         {
-            // This is either a string ID or an error.  A negative value means
-            // it's an error value.
+            // This is an error value, which must be negative.
             auto v = mp_impl->m_data.get_integer(row, col);
-
             if (v >= 0)
-            {
-                me.type = element_type::string;
-                me.string_id = v;
-            }
-            else
-            {
-                me.type = element_type::error;
-                me.error = static_cast<formula_error_t>(-v);
-            }
+                break;
+
+            me.type = element_type::error;
+            me.error = static_cast<formula_error_t>(-v);
             break;
         }
         case mdds::mtm::element_string:
         {
-            me.type = element_type::string_value;
+            me.type = element_type::string;
             me.str = &mp_impl->m_data.get_string(row, col);
             break;
         }

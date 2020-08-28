@@ -146,7 +146,7 @@ void test_matrix_non_numeric_values()
     matrix mtx(2, 2);
     mtx.set(0, 0, 1.1);
     mtx.set(1, 0, formula_error_t::division_by_zero);
-    mtx.set(0, 1, string_id_t(3));
+    mtx.set(0, 1, std::string("foo"));
     mtx.set(1, 1, true);
 
     assert(mtx.get_numeric(0, 0) == 1.1);
@@ -157,7 +157,7 @@ void test_matrix_non_numeric_values()
 
     elem = mtx.get(0, 1);
     assert(elem.type == matrix::element_type::string);
-    assert(elem.string_id == 3u);
+    assert(*elem.str == "foo");
 
     elem = mtx.get(1, 1);
     assert(elem.type == matrix::element_type::boolean);

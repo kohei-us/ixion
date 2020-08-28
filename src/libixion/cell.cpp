@@ -162,7 +162,6 @@ struct formula_cell::impl
                     case matrix::element_type::boolean:
                         return elem.boolean ? 1.0 : 0.0;
                     case matrix::element_type::string:
-                    case matrix::element_type::string_value:
                     case matrix::element_type::error:
                     default:
                         throw formula_error(formula_error_t::invalid_value_type);
@@ -202,13 +201,12 @@ struct formula_cell::impl
 
                 switch (elem.type)
                 {
-                    case matrix::element_type::string_value:
+                    case matrix::element_type::string:
                         return elem.str;
                     case matrix::element_type::numeric:
                     case matrix::element_type::empty:
                     case matrix::element_type::boolean:
                     case matrix::element_type::error:
-                    case matrix::element_type::string:
                     default:
                         throw formula_error(formula_error_t::invalid_value_type);
                 }
@@ -271,8 +269,6 @@ struct formula_cell::impl
             case matrix::element_type::numeric:
                 return formula_result(elem.numeric);
             case matrix::element_type::string:
-                return formula_result(elem.string_id);
-            case matrix::element_type::string_value:
                 return formula_result(*elem.str);
             case matrix::element_type::error:
                 return formula_result(elem.error);
