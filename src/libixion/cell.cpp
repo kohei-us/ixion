@@ -191,7 +191,27 @@ struct formula_cell::impl
                 return &m_calc_status->result->get_string();
             case formula_result::result_type::matrix:
             {
-                throw std::runtime_error("TODO");
+                const matrix& m = m_calc_status->result->get_matrix();
+                row_t row_size = m.row_size();
+                col_t col_size = m.col_size();
+
+                if (m_group_pos.row >= row_size || m_group_pos.column >= col_size)
+                    throw formula_error(formula_error_t::invalid_value_type);
+
+                matrix::element elem = m.get(m_group_pos.row, m_group_pos.column);
+
+                switch (elem.type)
+                {
+                    case matrix::element_type::string_value:
+                        return elem.str;
+                    case matrix::element_type::numeric:
+                    case matrix::element_type::empty:
+                    case matrix::element_type::boolean:
+                    case matrix::element_type::error:
+                    case matrix::element_type::string:
+                    default:
+                        throw formula_error(formula_error_t::invalid_value_type);
+                }
             }
             default:
             {

@@ -17,6 +17,7 @@
 #include "ixion/config.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/cell_access.hpp"
+#include "ixion/formula_result.hpp"
 
 #include <iostream>
 #include <cassert>
@@ -2309,6 +2310,28 @@ void test_invalid_formula_tokens()
     assert(error_msg.str() == *s);
 }
 
+void test_grouped_formula_string_results()
+{
+    model_context cxt;
+    cxt.append_sheet("test");
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    abs_range_t A1B2(0, 0, 0, 2, 2);
+
+    formula_tokens_t tokens = parse_formula_string(
+        cxt, A1B2.first, *resolver, IXION_ASCII("\"literal string\""));
+
+    matrix res_value(2, 2, std::string("literal string"));
+    formula_result res(std::move(res_value));
+    cxt.set_grouped_formula_cells(A1B2, std::move(tokens), std::move(res));
+
+    const std::string* p = cxt.get_string_value(A1B2.last);
+    assert(p);
+    assert(*p == "literal string");
+}
+
 } // anonymous namespace
 
 int main()
@@ -2344,6 +2367,7 @@ int main()
     test_model_context_error_value();
     test_volatile_function();
     test_invalid_formula_tokens();
+    test_grouped_formula_string_results();
 
     return EXIT_SUCCESS;
 }
