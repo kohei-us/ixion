@@ -16,14 +16,14 @@
 
 #ifdef IXION_DEBUG_ON
 #define IXION_DEBUG(stream) \
-    do { std::cout << "[DEBUG]" << __FUNCTION__ << ": " << stream << std::endl; } while (false)
+    do { std::cout << "[ixion]:[DEBUG]:" << __FUNCTION__ << ": " << stream << std::endl; } while (false)
 #else
 #define IXION_DEBUG(...)
 #endif
 
 #ifdef IXION_TRACE_ON
 #define IXION_TRACE(stream) \
-    do { std::cout << "[TRACE]" << __FUNCTION__ << ": " << stream << std::endl; } while (false)
+    do { std::cout << "[ixion]:[TRACE]:" << __FUNCTION__ << ": " << stream << std::endl; } while (false)
 #else
 #define IXION_TRACE(...)
 #endif
