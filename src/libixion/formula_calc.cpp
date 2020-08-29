@@ -59,9 +59,7 @@ void calculate_sorted_cells(
     for (queue_entry& e : entries)
     {
         e.p->reset();
-        IXION_TRACE(
-            "calculate_sorted_cells: pos=" << e.pos.get_name()
-            << " formula=" << detail::print_formula_expression(cxt, e.pos, *e.p));
+        IXION_TRACE("pos=" << e.pos.get_name() << " formula=" << detail::print_formula_expression(cxt, e.pos, *e.p));
     }
 
     // First, detect circular dependencies and mark those circular

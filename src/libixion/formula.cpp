@@ -316,7 +316,7 @@ void register_formula_cell(
         src_pos.last.row += fg_props.size.row - 1;
     }
 
-    IXION_TRACE("register_formula_cell: pos=" << pos.get_name()
+    IXION_TRACE("pos=" << pos.get_name()
         << "; formula='" << detail::print_formula_expression(cxt, pos, *cell)
         << "'");
 
@@ -324,7 +324,7 @@ void register_formula_cell(
 
     for (const formula_token* p : ref_tokens)
     {
-        IXION_TRACE("register_formula_cell: ref token: " << detail::print_formula_token_repr(*p));
+        IXION_TRACE("ref token: " << detail::print_formula_token_repr(*p));
 
         switch (p->get_opcode())
         {
