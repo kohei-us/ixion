@@ -41,10 +41,10 @@ for both full and partial calculation modes.
 * Python API.
 * Matrix support via grouped formulas.
 
-## Planned features
+## Features known to be missing
 * More built-in functions.
-* Support for custom functions defined in the caller program.
-* Support for external references.
+* Custom functions defined in the caller program.
+* External references.
 * Implicit intersection.
 
 ## Documentation
