@@ -19,15 +19,11 @@ Note that if you build Boost as dynamic libraries, make sure that all the
 relevant dll files are in your PATH.
 
 
-## Clone spdlog and mdds
+## Clone mdds
 
-As ixion uses [spdlog](https://github.com/gabime/spdlog) as its logging facility,
-you need to clone its repository before building ixion.
-
-Likewise, you also need to clone [mdds](https://gitlab.com/mdds/mdds).  As both
-mdds and spdlog are header-only libraries, you don't need to go through any
-build process for these libraries.  Just make note of their respective header
-directory locations.
+you need to clone [mdds](https://gitlab.com/mdds/mdds).  As mdds is a header-only
+library, you don't need to go through any build process for these libraries.
+Just make note of their respective header directory locations.
 
 
 ## Using CMake to build ixion
@@ -42,7 +38,6 @@ cmake .. \
     -DBOOST_INCLUDEDIR="/path/to/boost" \
     -DBOOST_LIBRARYDIR="/path/to/boost/stage/x64/lib" \
     -DMDDS_INCLUDEDIR="/path/to/mdds/include" \
-    -DSPDLOG_INCLUDEDIR="/path/to/spdlog/include" \
     -DBoost_USE_STATIC_LIBS=1
 ```
 

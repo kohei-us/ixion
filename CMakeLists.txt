@@ -26,7 +26,6 @@ if(MSVC)
 endif(MSVC)
 
 set(MDDS_INCLUDEDIR "" CACHE STRING "path to mdds header directory.")
-set(SPDLOG_INCLUDEDIR "" CACHE STRING "path to spdlog header directory.")
 
 add_definitions(
     -DIXION_THREADS=1
@@ -38,7 +37,6 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src/include
     ${Boost_INCLUDE_DIR}
     ${MDDS_INCLUDEDIR}
-    ${SPDLOG_INCLUDEDIR}
 )
 
 link_directories(${Boost_LIBRARY_DIRS})
