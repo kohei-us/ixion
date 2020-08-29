@@ -125,7 +125,6 @@ AS_IF([test "x$enable_debug" != "xno"], [
 ])
 
 PKG_CHECK_MODULES([MDDS],[mdds-1.5 >= 1.4.99])
-PKG_CHECK_MODULES([SPDLOG], [spdlog >= 0.16.0])
 
 AC_ARG_ENABLE(log-debug,
 	AS_HELP_STRING([--enable-log-debug], [Enable debug outputs.])],
@@ -134,7 +133,7 @@ AC_ARG_ENABLE(log-debug,
 )
 
 AS_IF([test "x$enable_log_debug" != "xno"], [
-        CXXFLAGS="$CXXFLAGS -DSPDLOG_DEBUG_ON"
+        CXXFLAGS="$CXXFLAGS -DIXION_DEBUG_ON"
 ],)
 
 AC_ARG_ENABLE(log-trace,
@@ -144,7 +143,7 @@ AC_ARG_ENABLE(log-trace,
 )
 
 AS_IF([test "x$enable_log_trace" != "xno"], [
-        CXXFLAGS="$CXXFLAGS -DSPDLOG_TRACE_ON"
+        CXXFLAGS="$CXXFLAGS -DIXION_TRACE_ON"
 ],)
 
 # Check for python.

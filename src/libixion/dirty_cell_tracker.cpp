@@ -10,13 +10,11 @@
 #include "ixion/formula_name_resolver.hpp"
 
 #include "depth_first_search.hpp"
+#include "debug.hpp"
 
 #include <mdds/rtree.hpp>
 #include <deque>
 #include <limits>
-
-#include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h>
 
 namespace ixion {
 
@@ -183,7 +181,7 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
         rtree_type* tree = mp_impl->fetch_grid(sheet);
         if (!tree)
         {
-            SPDLOG_DEBUG(spdlog::get("ixion"), "Nothing is tracked on sheet {}.", sheet);
+            IXION_DEBUG("Nothing is tracked on sheet " << sheet << ".");
             continue;
         }
 
@@ -195,7 +193,7 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
         if (res.begin() == res.end())
         {
             // No listener for this destination cell. Nothing to remove.
-            SPDLOG_DEBUG(spdlog::get("ixion"), "{} is not being tracked by anybody on sheet {}.", dest, sheet);
+            IXION_DEBUG(dest << " is not being tracked by anybody on sheet " << sheet << ".");
             continue;
         }
 
@@ -205,7 +203,7 @@ void dirty_cell_tracker::remove(const abs_range_t& src, const abs_range_t& dest)
 
         if (!n_removed)
         {
-            SPDLOG_DEBUG(spdlog::get("ixion"), "{} was not tracking {} on sheet {}.", src, dest, sheet);
+            IXION_DEBUG(src << " was not tracking " << dest << " on sheet " << sheet << ".");
         }
 
         if (listener.empty())

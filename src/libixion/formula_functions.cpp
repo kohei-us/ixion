@@ -6,6 +6,7 @@
  */
 
 #include "formula_functions.hpp"
+#include "debug.hpp"
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/matrix.hpp"
@@ -27,7 +28,6 @@
 #include <chrono>
 #include <cmath>
 
-#include <spdlog/spdlog.h>
 #include <mdds/sorted_string_map.hpp>
 
 using namespace std;
@@ -565,7 +565,7 @@ void formula_functions::fnc_min(formula_value_stack& args) const
 
 void formula_functions::fnc_sum(formula_value_stack& args) const
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "function: sum");
+    IXION_TRACE("function: sum");
 
     if (args.empty())
         throw formula_functions::invalid_arg("SUM requires one or more arguments.");
@@ -588,7 +588,7 @@ void formula_functions::fnc_sum(formula_value_stack& args) const
 
     args.push_value(ret);
 
-    SPDLOG_TRACE(spdlog::get("ixion"), "function: sum end (result={})", ret);
+    IXION_TRACE("function: sum end (result=" << ret << ")");
 }
 
 void formula_functions::fnc_counta(formula_value_stack& args) const

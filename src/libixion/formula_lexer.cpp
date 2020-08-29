@@ -6,13 +6,12 @@
  */
 
 #include "formula_lexer.hpp"
+#include "debug.hpp"
 #include "ixion/global.hpp"
 
 #include <cassert>
 #include <iostream>
 #include <sstream>
-
-#include <spdlog/spdlog.h>
 
 using namespace std;
 
@@ -228,7 +227,7 @@ void tokenizer::numeral()
     if (sep_count > 1)
     {
         // failed to parse this as a numeral. Treat this as a name.
-        SPDLOG_TRACE(spdlog::get("ixion"), "error parsing '{}' as a numeral, treating it as a name.", std::string(p, len));
+        IXION_TRACE("error parsing '" << std::string(p, len) << "' as a numeral, treating it as a name.");
         pop_pos();
         name();
         return;

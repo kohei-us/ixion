@@ -6,7 +6,7 @@
  */
 
 #include "model_context_impl.hpp"
-#include "utils.hpp"
+
 #include "ixion/address.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/formula_result.hpp"
@@ -15,10 +15,12 @@
 
 #include "calc_status.hpp"
 #include "model_types.hpp"
+#include "utils.hpp"
+#include "debug.hpp"
 
-#include <spdlog/spdlog.h>
 #include <sstream>
 #include <iostream>
+#include <cstring>
 
 using std::cout;
 using std::endl;
@@ -170,7 +172,7 @@ void model_context_impl::set_named_expression(
     const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
 {
     std::string name(p, n);
-    SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
+    IXION_TRACE("named expression: name='" << name << "'");
     m_named_expressions.insert(
         detail::named_expressions_t::value_type(
             std::move(name),
@@ -184,7 +186,7 @@ void model_context_impl::set_named_expression(
 {
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     std::string name(p, n);
-    SPDLOG_TRACE(spdlog::get("ixion"), "named expression: name='{}'", name);
+    IXION_TRACE("named expression: name='" << name << "'");
     ns.insert(
         detail::named_expressions_t::value_type(
             std::move(name),
@@ -251,7 +253,7 @@ size_t model_context_impl::get_sheet_count() const
 
 sheet_t model_context_impl::append_sheet(std::string&& name)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "append_sheet: name='{}'", name);
+    IXION_TRACE("name='" << name << "'");
 
     // Check if the new sheet name already exists.
     strings_type::const_iterator it =

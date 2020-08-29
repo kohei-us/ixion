@@ -6,7 +6,7 @@ build:
     - apt update
     - apt -y install gfortran-8
     - update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-8 999
-    - apt -y install make autoconf automake libtool pkg-config git python3-dev libspdlog-dev
+    - apt -y install make autoconf automake libtool pkg-config git python3-dev
     - apt -y install libboost-all-dev
     - git clone https://gitlab.com/mdds/mdds.git /mdds && (cd /mdds && ./autogen.sh && make install)
   script: 

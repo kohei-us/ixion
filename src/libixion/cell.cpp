@@ -18,6 +18,7 @@
 #include "ixion/formula.hpp"
 
 #include "formula_interpreter.hpp"
+#include "debug.hpp"
 
 #include <cassert>
 #include <string>
@@ -25,8 +26,6 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
-
-#include <spdlog/spdlog.h>
 
 #include "calc_status.hpp"
 
@@ -76,11 +75,11 @@ struct formula_cell::impl
      */
     void wait_for_interpreted_result(std::unique_lock<std::mutex>& lock) const
     {
-        SPDLOG_TRACE(spdlog::get("ixion"), "Wait for the interpreted result");
+        IXION_TRACE("Wait for the interpreted result");
 
         while (!m_calc_status->result)
         {
-            SPDLOG_TRACE(spdlog::get("ixion"), "Waiting...");
+            IXION_TRACE("Waiting...");
             m_calc_status->cond.wait(lock);
         }
     }
@@ -106,7 +105,7 @@ struct formula_cell::impl
         if (!ref.mp_impl->is_circular_safe())
         {
             // Circular dependency detected !!
-            SPDLOG_DEBUG(spdlog::get("ixion"), "Circular dependency detected !!");
+            IXION_DEBUG("Circular dependency detected !!");
             assert(!m_calc_status->result);
             m_calc_status->result =
                 ixion::make_unique<formula_result>(formula_error_t::ref_result_not_available);
@@ -121,14 +120,14 @@ struct formula_cell::impl
         if (!m_calc_status->result)
         {
             // Result not cached yet.  Reference error.
-            SPDLOG_DEBUG(spdlog::get("ixion"), "Result not cached yet. This is a reference error.");
+            IXION_DEBUG("Result not cached yet. This is a reference error.");
             throw formula_error(formula_error_t::ref_result_not_available);
         }
 
         if (m_calc_status->result->get_type() == formula_result::result_type::error)
         {
             // Error condition.
-            SPDLOG_DEBUG(spdlog::get("ixion"), "Error in result.");
+            IXION_DEBUG("Error in result.");
             throw formula_error(m_calc_status->result->get_error());
         }
     }
@@ -143,7 +142,7 @@ struct formula_cell::impl
                 return m_calc_status->result->get_value();
             case formula_result::result_type::matrix:
             {
-                SPDLOG_TRACE(spdlog::get("ixion"), "Fetching a matrix result.");
+                IXION_TRACE("Fetching a matrix result.");
                 const matrix& m = m_calc_status->result->get_matrix();
                 row_t row_size = m.row_size();
                 col_t col_size = m.col_size();
@@ -364,7 +363,7 @@ const std::string* formula_cell::get_string(formula_result_wait_policy_t policy)
 
 void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "{}", gen_trace_output(*this, context, pos));
+    IXION_TRACE(gen_trace_output(*this, context, pos));
 
     if (!mp_impl->calc_allowed())
         throw std::logic_error("Calculation on this formula cell is not allowed.");
@@ -532,7 +531,7 @@ const formula_result& formula_cell::get_raw_result_cache(formula_result_wait_pol
 
     if (!mp_impl->m_calc_status->result)
     {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "Result not yet available.");
+        IXION_DEBUG("Result not yet available.");
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 

@@ -18,16 +18,8 @@
 #include "debug.hpp"
 #include "concrete_formula_tokens.hpp"
 
-#define DEBUG_FORMULA_API 0
-
 #include <sstream>
 #include <algorithm>
-#include <spdlog/spdlog.h>
-
-#if DEBUG_FORMULA_API
-#include <iostream>
-using namespace std;
-#endif
 
 namespace ixion {
 
@@ -55,13 +47,13 @@ formula_tokens_t parse_formula_string(
     iface::formula_model_access& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const char* p, size_t n)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "pos={}; formula='{}'", pos.get_name(), std::string(p, n));
+    IXION_TRACE("pos=" << pos.get_name() << "; formula='" << std::string(p, n) << "'");
     lexer_tokens_t lxr_tokens;
     formula_lexer lexer(cxt.get_config(), p, n);
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
-    SPDLOG_TRACE(spdlog::get("ixion"), "lexer tokens: {}", print_tokens(lxr_tokens, true));
+    IXION_TRACE(print_tokens(lxr_tokens, true));
 
     formula_tokens_t tokens;
     formula_parser parser(lxr_tokens, cxt, resolver);
@@ -69,8 +61,8 @@ formula_tokens_t parse_formula_string(
     parser.parse();
     parser.get_tokens().swap(tokens);
 
-    SPDLOG_TRACE(spdlog::get("ixion"), "formula tokens (string): {}", print_formula_tokens(cxt, pos, resolver, tokens));
-    SPDLOG_TRACE(spdlog::get("ixion"), "formula tokens (individual): {}", debug_print_formula_tokens(tokens));
+    IXION_TRACE("formula tokens (string): " << print_formula_tokens(cxt, pos, resolver, tokens));
+    IXION_TRACE("formula tokens (individual): " << debug_print_formula_tokens(tokens));
 
     return tokens;
 }
@@ -206,9 +198,11 @@ public:
             {
                 std::ostringstream repr;
                 token.write_string(repr);
-                SPDLOG_DEBUG(
-                    spdlog::get("ixion"), "token not printed (repr=\"{}\"; name=\"{}\"; opcode=\"{}\")",
-                    repr.str(), get_opcode_name(token.get_opcode()), get_formula_opcode_string(token.get_opcode()));
+                IXION_DEBUG(
+                    "token not printed (repr='" << repr.str()
+                    << "'; name='" << get_opcode_name(token.get_opcode())
+                    << "'; opcode='" << get_formula_opcode_string(token.get_opcode())
+                    << "')");
             }
         }
     }
@@ -275,8 +269,10 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::for
     if (is_valid_sheet(sheet))
         return;
 
-    SPDLOG_DEBUG(spdlog::get("ixion"), "{}: invalid range reference: pos={}; formula='{}'",
-        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell));
+    IXION_DEBUG("invalid range reference: func=" << func_name
+        << "; pos=" << pos.get_name()
+        << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
+        << "'");
 
     std::ostringstream os;
     os << func_name << ": invalid sheet index in " << pos.get_name()
@@ -320,12 +316,15 @@ void register_formula_cell(
         src_pos.last.row += fg_props.size.row - 1;
     }
 
-    SPDLOG_TRACE(spdlog::get("ixion"), "register_formula_cell: pos={}; formula='{}'", pos.get_name(), detail::print_formula_expression(cxt, pos, *cell));
+    IXION_TRACE("register_formula_cell: pos=" << pos.get_name()
+        << "; formula='" << detail::print_formula_expression(cxt, pos, *cell)
+        << "'");
+
     std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
 
     for (const formula_token* p : ref_tokens)
     {
-        SPDLOG_TRACE(spdlog::get("ixion"), "register_formula_cell: ref token: {}", detail::print_formula_token_repr(*p));
+        IXION_TRACE("register_formula_cell: ref token: " << detail::print_formula_token_repr(*p));
 
         switch (p->get_opcode())
         {

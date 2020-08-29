@@ -20,21 +20,12 @@
 #include <fstream>
 #include <chrono>
 
-#if IXION_LOGGING
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_sinks.h>
-#endif
-
 using namespace std;
 
 namespace ixion {
 
 void init()
 {
-#if IXION_LOGGING
-    auto console = spdlog::stdout_logger_mt("ixion");
-    spdlog::set_level(spdlog::level::trace);
-#endif
 }
 
 const char* get_formula_result_output_separator()

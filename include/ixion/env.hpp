@@ -33,7 +33,7 @@
   #define IXION_DLLPUBLIC_VAR IXION_DLLPUBLIC extern
 #endif
 
-#if defined(SPDLOG_TRACE_ON) || defined(SPDLOG_DEBUG_ON)
+#if defined(IXION_TRACE_ON) || defined(IXION_DEBUG_ON)
 #define IXION_LOGGING 1
 #else
 #define IXION_LOGGING 0

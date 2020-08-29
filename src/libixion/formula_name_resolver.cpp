@@ -11,6 +11,7 @@
 #include "ixion/table.hpp"
 
 #include "formula_functions.hpp"
+#include "debug.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -18,8 +19,6 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
-
-#include <spdlog/spdlog.h>
 
 using namespace std;
 
@@ -263,7 +262,7 @@ void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_acce
 {
     if (!is_valid_sheet(sheet))
     {
-        SPDLOG_DEBUG(spdlog::get("ixion"), "invalid sheet index ({})", sheet);
+        IXION_DEBUG("invalid sheet index (" << sheet << ")");
         return;
     }
 
@@ -1548,7 +1547,7 @@ public:
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
         parse_address_result parse_res = m_func_parse_address(mp_cxt, p, p_last, parsed_addr);
-        SPDLOG_TRACE(spdlog::get("ixion"), "parse address result on 1st address ({})", to_string(parse_res.result));
+        IXION_TRACE("parse address result on 1st address (" << to_string(parse_res.result) << ")");
 
         if (parse_res.result != invalid)
         {
@@ -1556,13 +1555,13 @@ public:
 
             if (parsed_addr.sheet == invalid_sheet)
             {
-                SPDLOG_DEBUG(spdlog::get("ixion"), "Sheet name is not found in the model context.");
+                IXION_DEBUG("Sheet name is not found in the model context.");
                 return ret;
             }
 
             if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
             {
-                SPDLOG_DEBUG(spdlog::get("ixion"), "Address is outside the sheet bounds.");
+                IXION_DEBUG("Address is outside the sheet bounds.");
                 parse_res.result = invalid;
             }
         }
@@ -1581,7 +1580,7 @@ public:
         {
             if (p == p_last)
             {
-                SPDLOG_DEBUG(spdlog::get("ixion"), "':' occurs as the last character.  This is not allowed.");
+                IXION_DEBUG("':' occurs as the last character.  This is not allowed.");
                 return ret;
             }
 
@@ -1591,11 +1590,11 @@ public:
             set_address(ret.range.first, parsed_addr);
 
             parse_res = m_func_parse_address(mp_cxt, p, p_last, parsed_addr);
-            SPDLOG_TRACE(spdlog::get("ixion"), "parse address result on 2nd address ({})", to_string(parse_res.result));
+            IXION_TRACE("parse address result on 2nd address (" << to_string(parse_res.result) << ")");
 
             if (parse_res.result != valid_address)
             {
-                SPDLOG_DEBUG(spdlog::get("ixion"), "2nd part after the ':' is not valid.");
+                IXION_DEBUG("2nd part after the ':' is not valid.");
                 return ret;
             }
 

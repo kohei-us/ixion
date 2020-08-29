@@ -3,9 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/include \
 	-DIXION_BUILD \
-	-DFMT_HEADER_ONLY \
 	$(MDDS_CFLAGS) \
-	$(SPDLOG_CFLAGS) \
 	$(BOOST_CPPFLAGS)
 
 if BUILD_CUDA

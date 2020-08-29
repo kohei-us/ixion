@@ -18,7 +18,6 @@
 #endif
 
 #include <algorithm>
-#include <spdlog/spdlog.h>
 
 namespace ixion {
 
@@ -60,10 +59,9 @@ void calculate_sorted_cells(
     for (queue_entry& e : entries)
     {
         e.p->reset();
-        SPDLOG_TRACE(
-            spdlog::get("ixion"), "calculate_sorted_cells: pos={} formula={}",
-            e.pos.get_name(),
-            detail::print_formula_expression(cxt, e.pos, *e.p));
+        IXION_TRACE(
+            "calculate_sorted_cells: pos=" << e.pos.get_name()
+            << " formula=" << detail::print_formula_expression(cxt, e.pos, *e.p));
     }
 
     // First, detect circular dependencies and mark those circular

@@ -6,6 +6,7 @@
  */
 
 #include "formula_value_stack.hpp"
+#include "debug.hpp"
 
 #include "ixion/address.hpp"
 #include "ixion/cell.hpp"
@@ -16,7 +17,6 @@
 
 #include <string>
 #include <sstream>
-#include <spdlog/spdlog.h>
 
 namespace ixion {
 
@@ -39,7 +39,7 @@ double get_numeric_value(const iface::formula_model_access& cxt, const stack_val
             break;
         }
         default:
-            SPDLOG_DEBUG(spdlog::get("ixion"), "value is being popped, but the stack value type is not appropriate.");
+            IXION_DEBUG("value is being popped, but the stack value type is not appropriate.");
             throw formula_error(formula_error_t::stack_error);
     }
     return ret;
@@ -283,38 +283,38 @@ double formula_value_stack::get_value(size_t pos) const
 
 void formula_value_stack::push_back(value_type&& val)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "push_back");
+    IXION_TRACE("push_back");
     m_stack.push_back(std::move(val));
 }
 
 void formula_value_stack::push_value(double val)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "push_value: val={}", val);
+    IXION_TRACE("val=" << val);
     m_stack.emplace_back(val);
 }
 
 void formula_value_stack::push_string(std::string str)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "push_string: sid={}", sid);
+    IXION_TRACE("str='" << str << "'");
     m_stack.emplace_back(std::move(str));
 }
 
 void formula_value_stack::push_single_ref(const abs_address_t& val)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "push_single_ref: val={}", val.get_name());
+    IXION_TRACE("val=" << val.get_name());
     m_stack.emplace_back(val);
 }
 
 void formula_value_stack::push_range_ref(const abs_range_t& val)
 {
     assert(val.valid());
-    SPDLOG_TRACE(spdlog::get("ixion"), "push_range_ref: start={}; end={}", val.first.get_name(), val.last.get_name());
+    IXION_TRACE("start=" << val.first.get_name() << "; end=" << val.last.get_name());
     m_stack.emplace_back(val);
 }
 
 void formula_value_stack::push_matrix(matrix mtx)
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "push_matrix");
+    IXION_TRACE("push_matrix");
     m_stack.emplace_back(std::move(mtx));
 }
 
@@ -327,13 +327,13 @@ double formula_value_stack::pop_value()
     const stack_value& v = m_stack.back();
     ret = get_numeric_value(m_context, v);
     m_stack.pop_back();
-    SPDLOG_TRACE(spdlog::get("ixion"), "pop_value: ret={}", ret);
+    IXION_TRACE("ret=" << ret);
     return ret;
 }
 
 const std::string formula_value_stack::pop_string()
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "pop_string");
+    IXION_TRACE("pop_string");
 
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
@@ -414,7 +414,7 @@ const std::string formula_value_stack::pop_string()
 
 abs_address_t formula_value_stack::pop_single_ref()
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "pop_single_ref");
+    IXION_TRACE("pop_single_ref");
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
 
@@ -429,7 +429,7 @@ abs_address_t formula_value_stack::pop_single_ref()
 
 abs_range_t formula_value_stack::pop_range_ref()
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "pop_range_ref");
+    IXION_TRACE("pop_range_ref");
 
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
@@ -445,7 +445,7 @@ abs_range_t formula_value_stack::pop_range_ref()
 
 matrix formula_value_stack::pop_range_value()
 {
-    SPDLOG_TRACE(spdlog::get("ixion"), "pop_range_value");
+    IXION_TRACE("pop_range_value");
 
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
