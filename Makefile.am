@@ -55,18 +55,28 @@ doc_data = \
 	doc/conf.py \
 	doc/doxygen.conf \
 	doc/overview/index.rst \
-	doc/index.rst \
-	doc/python/overview.rst \
-	doc/python/index.rst \
-	doc/python/sheet.rst \
-	doc/python/document.rst \
-	doc/cpp/interface/index.rst \
-	doc/cpp/model_context/index.rst \
+	doc/cpp/data_store/types.rst \
+	doc/cpp/data_store/model_context.rst \
+	doc/cpp/data_store/index.rst \
+	doc/cpp/data_store/cell_access.rst \
+	doc/cpp/data_store/document.rst \
+	doc/cpp/data_store/dirty_cell_tracker.rst \
+	doc/cpp/formula/types.rst \
+	doc/cpp/formula/formula_tokens.rst \
+	doc/cpp/formula/formula_cell.rst \
+	doc/cpp/formula/formula_engine.rst \
 	doc/cpp/formula/index.rst \
+	doc/cpp/formula/formula_name_resolver.rst \
 	doc/cpp/index.rst \
-	doc/cpp/formula_cell/index.rst \
-	doc/cpp/formula_name_resolver/index.rst \
-	doc/cpp/types/index.rst
+	doc/cpp/interface/index.rst \
+	doc/cpp/quickstart/using_model_context.rst \
+	doc/cpp/quickstart/index.rst \
+	doc/cpp/quickstart/using_document.rst \
+	doc/index.rst \
+	doc/python/quickstart.rst \
+	doc/python/index.rst \
+	doc/python/document.rst \
+	doc/python/sheet.rst
 
 EXTRA_DIST = \
 	LICENSE \
