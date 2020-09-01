@@ -68,7 +68,7 @@ IXION_DLLPUBLIC std::string print_formula_tokens(
     const formula_name_resolver& resolver, const formula_tokens_t& tokens);
 
 /**
- * Convert an individual formula token intoa human-readable string
+ * Convert an individual formula token into a human-readable string
  * representation.
  *
  * @param cxt model context.
