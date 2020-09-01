@@ -5,14 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef NAMED_EXPRESSIONS_ITERATOR_HPP
-#define NAMED_EXPRESSIONS_ITERATOR_HPP
+#ifndef INCLUDED_IXION_NAMED_EXPRESSIONS_ITERATOR_HPP
+#define INCLUDED_IXION_NAMED_EXPRESSIONS_ITERATOR_HPP
 
 #include "ixion/types.hpp"
 #include "ixion/formula_tokens_fwd.hpp"
 
 #include <memory>
 #include <iosfwd>
+#include <string>
 
 namespace ixion {
 
