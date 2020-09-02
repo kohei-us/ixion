@@ -25,7 +25,7 @@ ixion 0.16.0
   * added document class which provides a layer on top of model_context, to
     abstract away the handling of formula calculations.
 
-  * deprecate model_context::erase_cell() in favor of empty_cell().
+  * deprecated model_context::erase_cell() in favor of empty_cell().
 
 * formula parser / interpreter
 
