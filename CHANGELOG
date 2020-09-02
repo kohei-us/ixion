@@ -1,3 +1,57 @@
+ixion 0.16.0
+
+* documentation
+
+  * added quickstart sections for using model_context and document classes.
+
+  * added code example for cell_access class.
+
+* C++ API
+
+  * added new function to allow printing of single formula tokens.
+
+  * added method for setting cached results on formula cells in
+    model_context.
+
+  * changed the model_context design to ensure that all sheets are of the same
+    size.
+
+  * added an accessor method to formula_model_access interface (and implicitly
+    in model_context) that directly returns a string value from cell.
+
+  * added cell_access class for querying of cell states without knowing its
+    type ahead of time.
+
+  * added document class which provides a layer on top of model_context, to
+    abstract away the handling of formula calculations.
+
+  * deprecate model_context::erase_cell() in favor of empty_cell().
+
+* formula parser / interpreter
+
+  * added support for 3D references - references that contain multiple sheets.
+
+  * added support for the exponent (^) and concatenation (&) operators.
+
+  * fixed incorrect handling of range references containing whole columns such
+    as A:A.
+
+  * added support for unordered range references - range references whose
+    start row or column is greater than their end position counterparts, such
+    as A3:A1.
+
+  * fixed a bug that prevented nested formula functions from working properly.
+
+  * implemented Calc A1 style reference resolver.
+
+* misc
+
+  * formula results now directly store the string values when the results are
+    of string type.  They previously stored string ID values after interning
+    the original strings.
+
+  * removed build-time dependency on spdlog.
+
 ixion 0.15.0
 
 * fill_down_cells() method has been added to model_context, to fill duplicate
