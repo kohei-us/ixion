@@ -39,6 +39,7 @@ void test_size()
     cout << "* long: " << sizeof(long) << endl;
     cout << "* double: " << sizeof(double) << endl;
     cout << "* size_t: " << sizeof(size_t) << endl;
+    cout << "* string_id_t: " << sizeof(string_id_t) << endl;
     cout << "* celltype_t: " << sizeof(celltype_t) << endl;
     cout << "* formula_cell: " << sizeof(formula_cell) << endl;
     cout << "* formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
