@@ -170,6 +170,9 @@ public:
                 const std::string* p = m_cxt.get_string(token.get_index());
                 if (p)
                     m_os << "\"" << *p << "\"";
+                else
+                    IXION_DEBUG("failed to get a string value for the identifier value of " << token.get_index());
+
                 break;
             }
             case fop_equal:
