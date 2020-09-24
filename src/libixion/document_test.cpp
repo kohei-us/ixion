@@ -12,17 +12,21 @@
 
 #include <iostream>
 #include <cassert>
+#include <sstream>
 
 using namespace std;
 using namespace ixion;
 
 namespace {
 
-bool equal(double v1, double v2, double multiplier)
+bool equal(double v1, double v2)
 {
-    long i1 = v1 * multiplier;
-    long i2 = v2 * multiplier;
-    return i1 == i2;
+    // To work around the floating point rounding errors, convert the values to
+    // strings then compare as string numbers.
+    std::ostringstream os1, os2;
+    os1 << v1;
+    os2 << v2;
+    return os1.str() == os2.str();
 }
 
 }
@@ -47,12 +51,12 @@ void test_basic_calc()
     doc.calculate(0);
 
     double v = doc.get_numeric_value("B4");
-    assert(equal(v, 3.6, 10.0));
+    assert(equal(v, 3.6));
 
     doc.empty_cell(A2);
     doc.calculate(0);
     v = doc.get_numeric_value("B4");
-    assert(equal(v, 2.4, 10.0));
+    assert(equal(v, 2.4));
 }
 
 void test_string_io()
