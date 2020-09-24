@@ -106,6 +106,9 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_STRTOD
 
+AC_CHECK_SIZEOF([void *])
+CXXFLAGS="$CXXFLAGS -DSIZEOF_VOID_P=$ac_cv_sizeof_void_p"
+
 BOOST_REQUIRE([1.36])
 BOOST_FILESYSTEM
 

@@ -27,14 +27,22 @@ namespace ixion {
 constexpr mdds::mtv::element_t element_type_empty   = mdds::mtv::element_type_empty;
 constexpr mdds::mtv::element_t element_type_boolean = mdds::mtv::element_type_boolean;
 constexpr mdds::mtv::element_t element_type_numeric = mdds::mtv::element_type_double;
+#if SIZEOF_VOID_P == 4
+constexpr mdds::mtv::element_t element_type_string  = mdds::mtv::element_type_uint32;
+#else
 constexpr mdds::mtv::element_t element_type_string  = mdds::mtv::element_type_uint64;
+#endif
 constexpr mdds::mtv::element_t element_type_formula = mdds::mtv::element_type_user_start;
 
 // Element block types
 
 using boolean_element_block = mdds::mtv::boolean_element_block;
 using numeric_element_block = mdds::mtv::double_element_block;
+#if SIZEOF_VOID_P == 4
+using string_element_block  = mdds::mtv::uint32_element_block;
+#else
 using string_element_block  = mdds::mtv::uint64_element_block;
+#endif
 
 using formula_element_block =
     mdds::mtv::noncopyable_managed_element_block<element_type_formula, ixion::formula_cell>;
