@@ -15,7 +15,7 @@
 
 namespace ixion {
 
-class model_context;
+namespace detail { class model_context_impl; }
 class formula_cell;
 struct abs_rc_range_t;
 
@@ -25,10 +25,10 @@ public:
     class impl;
 
 private:
-    friend class model_context;
+    friend class detail::model_context_impl;
     std::unique_ptr<model_iterator::impl> mp_impl;
 
-    model_iterator(const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir);
+    model_iterator(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir);
 public:
 
     struct IXION_DLLPUBLIC cell

@@ -8,7 +8,7 @@
 #include "ixion/model_iterator.hpp"
 #include "ixion/global.hpp"
 #include "ixion/exceptions.hpp"
-#include "ixion/model_context.hpp"
+#include "model_context_impl.hpp"
 
 #include <mdds/multi_type_vector/collection.hpp>
 #include <sstream>
@@ -143,7 +143,7 @@ class iterator_core_horizontal : public model_iterator::impl
         m_update_current_cell = false;
     }
 public:
-    iterator_core_horizontal(const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range) :
+    iterator_core_horizontal(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range) :
         m_update_current_cell(true)
     {
         const column_stores_t* cols = cxt.get_columns(sheet);
@@ -254,7 +254,7 @@ class iterator_core_vertical : public model_iterator::impl
     }
 
 public:
-    iterator_core_vertical(const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range) :
+    iterator_core_vertical(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range) :
         m_update_current_cell(true),
         m_row_first(0),
         m_row_last(row_unset)
@@ -361,7 +361,7 @@ public:
 } // anonymous namespace
 
 model_iterator::model_iterator() : mp_impl(ixion::make_unique<iterator_core_empty>()) {}
-model_iterator::model_iterator(const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir)
+model_iterator::model_iterator(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir)
 {
     switch (dir)
     {

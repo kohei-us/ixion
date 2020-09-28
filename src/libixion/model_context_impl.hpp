@@ -170,6 +170,9 @@ public:
     const detail::named_expressions_t& get_named_expressions() const;
     const detail::named_expressions_t& get_named_expressions(sheet_t sheet) const;
 
+    model_iterator get_model_iterator(
+        sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
+
 private:
     model_context& m_parent;
 

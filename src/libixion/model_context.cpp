@@ -415,7 +415,7 @@ const column_stores_t* model_context::get_columns(sheet_t sheet) const
 model_iterator model_context::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {
-    return model_iterator(*this, sheet, range, dir);
+    return mp_impl->get_model_iterator(sheet, dir, range);
 }
 
 named_expressions_iterator model_context::get_named_expressions_iterator() const
