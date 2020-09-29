@@ -402,16 +402,6 @@ string_id_t model_context::get_identifier_from_string(const char* p, size_t n) c
     return mp_impl->get_identifier_from_string(p, n);
 }
 
-const column_store_t* model_context::get_column(sheet_t sheet, col_t col) const
-{
-    return mp_impl->get_column(sheet, col);
-}
-
-const column_stores_t* model_context::get_columns(sheet_t sheet) const
-{
-    return mp_impl->get_columns(sheet);
-}
-
 model_iterator model_context::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {

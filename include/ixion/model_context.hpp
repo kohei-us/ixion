@@ -8,7 +8,6 @@
 #ifndef INCLUDED_IXION_MODEL_CONTEXT_HPP
 #define INCLUDED_IXION_MODEL_CONTEXT_HPP
 
-#include "ixion/column_store_type.hpp"
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/env.hpp"
@@ -294,28 +293,6 @@ public:
     void dump_strings() const;
 
     string_id_t get_identifier_from_string(const char* p, size_t n) const;
-
-    /**
-     * Get column storage.
-     *
-     * @param sheet sheet index.
-     * @param col column index.
-     *
-     * @return const pointer to column storage, or NULL in case sheet index or
-     *         column index is out of bound.
-     */
-    IXION_DEPRECATED const column_store_t* get_column(sheet_t sheet, col_t col) const;
-
-    /**
-     * Get an array of column stores for the entire sheet.
-     *
-     *
-     * @param sheet sheet index.
-     *
-     * @return const pointer to an array of column stores, or nullptr in case
-     * the sheet index is out of bound.
-     */
-    IXION_DEPRECATED const column_stores_t* get_columns(sheet_t sheet) const;
 
     /**
      * Get an immutable iterator that lets you iterate cell values in one

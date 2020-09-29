@@ -15,6 +15,7 @@
 #include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/cell_access.hpp"
 #include "ixion/config.hpp"
+#include "ixion/cell.hpp"
 
 #include <sstream>
 #include <iostream>
