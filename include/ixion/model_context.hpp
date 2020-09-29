@@ -304,7 +304,7 @@ public:
      * @return const pointer to column storage, or NULL in case sheet index or
      *         column index is out of bound.
      */
-    const column_store_t* get_column(sheet_t sheet, col_t col) const;
+    IXION_DEPRECATED const column_store_t* get_column(sheet_t sheet, col_t col) const;
 
     /**
      * Get an array of column stores for the entire sheet.
@@ -315,7 +315,7 @@ public:
      * @return const pointer to an array of column stores, or nullptr in case
      * the sheet index is out of bound.
      */
-    const column_stores_t* get_columns(sheet_t sheet) const;
+    IXION_DEPRECATED const column_stores_t* get_columns(sheet_t sheet) const;
 
     /**
      * Get an immutable iterator that lets you iterate cell values in one
