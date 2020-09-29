@@ -228,7 +228,6 @@
                 <F N="../include/ixion/address_iterator.hpp"/>
                 <F N="../include/ixion/cell.hpp"/>
                 <F N="../include/ixion/cell_access.hpp"/>
-                <F N="../include/ixion/column_store_type.hpp"/>
                 <F N="../include/ixion/compute_engine.hpp"/>
                 <F N="../include/ixion/config.hpp"/>
                 <F N="../include/ixion/dirty_cell_tracker.hpp"/>
@@ -271,6 +270,7 @@
                 <F N="../src/libixion/cell_access.cpp"/>
                 <F N="../src/libixion/cell_queue_manager.cpp"/>
                 <F N="../src/libixion/cell_queue_manager.hpp"/>
+                <F N="../src/libixion/column_store_type.hpp"/>
                 <F N="../src/libixion/compute_engine.cpp"/>
                 <F N="../src/libixion/compute_engine_cuda.cpp"/>
                 <F N="../src/libixion/compute_engine_cuda.hpp"/>

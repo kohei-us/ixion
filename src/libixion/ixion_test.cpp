@@ -16,6 +16,7 @@
 #include "ixion/interface/table_handler.hpp"
 #include "ixion/config.hpp"
 #include "ixion/matrix.hpp"
+#include "ixion/cell.hpp"
 #include "ixion/cell_access.hpp"
 #include "ixion/formula_result.hpp"
 

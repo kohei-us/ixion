@@ -9,7 +9,7 @@
 #define INCLUDED_IXION_DETAIL_UTILS_HPP
 
 #include "ixion/types.hpp"
-#include "ixion/column_store_type.hpp"
+#include "column_store_type.hpp"
 
 namespace ixion { namespace detail {
 

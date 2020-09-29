@@ -27,6 +27,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	calc_status.cpp \
 	cell.cpp \
 	cell_access.cpp \
+	column_store_type.hpp \
 	compute_engine.cpp \
 	concrete_formula_tokens.hpp \
 	concrete_formula_tokens.cpp \

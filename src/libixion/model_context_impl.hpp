@@ -12,10 +12,10 @@
 #include "ixion/mem_str_buf.hpp"
 #include "ixion/types.hpp"
 #include "ixion/config.hpp"
-#include "ixion/column_store_type.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
 
 #include "workbook.hpp"
+#include "column_store_type.hpp"
 
 #include <vector>
 #include <string>

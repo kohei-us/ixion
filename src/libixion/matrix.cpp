@@ -7,6 +7,7 @@
 
 #include "ixion/matrix.hpp"
 #include "ixion/global.hpp"
+#include "column_store_type.hpp"
 
 #include <limits>
 #include <cstring>

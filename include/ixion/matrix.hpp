@@ -9,7 +9,7 @@
 #define INCLUDED_IXION_MATRIX_HPP
 
 #include "ixion/env.hpp"
-#include "ixion/column_store_type.hpp"
+#include "ixion/types.hpp"
 
 #include <memory>
 #include <vector>

@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_WORKBOOK_HPP
 #define INCLUDED_IXION_WORKBOOK_HPP
 
-#include "ixion/column_store_type.hpp"
+#include "column_store_type.hpp"
 #include "model_types.hpp"
 
 #include <vector>
