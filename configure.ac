@@ -20,7 +20,7 @@ AC_INIT([libixion], [ixion_version])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-AX_CXX_COMPILE_STDCXX_11
+AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
 CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -Wshadow -Wno-write-strings -pthread"
 
 AC_CANONICAL_HOST
