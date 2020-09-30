@@ -1062,10 +1062,6 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
         ret.matrix_value = true;
     }
 
-#if DEBUG_MODEL_PARSER
-    __IXION_DEBUG_OUT__ << "(name='" << ret.name.str() << "'; value='" << ret.value.str() << "')" << endl;
-#endif
-
     if (ret.name.empty())
     {
         if (ret.value.empty())

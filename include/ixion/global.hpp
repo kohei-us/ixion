@@ -14,8 +14,6 @@
 #include <memory>
 #include <string>
 
-#define __IXION_DEBUG_OUT__ ::std::cout << __FILE__ << "#" << __LINE__ << ": "
-
 namespace ixion {
 
 IXION_DLLPUBLIC void init();
