@@ -191,7 +191,7 @@ struct formula_tokens_store::impl
 };
 
 formula_tokens_store::formula_tokens_store() :
-    mp_impl(ixion::make_unique<impl>())
+    mp_impl(std::make_unique<impl>())
 {
 }
 

@@ -175,10 +175,10 @@ struct document::impl
 };
 
 document::document() :
-    mp_impl(ixion::make_unique<impl>()) {}
+    mp_impl(std::make_unique<impl>()) {}
 
 document::document(formula_name_resolver_t cell_address_type) :
-    mp_impl(ixion::make_unique<impl>(cell_address_type)) {}
+    mp_impl(std::make_unique<impl>(cell_address_type)) {}
 
 document::~document() {}
 

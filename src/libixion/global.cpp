@@ -145,15 +145,15 @@ struct formula_error::impl
 };
 
 formula_error::formula_error(formula_error_t fe) :
-    mp_impl(ixion::make_unique<impl>(fe)) {}
+    mp_impl(std::make_unique<impl>(fe)) {}
 
 formula_error::formula_error(formula_error_t fe, std::string msg) :
-    mp_impl(ixion::make_unique<impl>(fe, std::move(msg))) {}
+    mp_impl(std::make_unique<impl>(fe, std::move(msg))) {}
 
 formula_error::formula_error(formula_error&& other) :
     mp_impl(std::move(other.mp_impl))
 {
-    other.mp_impl = ixion::make_unique<impl>(formula_error_t::no_error);
+    other.mp_impl = std::make_unique<impl>(formula_error_t::no_error);
 }
 
 formula_error::~formula_error() throw()

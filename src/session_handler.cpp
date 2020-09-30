@@ -26,7 +26,7 @@ session_handler::factory::~factory() {}
 
 std::unique_ptr<iface::session_handler> session_handler::factory::create()
 {
-    return ixion::make_unique<session_handler>(m_context, m_show_sheet_name);
+    return std::make_unique<session_handler>(m_context, m_show_sheet_name);
 }
 
 void session_handler::factory::show_sheet_name(bool b)
@@ -49,7 +49,7 @@ struct session_handler::impl
 };
 
 session_handler::session_handler(const model_context& cxt, bool show_sheet_name) :
-    mp_impl(ixion::make_unique<impl>(cxt, show_sheet_name)) {}
+    mp_impl(std::make_unique<impl>(cxt, show_sheet_name)) {}
 
 session_handler::~session_handler() {}
 

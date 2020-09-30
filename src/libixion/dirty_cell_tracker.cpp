@@ -100,7 +100,7 @@ struct dirty_cell_tracker::impl
     }
 };
 
-dirty_cell_tracker::dirty_cell_tracker() : mp_impl(ixion::make_unique<impl>()) {}
+dirty_cell_tracker::dirty_cell_tracker() : mp_impl(std::make_unique<impl>()) {}
 dirty_cell_tracker::~dirty_cell_tracker() {}
 
 void dirty_cell_tracker::add(const abs_range_t& src, const abs_range_t& dest)

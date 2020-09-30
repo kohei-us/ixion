@@ -108,7 +108,7 @@ struct formula_cell::impl
             IXION_DEBUG("Circular dependency detected !!");
             assert(!m_calc_status->result);
             m_calc_status->result =
-                ixion::make_unique<formula_result>(formula_error_t::ref_result_not_available);
+                std::make_unique<formula_result>(formula_error_t::ref_result_not_available);
 
             return false;
         }
@@ -289,7 +289,7 @@ struct formula_cell::impl
             if (!m_calc_status->result)
             {
                 m_calc_status->result =
-                    ixion::make_unique<formula_result>(
+                    std::make_unique<formula_result>(
                         matrix(m_calc_status->group_size.row, m_calc_status->group_size.column));
             }
 
@@ -316,20 +316,20 @@ struct formula_cell::impl
         }
 
         std::unique_lock<std::mutex> lock(m_calc_status->mtx);
-        m_calc_status->result = ixion::make_unique<formula_result>(std::move(result));
+        m_calc_status->result = std::make_unique<formula_result>(std::move(result));
     }
 };
 
-formula_cell::formula_cell() : mp_impl(ixion::make_unique<impl>()) {}
+formula_cell::formula_cell() : mp_impl(std::make_unique<impl>()) {}
 
 formula_cell::formula_cell(const formula_tokens_store_ptr_t& tokens) :
-    mp_impl(ixion::make_unique<impl>(tokens)) {}
+    mp_impl(std::make_unique<impl>(tokens)) {}
 
 formula_cell::formula_cell(
     row_t group_row, col_t group_col,
     const calc_status_ptr_t& cs,
     const formula_tokens_store_ptr_t& tokens) :
-    mp_impl(ixion::make_unique<impl>(group_row, group_col, cs, tokens)) {}
+    mp_impl(std::make_unique<impl>(group_row, group_col, cs, tokens)) {}
 
 formula_cell::~formula_cell()
 {
@@ -393,7 +393,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
 
         formula_interpreter fin(this, context);
         fin.set_origin(pos);
-        status.result = ixion::make_unique<formula_result>();
+        status.result = std::make_unique<formula_result>();
         if (fin.interpret())
         {
             // Successful interpretation.

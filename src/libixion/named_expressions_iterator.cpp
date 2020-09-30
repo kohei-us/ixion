@@ -32,13 +32,13 @@ struct named_expressions_iterator::impl
 };
 
 named_expressions_iterator::named_expressions_iterator() :
-    mp_impl(ixion::make_unique<impl>()) {}
+    mp_impl(std::make_unique<impl>()) {}
 
 named_expressions_iterator::named_expressions_iterator(const model_context& cxt, sheet_t scope) :
-    mp_impl(ixion::make_unique<impl>(cxt, scope)) {}
+    mp_impl(std::make_unique<impl>(cxt, scope)) {}
 
 named_expressions_iterator::named_expressions_iterator(const named_expressions_iterator& other) :
-    mp_impl(ixion::make_unique<impl>(*other.mp_impl)) {}
+    mp_impl(std::make_unique<impl>(*other.mp_impl)) {}
 
 named_expressions_iterator::~named_expressions_iterator()
 {
@@ -75,7 +75,7 @@ named_expressions_iterator::named_expression named_expressions_iterator::get() c
 
 named_expressions_iterator& named_expressions_iterator::operator= (const named_expressions_iterator& other)
 {
-    mp_impl = ixion::make_unique<impl>(*other.mp_impl);
+    mp_impl = std::make_unique<impl>(*other.mp_impl);
     return *this;
 }
 

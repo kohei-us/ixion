@@ -100,12 +100,6 @@ struct default_deleter
     }
 };
 
-template<typename T, typename ...Args>
-std::unique_ptr<T> make_unique(Args&& ...args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 inline bool is_digit(char c)
 {
     return '0' <= c && c <= '9';

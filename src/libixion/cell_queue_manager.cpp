@@ -136,7 +136,7 @@ struct formula_cell_queue::impl
 
 formula_cell_queue::formula_cell_queue(
     iface::formula_model_access& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
-    mp_impl(ixion::make_unique<impl>(cxt, std::move(cells), thread_count)) {}
+    mp_impl(std::make_unique<impl>(cxt, std::move(cells), thread_count)) {}
 
 formula_cell_queue::~formula_cell_queue() {}
 

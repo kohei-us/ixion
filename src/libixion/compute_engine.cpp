@@ -87,7 +87,7 @@ void compute_engine::add_class(
 }
 
 compute_engine::compute_engine() :
-    mp_impl(ixion::make_unique<impl>())
+    mp_impl(std::make_unique<impl>())
 {
 }
 

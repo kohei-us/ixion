@@ -25,7 +25,7 @@ struct cell_access::impl
 };
 
 cell_access::cell_access(const model_context& cxt, const abs_address_t& addr) :
-    mp_impl(ixion::make_unique<impl>(cxt))
+    mp_impl(std::make_unique<impl>(cxt))
 {
     mp_impl->pos = cxt.mp_impl->get_cell_position(addr);
 }
@@ -33,13 +33,13 @@ cell_access::cell_access(const model_context& cxt, const abs_address_t& addr) :
 cell_access::cell_access(cell_access&& other) :
     mp_impl(std::move(other.mp_impl))
 {
-    other.mp_impl = ixion::make_unique<impl>(mp_impl->cxt);
+    other.mp_impl = std::make_unique<impl>(mp_impl->cxt);
 }
 
 cell_access& cell_access::operator= (cell_access&& other)
 {
     mp_impl = std::move(other.mp_impl);
-    other.mp_impl = ixion::make_unique<impl>(mp_impl->cxt);
+    other.mp_impl = std::make_unique<impl>(mp_impl->cxt);
     return *this;
 }
 

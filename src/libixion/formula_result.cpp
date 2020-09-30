@@ -435,20 +435,20 @@ struct formula_result::impl
 };
 
 formula_result::formula_result() :
-    mp_impl(ixion::make_unique<impl>()) {}
+    mp_impl(std::make_unique<impl>()) {}
 
 formula_result::formula_result(const formula_result& r) :
-    mp_impl(ixion::make_unique<impl>(*r.mp_impl)) {}
+    mp_impl(std::make_unique<impl>(*r.mp_impl)) {}
 
 formula_result::formula_result(formula_result&& r) : mp_impl(std::move(r.mp_impl)) {}
 
-formula_result::formula_result(double v) : mp_impl(ixion::make_unique<impl>(v)) {}
+formula_result::formula_result(double v) : mp_impl(std::make_unique<impl>(v)) {}
 
-formula_result::formula_result(std::string str) : mp_impl(ixion::make_unique<impl>(std::move(str))) {}
+formula_result::formula_result(std::string str) : mp_impl(std::make_unique<impl>(std::move(str))) {}
 
-formula_result::formula_result(formula_error_t e) : mp_impl(ixion::make_unique<impl>(e)) {}
+formula_result::formula_result(formula_error_t e) : mp_impl(std::make_unique<impl>(e)) {}
 
-formula_result::formula_result(matrix mtx) : mp_impl(ixion::make_unique<impl>(std::move(mtx))) {}
+formula_result::formula_result(matrix mtx) : mp_impl(std::make_unique<impl>(std::move(mtx))) {}
 
 formula_result::~formula_result() {}
 

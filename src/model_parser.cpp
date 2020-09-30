@@ -384,7 +384,7 @@ void model_parser::parse_command()
         {
             m_print_separator = true;
             m_parse_mode = parse_mode_named_expression;
-            mp_named_expression = ixion::make_unique<named_expression_type>();
+            mp_named_expression = std::make_unique<named_expression_type>();
             break;
         }
         case commands::type::print_dependency:

@@ -360,16 +360,16 @@ public:
 
 } // anonymous namespace
 
-model_iterator::model_iterator() : mp_impl(ixion::make_unique<iterator_core_empty>()) {}
+model_iterator::model_iterator() : mp_impl(std::make_unique<iterator_core_empty>()) {}
 model_iterator::model_iterator(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir)
 {
     switch (dir)
     {
         case rc_direction_t::horizontal:
-            mp_impl = ixion::make_unique<iterator_core_horizontal>(cxt, sheet, range);
+            mp_impl = std::make_unique<iterator_core_horizontal>(cxt, sheet, range);
             break;
         case rc_direction_t::vertical:
-            mp_impl = ixion::make_unique<iterator_core_vertical>(cxt, sheet, range);
+            mp_impl = std::make_unique<iterator_core_vertical>(cxt, sheet, range);
             break;
     }
 }
@@ -381,7 +381,7 @@ model_iterator::~model_iterator() {}
 model_iterator& model_iterator::operator= (model_iterator&& other)
 {
     mp_impl = std::move(other.mp_impl);
-    other.mp_impl = ixion::make_unique<iterator_core_empty>();
+    other.mp_impl = std::make_unique<iterator_core_empty>();
     return *this;
 }
 

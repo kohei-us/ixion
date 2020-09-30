@@ -226,14 +226,14 @@ struct abs_address_iterator::const_iterator::impl_node
 };
 
 abs_address_iterator::const_iterator::const_iterator() :
-    mp_impl(ixion::make_unique<impl_node>()) {}
+    mp_impl(std::make_unique<impl_node>()) {}
 
 abs_address_iterator::const_iterator::const_iterator(
     const abs_range_t& range, rc_direction_t dir, bool end) :
-    mp_impl(ixion::make_unique<impl_node>(range, dir, end)) {}
+    mp_impl(std::make_unique<impl_node>(range, dir, end)) {}
 
 abs_address_iterator::const_iterator::const_iterator(const const_iterator& r) :
-    mp_impl(ixion::make_unique<impl_node>(*r.mp_impl)) {}
+    mp_impl(std::make_unique<impl_node>(*r.mp_impl)) {}
 
 abs_address_iterator::const_iterator::const_iterator(const_iterator&& r) :
     mp_impl(std::move(r.mp_impl)) {}
@@ -287,7 +287,7 @@ bool abs_address_iterator::const_iterator::operator!= (const const_iterator& r) 
 }
 
 abs_address_iterator::abs_address_iterator(const abs_range_t& range, rc_direction_t dir) :
-    mp_impl(ixion::make_unique<impl>(range, dir)) {}
+    mp_impl(std::make_unique<impl>(range, dir)) {}
 
 abs_address_iterator::~abs_address_iterator() {}
 

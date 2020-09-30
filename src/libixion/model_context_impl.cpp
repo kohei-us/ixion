@@ -34,7 +34,7 @@ string_id_t safe_string_pool::append_string_unsafe(const char* p, size_t n)
     assert(n);
 
     string_id_t str_id = m_strings.size();
-    m_strings.push_back(make_unique<std::string>(p, n));
+    m_strings.push_back(std::make_unique<std::string>(p, n));
     p = m_strings.back()->data();
     mem_str_buf key(p, n);
     m_string_map.insert(string_map_type::value_type(key, str_id));
@@ -658,7 +658,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
 formula_cell* model_context_impl::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
-    std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(tokens);
+    std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
@@ -671,7 +671,7 @@ formula_cell* model_context_impl::set_formula_cell(
 formula_cell* model_context_impl::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result)
 {
-    std::unique_ptr<formula_cell> fcell = ixion::make_unique<formula_cell>(tokens);
+    std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
 
     worksheet& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
@@ -708,7 +708,7 @@ void model_context_impl::set_grouped_formula_cells(
         throw std::invalid_argument("dimension of the cached result differs from the size of the group.");
 
     calc_status_ptr_t cs(new calc_status(group_size));
-    cs->result = ixion::make_unique<formula_result>(std::move(result));
+    cs->result = std::make_unique<formula_result>(std::move(result));
     set_grouped_formula_cells_to_workbook(m_sheets, group_range.first, group_size, cs, ts);
 }
 
