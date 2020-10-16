@@ -158,6 +158,10 @@ void check_named_exp_name_or_throw(const char* p, size_t n)
         throw model_context_error(
             "name cannot start with a numeric character", model_context_error::invalid_named_expression);
 
+    if (*p == '.')
+        throw model_context_error(
+            "name cannot start with a dot", model_context_error::invalid_named_expression);
+
     for (; p != p_end; ++p)
     {
         char c = *p;
@@ -170,7 +174,7 @@ void check_named_exp_name_or_throw(const char* p, size_t n)
         if ('0' <= c && c <= '9')
             continue;
 
-        if (c == '_')
+        if (c == '_' || c == '.')
             continue;
 
         std::ostringstream os;

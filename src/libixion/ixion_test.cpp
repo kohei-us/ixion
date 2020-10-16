@@ -1634,6 +1634,8 @@ void test_model_context_named_expression()
         { "123Name", false },
         { "Name123", true },
         { "", false },
+        { "Name.1", true },
+        { ".Name.2", false },
     };
 
     for (const name_test_case& tc : invalid_names)
