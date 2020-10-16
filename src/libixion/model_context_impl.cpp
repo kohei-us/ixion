@@ -142,7 +142,35 @@ void set_grouped_formula_cells_to_workbook(
     }
 }
 
+/**
+ * The name of a named expression can only contain letters, numbers or an
+ * underscore character.
+ */
+void check_named_exp_name_or_throw(const char* p, size_t n)
+{
+    const char* p_end = p + n;
+    for (; p != p_end; ++p)
+    {
+        char c = *p;
+        if ('a' <= c && c <= 'z')
+            continue;
+
+        if ('A' <= c && c <= 'Z')
+            continue;
+
+        if ('0' <= c && c <= '9')
+            continue;
+
+        if (c == '_')
+            continue;
+
+        std::ostringstream os;
+        os << "name contains invalid character '" << c << "'";
+        throw model_context_error(os.str(), model_context_error::invalid_named_expression);
+    }
 }
+
+} // anonymous namespace
 
 model_context_impl::model_context_impl(model_context& parent, const rc_size_t& sheet_size) :
     m_parent(parent),
@@ -172,6 +200,8 @@ void model_context_impl::notify(formula_event_t event)
 void model_context_impl::set_named_expression(
     const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
 {
+    check_named_exp_name_or_throw(p, n);
+
     std::string name(p, n);
     IXION_TRACE("named expression: name='" << name << "'");
     m_named_expressions.insert(
@@ -185,6 +215,8 @@ void model_context_impl::set_named_expression(
 void model_context_impl::set_named_expression(
     sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
 {
+    check_named_exp_name_or_throw(p, n);
+
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     std::string name(p, n);
     IXION_TRACE("named expression: name='" << name << "'");

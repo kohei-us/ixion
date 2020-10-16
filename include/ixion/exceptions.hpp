@@ -53,6 +53,7 @@ public:
     enum error_type
     {
         circular_dependency,
+        invalid_named_expression,
         sheet_name_conflict,
         sheet_size_locked,
         not_implemented
