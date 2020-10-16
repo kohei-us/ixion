@@ -1620,6 +1620,57 @@ void test_model_context_named_expression()
         std::string test = print_formula_tokens(cxt, exp->origin, *resolver, exp->tokens);
         assert(test == tc.formula);
     }
+
+    // invalid names should be rejected.
+    struct name_test_case
+    {
+        std::string name;
+        bool valid;
+    };
+
+    std::vector<name_test_case> invalid_names = {
+        { "Name 1", false },
+        { "Name_1", true },
+    };
+
+    for (const name_test_case& tc : invalid_names)
+    {
+        abs_address_t origin;
+        std::string formula = "1+2";
+
+        if (tc.valid)
+        {
+            formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+            cxt.set_named_expression(tc.name.data(), tc.name.size(), origin, std::move(tokens));
+
+            tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+            cxt.set_named_expression(0, tc.name.data(), tc.name.size(), origin, std::move(tokens));
+        }
+        else
+        {
+            try
+            {
+                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+                cxt.set_named_expression(tc.name.data(), tc.name.size(), origin, std::move(tokens));
+                assert(!"named expression with invalid name should have been rejected!");
+            }
+            catch (const model_context_error& e)
+            {
+                assert(e.get_error_type() == model_context_error::invalid_named_expression);
+            }
+
+            try
+            {
+                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+                cxt.set_named_expression(0, tc.name.data(), tc.name.size(), origin, std::move(tokens));
+                assert(!"named expression with invalid name should have been rejected!");
+            }
+            catch (const model_context_error& e)
+            {
+                assert(e.get_error_type() == model_context_error::invalid_named_expression);
+            }
+        }
+    }
 }
 
 bool check_model_iterator_output(model_iterator& iter, const std::vector<model_iterator::cell>& checks)
