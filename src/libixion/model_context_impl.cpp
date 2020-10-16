@@ -149,6 +149,15 @@ void set_grouped_formula_cells_to_workbook(
 void check_named_exp_name_or_throw(const char* p, size_t n)
 {
     const char* p_end = p + n;
+
+    if (p == p_end)
+        throw model_context_error(
+            "empty name is not allowed", model_context_error::invalid_named_expression);
+
+    if ('0' <= *p && *p <= '9')
+        throw model_context_error(
+            "name cannot start with a numeric character", model_context_error::invalid_named_expression);
+
     for (; p != p_end; ++p)
     {
         char c = *p;

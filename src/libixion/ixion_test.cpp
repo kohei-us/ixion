@@ -1631,6 +1631,9 @@ void test_model_context_named_expression()
     std::vector<name_test_case> invalid_names = {
         { "Name 1", false },
         { "Name_1", true },
+        { "123Name", false },
+        { "Name123", true },
+        { "", false },
     };
 
     for (const name_test_case& tc : invalid_names)
