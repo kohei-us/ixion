@@ -17,7 +17,7 @@
 
 namespace ixion {
 
-model_context::input_cell::input_cell(nullptr_t) : type(celltype_t::empty) {}
+model_context::input_cell::input_cell(std::nullptr_t) : type(celltype_t::empty) {}
 model_context::input_cell::input_cell(bool b) : type(celltype_t::boolean)
 {
     value.boolean = b;
