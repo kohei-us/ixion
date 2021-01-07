@@ -506,6 +506,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_concatenate:
             fnc_concatenate(args);
             break;
+        case formula_function_t::func_left:
+            fnc_left(args);
+            break;
         case formula_function_t::func_now:
             fnc_now(args);
             break;
@@ -768,7 +771,7 @@ void formula_functions::fnc_len(formula_value_stack& args) const
     args.push_value(s.size());
 }
 
-void formula_functions::fnc_concatenate(formula_value_stack& args)
+void formula_functions::fnc_concatenate(formula_value_stack& args) const
 {
     string s;
     while (!args.empty())
@@ -776,10 +779,29 @@ void formula_functions::fnc_concatenate(formula_value_stack& args)
     args.push_string(std::move(s));
 }
 
+void formula_functions::fnc_left(formula_value_stack& args) const
+{
+    if (args.empty() || args.size() > 2)
+        throw formula_functions::invalid_arg(
+            "LEFT requires at least one argument but no more than 2.");
+
+    size_t n = 1; // when the 2nd arg is skipped, it defaults to 1.
+    if (args.size() == 2)
+        n = std::floor(args.pop_value());
+
+    string s = args.pop_string();
+
+    // Resize ONLY when the desired length is lower than the original string length.
+    if (n < s.size())
+        s.resize(n);
+
+    args.push_string(std::move(s));
+}
+
 void formula_functions::fnc_now(formula_value_stack& args) const
 {
     if (!args.empty())
-        throw formula_functions::invalid_arg("NOW takes no argument.");
+        throw formula_functions::invalid_arg("NOW takes no arguments.");
 
     // TODO: this value is currently not accurate since we don't take into
     // account the zero date yet.

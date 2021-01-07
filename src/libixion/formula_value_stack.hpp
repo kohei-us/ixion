@@ -81,6 +81,9 @@ public:
     matrix pop_matrix();
 };
 
+/**
+ * FILO stack of values; last pushed value gets popped first.
+ */
 class formula_value_stack
 {
     typedef std::deque<stack_value> store_type;

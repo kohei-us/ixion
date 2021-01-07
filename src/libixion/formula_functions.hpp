@@ -64,7 +64,8 @@ private:
     void fnc_if(formula_value_stack& args) const;
 
     void fnc_len(formula_value_stack& args) const;
-    void fnc_concatenate(formula_value_stack& args);
+    void fnc_concatenate(formula_value_stack& args) const;
+    void fnc_left(formula_value_stack& args) const;
 
     void fnc_now(formula_value_stack& args) const;
 

@@ -1,0 +1,36 @@
+%% Test built-in function LEFT.
+%mode init
+A1@ABCDE
+A2:12345
+B1=LEFT(A1)
+B2=LEFT(A1,2)
+B3=LEFT(A1,3)
+B4=LEFT(A1,4)
+B5=LEFT(A1,5)
+B6=LEFT(A1,6)
+B7=LEFT(B6,3)
+C1=LEFT(A2)
+C2=LEFT(A2,2)
+C3=LEFT(A2,3)
+C4=LEFT(A2,4)
+C5=LEFT(A2,5)
+C6=LEFT(A2,6)
+C7=LEFT(C6,2)
+%calc
+%mode result
+B1="A"
+B2="AB"
+B3="ABC"
+B4="ABCD"
+B5="ABCDE"
+B6="ABCDE"
+B7="ABC"
+C1="1"
+C2="12"
+C3="123"
+C4="1234"
+C5="12345"
+C6="12345"
+C7="12"
+%check
+%exit
