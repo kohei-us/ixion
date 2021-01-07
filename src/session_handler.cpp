@@ -9,6 +9,7 @@
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula_tokens.hpp"
+#include "ixion/config.hpp"
 
 #include <string>
 #include <iostream>
@@ -86,7 +87,10 @@ void session_handler::set_formula_error(const char* msg)
 
 void session_handler::push_token(fopcode_t fop)
 {
-    mp_impl->m_buf << get_formula_opcode_string(fop);
+    if (fop == fop_sep)
+        mp_impl->m_buf << mp_impl->m_context.get_config().sep_function_arg;
+    else
+        mp_impl->m_buf << get_formula_opcode_string(fop);
 }
 
 void session_handler::push_value(double val)
