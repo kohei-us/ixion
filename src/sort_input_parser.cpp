@@ -29,7 +29,7 @@ size_t hash_value(const ixion::mem_str_buf& s)
 
 namespace {
 
-struct mem_str_buf_printer : unary_function<mem_str_buf, void>
+struct mem_str_buf_printer
 {
     void operator() (const mem_str_buf& r) const
     {

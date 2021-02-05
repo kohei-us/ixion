@@ -71,33 +71,6 @@ public:
     formula_error_t get_error() const;
 };
 
-template<typename _T>
-struct delete_element : public std::unary_function<_T*, void>
-{
-    void operator() (_T* p)
-    {
-        delete p;
-    }
-};
-
-template<typename _T>
-struct delete_map_value : public std::unary_function<typename _T::value_type, void>
-{
-    void operator() (typename _T::value_type& v)
-    {
-        delete v.second;
-    }
-};
-
-template<typename _T>
-struct default_deleter
-{
-    void operator() (const _T* p) const
-    {
-        delete p;
-    }
-};
-
 inline bool is_digit(char c)
 {
     return '0' <= c && c <= '9';

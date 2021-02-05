@@ -19,7 +19,7 @@ using namespace ixion;
 
 namespace {
 
-class parse_file : public unary_function<void, string>
+class parse_file
 {
     const size_t m_thread_count;
 public:

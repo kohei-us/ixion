@@ -88,7 +88,7 @@ mem_str_buf parse_command_to_buffer(const char*& p, const char* p_end)
     return buf;
 }
 
-class string_printer : public std::unary_function<string_id_t, void>
+class string_printer
 {
     const model_context& m_cxt;
     char m_sep;

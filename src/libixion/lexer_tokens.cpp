@@ -17,7 +17,7 @@ namespace ixion {
 
 namespace {
 
-class token_printer : public unary_function<unique_ptr<lexer_token_base>, void>
+class token_printer
 {
 public:
     token_printer(ostringstream& os, bool verbose) : m_os(os), m_verbose(verbose) {}
