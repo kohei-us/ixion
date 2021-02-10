@@ -51,5 +51,35 @@ mmult:
   params:
     min: 2
     max: 2
-
-# TODO : continue on ...
+now:
+  category: time
+  params:
+    min: 0
+    max: 0
+  note:
+    This function currently does not account for the zero date.
+pi:
+  category: mathematical
+  params:
+    min: 0
+    max: 0
+subtotal:
+  category: mathematical
+  params:
+    min: 2
+    max: 2
+  note:
+    This function is not fully implemented.
+sum:
+  category: mathematical
+  params:
+    min: 1
+    max: null
+wait:
+  category: development
+  params:
+    min: 0
+    max: 0
+  note:
+    This function is used for development only.  It sleeps for 1 second and
+    always returns 1.
