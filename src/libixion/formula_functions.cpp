@@ -479,20 +479,11 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
 {
     switch (oc)
     {
-        case formula_function_t::func_max:
-            fnc_max(args);
-            break;
         case formula_function_t::func_average:
             fnc_average(args);
             break;
-        case formula_function_t::func_min:
-            fnc_min(args);
-            break;
-        case formula_function_t::func_wait:
-            fnc_wait(args);
-            break;
-        case formula_function_t::func_sum:
-            fnc_sum(args);
+        case formula_function_t::func_concatenate:
+            fnc_concatenate(args);
             break;
         case formula_function_t::func_counta:
             fnc_counta(args);
@@ -500,29 +491,38 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_if:
             fnc_if(args);
             break;
-        case formula_function_t::func_len:
-            fnc_len(args);
-            break;
-        case formula_function_t::func_concatenate:
-            fnc_concatenate(args);
+        case formula_function_t::func_int:
+            fnc_int(args);
             break;
         case formula_function_t::func_left:
             fnc_left(args);
             break;
-        case formula_function_t::func_now:
-            fnc_now(args);
+        case formula_function_t::func_len:
+            fnc_len(args);
             break;
-        case formula_function_t::func_subtotal:
-            fnc_subtotal(args);
+        case formula_function_t::func_max:
+            fnc_max(args);
+            break;
+        case formula_function_t::func_min:
+            fnc_min(args);
             break;
         case formula_function_t::func_mmult:
             fnc_mmult(args);
             break;
+        case formula_function_t::func_now:
+            fnc_now(args);
+            break;
         case formula_function_t::func_pi:
             fnc_pi(args);
             break;
-        case formula_function_t::func_int:
-            fnc_int(args);
+        case formula_function_t::func_subtotal:
+            fnc_subtotal(args);
+            break;
+        case formula_function_t::func_sum:
+            fnc_sum(args);
+            break;
+        case formula_function_t::func_wait:
+            fnc_wait(args);
             break;
         case formula_function_t::func_unknown:
         default:
