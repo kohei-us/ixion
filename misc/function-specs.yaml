@@ -1,0 +1,55 @@
+---
+# Specifications of built-in functions alreay implemented in ixion.
+# Keep them sorted alphabetically.
+average:
+  category: statistical
+  params:
+    min: 1
+    max: null
+concatenate:
+  category: text
+  params:
+    min: null
+    max: null
+counta:
+  category: statistical
+  params:
+    min: null
+    max: null
+if:
+  category: logical
+  params:
+    min: 3
+    max: 3
+int:
+  category: mathematical
+  params:
+    min: 1
+    max: 1
+left:
+  category: text
+  params:
+    min: 1
+    max: 2
+len:
+  category: text
+  params:
+    min: 1
+    max: 1
+max:
+  category: statistical
+  params:
+    min: 1
+    max: null
+min:
+  category: statistical
+  params:
+    min: 1
+    max: null
+mmult:
+  category: matrix
+  params:
+    min: 2
+    max: 2
+
+# TODO : continue on ...
