@@ -11,11 +11,21 @@
 #include <cassert>
 #include <cstring>
 
+using std::cout;
+using std::endl;
+
+void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
+{
+    cout << "--" << endl;
+    cout << "name: " << engine->get_name() << endl;
+}
+
 void test_create_default()
 {
     std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create(nullptr);
     assert(p);
     assert(!std::strcmp(p->get_name(), "default"));
+    print_summary(p);
 }
 
 void test_create_cuda()
@@ -23,6 +33,7 @@ void test_create_cuda()
     std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create("cuda");
     assert(p);
     assert(!std::strcmp(p->get_name(), "cuda"));
+    print_summary(p);
 }
 
 int main()
