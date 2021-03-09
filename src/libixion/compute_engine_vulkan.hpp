@@ -12,11 +12,11 @@
 
 namespace ixion { namespace draft {
 
-class compute_engine_cuda : public compute_engine
+class compute_engine_vulkan : public compute_engine
 {
 public:
-    compute_engine_cuda();
-    virtual ~compute_engine_cuda();
+    compute_engine_vulkan();
+    virtual ~compute_engine_vulkan();
 
     virtual const char* get_name() const override;
 };

@@ -5,34 +5,34 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "compute_engine_cuda.hpp"
+#include "compute_engine_vulkan.hpp"
 #include "ixion/module.hpp"
 #include "ixion/env.hpp"
 #include <iostream>
 
 namespace ixion { namespace draft {
 
-compute_engine_cuda::compute_engine_cuda() : compute_engine()
+compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
 {
 }
 
-compute_engine_cuda::~compute_engine_cuda()
+compute_engine_vulkan::~compute_engine_vulkan()
 {
 }
 
-const char* compute_engine_cuda::get_name() const
+const char* compute_engine_vulkan::get_name() const
 {
-    return "cuda";
+    return "vulkan";
 }
 
 compute_engine* create()
 {
-    return new compute_engine_cuda();
+    return new compute_engine_vulkan();
 }
 
 void destroy(const compute_engine* p)
 {
-    delete static_cast<const compute_engine_cuda*>(p);
+    delete static_cast<const compute_engine_vulkan*>(p);
 }
 
 }}

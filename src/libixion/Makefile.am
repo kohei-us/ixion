@@ -6,11 +6,11 @@ AM_CPPFLAGS = \
 	$(MDDS_CFLAGS) \
 	$(BOOST_CPPFLAGS)
 
-if BUILD_CUDA
+if BUILD_VULKAN
 
-AM_CPPFLAGS += -DBUILD_CUDA
+AM_CPPFLAGS += -DBUILD_VULKAN
 
-endif # BUILD_CUDA
+endif # BUILD_VULKAN
 
 check_PROGRAMS = \
 	document-test \
@@ -77,20 +77,22 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	workbook.cpp \
 	interface.cpp
 
-if BUILD_CUDA
+if BUILD_VULKAN
 
-# CUDA module
+# VULKAN module
 
-pkglib_LTLIBRARIES = ixion-@IXION_API_VERSION@-cuda.la
-ixion_@IXION_API_VERSION@_cuda_la_SOURCES = \
-	compute_engine_cuda.hpp \
-	compute_engine_cuda.cpp
+pkglib_LTLIBRARIES = ixion-@IXION_API_VERSION@-vulkan.la
+ixion_@IXION_API_VERSION@_vulkan_la_SOURCES = \
+	compute_engine_vulkan.hpp \
+	compute_engine_vulkan.cpp
 
-ixion_@IXION_API_VERSION@_cuda_la_LDFLAGS = -module -avoid-version -export-symbols-regex register_module
-ixion_@IXION_API_VERSION@_cuda_la_LIBADD = \
+ixion_@IXION_API_VERSION@_vulkan_la_LDFLAGS = \
+	-module -avoid-version -export-symbols-regex \
+	register_module
+ixion_@IXION_API_VERSION@_vulkan_la_LIBADD = \
 	libixion-@IXION_API_VERSION@.la
 
-endif # BUILD_CUDA
+endif # BUILD_VULKAN
 
 if IXION_THREADS
 

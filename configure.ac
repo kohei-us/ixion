@@ -57,10 +57,10 @@ AC_ARG_ENABLE([threads],
     [enable_threads=yes]
 )
 
-AC_ARG_ENABLE([cuda],
-    [AS_HELP_STRING([--enable-cuda], [Enable CUDA compute engine])],
-    [enable_cuda="$enableval"],
-    [enable_cuda=no]
+AC_ARG_ENABLE([vulkan],
+    [AS_HELP_STRING([--enable-vulkan], [Enable vulkan compute engine])],
+    [enable_vulkan="$enableval"],
+    [enable_vulkan=no]
 )
 
 IXION_VERSION=ixion_version
@@ -167,7 +167,7 @@ AS_IF([test "x$enable_debug_utils" != "xno"], [
 
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([IXION_THREADS], [test "x$enable_threads" != "xno"])
-AM_CONDITIONAL([BUILD_CUDA], [test "x$enable_cuda" != "xno"])
+AM_CONDITIONAL([BUILD_VULKAN], [test "x$enable_vulkan" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
 
 BOOST_PROGRAM_OPTIONS
@@ -211,7 +211,7 @@ Build configuration:
         host os:              $host_os
         python:               $enable_python
         threads:              $enable_threads
-        cuda:                 $enable_cuda
+        vulkan:               $enable_vulkan
         log (debug)           $enable_log_debug
         log (trace)           $enable_log_trace
 ==============================================================================

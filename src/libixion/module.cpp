@@ -38,7 +38,7 @@ void init_modules()
         return;
 
     static std::vector<const char*> mod_names = {
-        "cuda",
+        "vulkan",
     };
 
     std::string mod_prefix;

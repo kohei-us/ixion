@@ -28,11 +28,11 @@ void test_create_default()
     print_summary(p);
 }
 
-void test_create_cuda()
+void test_create_vulkan()
 {
-    std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create("cuda");
+    std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create("vulkan");
     assert(p);
-    assert(!std::strcmp(p->get_name(), "cuda"));
+    assert(!std::strcmp(p->get_name(), "vulkan"));
     print_summary(p);
 }
 
@@ -41,8 +41,8 @@ int main()
     ixion::draft::init_modules();
 
     test_create_default();
-#ifdef BUILD_CUDA
-    test_create_cuda();
+#ifdef BUILD_VULKAN
+    test_create_vulkan();
 #endif
 
     return EXIT_SUCCESS;
