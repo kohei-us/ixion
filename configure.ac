@@ -165,6 +165,10 @@ AS_IF([test "x$enable_debug_utils" != "xno"], [
         CXXFLAGS="$CXXFLAGS -D__IXION_DEBUG_UTILS"
 ])
 
+AS_IF([test "x$enable_vulkan" != "xno"], [
+        PKG_CHECK_MODULES([VULKAN],[vulkan >= 1.2.0])
+])
+
 AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([IXION_THREADS], [test "x$enable_threads" != "xno"])
 AM_CONDITIONAL([BUILD_VULKAN], [test "x$enable_vulkan" != "xno"])

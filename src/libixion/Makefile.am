@@ -89,8 +89,14 @@ ixion_@IXION_API_VERSION@_vulkan_la_SOURCES = \
 ixion_@IXION_API_VERSION@_vulkan_la_LDFLAGS = \
 	-module -avoid-version -export-symbols-regex \
 	register_module
+
 ixion_@IXION_API_VERSION@_vulkan_la_LIBADD = \
-	libixion-@IXION_API_VERSION@.la
+	libixion-@IXION_API_VERSION@.la \
+	$(VULKAN_LIBS)
+
+ixion_@IXION_API_VERSION@_vulkan_la_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	$(VULKAN_CPPFLAGS)
 
 endif # BUILD_VULKAN
 

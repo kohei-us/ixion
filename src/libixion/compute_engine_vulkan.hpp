@@ -10,10 +10,13 @@
 
 #include "ixion/compute_engine.hpp"
 
+#include <vulkan/vulkan.h>
+
 namespace ixion { namespace draft {
 
 class compute_engine_vulkan : public compute_engine
 {
+    VkInstance m_instance;
 public:
     compute_engine_vulkan();
     virtual ~compute_engine_vulkan();
