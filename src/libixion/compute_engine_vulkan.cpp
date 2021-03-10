@@ -21,7 +21,7 @@ namespace ixion { namespace draft {
 compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
 {
     const char* validation_layer = "VK_LAYER_KHRONOS_validation";
-    const char* validation_ext = "VK_EXT_debug_report";
+    const char* validation_ext = "VK_EXT_debug_utils";
 
     VkApplicationInfo app_info = {};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
