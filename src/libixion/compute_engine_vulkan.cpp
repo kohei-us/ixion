@@ -10,17 +10,17 @@
 #include "ixion/env.hpp"
 #include "ixion/exceptions.hpp"
 
+#include "debug.hpp"
+
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 namespace ixion { namespace draft {
 
 compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
 {
-    std::vector<const char*> validation_layers = {
-        "VK_LAYER_LUNARG_standard_validation",
-    };
-
+    const char* validation_layer = "VK_LAYER_LUNARG_standard_validation";
     const char* validation_ext = "VK_EXT_debug_report";
 
     VkApplicationInfo app_info = {};
@@ -33,10 +33,32 @@ compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
     instance_ci.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instance_ci.pApplicationInfo = &app_info;
 
-    instance_ci.ppEnabledLayerNames = validation_layers.data();
-    instance_ci.enabledLayerCount = validation_layers.size();
-    instance_ci.enabledExtensionCount = 1;
-    instance_ci.ppEnabledExtensionNames = &validation_ext;
+    uint32_t n_layers;
+    vkEnumerateInstanceLayerProperties(&n_layers, nullptr);
+    std::vector<VkLayerProperties> layers(n_layers);
+    vkEnumerateInstanceLayerProperties(&n_layers, layers.data());
+
+    IXION_TRACE("scanning for validation layer...");
+    bool has_validation_layer = false;
+    for (const VkLayerProperties& props : layers)
+    {
+        if (!strcmp(props.layerName, validation_layer))
+        {
+            IXION_TRACE("- " << props.layerName << " (found)");
+            has_validation_layer = true;
+            break;
+        }
+
+        IXION_TRACE("- " << props.layerName);
+    }
+
+    if (has_validation_layer)
+    {
+        instance_ci.ppEnabledLayerNames = &validation_layer;
+        instance_ci.enabledLayerCount = 1;
+        instance_ci.enabledExtensionCount = 1;
+        instance_ci.ppEnabledExtensionNames = &validation_ext;
+    }
 
     VkResult res = vkCreateInstance(&instance_ci, nullptr, &m_instance);
     if (res != VK_SUCCESS)
