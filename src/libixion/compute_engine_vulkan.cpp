@@ -20,7 +20,7 @@ namespace ixion { namespace draft {
 
 compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
 {
-    const char* validation_layer = "VK_LAYER_LUNARG_standard_validation";
+    const char* validation_layer = "VK_LAYER_KHRONOS_validation";
     const char* validation_ext = "VK_EXT_debug_report";
 
     VkApplicationInfo app_info = {};
