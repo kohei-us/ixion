@@ -16,7 +16,9 @@ namespace ixion { namespace draft {
 
 class compute_engine_vulkan : public compute_engine
 {
-    VkInstance m_instance;
+    VkInstance m_instance = nullptr;
+    VkDebugUtilsMessengerEXT m_debug_messenger = nullptr;
+
 public:
     compute_engine_vulkan();
     virtual ~compute_engine_vulkan();

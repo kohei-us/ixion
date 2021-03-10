@@ -18,6 +18,20 @@
 
 namespace ixion { namespace draft {
 
+namespace {
+
+VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+    VkDebugUtilsMessageTypeFlagsEXT type,
+    const VkDebugUtilsMessengerCallbackDataEXT* cb_data,
+    void* user)
+{
+    IXION_DEBUG(cb_data->pMessage);
+    return VK_FALSE;
+}
+
+}
+
 compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
 {
     const char* validation_layer = "VK_LAYER_KHRONOS_validation";
@@ -62,11 +76,46 @@ compute_engine_vulkan::compute_engine_vulkan() : compute_engine()
 
     VkResult res = vkCreateInstance(&instance_ci, nullptr, &m_instance);
     if (res != VK_SUCCESS)
-        throw general_error("failed to create a vulkan instance.");
+        throw std::runtime_error("failed to create a vulkan instance.");
+
+    if (has_validation_layer)
+    {
+        VkDebugUtilsMessengerCreateInfoEXT debug_ci{};
+        debug_ci.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        debug_ci.messageSeverity =
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        debug_ci.messageType =
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        debug_ci.pfnUserCallback = vulkan_debug_callback;
+        debug_ci.pUserData = nullptr;
+
+        auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+            m_instance, "vkCreateDebugUtilsMessengerEXT");
+
+        if (func)
+        {
+            res = func(m_instance, &debug_ci, nullptr, &m_debug_messenger);
+            if (res != VK_SUCCESS)
+                throw std::runtime_error("failed to create debug utils messenger.");
+        }
+    }
 }
 
 compute_engine_vulkan::~compute_engine_vulkan()
 {
+    if (m_debug_messenger)
+    {
+        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+            m_instance, "vkDestroyDebugUtilsMessengerEXT");
+
+        if (func)
+            func(m_instance, m_debug_messenger, nullptr);
+    }
+
     vkDestroyInstance(m_instance, nullptr);
 }
 
