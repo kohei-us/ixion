@@ -272,9 +272,9 @@
                 <F N="../src/libixion/cell_queue_manager.hpp"/>
                 <F N="../src/libixion/column_store_type.hpp"/>
                 <F N="../src/libixion/compute_engine.cpp"/>
+                <F N="../src/libixion/compute_engine_test.cpp"/>
                 <F N="../src/libixion/compute_engine_vulkan.cpp"/>
                 <F N="../src/libixion/compute_engine_vulkan.hpp"/>
-                <F N="../src/libixion/compute_engine_test.cpp"/>
                 <F N="../src/libixion/concrete_formula_tokens.cpp"/>
                 <F N="../src/libixion/concrete_formula_tokens.hpp"/>
                 <F N="../src/libixion/config.cpp"/>
@@ -328,6 +328,8 @@
                 <F N="../src/libixion/types.cpp"/>
                 <F N="../src/libixion/utils.cpp"/>
                 <F N="../src/libixion/utils.hpp"/>
+                <F N="../src/libixion/vulkan_obj.cpp"/>
+                <F N="../src/libixion/vulkan_obj.hpp"/>
                 <F N="../src/libixion/workbook.cpp"/>
                 <F N="../src/libixion/workbook.hpp"/>
             </Folder>

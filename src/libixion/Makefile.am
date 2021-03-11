@@ -84,7 +84,9 @@ if BUILD_VULKAN
 pkglib_LTLIBRARIES = ixion-@IXION_API_VERSION@-vulkan.la
 ixion_@IXION_API_VERSION@_vulkan_la_SOURCES = \
 	compute_engine_vulkan.hpp \
-	compute_engine_vulkan.cpp
+	compute_engine_vulkan.cpp \
+	vulkan_obj.hpp \
+	vulkan_obj.cpp
 
 ixion_@IXION_API_VERSION@_vulkan_la_LDFLAGS = \
 	-module -avoid-version -export-symbols-regex \

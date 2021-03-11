@@ -5,24 +5,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_COMPUTE_ENGINE_VULKAN_HPP
-#define INCLUDED_IXION_COMPUTE_ENGINE_VULKAN_HPP
+#ifndef INCLUDED_IXION_VULKAN_OBJ_HPP
+#define INCLUDED_IXION_VULKAN_OBJ_HPP
 
-#include "ixion/compute_engine.hpp"
-
-#include "vulkan_obj.hpp"
+#include <vulkan/vulkan.h>
+#include <memory>
 
 namespace ixion { namespace draft {
 
-class compute_engine_vulkan : public compute_engine
+class vk_instance
 {
-    vk_instance m_instance;
+    VkInstance m_instance = nullptr;
+    VkDebugUtilsMessengerEXT m_debug_messenger = nullptr;
 
 public:
-    compute_engine_vulkan();
-    virtual ~compute_engine_vulkan();
+    vk_instance();
+    ~vk_instance();
 
-    virtual const char* get_name() const override;
+    VkInstance get();
 };
 
 }}
