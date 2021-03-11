@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_COMPUTE_ENGINE_CUDA_HPP
-#define INCLUDED_IXION_COMPUTE_ENGINE_CUDA_HPP
+#ifndef INCLUDED_IXION_COMPUTE_ENGINE_VULKAN_HPP
+#define INCLUDED_IXION_COMPUTE_ENGINE_VULKAN_HPP
 
 #include "ixion/compute_engine.hpp"
 
