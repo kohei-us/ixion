@@ -17,6 +17,7 @@ namespace ixion { namespace draft {
 class compute_engine_vulkan : public compute_engine
 {
     vk_instance m_instance;
+    vk_device m_device;
 
 public:
     compute_engine_vulkan();

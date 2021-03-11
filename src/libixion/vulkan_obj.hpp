@@ -25,6 +25,17 @@ public:
     VkInstance get();
 };
 
+class vk_device
+{
+    VkDevice m_device = nullptr;
+
+public:
+    vk_device(vk_instance& instance);
+    ~vk_device();
+
+    VkDevice get();
+};
+
 }}
 
 #endif

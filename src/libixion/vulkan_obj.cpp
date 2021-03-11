@@ -117,6 +117,43 @@ vk_instance::~vk_instance()
 
 VkInstance vk_instance::get() { return m_instance; }
 
+vk_device::vk_device(vk_instance& instance)
+{
+    uint32_t n_devices = 0;
+    VkResult res = vkEnumeratePhysicalDevices(instance.get(), &n_devices, nullptr);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to query the number of physical devices.");
+
+    std::vector<VkPhysicalDevice> devices(n_devices);
+    res = vkEnumeratePhysicalDevices(instance.get(), &n_devices, devices.data());
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to obtain the physical device data.");
+
+#ifdef IXION_TRACE_ON
+    for (const VkPhysicalDevice pd : devices)
+    {
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(pd, &props);
+
+        IXION_TRACE("--");
+        IXION_TRACE("name: " << props.deviceName);
+        IXION_TRACE("vendor ID: " << props.vendorID);
+        IXION_TRACE("device ID: " << props.deviceID);
+    }
+#endif
+
+    // TODO : pick a queue family that supports compute queue.
+}
+
+vk_device::~vk_device()
+{
+}
+
+VkDevice vk_device::get()
+{
+    return m_device;
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
