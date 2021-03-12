@@ -11,6 +11,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 namespace ixion { namespace draft {
 
@@ -124,6 +125,9 @@ vk_device::vk_device(vk_instance& instance)
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to query the number of physical devices.");
 
+    if (!n_devices)
+        throw std::runtime_error("no vulkan devices found!");
+
     std::vector<VkPhysicalDevice> devices(n_devices);
     res = vkEnumeratePhysicalDevices(instance.get(), &n_devices, devices.data());
     if (res != VK_SUCCESS)
@@ -142,11 +146,95 @@ vk_device::vk_device(vk_instance& instance)
     }
 #endif
 
-    // TODO : pick a queue family that supports compute queue.
+    VkPhysicalDevice pd = devices[0]; // pick the first physical device for now.
+
+    {
+        uint32_t n_qfs;
+        vkGetPhysicalDeviceQueueFamilyProperties(pd, &n_qfs, nullptr);
+
+        std::vector<VkQueueFamilyProperties> qf_props(n_qfs);
+        vkGetPhysicalDeviceQueueFamilyProperties(pd, &n_qfs, qf_props.data());
+
+        IXION_TRACE("scanning for a queue family that supports compute...");
+
+        uint8_t current_n_flags = std::numeric_limits<uint8_t>::max();
+
+        for (size_t i = 0; i < qf_props.size(); ++i)
+        {
+            uint8_t n_flags = 0;
+            bool supports_compute = false;
+
+            const VkQueueFamilyProperties& props = qf_props[i];
+
+            std::ostringstream os;
+            os << "- queue family " << i << ": ";
+
+            if (props.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                os << "graphics ";
+                ++n_flags;
+            }
+
+            if (props.queueFlags & VK_QUEUE_COMPUTE_BIT)
+            {
+                os << "compute ";
+                ++n_flags;
+                supports_compute = true;
+            }
+
+            if (props.queueFlags & VK_QUEUE_TRANSFER_BIT)
+            {
+                os << "transfer ";
+                ++n_flags;
+            }
+
+            if (props.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT)
+            {
+                os << "sparse-binding ";
+                ++n_flags;
+            }
+
+            if (props.queueFlags & VK_QUEUE_PROTECTED_BIT)
+            {
+                os << "protected ";
+                ++n_flags;
+            }
+
+            if (supports_compute && n_flags < current_n_flags)
+            {
+                current_n_flags = n_flags;
+                m_queue_family_index = i;
+                os << "(picked)";
+            }
+
+            IXION_TRACE(os.str());
+        }
+
+        IXION_TRACE("final queue family index: " << m_queue_family_index);
+
+        VkDeviceQueueCreateInfo queue_ci = {};
+
+        const float queue_prio = 0.0f;
+        queue_ci.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queue_ci.queueFamilyIndex = m_queue_family_index;
+        queue_ci.queueCount = 1;
+        queue_ci.pQueuePriorities = &queue_prio;
+
+        VkDeviceCreateInfo device_ci = {};
+        device_ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        device_ci.queueCreateInfoCount = 1;
+        device_ci.pQueueCreateInfos = &queue_ci;
+		res = vkCreateDevice(pd, &device_ci, nullptr, &m_device);
+        if (res != VK_SUCCESS)
+            throw std::runtime_error("failed to create a logical device.");
+
+        vkGetDeviceQueue(m_device, m_queue_family_index, 0, &m_queue);
+    }
 }
 
 vk_device::~vk_device()
 {
+    vkDestroyDevice(m_device, nullptr);
 }
 
 VkDevice vk_device::get()

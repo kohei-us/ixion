@@ -10,6 +10,7 @@
 
 #include <vulkan/vulkan.h>
 #include <memory>
+#include <limits>
 
 namespace ixion { namespace draft {
 
@@ -27,7 +28,11 @@ public:
 
 class vk_device
 {
+    static constexpr uint32_t QUEUE_FAMILY_NOT_SET = std::numeric_limits<uint32_t>::max();
+
     VkDevice m_device = nullptr;
+    uint32_t m_queue_family_index = QUEUE_FAMILY_NOT_SET;
+    VkQueue m_queue = nullptr;
 
 public:
     vk_device(vk_instance& instance);
