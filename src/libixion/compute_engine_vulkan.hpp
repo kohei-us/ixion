@@ -19,6 +19,7 @@ class compute_engine_vulkan : public compute_engine
     vk_instance m_instance;
     vk_device m_device;
     vk_command_pool m_cmd_pool;
+    vk_buffer m_host_buffer;
 
 public:
     compute_engine_vulkan();

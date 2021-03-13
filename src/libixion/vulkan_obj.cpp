@@ -12,6 +12,8 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
+#include <bitset>
 
 namespace ixion { namespace draft {
 
@@ -146,14 +148,14 @@ vk_device::vk_device(vk_instance& instance)
     }
 #endif
 
-    VkPhysicalDevice pd = devices[0]; // pick the first physical device for now.
+    m_physical_device = devices[0]; // pick the first physical device for now.
 
     {
         uint32_t n_qfs;
-        vkGetPhysicalDeviceQueueFamilyProperties(pd, &n_qfs, nullptr);
+        vkGetPhysicalDeviceQueueFamilyProperties(m_physical_device, &n_qfs, nullptr);
 
         std::vector<VkQueueFamilyProperties> qf_props(n_qfs);
-        vkGetPhysicalDeviceQueueFamilyProperties(pd, &n_qfs, qf_props.data());
+        vkGetPhysicalDeviceQueueFamilyProperties(m_physical_device, &n_qfs, qf_props.data());
 
         IXION_TRACE("scanning for a queue family that supports compute...");
 
@@ -224,7 +226,7 @@ vk_device::vk_device(vk_instance& instance)
         device_ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         device_ci.queueCreateInfoCount = 1;
         device_ci.pQueueCreateInfos = &queue_ci;
-		res = vkCreateDevice(pd, &device_ci, nullptr, &m_device);
+		res = vkCreateDevice(m_physical_device, &device_ci, nullptr, &m_device);
         if (res != VK_SUCCESS)
             throw std::runtime_error("failed to create a logical device.");
 
@@ -257,6 +259,64 @@ vk_command_pool::vk_command_pool(vk_device& device) :
 vk_command_pool::~vk_command_pool()
 {
     vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
+}
+
+vk_buffer::vk_buffer(vk_device& device, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props) :
+    m_device(device)
+{
+    VkBufferCreateInfo buf_ci {};
+    buf_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    buf_ci.usage = usage;
+    buf_ci.size = 256;
+    buf_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VkResult res = vkCreateBuffer(m_device.get(), &buf_ci, nullptr, &m_buffer);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create buffer.");
+
+    {
+        VkPhysicalDeviceMemoryProperties pm_props;
+        vkGetPhysicalDeviceMemoryProperties(m_device.get_physical_device(), &pm_props);
+
+		VkMemoryRequirements mem_reqs;
+		vkGetBufferMemoryRequirements(m_device.get(), m_buffer, &mem_reqs);
+
+        IXION_TRACE("buffer memory requirements:");
+        IXION_TRACE("  - size: " << mem_reqs.size);
+        IXION_TRACE("  - alignment: " << mem_reqs.alignment);
+        IXION_TRACE("  - memory type bits: "
+            << std::bitset<32>(mem_reqs.memoryTypeBits)
+            << " (" << mem_reqs.memoryTypeBits << ")");
+
+        IXION_TRACE("requested memory property flags: 0x"
+            << std::setw(2) << std::hex << std::setfill('0') << mem_props);
+
+        IXION_TRACE("memory types:");
+        for (uint32_t i = 0; i < pm_props.memoryTypeCount; ++i)
+        {
+            auto mt = pm_props.memoryTypes[i];
+            IXION_TRACE("- "
+                << std::setw(2)
+                << std::setfill('0')
+                << i
+                << ": property flags: 0x"
+                << std::setw(2)
+                << std::hex
+                << std::setfill('0')
+                << mt.propertyFlags
+                << "; heap index: "
+                << std::dec
+                << mt.heapIndex);
+
+            // TODO : find a suitable device memory type from the buffer
+            // requirements as well as the requested memory flags.
+        }
+    }
+}
+
+vk_buffer::~vk_buffer()
+{
+    vkDestroyBuffer(m_device.get(), m_buffer, nullptr);
 }
 
 }}

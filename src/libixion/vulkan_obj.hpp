@@ -46,12 +46,19 @@ public:
 class vk_device
 {
     friend class vk_command_pool;
+    friend class vk_buffer;
 
     static constexpr uint32_t QUEUE_FAMILY_NOT_SET = std::numeric_limits<uint32_t>::max();
 
+    VkPhysicalDevice m_physical_device = null_value<VkPhysicalDevice>::value;
     VkDevice m_device = null_value<VkDevice>::value;
     uint32_t m_queue_family_index = QUEUE_FAMILY_NOT_SET;
     VkQueue m_queue = null_value<VkQueue>::value;
+
+    VkPhysicalDevice get_physical_device()
+    {
+        return m_physical_device;
+    }
 
     uint32_t get_queue_family_index() const
     {
@@ -73,6 +80,17 @@ class vk_command_pool
 public:
     vk_command_pool(vk_device& device);
     ~vk_command_pool();
+};
+
+class vk_buffer
+{
+    vk_device& m_device;
+    VkBuffer m_buffer = null_value<VkBuffer>::value;
+    VkDeviceMemory m_memory = null_value<VkDeviceMemory>::value;
+
+public:
+    vk_buffer(vk_device& device, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props);
+    ~vk_buffer();
 };
 
 }}

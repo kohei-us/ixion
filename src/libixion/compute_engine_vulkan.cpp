@@ -22,7 +22,11 @@ compute_engine_vulkan::compute_engine_vulkan() :
     compute_engine(),
     m_instance(),
     m_device(m_instance),
-    m_cmd_pool(m_device)
+    m_cmd_pool(m_device),
+    m_host_buffer(
+        m_device,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
 {
 }
 
