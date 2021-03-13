@@ -366,6 +366,7 @@ vk_buffer::~vk_buffer()
 
 void vk_buffer::fill_memory(void* data, VkDeviceSize size)
 {
+    IXION_TRACE("copying data of size " << size);
     void* mapped = nullptr;
     VkResult res = vkMapMemory(m_device.get(), m_memory, 0, size, 0, &mapped);
     if (res != VK_SUCCESS)

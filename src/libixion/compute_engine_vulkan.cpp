@@ -42,7 +42,7 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    host_buffer.fill_memory(io.data, io.size);
+    host_buffer.fill_memory(io.data, sizeof(uint32_t)*io.size);
 }
 
 compute_engine* create()
