@@ -21,7 +21,8 @@ namespace ixion { namespace draft {
 compute_engine_vulkan::compute_engine_vulkan() :
     compute_engine(),
     m_instance(),
-    m_device(m_instance)
+    m_device(m_instance),
+    m_cmd_pool(m_device)
 {
 }
 

@@ -242,6 +242,23 @@ VkDevice vk_device::get()
     return m_device;
 }
 
+vk_command_pool::vk_command_pool(vk_device& device) :
+    m_device(device.get())
+{
+    VkCommandPoolCreateInfo ci = {};
+    ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    ci.queueFamilyIndex = device.get_queue_family_index();
+    ci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    VkResult res = vkCreateCommandPool(device.get(), &ci, nullptr, &m_cmd_pool);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create command pool.");
+}
+
+vk_command_pool::~vk_command_pool()
+{
+    vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
