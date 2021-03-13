@@ -19,13 +19,14 @@ class compute_engine_vulkan : public compute_engine
     vk_instance m_instance;
     vk_device m_device;
     vk_command_pool m_cmd_pool;
-    vk_buffer m_host_buffer;
 
 public:
     compute_engine_vulkan();
     virtual ~compute_engine_vulkan();
 
     virtual const char* get_name() const override;
+
+    virtual void compute_fibonacci(array& io) override;
 };
 
 }}

@@ -100,6 +100,11 @@ const char* compute_engine::get_name() const
     return "default";
 }
 
+void compute_engine::compute_fibonacci(array& io)
+{
+    // TODO : add CPU implementation
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

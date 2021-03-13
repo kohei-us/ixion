@@ -14,6 +14,22 @@
 
 namespace ixion { namespace draft {
 
+enum class array_type { unknown, float32, float64, uint32 };
+
+struct array
+{
+    union
+    {
+        float* float32;
+        double* float64;
+        uint32_t* uint32;
+        void* data;
+    };
+
+    array_type type = array_type::unknown;
+    size_t size = 0u;
+};
+
 /**
  * Default compute engine class that uses CPU for all its computations.
  *
@@ -59,6 +75,8 @@ public:
     virtual ~compute_engine();
 
     virtual const char* get_name() const;
+
+    virtual void compute_fibonacci(array& io);
 };
 
 }}

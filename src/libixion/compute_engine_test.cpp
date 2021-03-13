@@ -10,14 +10,43 @@
 #include <iostream>
 #include <cassert>
 #include <cstring>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 using std::cout;
 using std::endl;
+
+namespace {
+
+template<typename T>
+void print_values(std::string_view msg, const T& values)
+{
+    cout << msg << ": ";
+    std::copy(values.begin(), values.end(), std::ostream_iterator<typename T::value_type>(cout, " "));
+    cout << endl;
+}
 
 void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
 {
     cout << "--" << endl;
     cout << "name: " << engine->get_name() << endl;
+
+    std::vector<uint32_t> values(32u);
+
+    uint32_t n = 0;
+    std::generate(values.begin(), values.end(), [&n] { return n++; });
+
+    ixion::draft::array io{};
+    io.uint32 = values.data();
+    io.size = values.size();
+    io.type = ixion::draft::array_type::uint32;
+
+    print_values("fibonacci input", values);
+    engine->compute_fibonacci(io);
+    print_values("fibonacci output", values);
+}
+
 }
 
 void test_create_default()

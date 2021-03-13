@@ -244,6 +244,11 @@ VkDevice vk_device::get()
     return m_device;
 }
 
+VkPhysicalDevice vk_device::get_physical_device()
+{
+    return m_physical_device;
+}
+
 vk_command_pool::vk_command_pool(vk_device& device) :
     m_device(device.get())
 {
@@ -261,62 +266,113 @@ vk_command_pool::~vk_command_pool()
     vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
 }
 
-vk_buffer::vk_buffer(vk_device& device, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props) :
+vk_buffer::mem_type vk_buffer::find_memory_type(VkMemoryPropertyFlags mem_props) const
+{
+    mem_type ret;
+
+    VkPhysicalDeviceMemoryProperties pm_props;
+    vkGetPhysicalDeviceMemoryProperties(m_device.get_physical_device(), &pm_props);
+
+    VkMemoryRequirements mem_reqs;
+    vkGetBufferMemoryRequirements(m_device.get(), m_buffer, &mem_reqs);
+
+    ret.size = mem_reqs.size;
+
+    IXION_TRACE("buffer memory requirements:");
+    IXION_TRACE("  - size: " << mem_reqs.size);
+    IXION_TRACE("  - alignment: " << mem_reqs.alignment);
+    IXION_TRACE("  - memory type bits: "
+        << std::bitset<32>(mem_reqs.memoryTypeBits)
+        << " (" << mem_reqs.memoryTypeBits << ")");
+
+    IXION_TRACE("requested memory property flags: 0x"
+        << std::setw(2) << std::hex << std::setfill('0') << mem_props);
+
+    IXION_TRACE("memory types: n=" << std::dec << pm_props.memoryTypeCount);
+    for (uint32_t i = 0; i < pm_props.memoryTypeCount; ++i)
+    {
+        auto mt = pm_props.memoryTypes[i];
+        IXION_TRACE("- "
+            << std::setw(2)
+            << std::setfill('0')
+            << i
+            << ": property flags: " << std::bitset<32>(mt.propertyFlags) << " (0x"
+            << std::setw(2)
+            << std::hex
+            << std::setfill('0')
+            << mt.propertyFlags
+            << "); heap index: "
+            << std::dec
+            << mt.heapIndex);
+
+        if ((mem_reqs.memoryTypeBits & 1) == 1)
+        {
+            // The buffer can take this memory type.  Now, check against
+            // the requested usage types.
+
+            if ((mt.propertyFlags & mem_props) == mem_props)
+            {
+                ret.index = i;
+                return ret;
+            }
+        }
+
+        mem_reqs.memoryTypeBits >>= 1;
+    }
+
+    throw std::runtime_error("no usable memory type found!");
+}
+
+vk_buffer::vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props) :
     m_device(device)
 {
     VkBufferCreateInfo buf_ci {};
     buf_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     buf_ci.usage = usage;
-    buf_ci.size = 256;
+    buf_ci.size = size;
     buf_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    IXION_TRACE("buffer usage flags: " << std::bitset<32>(usage) << " (0x" << std::hex << usage << ")");
+    IXION_TRACE("memory property flags: " << std::bitset<32>(mem_props) << " (0x" << std::hex << mem_props << ")");
+    IXION_TRACE("buffer size: " << std::dec << size);
 
     VkResult res = vkCreateBuffer(m_device.get(), &buf_ci, nullptr, &m_buffer);
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to create buffer.");
 
-    {
-        VkPhysicalDeviceMemoryProperties pm_props;
-        vkGetPhysicalDeviceMemoryProperties(m_device.get_physical_device(), &pm_props);
+    mem_type mt = find_memory_type(mem_props);
 
-		VkMemoryRequirements mem_reqs;
-		vkGetBufferMemoryRequirements(m_device.get(), m_buffer, &mem_reqs);
+    IXION_TRACE("memory type: (index=" << mt.index << "; size=" << mt.size << ")");
 
-        IXION_TRACE("buffer memory requirements:");
-        IXION_TRACE("  - size: " << mem_reqs.size);
-        IXION_TRACE("  - alignment: " << mem_reqs.alignment);
-        IXION_TRACE("  - memory type bits: "
-            << std::bitset<32>(mem_reqs.memoryTypeBits)
-            << " (" << mem_reqs.memoryTypeBits << ")");
+    VkMemoryAllocateInfo mem_ai {};
+    mem_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    mem_ai.allocationSize = mt.size;
+    mem_ai.memoryTypeIndex = mt.index;
 
-        IXION_TRACE("requested memory property flags: 0x"
-            << std::setw(2) << std::hex << std::setfill('0') << mem_props);
+    res = vkAllocateMemory(m_device.get(), &mem_ai, nullptr, &m_memory);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to allocate memory.");
 
-        IXION_TRACE("memory types:");
-        for (uint32_t i = 0; i < pm_props.memoryTypeCount; ++i)
-        {
-            auto mt = pm_props.memoryTypes[i];
-            IXION_TRACE("- "
-                << std::setw(2)
-                << std::setfill('0')
-                << i
-                << ": property flags: 0x"
-                << std::setw(2)
-                << std::hex
-                << std::setfill('0')
-                << mt.propertyFlags
-                << "; heap index: "
-                << std::dec
-                << mt.heapIndex);
-
-            // TODO : find a suitable device memory type from the buffer
-            // requirements as well as the requested memory flags.
-        }
-    }
+    res = vkBindBufferMemory(m_device.get(), m_buffer, m_memory, 0);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to bind buffer to memory.");
 }
 
 vk_buffer::~vk_buffer()
 {
+    vkFreeMemory(m_device.get(), m_memory, nullptr);
     vkDestroyBuffer(m_device.get(), m_buffer, nullptr);
+}
+
+void vk_buffer::fill_memory(void* data, VkDeviceSize size)
+{
+    void* mapped = nullptr;
+    VkResult res = vkMapMemory(m_device.get(), m_memory, 0, size, 0, &mapped);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to map memory.");
+
+    memcpy(mapped, data, size);
+    vkUnmapMemory(m_device.get(), m_memory);
 }
 
 }}

@@ -55,11 +55,6 @@ class vk_device
     uint32_t m_queue_family_index = QUEUE_FAMILY_NOT_SET;
     VkQueue m_queue = null_value<VkQueue>::value;
 
-    VkPhysicalDevice get_physical_device()
-    {
-        return m_physical_device;
-    }
-
     uint32_t get_queue_family_index() const
     {
         return m_queue_family_index;
@@ -70,6 +65,8 @@ public:
     ~vk_device();
 
     VkDevice get();
+
+    VkPhysicalDevice get_physical_device();
 };
 
 class vk_command_pool
@@ -88,9 +85,28 @@ class vk_buffer
     VkBuffer m_buffer = null_value<VkBuffer>::value;
     VkDeviceMemory m_memory = null_value<VkDeviceMemory>::value;
 
+    struct mem_type
+    {
+        uint32_t index;
+        VkDeviceSize size;
+    };
+
+    /**
+     * Find a suitable device memory type that can be used to store data for
+     * the buffer.
+     *
+     * @param mem_props desired memory properties.
+     *
+     * @return mem_type memory type as an index into the list of device memory
+     *         types, and the memory size as required by the buffer.
+     */
+    mem_type find_memory_type(VkMemoryPropertyFlags mem_props) const;
+
 public:
-    vk_buffer(vk_device& device, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props);
+    vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props);
     ~vk_buffer();
+
+    void fill_memory(void* data, VkDeviceSize size);
 };
 
 }}
