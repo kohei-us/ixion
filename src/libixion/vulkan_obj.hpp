@@ -106,7 +106,7 @@ public:
     vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props);
     ~vk_buffer();
 
-    void fill_memory(void* data, VkDeviceSize size);
+    void write_to_memory(void* data, VkDeviceSize size);
 };
 
 }}

@@ -364,7 +364,7 @@ vk_buffer::~vk_buffer()
     vkDestroyBuffer(m_device.get(), m_buffer, nullptr);
 }
 
-void vk_buffer::fill_memory(void* data, VkDeviceSize size)
+void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
 {
     IXION_TRACE("copying data of size " << size);
     void* mapped = nullptr;
