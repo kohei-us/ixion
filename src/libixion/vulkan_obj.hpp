@@ -71,7 +71,7 @@ public:
 
 class vk_command_pool
 {
-    VkDevice m_device;
+    VkDevice m_device = null_value<VkDevice>::value;
     VkCommandPool m_cmd_pool = null_value<VkCommandPool>::value;
 
 public:
