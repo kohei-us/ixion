@@ -43,6 +43,13 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     host_buffer.write_to_memory(io.data, sizeof(uint32_t)*io.size);
+
+    vk_buffer device_buffer(
+        m_device, io.size,
+        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    // TODO : transfer the data from host to device.
 }
 
 compute_engine* create()
