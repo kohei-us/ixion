@@ -249,6 +249,21 @@ VkPhysicalDevice vk_device::get_physical_device()
     return m_physical_device;
 }
 
+VkQueue vk_device::get_queue()
+{
+    return m_queue;
+}
+
+VkDevice vk_command_pool::get_device()
+{
+    return m_device;
+}
+
+VkCommandPool vk_command_pool::get()
+{
+    return m_cmd_pool;
+}
+
 vk_command_pool::vk_command_pool(vk_device& device) :
     m_device(device.get())
 {
@@ -264,6 +279,49 @@ vk_command_pool::vk_command_pool(vk_device& device) :
 vk_command_pool::~vk_command_pool()
 {
     vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
+}
+
+vk_command_buffer vk_command_pool::create_command_buffer()
+{
+    return vk_command_buffer(*this);
+}
+
+vk_command_buffer::vk_command_buffer(vk_command_pool& cmd_pool) :
+    m_cmd_pool(cmd_pool)
+{
+    VkCommandBufferAllocateInfo cb_ai {};
+    cb_ai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    cb_ai.commandPool = m_cmd_pool.get();
+    cb_ai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    cb_ai.commandBufferCount = 1;
+
+    VkResult res = vkAllocateCommandBuffers(m_cmd_pool.get_device(), &cb_ai, &m_cmd_buffer);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create a command buffer.");
+}
+
+vk_command_buffer::~vk_command_buffer()
+{
+    vkFreeCommandBuffers(m_cmd_pool.get_device(), m_cmd_pool.get(), 1, &m_cmd_buffer);
+}
+
+void vk_command_buffer::begin()
+{
+    VkCommandBufferBeginInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    vkBeginCommandBuffer(m_cmd_buffer, &info);
+}
+
+void vk_command_buffer::end()
+{
+    vkEndCommandBuffer(m_cmd_buffer);
+}
+
+void vk_command_buffer::copy_buffer(vk_buffer& src, vk_buffer& dst, VkDeviceSize size)
+{
+    VkBufferCopy copy_region{};
+    copy_region.size = size;
+    vkCmdCopyBuffer(m_cmd_buffer, src.get(), dst.get(), 1, &copy_region);
 }
 
 vk_buffer::mem_type vk_buffer::find_memory_type(VkMemoryPropertyFlags mem_props) const
@@ -364,6 +422,11 @@ vk_buffer::~vk_buffer()
     vkDestroyBuffer(m_device.get(), m_buffer, nullptr);
 }
 
+VkBuffer vk_buffer::get()
+{
+    return m_buffer;
+}
+
 void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
 {
     IXION_TRACE("copying data of size " << size);
@@ -383,6 +446,26 @@ void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
     vkFlushMappedMemoryRanges(m_device.get(), 1, &flush_range);
 
     vkUnmapMemory(m_device.get(), m_memory);
+}
+
+vk_fence::vk_fence(vk_device& device, VkFenceCreateFlags flags) :
+    m_device(device)
+{
+    VkFenceCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    info.flags = flags;
+
+    vkCreateFence(m_device.get(), &info, nullptr, &m_fence);
+}
+
+vk_fence::~vk_fence()
+{
+    vkDestroyFence(m_device.get(), m_fence, nullptr);
+}
+
+VkFence vk_fence::get()
+{
+    return m_fence;
 }
 
 }}

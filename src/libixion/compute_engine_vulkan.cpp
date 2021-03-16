@@ -49,7 +49,14 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    // TODO : transfer the data from host to device.
+    vk_command_buffer cmd_copy = m_cmd_pool.create_command_buffer();
+    cmd_copy.begin();
+    cmd_copy.copy_buffer(host_buffer, device_buffer, io.size);
+    cmd_copy.end();
+
+    vk_fence fence(m_device, 0);
+
+    // TODO : submit this to queue.
 }
 
 compute_engine* create()

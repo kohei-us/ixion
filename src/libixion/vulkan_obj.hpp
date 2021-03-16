@@ -29,6 +29,8 @@ struct null_value<T, typename std::enable_if<std::is_integral<T>::value>::type>
     static constexpr T value = 0;
 };
 
+class vk_buffer;
+class vk_command_buffer;
 class vk_command_pool;
 
 class vk_instance
@@ -67,16 +69,43 @@ public:
     VkDevice get();
 
     VkPhysicalDevice get_physical_device();
+
+    VkQueue get_queue();
 };
 
 class vk_command_pool
 {
+    friend class vk_command_buffer;
+
     VkDevice m_device = null_value<VkDevice>::value;
     VkCommandPool m_cmd_pool = null_value<VkCommandPool>::value;
+
+    VkDevice get_device();
+    VkCommandPool get();
 
 public:
     vk_command_pool(vk_device& device);
     ~vk_command_pool();
+
+    vk_command_buffer create_command_buffer();
+};
+
+class vk_command_buffer
+{
+    friend class vk_command_pool;
+
+    vk_command_pool& m_cmd_pool;
+    VkCommandBuffer m_cmd_buffer = null_value<VkCommandBuffer>::value;
+
+    vk_command_buffer(vk_command_pool& cmd_pool);
+
+public:
+    ~vk_command_buffer();
+
+    void begin();
+    void end();
+
+    void copy_buffer(vk_buffer& src, vk_buffer& dst, VkDeviceSize size);
 };
 
 class vk_buffer
@@ -106,7 +135,21 @@ public:
     vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props);
     ~vk_buffer();
 
+    VkBuffer get();
+
     void write_to_memory(void* data, VkDeviceSize size);
+};
+
+class vk_fence
+{
+    vk_device& m_device;
+    VkFence m_fence = null_value<VkFence>::value;
+
+public:
+    vk_fence(vk_device& device, VkFenceCreateFlags flags);
+    ~vk_fence();
+
+    VkFence get();
 };
 
 }}
