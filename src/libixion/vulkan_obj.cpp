@@ -373,6 +373,15 @@ void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
         throw std::runtime_error("failed to map memory.");
 
     memcpy(mapped, data, size);
+
+    // flush the modified memory range.
+    VkMappedMemoryRange flush_range{};
+    flush_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    flush_range.memory = m_memory;
+    flush_range.offset = 0;
+    flush_range.size = size;
+    vkFlushMappedMemoryRanges(m_device.get(), 1, &flush_range);
+
     vkUnmapMemory(m_device.get(), m_memory);
 }
 
