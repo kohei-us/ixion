@@ -118,7 +118,23 @@ vk_instance::~vk_instance()
     vkDestroyInstance(m_instance, nullptr);
 }
 
-VkInstance vk_instance::get() { return m_instance; }
+VkInstance& vk_instance::get() { return m_instance; }
+
+vk_queue::vk_queue(VkQueue queue) : m_queue(queue) {}
+
+vk_queue::~vk_queue() {}
+
+void vk_queue::submit(vk_command_buffer& cmd, vk_fence& fence)
+{
+    VkSubmitInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    info.commandBufferCount = 1;
+    info.pCommandBuffers = &cmd.get();
+
+    VkResult res = vkQueueSubmit(m_queue, 1, &info, fence.get());
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to submit command to queue.");
+}
 
 vk_device::vk_device(vk_instance& instance)
 {
@@ -239,7 +255,7 @@ vk_device::~vk_device()
     vkDestroyDevice(m_device, nullptr);
 }
 
-VkDevice vk_device::get()
+VkDevice& vk_device::get()
 {
     return m_device;
 }
@@ -249,17 +265,17 @@ VkPhysicalDevice vk_device::get_physical_device()
     return m_physical_device;
 }
 
-VkQueue vk_device::get_queue()
+vk_queue vk_device::get_queue()
 {
-    return m_queue;
+    return vk_queue(m_queue);
 }
 
-VkDevice vk_command_pool::get_device()
+VkDevice& vk_command_pool::get_device()
 {
     return m_device;
 }
 
-VkCommandPool vk_command_pool::get()
+VkCommandPool& vk_command_pool::get()
 {
     return m_cmd_pool;
 }
@@ -303,6 +319,11 @@ vk_command_buffer::vk_command_buffer(vk_command_pool& cmd_pool) :
 vk_command_buffer::~vk_command_buffer()
 {
     vkFreeCommandBuffers(m_cmd_pool.get_device(), m_cmd_pool.get(), 1, &m_cmd_buffer);
+}
+
+VkCommandBuffer& vk_command_buffer::get()
+{
+    return m_cmd_buffer;
 }
 
 void vk_command_buffer::begin()
@@ -422,7 +443,7 @@ vk_buffer::~vk_buffer()
     vkDestroyBuffer(m_device.get(), m_buffer, nullptr);
 }
 
-VkBuffer vk_buffer::get()
+VkBuffer& vk_buffer::get()
 {
     return m_buffer;
 }
@@ -463,9 +484,16 @@ vk_fence::~vk_fence()
     vkDestroyFence(m_device.get(), m_fence, nullptr);
 }
 
-VkFence vk_fence::get()
+VkFence& vk_fence::get()
 {
     return m_fence;
+}
+
+void vk_fence::wait()
+{
+    VkResult res = vkWaitForFences(m_device.get(), 1, &m_fence, VK_TRUE, UINT64_MAX);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to wait for a fence.");
 }
 
 }}

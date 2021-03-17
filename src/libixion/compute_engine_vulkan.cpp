@@ -56,7 +56,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
 
     vk_fence fence(m_device, 0);
 
-    // TODO : submit this to queue.
+    vk_queue q = m_device.get_queue();
+    q.submit(cmd_copy, fence);
+    fence.wait();
 }
 
 compute_engine* create()

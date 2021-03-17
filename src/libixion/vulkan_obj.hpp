@@ -32,6 +32,7 @@ struct null_value<T, typename std::enable_if<std::is_integral<T>::value>::type>
 class vk_buffer;
 class vk_command_buffer;
 class vk_command_pool;
+class vk_fence;
 
 class vk_instance
 {
@@ -42,7 +43,18 @@ public:
     vk_instance();
     ~vk_instance();
 
-    VkInstance get();
+    VkInstance& get();
+};
+
+class vk_queue
+{
+    VkQueue m_queue;
+
+public:
+    vk_queue(VkQueue queue);
+    ~vk_queue();
+
+    void submit(vk_command_buffer& cmd, vk_fence& fence);
 };
 
 class vk_device
@@ -66,11 +78,11 @@ public:
     vk_device(vk_instance& instance);
     ~vk_device();
 
-    VkDevice get();
+    VkDevice& get();
 
     VkPhysicalDevice get_physical_device();
 
-    VkQueue get_queue();
+    vk_queue get_queue();
 };
 
 class vk_command_pool
@@ -80,8 +92,8 @@ class vk_command_pool
     VkDevice m_device = null_value<VkDevice>::value;
     VkCommandPool m_cmd_pool = null_value<VkCommandPool>::value;
 
-    VkDevice get_device();
-    VkCommandPool get();
+    VkDevice& get_device();
+    VkCommandPool& get();
 
 public:
     vk_command_pool(vk_device& device);
@@ -101,6 +113,8 @@ class vk_command_buffer
 
 public:
     ~vk_command_buffer();
+
+    VkCommandBuffer& get();
 
     void begin();
     void end();
@@ -135,7 +149,7 @@ public:
     vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props);
     ~vk_buffer();
 
-    VkBuffer get();
+    VkBuffer& get();
 
     void write_to_memory(void* data, VkDeviceSize size);
 };
@@ -149,7 +163,9 @@ public:
     vk_fence(vk_device& device, VkFenceCreateFlags flags);
     ~vk_fence();
 
-    VkFence get();
+    VkFence& get();
+
+    void wait();
 };
 
 }}
