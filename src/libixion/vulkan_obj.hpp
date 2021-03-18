@@ -175,7 +175,7 @@ class vk_descriptor_pool
 
 public:
 
-    vk_descriptor_pool(vk_device& device, uint32_t max_sets, const std::initializer_list<VkDescriptorPoolSize>& sizes);
+    vk_descriptor_pool(vk_device& device, uint32_t max_sets, std::initializer_list<VkDescriptorPoolSize> sizes);
     ~vk_descriptor_pool();
 };
 

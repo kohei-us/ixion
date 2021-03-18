@@ -497,7 +497,7 @@ void vk_fence::wait()
 }
 
 vk_descriptor_pool::vk_descriptor_pool(
-    vk_device& device, uint32_t max_sets, const std::initializer_list<VkDescriptorPoolSize>& sizes) :
+    vk_device& device, uint32_t max_sets, std::initializer_list<VkDescriptorPoolSize> sizes) :
     m_device(device)
 {
     VkDescriptorPoolCreateInfo info{};
