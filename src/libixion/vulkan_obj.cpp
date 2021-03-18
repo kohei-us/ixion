@@ -496,6 +496,26 @@ void vk_fence::wait()
         throw std::runtime_error("failed to wait for a fence.");
 }
 
+vk_descriptor_pool::vk_descriptor_pool(
+    vk_device& device, uint32_t max_sets, const std::initializer_list<VkDescriptorPoolSize>& sizes) :
+    m_device(device)
+{
+    VkDescriptorPoolCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    info.poolSizeCount = sizes.size();
+    info.pPoolSizes = sizes.begin();
+    info.maxSets = max_sets;
+
+    VkResult res = vkCreateDescriptorPool(m_device.get(), &info, nullptr, &m_pool);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create a descriptor pool.");
+}
+
+vk_descriptor_pool::~vk_descriptor_pool()
+{
+    vkDestroyDescriptorPool(m_device.get(), m_pool, nullptr);
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

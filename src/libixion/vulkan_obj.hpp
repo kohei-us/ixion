@@ -168,6 +168,17 @@ public:
     void wait();
 };
 
+class vk_descriptor_pool
+{
+    vk_device& m_device;
+    VkDescriptorPool m_pool = null_value<VkDescriptorPool>::value;
+
+public:
+
+    vk_descriptor_pool(vk_device& device, uint32_t max_sets, const std::initializer_list<VkDescriptorPoolSize>& sizes);
+    ~vk_descriptor_pool();
+};
+
 }}
 
 #endif

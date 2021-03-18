@@ -18,24 +18,7 @@
 
 namespace ixion { namespace draft {
 
-compute_engine_vulkan::compute_engine_vulkan() :
-    compute_engine(),
-    m_instance(),
-    m_device(m_instance),
-    m_cmd_pool(m_device)
-{
-}
-
-compute_engine_vulkan::~compute_engine_vulkan()
-{
-}
-
-const char* compute_engine_vulkan::get_name() const
-{
-    return "vulkan";
-}
-
-void compute_engine_vulkan::compute_fibonacci(array& io)
+void compute_engine_vulkan::copy_to_device_local_buffer(array& io)
 {
     vk_buffer host_buffer(
         m_device, io.size,
@@ -55,10 +38,52 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     cmd_copy.end();
 
     vk_fence fence(m_device, 0);
-
     vk_queue q = m_device.get_queue();
     q.submit(cmd_copy, fence);
     fence.wait();
+}
+
+compute_engine_vulkan::compute_engine_vulkan() :
+    compute_engine(),
+    m_instance(),
+    m_device(m_instance),
+    m_cmd_pool(m_device)
+{
+}
+
+compute_engine_vulkan::~compute_engine_vulkan()
+{
+}
+
+const char* compute_engine_vulkan::get_name() const
+{
+    return "vulkan";
+}
+
+void compute_engine_vulkan::compute_fibonacci(array& io)
+{
+    copy_to_device_local_buffer(io);
+
+    // Create a descriptor pool, by specifying the number of descriptors for
+    // each type that can be allocated in a single set, as well as the max
+    // number of sets.
+    vk_descriptor_pool desc_pool(m_device, 1u,
+        {
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u },
+        }
+    );
+
+    //  2. create descriptor set layout.
+    //  3. create pipeline layout.
+    //  4. allocate descriptor sets.
+    //  5. update descriptor sets.
+    //  6. create pipeline cache.
+    //  7. load shader module.
+    //  8. create compute pipeline.
+    //  9. allocate command buffer.
+    // 10. create fence.
+    //
+    // Once here, record the command buffer and continue on...
 }
 
 compute_engine* create()

@@ -20,6 +20,8 @@ class compute_engine_vulkan : public compute_engine
     vk_device m_device;
     vk_command_pool m_cmd_pool;
 
+    void copy_to_device_local_buffer(array& io);
+
 public:
     compute_engine_vulkan();
     virtual ~compute_engine_vulkan();
