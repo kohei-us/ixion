@@ -174,9 +174,18 @@ class vk_descriptor_pool
     VkDescriptorPool m_pool = null_value<VkDescriptorPool>::value;
 
 public:
-
     vk_descriptor_pool(vk_device& device, uint32_t max_sets, std::initializer_list<VkDescriptorPoolSize> sizes);
     ~vk_descriptor_pool();
+};
+
+class vk_descriptor_set_layout
+{
+    vk_device& m_device;
+    VkDescriptorSetLayout m_ds_layout = null_value<VkDescriptorSetLayout>::value;
+
+public:
+    vk_descriptor_set_layout(vk_device& device, std::initializer_list<VkDescriptorSetLayoutBinding> bindings);
+    ~vk_descriptor_set_layout();
 };
 
 }}

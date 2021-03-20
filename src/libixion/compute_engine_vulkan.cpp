@@ -73,7 +73,16 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         }
     );
 
-    //  2. create descriptor set layout.
+    // Create a descriptor set layout. This specifies what descriptor type is
+    // bound to what binding location and how many units (in case the
+    // descriptor is an array), and which stages can access it.
+    vk_descriptor_set_layout ds_layout(m_device,
+        {
+            // binding id, descriptor type, descriptor count, stage flags, sampler (optional)
+            { 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr },
+        }
+    );
+
     //  3. create pipeline layout.
     //  4. allocate descriptor sets.
     //  5. update descriptor sets.

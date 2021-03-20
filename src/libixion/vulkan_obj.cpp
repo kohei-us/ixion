@@ -516,6 +516,25 @@ vk_descriptor_pool::~vk_descriptor_pool()
     vkDestroyDescriptorPool(m_device.get(), m_pool, nullptr);
 }
 
+vk_descriptor_set_layout::vk_descriptor_set_layout(
+    vk_device& device, std::initializer_list<VkDescriptorSetLayoutBinding> bindings) :
+    m_device(device)
+{
+    VkDescriptorSetLayoutCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    info.pBindings = bindings.begin();
+    info.bindingCount = bindings.size();
+
+    VkResult res = vkCreateDescriptorSetLayout(m_device.get(), &info, nullptr, &m_ds_layout);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create a descriptor set layout.");
+}
+
+vk_descriptor_set_layout::~vk_descriptor_set_layout()
+{
+    vkDestroyDescriptorSetLayout(m_device.get(), m_ds_layout, nullptr);
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
