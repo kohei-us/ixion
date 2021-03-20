@@ -186,6 +186,18 @@ class vk_descriptor_set_layout
 public:
     vk_descriptor_set_layout(vk_device& device, std::initializer_list<VkDescriptorSetLayoutBinding> bindings);
     ~vk_descriptor_set_layout();
+
+    VkDescriptorSetLayout& get();
+};
+
+class vk_pipeline_layout
+{
+    vk_device& m_device;
+    VkPipelineLayout m_layout = null_value<VkPipelineLayout>::value;
+
+public:
+    vk_pipeline_layout(vk_device& device, vk_descriptor_set_layout& ds_layout);
+    ~vk_pipeline_layout();
 };
 
 }}

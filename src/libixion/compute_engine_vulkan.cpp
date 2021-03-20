@@ -79,11 +79,15 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     vk_descriptor_set_layout ds_layout(m_device,
         {
             // binding id, descriptor type, descriptor count, stage flags, sampler (optional)
-            { 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr },
+            { 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_COMPUTE_BIT, nullptr },
         }
     );
 
-    //  3. create pipeline layout.
+    // Create a pipeline layout.  A pipeline layout consists of one or more
+    // descriptor set layouts as well as one or more push constants.  It
+    // describes the entire resources the pipeline will have access to.
+    vk_pipeline_layout pl_layout(m_device, ds_layout);
+
     //  4. allocate descriptor sets.
     //  5. update descriptor sets.
     //  6. create pipeline cache.

@@ -535,6 +535,30 @@ vk_descriptor_set_layout::~vk_descriptor_set_layout()
     vkDestroyDescriptorSetLayout(m_device.get(), m_ds_layout, nullptr);
 }
 
+VkDescriptorSetLayout& vk_descriptor_set_layout::get()
+{
+    return m_ds_layout;
+}
+
+vk_pipeline_layout::vk_pipeline_layout(
+    vk_device& device, vk_descriptor_set_layout& ds_layout) :
+    m_device(device)
+{
+    VkPipelineLayoutCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    info.setLayoutCount = 1;
+    info.pSetLayouts = &ds_layout.get();
+
+    VkResult res = vkCreatePipelineLayout(m_device.get(), &info, nullptr, &m_layout);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create a pipeline layout.");
+}
+
+vk_pipeline_layout::~vk_pipeline_layout()
+{
+    vkDestroyPipelineLayout(m_device.get(), m_layout, nullptr);
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
