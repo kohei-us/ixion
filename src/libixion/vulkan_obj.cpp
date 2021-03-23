@@ -516,6 +516,22 @@ vk_descriptor_pool::~vk_descriptor_pool()
     vkDestroyDescriptorPool(m_device.get(), m_pool, nullptr);
 }
 
+vk_descriptor_set vk_descriptor_pool::allocate(const vk_descriptor_set_layout& ds_layout)
+{
+    VkDescriptorSetAllocateInfo ai{};
+    ai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    ai.descriptorPool = m_pool;
+    ai.pSetLayouts = &ds_layout.get();
+    ai.descriptorSetCount = 1u;
+
+    VkDescriptorSet ds;
+    VkResult res = vkAllocateDescriptorSets(m_device.get(), &ai, &ds);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to allocate a descriptor set.");
+
+    return vk_descriptor_set(ds);
+}
+
 vk_descriptor_set_layout::vk_descriptor_set_layout(
     vk_device& device, std::initializer_list<VkDescriptorSetLayoutBinding> bindings) :
     m_device(device)
@@ -539,6 +555,16 @@ VkDescriptorSetLayout& vk_descriptor_set_layout::get()
 {
     return m_ds_layout;
 }
+
+const VkDescriptorSetLayout& vk_descriptor_set_layout::get() const
+{
+    return m_ds_layout;
+}
+
+vk_descriptor_set::vk_descriptor_set(VkDescriptorSet ds) :
+    m_set(ds) {}
+
+vk_descriptor_set::~vk_descriptor_set() {}
 
 vk_pipeline_layout::vk_pipeline_layout(
     vk_device& device, vk_descriptor_set_layout& ds_layout) :

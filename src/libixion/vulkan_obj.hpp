@@ -32,6 +32,8 @@ struct null_value<T, typename std::enable_if<std::is_integral<T>::value>::type>
 class vk_buffer;
 class vk_command_buffer;
 class vk_command_pool;
+class vk_descriptor_set;
+class vk_descriptor_set_layout;
 class vk_fence;
 
 class vk_instance
@@ -176,6 +178,8 @@ class vk_descriptor_pool
 public:
     vk_descriptor_pool(vk_device& device, uint32_t max_sets, std::initializer_list<VkDescriptorPoolSize> sizes);
     ~vk_descriptor_pool();
+
+    vk_descriptor_set allocate(const vk_descriptor_set_layout& ds_layout);
 };
 
 class vk_descriptor_set_layout
@@ -188,6 +192,17 @@ public:
     ~vk_descriptor_set_layout();
 
     VkDescriptorSetLayout& get();
+    const VkDescriptorSetLayout& get() const;
+};
+
+class vk_descriptor_set
+{
+    friend class vk_descriptor_pool;
+    VkDescriptorSet m_set = null_value<VkDescriptorSet>::value;
+
+    vk_descriptor_set(VkDescriptorSet ds);
+public:
+    ~vk_descriptor_set();
 };
 
 class vk_pipeline_layout

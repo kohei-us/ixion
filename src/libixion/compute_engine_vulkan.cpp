@@ -88,7 +88,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     // describes the entire resources the pipeline will have access to.
     vk_pipeline_layout pl_layout(m_device, ds_layout);
 
-    //  4. allocate descriptor sets.
+    //  Allocate a descriptor set from the descriptor set layout.
+    vk_descriptor_set desc_set = desc_pool.allocate(ds_layout);
+
     //  5. update descriptor sets.
     //  6. create pipeline cache.
     //  7. load shader module.
