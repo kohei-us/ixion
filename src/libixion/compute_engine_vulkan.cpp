@@ -18,7 +18,7 @@
 
 namespace ixion { namespace draft {
 
-void compute_engine_vulkan::copy_to_device_local_buffer(array& io)
+vk_buffer compute_engine_vulkan::copy_to_device_local_buffer(array& io)
 {
     vk_buffer host_buffer(
         m_device, io.size,
@@ -41,6 +41,8 @@ void compute_engine_vulkan::copy_to_device_local_buffer(array& io)
     vk_queue q = m_device.get_queue();
     q.submit(cmd_copy, fence);
     fence.wait();
+
+    return device_buffer;
 }
 
 compute_engine_vulkan::compute_engine_vulkan() :
@@ -62,7 +64,7 @@ const char* compute_engine_vulkan::get_name() const
 
 void compute_engine_vulkan::compute_fibonacci(array& io)
 {
-    copy_to_device_local_buffer(io);
+    vk_buffer device_buffer = copy_to_device_local_buffer(io);
 
     // Create a descriptor pool, by specifying the number of descriptors for
     // each type that can be allocated in a single set, as well as the max
@@ -88,10 +90,12 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     // describes the entire resources the pipeline will have access to.
     vk_pipeline_layout pl_layout(m_device, ds_layout);
 
-    //  Allocate a descriptor set from the descriptor set layout.
+    // Allocate a descriptor set from the descriptor set layout.
     vk_descriptor_set desc_set = desc_pool.allocate(ds_layout);
 
-    //  5. update descriptor sets.
+    // Update the descriptor set with the content of the device-local buffer.
+    desc_set.update(m_device, 0u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, device_buffer);
+
     //  6. create pipeline cache.
     //  7. load shader module.
     //  8. create compute pipeline.

@@ -81,6 +81,7 @@ public:
     ~vk_device();
 
     VkDevice& get();
+    const VkDevice& get() const;
 
     VkPhysicalDevice get_physical_device();
 
@@ -152,6 +153,7 @@ public:
     ~vk_buffer();
 
     VkBuffer& get();
+    const VkBuffer& get() const;
 
     void write_to_memory(void* data, VkDeviceSize size);
 };
@@ -203,6 +205,19 @@ class vk_descriptor_set
     vk_descriptor_set(VkDescriptorSet ds);
 public:
     ~vk_descriptor_set();
+
+    VkDescriptorSet& get();
+    const VkDescriptorSet& get() const;
+
+    /**
+     * Update the descriptor set with the content of the device local buffer.
+     *
+     * @param device logical device
+     * @param binding binding position
+     * @param type descriptor type.
+     * @param buffer device local buffer to get the content from.
+     */
+    void update(const vk_device& device, uint32_t binding, VkDescriptorType type, const vk_buffer& buffer);
 };
 
 class vk_pipeline_layout

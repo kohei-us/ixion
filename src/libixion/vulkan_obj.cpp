@@ -260,6 +260,11 @@ VkDevice& vk_device::get()
     return m_device;
 }
 
+const VkDevice& vk_device::get() const
+{
+    return m_device;
+}
+
 VkPhysicalDevice vk_device::get_physical_device()
 {
     return m_physical_device;
@@ -448,6 +453,11 @@ VkBuffer& vk_buffer::get()
     return m_buffer;
 }
 
+const VkBuffer& vk_buffer::get() const
+{
+    return m_buffer;
+}
+
 void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
 {
     IXION_TRACE("copying data of size " << size);
@@ -565,6 +575,33 @@ vk_descriptor_set::vk_descriptor_set(VkDescriptorSet ds) :
     m_set(ds) {}
 
 vk_descriptor_set::~vk_descriptor_set() {}
+
+VkDescriptorSet& vk_descriptor_set::get()
+{
+    return m_set;
+}
+
+const VkDescriptorSet& vk_descriptor_set::get() const
+{
+    return m_set;
+}
+
+void vk_descriptor_set::update(
+    const vk_device& device, uint32_t binding, VkDescriptorType type,
+    const vk_buffer& buffer)
+{
+    VkDescriptorBufferInfo buffer_desc = { buffer.get(), 0, VK_WHOLE_SIZE };
+
+    VkWriteDescriptorSet write_ds{};
+    write_ds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_ds.dstSet = m_set;
+    write_ds.descriptorType = type;
+    write_ds.dstBinding = binding;
+    write_ds.pBufferInfo = &buffer_desc;
+    write_ds.descriptorCount = 1u;
+
+    vkUpdateDescriptorSets(device.get(), 1u, &write_ds, 0, nullptr);
+}
 
 vk_pipeline_layout::vk_pipeline_layout(
     vk_device& device, vk_descriptor_set_layout& ds_layout) :
