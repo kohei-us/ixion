@@ -96,7 +96,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     // Update the descriptor set with the content of the device-local buffer.
     desc_set.update(m_device, 0u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, device_buffer);
 
-    //  6. create pipeline cache.
+    // Create pipeline cache.
+    vk_pipeline_cache pl_cache(m_device);
+
     //  7. load shader module.
     //  8. create compute pipeline.
     //  9. allocate command buffer.

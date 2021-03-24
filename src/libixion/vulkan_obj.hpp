@@ -230,6 +230,16 @@ public:
     ~vk_pipeline_layout();
 };
 
+class vk_pipeline_cache
+{
+    vk_device& m_device;
+    VkPipelineCache m_cache = null_value<VkPipelineCache>::value;
+
+public:
+    vk_pipeline_cache(vk_device& device);
+    ~vk_pipeline_cache();
+};
+
 }}
 
 #endif

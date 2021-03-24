@@ -622,6 +622,21 @@ vk_pipeline_layout::~vk_pipeline_layout()
     vkDestroyPipelineLayout(m_device.get(), m_layout, nullptr);
 }
 
+vk_pipeline_cache::vk_pipeline_cache(vk_device& device) :
+    m_device(device)
+{
+    VkPipelineCacheCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    VkResult res = vkCreatePipelineCache(m_device.get(), &info, nullptr, &m_cache);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create a pipeline cache.");
+}
+
+vk_pipeline_cache::~vk_pipeline_cache()
+{
+    vkDestroyPipelineCache(m_device.get(), m_cache, nullptr);
+}
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
