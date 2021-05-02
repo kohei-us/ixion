@@ -1740,7 +1740,7 @@ void test_model_context_iterator_horizontal()
     }
 
     assert(!iter.has()); // There should be no more cells on this sheet.
-    assert(cell_count = 10);
+    assert(cell_count == 10);
 
     cxt.append_sheet(IXION_ASCII("values"));
     cxt.set_string_cell(abs_address_t(1, 0, 0), IXION_ASCII("F1"));
