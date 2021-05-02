@@ -1915,9 +1915,9 @@ void test_model_context_iterator_vertical()
 
     // Make sure the cell position iterates correctly.
     size_t cell_count = 0;
-    for (col_t col = 0; col < col_size; ++cell_count, ++col)
+    for (col_t col = 0; col < col_size; ++col)
     {
-        for (row_t row = 0; row < row_size; ++row, iter.next())
+        for (row_t row = 0; row < row_size; ++cell_count, ++row, iter.next())
         {
             const model_iterator::cell& cell = iter.get();
             assert(iter.has());
@@ -1928,7 +1928,7 @@ void test_model_context_iterator_vertical()
     }
 
     assert(!iter.has()); // There should be no more cells on this sheet.
-    assert(cell_count = 10);
+    assert(cell_count == 10);
 
     cxt.append_sheet("values");
     cxt.set_string_cell(abs_address_t(1, 0, 0), IXION_ASCII("F1"));
