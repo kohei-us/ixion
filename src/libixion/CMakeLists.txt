@@ -7,7 +7,6 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     cell_access.cpp
     cell_queue_manager.cpp
     compute_engine.cpp
-    compute_engine_cuda.cpp
     concrete_formula_tokens.cpp
     config.cpp
     debug.cpp
