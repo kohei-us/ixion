@@ -19,6 +19,12 @@ using std::endl;
 
 namespace {
 
+using test_func_t = std::function<void()>;
+
+std::vector<std::pair<std::string, test_func_t>> tests;
+
+#define REGISTER_TEST(x) tests.emplace_back(#x, x);
+
 template<typename T>
 void print_values(std::string_view msg, const T& values)
 {
@@ -69,10 +75,18 @@ int main()
 {
     ixion::draft::init_modules();
 
-    test_create_default();
+    REGISTER_TEST(test_create_default);
 #ifdef BUILD_VULKAN
-    test_create_vulkan();
+    REGISTER_TEST(test_create_vulkan);
 #endif
+
+    for (auto test : tests)
+    {
+        cout << "--------------------------" << endl;
+        cout << "  " << test.first << endl;
+        cout << "--------------------------" << endl;
+        test.second();
+    }
 
     return EXIT_SUCCESS;
 }
