@@ -197,6 +197,14 @@ public:
     const VkDescriptorSetLayout& get() const;
 };
 
+/**
+ * Descriptor set contains a collection of descriptors. Think of a
+ * descriptor as a handle into a resource, which can be a buffer or an
+ * image.
+ *
+ * @see https://vkguide.dev/docs/chapter-4/descriptors/
+ *
+ */
 class vk_descriptor_set
 {
     friend class vk_descriptor_pool;
@@ -228,6 +236,9 @@ class vk_pipeline_layout
 public:
     vk_pipeline_layout(vk_device& device, vk_descriptor_set_layout& ds_layout);
     ~vk_pipeline_layout();
+
+    VkPipelineLayout& get();
+    const VkPipelineLayout& get() const;
 };
 
 class vk_pipeline_cache
@@ -238,6 +249,18 @@ class vk_pipeline_cache
 public:
     vk_pipeline_cache(vk_device& device);
     ~vk_pipeline_cache();
+};
+
+class vk_shader_module
+{
+    vk_device& m_device;
+    VkShaderModule m_module = null_value<VkShaderModule>::value;
+
+public:
+    enum class module_type { fibonacci };
+
+    vk_shader_module(vk_device& device, module_type mt);
+    ~vk_shader_module();
 };
 
 }}

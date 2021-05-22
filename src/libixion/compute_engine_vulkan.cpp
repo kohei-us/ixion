@@ -18,6 +18,11 @@
 
 namespace ixion { namespace draft {
 
+/**
+ * This function first writes the source data array to host buffer, then
+ * creates a device local buffer, and create and execute a command to copy
+ * the data in the host buffer to the device local buffer.
+ */
 vk_buffer compute_engine_vulkan::copy_to_device_local_buffer(array& io)
 {
     vk_buffer host_buffer(
@@ -68,7 +73,8 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
 
     // Create a descriptor pool, by specifying the number of descriptors for
     // each type that can be allocated in a single set, as well as the max
-    // number of sets.
+    // number of sets. Here, we are specifying that we will only allocate one
+    // set, and each set will contain only one storage buffer.
     vk_descriptor_pool desc_pool(m_device, 1u,
         {
             { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u },
@@ -77,7 +83,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
 
     // Create a descriptor set layout. This specifies what descriptor type is
     // bound to what binding location and how many units (in case the
-    // descriptor is an array), and which stages can access it.
+    // descriptor is an array), and which stages can access it.  Here, we are
+    // binding one storage buffer to the binding location of 0, for the
+    // compute stage.
     vk_descriptor_set_layout ds_layout(m_device,
         {
             // binding id, descriptor type, descriptor count, stage flags, sampler (optional)
@@ -99,7 +107,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     // Create pipeline cache.
     vk_pipeline_cache pl_cache(m_device);
 
-    //  7. load shader module.
+    // Load shader module for fibonnaci.
+    vk_shader_module fibonnaci_module(m_device, vk_shader_module::module_type::fibonacci);
+
     //  8. create compute pipeline.
     //  9. allocate command buffer.
     // 10. create fence.

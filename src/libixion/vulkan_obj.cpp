@@ -8,6 +8,8 @@
 #include "vulkan_obj.hpp"
 #include "debug.hpp"
 
+#include "ixion/macros.hpp"
+
 #include <vector>
 #include <cstring>
 #include <iostream>
@@ -18,6 +20,8 @@
 namespace ixion { namespace draft {
 
 namespace {
+
+#include "vulkan_spirv_blobs.inl"
 
 VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT severity,
@@ -622,6 +626,16 @@ vk_pipeline_layout::~vk_pipeline_layout()
     vkDestroyPipelineLayout(m_device.get(), m_layout, nullptr);
 }
 
+VkPipelineLayout& vk_pipeline_layout::get()
+{
+    return m_layout;
+}
+
+const VkPipelineLayout& vk_pipeline_layout::get() const
+{
+    return m_layout;
+}
+
 vk_pipeline_cache::vk_pipeline_cache(vk_device& device) :
     m_device(device)
 {
@@ -635,6 +649,44 @@ vk_pipeline_cache::vk_pipeline_cache(vk_device& device) :
 vk_pipeline_cache::~vk_pipeline_cache()
 {
     vkDestroyPipelineCache(m_device.get(), m_cache, nullptr);
+}
+
+vk_shader_module::vk_shader_module(vk_device& device, module_type mt) :
+    m_device(device)
+{
+    const uint32_t* array = nullptr;
+    std::size_t n_array = 0;
+
+    switch (mt)
+    {
+        case module_type::fibonacci:
+        {
+            array = reinterpret_cast<const uint32_t*>(fibonacci_spirv);
+            n_array = IXION_N_ELEMENTS(fibonacci_spirv);
+
+            std::ostringstream os;
+            os << "module type: fibonacci (size=" << n_array << ")";
+            IXION_TRACE(os.str().data());
+
+            break;
+        }
+        default:
+            throw std::runtime_error("invalid module type");
+    }
+
+    VkShaderModuleCreateInfo ci{};
+    ci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    ci.codeSize = n_array;
+    ci.pCode = array;
+
+    VkResult res = vkCreateShaderModule(m_device.get(), &ci, NULL, &m_module);
+    if (res != VK_SUCCESS)
+        throw std::runtime_error("failed to create a shader module.");
+}
+
+vk_shader_module::~vk_shader_module()
+{
+    vkDestroyShaderModule(m_device.get(), m_module, nullptr);
 }
 
 }}
