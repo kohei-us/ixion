@@ -664,9 +664,7 @@ vk_shader_module::vk_shader_module(vk_device& device, module_type mt) :
             array = reinterpret_cast<const uint32_t*>(fibonacci_spirv);
             n_array = IXION_N_ELEMENTS(fibonacci_spirv);
 
-            std::ostringstream os;
-            os << "module type: fibonacci (size=" << n_array << ")";
-            IXION_TRACE(os.str().data());
+            IXION_TRACE("module type: fibonacci (size=" << n_array << ")");
 
             break;
         }
