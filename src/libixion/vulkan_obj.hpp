@@ -249,6 +249,9 @@ class vk_pipeline_cache
 public:
     vk_pipeline_cache(vk_device& device);
     ~vk_pipeline_cache();
+
+    VkPipelineCache& get();
+    const VkPipelineCache& get() const;
 };
 
 class vk_shader_module
@@ -261,6 +264,22 @@ public:
 
     vk_shader_module(vk_device& device, module_type mt);
     ~vk_shader_module();
+
+    VkShaderModule& get();
+    const VkShaderModule& get() const;
+};
+
+class vk_pipeline
+{
+    vk_device& m_device;
+    VkPipeline m_pipeline = null_value<VkPipeline>::value;
+
+public:
+    vk_pipeline(vk_device& device, vk_pipeline_layout& pl_layout, vk_pipeline_cache& pl_cache, vk_shader_module& shader);
+    ~vk_pipeline();
+
+    VkPipeline& get();
+    const VkPipeline& get() const;
 };
 
 }}

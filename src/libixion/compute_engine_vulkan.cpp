@@ -110,7 +110,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     // Load shader module for fibonnaci.
     vk_shader_module fibonnaci_module(m_device, vk_shader_module::module_type::fibonacci);
 
-    //  8. create compute pipeline.
+    // Create a compute pipeline.
+    vk_pipeline pipeline(m_device, pl_layout, pl_cache, fibonnaci_module);
+
     //  9. allocate command buffer.
     // 10. create fence.
     //

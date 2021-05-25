@@ -651,6 +651,16 @@ vk_pipeline_cache::~vk_pipeline_cache()
     vkDestroyPipelineCache(m_device.get(), m_cache, nullptr);
 }
 
+VkPipelineCache& vk_pipeline_cache::get()
+{
+    return m_cache;
+}
+
+const VkPipelineCache& vk_pipeline_cache::get() const
+{
+    return m_cache;
+}
+
 vk_shader_module::vk_shader_module(vk_device& device, module_type mt) :
     m_device(device)
 {
@@ -685,6 +695,70 @@ vk_shader_module::vk_shader_module(vk_device& device, module_type mt) :
 vk_shader_module::~vk_shader_module()
 {
     vkDestroyShaderModule(m_device.get(), m_module, nullptr);
+}
+
+VkShaderModule& vk_shader_module::get()
+{
+    return m_module;
+}
+
+const VkShaderModule& vk_shader_module::get() const
+{
+    return m_module;
+}
+
+vk_pipeline::vk_pipeline(
+    vk_device& device, vk_pipeline_layout& pl_layout, vk_pipeline_cache& pl_cache,
+    vk_shader_module& shader) :
+    m_device(device)
+{
+    struct sp_data_type {
+        uint32_t BUFFER_ELEMENTS = 32;
+    } sp_data;
+
+    VkSpecializationMapEntry sp_map_entry{};
+    sp_map_entry.constantID = 0;
+    sp_map_entry.offset = 0;
+    sp_map_entry.size = sizeof(uint32_t);
+
+    VkSpecializationInfo sp_info{};
+    sp_info.mapEntryCount = 1;
+    sp_info.pMapEntries = &sp_map_entry;
+    sp_info.dataSize = sizeof(sp_data_type);
+    sp_info.pData = &sp_data;
+
+    // Data about the shader module, with special constant data via specialiation
+    // info member.
+    VkPipelineShaderStageCreateInfo shader_stage_ci{};
+    shader_stage_ci.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shader_stage_ci.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+    shader_stage_ci.module = shader.get();
+    shader_stage_ci.pName = "main";
+    shader_stage_ci.pSpecializationInfo = &sp_info;
+
+    VkComputePipelineCreateInfo pipeline_ci{};
+    pipeline_ci.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+    pipeline_ci.layout = pl_layout.get();
+    pipeline_ci.flags = 0;
+    pipeline_ci.stage = shader_stage_ci;
+
+    vkCreateComputePipelines(
+        m_device.get(), pl_cache.get(), 1, &pipeline_ci, nullptr, &m_pipeline);
+}
+
+vk_pipeline::~vk_pipeline()
+{
+    vkDestroyPipeline(m_device.get(), m_pipeline, nullptr);
+}
+
+VkPipeline& vk_pipeline::get()
+{
+    return m_pipeline;
+}
+
+const VkPipeline& vk_pipeline::get() const
+{
+    return m_pipeline;
 }
 
 }}
