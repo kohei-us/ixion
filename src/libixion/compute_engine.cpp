@@ -102,7 +102,29 @@ const char* compute_engine::get_name() const
 
 void compute_engine::compute_fibonacci(array& io)
 {
-    // TODO : add CPU implementation
+    if (io.type != array_type::uint32)
+        return;
+
+    auto fibonacci = [](uint32_t n) -> uint32_t
+    {
+        if (n <= 1)
+            return n;
+
+        uint curr = 1;
+        uint prev = 1;
+
+        for (uint32_t i = 2; i < n; ++i)
+        {
+            uint32_t temp = curr;
+            curr += prev;
+            prev = temp;
+        }
+
+        return curr;
+    };
+
+    for (uint32_t i = 0; i < io.size; ++i)
+        io.uint32[i] = fibonacci(io.uint32[i]);
 }
 
 }}
