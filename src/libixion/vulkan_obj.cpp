@@ -128,16 +128,22 @@ vk_queue::vk_queue(VkQueue queue) : m_queue(queue) {}
 
 vk_queue::~vk_queue() {}
 
-void vk_queue::submit(vk_command_buffer& cmd, vk_fence& fence)
+void vk_queue::submit(vk_command_buffer& cmd, vk_fence& fence, VkPipelineStageFlags dst_stages)
 {
     VkSubmitInfo info{};
     info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    info.pWaitDstStageMask = dst_stages ? &dst_stages : nullptr;
     info.commandBufferCount = 1;
     info.pCommandBuffers = &cmd.get();
 
     VkResult res = vkQueueSubmit(m_queue, 1, &info, fence.get());
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to submit command to queue.");
+}
+
+void vk_queue::wait_idle()
+{
+    vkQueueWaitIdle(m_queue);
 }
 
 vk_device::vk_device(vk_instance& instance)
@@ -354,6 +360,47 @@ void vk_command_buffer::copy_buffer(vk_buffer& src, vk_buffer& dst, VkDeviceSize
     vkCmdCopyBuffer(m_cmd_buffer, src.get(), dst.get(), 1, &copy_region);
 }
 
+void vk_command_buffer::buffer_memory_barrier(
+    const vk_buffer& buffer, VkAccessFlags src_access, VkAccessFlags dst_access,
+    VkPipelineStageFlagBits src_stage, VkPipelineStageFlagBits dst_stage)
+{
+    VkBufferMemoryBarrier info{};
+    info.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    info.buffer = buffer.get();
+    info.size = VK_WHOLE_SIZE;
+    info.srcAccessMask = src_access;
+    info.dstAccessMask = dst_access;
+    info.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    info.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    vkCmdPipelineBarrier(
+        m_cmd_buffer,
+        src_stage,
+        dst_stage,
+        0,
+        0, nullptr,
+        1, &info,
+        0, nullptr);
+}
+
+void vk_command_buffer::bind_pipeline(const vk_pipeline& pipeline)
+{
+    vkCmdBindPipeline(m_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline.get());
+}
+
+void vk_command_buffer::bind_descriptor_set(
+    VkPipelineBindPoint bind_point, const vk_pipeline_layout& pl_layout,
+    const vk_descriptor_set& desc_set)
+{
+    vkCmdBindDescriptorSets(
+        m_cmd_buffer, bind_point, pl_layout.get(), 0, 1, &desc_set.get(), 0, 0);
+}
+
+void vk_command_buffer::dispatch(uint32_t gc_x, uint32_t gc_y, uint32_t gc_z)
+{
+    vkCmdDispatch(m_cmd_buffer, gc_x, gc_y, gc_z);
+}
+
 vk_buffer::mem_type vk_buffer::find_memory_type(VkMemoryPropertyFlags mem_props) const
 {
     mem_type ret;
@@ -483,6 +530,25 @@ void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
     vkUnmapMemory(m_device.get(), m_memory);
 }
 
+void vk_buffer::read_from_memory(void* data, VkDeviceSize size)
+{
+    IXION_TRACE("reading data from memory for size " << size << "...");
+
+    void *mapped;
+    vkMapMemory(m_device.get(), m_memory, 0, size, 0, &mapped);
+
+    VkMappedMemoryRange invalidate_range{};
+    invalidate_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    invalidate_range.memory = m_memory;
+    invalidate_range.offset = 0;
+    invalidate_range.size = size;
+    vkInvalidateMappedMemoryRanges(m_device.get(), 1, &invalidate_range);
+
+    // Copy to output
+    memcpy(data, mapped, size);
+    vkUnmapMemory(m_device.get(), m_memory);
+}
+
 vk_fence::vk_fence(vk_device& device, VkFenceCreateFlags flags) :
     m_device(device)
 {
@@ -508,6 +574,11 @@ void vk_fence::wait()
     VkResult res = vkWaitForFences(m_device.get(), 1, &m_fence, VK_TRUE, UINT64_MAX);
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to wait for a fence.");
+}
+
+void vk_fence::reset()
+{
+    vkResetFences(m_device.get(), 1, &m_fence);
 }
 
 vk_descriptor_pool::vk_descriptor_pool(
@@ -708,13 +779,17 @@ const VkShaderModule& vk_shader_module::get() const
 }
 
 vk_pipeline::vk_pipeline(
-    vk_device& device, vk_pipeline_layout& pl_layout, vk_pipeline_cache& pl_cache,
-    vk_shader_module& shader) :
+    const runtime_context& cxt, vk_device& device, vk_pipeline_layout& pl_layout,
+    vk_pipeline_cache& pl_cache, vk_shader_module& shader) :
     m_device(device)
 {
-    struct sp_data_type {
-        uint32_t BUFFER_ELEMENTS = 32;
-    } sp_data;
+    struct sp_data_type
+    {
+        uint32_t BUFFER_ELEMENTS;
+    };
+
+    sp_data_type sp_data;
+    sp_data.BUFFER_ELEMENTS = cxt.input_buffer_size;
 
     VkSpecializationMapEntry sp_map_entry{};
     sp_map_entry.constantID = 0;

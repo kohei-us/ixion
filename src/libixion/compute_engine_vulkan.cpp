@@ -23,31 +23,18 @@ namespace ixion { namespace draft {
  * creates a device local buffer, and create and execute a command to copy
  * the data in the host buffer to the device local buffer.
  */
-vk_buffer compute_engine_vulkan::copy_to_device_local_buffer(array& io)
+void compute_engine_vulkan::copy_to_device_local_buffer(
+    array& io, vk_buffer& host_buffer, vk_buffer& device_buffer)
 {
-    vk_buffer host_buffer(
-        m_device, io.size,
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-    host_buffer.write_to_memory(io.data, sizeof(uint32_t)*io.size);
-
-    vk_buffer device_buffer(
-        m_device, io.size,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
     vk_command_buffer cmd_copy = m_cmd_pool.create_command_buffer();
     cmd_copy.begin();
-    cmd_copy.copy_buffer(host_buffer, device_buffer, io.size);
+    cmd_copy.copy_buffer(host_buffer, device_buffer, sizeof(uint32_t)*io.size);
     cmd_copy.end();
 
     vk_fence fence(m_device, 0);
     vk_queue q = m_device.get_queue();
     q.submit(cmd_copy, fence);
     fence.wait();
-
-    return device_buffer;
 }
 
 compute_engine_vulkan::compute_engine_vulkan() :
@@ -69,7 +56,22 @@ const char* compute_engine_vulkan::get_name() const
 
 void compute_engine_vulkan::compute_fibonacci(array& io)
 {
-    vk_buffer device_buffer = copy_to_device_local_buffer(io);
+    runtime_context cxt;
+    cxt.input_buffer_size = io.size;
+
+    vk_buffer host_buffer(
+        m_device, sizeof(uint32_t)*io.size,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+    host_buffer.write_to_memory(io.data, sizeof(uint32_t)*io.size);
+
+    vk_buffer device_buffer(
+        m_device, sizeof(uint32_t)*io.size,
+        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    copy_to_device_local_buffer(io, host_buffer, device_buffer);
 
     // Create a descriptor pool, by specifying the number of descriptors for
     // each type that can be allocated in a single set, as well as the max
@@ -111,12 +113,54 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     vk_shader_module fibonnaci_module(m_device, vk_shader_module::module_type::fibonacci);
 
     // Create a compute pipeline.
-    vk_pipeline pipeline(m_device, pl_layout, pl_cache, fibonnaci_module);
+    vk_pipeline pipeline(cxt, m_device, pl_layout, pl_cache, fibonnaci_module);
 
-    //  9. allocate command buffer.
-    // 10. create fence.
-    //
-    // Once here, record the command buffer and continue on...
+    // allocate command buffer.
+    vk_command_buffer cmd = m_cmd_pool.create_command_buffer();
+
+    // Record command buffer.
+    cmd.begin();
+    cmd.buffer_memory_barrier(
+        device_buffer,
+        VK_ACCESS_HOST_WRITE_BIT,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_PIPELINE_STAGE_HOST_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT
+    );
+    cmd.bind_pipeline(pipeline);
+    cmd.bind_descriptor_set(VK_PIPELINE_BIND_POINT_COMPUTE, pl_layout, desc_set);
+    cmd.dispatch(cxt.input_buffer_size, 1, 1);
+    cmd.buffer_memory_barrier(
+        device_buffer,
+        VK_ACCESS_SHADER_WRITE_BIT,
+        VK_ACCESS_TRANSFER_READ_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT
+    );
+
+    cmd.copy_buffer(device_buffer, host_buffer, sizeof(uint32_t)*io.size);
+
+    cmd.buffer_memory_barrier(
+        host_buffer,
+        VK_ACCESS_TRANSFER_WRITE_BIT,
+        VK_ACCESS_HOST_READ_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_HOST_BIT
+    );
+
+    cmd.end();
+
+    // Submit the command and wait.
+    vk_fence fence(m_device, VK_FENCE_CREATE_SIGNALED_BIT);
+    fence.reset();
+
+    vk_queue q = m_device.get_queue();
+    q.submit(cmd, fence, VK_PIPELINE_STAGE_TRANSFER_BIT);
+    fence.wait();
+
+    host_buffer.read_from_memory(io.data, sizeof(uint32_t)*io.size);
+
+    q.wait_idle();
 }
 
 compute_engine* create()

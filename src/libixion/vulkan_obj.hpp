@@ -29,12 +29,19 @@ struct null_value<T, typename std::enable_if<std::is_integral<T>::value>::type>
     static constexpr T value = 0;
 };
 
+struct runtime_context
+{
+    uint32_t input_buffer_size = 0;
+};
+
 class vk_buffer;
 class vk_command_buffer;
 class vk_command_pool;
 class vk_descriptor_set;
 class vk_descriptor_set_layout;
 class vk_fence;
+class vk_pipeline;
+class vk_pipeline_layout;
 
 class vk_instance
 {
@@ -56,7 +63,9 @@ public:
     vk_queue(VkQueue queue);
     ~vk_queue();
 
-    void submit(vk_command_buffer& cmd, vk_fence& fence);
+    void submit(vk_command_buffer& cmd, vk_fence& fence, VkPipelineStageFlags dst_stages = 0);
+
+    void wait_idle();
 };
 
 class vk_device
@@ -123,6 +132,18 @@ public:
     void end();
 
     void copy_buffer(vk_buffer& src, vk_buffer& dst, VkDeviceSize size);
+
+    void buffer_memory_barrier(
+        const vk_buffer& buffer, VkAccessFlags src_access, VkAccessFlags dst_access,
+        VkPipelineStageFlagBits src_stage, VkPipelineStageFlagBits dst_stage);
+
+    void bind_pipeline(const vk_pipeline& pipeline);
+
+    void bind_descriptor_set(
+        VkPipelineBindPoint bind_point, const vk_pipeline_layout& pl_layout,
+        const vk_descriptor_set& desc_set);
+
+    void dispatch(uint32_t gc_x, uint32_t gc_y, uint32_t gc_z);
 };
 
 class vk_buffer
@@ -156,6 +177,8 @@ public:
     const VkBuffer& get() const;
 
     void write_to_memory(void* data, VkDeviceSize size);
+
+    void read_from_memory(void* data, VkDeviceSize size);
 };
 
 class vk_fence
@@ -170,6 +193,7 @@ public:
     VkFence& get();
 
     void wait();
+    void reset();
 };
 
 class vk_descriptor_pool
@@ -275,7 +299,10 @@ class vk_pipeline
     VkPipeline m_pipeline = null_value<VkPipeline>::value;
 
 public:
-    vk_pipeline(vk_device& device, vk_pipeline_layout& pl_layout, vk_pipeline_cache& pl_cache, vk_shader_module& shader);
+    vk_pipeline(
+        const runtime_context& cxt, vk_device& device, vk_pipeline_layout& pl_layout,
+        vk_pipeline_cache& pl_cache, vk_shader_module& shader);
+
     ~vk_pipeline();
 
     VkPipeline& get();
