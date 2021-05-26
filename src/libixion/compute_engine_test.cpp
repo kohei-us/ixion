@@ -7,17 +7,49 @@
 
 #include <ixion/compute_engine.hpp>
 #include <ixion/module.hpp>
-#include <iostream>
-#include <cassert>
-#include <cstring>
-#include <vector>
 #include <algorithm>
+#include <cassert>
+#include <chrono>
+#include <cstring>
+#include <iostream>
 #include <iterator>
+#include <sstream>
+#include <string>
+#include <vector>
 
 using std::cout;
 using std::endl;
 
 namespace {
+
+class stack_printer
+{
+public:
+    explicit stack_printer(std::string msg) :
+        m_msg(std::move(msg))
+    {
+        m_start_time = get_time();
+    }
+
+    ~stack_printer()
+    {
+        double end_time = get_time();
+        std::cout << m_msg << ": duration = " << (end_time-m_start_time) << " sec" << std::endl;
+    }
+
+private:
+    double get_time() const
+    {
+        unsigned long usec_since_epoch =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count();
+
+        return usec_since_epoch / 1000000.0;
+    }
+
+    std::string m_msg;
+    double m_start_time;
+};
 
 using test_func_t = std::function<void()>;
 
@@ -29,7 +61,25 @@ template<typename T>
 void print_values(std::string_view msg, const T& values)
 {
     cout << msg << ": ";
-    std::copy(values.begin(), values.end(), std::ostream_iterator<typename T::value_type>(cout, " "));
+
+    if (values.size() <= 20)
+        std::copy(values.begin(), values.end(), std::ostream_iterator<typename T::value_type>(cout, " "));
+    else
+    {
+        // Print only the first 15 and last 5 values.
+        auto it = values.begin();
+        auto it_end = it + 15;
+
+        std::copy(it, it_end, std::ostream_iterator<typename T::value_type>(cout, " "));
+
+        cout << "... ";
+
+        it_end = values.end();
+        it = it_end - 5;
+
+        std::copy(it, it_end, std::ostream_iterator<typename T::value_type>(cout, " "));
+    }
+
     cout << endl;
 }
 
@@ -38,7 +88,7 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
     cout << "--" << endl;
     cout << "name: " << engine->get_name() << endl;
 
-    std::vector<uint32_t> values(33u);
+    std::vector<uint32_t> values(16384u);
 
     uint32_t n = 0;
     std::generate(values.begin(), values.end(), [&n] { return n++; });
@@ -49,7 +99,12 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
     io.type = ixion::draft::array_type::uint32;
 
     print_values("fibonacci input", values);
-    engine->compute_fibonacci(io);
+    {
+        std::ostringstream os;
+        os << "fibonacci (n=" << values.size() << ")";
+        stack_printer __stack_printer__(os.str());
+        engine->compute_fibonacci(io);
+    }
     print_values("fibonacci output", values);
 }
 
