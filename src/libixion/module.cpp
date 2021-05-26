@@ -33,10 +33,6 @@ void unload_module(void* /*handler*/)
 
 void init_modules()
 {
-    const char* module_path = std::getenv("IXION_MODULE_PATH");
-    if (!module_path)
-        return;
-
     static std::vector<const char*> mod_names = {
         "vulkan",
     };
@@ -50,16 +46,11 @@ void init_modules()
 
     for (const char* mod_name : mod_names)
     {
-        fs::path p(module_path);
-
-        {
-            std::ostringstream os;
-            os << mod_prefix << mod_name << ".so";
-            p /= os.str();
-        }
+        std::ostringstream os;
+        os << mod_prefix << mod_name << ".so";
 
         // TODO: make this cross-platform.
-        void* hdl = dlopen(p.string().data(), RTLD_NOW | RTLD_GLOBAL);
+        void* hdl = dlopen(os.str().data(), RTLD_NOW | RTLD_GLOBAL);
         if (!hdl)
             return;
 

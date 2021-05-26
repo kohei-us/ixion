@@ -112,6 +112,7 @@ endif
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = \
 	-no-undefined \
+	-Wl,-rpath,'$$ORIGIN' \
 	$(BOOST_FILESYSTEM_LDFLAGS)
 
 libixion_@IXION_API_VERSION@_la_LIBADD = \
@@ -141,7 +142,7 @@ dirty_cell_tracker_test_SOURCES = dirty_cell_tracker_test.cpp
 dirty_cell_tracker_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la
 
-AM_TESTS_ENVIRONMENT = IXION_MODULE_PATH=.libs; export IXION_MODULE_PATH;
+AM_TESTS_ENVIRONMENT =
 
 TESTS = \
 	document-test \
