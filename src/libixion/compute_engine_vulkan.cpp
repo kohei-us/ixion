@@ -182,8 +182,6 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     fence.wait();
 
     host_buffer.read_from_memory(io.data, data_byte_size);
-
-    q.wait_idle();
 }
 
 compute_engine* create()
