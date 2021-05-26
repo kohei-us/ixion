@@ -18,6 +18,27 @@
 
 namespace ixion { namespace draft {
 
+namespace {
+
+std::size_t get_byte_size(const array& io)
+{
+    switch (io.type)
+    {
+        case array_type::uint32:
+            return sizeof(uint32_t) * io.size;
+        case array_type::float32:
+            return sizeof(float) * io.size;
+        case array_type::float64:
+            return sizeof(double) * io.size;
+        case array_type::unknown:
+            IXION_DEBUG("array type is unknown.");
+    }
+
+    return 0;
+}
+
+}
+
 /**
  * This function first writes the source data array to host buffer, then
  * creates a device local buffer, and create and execute a command to copy
@@ -59,15 +80,17 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     runtime_context cxt;
     cxt.input_buffer_size = io.size;
 
+    std::size_t data_byte_size = get_byte_size(io);
+
     vk_buffer host_buffer(
-        m_device, sizeof(uint32_t)*io.size,
+        m_device, data_byte_size,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    host_buffer.write_to_memory(io.data, sizeof(uint32_t)*io.size);
+    host_buffer.write_to_memory(io.data, data_byte_size);
 
     vk_buffer device_buffer(
-        m_device, sizeof(uint32_t)*io.size,
+        m_device, data_byte_size,
         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
@@ -138,7 +161,7 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         VK_PIPELINE_STAGE_TRANSFER_BIT
     );
 
-    cmd.copy_buffer(device_buffer, host_buffer, sizeof(uint32_t)*io.size);
+    cmd.copy_buffer(device_buffer, host_buffer, data_byte_size);
 
     cmd.buffer_memory_barrier(
         host_buffer,
@@ -158,7 +181,7 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     q.submit(cmd, fence, VK_PIPELINE_STAGE_TRANSFER_BIT);
     fence.wait();
 
-    host_buffer.read_from_memory(io.data, sizeof(uint32_t)*io.size);
+    host_buffer.read_from_memory(io.data, data_byte_size);
 
     q.wait_idle();
 }

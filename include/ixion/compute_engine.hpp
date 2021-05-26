@@ -27,7 +27,7 @@ struct array
     };
 
     array_type type = array_type::unknown;
-    size_t size = 0u;
+    std::size_t size = 0u;
 };
 
 /**
