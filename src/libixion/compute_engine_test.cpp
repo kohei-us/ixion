@@ -38,7 +38,7 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
     cout << "--" << endl;
     cout << "name: " << engine->get_name() << endl;
 
-    std::vector<uint32_t> values(32u);
+    std::vector<uint32_t> values(33u);
 
     uint32_t n = 0;
     std::generate(values.begin(), values.end(), [&n] { return n++; });

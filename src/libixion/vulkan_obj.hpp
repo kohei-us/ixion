@@ -76,6 +76,7 @@ class vk_device
     static constexpr uint32_t QUEUE_FAMILY_NOT_SET = std::numeric_limits<uint32_t>::max();
 
     VkPhysicalDevice m_physical_device = null_value<VkPhysicalDevice>::value;
+    VkPhysicalDeviceProperties m_physical_device_props;
     VkDevice m_device = null_value<VkDevice>::value;
     uint32_t m_queue_family_index = QUEUE_FAMILY_NOT_SET;
     VkQueue m_queue = null_value<VkQueue>::value;
@@ -93,6 +94,8 @@ public:
     const VkDevice& get() const;
 
     VkPhysicalDevice get_physical_device();
+
+    const VkPhysicalDeviceLimits& get_physical_device_limits() const;
 
     vk_queue get_queue();
 };

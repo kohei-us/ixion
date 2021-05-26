@@ -33,6 +33,18 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_callback(
     return VK_FALSE;
 }
 
+VkDeviceSize pad_to_atom_size(const vk_device& device, VkDeviceSize src_size)
+{
+    auto padded_size = src_size;
+
+    auto atom_size = device.get_physical_device_limits().nonCoherentAtomSize;
+    auto rem = padded_size % atom_size;
+    if (rem)
+        padded_size += atom_size - rem;
+
+    return padded_size;
+}
+
 } // anonymous namespace
 
 vk_instance::vk_instance()
@@ -175,6 +187,7 @@ vk_device::vk_device(vk_instance& instance)
 #endif
 
     m_physical_device = devices[0]; // pick the first physical device for now.
+    vkGetPhysicalDeviceProperties(m_physical_device, &m_physical_device_props);
 
     {
         uint32_t n_qfs;
@@ -278,6 +291,11 @@ const VkDevice& vk_device::get() const
 VkPhysicalDevice vk_device::get_physical_device()
 {
     return m_physical_device;
+}
+
+const VkPhysicalDeviceLimits& vk_device::get_physical_device_limits() const
+{
+    return m_physical_device_props.limits;
 }
 
 vk_queue vk_device::get_queue()
@@ -512,8 +530,11 @@ const VkBuffer& vk_buffer::get() const
 void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
 {
     IXION_TRACE("copying data of size " << size);
+
+    VkDeviceSize padded_size = pad_to_atom_size(m_device, size);
+
     void* mapped = nullptr;
-    VkResult res = vkMapMemory(m_device.get(), m_memory, 0, size, 0, &mapped);
+    VkResult res = vkMapMemory(m_device.get(), m_memory, 0, padded_size, 0, &mapped);
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to map memory.");
 
@@ -524,7 +545,7 @@ void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
     flush_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     flush_range.memory = m_memory;
     flush_range.offset = 0;
-    flush_range.size = size;
+    flush_range.size = padded_size;
     vkFlushMappedMemoryRanges(m_device.get(), 1, &flush_range);
 
     vkUnmapMemory(m_device.get(), m_memory);
@@ -534,14 +555,16 @@ void vk_buffer::read_from_memory(void* data, VkDeviceSize size)
 {
     IXION_TRACE("reading data from memory for size " << size << "...");
 
+    VkDeviceSize padded_size = pad_to_atom_size(m_device, size);
+
     void *mapped;
-    vkMapMemory(m_device.get(), m_memory, 0, size, 0, &mapped);
+    vkMapMemory(m_device.get(), m_memory, 0, padded_size, 0, &mapped);
 
     VkMappedMemoryRange invalidate_range{};
     invalidate_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     invalidate_range.memory = m_memory;
     invalidate_range.offset = 0;
-    invalidate_range.size = size;
+    invalidate_range.size = padded_size;
     vkInvalidateMappedMemoryRanges(m_device.get(), 1, &invalidate_range);
 
     // Copy to output
