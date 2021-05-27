@@ -33,6 +33,11 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_callback(
     return VK_FALSE;
 }
 
+/**
+ * When the original size is not a multiple of the device's atom size, pad
+ * it to the next multiple of the atom size.  Certain memory operations
+ * require the size to be a multiple of the atom size.
+ */
 VkDeviceSize pad_to_atom_size(const vk_device& device, VkDeviceSize src_size)
 {
     auto padded_size = src_size;
@@ -401,9 +406,10 @@ void vk_command_buffer::buffer_memory_barrier(
         0, nullptr);
 }
 
-void vk_command_buffer::bind_pipeline(const vk_pipeline& pipeline)
+void vk_command_buffer::bind_pipeline(
+    const vk_pipeline& pipeline, VkPipelineBindPoint bind_point)
 {
-    vkCmdBindPipeline(m_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline.get());
+    vkCmdBindPipeline(m_cmd_buffer, bind_point, pipeline.get());
 }
 
 void vk_command_buffer::bind_descriptor_set(

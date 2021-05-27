@@ -120,16 +120,23 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
 
     // Create a pipeline layout.  A pipeline layout consists of one or more
     // descriptor set layouts as well as one or more push constants.  It
-    // describes the entire resources the pipeline will have access to.
+    // describes the entire resources the pipeline will have access to.  Here
+    // we only have one descriptor set layout and no push constants.
     vk_pipeline_layout pl_layout(m_device, ds_layout);
 
-    // Allocate a descriptor set from the descriptor set layout.
+    // Allocate a descriptor set from the descriptor set layout.  This will
+    // get bound to command buffer later as part of the recorded commands.
     vk_descriptor_set desc_set = desc_pool.allocate(ds_layout);
 
     // Update the descriptor set with the content of the device-local buffer.
+    // You always have to create a descriptor set first, then update it
+    // afterward.  Here, we are binding the actual device buffer instance to
+    // the binding location of 0, just like we specified above.
     desc_set.update(m_device, 0u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, device_buffer);
 
-    // Create pipeline cache.
+    // Create pipeline cache.  You need to create this so that you can
+    // optinally save the cached pipeline state to disk for re-use, which we
+    // don't do here.
     vk_pipeline_cache pl_cache(m_device);
 
     // Load shader module for fibonnaci.
@@ -143,6 +150,9 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
 
     // Record command buffer.
     cmd.begin();
+
+    // Ensure that the write to the device buffer gets finished before the
+    // compute shader stage.
     cmd.buffer_memory_barrier(
         device_buffer,
         VK_ACCESS_HOST_WRITE_BIT,
@@ -150,9 +160,15 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         VK_PIPELINE_STAGE_HOST_BIT,
         VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT
     );
-    cmd.bind_pipeline(pipeline);
+
+    // Bind the pipeline and descriptor set to the compute pipeline.
+    cmd.bind_pipeline(pipeline, VK_PIPELINE_BIND_POINT_COMPUTE);
     cmd.bind_descriptor_set(VK_PIPELINE_BIND_POINT_COMPUTE, pl_layout, desc_set);
+
+    // Trigger compute work for data size of (n, 1, 1).
     cmd.dispatch(cxt.input_buffer_size, 1, 1);
+
+    // Ensure that the compute stages finishes before buffer gets copied.
     cmd.buffer_memory_barrier(
         device_buffer,
         VK_ACCESS_SHADER_WRITE_BIT,
@@ -161,8 +177,11 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
         VK_PIPELINE_STAGE_TRANSFER_BIT
     );
 
+    // Copy the data from the device local buffer to the host buffer.
     cmd.copy_buffer(device_buffer, host_buffer, data_byte_size);
 
+    // Ensure that the buffer copying gets done before data is read on the
+    // host cpu side.
     cmd.buffer_memory_barrier(
         host_buffer,
         VK_ACCESS_TRANSFER_WRITE_BIT,
@@ -181,6 +200,7 @@ void compute_engine_vulkan::compute_fibonacci(array& io)
     q.submit(cmd, fence, VK_PIPELINE_STAGE_TRANSFER_BIT);
     fence.wait();
 
+    // Read the values from the host memory.
     host_buffer.read_from_memory(io.data, data_byte_size);
 }
 

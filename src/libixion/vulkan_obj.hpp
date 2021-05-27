@@ -140,7 +140,7 @@ public:
         const vk_buffer& buffer, VkAccessFlags src_access, VkAccessFlags dst_access,
         VkPipelineStageFlagBits src_stage, VkPipelineStageFlagBits dst_stage);
 
-    void bind_pipeline(const vk_pipeline& pipeline);
+    void bind_pipeline(const vk_pipeline& pipeline, VkPipelineBindPoint bind_point);
 
     void bind_descriptor_set(
         VkPipelineBindPoint bind_point, const vk_pipeline_layout& pl_layout,
