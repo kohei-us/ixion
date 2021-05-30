@@ -374,7 +374,7 @@ const map_type& get()
     return mt;
 }
 
-} // anonymous namespace
+} // builtin_funcs namespace
 
 const char* unknown_func_name = "unknown";
 
@@ -423,7 +423,7 @@ numeric_matrix multiply_matrices(const matrix& left, const matrix& right)
     return output;
 }
 
-}
+} // anonymous namespace
 
 // ============================================================================
 
