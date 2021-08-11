@@ -110,8 +110,8 @@ void compute_engine::compute_fibonacci(array& io)
         if (n <= 1)
             return n;
 
-        uint curr = 1;
-        uint prev = 1;
+        uint32_t curr = 1;
+        uint32_t prev = 1;
 
         for (uint32_t i = 2; i < n; ++i)
         {
