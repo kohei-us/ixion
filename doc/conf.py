@@ -20,7 +20,7 @@ import subprocess
 rtd_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if rtd_build:
-    subprocess.call("cd doc; doxygen doxygen.conf", shell=True)
+    subprocess.call("doxygen --version; doxygen doxygen.conf", shell=True)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Ixion'
-copyright = '2018, Kohei Yoshida'
+copyright = '2021, Kohei Yoshida'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
