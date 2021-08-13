@@ -829,7 +829,7 @@ void formula_interpreter::constant()
 
 void formula_interpreter::literal()
 {
-    size_t sid = token().get_index();
+    string_id_t sid = token().get_uint32();
     const std::string* p = m_context.get_string(sid);
     if (!p)
         throw general_error("no string found for the specified string ID.");

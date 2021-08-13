@@ -37,11 +37,7 @@ using rc_t = row_t;
  * get_string() method of ixion::iface::formula_model_access to get the
  * actual string value.
  */
-#if SIZEOF_VOID_P == 4
 using string_id_t = uint32_t;
-#else
-using string_id_t = uint64_t;
-#endif
 
 /**
  * Special sheet ID that represents a global scope, as opposed to a

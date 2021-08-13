@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_CONCRETE_FORMULA_TOKENS_HPP
 
 #include "ixion/formula_tokens.hpp"
+#include "ixion/formula_function_opcode.hpp"
 
 namespace ixion {
 
@@ -45,14 +46,14 @@ class string_token : public formula_token
 {
     string_token() = delete;
 public:
-    explicit string_token(size_t str_identifier);
+    explicit string_token(string_id_t str_identifier);
     virtual ~string_token() override;
 
-    virtual size_t get_index() const override;
+    virtual uint32_t get_uint32() const override;
     virtual void write_string(std::ostream& os) const override;
 
 private:
-    size_t m_str_identifier;
+    string_id_t m_str_identifier;
 };
 
 // ============================================================================
@@ -128,15 +129,15 @@ private:
 class function_token : public formula_token
 {
 public:
-    function_token(size_t func_oc);
+    function_token(formula_function_t func_oc);
     function_token(const function_token& r);
     virtual ~function_token() override;
 
-    virtual size_t get_index() const override;
+    virtual uint32_t get_uint32() const override;
     virtual void write_string(std::ostream& os) const override;
 
 private:
-    size_t m_func_oc;
+    formula_function_t m_func_oc;
 };
 
 /**
@@ -147,14 +148,14 @@ private:
 class error_token : public formula_token
 {
 public:
-    error_token(size_t n_msgs);
+    error_token(uint32_t n_msgs);
     error_token(const error_token& other);
     virtual ~error_token() override;
 
-    virtual size_t get_index() const override;
+    virtual uint32_t get_uint32() const override;
 
 private:
-    size_t m_n_msgs;
+    uint32_t m_n_msgs;
 };
 
 }

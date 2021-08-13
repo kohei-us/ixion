@@ -141,7 +141,7 @@ public:
                 break;
             case fop_function:
             {
-                formula_function_t fop = static_cast<formula_function_t>(token.get_index());
+                formula_function_t fop = static_cast<formula_function_t>(token.get_uint32());
                 m_os << formula_functions::get_function_name(fop);
                 break;
             }
@@ -167,11 +167,11 @@ public:
             }
             case fop_string:
             {
-                const std::string* p = m_cxt.get_string(token.get_index());
+                const std::string* p = m_cxt.get_string(token.get_uint32());
                 if (p)
                     m_os << "\"" << *p << "\"";
                 else
-                    IXION_DEBUG("failed to get a string value for the identifier value of " << token.get_index());
+                    IXION_DEBUG("failed to get a string value for the identifier value of " << token.get_uint32());
 
                 break;
             }
@@ -260,7 +260,7 @@ bool has_volatile(const formula_tokens_t& tokens)
         if (t.get_opcode() != fop_function)
             continue;
 
-        formula_function_t func = static_cast<formula_function_t>(t.get_index());
+        formula_function_t func = static_cast<formula_function_t>(t.get_uint32());
         if (is_volatile(func))
             return true;
     }

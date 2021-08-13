@@ -54,13 +54,13 @@ void value_token::write_string(std::ostream& os) const
     os << "value token: " << m_value;
 }
 
-string_token::string_token(size_t str_identifier) :
+string_token::string_token(string_id_t str_identifier) :
     formula_token(fop_string),
     m_str_identifier(str_identifier) {}
 
 string_token::~string_token() {}
 
-size_t string_token::get_index() const
+uint32_t string_token::get_uint32() const
 {
     return m_str_identifier;
 }
@@ -168,7 +168,7 @@ void named_exp_token::write_string(std::ostream& os) const
 
 // ============================================================================
 
-function_token::function_token(size_t func_oc) :
+function_token::function_token(formula_function_t func_oc) :
     formula_token(fop_function),
     m_func_oc(func_oc)
 {
@@ -184,19 +184,18 @@ function_token::~function_token()
 {
 }
 
-size_t function_token::get_index() const
+uint32_t function_token::get_uint32() const
 {
-    return m_func_oc;
+    return static_cast<uint32_t>(m_func_oc);
 }
 
 void function_token::write_string(std::ostream& os) const
 {
-    os << "function token: (opcode=" << m_func_oc << "; name='"
-        << get_formula_function_name(static_cast<formula_function_t>(m_func_oc))
-        << "')";
+    os << "function token: (opcode=" << uint32_t(m_func_oc) << "; name='"
+        << get_formula_function_name(m_func_oc) << "')";
 }
 
-error_token::error_token(size_t n_msgs) :
+error_token::error_token(uint32_t n_msgs) :
     formula_token(fop_error),
     m_n_msgs(n_msgs) {}
 
@@ -206,7 +205,7 @@ error_token::error_token(const error_token& other) :
 
 error_token::~error_token() {}
 
-size_t error_token::get_index() const
+uint32_t error_token::get_uint32() const
 {
     return m_n_msgs;
 }

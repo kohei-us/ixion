@@ -132,11 +132,11 @@ bool formula_token::operator== (const formula_token& r) const
         case fop_named_expression:
             return get_name() == r.get_name();
         case fop_string:
-            return get_index() == r.get_index();
+            return get_uint32() == r.get_uint32();
         case fop_value:
             return get_value() == r.get_value();
         case fop_function:
-            return get_index() == r.get_index();
+            return get_uint32() == r.get_uint32();
         default:
             ;
     }
@@ -168,7 +168,7 @@ double formula_token::get_value() const
     return 0.0;
 }
 
-size_t formula_token::get_index() const
+uint32_t formula_token::get_uint32() const
 {
     return 0;
 }

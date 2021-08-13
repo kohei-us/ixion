@@ -161,7 +161,7 @@ void formula_parser::name(const lexer_token_base& t)
                     address_t(
                         fn.address.sheet, fn.address.row, fn.address.col,
                         fn.address.abs_sheet, fn.address.abs_row, fn.address.abs_col)));
-        break;
+            break;
         case formula_name_t::range_reference:
         {
             address_t first(fn.range.first.sheet, fn.range.first.row, fn.range.first.col,
@@ -169,8 +169,8 @@ void formula_parser::name(const lexer_token_base& t)
             address_t last(fn.range.last.sheet, fn.range.last.row, fn.range.last.col,
                            fn.range.last.abs_sheet, fn.range.last.abs_row, fn.range.last.abs_col);
             m_formula_tokens.push_back(make_unique<range_ref_token>(range_t(first, last)));
+            break;
         }
-        break;
         case formula_name_t::table_reference:
         {
             table_t table;
@@ -179,16 +179,15 @@ void formula_parser::name(const lexer_token_base& t)
             table.column_last = m_context.add_string(fn.table.column_last, fn.table.column_last_length);
             table.areas = fn.table.areas;
             m_formula_tokens.push_back(make_unique<table_ref_token>(table));
+            break;
         }
-        break;
         case formula_name_t::function:
-            m_formula_tokens.push_back(
-                make_unique<function_token>(static_cast<size_t>(fn.func_oc)));
-        break;
+            m_formula_tokens.push_back(make_unique<function_token>(fn.func_oc));
+            break;
         case formula_name_t::named_expression:
             m_formula_tokens.push_back(
                 make_unique<named_exp_token>(name.get(), name.size()));
-        break;
+            break;
         default:
         {
             std::ostringstream os;

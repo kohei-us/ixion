@@ -433,7 +433,7 @@ formula_functions::invalid_arg::invalid_arg(const string& msg) :
 formula_function_t formula_functions::get_function_opcode(const formula_token& token)
 {
     assert(token.get_opcode() == fop_function);
-    return static_cast<formula_function_t>(token.get_index());
+    return static_cast<formula_function_t>(token.get_uint32());
 }
 
 formula_function_t formula_functions::get_function_opcode(const char* p, size_t n)

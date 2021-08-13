@@ -57,7 +57,7 @@ public:
     virtual range_t get_range_ref() const;
     virtual table_t get_table_ref() const;
     virtual double get_value() const;
-    virtual size_t get_index() const;
+    virtual uint32_t get_uint32() const;
     virtual std::string get_name() const;
     virtual void write_string(std::ostream& os) const;
 };

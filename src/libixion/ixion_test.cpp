@@ -2357,15 +2357,15 @@ void test_invalid_formula_tokens()
         cxt, invalid_formula.get(), invalid_formula.size(), error_msg.get(), error_msg.size());
 
     assert(tokens[0]->get_opcode() == fop_error);
-    assert(tokens.size() == (tokens[0]->get_index() + 1));
+    assert(tokens.size() == (tokens[0]->get_uint32() + 1));
 
     assert(tokens[1]->get_opcode() == fop_string);
-    string_id_t sid = tokens[1]->get_index();
+    string_id_t sid = tokens[1]->get_uint32();
     const std::string* s = cxt.get_string(sid);
     assert(invalid_formula.str() == *s);
 
     assert(tokens[2]->get_opcode() == fop_string);
-    sid = tokens[2]->get_index();
+    sid = tokens[2]->get_uint32();
     s = cxt.get_string(sid);
     assert(error_msg.str() == *s);
 }
