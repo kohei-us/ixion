@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <functional>
 
 using std::cout;
 using std::endl;
