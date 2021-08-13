@@ -3,6 +3,7 @@
     <Projects>
         <Project File="cmake.vpj"/>
         <Project File="doc-example.vpj"/>
+        <Project File="doc.vpj"/>
         <Project File="ixion.vpj"/>
         <Project File="rst.vpj"/>
     </Projects>
