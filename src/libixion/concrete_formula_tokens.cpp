@@ -5,8 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "concrete_formula_tokens.hpp"
 #include "ixion/formula_function_opcode.hpp"
+
+#include "concrete_formula_tokens.hpp"
+#include "utils.hpp"
+
+#include <sstream>
 
 namespace ixion {
 
@@ -56,7 +60,12 @@ void value_token::write_string(std::ostream& os) const
 
 string_token::string_token(string_id_t str_identifier) :
     formula_token(fop_string),
-    m_str_identifier(str_identifier) {}
+    m_str_identifier(str_identifier)
+{
+#ifdef IXION_DEBUG_UTILS
+    detail::ensure_max_size<4>(str_identifier, "string identifier");
+#endif
+}
 
 string_token::~string_token() {}
 

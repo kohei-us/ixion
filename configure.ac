@@ -162,7 +162,7 @@ AS_IF([test "x$enable_threads" != "xno"], [
 ])
 
 AS_IF([test "x$enable_debug_utils" != "xno"], [
-        CXXFLAGS="$CXXFLAGS -D__IXION_DEBUG_UTILS"
+        CXXFLAGS="$CXXFLAGS -DIXION_DEBUG_UTILS"
 ])
 
 AS_IF([test "x$enable_vulkan" != "xno"], [

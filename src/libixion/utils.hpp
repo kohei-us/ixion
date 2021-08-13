@@ -11,9 +11,22 @@
 #include "ixion/types.hpp"
 #include "column_store_type.hpp"
 
+#include <sstream>
+
 namespace ixion { namespace detail {
 
 celltype_t to_celltype(mdds::mtv::element_t mtv_type);
+
+template<std::size_t S, typename T>
+void ensure_max_size(const T& v, const std::string& name)
+{
+    if (sizeof(T) > S)
+    {
+        std::ostringstream os;
+        os << "The size of " << name << " cannot be greater than " << S << " bytes. The actual size was " << sizeof(T) << ".";
+        throw std::runtime_error(os.str());
+    }
+}
 
 }}
 

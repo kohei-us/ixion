@@ -288,7 +288,7 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::for
 void register_formula_cell(
     iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell* cell)
 {
-#ifdef __IXION_DEBUG_UTILS
+#ifdef IXION_DEBUG_UTILS
     if (cell)
     {
         const formula_cell* check = cxt.get_formula_cell(pos);
