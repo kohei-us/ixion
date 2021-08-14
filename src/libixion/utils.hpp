@@ -18,14 +18,9 @@ namespace ixion { namespace detail {
 celltype_t to_celltype(mdds::mtv::element_t mtv_type);
 
 template<std::size_t S, typename T>
-void ensure_max_size(const T& v, const std::string& name)
+void ensure_max_size(const T& v)
 {
-    if (sizeof(T) > S)
-    {
-        std::ostringstream os;
-        os << "The size of " << name << " cannot be greater than " << S << " bytes. The actual size was " << sizeof(T) << ".";
-        throw std::runtime_error(os.str());
-    }
+    static_assert(sizeof(T) <= S, "The size of the value exceeded allowed size limit.");
 }
 
 }}

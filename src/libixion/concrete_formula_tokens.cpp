@@ -63,7 +63,7 @@ string_token::string_token(string_id_t str_identifier) :
     m_str_identifier(str_identifier)
 {
 #ifdef IXION_DEBUG_UTILS
-    detail::ensure_max_size<4>(str_identifier, "string identifier");
+    detail::ensure_max_size<4>(str_identifier);
 #endif
 }
 
@@ -181,6 +181,9 @@ function_token::function_token(formula_function_t func_oc) :
     formula_token(fop_function),
     m_func_oc(func_oc)
 {
+#ifdef IXION_DEBUG_UTILS
+    detail::ensure_max_size<4>(func_oc);
+#endif
 }
 
 function_token::function_token(const function_token& r) :
