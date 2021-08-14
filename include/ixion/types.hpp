@@ -82,9 +82,9 @@ enum class celltype_t : uint8_t
 };
 
 /**
- * Similar to {@link celltype_t}, except that it does not include a formula
- * type. Instead it uses the formula result type to classify its type. The
- * error type refers to an error value in formula cell.
+ * Similar to celltype_t, except that it does not include a formula type.
+ * Instead it uses the formula result type to classify its type. The error
+ * type refers to an error value in formula cell.
  */
 enum class cell_value_t : uint8_t
 {
@@ -125,7 +125,7 @@ enum value_t
     value_empty   = 0x08
 };
 
-/** type that stores a mixture of {@link value_t} values. */
+/** type that stores a mixture of value_t values. */
 class values_t
 {
     int m_val;
@@ -171,9 +171,9 @@ enum class formula_name_resolver_t
 
 /**
  * Formula error types.  Note that only the official (i.e. non-internal)
- * error types have their corresponding error strings.  Use the {@link
- * ixion::get_formula_error_name} function to convert an enum member value
- * of this type to its string representation.
+ * error types have their corresponding error strings.  Use the
+ * get_formula_error_name() function to convert an enum member value of this
+ * type to its string representation.
  */
 enum class formula_error_t : uint8_t
 {

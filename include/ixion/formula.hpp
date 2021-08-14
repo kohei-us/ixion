@@ -44,10 +44,10 @@ IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
  * @param p_error pointer to the buffer containing the error string.
  * @param n_error length of the buffer containing the erorr string.
  *
- * @return a set of tokens, the first of which is a token of type {@link
- *         fop_error}, followed by two string tokens.  The first string
- *         token stores original formula string, whereas the second one
- *         stores the error string.
+ * @return a set of tokens, the first of which is a token of type fop_error,
+ *         followed by two string tokens.  The first string token stores
+ *         original formula string, whereas the second one stores the error
+ *         string.
  */
 IXION_DLLPUBLIC formula_tokens_t create_formula_error_tokens(
     iface::formula_model_access& cxt, const char* p_src_formula, size_t n_src_formula,
@@ -132,9 +132,9 @@ IXION_DLLPUBLIC abs_address_set_t query_dirty_cells(
  * that if the model contains volatile formula cells, they will be included
  * in the returned sequence each and every time.
  *
- * Use {@link ixion::query_dirty_cells} instead if you don't need the
- * results to be sorted in order of dependency, to avoid the extra overhead
- * incurred by the sorting.
+ * Use query_dirty_cells() instead if you don't need the results to be sorted
+ * in order of dependency, to avoid the extra overhead incurred by the
+ * sorting.
  *
  * @param cxt model context.
  * @param modified_cells a collection of non-formula cells whose values have
@@ -166,8 +166,7 @@ IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
  * @param formula_cells formula cells to be calculated.  The cells will be
  *                      calculated in the order they appear in the sequence.
  *                      In a typical use case, this will be the returned
- *                      value from {@link
- *                      ixion::query_and_sort_dirty_cells}.
+ *                      value from query_and_sort_dirty_cells.
  * @param thread_count number of calculation threads to use.  Note that
  *                     passing 0 will make the process use the main thread
  *                     only, while passing any number greater than 0 will
