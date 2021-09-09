@@ -4,7 +4,7 @@ ixion 0.16.1
   string ID values.
 
 * worked around floating point rounding errors which prevented two
-  theoretically-equal numeric values from being evaluated as equal in test
+  theoretically-equal numeric values from being evaluated as non-equal in test
   code.
 
 ixion 0.16.0
