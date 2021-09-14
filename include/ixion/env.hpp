@@ -36,7 +36,7 @@
 #if _WIN32
 #define IXION_MOD_EXPORT __declspec(dllexport)
 #else
-#define IXION_MOD_EXPORT
+#define IXION_MOD_EXPORT __attribute__ ((visibility ("default")))
 #endif
 
 #if defined(IXION_TRACE_ON) || defined(IXION_DEBUG_ON)
