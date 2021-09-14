@@ -218,7 +218,7 @@ void destroy(const compute_engine* p)
 
 extern "C" {
 
-IXION_DLLPUBLIC ixion::draft::module_def* register_module()
+IXION_MOD_EXPORT ixion::draft::module_def* register_module()
 {
     static ixion::draft::module_def md =
     {
