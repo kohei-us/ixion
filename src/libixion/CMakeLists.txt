@@ -43,6 +43,20 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     workbook.cpp
 )
 
+if(BUILD_VULKAN)
+
+    add_library(ixion-${IXION_API_VERSION}-vulkan SHARED
+        compute_engine_vulkan.cpp
+        vulkan_obj.cpp
+    )
+
+    target_link_libraries(ixion-${IXION_API_VERSION}-vulkan
+        ixion-${IXION_API_VERSION}
+        Vulkan::Vulkan
+    )
+
+endif()
+
 configure_file(constants.inl.in ${CMAKE_CURRENT_BINARY_DIR}/inl/constants.inl)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/inl)

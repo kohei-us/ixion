@@ -9,6 +9,8 @@ set(IXION_MINOR_API_VERSION 17)
 set(IXION_VERSION ${IXION_MAJOR_VERSION}.${IXION_MINOR_VERSION}.${IXION_MICRO_VERSION})
 set(IXION_API_VERSION ${IXION_MAJOR_API_VERSION}.${IXION_MINOR_API_VERSION})
 
+option(BUILD_VULKAN "Build Vulkan compute engine.")
+
 project(ixion VERSION ${IXION_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -22,15 +24,20 @@ enable_testing()
 set(CMAKE_CTEST_COMMAND ctest)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4251 /wd4275 /wd4267 /wd4244 /MP")
+    add_compile_options(/wd4251 /wd4275 /wd4267 /wd4244 /MP)
 endif(MSVC)
 
 set(MDDS_INCLUDEDIR "" CACHE STRING "path to mdds header directory.")
 
-add_definitions(
-    -DIXION_THREADS=1
+add_compile_definitions(
+    IXION_THREADS=1
     ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
 )
+
+if(BUILD_VULKAN)
+    find_package(Vulkan)
+    add_compile_definitions(BUILD_VULKAN)
+endif()
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
