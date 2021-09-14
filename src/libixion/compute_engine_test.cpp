@@ -5,10 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "test_global.hpp" // This must be the first header to be included.
+
 #include <ixion/compute_engine.hpp>
 #include <ixion/module.hpp>
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <cstring>
 #include <iostream>

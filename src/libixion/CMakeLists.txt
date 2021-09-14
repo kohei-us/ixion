@@ -95,6 +95,8 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
     compute_engine_test.cpp
 )
 
+target_include_directories(compute-engine-test PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
+
 target_link_libraries(document-test ixion-${IXION_API_VERSION})
 target_link_libraries(ixion-test ixion-${IXION_API_VERSION})
 target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION})

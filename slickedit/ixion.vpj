@@ -208,6 +208,8 @@
             Name="Other Files"
             Filters=""/>
     </CustomFolders>
+    <List Name="RTE">
+    </List>
     <Files AutoFolders="DirectoryView">
         <Folder Name="..">
             <F
@@ -260,6 +262,7 @@
         <Folder Name="../src">
             <Folder Name="include">
                 <F N="../src/include/depth_first_search.hpp"/>
+                <F N="../src/include/test_global.hpp"/>
             </Folder>
             <Folder Name="libixion">
                 <F N="../src/libixion/address.cpp"/>
