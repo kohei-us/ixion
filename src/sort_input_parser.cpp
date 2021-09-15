@@ -6,6 +6,7 @@
  */
 
 #include "sort_input_parser.hpp"
+#include "app_common.hpp"
 
 #include "ixion/global.hpp"
 
@@ -47,9 +48,9 @@ sort_input_parser::parse_error::~parse_error() throw() {}
 // ----------------------------------------------------------------------------
 
 sort_input_parser::sort_input_parser(const string& filepath) :
+    m_content(detail::load_file_content(filepath)),
     mp(nullptr), mp_last(nullptr)
 {
-    global::load_file_content(filepath, m_content);
 }
 
 sort_input_parser::~sort_input_parser()

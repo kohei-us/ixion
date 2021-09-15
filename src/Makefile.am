@@ -23,6 +23,7 @@ ixion_parser_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
 
 ixion_sorter_SOURCES = \
 	ixion_sorter.cpp \
+	app_common.cpp \
 	sort_input_parser.hpp \
 	sort_input_parser.cpp
 

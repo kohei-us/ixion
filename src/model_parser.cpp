@@ -190,6 +190,7 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
     mp_table_entry(nullptr),
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
     m_filepath(filepath),
+    m_strm(detail::load_file_content(m_filepath)),
     m_thread_count(thread_count),
     mp_head(nullptr),
     mp_end(nullptr),
@@ -201,8 +202,6 @@ model_parser::model_parser(const string& filepath, size_t thread_count) :
 {
     m_context.set_session_handler_factory(&m_session_handler_factory);
     m_context.set_table_handler(&m_table_handler);
-
-    global::load_file_content(m_filepath, m_strm);
 
     mp_head = m_strm.data();
     mp_end = mp_head + m_strm.size();

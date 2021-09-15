@@ -33,20 +33,6 @@ double global::get_current_time()
     return usec_since_epoch / 1000000.0;
 }
 
-void global::load_file_content(const string& filepath, string& content)
-{
-    ifstream file(filepath.c_str());
-    if (!file)
-        // failed to open the specified file.
-        throw file_not_found(filepath);
-
-    ostringstream os;
-    os << file.rdbuf();
-    file.close();
-
-    os.str().swap(content);
-}
-
 double global::to_double(const char* p, size_t n)
 {
     if (!n)
