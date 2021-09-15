@@ -9,13 +9,14 @@
 #define INCLUDED_IXION_DOCUMENT_HPP
 
 #include <ixion/types.hpp>
+#include <ixion/address.hpp>
 
 #include <memory>
 #include <string>
+#include <variant>
 
 namespace ixion {
 
-struct abs_address_t;
 class cell_access;
 
 /**
@@ -43,12 +44,7 @@ public:
         enum class cp_type { string, address };
         cp_type type;
 
-        union
-        {
-            struct { const char* str; size_t n; };
-            struct { sheet_t sheet; row_t row; col_t column; };
-
-        } value;
+        std::variant<std::string_view, ixion::abs_address_t> value;
 
         cell_pos(const char* p);
         cell_pos(const char* p, size_t n);

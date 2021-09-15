@@ -26,18 +26,21 @@ abs_address_t to_address(
     {
         case document::cell_pos::cp_type::string:
         {
-            formula_name_t name = resolver.resolve(pos.value.str, pos.value.n, abs_address_t());
+            std::string_view s = std::get<std::string_view>(pos.value);
+            formula_name_t name = resolver.resolve(s.data(), s.size(), abs_address_t());
             if (name.type != formula_name_t::cell_reference)
             {
                 std::ostringstream os;
-                os << "invalid cell address: " << std::string(pos.value.str, pos.value.n);
+                os << "invalid cell address: " << s;
                 throw std::invalid_argument(os.str());
             }
 
             return to_address(name.address).to_abs(abs_address_t());
         }
         case document::cell_pos::cp_type::address:
-            return abs_address_t(pos.value.sheet, pos.value.row, pos.value.column);
+        {
+            return std::get<abs_address_t>(pos.value);
+        }
     }
 
     throw std::logic_error("unrecognized cell position type.");
@@ -46,32 +49,27 @@ abs_address_t to_address(
 } // anonymous namespace
 
 document::cell_pos::cell_pos(const char* p) :
-    type(cp_type::string)
+    type(cp_type::string),
+    value(p)
 {
-    value.str = p;
-    value.n = std::strlen(p);
 }
 
 document::cell_pos::cell_pos(const char* p, size_t n) :
-    type(cp_type::string)
+    type(cp_type::string),
+    value(std::string_view(p, n))
 {
-    value.str = p;
-    value.n = n;
 }
 
 document::cell_pos::cell_pos(const std::string& s) :
-    type(cp_type::string)
+    type(cp_type::string),
+    value(s)
 {
-    value.str = s.data();
-    value.n = s.size();
 }
 
 document::cell_pos::cell_pos(const abs_address_t& addr) :
-    type(cp_type::address)
+    type(cp_type::address),
+    value(addr)
 {
-    value.sheet = addr.sheet;
-    value.row = addr.row;
-    value.column = addr.column;
 }
 
 struct document::impl
