@@ -65,11 +65,6 @@ public:
     formula_error_t get_error() const;
 };
 
-inline bool is_digit(char c)
-{
-    return '0' <= c && c <= '9';
-}
-
 }
 
 #endif

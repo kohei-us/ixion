@@ -676,7 +676,7 @@ T parse_number(const char*&p, const char* p_last)
     }
 
     bool all_digits = false;
-    while (is_digit(*p))
+    while (std::isdigit(*p))
     {
         // Parse number.
         num *= 10;
@@ -739,7 +739,7 @@ parse_address_result_type parse_address_a1(const char*& p, const char* p_last, a
             if (addr.column > column_upper_bound)
                 return invalid;
         }
-        else if (is_digit(c))
+        else if (std::isdigit(c))
         {
             if (mode == resolver_parse_mode::column)
             {
@@ -864,7 +864,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
             {
                 // Relative row address.
                 ++p;
-                if (!is_digit(*p) && *p != '-' && *p != '+')
+                if (!std::isdigit(*p) && *p != '-' && *p != '+')
                     return parse_address_result_type::invalid;
 
                 addr.row = parse_number<row_t>(p, p_last);
@@ -873,7 +873,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
                     return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
                 ++p;
             }
-            else if (is_digit(*p))
+            else if (std::isdigit(*p))
             {
                 // Absolute row address.
                 addr.row = parse_number<row_t>(p, p_last);
@@ -883,7 +883,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
 
                 --addr.row; // 1-based to 0-based.
 
-                if (p == p_last && is_digit(*p))
+                if (p == p_last && std::isdigit(*p))
                     // 'R' followed by a number without 'C' is valid.
                     return parse_address_result_type::valid_address;
                 ++p;
@@ -914,7 +914,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
         {
             // Relative column address.
             ++p;
-            if (!is_digit(*p) && *p != '-' && *p != '+')
+            if (!std::isdigit(*p) && *p != '-' && *p != '+')
                 return parse_address_result_type::invalid;
 
             addr.column = parse_number<col_t>(p, p_last);
@@ -924,7 +924,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
 
             ++p;
         }
-        else if (is_digit(*p))
+        else if (std::isdigit(*p))
         {
             // Absolute column address.
             addr.abs_column = true;

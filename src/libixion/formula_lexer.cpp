@@ -96,7 +96,7 @@ void tokenizer::run()
 
     while (has_char())
     {
-        if (is_digit(*mp_char))
+        if (std::isdigit(*mp_char))
         {
             numeral();
             continue;
@@ -216,7 +216,7 @@ void tokenizer::numeral()
             return;
         }
 
-        if (is_digit(*mp_char))
+        if (std::isdigit(*mp_char))
             continue;
         if (is_decimal_sep(*mp_char) && ++sep_count <= 1)
             continue;
