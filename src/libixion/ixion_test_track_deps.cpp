@@ -137,7 +137,6 @@ void test_matrix_dependency()
 
 int main()
 {
-    ixion::init();
     test_single_cell_dependency();
     test_range_dependency();
     test_matrix_dependency();

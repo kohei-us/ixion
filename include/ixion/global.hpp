@@ -16,12 +16,6 @@
 
 namespace ixion {
 
-IXION_DLLPUBLIC void init();
-
-IXION_DLLPUBLIC const char* get_formula_result_output_separator();
-
-// ============================================================================
-
 class IXION_DLLPUBLIC global
 {
 public:

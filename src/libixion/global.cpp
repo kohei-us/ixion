@@ -24,18 +24,6 @@ using namespace std;
 
 namespace ixion {
 
-void init()
-{
-}
-
-const char* get_formula_result_output_separator()
-{
-
-    static const char* sep =
-        "---------------------------------------------------------";
-    return sep;
-}
-
 double global::get_current_time()
 {
     unsigned long usec_since_epoch =

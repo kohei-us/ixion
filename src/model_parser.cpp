@@ -6,6 +6,7 @@
  */
 
 #include "model_parser.hpp"
+#include "app_common.hpp"
 
 #include "ixion/formula.hpp"
 #include "ixion/formula_name_resolver.hpp"
@@ -113,7 +114,7 @@ public:
 
 void print_section_title(const char* title)
 {
-    std::cout << get_formula_result_output_separator() << std::endl << title << std::endl;
+    std::cout << detail::get_formula_result_output_separator() << std::endl << title << std::endl;
 }
 
 namespace commands {
@@ -229,7 +230,7 @@ void model_parser::parse()
         if (m_print_separator)
         {
             m_print_separator = false;
-            cout << get_formula_result_output_separator() << endl;
+            cout << detail::get_formula_result_output_separator() << endl;
         }
 
         switch (m_parse_mode)
@@ -708,7 +709,7 @@ void model_parser::parse_table()
 
 void model_parser::push_table()
 {
-    cout << get_formula_result_output_separator() << endl;
+    cout << detail::get_formula_result_output_separator() << endl;
 
     if (!mp_table_entry)
         return;
@@ -831,7 +832,7 @@ void model_parser::push_named_expression()
 
 void model_parser::print_dependency()
 {
-    std::cout << get_formula_result_output_separator() << std::endl;
+    std::cout << detail::get_formula_result_output_separator() << std::endl;
     std::cout << m_context.get_cell_tracker().to_string() << std::endl;
 }
 
@@ -1103,9 +1104,9 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
 
 void model_parser::check()
 {
-    cout << get_formula_result_output_separator() << endl
+    cout << detail::get_formula_result_output_separator() << endl
          << "checking results" << endl
-         << get_formula_result_output_separator() << endl;
+         << detail::get_formula_result_output_separator() << endl;
 
     results_type::const_iterator itr = m_formula_results.begin(), itr_end = m_formula_results.end();
     for (; itr != itr_end; ++itr)

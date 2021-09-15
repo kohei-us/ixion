@@ -11,6 +11,8 @@ ixion_parser_SOURCES = \
 	ixion_parser.cpp \
 	model_parser.hpp \
 	model_parser.cpp \
+	app_common.hpp \
+	app_common.cpp \
 	session_handler.hpp \
 	session_handler.cpp \
 	table_handler.hpp \

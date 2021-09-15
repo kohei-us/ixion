@@ -345,6 +345,8 @@
                 <F N="../src/python/sheet.cpp"/>
                 <F N="../src/python/sheet.hpp"/>
             </Folder>
+            <F N="../src/app_common.cpp"/>
+            <F N="../src/app_common.hpp"/>
             <F N="../src/ixion_formula_tokenizer.cpp"/>
             <F N="../src/ixion_parser.cpp"/>
             <F N="../src/ixion_sorter.cpp"/>

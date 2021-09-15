@@ -2396,8 +2396,6 @@ void test_grouped_formula_string_results()
 
 int main()
 {
-    ixion::init();
-
     test_size();
     test_string_to_double();
     test_string_pool();

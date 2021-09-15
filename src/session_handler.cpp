@@ -6,6 +6,8 @@
  */
 
 #include "session_handler.hpp"
+#include "app_common.hpp"
+
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/formula_tokens.hpp"
@@ -61,7 +63,7 @@ void session_handler::begin_cell_interpret(const abs_address_t& pos)
     pos_display.set_absolute(false);
     mp_impl->m_cell_name = mp_impl->mp_resolver->get_name(pos_display, abs_address_t(), mp_impl->m_show_sheet_name);
 
-    mp_impl->m_buf << get_formula_result_output_separator() << endl;
+    mp_impl->m_buf << detail::get_formula_result_output_separator() << endl;
     mp_impl->m_buf << mp_impl->m_cell_name << ": ";
 }
 

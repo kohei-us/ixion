@@ -2,19 +2,20 @@
 add_subdirectory(libixion)
 
 add_executable(ixion-parser
-	ixion_parser.cpp
-	model_parser.cpp
-	session_handler.cpp
-	table_handler.cpp
+    ixion_parser.cpp
+    app_common.cpp
+    model_parser.cpp
+    session_handler.cpp
+    table_handler.cpp
 )
 
 add_executable(ixion-sorter
-	ixion_sorter.cpp
-	sort_input_parser.cpp
+    ixion_sorter.cpp
+    sort_input_parser.cpp
 )
 
 add_executable(ixion-formula-tokenizer
-	ixion_formula_tokenizer.cpp
+    ixion_formula_tokenizer.cpp
 )
 
 target_link_libraries(ixion-parser ${Boost_LIBRARIES} ixion-${IXION_API_VERSION})
