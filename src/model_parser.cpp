@@ -514,7 +514,7 @@ void model_parser::parse_init()
             }
             case ct_value:
             {
-                double v = to_double(cell_def.value.get(), cell_def.value.size());
+                double v = to_double({cell_def.value.get(), cell_def.value.size()});
                 m_context.set_numeric_cell(pos, v);
 
                 cout << get_display_cell_string(pos) << ": (n) " << v << endl;
@@ -597,7 +597,7 @@ void model_parser::parse_edit()
             break;
             case ct_value:
             {
-                double v = to_double(cell_def.value.get(), cell_def.value.size());
+                double v = to_double({cell_def.value.get(), cell_def.value.size()});
                 m_context.set_numeric_cell(pos, v);
                 cout << get_display_cell_string(pos) << ": (n) " << v << endl;
             }
@@ -698,7 +698,7 @@ void model_parser::parse_table()
     else if (name == "columns")
         parse_table_columns(value);
     else if (name == "totals-row-count")
-        entry.totals_row_count = to_double(value.get(), value.size());
+        entry.totals_row_count = to_double({value.get(), value.size()});
 }
 
 void model_parser::push_table()

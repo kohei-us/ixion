@@ -272,7 +272,7 @@ struct formula_result::impl
             {
                 // parse this as a number.
                 delete_buffer();
-                m_value = to_double(p, n);
+                m_value = to_double({p, n});
                 m_type = result_type::value;
             }
         }

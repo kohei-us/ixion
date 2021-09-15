@@ -8,8 +8,8 @@
 #ifndef INCLUDED_IXION_GLOBAL_HPP
 #define INCLUDED_IXION_GLOBAL_HPP
 
-#include "ixion/types.hpp"
-#include "ixion/env.hpp"
+#include "types.hpp"
+#include "env.hpp"
 
 #include <memory>
 #include <string>
@@ -25,7 +25,7 @@ namespace ixion {
  */
 IXION_DLLPUBLIC double get_current_time();
 
-IXION_DLLPUBLIC double to_double(const char* p, size_t n);
+IXION_DLLPUBLIC double to_double(std::string_view s);
 
 IXION_DLLPUBLIC bool to_bool(const char* p, size_t n);
 

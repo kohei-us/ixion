@@ -33,8 +33,11 @@ double get_current_time()
     return usec_since_epoch / 1000000.0;
 }
 
-double to_double(const char* p, size_t n)
+double to_double(std::string_view s)
 {
+    const char* p = s.data();
+    std::size_t n = s.size();
+
     if (!n)
         return 0.0;
 

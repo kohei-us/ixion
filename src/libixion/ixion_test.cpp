@@ -62,7 +62,7 @@ void test_string_to_double()
     size_t n = sizeof(tests) / sizeof(tests[0]);
     for (size_t i = 0; i < n; ++i)
     {
-        double v = to_double(tests[i].s, strlen(tests[i].s));
+        double v = to_double(tests[i].s);
         assert(v == tests[i].v);
     }
 }

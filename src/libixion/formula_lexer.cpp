@@ -232,7 +232,7 @@ void tokenizer::numeral()
         name();
         return;
     }
-    double val = to_double(p, len);
+    double val = to_double({p, len});
     m_tokens.push_back(make_unique<lexer_value_token>(val));
 }
 
