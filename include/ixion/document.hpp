@@ -72,7 +72,7 @@ public:
 
     const std::string* get_string_value(cell_pos pos) const;
 
-    void set_formula_cell(cell_pos pos, const std::string& formula);
+    void set_formula_cell(cell_pos pos, std::string_view formula);
 
     /**
      * Calculate all the "dirty" formula cells in the document.

@@ -147,7 +147,7 @@ struct document::impl
         return cxt.get_string_value(addr);
     }
 
-    void set_formula_cell(cell_pos pos, const std::string& formula)
+    void set_formula_cell(cell_pos pos, std::string_view formula)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -214,7 +214,7 @@ const std::string* document::get_string_value(cell_pos pos) const
     return mp_impl->get_string_value(pos);
 }
 
-void document::set_formula_cell(cell_pos pos, const std::string& formula)
+void document::set_formula_cell(cell_pos pos, std::string_view formula)
 {
     mp_impl->set_formula_cell(pos, formula);
 }
