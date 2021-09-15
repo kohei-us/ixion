@@ -47,8 +47,8 @@ int main(int argc, char** argv)
 
     // Insert string values.
     std::string s = "This cell contains a string value.";
-    doc.set_string_cell("B2", s.data(), s.size());
-    doc.set_string_cell("B3", IXION_ASCII("This too contains a string value."));
+    doc.set_string_cell("B2", s);
+    doc.set_string_cell("B3", "This too contains a string value.");
 
     doc.set_string_cell("MySheet!B4", "Yet another string value.");
 

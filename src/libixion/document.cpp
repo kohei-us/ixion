@@ -111,15 +111,7 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
-    void set_string_cell(cell_pos pos, const char* p, size_t n)
-    {
-        abs_address_t addr = to_address(cxt, *resolver, pos);
-        unregister_formula_cell(cxt, addr);
-        cxt.set_string_cell(addr, p, n);
-        modified_cells.insert(addr);
-    }
-
-    void set_string_cell(cell_pos pos, const std::string& s)
+    void set_string_cell(cell_pos pos, std::string_view s)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -197,12 +189,7 @@ void document::set_numeric_cell(cell_pos pos, double val)
     mp_impl->set_numeric_cell(pos, val);
 }
 
-void document::set_string_cell(cell_pos pos, const char* p, size_t n)
-{
-    mp_impl->set_string_cell(pos, p, n);
-}
-
-void document::set_string_cell(cell_pos pos, const std::string& s)
+void document::set_string_cell(cell_pos pos, std::string_view s)
 {
     mp_impl->set_string_cell(pos, s);
 }

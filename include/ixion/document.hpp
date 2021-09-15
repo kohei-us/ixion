@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_DOCUMENT_HPP
 #define INCLUDED_IXION_DOCUMENT_HPP
 
-#include "ixion/types.hpp"
+#include <ixion/types.hpp>
 
 #include <memory>
 #include <string>
@@ -62,9 +62,7 @@ public:
 
     void set_numeric_cell(cell_pos pos, double val);
 
-    void set_string_cell(cell_pos pos, const char* p, size_t n);
-
-    void set_string_cell(cell_pos pos, const std::string& s);
+    void set_string_cell(cell_pos pos, std::string_view s);
 
     void set_boolean_cell(cell_pos pos, bool val);
 

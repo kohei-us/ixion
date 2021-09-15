@@ -65,7 +65,7 @@ void test_string_io()
     doc.append_sheet("test");
 
     std::string B3("B3"), C4("C4"), D5("D5"), D5_value("Cell D5 value");
-    doc.set_string_cell(B3, IXION_ASCII("Cell B3"));
+    doc.set_string_cell(B3, "Cell B3");
     doc.set_string_cell(C4, "Cell C4");
     doc.set_string_cell(D5, D5_value);
 
