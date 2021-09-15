@@ -95,15 +95,9 @@ double to_double(std::string_view s)
     return sign*val;
 }
 
-bool to_bool(const char* p, size_t n)
+bool to_bool(std::string_view s)
 {
-    if (n == 4)
-    {
-        if (*p++ == 't' && *p++ == 'r' && *p++ == 'u' && *p == 'e')
-            return true;
-    }
-
-    return false;
+    return s == "true";
 }
 
 }

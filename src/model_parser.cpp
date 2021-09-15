@@ -454,7 +454,7 @@ void model_parser::parse_session()
     else if (cmd == "display-sheet-name")
     {
         cout << "display sheet name: " << value << endl;
-        m_print_sheet_name = to_bool(value.get(), value.size());
+        m_print_sheet_name = to_bool({value.get(), value.size()});
         m_session_handler_factory.show_sheet_name(m_print_sheet_name);
     }
 }
@@ -522,7 +522,7 @@ void model_parser::parse_init()
             }
             case ct_boolean:
             {
-                bool b = to_bool(cell_def.value.get(), cell_def.value.size());
+                bool b = to_bool({cell_def.value.get(), cell_def.value.size()});
                 m_context.set_boolean_cell(pos, b);
 
                 cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << endl;

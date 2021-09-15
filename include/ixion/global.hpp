@@ -27,7 +27,7 @@ IXION_DLLPUBLIC double get_current_time();
 
 IXION_DLLPUBLIC double to_double(std::string_view s);
 
-IXION_DLLPUBLIC bool to_bool(const char* p, size_t n);
+IXION_DLLPUBLIC bool to_bool(std::string_view s);
 
 }
 

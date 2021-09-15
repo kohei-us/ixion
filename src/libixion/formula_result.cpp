@@ -264,7 +264,7 @@ struct formula_result::impl
             {
                 // parse this as a boolean value.
                 delete_buffer();
-                m_value = to_bool(p, n) ? 1.0 : 0.0;
+                m_value = to_bool({p, n}) ? 1.0 : 0.0;
                 m_type = result_type::value;
                 break;
             }
