@@ -103,54 +103,6 @@ bool global::to_bool(const char* p, size_t n)
     return false;
 }
 
-// ============================================================================
-
-struct formula_error::impl
-{
-    formula_error_t error;
-    std::string msg;
-    std::string buffer;
-
-    impl(formula_error_t _error) :
-        error(_error) {}
-
-    impl(formula_error_t _error, std::string _msg) :
-        error(_error), msg(std::move(_msg)) {}
-};
-
-formula_error::formula_error(formula_error_t fe) :
-    mp_impl(std::make_unique<impl>(fe)) {}
-
-formula_error::formula_error(formula_error_t fe, std::string msg) :
-    mp_impl(std::make_unique<impl>(fe, std::move(msg))) {}
-
-formula_error::formula_error(formula_error&& other) :
-    mp_impl(std::move(other.mp_impl))
-{
-    other.mp_impl = std::make_unique<impl>(formula_error_t::no_error);
-}
-
-formula_error::~formula_error() throw()
-{
-}
-
-const char* formula_error::what() const throw()
-{
-    const char* error_name = get_formula_error_name(mp_impl->error);
-    if (mp_impl->msg.empty())
-        return error_name;
-
-    std::ostringstream os;
-    os << mp_impl->msg << " (type: " << error_name << ")";
-    mp_impl->buffer = os.str();
-    return mp_impl->buffer.data();
-}
-
-formula_error_t formula_error::get_error() const
-{
-    return mp_impl->error;
-}
-
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
