@@ -35,7 +35,7 @@ std::string get_module_prefix()
 
 typedef module_def* (*fp_register_module_type)(void);
 
-void register_module(void* mod_handler, const char* mod_name, fp_register_module_type fp_register_module)
+void register_module(void* mod_handler, std::string_view mod_name, fp_register_module_type fp_register_module)
 {
     if (!fp_register_module)
         return;

@@ -70,7 +70,7 @@ compute_engine_vulkan::~compute_engine_vulkan()
 {
 }
 
-const char* compute_engine_vulkan::get_name() const
+std::string_view compute_engine_vulkan::get_name() const
 {
     return "vulkan";
 }

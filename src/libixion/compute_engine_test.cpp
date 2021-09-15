@@ -11,7 +11,6 @@
 #include <ixion/module.hpp>
 #include <algorithm>
 #include <chrono>
-#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -114,9 +113,9 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
 
 void test_create_default()
 {
-    std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create(nullptr);
+    std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create();
     assert(p);
-    assert(!std::strcmp(p->get_name(), "default"));
+    assert(p->get_name() == "default");
     print_summary(p);
 }
 
@@ -124,7 +123,7 @@ void test_create_vulkan()
 {
     std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create("vulkan");
     assert(p);
-    assert(!std::strcmp(p->get_name(), "vulkan"));
+    assert(p->get_name() == "vulkan");
     print_summary(p);
 }
 

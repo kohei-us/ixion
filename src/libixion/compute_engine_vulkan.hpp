@@ -27,7 +27,7 @@ public:
     compute_engine_vulkan();
     virtual ~compute_engine_vulkan() override;
 
-    virtual const char* get_name() const override;
+    virtual std::string_view get_name() const override;
 
     virtual void compute_fibonacci(array& io) override;
 };
