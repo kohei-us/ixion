@@ -51,11 +51,6 @@ long to_long(const mem_str_buf& value)
     return ret;
 }
 
-bool to_bool(const mem_str_buf& value)
-{
-    return value == "true";
-}
-
 bool is_separator(char c)
 {
     switch (c)
@@ -459,7 +454,7 @@ void model_parser::parse_session()
     else if (cmd == "display-sheet-name")
     {
         cout << "display sheet name: " << value << endl;
-        m_print_sheet_name = to_bool(value);
+        m_print_sheet_name = to_bool(value.get(), value.size());
         m_session_handler_factory.show_sheet_name(m_print_sheet_name);
     }
 }
@@ -519,7 +514,7 @@ void model_parser::parse_init()
             }
             case ct_value:
             {
-                double v = global::to_double(cell_def.value.get(), cell_def.value.size());
+                double v = to_double(cell_def.value.get(), cell_def.value.size());
                 m_context.set_numeric_cell(pos, v);
 
                 cout << get_display_cell_string(pos) << ": (n) " << v << endl;
@@ -527,7 +522,7 @@ void model_parser::parse_init()
             }
             case ct_boolean:
             {
-                bool b = global::to_bool(cell_def.value.get(), cell_def.value.size());
+                bool b = to_bool(cell_def.value.get(), cell_def.value.size());
                 m_context.set_boolean_cell(pos, b);
 
                 cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << endl;
@@ -602,7 +597,7 @@ void model_parser::parse_edit()
             break;
             case ct_value:
             {
-                double v = global::to_double(cell_def.value.get(), cell_def.value.size());
+                double v = to_double(cell_def.value.get(), cell_def.value.size());
                 m_context.set_numeric_cell(pos, v);
                 cout << get_display_cell_string(pos) << ": (n) " << v << endl;
             }
@@ -703,7 +698,7 @@ void model_parser::parse_table()
     else if (name == "columns")
         parse_table_columns(value);
     else if (name == "totals-row-count")
-        entry.totals_row_count = global::to_double(value.get(), value.size());
+        entry.totals_row_count = to_double(value.get(), value.size());
 }
 
 void model_parser::push_table()

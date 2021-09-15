@@ -805,7 +805,7 @@ void formula_functions::fnc_now(formula_value_stack& args) const
 
     // TODO: this value is currently not accurate since we don't take into
     // account the zero date yet.
-    double cur_time = global::get_current_time();
+    double cur_time = get_current_time();
     cur_time /= 86400.0; // convert seconds to days.
     args.push_value(cur_time);
 }

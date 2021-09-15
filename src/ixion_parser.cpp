@@ -28,7 +28,7 @@ public:
 
     void operator() (const string& fpath) const
     {
-        double start_time = global::get_current_time();
+        double start_time = get_current_time();
         cout << detail::get_formula_result_output_separator() << endl;
         cout << "parsing " << fpath << endl;
 
@@ -45,7 +45,7 @@ public:
         }
 
         cout << detail::get_formula_result_output_separator() << endl;
-        cout << "(duration: " << global::get_current_time() - start_time << " sec)" << endl;
+        cout << "(duration: " << get_current_time() - start_time << " sec)" << endl;
         cout << detail::get_formula_result_output_separator() << endl;
     }
 };

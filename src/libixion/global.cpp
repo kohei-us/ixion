@@ -24,7 +24,7 @@ using namespace std;
 
 namespace ixion {
 
-double global::get_current_time()
+double get_current_time()
 {
     unsigned long usec_since_epoch =
         std::chrono::duration_cast<std::chrono::microseconds>(
@@ -33,7 +33,7 @@ double global::get_current_time()
     return usec_since_epoch / 1000000.0;
 }
 
-double global::to_double(const char* p, size_t n)
+double to_double(const char* p, size_t n)
 {
     if (!n)
         return 0.0;
@@ -92,7 +92,7 @@ double global::to_double(const char* p, size_t n)
     return sign*val;
 }
 
-bool global::to_bool(const char* p, size_t n)
+bool to_bool(const char* p, size_t n)
 {
     if (n == 4)
     {

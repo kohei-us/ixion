@@ -16,29 +16,18 @@
 
 namespace ixion {
 
-class IXION_DLLPUBLIC global
-{
-public:
-    /**
-     * Get current time in seconds since epoch.  Note that the value
-     * representing a time may differ from platform to platform.  Use this
-     * value only to measure relative time.
-     *
-     * @return current time in seconds since epoch.
-     */
-    static double get_current_time();
+/**
+ * Get current time in seconds since epoch.  Note that the value
+ * representing a time may differ from platform to platform.  Use this
+ * value only to measure relative time.
+ *
+ * @return current time in seconds since epoch.
+ */
+IXION_DLLPUBLIC double get_current_time();
 
-    static double to_double(const char* p, size_t n);
+IXION_DLLPUBLIC double to_double(const char* p, size_t n);
 
-    static bool to_bool(const char* p, size_t n);
-private:
-    global();
-    global(const global& r);
-    ~global();
-};
-
-// ============================================================================
-
+IXION_DLLPUBLIC bool to_bool(const char* p, size_t n);
 
 }
 
