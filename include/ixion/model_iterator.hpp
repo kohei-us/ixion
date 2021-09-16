@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_MODEL_ITERATOR_HPP
 #define INCLUDED_IXION_MODEL_ITERATOR_HPP
 
-#include "ixion/types.hpp"
+#include "types.hpp"
 
 #include <memory>
 #include <iosfwd>

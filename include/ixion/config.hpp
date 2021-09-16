@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_CONFIG_HPP
 #define INCLUDED_IXION_CONFIG_HPP
 
-#include "ixion/types.hpp"
+#include "types.hpp"
 
 namespace ixion {
 

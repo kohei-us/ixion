@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_DIRTY_CELL_TRACKER_HPP
 #define INCLUDED_IXION_DIRTY_CELL_TRACKER_HPP
 
-#include "ixion/address.hpp"
+#include "address.hpp"
 
 #include <memory>
 

@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_INFO_HPP
 #define INCLUDED_IXION_INFO_HPP
 
-#include "ixion/env.hpp"
+#include "env.hpp"
 
 namespace ixion {
 

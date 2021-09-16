@@ -8,8 +8,8 @@
 #ifndef INCLUDED_IXION_DOCUMENT_HPP
 #define INCLUDED_IXION_DOCUMENT_HPP
 
-#include <ixion/types.hpp>
-#include <ixion/address.hpp>
+#include "types.hpp"
+#include "address.hpp"
 
 #include <memory>
 #include <string>

@@ -8,11 +8,11 @@
 #ifndef INCLUDED_IXION_FORMULA_NAME_RESOLVER_HPP
 #define INCLUDED_IXION_FORMULA_NAME_RESOLVER_HPP
 
+#include "address.hpp"
+#include "formula_function_opcode.hpp"
+
 #include <string>
 #include <memory>
-
-#include "ixion/address.hpp"
-#include "ixion/formula_function_opcode.hpp"
 
 namespace ixion {
 

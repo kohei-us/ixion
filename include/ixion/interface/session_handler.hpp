@@ -8,8 +8,8 @@
 #ifndef __IXION_INTERFACE_SESSION_HANDLER_HPP__
 #define __IXION_INTERFACE_SESSION_HANDLER_HPP__
 
-#include "ixion/formula_opcode.hpp"
-#include "ixion/formula_function_opcode.hpp"
+#include "../formula_opcode.hpp"
+#include "../formula_function_opcode.hpp"
 #include "../env.hpp"
 
 #include <cstdlib>

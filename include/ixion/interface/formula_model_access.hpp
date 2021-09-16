@@ -8,9 +8,9 @@
 #ifndef INCLUDED_IXION_INTERFACE_MODEL_CONTEXT_HPP
 #define INCLUDED_IXION_INTERFACE_MODEL_CONTEXT_HPP
 
-#include "ixion/formula_tokens.hpp"
-#include "ixion/types.hpp"
-#include "ixion/exceptions.hpp"
+#include "../formula_tokens.hpp"
+#include "../types.hpp"
+#include "../exceptions.hpp"
 
 #include <string>
 #include <vector>

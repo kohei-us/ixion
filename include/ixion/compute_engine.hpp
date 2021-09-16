@@ -8,8 +8,8 @@
 #ifndef INCLUDED_IXION_COMPUTE_ENGINE_HPP
 #define INCLUDED_IXION_COMPUTE_ENGINE_HPP
 
-#include <ixion/env.hpp>
-#include <ixion/module.hpp>
+#include "env.hpp"
+#include "module.hpp"
 
 #include <memory>
 #include <string>

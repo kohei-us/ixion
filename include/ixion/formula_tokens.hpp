@@ -8,10 +8,10 @@
 #ifndef INCLUDED_FORMULA_TOKENS_HPP
 #define INCLUDED_FORMULA_TOKENS_HPP
 
-#include "ixion/address.hpp"
-#include "ixion/table.hpp"
-#include "ixion/formula_opcode.hpp"
-#include "ixion/formula_tokens_fwd.hpp"
+#include "address.hpp"
+#include "table.hpp"
+#include "formula_opcode.hpp"
+#include "formula_tokens_fwd.hpp"
 
 #include <string>
 

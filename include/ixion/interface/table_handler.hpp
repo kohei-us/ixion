@@ -8,8 +8,7 @@
 #ifndef IXION_INTERFACE_TABLE_HANDLER_HPP
 #define IXION_INTERFACE_TABLE_HANDLER_HPP
 
-#include "ixion/env.hpp"
-#include "ixion/types.hpp"
+#include "../types.hpp"
 
 namespace ixion {
 

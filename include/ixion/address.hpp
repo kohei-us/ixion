@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_ADDRESS_HPP
 #define INCLUDED_IXION_ADDRESS_HPP
 
-#include "ixion/global.hpp"
+#include "types.hpp"
 
 #include <string>
 #include <vector>

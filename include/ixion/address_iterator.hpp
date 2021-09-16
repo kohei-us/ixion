@@ -8,8 +8,7 @@
 #ifndef INCLUDED_IXION_ADDRESS_ITERATOR_HPP
 #define INCLUDED_IXION_ADDRESS_ITERATOR_HPP
 
-#include "ixion/env.hpp"
-#include "ixion/types.hpp"
+#include "types.hpp"
 
 #include <memory>
 

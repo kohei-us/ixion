@@ -8,9 +8,9 @@
 #ifndef INCLUDED_IXION_FORMULA_HPP
 #define INCLUDED_IXION_FORMULA_HPP
 
-#include "ixion/formula_tokens.hpp"
-#include "ixion/interface/formula_model_access.hpp"
-#include "ixion/env.hpp"
+#include "formula_tokens.hpp"
+#include "./interface/formula_model_access.hpp"
+#include "env.hpp"
 
 #include <string>
 

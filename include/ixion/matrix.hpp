@@ -8,8 +8,7 @@
 #ifndef INCLUDED_IXION_MATRIX_HPP
 #define INCLUDED_IXION_MATRIX_HPP
 
-#include "ixion/env.hpp"
-#include "ixion/types.hpp"
+#include "types.hpp"
 
 #include <memory>
 #include <vector>

@@ -5,10 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef IXION_TABLE_HPP
-#define IXION_TABLE_HPP
+#ifndef INCLUDED_IXION_TABLE_HPP
+#define INCLUDED_IXION_TABLE_HPP
 
-#include "env.hpp"
 #include "types.hpp"
 
 namespace ixion {

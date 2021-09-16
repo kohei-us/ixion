@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_TYPES_HPP
 #define INCLUDED_IXION_TYPES_HPP
 
-#include "ixion/env.hpp"
+#include "env.hpp"
 
 #include <cstdlib>
 #include <cstdint>

@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_FORMULA_FUNCTION_OPCODE_HPP
 #define INCLUDED_IXION_FORMULA_FUNCTION_OPCODE_HPP
 
-#include "ixion/env.hpp"
+#include "env.hpp"
 
 #include <cstdint>
 #include <string_view>

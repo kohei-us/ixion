@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_MODULE_HPP
 #define INCLUDED_IXION_MODULE_HPP
 
-#include "ixion/env.hpp"
+#include "env.hpp"
 
 namespace ixion { namespace draft {
 

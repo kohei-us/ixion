@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_CELL_ACCESS_HPP
 #define INCLUDED_IXION_CELL_ACCESS_HPP
 
-#include "ixion/types.hpp"
+#include "types.hpp"
 
 #include <memory>
 #include <string>

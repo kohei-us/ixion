@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_FORMULA_RESULT_HPP
 #define INCLUDED_IXION_FORMULA_RESULT_HPP
 
-#include "ixion/global.hpp"
+#include "global.hpp"
 
 #include <string>
 #include <memory>
