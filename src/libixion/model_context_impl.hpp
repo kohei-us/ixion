@@ -137,8 +137,8 @@ public:
     void set_named_expression(const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr);
     void set_named_expression(sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr);
 
-    const named_expression_t* get_named_expression(const std::string& name) const;
-    const named_expression_t* get_named_expression(sheet_t sheet, const std::string& name) const;
+    const named_expression_t* get_named_expression(std::string_view name) const;
+    const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const;
 
     sheet_t get_sheet_index(const char* p, size_t n) const;
     std::string get_sheet_name(sheet_t sheet) const;

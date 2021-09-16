@@ -357,7 +357,7 @@ void model_context::set_named_expression(
     mp_impl->set_named_expression(sheet, p, n, origin, std::move(expr));
 }
 
-const named_expression_t* model_context::get_named_expression(sheet_t sheet, const std::string& name) const
+const named_expression_t* model_context::get_named_expression(sheet_t sheet, std::string_view name) const
 {
     return mp_impl->get_named_expression(sheet, name);
 }

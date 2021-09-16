@@ -241,20 +241,20 @@ void model_context_impl::set_named_expression(
     );
 }
 
-const named_expression_t* model_context_impl::get_named_expression(const std::string& name) const
+const named_expression_t* model_context_impl::get_named_expression(std::string_view name) const
 {
-    named_expressions_t::const_iterator itr = m_named_expressions.find(name);
+    named_expressions_t::const_iterator itr = m_named_expressions.find(std::string(name));
     return itr == m_named_expressions.end() ? nullptr : &itr->second;
 }
 
-const named_expression_t* model_context_impl::get_named_expression(sheet_t sheet, const std::string& name) const
+const named_expression_t* model_context_impl::get_named_expression(sheet_t sheet, std::string_view name) const
 {
     const worksheet* ws = fetch_sheet(sheet);
 
     if (ws)
     {
         const named_expressions_t& ns = ws->get_named_expressions();
-        auto it = ns.find(name);
+        auto it = ns.find(std::string(name));
         if (it != ns.end())
             return &it->second;
     }

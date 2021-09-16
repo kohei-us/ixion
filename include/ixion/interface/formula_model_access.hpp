@@ -101,7 +101,7 @@ public:
      *
      * @return const pointer to the token set if exists, nullptr otherwise.
      */
-    virtual const named_expression_t* get_named_expression(sheet_t sheet, const std::string& name) const = 0;
+    virtual const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const = 0;
 
     virtual double count_range(const abs_range_t& range, const values_t& values_type) const = 0;
 

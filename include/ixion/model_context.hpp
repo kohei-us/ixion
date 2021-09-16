@@ -113,7 +113,7 @@ public:
 
     virtual formula_result get_formula_result(const abs_address_t& addr) const override;
 
-    virtual const named_expression_t* get_named_expression(sheet_t sheet, const std::string& name) const override;
+    virtual const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const override;
 
     virtual double count_range(const abs_range_t& range, const values_t& values_type) const override;
     virtual matrix get_range_value(const abs_range_t& range) const override;
