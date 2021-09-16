@@ -298,14 +298,14 @@ const iface::table_handler* model_context::get_table_handler() const
     return mp_impl->get_table_handler();
 }
 
-string_id_t model_context::append_string(const char* p, size_t n)
+string_id_t model_context::append_string(std::string_view s)
 {
-    return mp_impl->append_string(p, n);
+    return mp_impl->append_string(s);
 }
 
-string_id_t model_context::add_string(const char* p, size_t n)
+string_id_t model_context::add_string(std::string_view s)
 {
-    return mp_impl->add_string(p, n);
+    return mp_impl->add_string(s);
 }
 
 const std::string* model_context::get_string(string_id_t identifier) const

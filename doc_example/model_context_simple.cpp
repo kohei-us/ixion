@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 
     // Insert a string value into B4 via string identifier.
     s = "Yet another string value.";
-    ixion::string_id_t sid = cxt.add_string(s.data(), s.size());
+    ixion::string_id_t sid = cxt.add_string(s);
     ixion::abs_address_t B4(0, 3, 1);
     cxt.set_string_cell(B4, sid);
 

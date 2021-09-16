@@ -27,23 +27,23 @@ namespace ixion { namespace detail {
 class safe_string_pool
 {
     using string_pool_type = std::vector<std::unique_ptr<std::string>>;
-    using string_map_type = std::unordered_map<mem_str_buf, string_id_t, mem_str_buf::hash>;
+    using string_map_type = std::unordered_map<std::string_view, string_id_t>;
 
     std::mutex m_mtx;
     string_pool_type m_strings;
     string_map_type m_string_map;
     std::string m_empty_string;
 
-    string_id_t append_string_unsafe(const char* p, size_t n);
+    string_id_t append_string_unsafe(std::string_view s);
 
 public:
-    string_id_t append_string(const char* p, size_t n);
-    string_id_t add_string(const char* p, size_t n);
+    string_id_t append_string(std::string_view s);
+    string_id_t add_string(std::string_view s);
     const std::string* get_string(string_id_t identifier) const;
 
     size_t size() const;
     void dump_strings() const;
-    string_id_t get_identifier_from_string(const char* p, size_t n) const;
+    string_id_t get_identifier_from_string(std::string_view s) const;
 };
 
 class model_context_impl
@@ -148,8 +148,8 @@ public:
 
     void set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows);
 
-    string_id_t append_string(const char* p, size_t n);
-    string_id_t add_string(const char* p, size_t n);
+    string_id_t append_string(std::string_view s);
+    string_id_t add_string(std::string_view s);
     const std::string* get_string(string_id_t identifier) const;
     size_t get_string_count() const;
     void dump_strings() const;

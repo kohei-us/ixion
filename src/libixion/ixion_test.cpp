@@ -72,10 +72,10 @@ void test_string_pool()
     cout << "test string pool" << endl;
     model_context cxt;
 
-    string_id_t s_table1 = cxt.append_string(IXION_ASCII("Table1"));
-    string_id_t s_table2 = cxt.append_string(IXION_ASCII("Table2"));
-    string_id_t s_cat = cxt.append_string(IXION_ASCII("Category"));
-    string_id_t s_val = cxt.append_string(IXION_ASCII("Value"));
+    string_id_t s_table1 = cxt.append_string("Table1");
+    string_id_t s_table2 = cxt.append_string("Table2");
+    string_id_t s_cat = cxt.append_string("Category");
+    string_id_t s_val = cxt.append_string("Value");
 
     cxt.dump_strings();
 
@@ -576,10 +576,10 @@ void test_name_resolver_table_excel_a1()
     cout << "Testing the Excel A1 name resolver for parsing table references." << endl;
     model_context cxt;
     cxt.append_sheet(IXION_ASCII("Sheet"));
-    string_id_t s_table1 = cxt.append_string(IXION_ASCII("Table1"));
-    string_id_t s_table2 = cxt.append_string(IXION_ASCII("Table2"));
-    string_id_t s_cat = cxt.append_string(IXION_ASCII("Category"));
-    string_id_t s_val = cxt.append_string(IXION_ASCII("Value"));
+    string_id_t s_table1 = cxt.append_string("Table1");
+    string_id_t s_table2 = cxt.append_string("Table2");
+    string_id_t s_cat = cxt.append_string("Category");
+    string_id_t s_val = cxt.append_string("Value");
 
     // Make sure these work correctly before proceeding further with the test.
     assert(s_table1 == cxt.get_identifier_from_string(IXION_ASCII("Table1")));
@@ -1271,9 +1271,9 @@ void test_parse_and_print_expressions()
 
     model_context cxt;
     cxt.append_sheet(IXION_ASCII("Test"));
-    cxt.append_string(IXION_ASCII("Table1"));
-    cxt.append_string(IXION_ASCII("Category"));
-    cxt.append_string(IXION_ASCII("Value"));
+    cxt.append_string("Table1");
+    cxt.append_string("Category");
+    cxt.append_string("Value");
     cxt.append_sheet(IXION_ASCII("Ying & Yang")); // name with '&'
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);

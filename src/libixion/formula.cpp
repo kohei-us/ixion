@@ -74,10 +74,10 @@ formula_tokens_t create_formula_error_tokens(
     formula_tokens_t tokens;
     tokens.push_back(std::make_unique<error_token>(2));
 
-    string_id_t sid_src_formula = cxt.add_string(p_src_formula, n_src_formula);
+    string_id_t sid_src_formula = cxt.add_string({p_src_formula, n_src_formula});
     tokens.push_back(std::make_unique<string_token>(sid_src_formula));
 
-    string_id_t sid_error = cxt.add_string(p_error, n_error);
+    string_id_t sid_error = cxt.add_string({p_error, n_error});
     tokens.push_back(std::make_unique<string_token>(sid_error));
 
     return tokens;

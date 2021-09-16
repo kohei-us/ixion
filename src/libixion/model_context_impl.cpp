@@ -28,41 +28,39 @@ using std::endl;
 
 namespace ixion { namespace detail {
 
-string_id_t safe_string_pool::append_string_unsafe(const char* p, size_t n)
+string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
 {
-    assert(p);
-    assert(n);
+    assert(!s.empty());
 
     string_id_t str_id = m_strings.size();
-    m_strings.push_back(std::make_unique<std::string>(p, n));
-    p = m_strings.back()->data();
-    mem_str_buf key(p, n);
-    m_string_map.insert(string_map_type::value_type(key, str_id));
+    m_strings.push_back(std::make_unique<std::string>(s));
+    s = *m_strings.back();
+    m_string_map.insert(string_map_type::value_type(s, str_id));
     return str_id;
 }
 
-string_id_t safe_string_pool::append_string(const char* p, size_t n)
+string_id_t safe_string_pool::append_string(std::string_view s)
 {
-    if (!p || !n)
+    if (s.empty())
         // Never add an empty or invalid string.
         return empty_string_id;
 
     std::unique_lock<std::mutex> lock(m_mtx);
-    return append_string_unsafe(p, n);
+    return append_string_unsafe(s);
 }
 
-string_id_t safe_string_pool::add_string(const char* p, size_t n)
+string_id_t safe_string_pool::add_string(std::string_view s)
 {
-    if (!p || !n)
+    if (s.empty())
         // Never add an empty or invalid string.
         return empty_string_id;
 
     std::unique_lock<std::mutex> lock(m_mtx);
-    string_map_type::iterator itr = m_string_map.find(mem_str_buf(p, n));
+    string_map_type::iterator itr = m_string_map.find(s);
     if (itr != m_string_map.end())
         return itr->second;
 
-    return append_string_unsafe(p, n);
+    return append_string_unsafe(s);
 }
 
 const std::string* safe_string_pool::get_string(string_id_t identifier) const
@@ -98,15 +96,15 @@ void safe_string_pool::dump_strings() const
         auto it = m_string_map.begin(), ite = m_string_map.end();
         for (; it != ite; ++it)
         {
-            mem_str_buf key = it->first;
-            cout << "* key: '" << key << "' (" << (void*)key.get() << "; " << key.size() << "), value: " << it->second << endl;
+            std::string_view key = it->first;
+            cout << "* key: '" << key << "' (" << (void*)key.data() << "; " << key.size() << "), value: " << it->second << endl;
         }
     }
 }
 
-string_id_t safe_string_pool::get_identifier_from_string(const char* p, size_t n) const
+string_id_t safe_string_pool::get_identifier_from_string(std::string_view s) const
 {
-    string_map_type::const_iterator it = m_string_map.find(mem_str_buf(p, n));
+    string_map_type::const_iterator it = m_string_map.find(s);
     return it == m_string_map.end() ? empty_string_id : it->second;
 }
 
@@ -358,14 +356,14 @@ void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<mo
     }
 }
 
-string_id_t model_context_impl::append_string(const char* p, size_t n)
+string_id_t model_context_impl::append_string(std::string_view s)
 {
-    return m_str_pool.append_string(p, n);
+    return m_str_pool.append_string(s);
 }
 
-string_id_t model_context_impl::add_string(const char* p, size_t n)
+string_id_t model_context_impl::add_string(std::string_view s)
 {
-    return m_str_pool.add_string(p, n);
+    return m_str_pool.add_string(s);
 }
 
 const std::string* model_context_impl::get_string(string_id_t identifier) const
@@ -631,7 +629,7 @@ void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
-    string_id_t str_id = add_string(p, n);
+    string_id_t str_id = add_string({p, n});
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, str_id);
@@ -963,7 +961,7 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
 
 string_id_t model_context_impl::get_identifier_from_string(const char* p, size_t n) const
 {
-    return m_str_pool.get_identifier_from_string(p, n);
+    return m_str_pool.get_identifier_from_string({p, n});
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const

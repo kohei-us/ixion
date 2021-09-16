@@ -141,7 +141,16 @@ public:
 
     virtual const table_handler* get_table_handler() const;
 
-    virtual string_id_t add_string(const char* p, size_t n) = 0;
+    /**
+     * Try to add a new string to the string pool. If the same string already
+     * exists in the pool, the new string won't be added to the pool.
+     *
+     * @param s string to try to add to the pool.
+     *
+     * @return string_id_t integer value representing the string.
+     */
+    virtual string_id_t add_string(std::string_view s) = 0;
+
     virtual const std::string* get_string(string_id_t identifier) const = 0;
 
     /**

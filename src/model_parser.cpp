@@ -681,7 +681,7 @@ void model_parser::parse_table()
     table_handler::entry& entry = *mp_table_entry;
 
     if (name == "name")
-        entry.name = m_context.add_string(value.get(), value.size());
+        entry.name = m_context.add_string({value.get(), value.size()});
     else if (name == "range")
     {
         if (!mp_name_resolver)
@@ -844,7 +844,7 @@ void model_parser::parse_table_columns(const mem_str_buf& str)
             // Flush the current column name buffer.
             string_id_t col_name = empty_string_id;
             if (!buf.empty())
-                col_name = m_context.add_string(buf.get(), buf.size());
+                col_name = m_context.add_string({buf.get(), buf.size()});
 
             entry.columns.push_back(col_name);
             buf.clear();
@@ -860,7 +860,7 @@ void model_parser::parse_table_columns(const mem_str_buf& str)
 
     string_id_t col_name = empty_string_id;
     if (!buf.empty())
-        col_name = m_context.add_string(buf.get(), buf.size());
+        col_name = m_context.add_string({buf.get(), buf.size()});
 
     entry.columns.push_back(col_name);
 }
