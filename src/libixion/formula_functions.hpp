@@ -46,8 +46,8 @@ public:
     ~formula_functions();
 
     static formula_function_t get_function_opcode(const formula_token& token);
-    static formula_function_t get_function_opcode(const char* p, size_t n);
-    static const char* get_function_name(formula_function_t oc);
+    static formula_function_t get_function_opcode(std::string_view s);
+    static std::string_view get_function_name(formula_function_t oc);
 
     void interpret(formula_function_t oc, formula_value_stack& args);
 

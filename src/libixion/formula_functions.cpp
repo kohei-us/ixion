@@ -376,7 +376,7 @@ const map_type& get()
 
 } // builtin_funcs namespace
 
-const char* unknown_func_name = "unknown";
+std::string_view unknown_func_name = "unknown";
 
 /**
  * Traverse all elements of a passed matrix to sum up their values.
@@ -436,14 +436,12 @@ formula_function_t formula_functions::get_function_opcode(const formula_token& t
     return static_cast<formula_function_t>(token.get_uint32());
 }
 
-formula_function_t formula_functions::get_function_opcode(const char* p, size_t n)
+formula_function_t formula_functions::get_function_opcode(std::string_view s)
 {
     std::string upper;
 
-    for (const char* p_end = p + n; p != p_end; ++p)
+    for (char c : s)
     {
-        char c = *p;
-
         if (c > 'Z')
         {
             // Convert to upper case.
@@ -456,7 +454,7 @@ formula_function_t formula_functions::get_function_opcode(const char* p, size_t 
     return builtin_funcs::get().find(upper.data(), upper.size());
 }
 
-const char* formula_functions::get_function_name(formula_function_t oc)
+std::string_view formula_functions::get_function_name(formula_function_t oc)
 {
     for (const builtin_funcs::map_type::entry& e : builtin_funcs::entries)
     {

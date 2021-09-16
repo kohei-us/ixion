@@ -11,7 +11,7 @@
 #include "ixion/env.hpp"
 
 #include <cstdint>
-#include <cstdlib>
+#include <string_view>
 
 namespace ixion {
 
@@ -348,20 +348,18 @@ enum class formula_function_t : uint16_t
  *
  * @param func formula function opcode.
  *
- * @return null-terminated string representation of the opcode.
+ * @return string representation of the opcode.
  */
-IXION_DLLPUBLIC const char* get_formula_function_name(formula_function_t func);
+IXION_DLLPUBLIC std::string_view get_formula_function_name(formula_function_t func);
 
 /**
  * Get a formula function opcode from a formula function name.
  *
- * @param p pointer to the string buffer that stores the formula function
- *          name.
- * @param n size of the string buffer.
+ * @param s formula function name.
  *
  * @return formula function opcode representing the specified name.
  */
-IXION_DLLPUBLIC formula_function_t get_formula_function_opcode(const char* p, size_t n);
+IXION_DLLPUBLIC formula_function_t get_formula_function_opcode(std::string_view s);
 
 }
 

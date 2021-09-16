@@ -11,14 +11,14 @@
 
 namespace ixion {
 
-const char* get_formula_function_name(formula_function_t func)
+std::string_view get_formula_function_name(formula_function_t func)
 {
     return formula_functions::get_function_name(func);
 }
 
-formula_function_t get_formula_function_opcode(const char* p, size_t n)
+formula_function_t get_formula_function_opcode(std::string_view s)
 {
-    return formula_functions::get_function_opcode(p, n);
+    return formula_functions::get_function_opcode(s);
 }
 
 }

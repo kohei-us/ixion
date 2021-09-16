@@ -51,7 +51,7 @@ bool check_address_by_sheet_bounds(const iface::formula_model_access* cxt, const
 
 bool resolve_function(const char* p, size_t n, formula_name_t& ret)
 {
-    formula_function_t func_oc = formula_functions::get_function_opcode(p, n);
+    formula_function_t func_oc = formula_functions::get_function_opcode({p, n});
     if (func_oc != formula_function_t::func_unknown)
     {
         // This is a built-in function.
