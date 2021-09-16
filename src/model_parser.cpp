@@ -638,8 +638,7 @@ void model_parser::parse_result_cache()
     formula_result fres;
     fres.parse(m_context, res.second.get(), res.second.size());
 
-    formula_name_t fnt = mp_name_resolver->resolve(
-        name_s.data(), name_s.size(), abs_address_t(m_current_sheet,0,0));
+    formula_name_t fnt = mp_name_resolver->resolve(name_s, abs_address_t(m_current_sheet,0,0));
 
     switch (fnt.type)
     {
@@ -689,7 +688,7 @@ void model_parser::parse_table()
             return;
 
         abs_address_t pos(m_current_sheet,0,0);
-        formula_name_t ret = mp_name_resolver->resolve(value.get(), value.size(), pos);
+        formula_name_t ret = mp_name_resolver->resolve({value.get(), value.size()}, pos);
         if (ret.type != formula_name_t::range_reference)
             throw parse_error("range of a table is expected to be given as a range reference.");
 
@@ -741,7 +740,7 @@ void model_parser::parse_named_expression()
 
         formula_name_t name =
             mp_name_resolver->resolve(
-                s.get(), s.size(), abs_address_t(m_current_sheet,0,0));
+                {s.get(), s.size()}, abs_address_t(m_current_sheet,0,0));
 
         if (name.type != formula_name_t::name_type::cell_reference)
         {
@@ -1070,7 +1069,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
     }
 
     formula_name_t fnt = mp_name_resolver->resolve(
-        ret.name.get(), ret.name.size(), abs_address_t(m_current_sheet,0,0));
+        {ret.name.get(), ret.name.size()}, abs_address_t(m_current_sheet,0,0));
 
     switch (fnt.type)
     {
@@ -1112,7 +1111,7 @@ void model_parser::check()
         const formula_result& res = itr->second;
         cout << name << ": " << res.str(m_context) << endl;
 
-        formula_name_t name_type = mp_name_resolver->resolve(&name[0], name.size(), abs_address_t());
+        formula_name_t name_type = mp_name_resolver->resolve(name, abs_address_t());
         if (name_type.type != formula_name_t::cell_reference)
         {
             ostringstream os;

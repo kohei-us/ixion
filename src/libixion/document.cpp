@@ -27,7 +27,7 @@ abs_address_t to_address(
         case document::cell_pos::cp_type::string:
         {
             std::string_view s = std::get<std::string_view>(pos.value);
-            formula_name_t name = resolver.resolve(s.data(), s.size(), abs_address_t());
+            formula_name_t name = resolver.resolve(s, abs_address_t());
             if (name.type != formula_name_t::cell_reference)
             {
                 std::ostringstream os;

@@ -151,7 +151,7 @@ void formula_parser::name(const lexer_token_base& t)
 {
     mem_str_buf name = t.get_string();
 
-    formula_name_t fn = m_resolver.resolve(name.get(), name.size(), m_pos);
+    formula_name_t fn = m_resolver.resolve({name.get(), name.size()}, m_pos);
 
     switch (fn.type)
     {

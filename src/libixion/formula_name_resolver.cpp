@@ -1236,8 +1236,11 @@ public:
     excel_a1(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~excel_a1() {}
 
-    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
+    virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const
     {
+        const char* p = s.data();
+        std::size_t n = s.size();
+
         formula_name_t ret;
         if (!n)
             return ret;
@@ -1387,8 +1390,11 @@ class excel_r1c1 : public formula_name_resolver
 public:
     excel_r1c1(const iface::formula_model_access* cxt) : mp_cxt(cxt) {}
 
-    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
+    virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const
     {
+        const char* p = s.data();
+        std::size_t n = s.size();
+
         formula_name_t ret;
         if (!n)
             return ret;
@@ -1532,8 +1538,11 @@ public:
         m_func_append_address(func_append_address),
         m_func_append_sheet_name(func_append_sheet_name) {}
 
-    virtual formula_name_t resolve(const char *p, size_t n, const abs_address_t &pos) const override
+    virtual formula_name_t resolve(std::string_view s, const abs_address_t &pos) const override
     {
+        const char* p = s.data();
+        std::size_t n = s.size();
+
         formula_name_t ret;
         if (!n)
             return ret;
@@ -1665,8 +1674,11 @@ public:
     odff_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~odff_resolver() {}
 
-    virtual formula_name_t resolve(const char* p, size_t n, const abs_address_t& pos) const
+    virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const
     {
+        const char* p = s.data();
+        std::size_t n = s.size();
+
         formula_name_t ret;
 
         if (resolve_function(p, n, ret))

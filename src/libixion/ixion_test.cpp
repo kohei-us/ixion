@@ -223,7 +223,7 @@ void test_name_resolver_calc_a1()
             const char* p = names[i].name;
             string name_a1(p);
             cout << "single cell address: " << name_a1 << endl;
-            formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+            formula_name_t res = resolver->resolve(name_a1, abs_address_t());
             if (res.type != formula_name_t::cell_reference)
             {
                 cerr << "failed to resolve cell address: " << name_a1 << endl;
@@ -268,7 +268,7 @@ void test_name_resolver_calc_a1()
                 abs_address_t pos{sheet, 0, 0};
                 string name_a1(names[i].name);
                 cout << "range address: " << name_a1 << endl;
-                formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), pos);
+                formula_name_t res = resolver->resolve(name_a1, pos);
                 if (res.type != formula_name_t::range_reference)
                 {
                     cerr << "failed to resolve range address: " << name_a1 << endl;
@@ -302,7 +302,7 @@ void test_name_resolver_calc_a1()
     {
         string name_a1(range_tests[i].name);
         cout << "range address: " << name_a1 << endl;
-        formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         assert(res.type == formula_name_t::range_reference);
         assert(res.range.first.sheet == range_tests[i].sheet1);
         assert(res.range.first.row == range_tests[i].row1);
@@ -313,7 +313,7 @@ void test_name_resolver_calc_a1()
     }
 
     {
-        formula_name_t res = resolver->resolve("B1", 2, abs_address_t(0,1,1));
+        formula_name_t res = resolver->resolve("B1", abs_address_t(0,1,1));
         assert(res.type == formula_name_t::cell_reference);
         assert(res.address.sheet == 0);
         assert(res.address.row == -1);
@@ -321,7 +321,7 @@ void test_name_resolver_calc_a1()
     }
 
     {
-        formula_name_t res = resolver->resolve("B2:B4", 5, abs_address_t(0,0,3));
+        formula_name_t res = resolver->resolve("B2:B4", abs_address_t(0,0,3));
         assert(res.type == formula_name_t::range_reference);
         assert(res.range.first.sheet == 0);
         assert(res.range.first.row == 1);
@@ -332,7 +332,7 @@ void test_name_resolver_calc_a1()
     }
 
     {
-        formula_name_t res = resolver->resolve(IXION_ASCII("Three.B2"), abs_address_t(2,0,0));
+        formula_name_t res = resolver->resolve("Three.B2", abs_address_t(2,0,0));
         assert(res.type == formula_name_t::cell_reference);
         assert(!res.address.abs_sheet);
         assert(!res.address.abs_row);
@@ -345,7 +345,7 @@ void test_name_resolver_calc_a1()
     {
         abs_address_t pos(2, 0, 0);
         std::string name("One.B2:Three.C4");
-        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        formula_name_t res = resolver->resolve(name, pos);
         assert(res.type == formula_name_t::range_reference);
         assert(!res.range.first.abs_sheet);
         assert(!res.range.first.abs_row);
@@ -413,7 +413,7 @@ void test_name_resolver_excel_a1()
         {
             const char* p = names[i].name;
             string name_a1(p);
-            formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+            formula_name_t res = resolver->resolve(name_a1, abs_address_t());
             if (res.type != formula_name_t::cell_reference)
             {
                 cerr << "failed to resolve cell address: " << name_a1 << endl;
@@ -450,7 +450,7 @@ void test_name_resolver_excel_a1()
             const char* p = names[i].name;
             string name_a1(p);
             cout << "range address: " << name_a1 << endl;
-            formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+            formula_name_t res = resolver->resolve(name_a1, abs_address_t());
             if (res.type != formula_name_t::range_reference)
             {
                 cerr << "failed to resolve range address: " << name_a1 << endl;
@@ -483,7 +483,7 @@ void test_name_resolver_excel_a1()
     for (size_t i = 0; range_tests[i].name; ++i)
     {
         string name_a1(range_tests[i].name);
-        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         assert(res.type == formula_name_t::range_reference);
         assert(res.range.first.sheet == range_tests[i].sheet1);
         assert(res.range.first.row == range_tests[i].row1);
@@ -494,7 +494,7 @@ void test_name_resolver_excel_a1()
     }
 
     {
-        formula_name_t res = resolver->resolve("B1", 2, abs_address_t(0,1,1));
+        formula_name_t res = resolver->resolve("B1", abs_address_t(0,1,1));
         assert(res.type == formula_name_t::cell_reference);
         assert(res.address.sheet == 0);
         assert(res.address.row == -1);
@@ -502,7 +502,7 @@ void test_name_resolver_excel_a1()
     }
 
     {
-        formula_name_t res = resolver->resolve("B2:B4", 5, abs_address_t(0,0,3));
+        formula_name_t res = resolver->resolve("B2:B4", abs_address_t(0,0,3));
         assert(res.type == formula_name_t::range_reference);
         assert(res.range.first.sheet == 0);
         assert(res.range.first.row == 1);
@@ -526,13 +526,13 @@ void test_name_resolver_excel_a1()
     for (size_t i = 0; name_tests[i].name; ++i)
     {
         string name_a1(name_tests[i].name);
-        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         assert(res.type == name_tests[i].type);
     }
 
     {
         // Parse address with non-existing sheet name.  It should be flagged invalid.
-        formula_name_t res = resolver->resolve(IXION_ASCII("NotExists!A1"), abs_address_t());
+        formula_name_t res = resolver->resolve("NotExists!A1", abs_address_t());
         assert(res.type == formula_name_t::invalid);
     }
 }
@@ -565,7 +565,7 @@ void test_name_resolver_named_expression()
         for (const std::string& name : names)
         {
             cout << "parsing '" << name << "'..." << endl;
-            formula_name_t res = resolver->resolve(name.data(), name.size(), abs_address_t(0,0,0));
+            formula_name_t res = resolver->resolve(name, abs_address_t(0,0,0));
             assert(res.type == formula_name_t::name_type::named_expression);
         }
     }
@@ -622,7 +622,7 @@ void test_name_resolver_table_excel_a1()
     {
         cout << "* table reference: " << tests[i].exp << endl;
         abs_address_t pos(tests[i].sheet, tests[i].row, tests[i].col);
-        formula_name_t res = resolver->resolve(tests[i].exp, tests[i].len, pos);
+        formula_name_t res = resolver->resolve({tests[i].exp, tests[i].len}, pos);
         if (res.type != formula_name_t::table_reference)
             assert(!"table reference expected.");
 
@@ -687,7 +687,7 @@ void test_name_resolver_excel_r1c1()
         const char* p = single_ref_names[i].name;
         string name_r1c1(p);
         cout << "Parsing " << name_r1c1 << endl;
-        formula_name_t res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_r1c1, abs_address_t());
         if (res.type != formula_name_t::cell_reference)
         {
             cerr << "failed to resolve cell address: " << name_r1c1 << endl;
@@ -728,7 +728,7 @@ void test_name_resolver_excel_r1c1()
     {
         const char* p = invalid_address[i];
         string name_r1c1(p);
-        formula_name_t res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_r1c1, abs_address_t());
         if (res.type != formula_name_t::invalid && res.type != formula_name_t::named_expression)
         {
             cerr << "address " << name_r1c1 << " is expected to be invalid." << endl;
@@ -748,7 +748,7 @@ void test_name_resolver_excel_r1c1()
     {
         const char* p = valid_address[i];
         string name_r1c1(p);
-        formula_name_t res = resolver->resolve(name_r1c1.data(), name_r1c1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_r1c1, abs_address_t());
         if (res.type != formula_name_t::cell_reference)
         {
             cerr << "address " << name_r1c1 << " is expected to be valid." << endl;
@@ -787,7 +787,7 @@ void test_name_resolver_excel_r1c1()
     {
         string name_r1c1(range_tests[i].name);
         cout << "Parsing " << name_r1c1 << endl;
-        formula_name_t res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_r1c1, abs_address_t());
 
         assert(res.type == formula_name_t::range_reference);
 
@@ -827,7 +827,7 @@ void test_name_resolver_excel_r1c1()
         const char* p = range_ref_names[i].name;
         string name_r1c1(p);
         cout << "Parsing " << name_r1c1 << endl;
-        formula_name_t res = resolver->resolve(&name_r1c1[0], name_r1c1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_r1c1, abs_address_t());
         if (res.type != formula_name_t::range_reference)
         {
             cerr << "failed to resolve range address: " << name_r1c1 << endl;
@@ -892,7 +892,7 @@ void test_name_resolver_odff()
     {
         const char* p = single_ref_names[i].name;
         string name_a1(p);
-        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         if (res.type != formula_name_t::cell_reference)
         {
             cerr << "failed to resolve cell address: " << name_a1 << endl;
@@ -921,7 +921,7 @@ void test_name_resolver_odff()
     {
         const char* p = range_ref_names[i].name;
         string name_a1(p);
-        formula_name_t res = resolver->resolve(&name_a1[0], name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         if (res.type != formula_name_t::range_reference)
         {
             cerr << "failed to resolve range address: " << name_a1 << endl;
@@ -955,7 +955,7 @@ void test_name_resolver_odff()
         const char* p = addr_with_sheet_names[i].name;
         std::string name_a1(p);
 
-        formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         if (res.type != formula_name_t::cell_reference)
         {
             cerr << "failed to resolve cell address: " << name_a1 << endl;
@@ -992,7 +992,7 @@ void test_name_resolver_odff()
         const char* p = ref_with_sheet_names[i].name;
         std::string name_a1(p);
 
-        formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+        formula_name_t res = resolver->resolve(name_a1, abs_address_t());
         if (res.type != formula_name_t::range_reference)
         {
             cerr << "failed to resolve range address: " << name_a1 << endl;
@@ -1012,7 +1012,7 @@ void test_name_resolver_odff()
     {
         std::string name = "[.H2:.I2]";
         abs_address_t pos(2, 1, 9);
-        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        formula_name_t res = resolver->resolve(name, pos);
         assert(res.type == formula_name_t::range_reference);
         abs_range_t range = to_range(res.range).to_abs(pos);
         abs_range_t range_expected(abs_address_t(pos.sheet, 1, 7), 1, 2);
@@ -1022,7 +1022,7 @@ void test_name_resolver_odff()
     {
         std::string name = "[Two.$B$2:.$B$10]";
         abs_address_t pos(3, 2, 1);
-        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        formula_name_t res = resolver->resolve(name, pos);
         assert(res.type == formula_name_t::range_reference);
         abs_range_t range = to_range(res.range).to_abs(pos);
         abs_range_t range_expected(abs_address_t(1, 1, 1), 9, 1);
@@ -1032,7 +1032,7 @@ void test_name_resolver_odff()
     {
         std::string name = "MyRange";
         abs_address_t pos(3, 2, 1);
-        formula_name_t res = resolver->resolve(name.data(), name.size(), pos);
+        formula_name_t res = resolver->resolve(name, pos);
         assert(res.type == formula_name_t::named_expression);
     }
 }
@@ -1086,7 +1086,7 @@ void test_name_resolver_odf_cra()
             const char* p = names[i].name;
             string name_a1(p);
             cout << "single cell address: " << name_a1 << endl;
-            formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), abs_address_t());
+            formula_name_t res = resolver->resolve(name_a1, abs_address_t());
             if (res.type != formula_name_t::cell_reference)
             {
                 cerr << "failed to resolve cell address: " << name_a1 << endl;
@@ -1131,7 +1131,7 @@ void test_name_resolver_odf_cra()
                 abs_address_t pos{sheet, 0, 0};
                 string name_a1(names[i].name);
                 cout << "range address: " << name_a1 << endl;
-                formula_name_t res = resolver->resolve(name_a1.data(), name_a1.size(), pos);
+                formula_name_t res = resolver->resolve(name_a1, pos);
                 if (res.type != formula_name_t::range_reference)
                 {
                     cerr << "failed to resolve range address: " << name_a1 << endl;
@@ -1346,7 +1346,7 @@ void test_function_name_resolution()
     {
         const char* name = valid_names[i];
         cout << "valid name: " << name << endl;
-        formula_name_t t = resolver->resolve(name, strlen(name), abs_address_t());
+        formula_name_t t = resolver->resolve(name, abs_address_t());
         assert(t.type == formula_name_t::function);
     }
 
@@ -1355,7 +1355,7 @@ void test_function_name_resolution()
     {
         const char* name = invalid_names[i];
         cout << "invalid name: " << name << endl;
-        formula_name_t t = resolver->resolve(name, strlen(name), abs_address_t());
+        formula_name_t t = resolver->resolve(name, abs_address_t());
         assert(t.type != formula_name_t::function);
     }
 }
