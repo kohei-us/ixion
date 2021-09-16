@@ -77,12 +77,12 @@ void session_handler::set_result(const formula_result& result)
     mp_impl->m_buf << endl << mp_impl->m_cell_name << ": result = " << result.str(mp_impl->m_context) << endl;
 }
 
-void session_handler::set_invalid_expression(const char* msg)
+void session_handler::set_invalid_expression(std::string_view msg)
 {
     mp_impl->m_buf << endl << mp_impl->m_cell_name << ": invalid expression: " << msg << endl;
 }
 
-void session_handler::set_formula_error(const char* msg)
+void session_handler::set_formula_error(std::string_view msg)
 {
     mp_impl->m_buf << endl << mp_impl->m_cell_name << ": result = " << msg << endl;
 }

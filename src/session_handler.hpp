@@ -27,8 +27,8 @@ public:
     virtual void begin_cell_interpret(const abs_address_t& pos) override;
     virtual void end_cell_interpret() override;
     virtual void set_result(const formula_result& result) override;
-    virtual void set_invalid_expression(const char* msg) override;
-    virtual void set_formula_error(const char* msg) override;
+    virtual void set_invalid_expression(std::string_view msg) override;
+    virtual void set_formula_error(std::string_view msg) override;
 
     virtual void push_token(fopcode_t fop) override;
     virtual void push_value(double val) override;
