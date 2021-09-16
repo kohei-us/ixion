@@ -140,7 +140,7 @@ public:
     const named_expression_t* get_named_expression(std::string_view name) const;
     const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const;
 
-    sheet_t get_sheet_index(const char* p, size_t n) const;
+    sheet_t get_sheet_index(std::string_view name) const;
     std::string get_sheet_name(sheet_t sheet) const;
     rc_size_t get_sheet_size() const;
     size_t get_sheet_count() const;

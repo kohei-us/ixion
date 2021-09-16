@@ -261,7 +261,7 @@ const named_expression_t* model_context_impl::get_named_expression(sheet_t sheet
     return get_named_expression(name);
 }
 
-sheet_t model_context_impl::get_sheet_index(const char* p, size_t n) const
+sheet_t model_context_impl::get_sheet_index(std::string_view name) const
 {
     strings_type::const_iterator itr_beg = m_sheet_names.begin(), itr_end = m_sheet_names.end();
     for (strings_type::const_iterator itr = itr_beg; itr != itr_end; ++itr)
@@ -270,8 +270,7 @@ sheet_t model_context_impl::get_sheet_index(const char* p, size_t n) const
         if (s.empty())
             continue;
 
-        mem_str_buf s1(&s[0], s.size()), s2(p, n);
-        if (s1 == s2)
+        if (s == name)
             return static_cast<sheet_t>(std::distance(itr_beg, itr));
     }
     return invalid_sheet;

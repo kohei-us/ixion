@@ -440,7 +440,7 @@ void model_parser::parse_session()
     }
     else if (cmd == "current-sheet")
     {
-        m_current_sheet = m_context.get_sheet_index(value.get(), value.size());
+        m_current_sheet = m_context.get_sheet_index({value.get(), value.size()});
 
         if (m_current_sheet == invalid_sheet)
         {
@@ -755,7 +755,7 @@ void model_parser::parse_named_expression()
     {
         // Resolve it as a sheet name and store the sheet index if found.
         const mem_str_buf& s = res.second;
-        mp_named_expression->scope = m_context.get_sheet_index(s.get(), s.size());
+        mp_named_expression->scope = m_context.get_sheet_index({s.get(), s.size()});
         if (mp_named_expression->scope == invalid_sheet)
         {
             ostringstream os;

@@ -584,11 +584,11 @@ bool parse_sheet_name_quoted(
 
             if (buffer.empty())
                 // Name contains no single quotes.
-                sheet = cxt.get_sheet_index(p1, len);
+                sheet = cxt.get_sheet_index({p1, len});
             else
             {
                 buffer += string(p1, len);
-                sheet = cxt.get_sheet_index(buffer.data(), buffer.size());
+                sheet = cxt.get_sheet_index({buffer.data(), buffer.size()});
             }
 
             ++p; // skip the closing quote.
@@ -639,7 +639,7 @@ bool parse_sheet_name(
     {
         if (*p == sep)
         {
-            sheet = cxt.get_sheet_index(p0, len);
+            sheet = cxt.get_sheet_index({p0, len});
             if (p != p_last)
                 ++p; // skip the separator.
             return true;

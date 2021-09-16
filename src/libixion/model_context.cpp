@@ -313,9 +313,9 @@ const std::string* model_context::get_string(string_id_t identifier) const
     return mp_impl->get_string(identifier);
 }
 
-sheet_t model_context::get_sheet_index(const char* p, size_t n) const
+sheet_t model_context::get_sheet_index(std::string_view name) const
 {
-    return mp_impl->get_sheet_index(p, n);
+    return mp_impl->get_sheet_index(name);
 }
 
 std::string model_context::get_sheet_name(sheet_t sheet) const

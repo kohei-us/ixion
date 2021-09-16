@@ -123,7 +123,7 @@ public:
 
     virtual string_id_t add_string(std::string_view s) override;
     virtual const std::string* get_string(string_id_t identifier) const override;
-    virtual sheet_t get_sheet_index(const char* p, size_t n) const override;
+    virtual sheet_t get_sheet_index(std::string_view name) const override;
     virtual std::string get_sheet_name(sheet_t sheet) const override;
     virtual rc_size_t get_sheet_size() const override;
     virtual size_t get_sheet_count() const override;
