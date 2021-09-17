@@ -1202,8 +1202,7 @@ bool check_formula_expression(
     size_t n = strlen(p);
     cout << "testing formula expression '" << p << "'" << endl;
 
-    formula_tokens_t tokens = parse_formula_string(
-        cxt, abs_address_t(), resolver, p, n);
+    formula_tokens_t tokens = parse_formula_string(cxt, abs_address_t(), resolver, {p, n});
     std::string expression = print_formula_tokens(cxt, abs_address_t(), resolver, tokens);
 
     int res = strcmp(p, expression.data());
@@ -1364,7 +1363,7 @@ formula_cell* insert_formula(
     model_context& cxt, const abs_address_t& pos, const char* exp,
     const formula_name_resolver& resolver)
 {
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, resolver, exp, strlen(exp));
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, resolver, exp);
     auto ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
     formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
@@ -1425,7 +1424,7 @@ void test_model_context_storage()
         // Test formula cells.
         abs_address_t pos(0,3,0);
         const char* exp = "SUM(1,2,3)";
-        formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp, strlen(exp));
+        formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp);
         auto ts = formula_tokens_store::create();
         ts->get() = std::move(tokens);
         formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
@@ -1448,9 +1447,9 @@ void test_model_context_storage()
 
         cxt.append_sheet(IXION_ASCII("test"));
         string exp = "1";
-        cxt.set_formula_cell(abs_address_t(0,0,0), parse_formula_string(cxt, abs_address_t(0,0,0), *resolver, &exp[0], exp.size()));
-        cxt.set_formula_cell(abs_address_t(0,2,0), parse_formula_string(cxt, abs_address_t(0,2,0), *resolver, &exp[0], exp.size()));
-        cxt.set_formula_cell(abs_address_t(0,1,0), parse_formula_string(cxt, abs_address_t(0,1,0), *resolver, &exp[0], exp.size()));
+        cxt.set_formula_cell(abs_address_t(0,0,0), parse_formula_string(cxt, abs_address_t(0,0,0), *resolver, exp));
+        cxt.set_formula_cell(abs_address_t(0,2,0), parse_formula_string(cxt, abs_address_t(0,2,0), *resolver, exp));
+        cxt.set_formula_cell(abs_address_t(0,1,0), parse_formula_string(cxt, abs_address_t(0,1,0), *resolver, exp));
     }
 
     {
@@ -1560,8 +1559,7 @@ void test_model_context_direct_string_access()
     assert(resolver);
 
     // Insert a formula containing one literal string token.
-    formula_tokens_t tokens = parse_formula_string(
-        cxt, C4, *resolver, IXION_ASCII("\"string value in formula\""));
+    formula_tokens_t tokens = parse_formula_string(cxt, C4, *resolver, "\"string value in formula\"");
     assert(tokens.size() == 1);
     cxt.set_formula_cell(C4, std::move(tokens));
     // no need to register formula cell since it does not reference other cells.
@@ -1605,7 +1603,7 @@ void test_model_context_named_expression()
 
     for (const test_case& tc : tcs)
     {
-        formula_tokens_t tokens = parse_formula_string(cxt, tc.origin, *resolver, tc.formula.data(), tc.formula.size());
+        formula_tokens_t tokens = parse_formula_string(cxt, tc.origin, *resolver, tc.formula);
         std::string test = print_formula_tokens(cxt, tc.origin, *resolver, tokens);
         assert(test == tc.formula);
 
@@ -1645,17 +1643,17 @@ void test_model_context_named_expression()
 
         if (tc.valid)
         {
-            formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+            formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
             cxt.set_named_expression(tc.name.data(), tc.name.size(), origin, std::move(tokens));
 
-            tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+            tokens = parse_formula_string(cxt, origin, *resolver, formula);
             cxt.set_named_expression(0, tc.name.data(), tc.name.size(), origin, std::move(tokens));
         }
         else
         {
             try
             {
-                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
                 cxt.set_named_expression(tc.name.data(), tc.name.size(), origin, std::move(tokens));
                 assert(!"named expression with invalid name should have been rejected!");
             }
@@ -1666,7 +1664,7 @@ void test_model_context_named_expression()
 
             try
             {
-                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula.data(), formula.size());
+                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
                 cxt.set_named_expression(0, tc.name.data(), tc.name.size(), origin, std::move(tokens));
                 assert(!"named expression with invalid name should have been rejected!");
             }
@@ -1753,8 +1751,7 @@ void test_model_context_iterator_horizontal()
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     abs_range_set_t modified_cells;
     abs_address_t pos(1, 3, 0);
-    formula_tokens_t tokens = parse_formula_string(
-        cxt, pos, *resolver, IXION_ASCII("SUM(1, 2, 3)"));
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
     formula_cell* p = cxt.set_formula_cell(pos, std::move(tokens));
     assert(p);
     const formula_tokens_t& t = p->get_tokens()->get();
@@ -1763,8 +1760,7 @@ void test_model_context_iterator_horizontal()
     modified_cells.insert(pos);
 
     pos.column = 1;
-    tokens = parse_formula_string(
-        cxt, pos, *resolver, IXION_ASCII("5 + 6 - 7"));
+    tokens = parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
     p = cxt.set_formula_cell(pos, std::move(tokens));
     register_formula_cell(cxt, pos, p);
     modified_cells.insert(pos);
@@ -1941,15 +1937,13 @@ void test_model_context_iterator_vertical()
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     abs_range_set_t modified_cells;
     abs_address_t pos(1, 3, 0);
-    formula_tokens_t tokens = parse_formula_string(
-        cxt, pos, *resolver, IXION_ASCII("SUM(1, 2, 3)"));
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
     cxt.set_formula_cell(pos, std::move(tokens));
     register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
 
     pos.column = 1;
-    tokens = parse_formula_string(
-        cxt, pos, *resolver, IXION_ASCII("5 + 6 - 7"));
+    tokens = parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
     cxt.set_formula_cell(pos, std::move(tokens));
     register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
@@ -2118,8 +2112,7 @@ void test_model_context_iterator_named_exps()
 
     auto tokenize = [&](const char* p) -> formula_tokens_t
     {
-        size_t n = strlen(p);
-        return parse_formula_string(cxt, abs_address_t(), *resolver, p, n);
+        return parse_formula_string(cxt, abs_address_t(), *resolver, p);
     };
 
     auto validate = [](named_expressions_iterator _iter, const std::vector<check>& _expected) -> bool
@@ -2259,7 +2252,7 @@ void test_model_context_error_value()
 
     abs_address_t pos(0,3,0);
     const char* exp = "10/0";
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp, strlen(exp));
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp);
     formula_cell* fc = cxt.set_formula_cell(pos, std::move(tokens));
     fc->interpret(cxt, pos);
 
@@ -2380,8 +2373,7 @@ void test_grouped_formula_string_results()
 
     abs_range_t A1B2(0, 0, 0, 2, 2);
 
-    formula_tokens_t tokens = parse_formula_string(
-        cxt, A1B2.first, *resolver, IXION_ASCII("\"literal string\""));
+    formula_tokens_t tokens = parse_formula_string(cxt, A1B2.first, *resolver, "\"literal string\"");
 
     matrix res_value(2, 2, std::string("literal string"));
     formula_result res(std::move(res_value));

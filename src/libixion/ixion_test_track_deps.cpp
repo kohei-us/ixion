@@ -27,7 +27,7 @@ void test_single_cell_dependency()
 
     // A2
     abs_address_t pos(0,1,0);
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("A1*2"));
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "A1*2");
     formula_tokens_store_ptr_t store = formula_tokens_store::create();
     store->get() = std::move(tokens);
     cxt.set_formula_cell(pos, store);
@@ -35,7 +35,7 @@ void test_single_cell_dependency()
 
     // A3
     pos.row = 2;
-    tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("A2*2"));
+    tokens = parse_formula_string(cxt, pos, *resolver, "A2*2");
     store = formula_tokens_store::create();
     store->get() = std::move(tokens);
     cxt.set_formula_cell(pos, store);
@@ -70,7 +70,7 @@ void test_range_dependency()
 
     // C5
     abs_address_t pos(0,4,2);
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("SUM(A1:A3,C1:E1)"));
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "SUM(A1:A3,C1:E1)");
     auto ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
     cxt.set_formula_cell(pos, ts);
@@ -79,7 +79,7 @@ void test_range_dependency()
     // A10
     pos.row = 9;
     pos.column = 0;
-    tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("C5*2"));
+    tokens = parse_formula_string(cxt, pos, *resolver, "C5*2");
     ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
     cxt.set_formula_cell(pos, ts);
@@ -114,14 +114,14 @@ void test_matrix_dependency()
 
     // C5:E7
     formula_tokens_t tokens = parse_formula_string(
-        cxt, range.first, *resolver, IXION_ASCII("MMULT(A1:A3,C1:E1)"));
+        cxt, range.first, *resolver, "MMULT(A1:A3,C1:E1)");
 
     cxt.set_grouped_formula_cells(range, std::move(tokens));
     register_formula_cell(cxt, range.first); // Register only the top-left cell.
 
     // A10
     abs_address_t pos(0,9,0);
-    tokens = parse_formula_string(cxt, pos, *resolver, IXION_ASCII("C5*2"));
+    tokens = parse_formula_string(cxt, pos, *resolver, "C5*2");
     auto ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);
     cxt.set_formula_cell(pos, ts);

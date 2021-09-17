@@ -154,8 +154,7 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     sd->m_global->m_dirty_formula_cells.insert(pos);
 
     ixion::formula_tokens_t tokens =
-        ixion::parse_formula_string(
-            cxt, pos, *sd->m_global->m_resolver, formula, strlen(formula));
+        ixion::parse_formula_string(cxt, pos, *sd->m_global->m_resolver, formula);
 
     auto ts = formula_tokens_store::create();
     ts->get() = std::move(tokens);

@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     s = "SUM(A1:A10)";
 
     ixion::abs_address_t A11(0, 10, 0);
-    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s);
 
     // Set the tokens into the model.
     const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 
     // Insert a new formula to A11.
     s = "AVERAGE(A1:A10)";
-    tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
+    tokens = ixion::parse_formula_string(cxt, A11, *resolver, s);
 
     // Before overwriting, make sure to UN-register the old cell.
     ixion::unregister_formula_cell(cxt, A11);
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     // Overwrite A10 with a formula cell with no references.
     s = "(100+50)/2";
     ixion::abs_address_t A10(0, 9, 0);
-    tokens = ixion::parse_formula_string(cxt, A10, *resolver, s.data(), s.size());
+    tokens = ixion::parse_formula_string(cxt, A10, *resolver, s);
     cxt.set_formula_cell(A10, std::move(tokens));
     // No need to register this cell since it does not reference any other cells.
 

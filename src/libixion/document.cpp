@@ -149,7 +149,7 @@ struct document::impl
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
-        auto tokens = parse_formula_string(cxt, addr, *resolver, formula.data(), formula.size());
+        auto tokens = parse_formula_string(cxt, addr, *resolver, formula);
         formula_cell* fc = cxt.set_formula_cell(addr, std::move(tokens));
         register_formula_cell(cxt, addr, fc);
         modified_formula_cells.insert(addr);

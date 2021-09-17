@@ -70,8 +70,7 @@ void tokenize_formula(const std::string& formula, const std::string& sheets)
 
     abs_address_t pos;
 
-    formula_tokens_t tokens = parse_formula_string(
-        cxt, pos, *resolver, formula.data(), formula.size());
+    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, formula);
 
     cout << "* original formula string: " << formula << endl;
 

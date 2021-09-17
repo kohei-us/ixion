@@ -24,14 +24,13 @@ class formula_name_resolver;
  * @param cxt model context.
  * @param pos address of the cell that has the formula expression.
  * @param resolver name resolver object used to resolve name tokens.
- * @param p pointer to the first character of raw formula expression string.
- * @param n size of the raw formula expression string.
+ * @param formula raw formula expression string to parse.
  *
  * @return formula tokens representing the parsed formula expression.
  */
 IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
     iface::formula_model_access& cxt, const abs_address_t& pos,
-    const formula_name_resolver& resolver, const char* p, size_t n);
+    const formula_name_resolver& resolver, std::string_view formula);
 
 /**
  * Create a set of tokens that represent an invalid formula.

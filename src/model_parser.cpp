@@ -474,7 +474,7 @@ void model_parser::parse_init()
 
         formula_tokens_t tokens =
             parse_formula_string(
-                m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+                m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_formula_cells.insert(cell_def.pos);
@@ -495,7 +495,7 @@ void model_parser::parse_init()
             {
                 formula_tokens_t tokens =
                     parse_formula_string(
-                        m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+                        m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
 
                 auto ts = formula_tokens_store::create();
                 ts->get() = std::move(tokens);
@@ -550,7 +550,7 @@ void model_parser::parse_edit()
 
         formula_tokens_t tokens =
             parse_formula_string(
-                m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+                m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_formula_cells.insert(cell_def.pos);
@@ -579,7 +579,7 @@ void model_parser::parse_edit()
             {
                 formula_tokens_t tokens =
                     parse_formula_string(
-                        m_context, pos, *mp_name_resolver, cell_def.value.get(), cell_def.value.size());
+                        m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
 
                 auto ts = formula_tokens_store::create();
                 ts->get() = std::move(tokens);
@@ -777,8 +777,7 @@ void model_parser::push_named_expression()
 
     formula_tokens_t tokens = parse_formula_string(
         m_context, mp_named_expression->origin, *mp_name_resolver,
-        mp_named_expression->expression.data(),
-        mp_named_expression->expression.size());
+        mp_named_expression->expression);
 
     std::string exp_s = print_formula_tokens(
         m_context, mp_named_expression->origin, *mp_name_resolver, tokens);

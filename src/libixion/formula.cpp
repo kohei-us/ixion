@@ -45,11 +45,11 @@ std::string debug_print_formula_tokens(const formula_tokens_t& tokens)
 
 formula_tokens_t parse_formula_string(
     iface::formula_model_access& cxt, const abs_address_t& pos,
-    const formula_name_resolver& resolver, const char* p, size_t n)
+    const formula_name_resolver& resolver, std::string_view formula)
 {
-    IXION_TRACE("pos=" << pos.get_name() << "; formula='" << std::string(p, n) << "'");
+    IXION_TRACE("pos=" << pos.get_name() << "; formula='" << formula << "'");
     lexer_tokens_t lxr_tokens;
-    formula_lexer lexer(cxt.get_config(), p, n);
+    formula_lexer lexer(cxt.get_config(), formula.data(), formula.size());
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
