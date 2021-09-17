@@ -59,9 +59,9 @@ formula_error::~formula_error()
 
 const char* formula_error::what() const noexcept
 {
-    const char* error_name = get_formula_error_name(mp_impl->error);
+    std::string_view error_name = get_formula_error_name(mp_impl->error);
     if (mp_impl->msg.empty())
-        return error_name;
+        return error_name.data();
 
     std::ostringstream os;
     os << mp_impl->msg << " (type: " << error_name << ")";

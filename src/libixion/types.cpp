@@ -5,7 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/types.hpp"
+#include <ixion/types.hpp>
+#include <ixion/macros.hpp>
 
 #include <limits>
 #include <vector>
@@ -48,11 +49,11 @@ formula_group_t& formula_group_t::operator= (const formula_group_t& other)
     return *this;
 }
 
-const char* get_formula_error_name(formula_error_t fe)
+std::string_view get_formula_error_name(formula_error_t fe)
 {
     static const char* default_err_name = "#ERR!";
 
-    static const std::vector<const char*> names = {
+    static const std::string_view names[] = {
         "",        // 0: no error
         "#REF!",   // 1: result not available
         "#DIV/0!", // 2: division by zero
@@ -62,8 +63,8 @@ const char* get_formula_error_name(formula_error_t fe)
         "#VALUE!", // 6: invalid value type
     };
 
-    if (static_cast<size_t>(fe) < names.size())
-        return names[static_cast<size_t>(fe)];
+    if (std::size_t(fe) < IXION_N_ELEMENTS(names))
+        return names[std::size_t(fe)];
 
     return default_err_name;
 }

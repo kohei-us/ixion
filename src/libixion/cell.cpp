@@ -383,7 +383,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
                 if (handler)
                 {
                     handler->begin_cell_interpret(pos);
-                    const char* msg = get_formula_error_name(status.result->get_error());
+                    std::string_view msg = get_formula_error_name(status.result->get_error());
                     handler->set_formula_error(msg);
                     handler->end_cell_interpret();
                 }

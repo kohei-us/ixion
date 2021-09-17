@@ -110,7 +110,10 @@ struct formula_result::impl
         switch (type)
         {
             case result_type::error:
-                return get_formula_error_name(std::get<formula_error_t>(value));
+            {
+                std::string_view s = get_formula_error_name(std::get<formula_error_t>(value));
+                return std::string(s);
+            }
             case result_type::string:
                 return std::get<std::string>(value);
             case result_type::value:

@@ -12,6 +12,7 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <string_view>
 
 namespace ixion {
 
@@ -262,9 +263,9 @@ struct IXION_DLLPUBLIC formula_group_t
  * Get a string representation of a formula error type.
  *
  * @param fe enum value representing a formula error type.
- * @return string representation of the formula error type.
+ * @return null-terminated string representation of the formula error type.
  */
-IXION_DLLPUBLIC const char* get_formula_error_name(formula_error_t fe);
+IXION_DLLPUBLIC std::string_view get_formula_error_name(formula_error_t fe);
 
 }
 
