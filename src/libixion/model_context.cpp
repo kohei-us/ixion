@@ -20,36 +20,22 @@ namespace ixion {
 model_context::input_cell::input_cell(std::nullptr_t) : type(celltype_t::empty) {}
 model_context::input_cell::input_cell(bool b) : type(celltype_t::boolean)
 {
-    value.boolean = b;
+    value = b;
 }
 
 model_context::input_cell::input_cell(const char* s) : type(celltype_t::string)
 {
-    value.string = s;
+    value = std::string_view(s);
 }
 
 model_context::input_cell::input_cell(double v) : type(celltype_t::numeric)
 {
-    value.numeric = v;
+    value = v;
 }
 
 model_context::input_cell::input_cell(const input_cell& other) :
-    type(other.type)
+    type(other.type), value(other.value)
 {
-    switch (type)
-    {
-        case celltype_t::numeric:
-            value.numeric = other.value.numeric;
-            break;
-        case celltype_t::string:
-            value.string = other.value.string;
-            break;
-        case celltype_t::boolean:
-            value.boolean = other.value.boolean;
-            break;
-        default:
-            ;
-    }
 }
 
 model_context::input_row::input_row(std::initializer_list<input_cell> cells) :

@@ -14,6 +14,7 @@
 
 #include <string>
 #include <memory>
+#include <variant>
 
 namespace ixion {
 
@@ -61,15 +62,10 @@ public:
      */
     struct IXION_DLLPUBLIC input_cell
     {
+        using value_type = std::variant<bool, double, std::string_view>;
+
         celltype_t type;
-
-        union
-        {
-            bool boolean;
-            double numeric;
-            const char* string;
-
-        } value;
+        value_type value;
 
         /** Initializes the cell to be empty. */
         input_cell(std::nullptr_t);

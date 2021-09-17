@@ -336,13 +336,16 @@ void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<mo
             switch (c.type)
             {
                 case celltype_t::numeric:
-                    set_numeric_cell(pos, c.value.numeric);
+                    set_numeric_cell(pos, std::get<double>(c.value));
                     break;
                 case celltype_t::string:
-                    set_string_cell(pos, c.value.string, std::strlen(c.value.string));
+                {
+                    auto s = std::get<std::string_view>(c.value);
+                    set_string_cell(pos, s.data(), s.size());
                     break;
+                }
                 case celltype_t::boolean:
-                    set_boolean_cell(pos, c.value.boolean);
+                    set_boolean_cell(pos, std::get<bool>(c.value));
                     break;
                 default:
                     ;
