@@ -615,7 +615,7 @@ void model_parser::parse_result()
     string name_s = res.first.str();
 
     formula_result fres;
-    fres.parse(m_context, res.second.get(), res.second.size());
+    fres.parse({res.second.get(), res.second.size()});
     model_parser::results_type::iterator itr = m_formula_results.find(name_s);
     if (itr == m_formula_results.end())
     {
@@ -636,7 +636,7 @@ void model_parser::parse_result_cache()
     string name_s = res.first.str();
 
     formula_result fres;
-    fres.parse(m_context, res.second.get(), res.second.size());
+    fres.parse({res.second.get(), res.second.size()});
 
     formula_name_t fnt = mp_name_resolver->resolve(name_s, abs_address_t(m_current_sheet,0,0));
 

@@ -112,8 +112,10 @@ public:
     /**
      * Parse a textural representation of a formula result, and set result
      * value of appropriate type.
+     *
+     * @param s formula result as a string.
      */
-    void parse(iface::formula_model_access& cxt, const char* p, size_t n);
+    void parse(std::string_view s);
 
     formula_result& operator= (formula_result r);
     bool operator== (const formula_result& r) const;

@@ -242,21 +242,21 @@ struct formula_result::impl
         return string();
     }
 
-    void parse(iface::formula_model_access& cxt, const char* p, size_t n)
+    void parse(std::string_view s)
     {
-        if (!n)
+        if (s.empty())
             return;
 
-        switch (*p)
+        switch (s[0])
         {
             case '#':
             {
-                parse_error(p, n);
+                parse_error(s);
                 break;
             }
             case '"':
             {
-                parse_string(cxt, p, n);
+                parse_string(s);
                 break;
             }
             case 't':
@@ -264,7 +264,7 @@ struct formula_result::impl
             {
                 // parse this as a boolean value.
                 delete_buffer();
-                m_value = to_bool({p, n}) ? 1.0 : 0.0;
+                m_value = to_bool(s) ? 1.0 : 0.0;
                 m_type = result_type::value;
                 break;
             }
@@ -272,7 +272,7 @@ struct formula_result::impl
             {
                 // parse this as a number.
                 delete_buffer();
-                m_value = to_double({p, n});
+                m_value = to_double(s);
                 m_type = result_type::value;
             }
         }
@@ -327,13 +327,13 @@ struct formula_result::impl
         return false;
     }
 
-    void parse_error(const char* p, size_t n)
+    void parse_error(std::string_view s)
     {
-        assert(n);
-        assert(*p == '#');
+        assert(!s.empty());
+        assert(s[0] == '#');
 
-        const char* p0 = p;
-        const char* p_end = p + n;
+        const char* p = s.data();
+        const char* p_end = p + s.size();
 
         ++p; // skip '#'.
         mem_str_buf buf;
@@ -405,20 +405,21 @@ struct formula_result::impl
         }
 
         ostringstream os;
-        os << "malformed error string: " << string(p0, n);
+        os << "malformed error string: " << s;
         throw general_error(os.str());
     }
 
-    void parse_string(iface::formula_model_access& cxt, const char* p, size_t n)
+    void parse_string(std::string_view s)
     {
-        if (n <= 1)
+        if (s.size() <= 1u)
             return;
 
-        assert(*p == '"');
+        assert(s[0] == '"');
+        const char* p = s.data();
         ++p;
         const char* p_first = p;
-        size_t len = 0;
-        for (size_t i = 1; i < n; ++i, ++len, ++p)
+        std::size_t len = 0;
+        for (std::size_t i = 1; i < s.size(); ++i, ++len, ++p)
         {
             char c = *p;
             if (c == '"')
@@ -512,9 +513,9 @@ string formula_result::str(const iface::formula_model_access& cxt) const
     return mp_impl->str(cxt);
 }
 
-void formula_result::parse(iface::formula_model_access& cxt, const char* p, size_t n)
+void formula_result::parse(std::string_view s)
 {
-    mp_impl->parse(cxt, p, n);
+    mp_impl->parse(s);
 }
 
 formula_result& formula_result::operator= (formula_result r)
