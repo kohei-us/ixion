@@ -627,9 +627,9 @@ void test_name_resolver_table_excel_a1()
             assert(!"table reference expected.");
 
         formula_name_t::table_type table = res.table;
-        string_id_t table_name = cxt.get_identifier_from_string(table.name, table.name_length);
-        string_id_t column_first = cxt.get_identifier_from_string(table.column_first, table.column_first_length);
-        string_id_t column_last = cxt.get_identifier_from_string(table.column_last, table.column_last_length);
+        string_id_t table_name = cxt.get_identifier_from_string(table.name.data(), table.name.size());
+        string_id_t column_first = cxt.get_identifier_from_string(table.column_first.data(), table.column_first.size());
+        string_id_t column_last = cxt.get_identifier_from_string(table.column_last.data(), table.column_last.size());
         assert(table_name == tests[i].table_name);
         assert(column_first == tests[i].column_first);
         assert(column_last == tests[i].column_last);

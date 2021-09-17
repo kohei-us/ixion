@@ -89,8 +89,8 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
     short scope = 0;
     size_t last_column_pos = std::numeric_limits<size_t>::max();
     mem_str_buf buf;
-    mem_str_buf table_name;
-    vector<mem_str_buf> names;
+    std::string_view table_name;
+    std::vector<std::string_view> names;
 
     bool table_detected = false;
 
@@ -110,7 +110,7 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
                     if (scope != 0)
                         return false;
 
-                    table_name = buf;
+                    table_name = { buf.get(), buf.size() };
                     buf.clear();
                 }
 
@@ -125,7 +125,7 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
 
                 if (!buf.empty())
                 {
-                    names.push_back(buf);
+                    names.emplace_back(buf.get(), buf.size());
                     buf.clear();
                 }
 
@@ -172,43 +172,38 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
 
     ret.table.areas = table_area_none;
     ret.type = formula_name_t::table_reference;
-    ret.table.name = table_name.get();
-    ret.table.name_length = table_name.size();
-    ret.table.column_first = NULL;
-    ret.table.column_first_length = 0;
-    ret.table.column_last = NULL;
-    ret.table.column_last_length = 0;
+    ret.table.name = table_name;
+    ret.table.column_first = std::string_view();
+    ret.table.column_last = std::string_view();
 
-    vector<mem_str_buf>::iterator it = names.begin(), it_end = names.end();
-    for (; it != it_end; ++it)
+    for (std::size_t i = 0; i < names.size(); ++i)
     {
-        buf = *it;
-        assert(!buf.empty());
-        if (buf[0] == '#')
+        std::string_view name = names[i];
+        assert(!name.empty());
+
+        if (name[0] == '#')
         {
             // area specifier.
-            buf.pop_front();
-            if (buf.equals("Headers"))
+            name.remove_prefix(1);
+            if (name == "Headers")
                 ret.table.areas |= table_area_headers;
-            else if (buf.equals("Data"))
+            else if (name == "Data")
                 ret.table.areas |= table_area_data;
-            else if (buf.equals("Totals"))
+            else if (name == "Totals")
                 ret.table.areas |= table_area_totals;
-            else if (buf.equals("All"))
+            else if (name == "All")
                 ret.table.areas = table_area_all;
         }
-        else if (ret.table.column_first_length)
+        else if (!ret.table.column_first.empty())
         {
             // This is a second column name.
-            if (ret.table.column_last_length)
+            if (!ret.table.column_last.empty())
                 return false;
 
-            size_t dist = std::distance(names.begin(), it);
-            if (dist != last_column_pos)
+            if (i != last_column_pos)
                 return false;
 
-            ret.table.column_last = buf.get();
-            ret.table.column_last_length = buf.size();
+            ret.table.column_last = name;
         }
         else
         {
@@ -216,8 +211,7 @@ bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t
             if (!ret.table.areas)
                 ret.table.areas = table_area_data;
 
-            ret.table.column_first = buf.get();
-            ret.table.column_first_length = buf.size();
+            ret.table.column_first = name;
         }
     }
 

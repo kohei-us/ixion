@@ -75,12 +75,9 @@ struct IXION_DLLPUBLIC formula_name_t
      */
     struct table_type
     {
-        const char* name;
-        size_t name_length;
-        const char* column_first;
-        size_t column_first_length;
-        const char* column_last;
-        size_t column_last_length;
+        std::string_view name;
+        std::string_view column_first;
+        std::string_view column_last;
         table_areas_t areas;
     };
 

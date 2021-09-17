@@ -174,9 +174,9 @@ void formula_parser::name(const lexer_token_base& t)
         case formula_name_t::table_reference:
         {
             table_t table;
-            table.name = m_context.add_string({fn.table.name, fn.table.name_length});
-            table.column_first = m_context.add_string({fn.table.column_first, fn.table.column_first_length});
-            table.column_last = m_context.add_string({fn.table.column_last, fn.table.column_last_length});
+            table.name = m_context.add_string(fn.table.name);
+            table.column_first = m_context.add_string(fn.table.column_first);
+            table.column_last = m_context.add_string(fn.table.column_last);
             table.areas = fn.table.areas;
             m_formula_tokens.push_back(make_unique<table_ref_token>(table));
             break;
