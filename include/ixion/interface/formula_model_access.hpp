@@ -133,8 +133,8 @@ public:
      * named columns.  It is used when resolving a table reference that refers
      * to a cell or a range of cells by the table name and/or column name.
      *
-     * @return non-NULL pointer to the table storage inside the model, or NULL
-     *         if no table is present or supported by the model
+     * @return non-null pointer to the table storage inside the model, or
+     *         nullptr if no table is present or supported by the model
      *         implementation.
      */
     virtual table_handler* get_table_handler();
