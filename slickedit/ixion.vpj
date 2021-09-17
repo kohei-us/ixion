@@ -211,14 +211,6 @@
     <List Name="RTE">
     </List>
     <Files AutoFolders="DirectoryView">
-        <Folder Name="..">
-            <F
-                N="../Makefile.am"
-                Type="Makefile"/>
-        </Folder>
-        <Folder Name="../bin">
-            <F N="../bin/ixion-parser.sh"/>
-        </Folder>
         <Folder Name="../include">
             <Folder Name="ixion">
                 <Folder Name="interface">
@@ -246,9 +238,6 @@
                 <F N="../include/ixion/global.hpp"/>
                 <F N="../include/ixion/info.hpp"/>
                 <F N="../include/ixion/macros.hpp"/>
-                <F
-                    N="../include/ixion/Makefile.am"
-                    Type="Makefile"/>
                 <F N="../include/ixion/matrix.hpp"/>
                 <F N="../include/ixion/mem_str_buf.hpp"/>
                 <F N="../include/ixion/model_context.hpp"/>
@@ -312,9 +301,6 @@
                 <F N="../src/libixion/ixion_test_track_deps.cpp"/>
                 <F N="../src/libixion/lexer_tokens.cpp"/>
                 <F N="../src/libixion/lexer_tokens.hpp"/>
-                <F
-                    N="../src/libixion/Makefile.am"
-                    Type="Makefile"/>
                 <F N="../src/libixion/matrix.cpp"/>
                 <F N="../src/libixion/mem_str_buf.cpp"/>
                 <F N="../src/libixion/model_context.cpp"/>
@@ -333,6 +319,7 @@
                 <F N="../src/libixion/utils.hpp"/>
                 <F N="../src/libixion/vulkan_obj.cpp"/>
                 <F N="../src/libixion/vulkan_obj.hpp"/>
+                <F N="../src/libixion/vulkan_spirv_blobs.inl"/>
                 <F N="../src/libixion/workbook.cpp"/>
                 <F N="../src/libixion/workbook.hpp"/>
             </Folder>
@@ -350,9 +337,6 @@
             <F N="../src/ixion_formula_tokenizer.cpp"/>
             <F N="../src/ixion_parser.cpp"/>
             <F N="../src/ixion_sorter.cpp"/>
-            <F
-                N="../src/Makefile.am"
-                Type="Makefile"/>
             <F N="../src/model_parser.cpp"/>
             <F N="../src/model_parser.hpp"/>
             <F N="../src/session_handler.cpp"/>
