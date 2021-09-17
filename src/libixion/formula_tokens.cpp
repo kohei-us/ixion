@@ -5,18 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_tokens.hpp"
-#include "ixion/exceptions.hpp"
-#include "ixion/global.hpp"
-
-using ::std::string;
+#include <ixion/formula_tokens.hpp>
+#include <ixion/exceptions.hpp>
+#include <ixion/global.hpp>
+#include <ixion/macros.hpp>
 
 namespace ixion {
 
-const char* get_opcode_name(fopcode_t oc)
+std::string_view get_opcode_name(fopcode_t oc)
 {
     // Make sure the names are ordered identically to the ordering of the enum members.
-    static const std::vector<const char*> names = {
+    static const std::string_view names[] = {
         "unknown", // fop_unknown
         "single ref", // fop_single_ref
         "range ref", // fop_range_ref
@@ -43,18 +42,18 @@ const char* get_opcode_name(fopcode_t oc)
         "error", // fop_error
     };
 
-    if (size_t(oc) >= names.size())
+    if (std::size_t(oc) >= IXION_N_ELEMENTS(names))
         return "???";
 
     return names[oc];
 }
 
-const char* get_formula_opcode_string(fopcode_t oc)
+std::string_view get_formula_opcode_string(fopcode_t oc)
 {
     static const char* empty = "";
 
     // Make sure the names are ordered identically to the ordering of the enum members.
-    static const std::vector<const char*> names = {
+    static const std::string_view names[] = {
         empty, // fop_unknown
         empty, // fop_single_ref
         empty, // fop_range_ref
@@ -81,7 +80,7 @@ const char* get_formula_opcode_string(fopcode_t oc)
         empty, // fop_error
     };
 
-    if (size_t(oc) >= names.size())
+    if (std::size_t(oc) >= IXION_N_ELEMENTS(names))
         return empty;
 
     return names[oc];
