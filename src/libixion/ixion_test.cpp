@@ -2343,11 +2343,10 @@ void test_volatile_function()
 void test_invalid_formula_tokens()
 {
     model_context cxt;
-    mem_str_buf invalid_formula("invalid formula");
-    mem_str_buf error_msg("failed to parse formula");
+    std::string_view invalid_formula("invalid formula");
+    std::string_view error_msg("failed to parse formula");
 
-    formula_tokens_t tokens = create_formula_error_tokens(
-        cxt, invalid_formula.get(), invalid_formula.size(), error_msg.get(), error_msg.size());
+    formula_tokens_t tokens = create_formula_error_tokens(cxt, invalid_formula, error_msg);
 
     assert(tokens[0]->get_opcode() == fop_error);
     assert(tokens.size() == (tokens[0]->get_uint32() + 1));
@@ -2355,12 +2354,12 @@ void test_invalid_formula_tokens()
     assert(tokens[1]->get_opcode() == fop_string);
     string_id_t sid = tokens[1]->get_uint32();
     const std::string* s = cxt.get_string(sid);
-    assert(invalid_formula.str() == *s);
+    assert(invalid_formula == *s);
 
     assert(tokens[2]->get_opcode() == fop_string);
     sid = tokens[2]->get_uint32();
     s = cxt.get_string(sid);
-    assert(error_msg.str() == *s);
+    assert(error_msg == *s);
 }
 
 void test_grouped_formula_string_results()

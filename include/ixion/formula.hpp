@@ -36,12 +36,8 @@ IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
  * Create a set of tokens that represent an invalid formula.
  *
  * @param cxt model context.
- * @param p_src_formula pointer to the buffer containing the original
- *                      formula string.
- * @param n_src_formula length of the buffer containinig the original
- *                      formula string.
- * @param p_error pointer to the buffer containing the error string.
- * @param n_error length of the buffer containing the erorr string.
+ * @param src_formula original formula string.
+ * @param error error string.
  *
  * @return a set of tokens, the first of which is a token of type fop_error,
  *         followed by two string tokens.  The first string token stores
@@ -49,8 +45,8 @@ IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
  *         string.
  */
 IXION_DLLPUBLIC formula_tokens_t create_formula_error_tokens(
-    iface::formula_model_access& cxt, const char* p_src_formula, size_t n_src_formula,
-    const char* p_error, size_t n_error);
+    iface::formula_model_access& cxt, std::string_view src_formula,
+    std::string_view error);
 
 /**
  * Convert formula tokens into a human-readable string representation.

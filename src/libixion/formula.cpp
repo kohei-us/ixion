@@ -68,16 +68,16 @@ formula_tokens_t parse_formula_string(
 }
 
 formula_tokens_t create_formula_error_tokens(
-    iface::formula_model_access& cxt, const char* p_src_formula, size_t n_src_formula,
-    const char* p_error, size_t n_error)
+    iface::formula_model_access& cxt, std::string_view src_formula,
+    std::string_view error)
 {
     formula_tokens_t tokens;
     tokens.push_back(std::make_unique<error_token>(2));
 
-    string_id_t sid_src_formula = cxt.add_string({p_src_formula, n_src_formula});
+    string_id_t sid_src_formula = cxt.add_string(src_formula);
     tokens.push_back(std::make_unique<string_token>(sid_src_formula));
 
-    string_id_t sid_error = cxt.add_string({p_error, n_error});
+    string_id_t sid_error = cxt.add_string(error);
     tokens.push_back(std::make_unique<string_token>(sid_error));
 
     return tokens;
