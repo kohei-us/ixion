@@ -14,6 +14,7 @@
 
 #include "session_handler.hpp"
 #include "table_handler.hpp"
+#include "mem_str_buf.hpp"
 
 #include <string>
 #include <exception>

@@ -7,10 +7,10 @@
 
 #include "formula_functions.hpp"
 #include "debug.hpp"
+#include "mem_str_buf.hpp"
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/matrix.hpp"
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/macros.hpp"
 

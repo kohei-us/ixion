@@ -8,7 +8,6 @@
 #ifndef INCLUDED_IXION_MODEL_CONTEXT_HPP
 #define INCLUDED_IXION_MODEL_CONTEXT_HPP
 
-#include "mem_str_buf.hpp"
 #include "env.hpp"
 #include "./interface/formula_model_access.hpp"
 

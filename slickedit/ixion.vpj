@@ -239,7 +239,6 @@
                 <F N="../include/ixion/info.hpp"/>
                 <F N="../include/ixion/macros.hpp"/>
                 <F N="../include/ixion/matrix.hpp"/>
-                <F N="../include/ixion/mem_str_buf.hpp"/>
                 <F N="../include/ixion/model_context.hpp"/>
                 <F N="../include/ixion/model_iterator.hpp"/>
                 <F N="../include/ixion/module.hpp"/>
@@ -251,6 +250,7 @@
         <Folder Name="../src">
             <Folder Name="include">
                 <F N="../src/include/depth_first_search.hpp"/>
+                <F N="../src/include/mem_str_buf.hpp"/>
                 <F N="../src/include/test_global.hpp"/>
             </Folder>
             <Folder Name="libixion">

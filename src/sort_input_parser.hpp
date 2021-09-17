@@ -8,10 +8,10 @@
 #ifndef __IXION_SORT_INPUT_PARSER_HXX__
 #define __IXION_SORT_INPUT_PARSER_HXX__
 
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
 
 #include "depth_first_search.hpp"
+#include "mem_str_buf.hpp"
 
 #include <vector>
 

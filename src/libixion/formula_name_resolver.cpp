@@ -7,11 +7,11 @@
 
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/interface/formula_model_access.hpp"
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/table.hpp"
 
 #include "formula_functions.hpp"
 #include "debug.hpp"
+#include "mem_str_buf.hpp"
 
 #include <cassert>
 #include <iostream>

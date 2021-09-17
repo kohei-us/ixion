@@ -11,11 +11,11 @@
 #include <string>
 #include <exception>
 
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
 #include "ixion/config.hpp"
 
 #include "lexer_tokens.hpp"
+#include "mem_str_buf.hpp"
 
 namespace ixion {
 

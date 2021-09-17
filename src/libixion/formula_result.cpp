@@ -6,11 +6,12 @@
  */
 
 #include "ixion/formula_result.hpp"
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/exceptions.hpp"
 #include "ixion/interface/formula_model_access.hpp"
 #include "ixion/config.hpp"
 #include "ixion/matrix.hpp"
+
+#include "mem_str_buf.hpp"
 
 #include <cassert>
 #include <sstream>

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/mem_str_buf.hpp"
+#include "mem_str_buf.hpp"
 
 #include <cstring>
 #include <cassert>

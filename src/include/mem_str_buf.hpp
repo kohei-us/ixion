@@ -8,7 +8,7 @@
 #ifndef __IXION_MEM_STR_BUF_HPP__
 #define __IXION_MEM_STR_BUF_HPP__
 
-#include "env.hpp"
+#include <ixion/env.hpp>
 
 #include <string>
 #include <ostream>

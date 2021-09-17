@@ -6,13 +6,14 @@
  */
 
 #include "ixion/global.hpp"
-#include "ixion/mem_str_buf.hpp"
 #include "ixion/address.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/cell.hpp"
 #include "ixion/exceptions.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/interface/formula_model_access.hpp"
+
+#include "mem_str_buf.hpp"
 
 #include <iostream>
 #include <cstdlib>
