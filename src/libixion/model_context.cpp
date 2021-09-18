@@ -88,11 +88,6 @@ const dirty_cell_tracker& model_context::get_cell_tracker() const
     return mp_impl->get_cell_tracker();
 }
 
-void model_context::erase_cell(const abs_address_t& addr)
-{
-    mp_impl->empty_cell(addr);
-}
-
 void model_context::empty_cell(const abs_address_t& addr)
 {
     mp_impl->empty_cell(addr);
