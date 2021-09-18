@@ -1607,7 +1607,7 @@ void test_model_context_named_expression()
         std::string test = print_formula_tokens(cxt, tc.origin, *resolver, tokens);
         assert(test == tc.formula);
 
-        cxt.set_named_expression(tc.name.data(), tc.name.size(), tc.origin, std::move(tokens));
+        cxt.set_named_expression(tc.name, tc.origin, std::move(tokens));
     }
 
     for (const test_case& tc : tcs)
@@ -1644,17 +1644,17 @@ void test_model_context_named_expression()
         if (tc.valid)
         {
             formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
-            cxt.set_named_expression(tc.name.data(), tc.name.size(), origin, std::move(tokens));
+            cxt.set_named_expression(tc.name, origin, std::move(tokens));
 
             tokens = parse_formula_string(cxt, origin, *resolver, formula);
-            cxt.set_named_expression(0, tc.name.data(), tc.name.size(), origin, std::move(tokens));
+            cxt.set_named_expression(0, tc.name, origin, std::move(tokens));
         }
         else
         {
             try
             {
                 formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
-                cxt.set_named_expression(tc.name.data(), tc.name.size(), origin, std::move(tokens));
+                cxt.set_named_expression(tc.name, origin, std::move(tokens));
                 assert(!"named expression with invalid name should have been rejected!");
             }
             catch (const model_context_error& e)
@@ -1665,7 +1665,7 @@ void test_model_context_named_expression()
             try
             {
                 formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
-                cxt.set_named_expression(0, tc.name.data(), tc.name.size(), origin, std::move(tokens));
+                cxt.set_named_expression(0, tc.name, origin, std::move(tokens));
                 assert(!"named expression with invalid name should have been rejected!");
             }
             catch (const model_context_error& e)
@@ -2155,7 +2155,7 @@ void test_model_context_iterator_named_exps()
         return true;
     };
 
-    cxt.set_named_expression(IXION_ASCII("MyCalc"), tokenize("(1+2)/3"));
+    cxt.set_named_expression("MyCalc", tokenize("(1+2)/3"));
 
     std::vector<check> expected =
     {
@@ -2165,7 +2165,7 @@ void test_model_context_iterator_named_exps()
     iter = cxt.get_named_expressions_iterator();
     assert(validate(iter, expected));
 
-    cxt.set_named_expression(IXION_ASCII("RefToRight"), tokenize("B1"));
+    cxt.set_named_expression("RefToRight", tokenize("B1"));
 
     expected =
     {
@@ -2176,8 +2176,8 @@ void test_model_context_iterator_named_exps()
     iter = cxt.get_named_expressions_iterator();
     assert(validate(iter, expected));
 
-    cxt.set_named_expression(1, IXION_ASCII("MyCalc2"), tokenize("(B1+C1)/D1"));
-    cxt.set_named_expression(1, IXION_ASCII("MyCalc3"), tokenize("B1/(PI()*2)"));
+    cxt.set_named_expression(1, "MyCalc2", tokenize("(B1+C1)/D1"));
+    cxt.set_named_expression(1, "MyCalc3", tokenize("B1/(PI()*2)"));
 
     iter = cxt.get_named_expressions_iterator(0);
     assert(!iter.has());

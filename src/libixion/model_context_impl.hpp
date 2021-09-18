@@ -134,8 +134,8 @@ public:
 
     formula_result get_formula_result(const abs_address_t& addr) const;
 
-    void set_named_expression(const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr);
-    void set_named_expression(sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr);
+    void set_named_expression(std::string name, const abs_address_t& origin, formula_tokens_t&& expr);
+    void set_named_expression(sheet_t sheet, std::string name, const abs_address_t& origin, formula_tokens_t&& expr);
 
     const named_expression_t* get_named_expression(std::string_view name) const;
     const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const;

@@ -319,28 +319,27 @@ size_t model_context::get_sheet_count() const
     return mp_impl->get_sheet_count();
 }
 
-void model_context::set_named_expression(const char* p, size_t n, formula_tokens_t expr)
+void model_context::set_named_expression(std::string name, formula_tokens_t expr)
 {
     abs_address_t origin(0, 0, 0);
-    mp_impl->set_named_expression(p, n, origin, std::move(expr));
+    mp_impl->set_named_expression(std::move(name), origin, std::move(expr));
 }
 
-void model_context::set_named_expression(const char* p, size_t n, const abs_address_t& origin, formula_tokens_t expr)
+void model_context::set_named_expression(std::string name, const abs_address_t& origin, formula_tokens_t expr)
 {
-    mp_impl->set_named_expression(p, n, origin, std::move(expr));
+    mp_impl->set_named_expression(std::move(name), origin, std::move(expr));
+}
+
+void model_context::set_named_expression(sheet_t sheet, std::string name, formula_tokens_t expr)
+{
+    abs_address_t origin(0, 0, 0);
+    mp_impl->set_named_expression(sheet, std::move(name), origin, std::move(expr));
 }
 
 void model_context::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, formula_tokens_t expr)
+    sheet_t sheet, std::string name, const abs_address_t& origin, formula_tokens_t expr)
 {
-    abs_address_t origin(0, 0, 0);
-    mp_impl->set_named_expression(sheet, p, n, origin, std::move(expr));
-}
-
-void model_context::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t expr)
-{
-    mp_impl->set_named_expression(sheet, p, n, origin, std::move(expr));
+    mp_impl->set_named_expression(sheet, std::move(name), origin, std::move(expr));
 }
 
 const named_expression_t* model_context::get_named_expression(sheet_t sheet, std::string_view name) const

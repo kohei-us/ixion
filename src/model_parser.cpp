@@ -809,14 +809,12 @@ void model_parser::push_named_expression()
 
     if (mp_named_expression->scope == global_scope)
     {
-        m_context.set_named_expression(
-            mp_named_expression->name.data(), mp_named_expression->name.size(), std::move(tokens));
+        m_context.set_named_expression(mp_named_expression->name, std::move(tokens));
     }
     else
     {
         m_context.set_named_expression(
-            mp_named_expression->scope,
-            mp_named_expression->name.data(), mp_named_expression->name.size(), std::move(tokens));
+            mp_named_expression->scope, mp_named_expression->name, std::move(tokens));
     }
 
     mp_named_expression.reset();

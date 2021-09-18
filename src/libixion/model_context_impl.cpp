@@ -209,11 +209,10 @@ void model_context_impl::notify(formula_event_t event)
 }
 
 void model_context_impl::set_named_expression(
-    const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
+    std::string name, const abs_address_t& origin, formula_tokens_t&& expr)
 {
-    check_named_exp_name_or_throw(p, n);
+    check_named_exp_name_or_throw(name.data(), name.size());
 
-    std::string name(p, n);
     IXION_TRACE("named expression: name='" << name << "'");
     m_named_expressions.insert(
         detail::named_expressions_t::value_type(
@@ -224,12 +223,11 @@ void model_context_impl::set_named_expression(
 }
 
 void model_context_impl::set_named_expression(
-    sheet_t sheet, const char* p, size_t n, const abs_address_t& origin, formula_tokens_t&& expr)
+    sheet_t sheet, std::string name, const abs_address_t& origin, formula_tokens_t&& expr)
 {
-    check_named_exp_name_or_throw(p, n);
+    check_named_exp_name_or_throw(name.data(), name.size());
 
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
-    std::string name(p, n);
     IXION_TRACE("named expression: name='" << name << "'");
     ns.insert(
         detail::named_expressions_t::value_type(
