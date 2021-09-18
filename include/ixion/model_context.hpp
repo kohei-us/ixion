@@ -308,13 +308,6 @@ public:
      */
     named_expressions_iterator get_named_expressions_iterator(sheet_t sheet) const;
 
-    /**
-     * @deprecated This is not generic enough and should be replaced.  This
-     *             functionality should be realized via model_iterator in the
-     *             future.
-     */
-    abs_address_set_t get_all_formula_cells() const;
-
     bool empty() const;
 };
 

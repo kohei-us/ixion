@@ -398,11 +398,6 @@ named_expressions_iterator model_context::get_named_expressions_iterator(sheet_t
     return named_expressions_iterator(*this, sheet);
 }
 
-abs_address_set_t model_context::get_all_formula_cells() const
-{
-    return mp_impl->get_all_formula_cells();
-}
-
 bool model_context::empty() const
 {
     return mp_impl->empty();

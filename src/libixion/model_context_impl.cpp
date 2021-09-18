@@ -523,34 +523,6 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
     return ret;
 }
 
-abs_address_set_t model_context_impl::get_all_formula_cells() const
-{
-    abs_address_set_t cells;
-
-    for (size_t sid = 0; sid < m_sheets.size(); ++sid)
-    {
-        const worksheet& sh = m_sheets[sid];
-        for (size_t cid = 0; cid < sh.size(); ++cid)
-        {
-            const column_store_t& col = sh[cid];
-            column_store_t::const_iterator it = col.begin();
-            column_store_t::const_iterator ite = col.end();
-            for (; it != ite; ++it)
-            {
-                if (it->type != element_type_formula)
-                    continue;
-
-                row_t row_id = it->position;
-                abs_address_t pos(sid, row_id, cid);
-                for (size_t i = 0; i < it->size; ++i, ++pos.row)
-                    cells.insert(pos);
-            }
-        }
-    }
-
-    return cells;
-}
-
 bool model_context_impl::empty() const
 {
     return m_sheets.empty();

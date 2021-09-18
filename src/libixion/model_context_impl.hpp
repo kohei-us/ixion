@@ -159,8 +159,6 @@ public:
 
     double count_range(const abs_range_t& range, const values_t& values_type) const;
 
-    abs_address_set_t get_all_formula_cells() const;
-
     bool empty() const;
 
     const worksheet* fetch_sheet(sheet_t sheet_index) const;
