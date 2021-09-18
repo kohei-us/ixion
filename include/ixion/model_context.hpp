@@ -249,22 +249,6 @@ public:
      * being used for the new sheet already exists, it throws a
      * model_context_error exception.
      *
-     * @param p pointer to the char array storing the name of the inserted
-     *          sheet.
-     * @param n size of the sheet name char array.
-     *
-     * @return sheet index of the inserted sheet.
-     *
-     * @throw model_context_error
-     */
-    sheet_t append_sheet(const char* p, size_t n);
-
-    /**
-     * Append a new sheet to the model.  The caller must ensure that the name
-     * of the new sheet is unique within the model context.  When the name
-     * being used for the new sheet already exists, it throws a
-     * model_context_error exception.
-     *
      * @param name name of the sheet to be inserted.
      *
      * @return sheet index of the inserted sheet.

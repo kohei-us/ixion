@@ -348,11 +348,6 @@ const named_expression_t* model_context::get_named_expression(sheet_t sheet, std
     return mp_impl->get_named_expression(sheet, name);
 }
 
-sheet_t model_context::append_sheet(const char* p, size_t n)
-{
-    return mp_impl->append_sheet(std::string(p, n));
-}
-
 sheet_t model_context::append_sheet(std::string name)
 {
     return mp_impl->append_sheet(std::move(name));

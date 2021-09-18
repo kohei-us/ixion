@@ -259,7 +259,7 @@ void model_parser::parse()
 void model_parser::init_model()
 {
     if (m_context.empty())
-        m_context.append_sheet(IXION_ASCII("sheet"));
+        m_context.append_sheet("sheet");
 }
 
 void model_parser::parse_command()
@@ -435,7 +435,7 @@ void model_parser::parse_session()
     }
     else if (cmd == "insert-sheet")
     {
-        m_context.append_sheet(value.get(), value.size());
+        m_context.append_sheet({value.get(), value.size()});
         cout << "sheet: (name: " << value << ")" << endl;
     }
     else if (cmd == "current-sheet")

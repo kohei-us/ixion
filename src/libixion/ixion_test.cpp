@@ -179,10 +179,10 @@ void test_name_resolver_calc_a1()
     cout << "test name resolver calc a1" << endl;
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"));
-    cxt.append_sheet(IXION_ASCII("Two"));
-    cxt.append_sheet(IXION_ASCII("Three"));
-    cxt.append_sheet(IXION_ASCII("A B C")); // name with space
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("Three");
+    cxt.append_sheet("A B C"); // name with space
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
     assert(resolver);
 
@@ -370,11 +370,11 @@ void test_name_resolver_excel_a1()
     cout << "test name resolver excel a1" << endl;
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"));
-    cxt.append_sheet(IXION_ASCII("Two"));
-    cxt.append_sheet(IXION_ASCII("Three"));
-    cxt.append_sheet(IXION_ASCII("A B C")); // name with space
-    cxt.append_sheet(IXION_ASCII("'quote'")); // quoted name
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("Three");
+    cxt.append_sheet("A B C"); // name with space
+    cxt.append_sheet("'quote'"); // quoted name
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
@@ -542,7 +542,7 @@ void test_name_resolver_named_expression()
     cout << "Testing the name resolvers for parsing named expressions." << endl;
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("Sheet"));
+    cxt.append_sheet("Sheet");
 
     const std::vector<formula_name_resolver_t> resolver_types = {
         formula_name_resolver_t::excel_a1,
@@ -575,7 +575,7 @@ void test_name_resolver_table_excel_a1()
 {
     cout << "Testing the Excel A1 name resolver for parsing table references." << endl;
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("Sheet"));
+    cxt.append_sheet("Sheet");
     string_id_t s_table1 = cxt.append_string("Table1");
     string_id_t s_table2 = cxt.append_string("Table2");
     string_id_t s_cat = cxt.append_string("Category");
@@ -653,10 +653,10 @@ void test_name_resolver_excel_r1c1()
 {
     cout << "test name resolver excel r1c1" << endl;
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"));
-    cxt.append_sheet(IXION_ASCII("Two"));
-    cxt.append_sheet(IXION_ASCII("A B C")); // name with space
-    cxt.append_sheet(IXION_ASCII("80's Music"));
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("A B C"); // name with space
+    cxt.append_sheet("80's Music");
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_r1c1, &cxt);
     assert(resolver);
@@ -870,10 +870,10 @@ void test_name_resolver_odff()
     cout << "test name resolver odff" << endl;
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"));
-    cxt.append_sheet(IXION_ASCII("Two"));
-    cxt.append_sheet(IXION_ASCII("A B C")); // name with space
-    cxt.append_sheet(IXION_ASCII("80's Music"));
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("A B C"); // name with space
+    cxt.append_sheet("80's Music");
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::odff, &cxt);
     assert(resolver);
@@ -1042,10 +1042,10 @@ void test_name_resolver_odf_cra()
     cout << "test name resolver odf-cra" << endl;
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("One"));
-    cxt.append_sheet(IXION_ASCII("Two"));
-    cxt.append_sheet(IXION_ASCII("Three"));
-    cxt.append_sheet(IXION_ASCII("A B C")); // name with space
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("Three");
+    cxt.append_sheet("A B C"); // name with space
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::odf_cra, &cxt);
     assert(resolver);
 
@@ -1269,11 +1269,11 @@ void test_parse_and_print_expressions()
     };
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("Test"));
+    cxt.append_sheet("Test");
     cxt.append_string("Table1");
     cxt.append_string("Category");
     cxt.append_string("Value");
-    cxt.append_sheet(IXION_ASCII("Ying & Yang")); // name with '&'
+    cxt.append_sheet("Ying & Yang"); // name with '&'
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -1338,7 +1338,7 @@ void test_function_name_resolution()
     };
 
     model_context cxt;
-    cxt.append_sheet(IXION_ASCII("Test"));
+    cxt.append_sheet("Test");
     auto resolver = formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     size_t n = IXION_N_ELEMENTS(valid_names);
     for (size_t i = 0; i < n; ++i)
@@ -1383,7 +1383,7 @@ void test_model_context_storage()
         auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
         assert(resolver);
 
-        cxt.append_sheet(IXION_ASCII("test"));
+        cxt.append_sheet("test");
 
         // Test empty cell access.
         cell_access ca = cxt.get_cell_access(abs_address_t(0, 0, 0));
@@ -1445,7 +1445,7 @@ void test_model_context_storage()
         auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
         assert(resolver);
 
-        cxt.append_sheet(IXION_ASCII("test"));
+        cxt.append_sheet("test");
         string exp = "1";
         cxt.set_formula_cell(abs_address_t(0,0,0), parse_formula_string(cxt, abs_address_t(0,0,0), *resolver, exp));
         cxt.set_formula_cell(abs_address_t(0,2,0), parse_formula_string(cxt, abs_address_t(0,2,0), *resolver, exp));
@@ -1455,7 +1455,7 @@ void test_model_context_storage()
     {
         // Test data area.
         model_context cxt;
-        cxt.append_sheet(IXION_ASCII("test"));
+        cxt.append_sheet("test");
 
         abs_range_t area = cxt.get_data_range(0);
         assert(!area.valid());
@@ -1497,7 +1497,7 @@ void test_model_context_storage()
         const row_t row_size = 5;
         const col_t col_size = 4;
         model_context cxt({row_size, col_size});
-        cxt.append_sheet(IXION_ASCII("test"));
+        cxt.append_sheet("test");
         for (row_t row = 0; row < row_size; ++row)
             for (col_t col = 0; col < col_size; ++col)
                 cxt.set_numeric_cell(abs_address_t(0,row,col), 1.0);
@@ -1516,7 +1516,7 @@ void test_model_context_storage()
         const row_t row_size = 5;
         const col_t col_size = 4;
         model_context cxt({row_size, col_size});
-        cxt.append_sheet(IXION_ASCII("test"));
+        cxt.append_sheet("test");
         cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);
         cxt.set_numeric_cell(abs_address_t(0,row_size-1,0), 1.0);
         cxt.set_numeric_cell(abs_address_t(0,row_size/2,col_size/2), 1.0);
@@ -1721,7 +1721,7 @@ void test_model_context_iterator_horizontal()
 
     // Insert an actual sheet and try again.
 
-    cxt.append_sheet(IXION_ASCII("empty sheet"));
+    cxt.append_sheet("empty sheet");
     iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, whole_range);
 
     // Make sure the cell position iterates correctly.
@@ -1740,7 +1740,7 @@ void test_model_context_iterator_horizontal()
     assert(!iter.has()); // There should be no more cells on this sheet.
     assert(cell_count == 10);
 
-    cxt.append_sheet(IXION_ASCII("values"));
+    cxt.append_sheet("values");
     cxt.set_string_cell(abs_address_t(1, 0, 0), "F1");
     cxt.set_string_cell(abs_address_t(1, 0, 1), "F2");
     cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
@@ -2096,8 +2096,8 @@ void test_model_context_iterator_named_exps()
     };
 
     model_context cxt{{100, 10}};
-    cxt.append_sheet(IXION_ASCII("test1"));
-    cxt.append_sheet(IXION_ASCII("test2"));
+    cxt.append_sheet("test1");
+    cxt.append_sheet("test2");
 
     named_expressions_iterator iter;
     assert(!iter.has());
@@ -2197,7 +2197,7 @@ void test_model_context_fill_down()
 {
     nullptr_t empty = nullptr;
     model_context cxt{{100, 10}};
-    cxt.append_sheet(IXION_ASCII("test"));
+    cxt.append_sheet("test");
     cxt.set_cell_values(0, {
         { "numeric", "bool", "string",  "empty" },
         {      12.3,   true,    "foo",    empty },
@@ -2245,7 +2245,7 @@ void test_model_context_error_value()
     cout << "test model context error value" << endl;
 
     model_context cxt{{100, 10}};
-    cxt.append_sheet(IXION_ASCII("test"));
+    cxt.append_sheet("test");
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -2270,7 +2270,7 @@ void test_volatile_function()
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
-    cxt.append_sheet(IXION_ASCII("test"));
+    cxt.append_sheet("test");
 
     abs_range_set_t dirty_cells;
     abs_range_set_t modified_cells;
