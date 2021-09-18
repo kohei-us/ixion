@@ -377,9 +377,9 @@ void model_context::dump_strings() const
     mp_impl->dump_strings();
 }
 
-string_id_t model_context::get_identifier_from_string(const char* p, size_t n) const
+string_id_t model_context::get_identifier_from_string(std::string_view s) const
 {
-    return mp_impl->get_identifier_from_string(p, n);
+    return mp_impl->get_identifier_from_string(s);
 }
 
 model_iterator model_context::get_model_iterator(

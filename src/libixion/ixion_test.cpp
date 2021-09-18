@@ -80,10 +80,10 @@ void test_string_pool()
     cxt.dump_strings();
 
     // Make sure these work correctly before proceeding further with the test.
-    assert(s_table1 == cxt.get_identifier_from_string(IXION_ASCII("Table1")));
-    assert(s_table2 == cxt.get_identifier_from_string(IXION_ASCII("Table2")));
-    assert(s_cat == cxt.get_identifier_from_string(IXION_ASCII("Category")));
-    assert(s_val == cxt.get_identifier_from_string(IXION_ASCII("Value")));
+    assert(s_table1 == cxt.get_identifier_from_string("Table1"));
+    assert(s_table2 == cxt.get_identifier_from_string("Table2"));
+    assert(s_cat == cxt.get_identifier_from_string("Category"));
+    assert(s_val == cxt.get_identifier_from_string("Value"));
 }
 
 void test_formula_tokens_store()
@@ -582,10 +582,10 @@ void test_name_resolver_table_excel_a1()
     string_id_t s_val = cxt.append_string("Value");
 
     // Make sure these work correctly before proceeding further with the test.
-    assert(s_table1 == cxt.get_identifier_from_string(IXION_ASCII("Table1")));
-    assert(s_table2 == cxt.get_identifier_from_string(IXION_ASCII("Table2")));
-    assert(s_cat == cxt.get_identifier_from_string(IXION_ASCII("Category")));
-    assert(s_val == cxt.get_identifier_from_string(IXION_ASCII("Value")));
+    assert(s_table1 == cxt.get_identifier_from_string("Table1"));
+    assert(s_table2 == cxt.get_identifier_from_string("Table2"));
+    assert(s_cat == cxt.get_identifier_from_string("Category"));
+    assert(s_val == cxt.get_identifier_from_string("Value"));
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -627,9 +627,9 @@ void test_name_resolver_table_excel_a1()
             assert(!"table reference expected.");
 
         formula_name_t::table_type table = res.table;
-        string_id_t table_name = cxt.get_identifier_from_string(table.name.data(), table.name.size());
-        string_id_t column_first = cxt.get_identifier_from_string(table.column_first.data(), table.column_first.size());
-        string_id_t column_last = cxt.get_identifier_from_string(table.column_last.data(), table.column_last.size());
+        string_id_t table_name = cxt.get_identifier_from_string(table.name);
+        string_id_t column_first = cxt.get_identifier_from_string(table.column_first);
+        string_id_t column_last = cxt.get_identifier_from_string(table.column_last);
         assert(table_name == tests[i].table_name);
         assert(column_first == tests[i].column_first);
         assert(column_last == tests[i].column_last);
@@ -1772,8 +1772,8 @@ void test_model_context_iterator_horizontal()
     std::vector<model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string(IXION_ASCII("F1")) },
-        { 0, 1, cxt.get_identifier_from_string(IXION_ASCII("F2")) },
+        { 0, 0, cxt.get_identifier_from_string("F1") },
+        { 0, 1, cxt.get_identifier_from_string("F2") },
         { 1, 0, true },
         { 1, 1, false },
         { 2, 0, 3.14 },
@@ -1818,14 +1818,14 @@ void test_model_context_iterator_horizontal_range()
     std::vector<model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string(IXION_ASCII("F1")) },
-        { 0, 1, cxt.get_identifier_from_string(IXION_ASCII("F2")) },
-        { 0, 2, cxt.get_identifier_from_string(IXION_ASCII("F3")) },
-        { 0, 3, cxt.get_identifier_from_string(IXION_ASCII("F4")) },
-        { 0, 4, cxt.get_identifier_from_string(IXION_ASCII("F5")) },
+        { 0, 0, cxt.get_identifier_from_string("F1") },
+        { 0, 1, cxt.get_identifier_from_string("F2") },
+        { 0, 2, cxt.get_identifier_from_string("F3") },
+        { 0, 3, cxt.get_identifier_from_string("F4") },
+        { 0, 4, cxt.get_identifier_from_string("F5") },
         { 1, 0, 1.0 },
         { 1, 1, true },
-        { 1, 2, cxt.get_identifier_from_string(IXION_ASCII("s1")) },
+        { 1, 2, cxt.get_identifier_from_string("s1") },
         { 1, 3 },
         { 1, 4 },
     };
@@ -1843,17 +1843,17 @@ void test_model_context_iterator_horizontal_range()
         { 2, 0, 1.1 },
         { 2, 1, false },
         { 2, 2 },
-        { 2, 3, cxt.get_identifier_from_string(IXION_ASCII("s2")) },
+        { 2, 3, cxt.get_identifier_from_string("s2") },
         { 2, 4 },
         { 3, 0, 1.2 },
         { 3, 1, false },
         { 3, 2 },
-        { 3, 3, cxt.get_identifier_from_string(IXION_ASCII("s3")) },
+        { 3, 3, cxt.get_identifier_from_string("s3") },
         { 3, 4 },
         { 4, 0, 1.3 },
         { 4, 1, true },
         { 4, 2 },
-        { 4, 3, cxt.get_identifier_from_string(IXION_ASCII("s4")) },
+        { 4, 3, cxt.get_identifier_from_string("s4") },
         { 4, 4 },
     };
 
@@ -1869,21 +1869,21 @@ void test_model_context_iterator_horizontal_range()
     checks =
     {
         // row, column, value
-        { 0, 1, cxt.get_identifier_from_string(IXION_ASCII("F2")) },
-        { 0, 2, cxt.get_identifier_from_string(IXION_ASCII("F3")) },
-        { 0, 3, cxt.get_identifier_from_string(IXION_ASCII("F4")) },
+        { 0, 1, cxt.get_identifier_from_string("F2") },
+        { 0, 2, cxt.get_identifier_from_string("F3") },
+        { 0, 3, cxt.get_identifier_from_string("F4") },
         { 1, 1, true },
-        { 1, 2, cxt.get_identifier_from_string(IXION_ASCII("s1")) },
+        { 1, 2, cxt.get_identifier_from_string("s1") },
         { 1, 3 },
         { 2, 1, false },
         { 2, 2 },
-        { 2, 3, cxt.get_identifier_from_string(IXION_ASCII("s2")) },
+        { 2, 3, cxt.get_identifier_from_string("s2") },
         { 3, 1, false },
         { 3, 2 },
-        { 3, 3, cxt.get_identifier_from_string(IXION_ASCII("s3")) },
+        { 3, 3, cxt.get_identifier_from_string("s3") },
         { 4, 1, true },
         { 4, 2 },
-        { 4, 3, cxt.get_identifier_from_string(IXION_ASCII("s4")) },
+        { 4, 3, cxt.get_identifier_from_string("s4") },
     };
 
     assert(check_model_iterator_output(iter, checks));
@@ -1955,13 +1955,13 @@ void test_model_context_iterator_vertical()
     std::vector<model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string(IXION_ASCII("F1")) },
+        { 0, 0, cxt.get_identifier_from_string("F1") },
         { 1, 0, true },
         { 2, 0, 3.14 },
         { 3, 0, cxt.get_formula_cell(abs_address_t(1, 3, 0)) },
         { 4, 0 },
 
-        { 0, 1, cxt.get_identifier_from_string(IXION_ASCII("F2")) },
+        { 0, 1, cxt.get_identifier_from_string("F2") },
         { 1, 1, false },
         { 2, 1, -12.5 },
         { 3, 1, cxt.get_formula_cell(abs_address_t(1, 3, 1)) },
@@ -2001,15 +2001,15 @@ void test_model_context_iterator_vertical_range()
     std::vector<model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string(IXION_ASCII("F1")) },
+        { 0, 0, cxt.get_identifier_from_string("F1") },
         { 1, 0, 1.0 },
-        { 0, 1, cxt.get_identifier_from_string(IXION_ASCII("F2")) },
+        { 0, 1, cxt.get_identifier_from_string("F2") },
         { 1, 1, true },
-        { 0, 2, cxt.get_identifier_from_string(IXION_ASCII("F3")) },
-        { 1, 2, cxt.get_identifier_from_string(IXION_ASCII("s1")) },
-        { 0, 3, cxt.get_identifier_from_string(IXION_ASCII("F4")) },
+        { 0, 2, cxt.get_identifier_from_string("F3") },
+        { 1, 2, cxt.get_identifier_from_string("s1") },
+        { 0, 3, cxt.get_identifier_from_string("F4") },
         { 1, 3 },
-        { 0, 4, cxt.get_identifier_from_string(IXION_ASCII("F5")) },
+        { 0, 4, cxt.get_identifier_from_string("F5") },
         { 1, 4 },
     };
 
@@ -2030,10 +2030,10 @@ void test_model_context_iterator_vertical_range()
         { 9, 1, 299.9 },
         { 8, 2 },
         { 9, 2 },
-        { 8, 3, cxt.get_identifier_from_string(IXION_ASCII("s8")) },
-        { 9, 3, cxt.get_identifier_from_string(IXION_ASCII("s9")) },
+        { 8, 3, cxt.get_identifier_from_string("s8") },
+        { 9, 3, cxt.get_identifier_from_string("s9") },
         { 8, 4 },
-        { 9, 4, cxt.get_identifier_from_string(IXION_ASCII("end")) },
+        { 9, 4, cxt.get_identifier_from_string("end") },
     };
 
     assert(check_model_iterator_output(iter, checks));
@@ -2064,9 +2064,9 @@ void test_model_context_iterator_vertical_range()
 
     checks =
     {
-        { 0, 3, cxt.get_identifier_from_string(IXION_ASCII("F4")) },
+        { 0, 3, cxt.get_identifier_from_string("F4") },
         { 1, 3 },
-        { 0, 4, cxt.get_identifier_from_string(IXION_ASCII("F5")) },
+        { 0, 4, cxt.get_identifier_from_string("F5") },
         { 1, 4 },
     };
 
@@ -2081,7 +2081,7 @@ void test_model_context_iterator_vertical_range()
     iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
     checks =
     {
-        { 5, 3, cxt.get_identifier_from_string(IXION_ASCII("s5")) },
+        { 5, 3, cxt.get_identifier_from_string("s5") },
     };
 
     assert(check_model_iterator_output(iter, checks));

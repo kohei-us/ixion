@@ -268,7 +268,17 @@ public:
 
     void dump_strings() const;
 
-    string_id_t get_identifier_from_string(const char* p, size_t n) const;
+    /**
+     * Get an integer string ID from a string value.  If the string value
+     * doesn't exist in the pool, the value equal to empty_string_id gets
+     * returned.
+     *
+     * @param s string value.
+     *
+     * @return string_id_t integer string ID associated with the string value
+     *         given.
+     */
+    string_id_t get_identifier_from_string(std::string_view s) const;
 
     /**
      * Get an immutable iterator that lets you iterate cell values in one
