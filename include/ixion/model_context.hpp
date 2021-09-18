@@ -133,7 +133,7 @@ public:
 
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_boolean_cell(const abs_address_t& adr, bool val);
-    void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_string_cell(const abs_address_t& addr, std::string_view s);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
 
     cell_access get_cell_access(const abs_address_t& addr) const;

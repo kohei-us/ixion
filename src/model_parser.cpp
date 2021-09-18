@@ -507,7 +507,7 @@ void model_parser::parse_init()
             }
             case ct_string:
             {
-                m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
+                m_context.set_string_cell(pos, { cell_def.value.get(), cell_def.value.size() });
 
                 cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
                 break;
@@ -591,7 +591,7 @@ void model_parser::parse_edit()
             break;
             case ct_string:
             {
-                m_context.set_string_cell(pos, cell_def.value.get(), cell_def.value.size());
+                m_context.set_string_cell(pos, { cell_def.value.get(), cell_def.value.size() });
                 cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
             }
             break;

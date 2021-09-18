@@ -51,11 +51,11 @@ int main(int argc, char** argv)
     // Insert a string value into B2.
     ixion::abs_address_t B2(0, 1, 1);
     std::string s = "This cell contains a string value.";
-    cxt.set_string_cell(B2, s.data(), s.size());
+    cxt.set_string_cell(B2, s);
 
     // Insert a literal string value into B3.
     ixion::abs_address_t B3(0, 2, 1);
-    cxt.set_string_cell(B3, IXION_ASCII("This too contains a string value."));
+    cxt.set_string_cell(B3, "This too contains a string value.");
 
     // Insert a string value into B4 via string identifier.
     s = "Yet another string value.";

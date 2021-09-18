@@ -108,9 +108,9 @@ void model_context::set_boolean_cell(const abs_address_t& addr, bool val)
     mp_impl->set_boolean_cell(addr, val);
 }
 
-void model_context::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
+void model_context::set_string_cell(const abs_address_t& addr, std::string_view s)
 {
-    mp_impl->set_string_cell(addr, p, n);
+    mp_impl->set_string_cell(addr, s);
 }
 
 cell_access model_context::get_cell_access(const abs_address_t& addr) const

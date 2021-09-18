@@ -113,7 +113,7 @@ struct document::impl
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
-        cxt.set_string_cell(addr, s.data(), s.size());
+        cxt.set_string_cell(addr, s);
         modified_cells.insert(addr);
     }
 

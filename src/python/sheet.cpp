@@ -124,7 +124,7 @@ PyObject* sheet_set_string_cell(sheet* self, PyObject* args, PyObject* kwargs)
     ixion::model_context& cxt = sd->m_global->m_cxt;
     ixion::abs_address_t pos(sd->m_sheet_index, row, col);
     sd->m_global->m_modified_cells.insert(pos);
-    cxt.set_string_cell(pos, val, strlen(val));
+    cxt.set_string_cell(pos, val);
 
     Py_INCREF(Py_None);
     return Py_None;

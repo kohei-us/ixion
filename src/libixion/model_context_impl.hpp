@@ -112,7 +112,7 @@ public:
     void empty_cell(const abs_address_t& addr);
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_boolean_cell(const abs_address_t& addr, bool val);
-    void set_string_cell(const abs_address_t& addr, const char* p, size_t n);
+    void set_string_cell(const abs_address_t& addr, std::string_view s);
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
     void fill_down_cells(const abs_address_t& src, size_t n_dst);
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);

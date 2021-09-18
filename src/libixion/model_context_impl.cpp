@@ -341,7 +341,7 @@ void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<mo
                 case celltype_t::string:
                 {
                     auto s = std::get<std::string_view>(c.value);
-                    set_string_cell(pos, s.data(), s.size());
+                    set_string_cell(pos, s);
                     break;
                 }
                 case celltype_t::boolean:
@@ -628,10 +628,10 @@ void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
-void model_context_impl::set_string_cell(const abs_address_t& addr, const char* p, size_t n)
+void model_context_impl::set_string_cell(const abs_address_t& addr, std::string_view s)
 {
     worksheet& sheet = m_sheets.at(addr.sheet);
-    string_id_t str_id = add_string({p, n});
+    string_id_t str_id = add_string(s);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, str_id);

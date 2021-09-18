@@ -1541,7 +1541,7 @@ void test_model_context_direct_string_access()
 
     // regular string cell
     abs_address_t B2(0, 1, 1);
-    cxt.set_string_cell(B2, IXION_ASCII("string cell"));
+    cxt.set_string_cell(B2, "string cell");
     const std::string* p = cxt.get_string_value(B2);
     assert(p);
     assert(*p == "string cell");
@@ -1741,8 +1741,8 @@ void test_model_context_iterator_horizontal()
     assert(cell_count == 10);
 
     cxt.append_sheet(IXION_ASCII("values"));
-    cxt.set_string_cell(abs_address_t(1, 0, 0), IXION_ASCII("F1"));
-    cxt.set_string_cell(abs_address_t(1, 0, 1), IXION_ASCII("F2"));
+    cxt.set_string_cell(abs_address_t(1, 0, 0), "F1");
+    cxt.set_string_cell(abs_address_t(1, 0, 1), "F2");
     cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
     cxt.set_boolean_cell(abs_address_t(1, 1, 1), false);
     cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
@@ -1927,8 +1927,8 @@ void test_model_context_iterator_vertical()
     assert(cell_count == 10);
 
     cxt.append_sheet("values");
-    cxt.set_string_cell(abs_address_t(1, 0, 0), IXION_ASCII("F1"));
-    cxt.set_string_cell(abs_address_t(1, 0, 1), IXION_ASCII("F2"));
+    cxt.set_string_cell(abs_address_t(1, 0, 0), "F1");
+    cxt.set_string_cell(abs_address_t(1, 0, 1), "F2");
     cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
     cxt.set_boolean_cell(abs_address_t(1, 1, 1), false);
     cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
