@@ -13,6 +13,7 @@
 
 #include <string>
 #include <memory>
+#include <variant>
 
 namespace ixion {
 
@@ -49,29 +50,9 @@ struct IXION_DLLPUBLIC formula_name_t
     };
 
     /**
-     * Single cell address information for a cell reference name.
-     */
-    struct address_type
-    {
-        sheet_t sheet;
-        row_t row;
-        col_t col;
-        bool abs_sheet:1;
-        bool abs_row:1;
-        bool abs_col:1;
-    };
-
-    /**
-     * Range address information for a range reference name.
-     */
-    struct range_type
-    {
-        address_type first;
-        address_type last;
-    };
-
-    /**
-     * Table information for a table reference name.
+     * Table information for a table reference name.  Unlike the ixion::table_t
+     * counterpart, we store strings as string views as the resolver doesn't
+     * have access to the string pool.
      */
     struct table_type
     {
@@ -81,15 +62,10 @@ struct IXION_DLLPUBLIC formula_name_t
         table_areas_t areas;
     };
 
-    name_type type;
+    using value_type = std::variant<address_t, range_t, table_type, formula_function_t>;
 
-    union
-    {
-        address_type address;
-        range_type range;
-        table_type table;
-        formula_function_t func_oc; // function opcode
-    };
+    name_type type;
+    value_type value;
 
     formula_name_t();
 
@@ -99,9 +75,6 @@ struct IXION_DLLPUBLIC formula_name_t
      */
     std::string to_string() const;
 };
-
-IXION_DLLPUBLIC address_t to_address(const formula_name_t::address_type& src);
-IXION_DLLPUBLIC range_t to_range(const formula_name_t::range_type& src);
 
 /**
  * Formula name resolvers resolves a name in a formula expression to a more

@@ -35,7 +35,7 @@ abs_address_t to_address(
                 throw std::invalid_argument(os.str());
             }
 
-            return to_address(name.address).to_abs(abs_address_t());
+            return std::get<address_t>(name.value).to_abs(abs_address_t());
         }
         case document::cell_pos::cp_type::address:
         {

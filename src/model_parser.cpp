@@ -644,7 +644,7 @@ void model_parser::parse_result_cache()
     {
         case formula_name_t::cell_reference:
         {
-            abs_address_t pos = to_address(fnt.address).to_abs(abs_address_t());
+            abs_address_t pos = std::get<address_t>(fnt.value).to_abs(abs_address_t());
             formula_cell* fc = m_context.get_formula_cell(pos);
             if (!fc)
             {
@@ -692,7 +692,7 @@ void model_parser::parse_table()
         if (ret.type != formula_name_t::range_reference)
             throw parse_error("range of a table is expected to be given as a range reference.");
 
-        entry.range = to_range(ret.range).to_abs(pos);
+        entry.range = std::get<range_t>(ret.value).to_abs(pos);
     }
     else if (name == "columns")
         parse_table_columns(value);
@@ -749,7 +749,7 @@ void model_parser::parse_named_expression()
             throw parse_error(os.str());
         }
 
-        mp_named_expression->origin = to_address(name.address).to_abs(abs_address_t(m_current_sheet,0,0));
+        mp_named_expression->origin = std::get<address_t>(name.value).to_abs(abs_address_t(m_current_sheet,0,0));
     }
     else if (res.first == "scope")
     {
@@ -1072,13 +1072,13 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
     {
         case formula_name_t::cell_reference:
         {
-            ret.pos.first = to_address(fnt.address).to_abs(abs_address_t(0,0,0));
+            ret.pos.first = std::get<address_t>(fnt.value).to_abs(abs_address_t(0,0,0));
             ret.pos.last = ret.pos.first;
             break;
         }
         case formula_name_t::range_reference:
         {
-            ret.pos = to_range(fnt.range).to_abs(abs_address_t(0,0,0));
+            ret.pos = std::get<range_t>(fnt.value).to_abs(abs_address_t(0,0,0));
             break;
         }
         default:
@@ -1116,8 +1116,7 @@ void model_parser::check()
             throw std::runtime_error(os.str());
         }
 
-        const formula_name_t::address_type& _addr = name_type.address;
-        abs_address_t addr(_addr.sheet, _addr.row, _addr.col);
+        abs_address_t addr = std::get<address_t>(name_type.value).to_abs(abs_address_t());
         cell_access ca = m_context.get_cell_access(addr);
 
         switch (ca.get_type())

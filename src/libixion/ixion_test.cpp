@@ -230,7 +230,7 @@ void test_name_resolver_calc_a1()
                 assert(false);
             }
 
-            address_t addr = to_address(res.address);
+            address_t addr = std::get<address_t>(res.value);
             string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
 
             if (name_a1 != test_name)
@@ -275,8 +275,8 @@ void test_name_resolver_calc_a1()
                     assert(false);
                 }
 
-                range_t range = to_range(res.range);
-                std::string test_name = resolver->get_name(range, pos, names[i].sheet_name);
+                std::string test_name = resolver->get_name(
+                    std::get<range_t>(res.value), pos, names[i].sheet_name);
 
                 if (name_a1 != test_name)
                 {
@@ -303,64 +303,69 @@ void test_name_resolver_calc_a1()
         string name_a1(range_tests[i].name);
         cout << "range address: " << name_a1 << endl;
         formula_name_t res = resolver->resolve(name_a1, abs_address_t());
+        auto range = std::get<range_t>(res.value);
         assert(res.type == formula_name_t::range_reference);
-        assert(res.range.first.sheet == range_tests[i].sheet1);
-        assert(res.range.first.row == range_tests[i].row1);
-        assert(res.range.first.col == range_tests[i].col1);
-        assert(res.range.last.sheet == range_tests[i].sheet2);
-        assert(res.range.last.row == range_tests[i].row2);
-        assert(res.range.last.col == range_tests[i].col2);
+        assert(range.first.sheet == range_tests[i].sheet1);
+        assert(range.first.row == range_tests[i].row1);
+        assert(range.first.column == range_tests[i].col1);
+        assert(range.last.sheet == range_tests[i].sheet2);
+        assert(range.last.row == range_tests[i].row2);
+        assert(range.last.column == range_tests[i].col2);
     }
 
     {
         formula_name_t res = resolver->resolve("B1", abs_address_t(0,1,1));
+        auto addr = std::get<address_t>(res.value);
         assert(res.type == formula_name_t::cell_reference);
-        assert(res.address.sheet == 0);
-        assert(res.address.row == -1);
-        assert(res.address.col == 0);
+        assert(addr.sheet == 0);
+        assert(addr.row == -1);
+        assert(addr.column == 0);
     }
 
     {
         formula_name_t res = resolver->resolve("B2:B4", abs_address_t(0,0,3));
+        auto range = std::get<range_t>(res.value);
         assert(res.type == formula_name_t::range_reference);
-        assert(res.range.first.sheet == 0);
-        assert(res.range.first.row == 1);
-        assert(res.range.first.col == -2);
-        assert(res.range.last.sheet == 0);
-        assert(res.range.last.row == 3);
-        assert(res.range.last.col == -2);
+        assert(range.first.sheet == 0);
+        assert(range.first.row == 1);
+        assert(range.first.column == -2);
+        assert(range.last.sheet == 0);
+        assert(range.last.row == 3);
+        assert(range.last.column == -2);
     }
 
     {
         formula_name_t res = resolver->resolve("Three.B2", abs_address_t(2,0,0));
+        auto addr = std::get<address_t>(res.value);
         assert(res.type == formula_name_t::cell_reference);
-        assert(!res.address.abs_sheet);
-        assert(!res.address.abs_row);
-        assert(!res.address.abs_col);
-        assert(res.address.sheet == 0);
-        assert(res.address.row == 1);
-        assert(res.address.col == 1);
+        assert(!addr.abs_sheet);
+        assert(!addr.abs_row);
+        assert(!addr.abs_column);
+        assert(addr.sheet == 0);
+        assert(addr.row == 1);
+        assert(addr.column == 1);
     }
 
     {
         abs_address_t pos(2, 0, 0);
         std::string name("One.B2:Three.C4");
         formula_name_t res = resolver->resolve(name, pos);
+        auto range = std::get<range_t>(res.value);
         assert(res.type == formula_name_t::range_reference);
-        assert(!res.range.first.abs_sheet);
-        assert(!res.range.first.abs_row);
-        assert(!res.range.first.abs_col);
-        assert(res.range.first.sheet == -2);
-        assert(res.range.first.row == 1);
-        assert(res.range.first.col == 1);
-        assert(!res.range.last.abs_sheet);
-        assert(!res.range.last.abs_row);
-        assert(!res.range.last.abs_col);
-        assert(res.range.last.sheet == 0);
-        assert(res.range.last.row == 3);
-        assert(res.range.last.col == 2);
+        assert(!range.first.abs_sheet);
+        assert(!range.first.abs_row);
+        assert(!range.first.abs_column);
+        assert(range.first.sheet == -2);
+        assert(range.first.row == 1);
+        assert(range.first.column == 1);
+        assert(!range.last.abs_sheet);
+        assert(!range.last.abs_row);
+        assert(!range.last.abs_column);
+        assert(range.last.sheet == 0);
+        assert(range.last.row == 3);
+        assert(range.last.column == 2);
 
-        std::string s = resolver->get_name(to_range(res.range), pos, true);
+        std::string s = resolver->get_name(range, pos, true);
         assert(s == name);
     }
 }
@@ -420,7 +425,7 @@ void test_name_resolver_excel_a1()
                 assert(false);
             }
 
-            address_t addr = to_address(res.address);
+            address_t addr = std::get<address_t>(res.value);
             string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
 
             if (name_a1 != test_name)
@@ -457,7 +462,7 @@ void test_name_resolver_excel_a1()
                 assert(false);
             }
 
-            range_t range = to_range(res.range);
+            range_t range = std::get<range_t>(res.value);
             std::string test_name = resolver->get_name(range, abs_address_t(), names[i].sheet_name);
 
             if (name_a1 != test_name)
@@ -484,32 +489,35 @@ void test_name_resolver_excel_a1()
     {
         string name_a1(range_tests[i].name);
         formula_name_t res = resolver->resolve(name_a1, abs_address_t());
+        auto range = std::get<range_t>(res.value);
         assert(res.type == formula_name_t::range_reference);
-        assert(res.range.first.sheet == range_tests[i].sheet1);
-        assert(res.range.first.row == range_tests[i].row1);
-        assert(res.range.first.col == range_tests[i].col1);
-        assert(res.range.last.sheet == range_tests[i].sheet2);
-        assert(res.range.last.row == range_tests[i].row2);
-        assert(res.range.last.col == range_tests[i].col2);
+        assert(range.first.sheet == range_tests[i].sheet1);
+        assert(range.first.row == range_tests[i].row1);
+        assert(range.first.column == range_tests[i].col1);
+        assert(range.last.sheet == range_tests[i].sheet2);
+        assert(range.last.row == range_tests[i].row2);
+        assert(range.last.column == range_tests[i].col2);
     }
 
     {
         formula_name_t res = resolver->resolve("B1", abs_address_t(0,1,1));
+        auto addr = std::get<address_t>(res.value);
         assert(res.type == formula_name_t::cell_reference);
-        assert(res.address.sheet == 0);
-        assert(res.address.row == -1);
-        assert(res.address.col == 0);
+        assert(addr.sheet == 0);
+        assert(addr.row == -1);
+        assert(addr.column == 0);
     }
 
     {
         formula_name_t res = resolver->resolve("B2:B4", abs_address_t(0,0,3));
+        auto range = std::get<range_t>(res.value);
         assert(res.type == formula_name_t::range_reference);
-        assert(res.range.first.sheet == 0);
-        assert(res.range.first.row == 1);
-        assert(res.range.first.col == -2);
-        assert(res.range.last.sheet == 0);
-        assert(res.range.last.row == 3);
-        assert(res.range.last.col == -2);
+        assert(range.first.sheet == 0);
+        assert(range.first.row == 1);
+        assert(range.first.column == -2);
+        assert(range.last.sheet == 0);
+        assert(range.last.row == 3);
+        assert(range.last.column == -2);
     }
 
     // Parse name without row index.
@@ -626,7 +634,7 @@ void test_name_resolver_table_excel_a1()
         if (res.type != formula_name_t::table_reference)
             assert(!"table reference expected.");
 
-        formula_name_t::table_type table = res.table;
+        auto table = std::get<formula_name_t::table_type>(res.value);
         string_id_t table_name = cxt.get_identifier_from_string(table.name);
         string_id_t column_first = cxt.get_identifier_from_string(table.column_first);
         string_id_t column_last = cxt.get_identifier_from_string(table.column_last);
@@ -694,7 +702,7 @@ void test_name_resolver_excel_r1c1()
             assert(false);
         }
 
-        address_t addr = to_address(res.address);
+        address_t addr = std::get<address_t>(res.value);
         string test_name = resolver->get_name(addr, abs_address_t(), single_ref_names[i].sheet_name);
 
         if (name_r1c1 != test_name)
@@ -788,28 +796,28 @@ void test_name_resolver_excel_r1c1()
         string name_r1c1(range_tests[i].name);
         cout << "Parsing " << name_r1c1 << endl;
         formula_name_t res = resolver->resolve(name_r1c1, abs_address_t());
+        auto range = std::get<range_t>(res.value);
 
         assert(res.type == formula_name_t::range_reference);
-
-        assert(res.range.first.sheet == range_tests[i].sheet1);
-        assert(res.range.first.row == range_tests[i].row1);
-        assert(res.range.first.col == range_tests[i].col1);
-        assert(res.range.first.abs_sheet == range_tests[i].abs_sheet1);
-        if (res.range.first.row != row_unset)
+        assert(range.first.sheet == range_tests[i].sheet1);
+        assert(range.first.row == range_tests[i].row1);
+        assert(range.first.column == range_tests[i].col1);
+        assert(range.first.abs_sheet == range_tests[i].abs_sheet1);
+        if (range.first.row != row_unset)
             // When row is unset, whether it's relative or absolute is not relevant.
-            assert(res.range.first.abs_row == range_tests[i].abs_row1);
-        if (res.range.first.col != column_unset)
+            assert(range.first.abs_row == range_tests[i].abs_row1);
+        if (range.first.column != column_unset)
             // Same with unset column.
-            assert(res.range.first.abs_col == range_tests[i].abs_col1);
+            assert(range.first.abs_column == range_tests[i].abs_col1);
 
-        assert(res.range.last.sheet == range_tests[i].sheet2);
-        assert(res.range.last.row == range_tests[i].row2);
-        assert(res.range.last.col == range_tests[i].col2);
-        assert(res.range.last.abs_sheet == range_tests[i].abs_sheet2);
-        if (res.range.last.row != row_unset)
-            assert(res.range.last.abs_row == range_tests[i].abs_row2);
-        if (res.range.last.col != column_unset)
-            assert(res.range.last.abs_col == range_tests[i].abs_col2);
+        assert(range.last.sheet == range_tests[i].sheet2);
+        assert(range.last.row == range_tests[i].row2);
+        assert(range.last.column == range_tests[i].col2);
+        assert(range.last.abs_sheet == range_tests[i].abs_sheet2);
+        if (range.last.row != row_unset)
+            assert(range.last.abs_row == range_tests[i].abs_row2);
+        if (range.last.column != column_unset)
+            assert(range.last.abs_column == range_tests[i].abs_col2);
     }
 
     ref_name_entry range_ref_names[] =
@@ -834,7 +842,7 @@ void test_name_resolver_excel_r1c1()
             assert(false);
         }
 
-        range_t range = to_range(res.range);
+        auto range = std::get<range_t>(res.value);
         string test_name = resolver->get_name(range, abs_address_t(), range_ref_names[i].sheet_name);
 
         if (name_r1c1 != test_name)
@@ -899,7 +907,7 @@ void test_name_resolver_odff()
             assert(false);
         }
 
-        address_t addr = to_address(res.address);
+        address_t addr = std::get<address_t>(res.value);
         string test_name = resolver->get_name(addr, abs_address_t(), single_ref_names[i].sheet_name);
 
         if (name_a1 != test_name)
@@ -928,7 +936,7 @@ void test_name_resolver_odff()
             assert(false);
         }
 
-        range_t range = to_range(res.range);
+        auto range = std::get<range_t>(res.value);
         string test_name = resolver->get_name(range, abs_address_t(), range_ref_names[i].sheet_name);
 
         if (name_a1 != test_name)
@@ -962,7 +970,7 @@ void test_name_resolver_odff()
             assert(false);
         }
 
-        address_t addr = to_address(res.address);
+        address_t addr = std::get<address_t>(res.value);
         std::string test_name = resolver->get_name(addr, abs_address_t(), addr_with_sheet_names[i].sheet_name);
 
         if (name_a1 != test_name)
@@ -999,7 +1007,7 @@ void test_name_resolver_odff()
             assert(false);
         }
 
-        range_t range = to_range(res.range);
+        auto range = std::get<range_t>(res.value);
         std::string test_name = resolver->get_name(range, abs_address_t(), ref_with_sheet_names[i].sheet_name);
 
         if (name_a1 != test_name)
@@ -1014,7 +1022,7 @@ void test_name_resolver_odff()
         abs_address_t pos(2, 1, 9);
         formula_name_t res = resolver->resolve(name, pos);
         assert(res.type == formula_name_t::range_reference);
-        abs_range_t range = to_range(res.range).to_abs(pos);
+        abs_range_t range = std::get<range_t>(res.value).to_abs(pos);
         abs_range_t range_expected(abs_address_t(pos.sheet, 1, 7), 1, 2);
         assert(range == range_expected);
     }
@@ -1024,7 +1032,7 @@ void test_name_resolver_odff()
         abs_address_t pos(3, 2, 1);
         formula_name_t res = resolver->resolve(name, pos);
         assert(res.type == formula_name_t::range_reference);
-        abs_range_t range = to_range(res.range).to_abs(pos);
+        abs_range_t range = std::get<range_t>(res.value).to_abs(pos);
         abs_range_t range_expected(abs_address_t(1, 1, 1), 9, 1);
         assert(range == range_expected);
     }
@@ -1093,7 +1101,7 @@ void test_name_resolver_odf_cra()
                 assert(false);
             }
 
-            address_t addr = to_address(res.address);
+            address_t addr = std::get<address_t>(res.value);
             string test_name = resolver->get_name(addr, abs_address_t(), names[i].sheet_name);
 
             if (name_a1 != test_name)
@@ -1138,7 +1146,7 @@ void test_name_resolver_odf_cra()
                     assert(false);
                 }
 
-                range_t range = to_range(res.range);
+                auto range = std::get<range_t>(res.value);
                 std::string test_name = resolver->get_name(range, pos, names[i].sheet_name);
 
                 if (name_a1 != test_name)
