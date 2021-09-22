@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <iosfwd>
+#include <variant>
 
 namespace ixion {
 
@@ -33,18 +34,12 @@ public:
 
     struct IXION_DLLPUBLIC cell
     {
+        using value_type = std::variant<bool, double, string_id_t, const formula_cell*>;
+
         row_t row;
         col_t col;
         celltype_t type;
-
-        union
-        {
-            bool boolean;
-            double numeric;
-            string_id_t string;
-            const formula_cell* formula;
-
-        } value;
+        value_type value;
 
         cell();
         cell(row_t _row, col_t _col);
