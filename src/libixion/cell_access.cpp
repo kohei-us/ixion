@@ -139,14 +139,15 @@ bool cell_access::get_boolean_value() const
     return false;
 }
 
-const std::string* cell_access::get_string_value() const
+std::string_view cell_access::get_string_value() const
 {
     switch (mp_impl->pos.first->type)
     {
         case element_type_string:
         {
             string_id_t sid = string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return mp_impl->cxt.get_string(sid);
+            const std::string* p = mp_impl->cxt.get_string(sid);
+            return p ? *p : std::string_view{};
         }
         case element_type_formula:
         {
@@ -154,12 +155,12 @@ const std::string* cell_access::get_string_value() const
             return p->get_string(mp_impl->cxt.get_formula_result_wait_policy());
         }
         case element_type_empty:
-            return &detail::empty_string;
+            return detail::empty_string;
         default:
             ;
     }
 
-    return nullptr;
+    return std::string_view{};
 }
 
 string_id_t cell_access::get_string_identifier() const

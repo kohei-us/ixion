@@ -13,6 +13,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <variant>
 
 namespace ixion {
 
@@ -34,15 +35,10 @@ public:
 
     struct element
     {
-        element_type type;
+        using value_type = std::variant<double, bool, std::string_view, formula_error_t>;
 
-        union
-        {
-            double numeric;
-            bool boolean;
-            const std::string* str;
-            formula_error_t error;
-        };
+        element_type type;
+        value_type value;
     };
 
     matrix();

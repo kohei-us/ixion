@@ -55,7 +55,7 @@ public:
     void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
     double get_value(formula_result_wait_policy_t policy) const;
-    const std::string* get_string(formula_result_wait_policy_t policy) const;
+    std::string_view get_string(formula_result_wait_policy_t policy) const;
 
     void interpret(iface::formula_model_access& context, const abs_address_t& pos);
 

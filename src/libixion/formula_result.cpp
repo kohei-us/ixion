@@ -149,22 +149,22 @@ struct formula_result::impl
                         {
                             case matrix::element_type::numeric:
                             {
-                                os << e.numeric;
+                                os << std::get<double>(e.value);
                                 break;
                             }
                             case matrix::element_type::string:
                             {
-                                os << '"' << *e.str << '"';
+                                os << '"' << std::get<std::string_view>(e.value) << '"';
                                 break;
                             }
                             case matrix::element_type::error:
                             {
-                                os << get_formula_error_name(e.error);
+                                os << get_formula_error_name(std::get<formula_error_t>(e.value));
                                 break;
                             }
                             case matrix::element_type::boolean:
                             {
-                                os << e.boolean;
+                                os << std::get<bool>(e.value);
                                 break;
                             }
                             default:

@@ -53,7 +53,7 @@ public:
 
     bool get_boolean_value() const;
 
-    const std::string* get_string_value() const;
+    std::string_view get_string_value() const;
 
     string_id_t get_string_identifier() const;
 

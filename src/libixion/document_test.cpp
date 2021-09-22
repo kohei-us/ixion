@@ -69,31 +69,26 @@ void test_string_io()
     doc.set_string_cell(C4, "Cell C4");
     doc.set_string_cell(D5, D5_value);
 
-    const std::string* p = doc.get_string_value(B3);
-    assert(p);
-    assert(*p == "Cell B3");
+    std::string_view s = doc.get_string_value(B3);
+    assert(s == "Cell B3");
 
-    p = doc.get_string_value(C4);
-    assert(p);
-    assert(*p == "Cell C4");
+    s = doc.get_string_value(C4);
+    assert(s == "Cell C4");
 
-    p = doc.get_string_value(D5);
-    assert(p);
-    assert(*p == D5_value);
+    s = doc.get_string_value(D5);
+    assert(s == D5_value);
 
     doc.set_formula_cell("A10", "CONCATENATE(B3, \" and \", C4)");
     doc.calculate(0);
 
-    p = doc.get_string_value("A10");
-    assert(p);
-    assert(*p == "Cell B3 and Cell C4");
+    s = doc.get_string_value("A10");
+    assert(s == "Cell B3 and Cell C4");
 
     doc.empty_cell(C4);
     doc.calculate(0);
 
-    p = doc.get_string_value("A10");
-    assert(p);
-    assert(*p == "Cell B3 and ");
+    s = doc.get_string_value("A10");
+    assert(s == "Cell B3 and ");
 }
 
 void test_boolean_io()

@@ -18,9 +18,8 @@ void access(const ixion::cell_access& ca)
         }
         case ixion::cell_value_t::string:
         {
-            const std::string* s = ca.get_string_value();
-            if (s)
-                cout << "string value: " << *s << endl;
+            std::string_view s = ca.get_string_value();
+            cout << "string value: " << s << endl;
             break;
         }
         case ixion::cell_value_t::boolean:

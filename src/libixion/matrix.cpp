@@ -160,7 +160,7 @@ matrix::element matrix::get(size_t row, size_t col) const
     {
         case mdds::mtm::element_numeric:
             me.type = element_type::numeric;
-            me.numeric = mp_impl->m_data.get_numeric(row, col);
+            me.value = mp_impl->m_data.get_numeric(row, col);
             break;
         case mdds::mtm::element_integer:
         {
@@ -170,18 +170,21 @@ matrix::element matrix::get(size_t row, size_t col) const
                 break;
 
             me.type = element_type::error;
-            me.error = static_cast<formula_error_t>(-v);
+            me.value = static_cast<formula_error_t>(-v);
             break;
         }
         case mdds::mtm::element_string:
         {
             me.type = element_type::string;
-            me.str = &mp_impl->m_data.get_string(row, col);
+            me.value = mp_impl->m_data.get_string(row, col);
             break;
         }
         case mdds::mtm::element_boolean:
+        {
             me.type = element_type::boolean;
-            me.boolean = mp_impl->m_data.get_boolean(row, col);
+            me.value = mp_impl->m_data.get_boolean(row, col);
+            break;
+        }
         default:
             ;
     }

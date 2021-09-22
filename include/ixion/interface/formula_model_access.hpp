@@ -86,7 +86,7 @@ public:
      * @return pointer to a string value if the cell stores a valid string
      *         value, else nullptr.
      */
-    virtual const std::string* get_string_value(const abs_address_t& addr) const = 0;
+    virtual std::string_view get_string_value(const abs_address_t& addr) const = 0;
     virtual const formula_cell* get_formula_cell(const abs_address_t& addr) const = 0;
     virtual formula_cell* get_formula_cell(const abs_address_t& addr) = 0;
 

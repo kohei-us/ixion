@@ -139,7 +139,7 @@ struct document::impl
         return cxt.get_numeric_value(addr);
     }
 
-    const std::string* get_string_value(cell_pos pos) const
+    std::string_view get_string_value(cell_pos pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         return cxt.get_string_value(addr);
@@ -207,7 +207,7 @@ double document::get_numeric_value(cell_pos pos) const
     return mp_impl->get_numeric_value(pos);
 }
 
-const std::string* document::get_string_value(cell_pos pos) const
+std::string_view document::get_string_value(cell_pos pos) const
 {
     return mp_impl->get_string_value(pos);
 }

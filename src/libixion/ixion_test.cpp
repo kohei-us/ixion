@@ -141,7 +141,7 @@ void test_matrix()
     {
         matrix::element e = mtx.get(c.row, c.col);
         assert(e.type == matrix::element_type::numeric);
-        assert(e.numeric == c.val);
+        assert(std::get<double>(e.value) == c.val);
     }
 }
 
@@ -157,15 +157,15 @@ void test_matrix_non_numeric_values()
 
     matrix::element elem = mtx.get(1, 0);
     assert(elem.type == matrix::element_type::error);
-    assert(elem.error == formula_error_t::division_by_zero);
+    assert(std::get<formula_error_t>(elem.value) == formula_error_t::division_by_zero);
 
     elem = mtx.get(0, 1);
     assert(elem.type == matrix::element_type::string);
-    assert(*elem.str == "foo");
+    assert(std::get<std::string_view>(elem.value) == "foo");
 
     elem = mtx.get(1, 1);
     assert(elem.type == matrix::element_type::boolean);
-    assert(elem.boolean == true);
+    assert(std::get<bool>(elem.value) == true);
 }
 
 struct ref_name_entry
@@ -1391,14 +1391,12 @@ void test_model_context_storage()
         assert(ca.get_value_type() == cell_value_t::empty);
 
         // String value on an empty cell should be an empty string.
-        const std::string* ps = ca.get_string_value();
-        assert(ps);
-        assert(ps->empty());
+        std::string_view s = ca.get_string_value();
+        assert(s.empty());
 
         // Likewise...
-        ps = cxt.get_string_value(abs_address_t(0, 0, 0));
-        assert(ps);
-        assert(ps->empty());
+        s = cxt.get_string_value(abs_address_t(0, 0, 0));
+        assert(s.empty());
 
         // Test storage of numeric values.
         volatile double val = 0.1;
@@ -1542,16 +1540,14 @@ void test_model_context_direct_string_access()
     // regular string cell
     abs_address_t B2(0, 1, 1);
     cxt.set_string_cell(B2, "string cell");
-    const std::string* p = cxt.get_string_value(B2);
-    assert(p);
-    assert(*p == "string cell");
+    std::string_view s = cxt.get_string_value(B2);
+    assert(s == "string cell");
 
     cell_access ca = cxt.get_cell_access(B2);
     assert(ca.get_type() == celltype_t::string);
     assert(ca.get_value_type() == cell_value_t::string);
-    p = ca.get_string_value();
-    assert(p);
-    assert(*p == "string cell");
+    s = ca.get_string_value();
+    assert(s == "string cell");
 
     // formula cell containing a string result.
     abs_address_t C4(0, 3, 2);
@@ -1568,16 +1564,14 @@ void test_model_context_direct_string_access()
     auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &formula_cells);
     calculate_sorted_cells(cxt, sorted, 1);
 
-    p = cxt.get_string_value(C4);
-    assert(p);
-    assert(*p == "string value in formula");
+    s = cxt.get_string_value(C4);
+    assert(s == "string value in formula");
 
     ca = cxt.get_cell_access(C4);
     assert(ca.get_type() == celltype_t::formula);
     assert(ca.get_value_type() == cell_value_t::string);
-    p = ca.get_string_value();
-    assert(p);
-    assert(*p == "string value in formula");
+    s = ca.get_string_value();
+    assert(s == "string value in formula");
 }
 
 void test_model_context_named_expression()
@@ -2378,9 +2372,8 @@ void test_grouped_formula_string_results()
     formula_result res(std::move(res_value));
     cxt.set_grouped_formula_cells(A1B2, std::move(tokens), std::move(res));
 
-    const std::string* p = cxt.get_string_value(A1B2.last);
-    assert(p);
-    assert(*p == "literal string");
+    std::string_view s = cxt.get_string_value(A1B2.last);
+    assert(s == "literal string");
 }
 
 } // anonymous namespace

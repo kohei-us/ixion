@@ -905,7 +905,7 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
     return empty_string_id;
 }
 
-const std::string* model_context_impl::get_string_value(const abs_address_t& addr) const
+std::string_view model_context_impl::get_string_value(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
     auto pos = col_store.position(addr.row);
@@ -915,7 +915,8 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
         case element_type_string:
         {
             string_id_t sid = string_element_block::at(*pos.first->data, pos.second);
-            return m_str_pool.get_string(sid);
+            const std::string* p = m_str_pool.get_string(sid);
+            return p ? *p : std::string_view{};
         }
         case element_type_formula:
         {
@@ -923,12 +924,12 @@ const std::string* model_context_impl::get_string_value(const abs_address_t& add
             return p->get_string(m_formula_res_wait_policy);
         }
         case element_type_empty:
-            return &empty_string;
+            return empty_string;
         default:
             ;
     }
 
-    return nullptr;
+    return std::string_view{};
 }
 
 string_id_t model_context_impl::get_identifier_from_string(std::string_view s) const

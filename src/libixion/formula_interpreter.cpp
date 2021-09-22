@@ -181,9 +181,8 @@ void get_result_from_cell(const iface::formula_model_access& cxt, const abs_addr
             break;
         case celltype_t::string:
         {
-            const std::string* p = cxt.get_string_value(addr);
-            assert(p);
-            res.set_string_value(*p);
+            std::string_view s = cxt.get_string_value(addr);
+            res.set_string_value(std::string{s});
             break;
         }
         case celltype_t::unknown:

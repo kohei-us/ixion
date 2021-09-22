@@ -66,7 +66,7 @@ public:
 
     double get_numeric_value(cell_pos pos) const;
 
-    const std::string* get_string_value(cell_pos pos) const;
+    std::string_view get_string_value(cell_pos pos) const;
 
     void set_formula_cell(cell_pos pos, std::string_view formula);
 

@@ -217,11 +217,11 @@ PyObject* sheet_get_string_value(sheet* self, PyObject* args, PyObject* kwargs)
     }
 
     ixion::model_context& cxt = sd->m_global->m_cxt;
-    const std::string* ps = cxt.get_string_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
-    if (!ps)
+    std::string_view s = cxt.get_string_value(ixion::abs_address_t(sd->m_sheet_index, row, col));
+    if (s.empty())
         return PyUnicode_FromStringAndSize(nullptr, 0);
 
-    return PyUnicode_FromStringAndSize(ps->data(), ps->size());
+    return PyUnicode_FromStringAndSize(s.data(), s.size());
 }
 
 PyObject* sheet_get_formula_expression(sheet* self, PyObject* args, PyObject* kwargs)
