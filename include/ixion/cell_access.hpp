@@ -26,7 +26,7 @@ struct abs_address_t;
  * queries to the same cell.
  *
  * Note that an instance of this class will get invalidated when the content
- * of {@link ixion::model_context} is modified.
+ * of ixion::model_context is modified.
  */
 class IXION_DLLPUBLIC cell_access
 {
