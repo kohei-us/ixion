@@ -9,3 +9,11 @@ Formula Engine
 .. doxygenfunction:: ixion::query_dirty_cells
 .. doxygenfunction:: ixion::query_and_sort_dirty_cells
 .. doxygenfunction:: ixion::calculate_sorted_cells
+
+
+Formula Functions
+=================
+
+.. doxygenenum:: ixion::formula_function_t
+.. doxygenfunction:: ixion::get_formula_function_name
+.. doxygenfunction:: ixion::get_formula_function_opcode

@@ -15,6 +15,9 @@
 
 namespace ixion {
 
+/**
+ * Enum that represents built-in formula functions.
+ */
 enum class formula_function_t : uint16_t
 {
     func_unknown = 0,
