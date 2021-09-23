@@ -58,8 +58,7 @@ int main(int argc, char** argv)
     cxt.set_string_cell(B3, "This too contains a string value.");
 
     // Insert a string value into B4 via string identifier.
-    s = "Yet another string value.";
-    ixion::string_id_t sid = cxt.add_string(s);
+    ixion::string_id_t sid = cxt.add_string("Yet another string value.");
     ixion::abs_address_t B4(0, 3, 1);
     cxt.set_string_cell(B4, sid);
 
@@ -68,10 +67,9 @@ int main(int argc, char** argv)
     // Tokenize formula string first.
     std::unique_ptr<ixion::formula_name_resolver> resolver =
         ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
-    s = "SUM(A1:A10)";
 
     ixion::abs_address_t A11(0, 10, 0);
-    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s);
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, "SUM(A1:A10)");
 
     // Set the tokens into the model.
     const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
@@ -101,8 +99,7 @@ int main(int argc, char** argv)
     cout << "value of A11: " << value << endl;
 
     // Insert a new formula to A11.
-    s = "AVERAGE(A1:A10)";
-    tokens = ixion::parse_formula_string(cxt, A11, *resolver, s);
+    tokens = ixion::parse_formula_string(cxt, A11, *resolver, "AVERAGE(A1:A10)");
 
     // Before overwriting, make sure to UN-register the old cell.
     ixion::unregister_formula_cell(cxt, A11);
@@ -124,13 +121,12 @@ int main(int argc, char** argv)
     cout << "value of A11: " << value << endl;
 
     // Overwrite A10 with a formula cell with no references.
-    s = "(100+50)/2";
     ixion::abs_address_t A10(0, 9, 0);
-    tokens = ixion::parse_formula_string(cxt, A10, *resolver, s);
+    tokens = ixion::parse_formula_string(cxt, A10, *resolver, "(100+50)/2");
     cxt.set_formula_cell(A10, std::move(tokens));
     // No need to register this cell since it does not reference any other cells.
 
-    modified_formula_cells = {A10};
+    modified_formula_cells = { A10 };
     dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
 

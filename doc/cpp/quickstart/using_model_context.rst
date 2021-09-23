@@ -54,32 +54,24 @@ to specify a cell position.
 Note that, since row and column positions are internally 0-based, we add one to emulate how the row
 positions are presented in typical spreadsheet program.
 
-Inserting a string value can be done via :cpp:func:`~ixion::model_context::set_string_cell`.  You can choose
-one of three ways.
-
-The first way is to store the string value to an outside buffer (like std::string), and pass a pointer to
-that buffer and the size of the string value as in the following::
+Inserting a string value can be done via :cpp:func:`~ixion::model_context::set_string_cell` in one
+of two ways.  The first way is to store the value to a type that decays to ``std::string_view``, such
+as ``std::string``, char array, or string literal, and pass it to the method directly::
 
     // Insert a string value into B2.
     ixion::abs_address_t B2(0, 1, 1);
     std::string s = "This cell contains a string value.";
-    cxt.set_string_cell(B2, s.data(), s.size());
-
-Alternatively, you can use this convenience macro :c:macro:`IXION_ASCII` which expands to a char pointer and
-its length if you are passing a string literal::
+    cxt.set_string_cell(B2, s);
 
     // Insert a literal string value into B3.
     ixion::abs_address_t B3(0, 2, 1);
-    cxt.set_string_cell(B3, IXION_ASCII("This too contains a string value."));
+    cxt.set_string_cell(B3, "This too contains a string value.");
 
-But when you do, please be aware that you can only use this macro in conjunction with string literal only.
-
-The third way is to add your string to the model_context's internal string pool first which will return its
-string ID, then store that ID to the model::
+The second way is to add your string to the model_context's internal string pool first which will return its
+string ID, and pass that ID to the method::
 
     // Insert a string value into B4 via string identifier.
-    s = "Yet another string value.";
-    ixion::string_id_t sid = cxt.add_string(s.data(), s.size());
+    ixion::string_id_t sid = cxt.add_string("Yet another string value.");
     ixion::abs_address_t B4(0, 3, 1);
     cxt.set_string_cell(B4, sid);
 
@@ -89,8 +81,8 @@ The model_context class has two methods for inserting a string to the string poo
 upon each insertion attempt, and it will not insert the new value if the value already exists in the pool.
 The :cpp:func:`~ixion::model_context::append_string` method, on the other hand, does not check the pool for
 an existing value and always inserts the value.  The :cpp:func:`~ixion::model_context::append_string` method
-is appropriate if you know all your string entries ahead of time and wish to bulk-insert them.  Otherwise the
-:cpp:func:`~ixion::model_context::add_string` method is the right one to use.
+is appropriate if you know all your string entries ahead of time and wish to bulk-insert them.  Otherwise
+using :cpp:func:`~ixion::model_context::add_string` is appropriate in most cases.
 
 
 Insert a formula cell into model context
@@ -114,10 +106,8 @@ required for resolving sheet names.  You can pass a ``nullptr`` if you don't nee
 Next, let's create a formula string we want to tokenize.  Here, we are inserting a formula expression
 **SUM(A1:A10)** into cell A11::
 
-    s = "SUM(A1:A10)";
-
     ixion::abs_address_t A11(0, 10, 0);
-    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, A11, *resolver, "SUM(A1:A10)");
 
 To tokenize a formula string, you call the :cpp:func:`ixion::parse_formula_string` function and pass
 
@@ -144,8 +134,8 @@ dependencies via :cpp:func:`~ixion::register_formula_cell`::
     // Register this formula cell for automatic dependency tracking.
     ixion::register_formula_cell(cxt, A11, cell);
 
-Without registering formula cells, you won't be able to query formula cells to re-calculate
-given modified cells.  Here we are passing the pointer to the formula cell returned from the previous
+Without registering formula cells, you won't be able to determine which formula cells to re-calculate
+for given modified cells.  Here we are passing the pointer to the formula cell returned from the previous
 call.  This is optional, and you can pass a ``nullptr`` instead. But by passing it you will avoid the
 overhead of searching for the cell instance from the model.
 
@@ -215,8 +205,8 @@ that you need to "unregister" the old formula cell before overwriting it.
 
 Let's go through this step by step.  First, create new tokens to insert::
 
-    s = "AVERAGE(A1:A10)";
-    tokens = ixion::parse_formula_string(cxt, A11, *resolver, s.data(), s.size());
+    // Insert a new formula to A11.
+    tokens = ixion::parse_formula_string(cxt, A11, *resolver, "AVERAGE(A1:A10)");
 
 This time we are inserting the formula **AVERAGE(A1:A10)** in A11 to overwrite the previous one
 **SUM(A1:A10)**.  Before inserting these tokens, first unregister the current formula cell::
@@ -272,9 +262,8 @@ currently stores a numeric value, with a formula cell that references no other
 cells.  Let's add the new formula cell first::
 
     // Overwrite A10 with a formula cell with no references.
-    s = "(100+50)/2";
     ixion::abs_address_t A10(0, 9, 0);
-    tokens = ixion::parse_formula_string(cxt, A10, *resolver, s.data(), s.size());
+    tokens = ixion::parse_formula_string(cxt, A10, *resolver, "(100+50)/2");
     cxt.set_formula_cell(A10, std::move(tokens));
 
 Here, we are not registering this cell since it contains no references hence it
@@ -292,12 +281,12 @@ cell in A10 is not a formula cell, there is no cell to unregister.
     Likewise, unregistering a formula cell that didn't need to be registered
     (or wasn't registered) is entirely harmless.  Even unregistering a cell
     that didn't contain a formula cell is harmless, and essentially does
-    nothing.  As such, it's probably a good practice to unregister a cell
-    whenever a new cell value is being placed.
+    nothing.  As such, it's probably a good idea to unregister a cell whenever
+    a new cell value is being placed.
 
 Let's obtain all formula cells in need to re-calculation::
 
-    modified_formula_cells = {A10};
+    modified_formula_cells = { A10 };
     dirty_cells = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_formula_cells);
     cout << "number of dirty cells: " << dirty_cells.size() << endl;
 

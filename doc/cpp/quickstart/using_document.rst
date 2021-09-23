@@ -43,18 +43,19 @@ in cells A1 through A10::
 So far we don't see much of a difference from model_context.  Let's now insert
 string values into cells B2 and B3::
 
+    // Insert string values.
     std::string s = "This cell contains a string value.";
-    doc.set_string_cell("B2", s.data(), s.size());
-    doc.set_string_cell("B3", IXION_ASCII("This too contains a string value."));
+    doc.set_string_cell("B2", s);
+    doc.set_string_cell("B3", "This too contains a string value.");
 
 Here we see the first difference.  When using :cpp:class:`~ixion::document`,
 You can specify the cell position either by :cpp:struct:`~ixion::abs_address_t`
 as with :cpp:class:`~ixion::model_context`, or by a string whose value is the
 name of the cell address.  The default address syntax for the string cell address
-is "Excel A1" syntax.  You can pick a different syntax by passing an value of type
+is "Excel A1" syntax.  You can pick a different syntax by passing a value of type
 :cpp:enum:`~ixion::formula_name_resolver_t` to the constructor.
 
-It's worth noting that, when specifying the cell position in a string value and
+It's worth noting that, when specifying the cell position as a string value and
 the sheet name is omitted, the first sheet is implied.  You can also specify
 the sheet name explicitly as in the following::
 
