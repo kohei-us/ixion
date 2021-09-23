@@ -35,27 +35,6 @@ Primitive Types
 .. doxygenstruct:: ixion::formula_group_t
 
 
-Column Store Types
-------------------
-
-.. doxygentypedef:: ixion::boolean_element_block
-.. doxygentypedef:: ixion::numeric_element_block
-.. doxygentypedef:: ixion::string_element_block
-.. doxygentypedef:: ixion::formula_element_block
-.. doxygentypedef:: ixion::ixion_element_block_func
-.. doxygentypedef:: ixion::column_store_t
-.. doxygentypedef:: ixion::column_stores_t
-.. doxygentypedef:: ixion::matrix_store_t
-
-.. doxygenstruct:: ixion::matrix_store_trait
-
-.. doxygenvariable:: ixion::element_type_empty
-.. doxygenvariable:: ixion::element_type_boolean
-.. doxygenvariable:: ixion::element_type_numeric
-.. doxygenvariable:: ixion::element_type_string
-.. doxygenvariable:: ixion::element_type_formula
-
-
 Address Types
 -------------
 
