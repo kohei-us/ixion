@@ -1,85 +1,713 @@
 ---
 # Specifications of built-in functions alreay implemented in ixion.
 # Keep them sorted alphabetically.
+abs:
+  implemented: false
+acos:
+  implemented: false
+acosh:
+  implemented: false
+acot:
+  implemented: false
+acoth:
+  implemented: false
+address:
+  implemented: false
+aggregate:
+  implemented: false
+and:
+  implemented: false
+arabic:
+  implemented: false
+areas:
+  implemented: false
+asc:
+  implemented: false
+asin:
+  implemented: false
+asinh:
+  implemented: false
+atan:
+  implemented: false
+atan2:
+  implemented: false
+atanh:
+  implemented: false
+avedev:
+  implemented: false
 average:
   category: statistical
+  implemented: true
   params:
-    min: 1
     max: null
+    min: 1
+averagea:
+  implemented: false
+averageif:
+  implemented: false
+averageifs:
+  implemented: false
+b:
+  implemented: false
+bahttext:
+  implemented: false
+base:
+  implemented: false
+betadist:
+  implemented: false
+betainv:
+  implemented: false
+binomdist:
+  implemented: false
+bitand:
+  implemented: false
+bitlshift:
+  implemented: false
+bitor:
+  implemented: false
+bitrshift:
+  implemented: false
+bitxor:
+  implemented: false
+ceiling:
+  implemented: false
+cell:
+  implemented: false
+char:
+  implemented: false
+chidist:
+  implemented: false
+chiinv:
+  implemented: false
+chisqdist:
+  implemented: false
+chisqinv:
+  implemented: false
+chitest:
+  implemented: false
+choose:
+  implemented: false
+clean:
+  implemented: false
+code:
+  implemented: false
+color:
+  implemented: false
+column:
+  implemented: false
+columns:
+  implemented: false
+combin:
+  implemented: false
+combina:
+  implemented: false
+concat:
+  implemented: false
 concatenate:
   category: text
+  implemented: true
   params:
-    min: null
     max: null
+    min: null
+confidence:
+  implemented: false
+correl:
+  implemented: false
+cos:
+  implemented: false
+cosh:
+  implemented: false
+cot:
+  implemented: false
+coth:
+  implemented: false
+count:
+  implemented: false
 counta:
   category: statistical
+  implemented: true
   params:
-    min: null
     max: null
+    min: null
+countblank:
+  implemented: false
+countif:
+  implemented: false
+countifs:
+  implemented: false
+covar:
+  implemented: false
+critbinom:
+  implemented: false
+csc:
+  implemented: false
+csch:
+  implemented: false
+cumipmt:
+  implemented: false
+cumprinc:
+  implemented: false
+current:
+  implemented: false
+date:
+  implemented: false
+datedif:
+  implemented: false
+datevalue:
+  implemented: false
+daverage:
+  implemented: false
+day:
+  implemented: false
+days:
+  implemented: false
+days360:
+  implemented: false
+db:
+  implemented: false
+dcount:
+  implemented: false
+dcounta:
+  implemented: false
+ddb:
+  implemented: false
+dde:
+  implemented: false
+decimal:
+  implemented: false
+degrees:
+  implemented: false
+devsq:
+  implemented: false
+dget:
+  implemented: false
+dmax:
+  implemented: false
+dmin:
+  implemented: false
+dollar:
+  implemented: false
+dproduct:
+  implemented: false
+dstdev:
+  implemented: false
+dstdevp:
+  implemented: false
+dsum:
+  implemented: false
+dvar:
+  implemented: false
+dvarp:
+  implemented: false
+eastersunday:
+  implemented: false
+effect:
+  implemented: false
+encodeurl:
+  implemented: false
+errortype:
+  implemented: false
+euroconvert:
+  implemented: false
+even:
+  implemented: false
+exact:
+  implemented: false
+exp:
+  implemented: false
+expondist:
+  implemented: false
+fact:
+  implemented: false
+'false':
+  implemented: false
+fdist:
+  implemented: false
+filterxml:
+  implemented: false
+find:
+  implemented: false
+findb:
+  implemented: false
+finv:
+  implemented: false
+fisher:
+  implemented: false
+fisherinv:
+  implemented: false
+fixed:
+  implemented: false
+floor:
+  implemented: false
+forecast:
+  implemented: false
+formula:
+  implemented: false
+fourier:
+  implemented: false
+frequency:
+  implemented: false
+ftest:
+  implemented: false
+fv:
+  implemented: false
+gamma:
+  implemented: false
+gammadist:
+  implemented: false
+gammainv:
+  implemented: false
+gammaln:
+  implemented: false
+gauss:
+  implemented: false
+gcd:
+  implemented: false
+geomean:
+  implemented: false
+getpivotdata:
+  implemented: false
+goalseek:
+  implemented: false
+growth:
+  implemented: false
+harmean:
+  implemented: false
+hlookup:
+  implemented: false
+hour:
+  implemented: false
+hyperlink:
+  implemented: false
+hypgeomdist:
+  implemented: false
 if:
   category: logical
+  implemented: true
   params:
-    min: 3
     max: 3
+    min: 3
+iferror:
+  implemented: false
+ifna:
+  implemented: false
+ifs:
+  implemented: false
+index:
+  implemented: false
+indirect:
+  implemented: false
+info:
+  implemented: false
 int:
   category: mathematical
+  implemented: true
   params:
-    min: 1
     max: 1
+    min: 1
+intercept:
+  implemented: false
+ipmt:
+  implemented: false
+irr:
+  implemented: false
+isblank:
+  implemented: false
+iserr:
+  implemented: false
+iserror:
+  implemented: false
+iseven:
+  implemented: false
+isformula:
+  implemented: false
+islogical:
+  implemented: false
+isna:
+  implemented: false
+isnontext:
+  implemented: false
+isnumber:
+  implemented: false
+isodd:
+  implemented: false
+isoweeknum:
+  implemented: false
+ispmt:
+  implemented: false
+isref:
+  implemented: false
+istext:
+  implemented: false
+jis:
+  implemented: false
+kurt:
+  implemented: false
+large:
+  implemented: false
+lcm:
+  implemented: false
 left:
   category: text
+  implemented: true
   params:
-    min: 1
     max: 2
+    min: 1
+leftb:
+  implemented: false
 len:
   category: text
+  implemented: true
   params:
-    min: 1
     max: 1
+    min: 1
+lenb:
+  implemented: false
+linest:
+  implemented: false
+ln:
+  implemented: false
+log:
+  implemented: false
+log10:
+  implemented: false
+logest:
+  implemented: false
+loginv:
+  implemented: false
+lognormdist:
+  implemented: false
+lookup:
+  implemented: false
+lower:
+  implemented: false
+match:
+  implemented: false
 max:
   category: statistical
+  implemented: true
   params:
-    min: 1
     max: null
+    min: 1
+maxa:
+  implemented: false
+maxifs:
+  implemented: false
+mdeterm:
+  implemented: false
+median:
+  implemented: false
+mid:
+  implemented: false
+midb:
+  implemented: false
 min:
   category: statistical
+  implemented: true
   params:
-    min: 1
     max: null
+    min: 1
+mina:
+  implemented: false
+minifs:
+  implemented: false
+minute:
+  implemented: false
+minverse:
+  implemented: false
+mirr:
+  implemented: false
 mmult:
   category: matrix
+  implemented: true
   params:
-    min: 2
     max: 2
+    min: 2
+mod:
+  implemented: false
+mode:
+  implemented: false
+month:
+  implemented: false
+multirange:
+  implemented: false
+munit:
+  implemented: false
+mvalue:
+  implemented: false
+n:
+  implemented: false
+na:
+  implemented: false
+neg:
+  implemented: false
+negbinomdist:
+  implemented: false
+networkdays:
+  implemented: false
+nominal:
+  implemented: false
+normdist:
+  implemented: false
+norminv:
+  implemented: false
+normsdist:
+  implemented: false
+normsinv:
+  implemented: false
+not:
+  implemented: false
 now:
   category: time
+  implemented: true
+  note: This function currently does not account for the zero date.
   params:
-    min: 0
     max: 0
-  note:
-    This function currently does not account for the zero date.
+    min: 0
+nper:
+  implemented: false
+npv:
+  implemented: false
+numbervalue:
+  implemented: false
+odd:
+  implemented: false
+offset:
+  implemented: false
+or:
+  implemented: false
+pduration:
+  implemented: false
+pearson:
+  implemented: false
+percentile:
+  implemented: false
+percentrank:
+  implemented: false
+permut:
+  implemented: false
+permutationa:
+  implemented: false
+phi:
+  implemented: false
 pi:
   category: mathematical
+  implemented: true
   params:
-    min: 0
     max: 0
+    min: 0
+pmt:
+  implemented: false
+poisson:
+  implemented: false
+power:
+  implemented: false
+ppmt:
+  implemented: false
+prob:
+  implemented: false
+product:
+  implemented: false
+proper:
+  implemented: false
+pv:
+  implemented: false
+quartile:
+  implemented: false
+radians:
+  implemented: false
+rand:
+  implemented: false
+rank:
+  implemented: false
+rate:
+  implemented: false
+rawsubtract:
+  implemented: false
+regex:
+  implemented: false
+replace:
+  implemented: false
+replaceb:
+  implemented: false
+rept:
+  implemented: false
+right:
+  implemented: false
+rightb:
+  implemented: false
+roman:
+  implemented: false
+round:
+  implemented: false
+rounddown:
+  implemented: false
+roundsig:
+  implemented: false
+roundup:
+  implemented: false
+row:
+  implemented: false
+rows:
+  implemented: false
+rri:
+  implemented: false
+rsq:
+  implemented: false
+search:
+  implemented: false
+searchb:
+  implemented: false
+sec:
+  implemented: false
+sech:
+  implemented: false
+second:
+  implemented: false
+sheet:
+  implemented: false
+sheets:
+  implemented: false
+sign:
+  implemented: false
+sin:
+  implemented: false
+sinh:
+  implemented: false
+skew:
+  implemented: false
+skewp:
+  implemented: false
+sln:
+  implemented: false
+slope:
+  implemented: false
+small:
+  implemented: false
+sqrt:
+  implemented: false
+standardize:
+  implemented: false
+stdev:
+  implemented: false
+stdeva:
+  implemented: false
+stdevp:
+  implemented: false
+stdevpa:
+  implemented: false
+steyx:
+  implemented: false
+style:
+  implemented: false
+substitute:
+  implemented: false
 subtotal:
   category: mathematical
+  implemented: true
+  note: This function is not fully implemented.
   params:
-    min: 2
     max: 2
-  note:
-    This function is not fully implemented.
+    min: 2
 sum:
   category: mathematical
+  implemented: true
   params:
-    min: 1
     max: null
+    min: 1
+sumif:
+  implemented: false
+sumifs:
+  implemented: false
+sumproduct:
+  implemented: false
+sumsq:
+  implemented: false
+sumx2my2:
+  implemented: false
+sumx2py2:
+  implemented: false
+sumxmy2:
+  implemented: false
+switch:
+  implemented: false
+syd:
+  implemented: false
+t:
+  implemented: false
+tan:
+  implemented: false
+tanh:
+  implemented: false
+tdist:
+  implemented: false
+text:
+  implemented: false
+textjoin:
+  implemented: false
+time:
+  implemented: false
+timevalue:
+  implemented: false
+tinv:
+  implemented: false
+today:
+  implemented: false
+transpose:
+  implemented: false
+trend:
+  implemented: false
+trim:
+  implemented: false
+trimmean:
+  implemented: false
+'true':
+  implemented: false
+trunc:
+  implemented: false
+ttest:
+  implemented: false
+type:
+  implemented: false
+unichar:
+  implemented: false
+unicode:
+  implemented: false
+upper:
+  implemented: false
+value:
+  implemented: false
+var:
+  implemented: false
+vara:
+  implemented: false
+varp:
+  implemented: false
+varpa:
+  implemented: false
+vdb:
+  implemented: false
+vlookup:
+  implemented: false
 wait:
   category: development
+  implemented: true
+  note: This function is used for development only.  It sleeps for 1 second and always
+    returns 1.
   params:
-    min: 0
     max: 0
-  note:
-    This function is used for development only.  It sleeps for 1 second and
-    always returns 1.
+    min: 0
+webservice:
+  implemented: false
+weekday:
+  implemented: false
+weeknum:
+  implemented: false
+weibull:
+  implemented: false
+xor:
+  implemented: false
+year:
+  implemented: false
+ztest:
+  implemented: false
