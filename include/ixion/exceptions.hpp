@@ -62,7 +62,7 @@ public:
 };
 
 /**
- * This exception is thrown typically from the {@link model_context} class.
+ * This exception is thrown typically from the ixion::model_context class.
  */
 class IXION_DLLPUBLIC model_context_error: public general_error
 {

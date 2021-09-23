@@ -64,7 +64,7 @@ IXION_DLLPUBLIC bool is_valid_sheet(sheet_t sheet);
 IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 
 /**
- * This type represents a raw cell type as stored in {@link model_context}.
+ * This type represents a raw cell type as stored in ixion::model_context.
  */
 enum class celltype_t : uint8_t
 {
@@ -208,7 +208,7 @@ enum class formula_event_t
 };
 
 /**
- * Specifies iterator direction of a {@link model_context}.
+ * Specifies iterator direction of a ixion::model_context.
  */
 enum class rc_direction_t
 {
@@ -236,8 +236,7 @@ struct IXION_DLLPUBLIC rc_size_t
 
 /**
  * This strcuture stores information about grouped formula cells.  All
- * formula cells belonging to the same group should return the same set of
- * values.
+ * formula cells belonging to the same group shares the same set of values.
  */
 struct IXION_DLLPUBLIC formula_group_t
 {
