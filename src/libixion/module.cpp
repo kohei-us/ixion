@@ -87,7 +87,6 @@ void init_modules()
         std::ostringstream os;
         os << mod_prefix << mod_name << ".so";
 
-        // TODO: make this cross-platform.
         void* hdl = dlopen(os.str().data(), RTLD_NOW | RTLD_GLOBAL);
         if (!hdl)
             continue;
