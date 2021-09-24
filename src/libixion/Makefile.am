@@ -112,7 +112,7 @@ endif
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = \
 	-no-undefined \
-	-Wl,-rpath,'$$ORIGIN' \
+	-Wl,-rpath,'$$ORIGIN' -Wl,-rpath,'$$ORIGIN/$(PACKAGE)' \
 	$(BOOST_FILESYSTEM_LDFLAGS)
 
 libixion_@IXION_API_VERSION@_la_LIBADD = \
