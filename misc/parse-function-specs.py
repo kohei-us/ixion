@@ -28,8 +28,12 @@ def main():
         p_min = ""
         p_max = ""
         if impl_status and "params" in func_data:
-            p_min = func_data["params"]["min"] or "*"
-            p_max = func_data["params"]["max"] or "*"
+            p_min = func_data["params"]["min"]
+            if p_min is None:
+                p_min = "*"
+            p_max = func_data["params"]["max"]
+            if p_max is None:
+                p_max = "*"
         print(f"| {func_name.upper()} | {category.capitalize()} | {impl_status} | {p_min} | {p_max} | {note} |")
 
 
