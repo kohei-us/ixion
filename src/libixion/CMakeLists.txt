@@ -55,6 +55,12 @@ if(BUILD_VULKAN)
         Vulkan::Vulkan
     )
 
+    install(TARGETS ixion-${IXION_API_VERSION}-vulkan
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+
 endif()
 
 configure_file(constants.inl.in ${CMAKE_CURRENT_BINARY_DIR}/inl/constants.inl)
