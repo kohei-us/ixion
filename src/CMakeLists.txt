@@ -10,6 +10,7 @@ add_executable(ixion-parser
 )
 
 add_executable(ixion-sorter
+    app_common.cpp
     ixion_sorter.cpp
     sort_input_parser.cpp
 )
