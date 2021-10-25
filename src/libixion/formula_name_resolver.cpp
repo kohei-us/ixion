@@ -19,6 +19,7 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
+#include <cctype>
 
 using namespace std;
 
