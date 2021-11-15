@@ -3,7 +3,7 @@ tracker and spreadsheet document model backend all in one package.
 
 ## Overview
 The goal of this project is to create a library for calculating the
-results of formula expressions stored in multiple fomrula cells.  The cells
+results of formula expressions stored in multiple formula cells.  The cells
 can be referenced by each other, and Ixion resolves their dependencies
 automatically upon calculation.  The caller can run the calculation routine
 either in a single-threaded mode, or a multi-threaded mode. Ixion also supports
