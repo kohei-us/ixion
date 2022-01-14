@@ -477,6 +477,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
 {
     switch (oc)
     {
+        case formula_function_t::func_abs:
+            fnc_abs(args);
+            break;
         case formula_function_t::func_average:
             fnc_average(args);
             break;
@@ -628,6 +631,15 @@ void formula_functions::fnc_counta(formula_value_stack& args) const
     }
 
     args.push_value(ret);
+}
+
+void formula_functions::fnc_abs(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ABS requires exactly 1 argument.");
+
+    double v = args.pop_value();
+    args.push_value(std::abs(v));
 }
 
 void formula_functions::fnc_average(formula_value_stack& args) const

@@ -2,7 +2,11 @@
 # Specifications of built-in functions alreay implemented in ixion.
 # Keep them sorted alphabetically.
 abs:
-  implemented: false
+  category: mathematical
+  implemented: true
+  params:
+    max: 1
+    min: 1
 acos:
   implemented: false
 acosh:

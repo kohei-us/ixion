@@ -1,0 +1,20 @@
+%% Test for ABS function.
+%mode init
+A1=2
+A2=-4.2
+A3=9
+A4=-5.8
+B1=ABS(A1)
+B2=ABS(A2)
+B3=ABS(A3)
+B4=ABS(A4)
+B5=ABS(A2+A4)
+%calc
+%mode result
+B1=2
+B2=4.2
+B3=9
+B4=5.8
+B5=10
+%check
+%exit
