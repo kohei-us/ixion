@@ -59,6 +59,7 @@ public:
     virtual const dirty_cell_tracker& get_cell_tracker() const = 0;
 
     virtual bool is_empty(const abs_address_t& addr) const = 0;
+    virtual bool is_empty(const abs_range_t& range) const = 0;
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;
 
     /**

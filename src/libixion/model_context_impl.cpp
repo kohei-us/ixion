@@ -830,6 +830,30 @@ bool model_context_impl::is_empty(const abs_address_t& addr) const
     return m_sheets.at(addr.sheet).at(addr.column).is_empty(addr.row);
 }
 
+bool model_context_impl::is_empty(abs_range_t range) const
+{
+    range = shrink_to_workbook(range);
+
+    for (sheet_t sh = range.first.sheet; sh <= range.last.sheet; ++sh)
+    {
+        for (col_t col = range.first.column; col <= range.last.column; ++col)
+        {
+            const column_store_t& col_store = m_sheets[sh][col];
+            auto pos = col_store.position(range.first.row);
+            if (pos.first->type != element_type_empty)
+                // The top block is non-empty.
+                return false;
+
+            // See if this block covers the entire row range.
+            row_t last_empty_row = range.first.row + pos.first->size - pos.second - 1;
+            if (last_empty_row < range.last.row)
+                return false;
+        }
+    }
+
+    return true;
+}
+
 celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
     mdds::mtv::element_t gmcell_type =
@@ -966,6 +990,38 @@ formula_result model_context_impl::get_formula_result(const abs_address_t& addr)
         throw general_error("not a formula cell.");
 
     return fc->get_result_cache(m_formula_res_wait_policy);
+}
+
+abs_range_t model_context_impl::shrink_to_workbook(abs_range_t range) const
+{
+    range.reorder();
+
+    if (m_sheets.empty())
+        return range;
+
+    if (range.first.sheet >= sheet_t(m_sheets.size()))
+        throw general_error("out-of-bound sheet ranges");
+
+    range.last.sheet = std::min<sheet_t>(range.last.sheet, m_sheets.size()-1);
+    const worksheet& ws = m_sheets[range.last.sheet];
+    const column_stores_t& cols = ws.get_columns();
+
+    if (cols.empty())
+        return range;
+
+    if (range.first.column >= col_t(cols.size()))
+        throw general_error("out-of-bound column ranges");
+
+    range.last.column = std::min<col_t>(range.last.column, cols.size()-1);
+
+    const column_store_t& col = cols[0];
+
+    if (range.first.row >= row_t(col.size()))
+        throw general_error("out-of-bound row ranges");
+
+    range.last.row = std::min<row_t>(range.last.row, col.size()-1);
+
+    return range;
 }
 
 }}

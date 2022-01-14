@@ -789,8 +789,12 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
             break;
         }
         case stack_value_t::range_ref:
-            // TODO : implement this.
+        {
+            abs_range_t range = args.pop_range_ref();
+            bool res = m_context.is_empty(range);
+            args.push_value(res);
             break;
+        }
         default:
         {
             args.clear();

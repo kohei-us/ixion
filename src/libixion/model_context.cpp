@@ -165,6 +165,11 @@ bool model_context::is_empty(const abs_address_t& addr) const
     return mp_impl->is_empty(addr);
 }
 
+bool model_context::is_empty(const abs_range_t& range) const
+{
+    return mp_impl->is_empty(range);
+}
+
 celltype_t model_context::get_celltype(const abs_address_t& addr) const
 {
     return mp_impl->get_celltype(addr);

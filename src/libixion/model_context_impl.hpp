@@ -123,6 +123,7 @@ public:
     abs_range_t get_data_range(sheet_t sheet) const;
 
     bool is_empty(const abs_address_t& addr) const;
+    bool is_empty(abs_range_t range) const;
     celltype_t get_celltype(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
     bool get_boolean_value(const abs_address_t& addr) const;
@@ -170,6 +171,9 @@ public:
 
     model_iterator get_model_iterator(
         sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
+
+private:
+    abs_range_t shrink_to_workbook(abs_range_t range) const;
 
 private:
     model_context& m_parent;

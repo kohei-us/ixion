@@ -98,6 +98,7 @@ public:
     virtual const dirty_cell_tracker& get_cell_tracker() const override;
 
     virtual bool is_empty(const abs_address_t& addr) const override;
+    virtual bool is_empty(const abs_range_t& range) const override;
     virtual celltype_t get_celltype(const abs_address_t& addr) const override;
     virtual double get_numeric_value(const abs_address_t& addr) const override;
     virtual bool get_boolean_value(const abs_address_t& addr) const override;
