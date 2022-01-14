@@ -318,6 +318,9 @@ irr:
 isblank:
   category: information
   implemented: true
+  note:
+    When a range reference is passed, it returns true only when all of the cells
+    in the specified range are empty.
   params:
     max: 1
     min: 1
