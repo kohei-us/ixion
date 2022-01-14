@@ -316,7 +316,11 @@ ipmt:
 irr:
   implemented: false
 isblank:
-  implemented: false
+  category: information
+  implemented: true
+  params:
+    max: 1
+    min: 1
 iserr:
   implemented: false
 iserror:

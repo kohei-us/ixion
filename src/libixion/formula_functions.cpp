@@ -492,6 +492,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_if:
             fnc_if(args);
             break;
+        case formula_function_t::func_isblank:
+            fnc_isblank(args);
+            break;
         case formula_function_t::func_int:
             fnc_int(args);
             break;
@@ -769,6 +772,16 @@ void formula_functions::fnc_if(formula_value_stack& args) const
     formula_value_stack ret(m_context);
     ret.push_back(args.release(pos));
     args.swap(ret);
+}
+
+void formula_functions::fnc_isblank(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISBLANK requires exactly one argument.");
+
+    abs_address_t addr = args.pop_single_ref();
+    bool res = m_context.get_celltype(addr) == celltype_t::empty;
+    args.push_value(res);
 }
 
 void formula_functions::fnc_len(formula_value_stack& args) const
