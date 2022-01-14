@@ -1,0 +1,20 @@
+%% Test for ISNUMBER function.
+%mode init
+A1:345
+A2=2
+A3=CONCATENATE("string", " ", "formula")
+A4@string cell
+B1=ISNUMBER(A1)
+B2=ISNUMBER(A2)
+B3=ISNUMBER(A3)
+B4=ISNUMBER(A4)
+B5=ISNUMBER(A5)
+%calc
+%mode result
+B1=1
+B2=1
+B3=0
+B4=0
+B5=0
+%check
+%exit

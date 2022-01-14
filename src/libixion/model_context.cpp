@@ -175,6 +175,11 @@ celltype_t model_context::get_celltype(const abs_address_t& addr) const
     return mp_impl->get_celltype(addr);
 }
 
+cell_value_t model_context::get_cell_value_type(const abs_address_t& addr) const
+{
+    return mp_impl->get_cell_value_type(addr);
+}
+
 double model_context::get_numeric_value(const abs_address_t& addr) const
 {
     return mp_impl->get_numeric_value(addr);

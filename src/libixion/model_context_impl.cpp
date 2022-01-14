@@ -862,6 +862,13 @@ celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
     return detail::to_celltype(gmcell_type);
 }
 
+cell_value_t model_context_impl::get_cell_value_type(const abs_address_t& addr) const
+{
+    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    auto pos = col_store.position(addr.row);
+    return detail::to_cell_value_type(pos, get_formula_result_wait_policy());
+}
+
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);

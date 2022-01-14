@@ -17,6 +17,9 @@ namespace ixion { namespace detail {
 
 celltype_t to_celltype(mdds::mtv::element_t mtv_type);
 
+cell_value_t to_cell_value_type(
+    const column_store_t::const_position_type& pos, formula_result_wait_policy_t policy);
+
 template<std::size_t S, typename T>
 void ensure_max_size(const T& v)
 {

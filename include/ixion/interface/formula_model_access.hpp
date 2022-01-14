@@ -61,6 +61,7 @@ public:
     virtual bool is_empty(const abs_address_t& addr) const = 0;
     virtual bool is_empty(const abs_range_t& range) const = 0;
     virtual celltype_t get_celltype(const abs_address_t& addr) const = 0;
+    virtual cell_value_t get_cell_value_type(const abs_address_t& addr) const = 0;
 
     /**
      * Get a numeric representation of the cell value at specified position.

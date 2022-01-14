@@ -52,28 +52,8 @@ celltype_t cell_access::get_type() const
 
 cell_value_t cell_access::get_value_type() const
 {
-    celltype_t raw_type = get_type();
-
-    if (raw_type != celltype_t::formula)
-        // celltype_t and cell_result_t are numerically equivalent except for the formula slot.
-        return static_cast<cell_value_t>(raw_type);
-
-    const formula_cell* fc = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-    formula_result res = fc->get_result_cache(mp_impl->cxt.get_formula_result_wait_policy()); // by calling this we should not get a matrix result.
-
-    switch (res.get_type())
-    {
-        case formula_result::result_type::value:
-            return cell_value_t::numeric;
-        case formula_result::result_type::string:
-            return cell_value_t::string;
-        case formula_result::result_type::error:
-            return cell_value_t::error;
-        case formula_result::result_type::matrix:
-            throw std::logic_error("we shouldn't be getting a matrix result type here.");
-    }
-
-    return cell_value_t::unknown;
+    return detail::to_cell_value_type(
+        mp_impl->pos, mp_impl->cxt.get_formula_result_wait_policy());
 }
 
 const formula_cell* cell_access::get_formula_cell() const
