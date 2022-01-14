@@ -331,7 +331,11 @@ iserror:
 iseven:
   implemented: false
 isformula:
-  implemented: false
+  category: information
+  implemented: true
+  params:
+    max: 1
+    min: 1
 islogical:
   implemented: false
 isna:

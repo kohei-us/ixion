@@ -495,6 +495,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_isblank:
             fnc_isblank(args);
             break;
+        case formula_function_t::func_isformula:
+            fnc_isformula(args);
+            break;
         case formula_function_t::func_isnumber:
             fnc_isnumber(args);
             break;
@@ -804,6 +807,23 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
             args.push_value(0);
         }
     }
+}
+
+void formula_functions::fnc_isformula(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISFORMULA requires exactly one argument.");
+
+    if (args.get_type() != stack_value_t::single_ref)
+    {
+        args.clear();
+        args.push_value(0);
+        return;
+    }
+
+    abs_address_t addr = args.pop_single_ref();
+    bool res = m_context.get_celltype(addr) == celltype_t::formula;
+    args.push_value(res);
 }
 
 void formula_functions::fnc_isnumber(formula_value_stack& args) const

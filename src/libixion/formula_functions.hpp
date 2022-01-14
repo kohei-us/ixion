@@ -64,6 +64,7 @@ private:
 
     void fnc_if(formula_value_stack& args) const;
     void fnc_isblank(formula_value_stack& args) const;
+    void fnc_isformula(formula_value_stack& args) const;
     void fnc_isnumber(formula_value_stack& args) const;
 
     void fnc_len(formula_value_stack& args) const;
