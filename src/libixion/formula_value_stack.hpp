@@ -129,7 +129,6 @@ public:
     abs_address_t pop_single_ref();
     abs_range_t pop_range_ref();
     matrix pop_range_value();
-    cell_value_t pop_cell_value_type();
 
     stack_value_t get_type() const;
 };
