@@ -64,6 +64,7 @@ private:
 
     void fnc_if(formula_value_stack& args) const;
     void fnc_isblank(formula_value_stack& args) const;
+    void fnc_iserror(formula_value_stack& args) const;
     void fnc_iseven(formula_value_stack& args) const;
     void fnc_isformula(formula_value_stack& args) const;
     void fnc_isnontext(formula_value_stack& args) const;

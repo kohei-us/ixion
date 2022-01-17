@@ -504,6 +504,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_isblank:
             fnc_isblank(args);
             break;
+        case formula_function_t::func_iserror:
+            fnc_iserror(args);
+            break;
         case formula_function_t::func_iseven:
             fnc_iseven(args);
             break;
@@ -831,6 +834,23 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
             args.push_value(0);
         }
     }
+}
+
+void formula_functions::fnc_iserror(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISERROR requires exactly one argument.");
+
+    if (args.get_type() != stack_value_t::single_ref)
+    {
+        args.clear();
+        args.push_value(0);
+        return;
+    }
+
+    abs_address_t addr = args.pop_single_ref();
+    bool res = m_context.get_cell_value_type(addr) == cell_value_t::error;
+    args.push_value(res);
 }
 
 void formula_functions::fnc_iseven(formula_value_stack& args) const

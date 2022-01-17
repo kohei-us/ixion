@@ -330,7 +330,13 @@ iserr:
     ISNA needs to be implemented first.  This is the same as ISERROR except when
     the error value is '#'N/A it returns false.
 iserror:
-  implemented: false
+  category: information
+  implemented: true
+  note:
+    This function does NOT take a range reference.
+  params:
+    max: 1
+    min: 1
 iseven:
   category: information
   implemented: true

@@ -1,0 +1,22 @@
+%% Test case for built-in ISERROR function.
+%mode init
+A1:10
+A2=10/2
+A3=2/0
+A4=NonExistingName
+B1=ISERROR(A1)
+B2=ISERROR(A2)
+B3=ISERROR(A3)
+B4=ISERROR(A4)
+C4=ISERROR(5.2)
+C5=ISERROR("inline text")
+%calc
+%mode result
+B1=0
+B2=0
+B3=1
+B4=1
+C4=0
+C5=0
+%check
+
