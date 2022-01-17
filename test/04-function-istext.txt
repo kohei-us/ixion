@@ -1,0 +1,24 @@
+%% Test for ISTEXT and ISNONTEXT functions.
+%mode init
+A1:1
+A2=1
+A3="text"
+A4@text
+B1=ISTEXT(A1)
+B2=ISTEXT(A2)
+B3=ISTEXT(A3)
+B4=ISTEXT(A4)
+B5=ISTEXT(A5)
+B6=ISTEXT(1)
+B7=ISTEXT("inline text")
+%calc
+%mode result
+B1=0
+B2=0
+B3=1
+B4=1
+B5=0
+B6=0
+B7=1
+%check
+%exit
