@@ -326,6 +326,9 @@ isblank:
     min: 1
 iserr:
   implemented: false
+  note:
+    ISNA needs to be implemented first.  This is the same as ISERROR except when
+    the error value is '#'N/A it returns false.
 iserror:
   implemented: false
 iseven:
@@ -344,8 +347,15 @@ isformula:
     min: 1
 islogical:
   implemented: false
+  note:
+    We need to first support boolean type values in formula_result and formula_value_stack
+    classes, and possibly other places before we can implement this function.
 isna:
   implemented: false
+  note:
+    We first need to have a way to invoke an '#'N/A value as a formula result,
+    which typically happens when a value lookup fails in functions such as LOOKUP,
+    VLOOKUP etc.
 isnontext:
   category: information
   implemented: true
