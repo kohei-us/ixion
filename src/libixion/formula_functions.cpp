@@ -498,6 +498,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_isformula:
             fnc_isformula(args);
             break;
+        case formula_function_t::func_isnontext:
+            fnc_isnontext(args);
+            break;
         case formula_function_t::func_isnumber:
             fnc_isnumber(args);
             break;
@@ -827,6 +830,30 @@ void formula_functions::fnc_isformula(formula_value_stack& args) const
     abs_address_t addr = args.pop_single_ref();
     bool res = m_context.get_celltype(addr) == celltype_t::formula;
     args.push_value(res);
+}
+
+void formula_functions::fnc_isnontext(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISNONTEXT requires exactly one argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            bool res = m_context.get_cell_value_type(addr) != cell_value_t::string;
+            args.push_value(res);
+            break;
+        }
+        case stack_value_t::string:
+            args.clear();
+            args.push_value(0);
+            break;
+        default:
+            args.clear();
+            args.push_value(1);
+    }
 }
 
 void formula_functions::fnc_isnumber(formula_value_stack& args) const
