@@ -341,7 +341,14 @@ islogical:
 isna:
   implemented: false
 isnontext:
-  implemented: false
+  category: information
+  implemented: true
+  note:
+    This function does NOT take a range reference.  Also, the result of this
+    function is the complete opposite of ISTEXT function.
+  params:
+    max: 1
+    min: 1
 isnumber:
   category: information
   implemented: true
@@ -359,7 +366,13 @@ ispmt:
 isref:
   implemented: false
 istext:
-  implemented: false
+  category: information
+  implemented: true
+  note:
+    This function does NOT take a range reference.
+  params:
+    max: 1
+    min: 1
 jis:
   implemented: false
 kurt:
