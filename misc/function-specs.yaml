@@ -364,7 +364,13 @@ isoweeknum:
 ispmt:
   implemented: false
 isref:
-  implemented: false
+  category: information
+  implemented: true
+  note:
+    This function does NOT take a range reference.
+  params:
+    max: 1
+    min: 1
 istext:
   category: information
   implemented: true
