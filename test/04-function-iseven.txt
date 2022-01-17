@@ -1,0 +1,40 @@
+%% Test for ISEVEN and ISODD functions.
+%mode init
+A2=10.2
+A3=11.4
+B2=ISEVEN(2)
+B3=ISEVEN(3)
+B4=ISEVEN(1.2)
+B5=ISEVEN(4.2)
+B6=ISEVEN(4.9)
+B7=ISEVEN(-4.9)
+B8=ISEVEN(A2)
+B9=ISEVEN(A3)
+C2=ISODD(2)
+C3=ISODD(3)
+C4=ISODD(1.2)
+C5=ISODD(4.2)
+C6=ISODD(4.9)
+C7=ISODD(-4.9)
+C8=ISODD(A2)
+C9=ISODD(A3)
+%calc
+%mode result
+B2=1
+B3=0
+B4=0
+B5=1
+B6=1
+B7=1
+B8=1
+B9=0
+C2=0
+C3=1
+C4=1
+C5=0
+C6=0
+C7=0
+C8=0
+C9=1
+%check
+%exit

@@ -423,6 +423,15 @@ numeric_matrix multiply_matrices(const matrix& left, const matrix& right)
     return output;
 }
 
+bool pop_and_check_for_odd_value(formula_value_stack& args)
+{
+    double v = args.pop_value();
+    intmax_t iv = std::trunc(v);
+    iv = std::abs(iv);
+    bool odd = iv & 0x01;
+    return odd;
+}
+
 } // anonymous namespace
 
 // ============================================================================
@@ -495,6 +504,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_isblank:
             fnc_isblank(args);
             break;
+        case formula_function_t::func_iseven:
+            fnc_iseven(args);
+            break;
         case formula_function_t::func_isformula:
             fnc_isformula(args);
             break;
@@ -503,6 +515,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_isnumber:
             fnc_isnumber(args);
+            break;
+        case formula_function_t::func_isodd:
+            fnc_isodd(args);
             break;
         case formula_function_t::func_isref:
             fnc_isref(args);
@@ -818,6 +833,15 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
     }
 }
 
+void formula_functions::fnc_iseven(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISEVEN requires exactly one argument.");
+
+    bool odd = pop_and_check_for_odd_value(args);
+    args.push_value(!odd);
+}
+
 void formula_functions::fnc_isformula(formula_value_stack& args) const
 {
     if (args.size() != 1)
@@ -881,6 +905,15 @@ void formula_functions::fnc_isnumber(formula_value_stack& args) const
             args.clear();
             args.push_value(0);
     }
+}
+
+void formula_functions::fnc_isodd(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISODD requires exactly one argument.");
+
+    bool odd = pop_and_check_for_odd_value(args);
+    args.push_value(odd);
 }
 
 void formula_functions::fnc_isref(formula_value_stack& args) const

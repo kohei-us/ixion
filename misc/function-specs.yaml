@@ -329,7 +329,13 @@ iserr:
 iserror:
   implemented: false
 iseven:
-  implemented: false
+  category: information
+  implemented: true
+  note:
+    This function does NOT take a range reference.
+  params:
+    max: 1
+    min: 1
 isformula:
   category: information
   implemented: true
@@ -358,7 +364,13 @@ isnumber:
     max: 1
     min: 1
 isodd:
-  implemented: false
+  category: information
+  implemented: true
+  note:
+    This function does NOT take a range reference.
+  params:
+    max: 1
+    min: 1
 isoweeknum:
   implemented: false
 ispmt:
