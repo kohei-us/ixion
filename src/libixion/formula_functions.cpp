@@ -504,6 +504,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_isnumber:
             fnc_isnumber(args);
             break;
+        case formula_function_t::func_isref:
+            fnc_isref(args);
+            break;
         case formula_function_t::func_istext:
             fnc_istext(args);
             break;
@@ -871,6 +874,24 @@ void formula_functions::fnc_isnumber(formula_value_stack& args) const
             break;
         }
         case stack_value_t::value:
+            args.clear();
+            args.push_value(1);
+            break;
+        default:
+            args.clear();
+            args.push_value(0);
+    }
+}
+
+void formula_functions::fnc_isref(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISREF requires exactly one argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
             args.clear();
             args.push_value(1);
             break;

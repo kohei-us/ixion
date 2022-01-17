@@ -67,6 +67,7 @@ private:
     void fnc_isformula(formula_value_stack& args) const;
     void fnc_isnontext(formula_value_stack& args) const;
     void fnc_isnumber(formula_value_stack& args) const;
+    void fnc_isref(formula_value_stack& args) const;
     void fnc_istext(formula_value_stack& args) const;
 
     void fnc_len(formula_value_stack& args) const;
