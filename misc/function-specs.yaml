@@ -20,7 +20,11 @@ address:
 aggregate:
   implemented: false
 and:
+  category: logical
   implemented: false
+  params:
+    max: null
+    min: 1
 arabic:
   implemented: false
 areas:
