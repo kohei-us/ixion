@@ -9,13 +9,13 @@
 #define INCLUDED_IXION_FORMULA_HPP
 
 #include "formula_tokens.hpp"
-#include "./interface/formula_model_access.hpp"
 #include "env.hpp"
 
 #include <string>
 
 namespace ixion {
 
+class formula_cell;
 class formula_name_resolver;
 class model_context;
 

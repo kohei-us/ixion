@@ -11,7 +11,6 @@
 
 #include "ixion/formula_tokens.hpp"
 #include "ixion/matrix.hpp"
-#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/macros.hpp"
 
 #ifdef max

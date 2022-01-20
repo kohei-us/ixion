@@ -7,7 +7,6 @@
 
 #include "formula_parser.hpp"
 #include "ixion/formula_name_resolver.hpp"
-#include "ixion/interface/formula_model_access.hpp"
 
 #include "formula_functions.hpp"
 #include "concrete_formula_tokens.hpp"

@@ -214,7 +214,6 @@
         <Folder Name="../include">
             <Folder Name="ixion">
                 <Folder Name="interface">
-                    <F N="../include/ixion/interface/formula_model_access.hpp"/>
                     <F N="../include/ixion/interface/session_handler.hpp"/>
                     <F N="../include/ixion/interface/table_handler.hpp"/>
                 </Folder>

@@ -10,7 +10,6 @@
 #include <ixion/exceptions.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/formula_tokens.hpp>
-#include <ixion/interface/formula_model_access.hpp>
 #include <ixion/interface/session_handler.hpp>
 #include <ixion/global.hpp>
 #include <ixion/matrix.hpp>

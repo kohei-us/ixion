@@ -8,10 +8,11 @@
 #include "sheet.hpp"
 #include "global.hpp"
 
-#include "ixion/model_context.hpp"
-#include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula.hpp"
-#include "ixion/cell.hpp"
+#include <ixion/model_context.hpp>
+#include <ixion/formula_name_resolver.hpp>
+#include <ixion/formula.hpp>
+#include <ixion/cell.hpp>
+#include <ixion/exceptions.hpp>
 
 #include <structmember.h>
 

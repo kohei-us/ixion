@@ -7,31 +7,12 @@
 
 #include "ixion/interface/table_handler.hpp"
 #include "ixion/interface/session_handler.hpp"
-#include "ixion/interface/formula_model_access.hpp"
 
 namespace ixion { namespace iface {
 
 table_handler::~table_handler() {}
 
 session_handler::~session_handler() {}
-
-formula_model_access::formula_model_access() {}
-formula_model_access::~formula_model_access() {}
-
-std::unique_ptr<session_handler> formula_model_access::create_session_handler()
-{
-    return std::unique_ptr<session_handler>();
-}
-
-table_handler* formula_model_access::get_table_handler()
-{
-    return nullptr;
-}
-
-const table_handler* formula_model_access::get_table_handler() const
-{
-    return nullptr;
-}
 
 }}
 

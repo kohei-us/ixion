@@ -14,7 +14,6 @@
 #include "ixion/global.hpp"
 #include "ixion/matrix.hpp"
 #include "ixion/formula.hpp"
-#include "ixion/interface/formula_model_access.hpp"
 #include "ixion/interface/session_handler.hpp"
 #include "ixion/interface/table_handler.hpp"
 #include "ixion/config.hpp"
