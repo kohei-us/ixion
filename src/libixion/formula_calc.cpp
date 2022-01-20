@@ -5,10 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula.hpp"
-#include "ixion/address.hpp"
-#include "ixion/cell.hpp"
-#include "ixion/formula_name_resolver.hpp"
+#include <ixion/formula.hpp>
+#include <ixion/address.hpp>
+#include <ixion/cell.hpp>
+#include <ixion/formula_name_resolver.hpp>
+#include <ixion/model_context.hpp>
 
 #include "queue_entry.hpp"
 #include "debug.hpp"
@@ -25,9 +26,9 @@ namespace {
 
 class calc_scope
 {
-    iface::formula_model_access& m_cxt;
+    model_context& m_cxt;
 public:
-    calc_scope(iface::formula_model_access& cxt) : m_cxt(cxt)
+    calc_scope(model_context& cxt) : m_cxt(cxt)
     {
         m_cxt.notify(formula_event_t::calculation_begins);
     }
@@ -41,7 +42,7 @@ public:
 }
 
 void calculate_sorted_cells(
-    iface::formula_model_access& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)
+    model_context& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)
 {
 #if IXION_THREADS == 0
     thread_count = 0;  // threads are disabled thus not to be used.

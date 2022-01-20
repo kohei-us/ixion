@@ -8,17 +8,12 @@
 #ifndef INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
 #define INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
 
-#include "ixion/global.hpp"
+#include <ixion/global.hpp>
+#include <ixion/model_context.hpp>
 
 #include <deque>
 
 namespace ixion {
-
-namespace iface {
-
-class formula_model_access;
-
-}
 
 struct abs_address_t;
 struct abs_range_t;
@@ -88,14 +83,14 @@ class formula_value_stack
 {
     typedef std::deque<stack_value> store_type;
     store_type m_stack;
-    const iface::formula_model_access& m_context;
+    const model_context& m_context;
 
 public:
     formula_value_stack() = delete;
     formula_value_stack(const formula_value_stack&) = delete;
     formula_value_stack& operator= (const formula_value_stack&) = delete;
 
-    explicit formula_value_stack(const iface::formula_model_access& cxt);
+    explicit formula_value_stack(const model_context& cxt);
 
     typedef store_type::value_type value_type;
     typedef store_type::iterator iterator;

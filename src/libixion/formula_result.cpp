@@ -5,11 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_result.hpp"
-#include "ixion/exceptions.hpp"
-#include "ixion/interface/formula_model_access.hpp"
-#include "ixion/config.hpp"
-#include "ixion/matrix.hpp"
+#include <ixion/formula_result.hpp>
+#include <ixion/exceptions.hpp>
+#include <ixion/interface/formula_model_access.hpp>
+#include <ixion/config.hpp>
+#include <ixion/matrix.hpp>
+#include <ixion/model_context.hpp>
 
 #include "mem_str_buf.hpp"
 
@@ -106,7 +107,7 @@ struct formula_result::impl
         return type;
     }
 
-    std::string str(const iface::formula_model_access& cxt) const
+    std::string str(const model_context& cxt) const
     {
         switch (type)
         {
@@ -408,7 +409,7 @@ formula_result::result_type formula_result::get_type() const
     return mp_impl->get_type();
 }
 
-std::string formula_result::str(const iface::formula_model_access& cxt) const
+std::string formula_result::str(const model_context& cxt) const
 {
     return mp_impl->str(cxt);
 }

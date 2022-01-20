@@ -30,15 +30,14 @@
 
 namespace ixion {
 
-namespace iface { class formula_model_access; }
-
 class formula_cell;
 class formula_token;
 struct abs_address_t;
+class model_context;
 
 namespace detail {
 
-std::string print_formula_expression(const iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell& cell);
+std::string print_formula_expression(const model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
 std::string print_formula_token_repr(const formula_token& t);
 
 }}

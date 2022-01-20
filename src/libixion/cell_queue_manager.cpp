@@ -7,9 +7,8 @@
 
 #include "cell_queue_manager.hpp"
 #include "queue_entry.hpp"
-#include "ixion/cell.hpp"
-
-#include "ixion/interface/formula_model_access.hpp"
+#include <ixion/cell.hpp>
+#include <ixion/model_context.hpp>
 
 #include <cassert>
 #include <queue>
@@ -44,7 +43,7 @@ class interpreter_queue
 {
     using future_type = std::future<void>;
 
-    iface::formula_model_access& m_context;
+    model_context& m_context;
 
     std::queue<future_type> m_futures;
     std::mutex m_mtx;
@@ -58,7 +57,7 @@ class interpreter_queue
     }
 
 public:
-    interpreter_queue(iface::formula_model_access& cxt, size_t max_queue) :
+    interpreter_queue(model_context& cxt, size_t max_queue) :
         m_context(cxt), m_max_queue(max_queue) {}
 
     /**
@@ -107,11 +106,11 @@ public:
 
 struct formula_cell_queue::impl
 {
-    iface::formula_model_access& m_context;
+    model_context& m_context;
     std::vector<queue_entry> m_cells;
     size_t m_thread_count;
 
-    impl(iface::formula_model_access& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
+    impl(model_context& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
         m_context(cxt),
         m_cells(cells),
         m_thread_count(thread_count) {}
@@ -135,7 +134,7 @@ struct formula_cell_queue::impl
 };
 
 formula_cell_queue::formula_cell_queue(
-    iface::formula_model_access& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
+    model_context& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
     mp_impl(std::make_unique<impl>(cxt, std::move(cells), thread_count)) {}
 
 formula_cell_queue::~formula_cell_queue() {}

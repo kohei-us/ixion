@@ -21,12 +21,6 @@ namespace ixion {
 
 class formula_token;
 
-namespace iface {
-
-class formula_model_access;
-
-}
-
 /**
  * Collection of built-in cell function implementations.  Note that those
  * functions that return a string result <i>may</i> modify the state of the
@@ -42,7 +36,7 @@ public:
         invalid_arg(const ::std::string& msg);
     };
 
-    formula_functions(iface::formula_model_access& cxt);
+    formula_functions(model_context& cxt);
     ~formula_functions();
 
     static formula_function_t get_function_opcode(const formula_token& token);
@@ -84,7 +78,7 @@ private:
     void fnc_subtotal(formula_value_stack& args) const;
 
 private:
-    iface::formula_model_access& m_context;
+    model_context& m_context;
 };
 
 }

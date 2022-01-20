@@ -35,7 +35,7 @@ using rc_t = row_t;
  * String ID type.
  *
  * All string values are converted into integer tokens. You need to call the
- * get_string() method of ixion::iface::formula_model_access to get the
+ * get_string() method of ixion::model_context to get the
  * actual string value.
  */
 using string_id_t = uint32_t;

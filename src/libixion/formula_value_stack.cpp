@@ -22,7 +22,7 @@ namespace ixion {
 
 namespace {
 
-double get_numeric_value(const iface::formula_model_access& cxt, const stack_value& v)
+double get_numeric_value(const model_context& cxt, const stack_value& v)
 {
     double ret = 0.0;
     switch (v.get_type())
@@ -203,7 +203,7 @@ matrix stack_value::pop_matrix()
     }
 }
 
-formula_value_stack::formula_value_stack(const iface::formula_model_access& cxt) : m_context(cxt) {}
+formula_value_stack::formula_value_stack(const model_context& cxt) : m_context(cxt) {}
 
 formula_value_stack::iterator formula_value_stack::begin()
 {

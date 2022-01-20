@@ -5,12 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula.hpp"
-#include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula_function_opcode.hpp"
-#include "ixion/cell.hpp"
-#include "ixion/dirty_cell_tracker.hpp"
-#include "ixion/types.hpp"
+#include <ixion/formula.hpp>
+#include <ixion/formula_name_resolver.hpp>
+#include <ixion/formula_function_opcode.hpp>
+#include <ixion/cell.hpp>
+#include <ixion/dirty_cell_tracker.hpp>
+#include <ixion/types.hpp>
+#include <ixion/model_context.hpp>
 
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
@@ -44,7 +45,7 @@ std::string debug_print_formula_tokens(const formula_tokens_t& tokens)
 }
 
 formula_tokens_t parse_formula_string(
-    iface::formula_model_access& cxt, const abs_address_t& pos,
+    model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, std::string_view formula)
 {
     IXION_TRACE("pos=" << pos.get_name() << "; formula='" << formula << "'");
@@ -68,7 +69,7 @@ formula_tokens_t parse_formula_string(
 }
 
 formula_tokens_t create_formula_error_tokens(
-    iface::formula_model_access& cxt, std::string_view src_formula,
+    model_context& cxt, std::string_view src_formula,
     std::string_view error)
 {
     formula_tokens_t tokens;
@@ -87,13 +88,13 @@ namespace {
 
 class func_print_formula_token
 {
-    const iface::formula_model_access& m_cxt;
+    const model_context& m_cxt;
     const abs_address_t& m_pos;
     const formula_name_resolver& m_resolver;
     std::ostringstream& m_os;
 public:
     func_print_formula_token(
-        const iface::formula_model_access& cxt, const abs_address_t& pos,
+        const model_context& cxt, const abs_address_t& pos,
         const formula_name_resolver& resolver, std::ostringstream& os) :
         m_cxt(cxt),
         m_pos(pos),
@@ -214,7 +215,7 @@ public:
 }
 
 std::string print_formula_tokens(
-    const iface::formula_model_access& cxt, const abs_address_t& pos,
+    const model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_tokens_t& tokens)
 {
     std::ostringstream os;
@@ -228,7 +229,7 @@ std::string print_formula_tokens(
 }
 
 std::string print_formula_token(
-    const iface::formula_model_access& cxt, const abs_address_t& pos,
+    const model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_token& token)
 {
     std::ostringstream os;
@@ -267,7 +268,7 @@ bool has_volatile(const formula_tokens_t& tokens)
     return false;
 }
 
-void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell& cell)
+void check_sheet_or_throw(const char* func_name, sheet_t sheet, const model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
 {
     if (is_valid_sheet(sheet))
         return;
@@ -286,7 +287,7 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const iface::for
 }
 
 void register_formula_cell(
-    iface::formula_model_access& cxt, const abs_address_t& pos, const formula_cell* cell)
+    model_context& cxt, const abs_address_t& pos, const formula_cell* cell)
 {
 #ifdef IXION_DEBUG_UTILS
     if (cell)
@@ -368,7 +369,7 @@ void register_formula_cell(
         tracker.add_volatile(pos);
 }
 
-void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address_t& pos)
+void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
 {
     // When there is a formula cell at this position, unregister it from
     // the dependency tree.
@@ -410,7 +411,7 @@ void unregister_formula_cell(iface::formula_model_access& cxt, const abs_address
     }
 }
 
-abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_address_set_t& modified_cells)
+abs_address_set_t query_dirty_cells(model_context& cxt, const abs_address_set_t& modified_cells)
 {
     abs_range_set_t modified_ranges;
     for (const abs_address_t& mc : modified_cells)
@@ -431,7 +432,7 @@ abs_address_set_t query_dirty_cells(iface::formula_model_access& cxt, const abs_
 }
 
 std::vector<abs_range_t> query_and_sort_dirty_cells(
-    iface::formula_model_access& cxt, const abs_range_set_t& modified_cells,
+    model_context& cxt, const abs_range_set_t& modified_cells,
     const abs_range_set_t* dirty_formula_cells)
 {
     const dirty_cell_tracker& tracker = cxt.get_cell_tracker();

@@ -473,7 +473,7 @@ std::string_view formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-formula_functions::formula_functions(iface::formula_model_access& cxt) :
+formula_functions::formula_functions(model_context& cxt) :
     m_context(cxt)
 {
 }

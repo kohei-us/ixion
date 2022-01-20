@@ -8,7 +8,7 @@
 #ifndef INCLUDED_IXION_CELL_QUEUE_MANAGER_HPP
 #define INCLUDED_IXION_CELL_QUEUE_MANAGER_HPP
 
-#include "ixion/global.hpp"
+#include <ixion/global.hpp>
 
 #include <memory>
 #include <vector>
@@ -16,13 +16,8 @@
 namespace ixion {
 
 class formula_cell;
+class model_context;
 struct queue_entry;
-
-namespace iface {
-
-class formula_model_access;
-
-}
 
 /**
  * Class that manages multi-threaded calculation of formula cells.
@@ -36,7 +31,7 @@ public:
     formula_cell_queue() = delete;
 
     formula_cell_queue(
-        iface::formula_model_access& cxt,
+        model_context& cxt,
         std::vector<queue_entry>&& cells,
         size_t thread_count);
 

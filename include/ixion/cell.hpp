@@ -19,18 +19,13 @@ namespace ixion {
 
 class formula_result;
 class formula_cell;
+class model_context;
 struct abs_address_t;
 struct rc_address_t;
 
 // calc_status is internal.
 struct calc_status;
 using calc_status_ptr_t = boost::intrusive_ptr<calc_status>;
-
-namespace iface {
-
-class formula_model_access;
-
-}
 
 class IXION_DLLPUBLIC formula_cell
 {
@@ -57,13 +52,13 @@ public:
     double get_value(formula_result_wait_policy_t policy) const;
     std::string_view get_string(formula_result_wait_policy_t policy) const;
 
-    void interpret(iface::formula_model_access& context, const abs_address_t& pos);
+    void interpret(model_context& context, const abs_address_t& pos);
 
     /**
      * Determine if this cell contains circular reference by walking through
      * all its reference tokens.
      */
-    void check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos);
+    void check_circular(const model_context& cxt, const abs_address_t& pos);
 
     /**
      * Reset cell's internal state.
@@ -83,7 +78,7 @@ public:
      *         token instance is alive.
      */
     std::vector<const formula_token*> get_ref_tokens(
-        const iface::formula_model_access& cxt, const abs_address_t& pos) const;
+        const model_context& cxt, const abs_address_t& pos) const;
 
     /**
      * Get the cached result without post-processing in case of a grouped

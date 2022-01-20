@@ -27,7 +27,7 @@ namespace ixion {
 
 namespace {
 
-bool check_address_by_sheet_bounds(const iface::formula_model_access* cxt, const address_t& pos)
+bool check_address_by_sheet_bounds(const model_context* cxt, const address_t& pos)
 {
     rc_size_t ss(row_upper_bound, column_upper_bound);
 
@@ -82,7 +82,7 @@ bool resolve_function(const char* p, size_t n, formula_name_t& ret)
  * <li>#All</li>
  * </ul>
  */
-bool resolve_table(const iface::formula_model_access* cxt, const char* p, size_t n, formula_name_t& ret)
+bool resolve_table(const model_context* cxt, const char* p, size_t n, formula_name_t& ret)
 {
     if (!cxt)
         return false;
@@ -246,7 +246,7 @@ void set_cell_reference(formula_name_t& ret, const address_t& addr)
 
 enum class resolver_parse_mode { column, row };
 
-void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_access& cxt, sheet_t sheet)
+void append_sheet_name(ostringstream& os, const ixion::model_context& cxt, sheet_t sheet)
 {
     if (!is_valid_sheet(sheet))
     {
@@ -300,7 +300,7 @@ void append_sheet_name(ostringstream& os, const ixion::iface::formula_model_acce
 }
 
 void append_sheet_name_calc_a1(
-    std::ostringstream& os, const ixion::iface::formula_model_access* cxt, const address_t& addr, const abs_address_t& origin)
+    std::ostringstream& os, const ixion::model_context* cxt, const address_t& addr, const abs_address_t& origin)
 {
     if (!cxt)
         return;
@@ -315,7 +315,7 @@ void append_sheet_name_calc_a1(
 }
 
 void append_sheet_name_odf_cra(
-    std::ostringstream& os, const ixion::iface::formula_model_access* cxt, const address_t& addr, const abs_address_t& origin)
+    std::ostringstream& os, const ixion::model_context* cxt, const address_t& addr, const abs_address_t& origin)
 {
     if (cxt)
     {
@@ -377,7 +377,7 @@ void append_row_address_a1(std::ostringstream& os, row_t row, row_t origin, bool
 }
 
 void append_address_a1(
-    std::ostringstream& os, const ixion::iface::formula_model_access* cxt,
+    std::ostringstream& os, const ixion::model_context* cxt,
     const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
 {
     assert(sheet_name_sep);
@@ -412,7 +412,7 @@ void append_address_a1(
  * separator even if a sheet name is not appended.
  */
 void append_address_a1_with_sheet_name_sep(
-    std::ostringstream& os, const ixion::iface::formula_model_access* cxt,
+    std::ostringstream& os, const ixion::model_context* cxt,
     const address_t& addr, const abs_address_t& pos, char sheet_name_sep)
 {
     if (!cxt)
@@ -453,7 +453,7 @@ void append_address_r1c1(
     }
 }
 
-void append_name_string(ostringstream& os, const iface::formula_model_access* cxt, string_id_t sid)
+void append_name_string(ostringstream& os, const model_context* cxt, string_id_t sid)
 {
     if (!cxt)
         return;
@@ -538,7 +538,7 @@ std::string to_string(parse_address_result_type rt)
 #endif
 
 bool parse_sheet_name_quoted(
-    const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     ++p; // skip the open quote.
     size_t len = 0;
@@ -602,7 +602,7 @@ bool parse_sheet_name_quoted(
  * @return true if the string contains a valid sheet name, false otherwise.
  */
 bool parse_sheet_name(
-    const ixion::iface::formula_model_access& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
 {
     assert(p <= p_last);
 
@@ -937,7 +937,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
 }
 
 parse_address_result parse_address_calc_a1(
-    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     parse_address_result res;
 
@@ -965,7 +965,7 @@ parse_address_result parse_address_calc_a1(
  * '.E1' as opposed to just 'E1'.
  */
 parse_address_result parse_address_odf_cra(
-    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     if (*p == '.')
     {
@@ -978,7 +978,7 @@ parse_address_result parse_address_odf_cra(
 }
 
 parse_address_result_type parse_address_excel_a1(
-    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
@@ -994,7 +994,7 @@ parse_address_result_type parse_address_excel_a1(
 }
 
 parse_address_result_type parse_address_excel_r1c1(
-    const iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+    const model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
@@ -1010,7 +1010,7 @@ parse_address_result_type parse_address_excel_r1c1(
 }
 
 parse_address_result parse_address_odff(
-    const ixion::iface::formula_model_access* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
 {
     parse_address_result res;
     assert(p <= p_last);
@@ -1057,7 +1057,7 @@ void to_relative_address(address_t& addr, const abs_address_t& pos, bool sheet)
         addr.column -= pos.column;
 }
 
-string to_string(const iface::formula_model_access* cxt, const table_t& table)
+string to_string(const model_context* cxt, const table_t& table)
 {
     ostringstream os;
     append_name_string(os, cxt, table.name);
@@ -1186,7 +1186,7 @@ string get_column_name_a1(col_t col)
 class excel_a1 : public formula_name_resolver
 {
 public:
-    excel_a1(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
+    excel_a1(const model_context* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~excel_a1() {}
 
     virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const
@@ -1325,12 +1325,12 @@ public:
     }
 
 private:
-    const iface::formula_model_access* mp_cxt;
+    const model_context* mp_cxt;
 };
 
 class excel_r1c1 : public formula_name_resolver
 {
-    const iface::formula_model_access* mp_cxt;
+    const model_context* mp_cxt;
 
     void write_sheet_name(ostringstream& os, const address_t& addr, const abs_address_t& pos) const
     {
@@ -1346,7 +1346,7 @@ class excel_r1c1 : public formula_name_resolver
     }
 
 public:
-    excel_r1c1(const iface::formula_model_access* cxt) : mp_cxt(cxt) {}
+    excel_r1c1(const model_context* cxt) : mp_cxt(cxt) {}
 
     virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const
     {
@@ -1461,20 +1461,20 @@ class dot_a1_resolver : public formula_name_resolver
 {
     using func_parse_address_type =
         std::function<parse_address_result(
-            const ixion::iface::formula_model_access*,
+            const ixion::model_context*,
             const char*&, const char*, address_t&)>;
 
     using func_append_address_type =
         std::function<void(
-            std::ostringstream&, const ixion::iface::formula_model_access*,
+            std::ostringstream&, const ixion::model_context*,
             const address_t&, const abs_address_t&, char)>;
 
     using func_append_sheet_name_type =
         std::function<void(
-            std::ostringstream&, const ixion::iface::formula_model_access*,
+            std::ostringstream&, const ixion::model_context*,
             const address_t&, const abs_address_t&)>;
 
-    const iface::formula_model_access* mp_cxt;
+    const model_context* mp_cxt;
     func_parse_address_type m_func_parse_address;
     func_append_address_type m_func_append_address;
     func_append_sheet_name_type m_func_append_sheet_name;
@@ -1490,7 +1490,7 @@ class dot_a1_resolver : public formula_name_resolver
 
 public:
     dot_a1_resolver(
-        const iface::formula_model_access* cxt,
+        const model_context* cxt,
         func_parse_address_type func_parse_address,
         func_append_address_type func_append_address,
         func_append_sheet_name_type func_append_sheet_name) :
@@ -1635,7 +1635,7 @@ public:
 class odff_resolver : public formula_name_resolver
 {
 public:
-    odff_resolver(const iface::formula_model_access* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
+    odff_resolver(const model_context* cxt) : formula_name_resolver(), mp_cxt(cxt) {}
     virtual ~odff_resolver() {}
 
     virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const
@@ -1746,7 +1746,7 @@ public:
 
         if (sheet_name)
         {
-            const iface::formula_model_access* cxt = mp_cxt;
+            const model_context* cxt = mp_cxt;
 
             if (range.first.abs_sheet)
                 os << '$';
@@ -1793,13 +1793,13 @@ public:
     }
 
 private:
-    const iface::formula_model_access* mp_cxt;
+    const model_context* mp_cxt;
 };
 
 }
 
 std::unique_ptr<formula_name_resolver> formula_name_resolver::get(
-    formula_name_resolver_t type, const iface::formula_model_access* cxt)
+    formula_name_resolver_t type, const model_context* cxt)
 {
 
     switch (type)

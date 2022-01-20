@@ -17,12 +17,7 @@
 namespace ixion {
 
 class matrix;
-
-namespace iface {
-
-class formula_model_access;
-
-}
+class model_context;
 
 /**
  * Store formula result which may be either numeric, textural, or error.  In
@@ -107,7 +102,7 @@ public:
      *
      * @return string representation of the result value.
      */
-    std::string str(const iface::formula_model_access& cxt) const;
+    std::string str(const model_context& cxt) const;
 
     /**
      * Parse a textural representation of a formula result, and set result

@@ -5,17 +5,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/cell.hpp"
-#include "ixion/address.hpp"
-#include "ixion/exceptions.hpp"
-#include "ixion/formula_result.hpp"
-#include "ixion/formula_tokens.hpp"
-#include "ixion/interface/formula_model_access.hpp"
-#include "ixion/interface/session_handler.hpp"
-#include "ixion/global.hpp"
-#include "ixion/matrix.hpp"
-#include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula.hpp"
+#include <ixion/cell.hpp>
+#include <ixion/address.hpp>
+#include <ixion/exceptions.hpp>
+#include <ixion/formula_result.hpp>
+#include <ixion/formula_tokens.hpp>
+#include <ixion/interface/formula_model_access.hpp>
+#include <ixion/interface/session_handler.hpp>
+#include <ixion/global.hpp>
+#include <ixion/matrix.hpp>
+#include <ixion/formula_name_resolver.hpp>
+#include <ixion/formula.hpp>
+#include <ixion/model_context.hpp>
 
 #include "formula_interpreter.hpp"
 #include "debug.hpp"
@@ -40,7 +41,7 @@ namespace {
 
 #if IXION_LOGGING
 
-std::string gen_trace_output(const formula_cell& fc, const iface::formula_model_access& cxt, const abs_address_t& pos)
+std::string gen_trace_output(const formula_cell& fc, const model_context& cxt, const abs_address_t& pos)
 {
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     std::ostringstream os;
@@ -364,7 +365,7 @@ std::string_view formula_cell::get_string(formula_result_wait_policy_t policy) c
     return mp_impl->fetch_string_from_result();
 }
 
-void formula_cell::interpret(iface::formula_model_access& context, const abs_address_t& pos)
+void formula_cell::interpret(model_context& context, const abs_address_t& pos)
 {
     IXION_TRACE(gen_trace_output(*this, context, pos));
 
@@ -412,7 +413,7 @@ void formula_cell::interpret(iface::formula_model_access& context, const abs_add
     status.cond.notify_all();
 }
 
-void formula_cell::check_circular(const iface::formula_model_access& cxt, const abs_address_t& pos)
+void formula_cell::check_circular(const model_context& cxt, const abs_address_t& pos)
 {
     // TODO: Check to make sure this is being run on the main thread only.
     const formula_tokens_t& tokens = mp_impl->m_tokens->get();
@@ -488,7 +489,7 @@ void formula_cell::reset()
 }
 
 std::vector<const formula_token*> formula_cell::get_ref_tokens(
-    const iface::formula_model_access& cxt, const abs_address_t& pos) const
+    const model_context& cxt, const abs_address_t& pos) const
 {
     std::vector<const formula_token*> ret;
 

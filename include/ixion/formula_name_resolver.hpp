@@ -17,12 +17,7 @@
 
 namespace ixion {
 
-namespace iface {
-
-class formula_model_access;
-
-}
-
+class model_context;
 struct table_t;
 
 /**
@@ -124,7 +119,7 @@ public:
      *         is responsible for managing its life cycle.
      */
     IXION_DLLPUBLIC static std::unique_ptr<formula_name_resolver>
-        get(formula_name_resolver_t type, const iface::formula_model_access* cxt);
+        get(formula_name_resolver_t type, const model_context* cxt);
 };
 
 }

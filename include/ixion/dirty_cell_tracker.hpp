@@ -14,8 +14,6 @@
 
 namespace ixion {
 
-namespace iface { class formula_model_access; }
-
 /**
  * This class is designed to track in-direct dependencies of dirty formula
  * cells.  A "dirty" formula cell is a formula cell whose result needs to be
