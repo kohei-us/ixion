@@ -8,6 +8,8 @@
 #include <ixion/types.hpp>
 #include <ixion/macros.hpp>
 
+#include "column_store_type.hpp"
+
 #include <limits>
 #include <vector>
 
@@ -67,6 +69,41 @@ std::string_view get_formula_error_name(formula_error_t fe)
         return names[std::size_t(fe)];
 
     return default_err_name;
+}
+
+column_block_shape_t::column_block_shape_t() :
+    position(0), size(0), offset(0), type(column_block_t::unknown), data(nullptr)
+{
+}
+
+column_block_shape_t::column_block_shape_t(
+    std::size_t _position, std::size_t _size, std::size_t _offset,
+    column_block_t _type, column_block_handle _data) :
+    position(_position), size(_size), offset(_offset), type(_type), data(_data)
+{
+}
+
+column_block_shape_t::column_block_shape_t(const column_block_shape_t& other) :
+    position(other.position), size(other.size), offset(other.offset),
+    type(other.type), data(other.data)
+{
+}
+
+column_block_shape_t& column_block_shape_t::operator=(const column_block_shape_t& other)
+{
+    position = other.position;
+    size = other.size;
+    offset = other.offset;
+    type = other.type;
+    data = other.data;
+    return *this;
+}
+
+std::ostream& operator<< (std::ostream& os, const column_block_shape_t& v)
+{
+    os << "(column_block_shape_t: position=" << v.position << "; size=" << v.size << "; offset=" << v.offset
+        << "; type=" << int(v.type) << "; data=" << v.data << ")";
+    return os;
 }
 
 }

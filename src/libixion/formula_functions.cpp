@@ -7,11 +7,13 @@
 
 #include "formula_functions.hpp"
 #include "debug.hpp"
-#include "mem_str_buf.hpp"
+#include "column_store_type.hpp" // internal mdds::multi_type_vector
 
-#include "ixion/formula_tokens.hpp"
-#include "ixion/matrix.hpp"
-#include "ixion/macros.hpp"
+#include <ixion/formula_tokens.hpp>
+#include <ixion/formula_result.hpp>
+#include <ixion/matrix.hpp>
+#include <ixion/macros.hpp>
+#include <ixion/cell_access.hpp>
 
 #ifdef max
 #undef max
@@ -28,8 +30,6 @@
 #include <cmath>
 
 #include <mdds/sorted_string_map.hpp>
-
-using namespace std;
 
 namespace ixion {
 
@@ -435,7 +435,7 @@ bool pop_and_check_for_odd_value(formula_value_stack& args)
 
 // ============================================================================
 
-formula_functions::invalid_arg::invalid_arg(const string& msg) :
+formula_functions::invalid_arg::invalid_arg(const std::string& msg) :
     general_error(msg) {}
 
 formula_function_t formula_functions::get_function_opcode(const formula_token& token)
@@ -487,6 +487,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
     {
         case formula_function_t::func_abs:
             fnc_abs(args);
+            break;
+        case formula_function_t::func_and:
+            fnc_and(args);
             break;
         case formula_function_t::func_average:
             fnc_average(args);
@@ -789,6 +792,103 @@ void formula_functions::fnc_int(formula_value_stack& args) const
     args.push_value(std::floor(v));
 }
 
+void formula_functions::fnc_and(formula_value_stack& args) const
+{
+    const formula_result_wait_policy_t wait_policy = m_context.get_formula_result_wait_policy();
+    bool final_result = true;
+
+    while (!args.empty() && final_result)
+    {
+        switch (args.get_type())
+        {
+            case stack_value_t::single_ref:
+            {
+                auto addr = args.pop_single_ref();
+                cell_access ca = m_context.get_cell_access(addr);
+                if (ca.get_value_type() != cell_value_t::numeric)
+                    // Ignore the referenced cell unless it conttains a numeric value.
+                    break;
+
+                final_result = ca.get_numeric_value() != 0.0;
+                break;
+            }
+            case stack_value_t::range_ref:
+            {
+                auto range = args.pop_range_ref();
+                sheet_t sheet = range.first.sheet;
+                abs_rc_range_t rc_range = range;
+
+                column_block_callback_t cb = [&final_result, wait_policy](
+                    col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
+                {
+                    row_t length = row2 - row1 + 1;
+
+                    switch (node.type)
+                    {
+                        case column_block_t::empty:
+                        case column_block_t::string:
+                        case column_block_t::unknown:
+                            // non-numeric blocks get skipped.
+                            break;
+                        case column_block_t::boolean:
+                            break;
+                        case column_block_t::numeric:
+                        {
+                            // TODO: isolate this brute-force block type translation from void*.
+                            const auto* blk = reinterpret_cast<const numeric_element_block*>(node.data);
+                            const double* p = &numeric_element_block::at(*blk, node.offset);
+                            const double* p_end = p + length;
+
+                            bool res = std::all_of(p, p_end, [](double v) { return v != 0.0; });
+                            final_result = res;
+                            break;
+                        }
+                        case column_block_t::formula:
+                        {
+                            const auto* blk = reinterpret_cast<const formula_element_block*>(node.data);
+                            const formula_cell* const* p = &formula_element_block::at(*blk, node.offset);
+                            const formula_cell* const* p_end = p + length;
+
+                            for (; p != p_end; ++p)
+                            {
+                                const formula_cell* fc = *p;
+                                formula_result res = fc->get_result_cache(wait_policy);
+                                if (res.get_type() != formula_result::result_type::value)
+                                    continue;
+
+                                if (res.get_value() == 0.0)
+                                {
+                                    final_result = false;
+                                    break;
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+
+                    return final_result; // returning false will end the walk.
+                };
+
+                m_context.walk(sheet, rc_range, cb);
+                break;
+            }
+            case stack_value_t::value:
+                final_result = args.pop_value() != 0.0;
+                break;
+            case stack_value_t::string:
+                // Ignore string types.
+                args.pop_string();
+                break;
+            default:
+                throw formula_error(formula_error_t::general_error);
+        }
+    }
+
+    args.clear();
+    args.push_value(final_result);
+}
+
 void formula_functions::fnc_if(formula_value_stack& args) const
 {
     if (args.size() != 3)
@@ -982,14 +1082,14 @@ void formula_functions::fnc_len(formula_value_stack& args) const
     if (args.size() != 1)
         throw formula_functions::invalid_arg("LEN requires exactly one argument.");
 
-    string s = args.pop_string();
+    std::string s = args.pop_string();
     args.clear();
     args.push_value(s.size());
 }
 
 void formula_functions::fnc_concatenate(formula_value_stack& args) const
 {
-    string s;
+    std::string s;
     while (!args.empty())
         s = args.pop_string() + s;
     args.push_string(std::move(s));
@@ -1005,7 +1105,7 @@ void formula_functions::fnc_left(formula_value_stack& args) const
     if (args.size() == 2)
         n = std::floor(args.pop_value());
 
-    string s = args.pop_string();
+    std::string s = args.pop_string();
 
     // Resize ONLY when the desired length is lower than the original string length.
     if (n < s.size())

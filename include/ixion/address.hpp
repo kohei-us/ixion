@@ -327,8 +327,10 @@ IXION_DLLPUBLIC bool operator==(const range_t& left, const range_t& right);
 IXION_DLLPUBLIC bool operator!=(const range_t& left, const range_t& right);
 
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_address_t& addr);
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_rc_address_t& addr);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const address_t& addr);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_range_t& range);
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_rc_range_t& range);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range);
 
 /**

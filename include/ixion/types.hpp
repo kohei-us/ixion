@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <string_view>
+#include <functional>
 
 namespace ixion {
 
@@ -265,6 +266,41 @@ struct IXION_DLLPUBLIC formula_group_t
  * @return null-terminated string representation of the formula error type.
  */
 IXION_DLLPUBLIC std::string_view get_formula_error_name(formula_error_t fe);
+
+using column_block_handle = void*;
+
+enum class column_block_t : int
+{
+    unknown = 0,
+    empty,
+    boolean,
+    numeric,
+    string,
+    formula
+};
+
+struct IXION_DLLPUBLIC column_block_shape_t
+{
+    std::size_t position;
+    std::size_t size;
+    std::size_t offset;
+    column_block_t type;
+    column_block_handle data;
+
+    column_block_shape_t();
+
+    column_block_shape_t(
+        std::size_t _position, std::size_t _size, std::size_t _offset,
+        column_block_t _type, column_block_handle _data);
+
+    column_block_shape_t(const column_block_shape_t& other);
+
+    column_block_shape_t& operator=(const column_block_shape_t& other);
+};
+
+using column_block_callback_t = std::function<bool(col_t, row_t, row_t, const column_block_shape_t&)>;
+
+IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const column_block_shape_t& v);
 
 }
 

@@ -441,7 +441,21 @@ double count_formula_block(
     return ret;
 }
 
+column_block_t map_column_block_type(const mdds::mtv::element_t mtv_type)
+{
+    static const std::map<mdds::mtv::element_t, column_block_t> rules = {
+        { element_type_empty, column_block_t::empty }, // -1
+        { element_type_boolean, column_block_t::boolean }, // 0
+        { element_type_string, column_block_t::string }, // 6
+        { element_type_numeric, column_block_t::numeric }, // 10
+        { element_type_formula, column_block_t::formula }, // user-start (50)
+    };
+
+    auto it = rules.find(mtv_type);
+    return it == rules.end() ? column_block_t::unknown : it->second;
 }
+
+} // anonymous namespace
 
 double model_context_impl::count_range(const abs_range_t& range, const values_t& values_type) const
 {
@@ -522,6 +536,40 @@ double model_context_impl::count_range(const abs_range_t& range, const values_t&
     }
 
     return ret;
+}
+
+void model_context_impl::walk(sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const
+{
+    const worksheet& sh = m_sheets.at(sheet);
+
+    for (col_t ic = range.first.column; ic <= range.last.column; ++ic)
+    {
+        row_t cur_row = range.first.row;
+
+        while (cur_row <= range.last.row)
+        {
+            const column_store_t& col = sh.at(ic);
+            auto pos = col.position(cur_row);
+            auto blk = pos.first;
+
+            column_block_shape_t shape;
+            shape.position = blk->position;
+            shape.size = blk->size;
+            shape.offset = pos.second;
+            shape.type = map_column_block_type(blk->type);
+            shape.data = blk->data;
+
+            // last row specified by the caller, or row corresponding to the
+            // last element of the block, whichever comes first.
+            row_t last_row = std::min<row_t>(blk->size - pos.second - 1 + cur_row, range.last.row);
+
+            if (!cb(ic, cur_row, last_row, shape))
+                return;
+
+            assert(blk->size > pos.second);
+            cur_row += blk->size - pos.second;
+        }
+    }
 }
 
 bool model_context_impl::empty() const

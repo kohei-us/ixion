@@ -1,0 +1,33 @@
+%mode init
+A1:12
+A2:23
+A3:34
+A4:0
+A11=1
+A12=2
+A13=3
+A14=0
+A20@string value
+A21="string result"
+B1=AND(A1:A10)
+B2=AND(A1:A3)
+B3=AND(A11:A13)
+B4=AND(A11:A14)
+B5=AND(1,2,3)
+B6=AND(2,0,-1)
+B7=AND(2,"str",22)
+B8=AND(A1,A2,A3,A20,A21)
+B9=AND(A1,A14,A21)
+%calc
+%mode result
+B1=0
+B2=1
+B3=1
+B4=0
+B5=1
+B6=0
+B7=1
+B8=1
+B9=0
+%check
+%exit

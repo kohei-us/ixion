@@ -59,8 +59,6 @@ class IXION_DLLPUBLIC model_context final
 
     std::unique_ptr<detail::model_context_impl> mp_impl;
 
-    formula_result_wait_policy_t get_formula_result_wait_policy() const;
-
 public:
     class IXION_DLLPUBLIC session_handler_factory
     {
@@ -106,7 +104,14 @@ public:
     ~model_context();
 
     /**
-     * This method is used to notify the model access implementer of events.
+     * Query the current policy on what to do when a formula cell result is
+     * being requested while the result has not yet been computed.
+     */
+    formula_result_wait_policy_t get_formula_result_wait_policy() const;
+
+    /**
+     * This method is used to notify the model access implementer of formula
+     * events.
      *
      * @param event event type.
      */
@@ -419,6 +424,9 @@ public:
      *              stored.
      */
     named_expressions_iterator get_named_expressions_iterator(sheet_t sheet) const;
+
+    void walk(
+        sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const;
 
     bool empty() const;
 };

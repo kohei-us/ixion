@@ -161,6 +161,8 @@ public:
 
     double count_range(const abs_range_t& range, const values_t& values_type) const;
 
+    void walk(sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const;
+
     bool empty() const;
 
     const worksheet* fetch_sheet(sheet_t sheet_index) const;
