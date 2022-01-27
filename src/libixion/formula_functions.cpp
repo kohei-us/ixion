@@ -8,6 +8,7 @@
 #include "formula_functions.hpp"
 #include "debug.hpp"
 #include "column_store_type.hpp" // internal mdds::multi_type_vector
+#include "utils.hpp"
 
 #include <ixion/formula_tokens.hpp>
 #include <ixion/formula_result.hpp>
@@ -834,24 +835,17 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                             break;
                         case column_block_t::numeric:
                         {
-                            // TODO: isolate this brute-force block type translation from void*.
-                            const auto* blk = reinterpret_cast<const numeric_element_block*>(node.data);
-                            const double* p = &numeric_element_block::at(*blk, node.offset);
-                            const double* p_end = p + length;
-
-                            bool res = std::all_of(p, p_end, [](double v) { return v != 0.0; });
+                            auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
+                            bool res = std::all_of(blk_range.begin(), blk_range.end(), [](double v) { return v != 0.0; });
                             final_result = res;
                             break;
                         }
                         case column_block_t::formula:
                         {
-                            const auto* blk = reinterpret_cast<const formula_element_block*>(node.data);
-                            const formula_cell* const* p = &formula_element_block::at(*blk, node.offset);
-                            const formula_cell* const* p_end = p + length;
+                            auto blk_range = detail::make_element_range<column_block_t::formula>{}(node, length);
 
-                            for (; p != p_end; ++p)
+                            for (const formula_cell* fc : blk_range)
                             {
-                                const formula_cell* fc = *p;
                                 formula_result res = fc->get_result_cache(wait_policy);
                                 if (res.get_type() != formula_result::result_type::value)
                                     continue;
