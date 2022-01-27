@@ -832,6 +832,7 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                             // non-numeric blocks get skipped.
                             break;
                         case column_block_t::boolean:
+                            throw std::runtime_error("WIP: handle boolean block type.");
                             break;
                         case column_block_t::numeric:
                         {
