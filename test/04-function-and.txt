@@ -1,3 +1,4 @@
+%% AND function
 %mode init
 A1:12
 A2:23

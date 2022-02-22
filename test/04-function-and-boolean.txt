@@ -1,3 +1,4 @@
+%% AND function with boolean values.
 %mode init
 A1:true
 A2:true
