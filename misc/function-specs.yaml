@@ -21,7 +21,7 @@ aggregate:
   implemented: false
 and:
   category: logical
-  implemented: false
+  implemented: true
   params:
     max: null
     min: 1
