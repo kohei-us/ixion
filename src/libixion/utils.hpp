@@ -39,8 +39,40 @@ public:
     const T* end() const { return m_end; }
 };
 
+/* Specialization for bool in order to handle std::vector<bool>. */
+template<>
+class const_element_block_range<bool>
+{
+    using iterator_type = boolean_element_block::const_iterator;
+    iterator_type m_begin;
+    iterator_type m_end;
+
+public:
+    const_element_block_range(const iterator_type& begin, const iterator_type& end) :
+        m_begin(begin), m_end(end) {}
+
+    iterator_type begin() const { return m_begin; }
+    iterator_type end() const { return m_end; }
+};
+
 template<column_block_t BlockT>
 struct make_element_range;
+
+template<>
+struct make_element_range<column_block_t::boolean>
+{
+    const_element_block_range<bool> operator()(const column_block_shape_t& node, std::size_t length) const
+    {
+        // NB: special treatment for std::vector<bool> which underlies boolean_element_block.
+        const auto* blk = reinterpret_cast<const boolean_element_block*>(node.data);
+        auto it = boolean_element_block::cbegin(*blk);
+        it = std::next(it, node.offset);
+        length = std::min(node.size - node.offset, length);
+        auto it_end = std::next(it, length);
+
+        return {it, it_end};
+    }
+};
 
 template<>
 struct make_element_range<column_block_t::numeric>
@@ -52,7 +84,7 @@ struct make_element_range<column_block_t::numeric>
         length = std::min(node.size - node.offset, length);
         const double* p_end = p + length;
 
-        return { p, p_end };
+        return {p, p_end};
     }
 };
 
@@ -66,7 +98,7 @@ struct make_element_range<column_block_t::formula>
         length = std::min(node.size - node.offset, length);
         auto p_end = p + length;
 
-        return { p, p_end };
+        return {p, p_end};
     }
 };
 

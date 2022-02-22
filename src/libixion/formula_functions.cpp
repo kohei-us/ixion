@@ -806,11 +806,16 @@ void formula_functions::fnc_and(formula_value_stack& args) const
             {
                 auto addr = args.pop_single_ref();
                 cell_access ca = m_context.get_cell_access(addr);
-                if (ca.get_value_type() != cell_value_t::numeric)
-                    // Ignore the referenced cell unless it conttains a numeric value.
-                    break;
 
-                final_result = ca.get_numeric_value() != 0.0;
+                switch (ca.get_value_type())
+                {
+                    case cell_value_t::boolean:
+                    case cell_value_t::numeric:
+                        final_result = ca.get_numeric_value() != 0.0;
+                        break;
+                    default:;
+                }
+
                 break;
             }
             case stack_value_t::range_ref:
@@ -822,6 +827,7 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                 column_block_callback_t cb = [&final_result, wait_policy](
                     col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
                 {
+                    assert(row1 <= row2);
                     row_t length = row2 - row1 + 1;
 
                     switch (node.type)
@@ -832,8 +838,12 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                             // non-numeric blocks get skipped.
                             break;
                         case column_block_t::boolean:
-                            throw std::runtime_error("WIP: handle boolean block type.");
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
+                            bool res = std::all_of(blk_range.begin(), blk_range.end(), [](bool v) { return v; });
+                            final_result = res;
                             break;
+                        }
                         case column_block_t::numeric:
                         {
                             auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
