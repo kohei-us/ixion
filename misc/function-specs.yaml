@@ -356,10 +356,11 @@ isformula:
     max: 1
     min: 1
 islogical:
-  implemented: false
-  note:
-    We need to first support boolean type values in formula_result and formula_value_stack
-    classes, and possibly other places before we can implement this function.
+  category: information
+  implemented: true
+  params:
+    max: 1
+    min: 1
 isna:
   implemented: false
   note:
