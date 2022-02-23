@@ -16,7 +16,7 @@ def main():
 
     data = yaml.load(args.specs.read_text())
 
-    headers = ("Function Name", "Category", "Implemented", "Param Min", "Param Max", "Note")
+    headers = ("Function Name", "Category", "Implemented", "Param Min", "Param Max", "Return Type", "Note")
     print("| " + " | ".join(headers) + " |")
     seps = ["-" * len(label) for label in headers]
     print("| " + " | ".join(seps) + " |")
@@ -27,6 +27,7 @@ def main():
         note = func_data.get("note") or ""
         p_min = ""
         p_max = ""
+        return_type = func_data.get("return") or ""
         if impl_status and "params" in func_data:
             p_min = func_data["params"]["min"]
             if p_min is None:
@@ -34,7 +35,7 @@ def main():
             p_max = func_data["params"]["max"]
             if p_max is None:
                 p_max = "*"
-        print(f"| {func_name.upper()} | {category.capitalize()} | {impl_status} | {p_min} | {p_max} | {note} |")
+        print(f"| {func_name.upper()} | {category.capitalize()} | {impl_status} | {p_min} | {p_max} | {return_type} | {note} |")
 
 
 

@@ -328,6 +328,7 @@ isblank:
   params:
     max: 1
     min: 1
+  return: boolean
 iserr:
   implemented: false
   note:
@@ -341,6 +342,7 @@ iserror:
   params:
     max: 1
     min: 1
+  return: boolean
 iseven:
   category: information
   implemented: true
@@ -349,18 +351,21 @@ iseven:
   params:
     max: 1
     min: 1
+  return: boolean
 isformula:
   category: information
   implemented: true
   params:
     max: 1
     min: 1
+  return: boolean
 islogical:
   category: information
   implemented: true
   params:
     max: 1
     min: 1
+  return: boolean
 isna:
   implemented: false
   note:
@@ -376,6 +381,7 @@ isnontext:
   params:
     max: 1
     min: 1
+  return: boolean
 isnumber:
   category: information
   implemented: true
@@ -384,6 +390,7 @@ isnumber:
   params:
     max: 1
     min: 1
+  return: boolean
 isodd:
   category: information
   implemented: true
@@ -392,6 +399,7 @@ isodd:
   params:
     max: 1
     min: 1
+  return: boolean
 isoweeknum:
   implemented: false
 ispmt:
@@ -404,6 +412,7 @@ isref:
   params:
     max: 1
     min: 1
+  return: boolean
 istext:
   category: information
   implemented: true
@@ -412,6 +421,7 @@ istext:
   params:
     max: 1
     min: 1
+  return: boolean
 jis:
   implemented: false
 kurt:
