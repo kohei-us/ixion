@@ -432,6 +432,51 @@ bool pop_and_check_for_odd_value(formula_value_stack& args)
     return odd;
 }
 
+/**
+ * Pop a single-value argument from the stack and interpret it as a boolean
+ * value if it's either boolean or numeric type, or ignore if it's a string
+ * type.  The behavior is undefined if called for non-single-value argument
+ * type.
+ */
+std::optional<bool> pop_one_value_as_boolean(const model_context& cxt, formula_value_stack& args)
+{
+    std::optional<bool> ret;
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        {
+            auto addr = args.pop_single_ref();
+            cell_access ca = cxt.get_cell_access(addr);
+
+            switch (ca.get_value_type())
+            {
+                case cell_value_t::boolean:
+                case cell_value_t::numeric:
+                    ret = ca.get_boolean_value();
+                    break;
+                default:;
+            }
+
+            break;
+        }
+        case stack_value_t::value:
+        case stack_value_t::boolean:
+            ret = args.pop_boolean();
+            break;
+        case stack_value_t::string:
+            // ignore string type
+            args.pop_back();
+            break;
+        case stack_value_t::range_ref:
+        case stack_value_t::matrix:
+            // should not be called for non-single value.
+            throw formula_error(formula_error_t::general_error);
+    }
+
+    return ret;
+}
+
 } // anonymous namespace
 
 // ============================================================================
@@ -806,19 +851,12 @@ void formula_functions::fnc_and(formula_value_stack& args) const
         switch (args.get_type())
         {
             case stack_value_t::single_ref:
+            case stack_value_t::value:
+            case stack_value_t::string:
             {
-                auto addr = args.pop_single_ref();
-                cell_access ca = m_context.get_cell_access(addr);
-
-                switch (ca.get_value_type())
-                {
-                    case cell_value_t::boolean:
-                    case cell_value_t::numeric:
-                        final_result = ca.get_numeric_value() != 0.0;
-                        break;
-                    default:;
-                }
-
+                std::optional<bool> v = pop_one_value_as_boolean(m_context, args);
+                if (v)
+                    final_result = *v;
                 break;
             }
             case stack_value_t::range_ref:
@@ -883,13 +921,6 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                 m_context.walk(sheet, rc_range, cb);
                 break;
             }
-            case stack_value_t::value:
-                final_result = args.pop_value() != 0.0;
-                break;
-            case stack_value_t::string:
-                // Ignore string types.
-                args.pop_string();
-                break;
             default:
                 throw formula_error(formula_error_t::general_error);
         }

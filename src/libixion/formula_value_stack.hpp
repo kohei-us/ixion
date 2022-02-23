@@ -123,6 +123,8 @@ public:
     abs_range_t pop_range_ref();
     matrix pop_range_value();
 
+    void pop_back();
+
     stack_value_t get_type() const;
 };
 

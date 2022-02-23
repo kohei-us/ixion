@@ -467,6 +467,11 @@ matrix formula_value_stack::pop_range_value()
     return ret;
 }
 
+void formula_value_stack::pop_back()
+{
+    m_stack.pop_back();
+}
+
 stack_value_t formula_value_stack::get_type() const
 {
     if (m_stack.empty())
