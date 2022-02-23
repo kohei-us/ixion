@@ -421,6 +421,10 @@ double count_formula_block(
 
         switch (res.get_type())
         {
+            case formula_result::result_type::boolean:
+                if (vt.is_boolean())
+                    ++ret;
+                break;
             case formula_result::result_type::value:
                 if (vt.is_numeric())
                     ++ret;

@@ -50,6 +50,8 @@ cell_value_t to_cell_value_type(
 
     switch (res.get_type())
     {
+        case formula_result::result_type::boolean:
+            return cell_value_t::boolean;
         case formula_result::result_type::value:
             return cell_value_t::numeric;
         case formula_result::result_type::string:

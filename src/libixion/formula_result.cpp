@@ -29,12 +29,13 @@ namespace ixion {
 
 struct formula_result::impl
 {
-    using result_value_type = std::variant<double, formula_error_t, matrix, std::string>;
+    using result_value_type = std::variant<bool, double, formula_error_t, matrix, std::string>;
 
     result_type type;
     result_value_type value;
 
     impl() : type(result_type::value), value(0.0) {}
+    impl(bool b) : type(result_type::boolean), value(b) {}
     impl(double v) : type(result_type::value), value(v) {}
     impl(std::string str) : type(result_type::string), value(std::move(str)) {}
     impl(formula_error_t e) : type(result_type::error), value(e) {}
@@ -45,6 +46,12 @@ struct formula_result::impl
     {
         type = result_type::value;
         value = 0.0;
+    }
+
+    void set_boolean(bool b)
+    {
+        type = result_type::boolean;
+        value = b;
     }
 
     void set_value(double v)
@@ -69,6 +76,12 @@ struct formula_result::impl
     {
         type = result_type::matrix;
         value = std::move(mtx);
+    }
+
+    bool get_boolean() const
+    {
+        assert(type == result_type::boolean);
+        return std::get<bool>(value);
     }
 
     double get_value() const
@@ -117,6 +130,12 @@ struct formula_result::impl
             }
             case result_type::string:
                 return std::get<std::string>(value);
+            case result_type::boolean:
+            {
+                std::ostringstream os;
+                os << std::boolalpha << std::get<bool>(value);
+                return os.str();
+            }
             case result_type::value:
             {
                 std::ostringstream os;
@@ -204,8 +223,8 @@ struct formula_result::impl
             case 'f':
             {
                 // parse this as a boolean value.
-                value = to_bool(s) ? 1.0 : 0.0;
-                type = result_type::value;
+                value = to_bool(s);
+                type = result_type::boolean;
                 break;
             }
             default:
@@ -343,6 +362,8 @@ formula_result::formula_result(const formula_result& r) :
 
 formula_result::formula_result(formula_result&& r) : mp_impl(std::move(r.mp_impl)) {}
 
+formula_result::formula_result(bool b) : mp_impl(std::make_unique<impl>(b)) {}
+
 formula_result::formula_result(double v) : mp_impl(std::make_unique<impl>(v)) {}
 
 formula_result::formula_result(std::string str) : mp_impl(std::make_unique<impl>(std::move(str))) {}
@@ -356,6 +377,11 @@ formula_result::~formula_result() {}
 void formula_result::reset()
 {
     mp_impl->reset();
+}
+
+void formula_result::set_boolean(bool b)
+{
+    mp_impl->set_boolean(b);
 }
 
 void formula_result::set_value(double v)
@@ -376,6 +402,11 @@ void formula_result::set_error(formula_error_t e)
 void formula_result::set_matrix(matrix mtx)
 {
     mp_impl->set_matrix(std::move(mtx));
+}
+
+bool formula_result::get_boolean() const
+{
+    return mp_impl->get_boolean();
 }
 
 double formula_result::get_value() const
@@ -436,7 +467,6 @@ bool formula_result::operator!= (const formula_result& r) const
 
 std::ostream& operator<< (std::ostream& os, formula_result::result_type v)
 {
-
     switch (v)
     {
         case formula_result::result_type::error:
@@ -450,6 +480,9 @@ std::ostream& operator<< (std::ostream& os, formula_result::result_type v)
             break;
         case formula_result::result_type::value:
             os << "value";
+            break;
+        case formula_result::result_type::boolean:
+            os << "boolean";
             break;
         default:
             ;

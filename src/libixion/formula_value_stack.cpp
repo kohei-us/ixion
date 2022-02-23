@@ -376,6 +376,12 @@ const std::string formula_value_stack::pop_string()
                             throw formula_error(res.get_error());
                         case formula_result::result_type::string:
                             return res.get_string();
+                        case formula_result::result_type::boolean:
+                        {
+                            std::ostringstream os;
+                            os << std::boolalpha << res.get_boolean();
+                            return os.str();
+                        }
                         case formula_result::result_type::value:
                         {
                             std::ostringstream os;

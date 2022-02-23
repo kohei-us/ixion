@@ -138,6 +138,8 @@ struct formula_cell::impl
 
         switch (m_calc_status->result->get_type())
         {
+            case formula_result::result_type::boolean:
+                return m_calc_status->result->get_boolean() ? 1.0 : 0.0;
             case formula_result::result_type::value:
                 return m_calc_status->result->get_value();
             case formula_result::result_type::matrix:
@@ -302,6 +304,9 @@ struct formula_cell::impl
 
             switch (result.get_type())
             {
+                case formula_result::result_type::boolean:
+                    m.set(m_group_pos.row, m_group_pos.column, result.get_boolean());
+                    break;
                 case formula_result::result_type::value:
                     m.set(m_group_pos.row, m_group_pos.column, result.get_value());
                     break;

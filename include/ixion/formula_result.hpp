@@ -29,11 +29,12 @@ class IXION_DLLPUBLIC formula_result
     std::unique_ptr<impl> mp_impl;
 
 public:
-    enum class result_type { value, string, error, matrix };
+    enum class result_type { boolean, value, string, error, matrix };
 
     formula_result();
     formula_result(const formula_result& r);
     formula_result(formula_result&& r);
+    formula_result(bool b);
     formula_result(double v);
     formula_result(std::string str);
     formula_result(formula_error_t e);
@@ -41,10 +42,19 @@ public:
     ~formula_result();
 
     void reset();
+    void set_boolean(bool b);
     void set_value(double v);
     void set_string_value(std::string str);
     void set_error(formula_error_t e);
     void set_matrix(matrix mtx);
+
+    /**
+     * Get a boolean result value.  The caller must make sure the result is of
+     * boolean type, else the behavior is undefined.
+     *
+     * @return boolean result value.
+     */
+    bool get_boolean() const;
 
     /**
      * Get a numeric result value.  The caller must make sure the result is of

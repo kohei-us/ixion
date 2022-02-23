@@ -858,13 +858,15 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                             for (const formula_cell* fc : blk_range)
                             {
                                 formula_result res = fc->get_result_cache(wait_policy);
-                                if (res.get_type() != formula_result::result_type::value)
-                                    continue;
-
-                                if (res.get_value() == 0.0)
+                                switch (res.get_type())
                                 {
-                                    final_result = false;
-                                    break;
+                                    case formula_result::result_type::boolean:
+                                        final_result = res.get_boolean();
+                                        break;
+                                    case formula_result::result_type::value:
+                                        final_result = res.get_value() != 0.0;
+                                        break;
+                                    default:;
                                 }
                             }
 

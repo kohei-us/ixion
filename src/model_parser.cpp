@@ -1147,10 +1147,11 @@ void model_parser::check()
             case celltype_t::boolean:
             {
                 bool actual = ca.get_boolean_value();
-                bool expected = res.get_value() ? true : false;
+                bool expected = res.get_boolean();
                 if (actual != expected)
                 {
                     ostringstream os;
+                    os << std::boolalpha;
                     os << "unexpected boolean result: (expected: " << expected << "; actual: " << actual << ")";
                     throw check_error(os.str());
                 }

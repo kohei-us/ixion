@@ -366,6 +366,12 @@ bool pop_stack_value_or_string(const model_context& cxt,
 
                     switch (res.get_type())
                     {
+                        case formula_result::result_type::boolean:
+                        {
+                            vt = stack_value_t::value;
+                            val = res.get_boolean() ? 1.0 : 0.0;
+                            return true;
+                        }
                         case formula_result::result_type::value:
                         {
                             vt = stack_value_t::value;
