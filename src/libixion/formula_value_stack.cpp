@@ -51,99 +51,24 @@ stack_value::stack_value(double val) :
     m_type(stack_value_t::value), m_value(val) {}
 
 stack_value::stack_value(std::string str) :
-    m_type(stack_value_t::string), m_str(new std::string(std::move(str))) {}
+    m_type(stack_value_t::string), m_value(std::move(str)) {}
 
 stack_value::stack_value(const abs_address_t& val) :
-    m_type(stack_value_t::single_ref), m_address(new abs_address_t(val)) {}
+    m_type(stack_value_t::single_ref), m_value(val) {}
 
 stack_value::stack_value(const abs_range_t& val) :
-    m_type(stack_value_t::range_ref), m_range(new abs_range_t(val)) {}
+    m_type(stack_value_t::range_ref), m_value(val) {}
 
 stack_value::stack_value(matrix mtx) :
-    m_type(stack_value_t::matrix), m_matrix(new matrix(std::move(mtx))) {}
+    m_type(stack_value_t::matrix), m_value(std::move(mtx)) {}
 
 stack_value::stack_value(stack_value&& other) :
-    m_type(other.m_type)
-{
-    other.m_type = stack_value_t::value;
-
-    switch (m_type)
-    {
-        case stack_value_t::matrix:
-            m_matrix = other.m_matrix;
-            other.m_matrix = nullptr;
-            break;
-        case stack_value_t::range_ref:
-            m_range = other.m_range;
-            other.m_range = nullptr;
-            break;
-        case stack_value_t::single_ref:
-            m_address = other.m_address;
-            other.m_address = nullptr;
-            break;
-        case stack_value_t::string:
-            m_str = other.m_str;
-            other.m_str = nullptr;
-            break;
-        case stack_value_t::value:
-            m_value = other.m_value;
-            break;
-        default:
-            ;
-    }
-}
-
-stack_value::~stack_value()
-{
-    switch (m_type)
-    {
-        case stack_value_t::range_ref:
-            delete m_range;
-            break;
-        case stack_value_t::single_ref:
-            delete m_address;
-            break;
-        case stack_value_t::matrix:
-            delete m_matrix;
-            break;
-        case stack_value_t::string:
-            delete m_str;
-            break;
-        case stack_value_t::value:
-        default:
-            ; // do nothing
-    }
-}
+    m_type(other.m_type), m_value(std::move(other.m_value)) {}
 
 stack_value& stack_value::operator= (stack_value&& other)
 {
-    other.m_type = stack_value_t::value;
-
-    switch (m_type)
-    {
-        case stack_value_t::matrix:
-            m_matrix = other.m_matrix;
-            other.m_matrix = nullptr;
-            break;
-        case stack_value_t::range_ref:
-            m_range = other.m_range;
-            other.m_range = nullptr;
-            break;
-        case stack_value_t::single_ref:
-            m_address = other.m_address;
-            other.m_address = nullptr;
-            break;
-        case stack_value_t::string:
-            m_str = other.m_str;
-            other.m_str = nullptr;
-            break;
-        case stack_value_t::value:
-            m_value = other.m_value;
-            break;
-        default:
-            ;
-    }
-
+    m_type = other.m_type;
+    m_value = std::move(other.m_value);
     return *this;
 }
 
@@ -157,9 +82,9 @@ double stack_value::get_value() const
     switch (m_type)
     {
         case stack_value_t::value:
-            return m_value;
+            return std::get<double>(m_value);
         case stack_value_t::matrix:
-            return m_matrix->get_numeric(0, 0);
+            return std::get<matrix>(m_value).get_numeric(0, 0);
         default:
             ;
     }
@@ -169,17 +94,17 @@ double stack_value::get_value() const
 
 const std::string& stack_value::get_string() const
 {
-    return *m_str;
+    return std::get<std::string>(m_value);
 }
 
 const abs_address_t& stack_value::get_address() const
 {
-    return *m_address;
+    return std::get<abs_address_t>(m_value);
 }
 
 const abs_range_t& stack_value::get_range() const
 {
-    return *m_range;
+    return std::get<abs_range_t>(m_value);
 }
 
 matrix stack_value::pop_matrix()
@@ -189,13 +114,13 @@ matrix stack_value::pop_matrix()
         case stack_value_t::value:
         {
             matrix mtx(1, 1);
-            mtx.set(0, 0, m_value);
+            mtx.set(0, 0, std::get<double>(m_value));
             return mtx;
         }
         case stack_value_t::matrix:
         {
             matrix mtx;
-            mtx.swap(*m_matrix);
+            mtx.swap(std::get<matrix>(m_value));
             return mtx;
         }
         default:

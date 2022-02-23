@@ -8,16 +8,15 @@
 #ifndef INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
 #define INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
 
+#include <ixion/address.hpp>
 #include <ixion/global.hpp>
+#include <ixion/matrix.hpp>
 #include <ixion/model_context.hpp>
 
 #include <deque>
+#include <variant>
 
 namespace ixion {
-
-struct abs_address_t;
-struct abs_range_t;
-class matrix;
 
 /**
  * Type of stack value which can be used as intermediate value during
@@ -37,16 +36,10 @@ enum class stack_value_t
  */
 class stack_value
 {
-    stack_value_t m_type;
+    using stored_value_type = std::variant<double, abs_address_t, abs_range_t, matrix, std::string>;
 
-    union
-    {
-        double m_value;
-        abs_address_t* m_address;
-        abs_range_t* m_range;
-        matrix* m_matrix;
-        std::string* m_str;
-    };
+    stack_value_t m_type;
+    stored_value_type m_value;
 
 public:
     stack_value() = delete;
@@ -59,7 +52,7 @@ public:
     explicit stack_value(const abs_range_t& val);
     explicit stack_value(matrix mtx);
     stack_value(stack_value&& other);
-    ~stack_value();
+    ~stack_value() = default;
 
     stack_value& operator= (stack_value&& other);
 
