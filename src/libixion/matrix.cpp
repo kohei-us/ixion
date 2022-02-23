@@ -111,6 +111,11 @@ bool matrix::is_numeric() const
     return mp_impl->m_data.numeric();
 }
 
+bool matrix::get_boolean(size_t row, size_t col) const
+{
+    return mp_impl->m_data.get_boolean(row, col);
+}
+
 bool matrix::is_numeric(size_t row, size_t col) const
 {
     switch (mp_impl->m_data.get_type(row, col))

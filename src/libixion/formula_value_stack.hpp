@@ -24,6 +24,7 @@ namespace ixion {
  */
 enum class stack_value_t
 {
+    boolean,
     value,
     string,
     single_ref,
@@ -36,7 +37,7 @@ enum class stack_value_t
  */
 class stack_value
 {
-    using stored_value_type = std::variant<double, abs_address_t, abs_range_t, matrix, std::string>;
+    using stored_value_type = std::variant<bool, double, abs_address_t, abs_range_t, matrix, std::string>;
 
     stack_value_t m_type;
     stored_value_type m_value;
@@ -46,6 +47,7 @@ public:
     stack_value(const stack_value&) = delete;
     stack_value& operator= (const stack_value&) = delete;
 
+    explicit stack_value(bool b);
     explicit stack_value(double val);
     explicit stack_value(std::string str);
     explicit stack_value(const abs_address_t& val);
@@ -57,6 +59,7 @@ public:
     stack_value& operator= (stack_value&& other);
 
     stack_value_t get_type() const;
+    bool get_boolean() const;
     double get_value() const;
     const std::string& get_string() const;
     const abs_address_t& get_address() const;
@@ -112,6 +115,7 @@ public:
     void push_range_ref(const abs_range_t& val);
     void push_matrix(matrix mtx);
 
+    bool pop_boolean();
     double pop_value();
     const std::string pop_string();
     abs_address_t pop_single_ref();

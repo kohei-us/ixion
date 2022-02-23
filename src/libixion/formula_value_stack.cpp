@@ -22,11 +22,37 @@ namespace ixion {
 
 namespace {
 
+bool get_boolean_value(const model_context& cxt, const stack_value& v)
+{
+    switch (v.get_type())
+    {
+        case stack_value_t::boolean:
+            return v.get_boolean();
+        case stack_value_t::value:
+        case stack_value_t::matrix:
+            return v.get_value() != 0.0;
+        case stack_value_t::single_ref:
+        {
+            // reference to a single cell.
+            const abs_address_t& addr = v.get_address();
+            return cxt.get_boolean_value(addr);
+        }
+        default:
+            IXION_DEBUG("inappropriate stack value type.");
+            throw formula_error(formula_error_t::stack_error);
+    }
+
+    return false;
+}
+
 double get_numeric_value(const model_context& cxt, const stack_value& v)
 {
     double ret = 0.0;
     switch (v.get_type())
     {
+        case stack_value_t::boolean:
+            ret = v.get_boolean() ? 1.0 : 0.0;
+            break;
         case stack_value_t::value:
         case stack_value_t::matrix:
             ret = v.get_value();
@@ -39,13 +65,16 @@ double get_numeric_value(const model_context& cxt, const stack_value& v)
             break;
         }
         default:
-            IXION_DEBUG("value is being popped, but the stack value type is not appropriate.");
+            IXION_DEBUG("inappropriate stack value type.");
             throw formula_error(formula_error_t::stack_error);
     }
     return ret;
 }
 
 }
+
+stack_value::stack_value(bool b) :
+    m_type(stack_value_t::boolean), m_value(b) {}
 
 stack_value::stack_value(double val) :
     m_type(stack_value_t::value), m_value(val) {}
@@ -77,10 +106,28 @@ stack_value_t stack_value::get_type() const
     return m_type;
 }
 
+bool stack_value::get_boolean() const
+{
+    switch (m_type)
+    {
+        case stack_value_t::boolean:
+            return std::get<bool>(m_value);
+        case stack_value_t::value:
+            return std::get<double>(m_value) != 0.0;
+        case stack_value_t::matrix:
+            return std::get<matrix>(m_value).get_boolean(0, 0);
+        default:;
+    }
+
+    return false;
+}
+
 double stack_value::get_value() const
 {
     switch (m_type)
     {
+        case stack_value_t::boolean:
+            return std::get<bool>(m_value) ? 1.0 : 0.0;
         case stack_value_t::value:
             return std::get<double>(m_value);
         case stack_value_t::matrix:
@@ -111,6 +158,12 @@ matrix stack_value::pop_matrix()
 {
     switch (m_type)
     {
+        case stack_value_t::boolean:
+        {
+            matrix mtx(1, 1);
+            mtx.set(0, 0, std::get<bool>(m_value));
+            return mtx;
+        }
         case stack_value_t::value:
         {
             matrix mtx(1, 1);
@@ -243,6 +296,18 @@ void formula_value_stack::push_matrix(matrix mtx)
     m_stack.emplace_back(std::move(mtx));
 }
 
+bool formula_value_stack::pop_boolean()
+{
+    if (m_stack.empty())
+        throw formula_error(formula_error_t::stack_error);
+
+    const stack_value& v = m_stack.back();
+    bool ret = get_boolean_value(m_context, v);
+    m_stack.pop_back();
+    IXION_TRACE("ret=" << std::boolalpha << ret);
+    return ret;
+}
+
 double formula_value_stack::pop_value()
 {
     double ret = 0.0;
@@ -272,7 +337,13 @@ const std::string formula_value_stack::pop_string()
             m_stack.pop_back();
             return str;
         }
-        break;
+        case stack_value_t::boolean:
+        {
+            std::ostringstream os;
+            os << std::boolalpha << v.get_boolean();
+            m_stack.pop_back();
+            return os.str();
+        }
         case stack_value_t::value:
         {
             std::ostringstream os;
@@ -280,7 +351,6 @@ const std::string formula_value_stack::pop_string()
             m_stack.pop_back();
             return os.str();
         }
-        break;
         case stack_value_t::single_ref:
         {
             // reference to a single cell.
@@ -335,8 +405,9 @@ const std::string formula_value_stack::pop_string()
                 default:
                     throw formula_error(formula_error_t::stack_error);
             }
+
+            break;
         }
-        break;
         default:
             ;
     }

@@ -215,6 +215,11 @@ void formula_interpreter::pop_result()
             m_result.set_string_value(res.get_string());
             break;
         }
+        case stack_value_t::boolean:
+        {
+            m_result.set_boolean(res.get_boolean());
+            break;
+        }
         case stack_value_t::value:
             IXION_TRACE("value=" << res.get_value());
             m_result.set_value(res.get_value());
@@ -321,6 +326,9 @@ bool pop_stack_value_or_string(const model_context& cxt,
     vt = stack.get_type();
     switch (vt)
     {
+        case stack_value_t::boolean:
+            val = stack.pop_boolean() ? 1.0 : 0.0;
+            break;
         case stack_value_t::value:
             val = stack.pop_value();
             break;

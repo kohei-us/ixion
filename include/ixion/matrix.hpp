@@ -62,6 +62,7 @@ public:
      */
     bool is_numeric() const;
 
+    bool get_boolean(size_t row, size_t col) const;
     bool is_numeric(size_t row, size_t col) const;
     double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
