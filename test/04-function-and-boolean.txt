@@ -14,12 +14,12 @@ B6=AND(A3,A4,A5)
 B7=AND(A1,A4)
 %calc
 %mode result
-B1=1
-B2=1
-B3=0
-B4=0
-B5=1
-B6=0
-B7=1
+B1=true
+B2=true
+B3=false
+B4=false
+B5=true
+B6=false
+B7=true
 %check
 %exit

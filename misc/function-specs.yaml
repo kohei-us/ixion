@@ -25,6 +25,7 @@ and:
   params:
     max: null
     min: 1
+  return: boolean
 arabic:
   implemented: false
 areas:

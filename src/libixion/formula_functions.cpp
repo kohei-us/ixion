@@ -896,7 +896,7 @@ void formula_functions::fnc_and(formula_value_stack& args) const
     }
 
     args.clear();
-    args.push_value(final_result);
+    args.push_boolean(final_result);
 }
 
 void formula_functions::fnc_if(formula_value_stack& args) const

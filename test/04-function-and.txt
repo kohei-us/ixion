@@ -21,14 +21,14 @@ B8=AND(A1,A2,A3,A20,A21)
 B9=AND(A1,A14,A21)
 %calc
 %mode result
-B1=0
-B2=1
-B3=1
-B4=0
-B5=1
-B6=0
-B7=1
-B8=1
-B9=0
+B1=false
+B2=true
+B3=true
+B4=false
+B5=true
+B6=false
+B7=true
+B8=true
+B9=false
 %check
 %exit

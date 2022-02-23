@@ -267,7 +267,7 @@ void formula_value_stack::push_back(value_type&& val)
 
 void formula_value_stack::push_boolean(bool b)
 {
-    IXION_TRACE("b=" << b);
+    IXION_TRACE("b=" << std::boolalpha << b);
     m_stack.emplace_back(b);
 }
 
