@@ -19,11 +19,7 @@
 #include <ostream>
 #include <variant>
 
-#define DEBUG_FORMULA_RESULT 0
-
-#if DEBUG_FORMULA_RESULT
-#include <iostream>
-#endif
+#include "debug.hpp"
 
 namespace ixion {
 
@@ -56,6 +52,7 @@ struct formula_result::impl
 
     void set_value(double v)
     {
+        IXION_TRACE("v=" << v);
         type = result_type::value;
         value = v;
     }

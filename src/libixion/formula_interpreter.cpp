@@ -172,9 +172,8 @@ void get_result_from_cell(const model_context& cxt, const abs_address_t& addr, f
             break;
         }
         case celltype_t::boolean:
-            // TODO : treat this as a numeric value for now.  Later we need to
-            // decide whether we need to treat this as a distinct boolean
-            // type.
+            res.set_boolean(cxt.get_boolean_value(addr));
+            break;
         case celltype_t::numeric:
             res.set_value(cxt.get_numeric_value(addr));
             break;
