@@ -21,19 +21,19 @@ C6=ISNONTEXT(1)
 C7=ISNONTEXT("inline text")
 %calc
 %mode result
-B1=0
-B2=0
-B3=1
-B4=1
-B5=0
-B6=0
-B7=1
-C1=1
-C2=1
-C3=0
-C4=0
-C5=1
-C6=1
-C7=0
+B1=false
+B2=false
+B3=true
+B4=true
+B5=false
+B6=false
+B7=true
+C1=true
+C2=true
+C3=false
+C4=false
+C5=true
+C6=true
+C7=false
 %check
 %exit

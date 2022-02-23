@@ -63,6 +63,7 @@ private:
     void fnc_iserror(formula_value_stack& args) const;
     void fnc_iseven(formula_value_stack& args) const;
     void fnc_isformula(formula_value_stack& args) const;
+    void fnc_islogical(formula_value_stack& args) const;
     void fnc_isnontext(formula_value_stack& args) const;
     void fnc_isnumber(formula_value_stack& args) const;
     void fnc_isodd(formula_value_stack& args) const;

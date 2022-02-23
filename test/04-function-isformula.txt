@@ -11,10 +11,10 @@ B4=ISFORMULA(A4)
 B5=ISFORMULA(A5)
 %calc
 %mode result
-B1=0
-B2=0
-B3=1
-B4=1
-B5=0
+B1=false
+B2=false
+B3=true
+B4=true
+B5=false
 %check
 %exit

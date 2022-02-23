@@ -516,6 +516,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_isformula:
             fnc_isformula(args);
             break;
+        case formula_function_t::func_islogical:
+            fnc_islogical(args);
+            break;
         case formula_function_t::func_isnontext:
             fnc_isnontext(args);
             break;
@@ -924,20 +927,20 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
         {
             abs_address_t addr = args.pop_single_ref();
             bool res = m_context.get_celltype(addr) == celltype_t::empty;
-            args.push_value(res);
+            args.push_boolean(res);
             break;
         }
         case stack_value_t::range_ref:
         {
             abs_range_t range = args.pop_range_ref();
             bool res = m_context.is_empty(range);
-            args.push_value(res);
+            args.push_boolean(res);
             break;
         }
         default:
         {
             args.clear();
-            args.push_value(0);
+            args.push_boolean(false);
         }
     }
 }
@@ -950,13 +953,13 @@ void formula_functions::fnc_iserror(formula_value_stack& args) const
     if (args.get_type() != stack_value_t::single_ref)
     {
         args.clear();
-        args.push_value(0);
+        args.push_boolean(false);
         return;
     }
 
     abs_address_t addr = args.pop_single_ref();
     bool res = m_context.get_cell_value_type(addr) == cell_value_t::error;
-    args.push_value(res);
+    args.push_boolean(res);
 }
 
 void formula_functions::fnc_iseven(formula_value_stack& args) const
@@ -965,7 +968,7 @@ void formula_functions::fnc_iseven(formula_value_stack& args) const
         throw formula_functions::invalid_arg("ISEVEN requires exactly one argument.");
 
     bool odd = pop_and_check_for_odd_value(args);
-    args.push_value(!odd);
+    args.push_boolean(!odd);
 }
 
 void formula_functions::fnc_isformula(formula_value_stack& args) const
@@ -976,13 +979,37 @@ void formula_functions::fnc_isformula(formula_value_stack& args) const
     if (args.get_type() != stack_value_t::single_ref)
     {
         args.clear();
-        args.push_value(0);
+        args.push_boolean(false);
         return;
     }
 
     abs_address_t addr = args.pop_single_ref();
     bool res = m_context.get_celltype(addr) == celltype_t::formula;
-    args.push_value(res);
+    args.push_boolean(res);
+}
+
+void formula_functions::fnc_islogical(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISLOGICAL requires exactly one argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            bool res = m_context.get_cell_value_type(addr) == cell_value_t::boolean;
+            args.push_boolean(res);
+            break;
+        }
+        case stack_value_t::boolean:
+            args.clear();
+            args.push_boolean(true);
+            break;
+        default:
+            args.clear();
+            args.push_boolean(false);
+    }
 }
 
 void formula_functions::fnc_isnontext(formula_value_stack& args) const
@@ -996,16 +1023,16 @@ void formula_functions::fnc_isnontext(formula_value_stack& args) const
         {
             abs_address_t addr = args.pop_single_ref();
             bool res = m_context.get_cell_value_type(addr) != cell_value_t::string;
-            args.push_value(res);
+            args.push_boolean(res);
             break;
         }
         case stack_value_t::string:
             args.clear();
-            args.push_value(0);
+            args.push_boolean(false);
             break;
         default:
             args.clear();
-            args.push_value(1);
+            args.push_boolean(true);
     }
 }
 
@@ -1020,16 +1047,16 @@ void formula_functions::fnc_isnumber(formula_value_stack& args) const
         {
             abs_address_t addr = args.pop_single_ref();
             bool res = m_context.get_cell_value_type(addr) == cell_value_t::numeric;
-            args.push_value(res);
+            args.push_boolean(res);
             break;
         }
         case stack_value_t::value:
             args.clear();
-            args.push_value(1);
+            args.push_boolean(true);
             break;
         default:
             args.clear();
-            args.push_value(0);
+            args.push_boolean(false);
     }
 }
 
@@ -1039,7 +1066,7 @@ void formula_functions::fnc_isodd(formula_value_stack& args) const
         throw formula_functions::invalid_arg("ISODD requires exactly one argument.");
 
     bool odd = pop_and_check_for_odd_value(args);
-    args.push_value(odd);
+    args.push_boolean(odd);
 }
 
 void formula_functions::fnc_isref(formula_value_stack& args) const
@@ -1052,11 +1079,11 @@ void formula_functions::fnc_isref(formula_value_stack& args) const
         case stack_value_t::single_ref:
         case stack_value_t::range_ref:
             args.clear();
-            args.push_value(1);
+            args.push_boolean(true);
             break;
         default:
             args.clear();
-            args.push_value(0);
+            args.push_boolean(false);
     }
 }
 
@@ -1071,16 +1098,16 @@ void formula_functions::fnc_istext(formula_value_stack& args) const
         {
             abs_address_t addr = args.pop_single_ref();
             bool res = m_context.get_cell_value_type(addr) == cell_value_t::string;
-            args.push_value(res);
+            args.push_boolean(res);
             break;
         }
         case stack_value_t::string:
             args.clear();
-            args.push_value(1);
+            args.push_boolean(true);
             break;
         default:
             args.clear();
-            args.push_value(0);
+            args.push_boolean(false);
     }
 }
 

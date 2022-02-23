@@ -1171,8 +1171,18 @@ void model_parser::check()
 
                 break;
             }
-            default:
-                throw check_error("unhandled cell type.");
+            case celltype_t::empty:
+            {
+                std::ostringstream os;
+                os << "cell " << name << " is empty.";
+                throw check_error(os.str());
+            }
+            case celltype_t::unknown:
+            {
+                std::ostringstream os;
+                os << "cell type is unknown for cell " << name;
+                throw check_error(os.str());
+            }
         }
     }
 }

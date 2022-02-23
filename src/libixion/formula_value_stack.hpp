@@ -109,6 +109,7 @@ public:
     double get_value(size_t pos) const;
 
     void push_back(value_type&& val);
+    void push_boolean(bool b);
     void push_value(double val);
     void push_string(std::string str);
     void push_single_ref(const abs_address_t& val);

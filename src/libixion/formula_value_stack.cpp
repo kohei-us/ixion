@@ -265,6 +265,12 @@ void formula_value_stack::push_back(value_type&& val)
     m_stack.push_back(std::move(val));
 }
 
+void formula_value_stack::push_boolean(bool b)
+{
+    IXION_TRACE("b=" << b);
+    m_stack.emplace_back(b);
+}
+
 void formula_value_stack::push_value(double val)
 {
     IXION_TRACE("val=" << val);

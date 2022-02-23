@@ -11,10 +11,10 @@ B4=ISNUMBER(A4)
 B5=ISNUMBER(A5)
 %calc
 %mode result
-B1=1
-B2=1
-B3=0
-B4=0
-B5=0
+B1=true
+B2=true
+B3=false
+B4=false
+B5=false
 %check
 %exit

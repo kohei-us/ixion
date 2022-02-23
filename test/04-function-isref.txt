@@ -8,11 +8,11 @@ C9=ISREF(CONCATENATE("this ", "is ", "text"))
 C10=ISREF(A1 + 10)
 %calc
 %mode result
-C5=1
-C6=1
-C7=0
-C8=0
-C9=0
-C10=0
+C5=true
+C6=true
+C7=false
+C8=false
+C9=false
+C10=false
 %check
 %exit

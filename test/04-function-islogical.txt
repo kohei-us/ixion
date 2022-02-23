@@ -1,0 +1,64 @@
+%% All values in column A are expected to be logical.
+%% All values in column B are expected to be non-logical.
+%mode init
+A1:true
+A2:false
+A3=ISBLANK(A1)
+A4=ISERROR(A2)
+A5=ISEVEN(A1)
+A6=ISODD(A1)
+A7=ISFORMULA(A2)
+A8=ISNUMBER(A1)
+A9=ISREF(A1)
+A10=ISTEXT(A3)
+A11=ISNONTEXT(A3)
+A12=A1
+A13=A2
+%% B1 is empty
+B2:12.4
+B3@string value
+B4=1/2
+C1=ISLOGICAL(A1)
+C2=ISLOGICAL(A2)
+C3=ISLOGICAL(A3)
+C4=ISLOGICAL(A4)
+C5=ISLOGICAL(A5)
+C6=ISLOGICAL(A6)
+C7=ISLOGICAL(A7)
+C8=ISLOGICAL(A8)
+C9=ISLOGICAL(A9)
+C10=ISLOGICAL(A10)
+C11=ISLOGICAL(A11)
+C12=ISLOGICAL(A12)
+C13=ISLOGICAL(A13)
+C43=ISLOGICAL(1)
+C44=ISLOGICAL("string value")
+C45=ISLOGICAL(A100)
+C46=ISLOGICAL(C1)
+D1=ISLOGICAL(B1)
+D2=ISLOGICAL(B2)
+D3=ISLOGICAL(B3)
+D4=ISLOGICAL(B4)
+%calc
+%mode result
+C1=true
+C2=true
+C3=true
+C4=true
+C5=true
+C6=true
+C7=true
+C8=true
+C9=true
+C10=true
+C11=true
+C12=true
+C13=true
+C43=false
+C44=false
+C45=false
+C46=true
+D1=false
+D2=false
+D3=false
+%check
