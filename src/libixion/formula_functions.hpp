@@ -57,6 +57,7 @@ private:
     void fnc_int(formula_value_stack& args) const;
 
     void fnc_and(formula_value_stack& args) const;
+    void fnc_or(formula_value_stack& args) const;
     void fnc_if(formula_value_stack& args) const;
 
     void fnc_isblank(formula_value_stack& args) const;

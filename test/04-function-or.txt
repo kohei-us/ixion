@@ -1,0 +1,39 @@
+%% Test case for OR function.
+%mode init
+A1:1
+A2:0
+A4:0
+A5=1
+A6=0
+A7:true
+A8:false
+A9@string value is ignored
+B1=OR(A1,A2)
+B2=OR(A1:A2)
+B3=OR(A2,A4)
+B4=OR(A2:A4)
+B5=OR(A2:A4,A1)
+B6=OR(A5,A6)
+B7=OR(A5:A6,A2)
+B8=OR(B1:B7)
+B9=OR(A7,A8)
+B10=OR(A8:A10)
+B11=OR(A9,A1)
+B12=OR(A9,A2)
+B13=OR(A1:A10)
+%calc
+%mode result
+B1=true
+B2=true
+B3=false
+B4=false
+B5=true
+B6=true
+B7=true
+B8=true
+B9=true
+B10=false
+B11=true
+B12=false
+B13=true
+%check

@@ -600,6 +600,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_now:
             fnc_now(args);
             break;
+        case formula_function_t::func_or:
+            fnc_or(args);
+            break;
         case formula_function_t::func_pi:
             fnc_pi(args);
             break;
@@ -923,6 +926,106 @@ void formula_functions::fnc_and(formula_value_stack& args) const
             }
             default:
                 throw formula_error(formula_error_t::general_error);
+        }
+    }
+
+    args.clear();
+    args.push_boolean(final_result);
+}
+
+void formula_functions::fnc_or(formula_value_stack& args) const
+{
+    const formula_result_wait_policy_t wait_policy = m_context.get_formula_result_wait_policy();
+    bool final_result = false;
+
+    while (!args.empty())
+    {
+        bool this_result = false;
+
+        switch (args.get_type())
+        {
+            case stack_value_t::single_ref:
+            case stack_value_t::value:
+            case stack_value_t::string:
+            {
+                std::optional<bool> v = pop_one_value_as_boolean(m_context, args);
+                if (v)
+                    this_result = *v;
+                break;
+            }
+            case stack_value_t::range_ref:
+            {
+                auto range = args.pop_range_ref();
+                sheet_t sheet = range.first.sheet;
+                abs_rc_range_t rc_range = range;
+
+                // We will bail out of the walk on the first positive result.
+
+                column_block_callback_t cb = [&this_result, wait_policy](
+                    col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
+                {
+                    assert(row1 <= row2);
+                    row_t length = row2 - row1 + 1;
+
+                    switch (node.type)
+                    {
+                        case column_block_t::empty:
+                        case column_block_t::string:
+                        case column_block_t::unknown:
+                            // non-numeric blocks get skipped.
+                            break;
+                        case column_block_t::boolean:
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
+                            this_result = std::any_of(blk_range.begin(), blk_range.end(), [](bool v) { return v; });
+                            break;
+                        }
+                        case column_block_t::numeric:
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
+                            this_result = std::any_of(blk_range.begin(), blk_range.end(), [](double v) { return v != 0.0; });
+                            break;
+                        }
+                        case column_block_t::formula:
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::formula>{}(node, length);
+
+                            for (const formula_cell* fc : blk_range)
+                            {
+                                formula_result res = fc->get_result_cache(wait_policy);
+                                switch (res.get_type())
+                                {
+                                    case formula_result::result_type::boolean:
+                                        this_result = res.get_boolean();
+                                        break;
+                                    case formula_result::result_type::value:
+                                        this_result = res.get_value() != 0.0;
+                                        break;
+                                    default:;
+                                }
+
+                                if (this_result)
+                                    break;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    return !this_result; // returning false will end the walk.
+                };
+
+                m_context.walk(sheet, rc_range, cb);
+                break;
+            }
+            default:
+                throw formula_error(formula_error_t::general_error);
+        }
+
+        if (this_result)
+        {
+            final_result = true;
+            break;
         }
     }
 
