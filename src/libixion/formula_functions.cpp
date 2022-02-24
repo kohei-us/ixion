@@ -29,6 +29,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <optional>
 
 #include <mdds/sorted_string_map.hpp>
 
