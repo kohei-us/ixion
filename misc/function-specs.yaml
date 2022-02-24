@@ -559,7 +559,12 @@ odd:
 offset:
   implemented: false
 or:
-  implemented: false
+  category: logical
+  implemented: true
+  params:
+    max: null
+    min: 1
+  return: boolean
 pduration:
   implemented: false
 pearson:
