@@ -407,7 +407,7 @@ named_expressions_iterator model_context::get_named_expressions_iterator(sheet_t
 void model_context::walk(
     sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const
 {
-    mp_impl->walk(sheet, range, cb);
+    mp_impl->walk(sheet, range, std::move(cb));
 }
 
 bool model_context::empty() const
