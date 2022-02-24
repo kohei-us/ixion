@@ -672,7 +672,7 @@ void formula_functions::fnc_sum(formula_value_stack& args) const
         {
             case stack_value_t::range_ref:
                 ret += sum_matrix_elements(args.pop_range_value());
-            break;
+                break;
             case stack_value_t::single_ref:
             case stack_value_t::string:
             case stack_value_t::value:
@@ -700,21 +700,21 @@ void formula_functions::fnc_counta(formula_value_stack& args) const
             case stack_value_t::value:
                 args.pop_value();
                 ++ret;
-            break;
+                break;
             case stack_value_t::range_ref:
             {
                 abs_range_t range = args.pop_range_ref();
                 ret += m_context.count_range(range, value_numeric | value_boolean | value_string);
+                break;
             }
-            break;
             case stack_value_t::single_ref:
             {
                 abs_address_t pos = args.pop_single_ref();
                 abs_range_t range;
                 range.first = range.last = pos;
                 ret += m_context.count_range(range, value_numeric | value_boolean | value_string);
+                break;
             }
-            break;
             default:
                 args.pop_value();
         }
@@ -761,8 +761,8 @@ void formula_functions::fnc_average(formula_value_stack& args) const
                         ++count;
                     }
                 }
+                break;
             }
-            break;
             case stack_value_t::single_ref:
             case stack_value_t::string:
             case stack_value_t::value:
