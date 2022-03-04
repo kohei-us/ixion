@@ -279,6 +279,8 @@ struct formula_result::impl
                     {
                         value = formula_error_t::division_by_zero;
                     }
+                    else if (buf.equals("VALUE"))
+                        value = formula_error_t::invalid_value_type;
                     else
                     {
                         good = false;

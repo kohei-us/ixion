@@ -10,6 +10,7 @@
 
 #include <ixion/address.hpp>
 #include <ixion/cell.hpp>
+#include <ixion/cell_access.hpp>
 #include <ixion/matrix.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/config.hpp>
@@ -35,14 +36,20 @@ bool get_boolean_value(const model_context& cxt, const stack_value& v)
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
-            return cxt.get_boolean_value(addr);
+            auto ca = cxt.get_cell_access(addr);
+            switch (ca.get_value_type())
+            {
+                case cell_value_t::numeric:
+                case cell_value_t::boolean:
+                    return ca.get_boolean_value();
+                default:;
+            }
+            break;
         }
-        default:
-            IXION_DEBUG("inappropriate stack value type.");
-            throw formula_error(formula_error_t::stack_error);
+        default:;
     }
 
-    return false;
+    throw formula_error(formula_error_t::invalid_value_type);
 }
 
 double get_numeric_value(const model_context& cxt, const stack_value& v)

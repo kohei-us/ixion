@@ -544,7 +544,13 @@ normsdist:
 normsinv:
   implemented: false
 not:
-  implemented: false
+  category: logical
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: boolean
+  note: It triggers '#'VALUE! error on string value input.
 now:
   category: time
   implemented: true

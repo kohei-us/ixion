@@ -1,8 +1,26 @@
 %mode init
 A1=TRUE()
 A2=FALSE()
+A3@string value
+A4=A3
+B1=NOT(A1)
+B2=NOT(A2)
+B3=NOT(1)
+B4=NOT(0)
+B5=NOT(-1)
+B6=NOT("str")
+B7=NOT(A3)
+B8=NOT(A4)
 %calc
 %mode result
 A1=true
 A2=false
+B1=false
+B2=true
+B3=false
+B4=true
+B5=false
+B6=#VALUE!
+B7=#VALUE!
+B8=#VALUE!
 %check

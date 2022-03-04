@@ -601,6 +601,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_mmult:
             fnc_mmult(args);
             break;
+        case formula_function_t::func_not:
+            fnc_not(args);
+            break;
         case formula_function_t::func_now:
             fnc_now(args);
             break;
@@ -1071,6 +1074,14 @@ void formula_functions::fnc_false(formula_value_stack& args) const
         throw formula_functions::invalid_arg("FALSE takes no arguments.");
 
     args.push_boolean(false);
+}
+
+void formula_functions::fnc_not(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("NOT requires exactly one argument.");
+
+    args.push_boolean(!args.pop_boolean());
 }
 
 void formula_functions::fnc_isblank(formula_value_stack& args) const
