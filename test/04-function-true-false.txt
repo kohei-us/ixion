@@ -3,6 +3,8 @@ A1=TRUE()
 A2=FALSE()
 A3@string value
 A4=A3
+A5:true
+A6:false
 B1=NOT(A1)
 B2=NOT(A2)
 B3=NOT(1)
@@ -11,6 +13,9 @@ B5=NOT(-1)
 B6=NOT("str")
 B7=NOT(A3)
 B8=NOT(A4)
+B9=NOT(A5)
+B10=NOT(A6)
+B11=NOT(A7)
 %calc
 %mode result
 A1=true
@@ -23,4 +28,7 @@ B5=false
 B6=#VALUE!
 B7=#VALUE!
 B8=#VALUE!
+B9=false
+B10=true
+B11=true
 %check

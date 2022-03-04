@@ -42,6 +42,8 @@ bool get_boolean_value(const model_context& cxt, const stack_value& v)
                 case cell_value_t::numeric:
                 case cell_value_t::boolean:
                     return ca.get_boolean_value();
+                case cell_value_t::empty:
+                    return false;
                 default:;
             }
             break;
