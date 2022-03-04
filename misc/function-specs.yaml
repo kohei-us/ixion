@@ -234,6 +234,7 @@ fact:
   params:
     max: 0
     min: 0
+  return: boolean
 fdist:
   implemented: false
 filterxml:
@@ -766,6 +767,7 @@ trimmean:
   params:
     max: 0
     min: 0
+  return: boolean
 trunc:
   implemented: false
 ttest:
