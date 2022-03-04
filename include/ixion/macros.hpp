@@ -8,8 +8,6 @@
 #ifndef __IXION_MACROS_HPP__
 #define __IXION_MACROS_HPP__
 
-#define IXION_N_ELEMENTS(array) sizeof(array) / sizeof(array[0])
-
 /**
  * Use this macro with a literal string and it returns the literal string
  * followed by its length.

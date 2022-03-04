@@ -772,7 +772,7 @@ vk_shader_module::vk_shader_module(vk_device& device, module_type mt) :
         case module_type::fibonacci:
         {
             array = reinterpret_cast<const uint32_t*>(fibonacci_spirv);
-            n_array = IXION_N_ELEMENTS(fibonacci_spirv);
+            n_array = std::size(fibonacci_spirv);
 
             IXION_TRACE("module type: fibonacci (size=" << n_array << ")");
 

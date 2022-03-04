@@ -42,7 +42,7 @@ std::string_view get_opcode_name(fopcode_t oc)
         "error", // fop_error
     };
 
-    if (std::size_t(oc) >= IXION_N_ELEMENTS(names))
+    if (std::size_t(oc) >= std::size(names))
         return "???";
 
     return names[oc];
@@ -80,7 +80,7 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
         empty, // fop_error
     };
 
-    if (std::size_t(oc) >= IXION_N_ELEMENTS(names))
+    if (std::size_t(oc) >= std::size(names))
         return empty;
 
     return names[oc];

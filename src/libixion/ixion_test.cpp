@@ -627,7 +627,7 @@ void test_name_resolver_table_excel_a1()
         { IXION_ASCII("Table1[[#Data],[#Totals],[Category]:[Value]]"), 0, 9, 2, s_table1, s_cat, s_val, table_area_data | table_area_totals },
     };
 
-    for (size_t i = 0, n = IXION_N_ELEMENTS(tests); i < n; ++i)
+    for (size_t i = 0, n = std::size(tests); i < n; ++i)
     {
         cout << "* table reference: " << tests[i].exp << endl;
         abs_address_t pos(tests[i].sheet, tests[i].row, tests[i].col);
@@ -863,7 +863,7 @@ void test_name_resolver_excel_r1c1()
         { 123, "124" },
     };
 
-    for (size_t i = 0, n = IXION_N_ELEMENTS(colnames); i < n; ++i)
+    for (size_t i = 0, n = std::size(colnames); i < n; ++i)
     {
         string colname = resolver->get_column_name(colnames[i].col);
         if (colname != colnames[i].name)
@@ -1349,7 +1349,7 @@ void test_function_name_resolution()
     model_context cxt;
     cxt.append_sheet("Test");
     auto resolver = formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
-    size_t n = IXION_N_ELEMENTS(valid_names);
+    size_t n = std::size(valid_names);
     for (size_t i = 0; i < n; ++i)
     {
         const char* name = valid_names[i];
@@ -1358,7 +1358,7 @@ void test_function_name_resolution()
         assert(t.type == formula_name_t::function);
     }
 
-    n = IXION_N_ELEMENTS(invalid_names);
+    n = std::size(invalid_names);
     for (size_t i = 0; i < n; ++i)
     {
         const char* name = invalid_names[i];
