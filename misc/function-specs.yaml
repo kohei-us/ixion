@@ -229,7 +229,11 @@ expondist:
 fact:
   implemented: false
 'false':
-  implemented: false
+  category: logical
+  implemented: true
+  params:
+    max: 0
+    min: 0
 fdist:
   implemented: false
 filterxml:
@@ -751,7 +755,11 @@ trim:
 trimmean:
   implemented: false
 'true':
-  implemented: false
+  category: logical
+  implemented: true
+  params:
+    max: 0
+    min: 0
 trunc:
   implemented: false
 ttest:
