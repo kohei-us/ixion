@@ -15,6 +15,20 @@
 
 namespace ixion {
 
+namespace {
+
+constexpr std::string_view formula_error_names[] = {
+    "",        // 0: no error
+    "#REF!",   // 1: result not available
+    "#DIV/0!", // 2: division by zero
+    "#NUM!",   // 3: invalid expression
+    "#NAME?",  // 4: name not found
+    "#NULL!",  // 5: no range intersection
+    "#VALUE!", // 6: invalid value type
+};
+
+} // anonymous namespace
+
 const sheet_t global_scope = -1;
 const sheet_t invalid_sheet = -2;
 
@@ -53,22 +67,25 @@ formula_group_t& formula_group_t::operator= (const formula_group_t& other)
 
 std::string_view get_formula_error_name(formula_error_t fe)
 {
-    static const char* default_err_name = "#ERR!";
+    constexpr std::string_view default_err_name = "#ERR!";
 
-    static const std::string_view names[] = {
-        "",        // 0: no error
-        "#REF!",   // 1: result not available
-        "#DIV/0!", // 2: division by zero
-        "#NUM!",   // 3: invalid expression
-        "#NAME?",  // 4: name not found
-        "#NULL!",  // 5: no range intersection
-        "#VALUE!", // 6: invalid value type
-    };
-
-    if (std::size_t(fe) < IXION_N_ELEMENTS(names))
-        return names[std::size_t(fe)];
+    if (std::size_t(fe) < std::size(formula_error_names))
+        return formula_error_names[std::size_t(fe)];
 
     return default_err_name;
+}
+
+formula_error_t to_formula_error_type(std::string_view s)
+{
+    const auto* p = formula_error_names;
+    const auto* p_end = p + std::size(formula_error_names);
+
+    p = std::find(p, p_end, s);
+
+    if (p == p_end)
+        return formula_error_t::no_error;
+
+    return formula_error_t(std::distance(formula_error_names, p));
 }
 
 column_block_shape_t::column_block_shape_t() :

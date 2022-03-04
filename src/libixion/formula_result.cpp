@@ -252,80 +252,17 @@ struct formula_result::impl
         assert(!s.empty());
         assert(s[0] == '#');
 
-        const char* p = s.data();
-        const char* p_end = p + s.size();
+        formula_error_t err = to_formula_error_type(s);
 
-        ++p; // skip '#'.
-        mem_str_buf buf;
-        for (; p != p_end; ++p)
+        if (err == formula_error_t::no_error)
         {
-            bool good = true;
-
-            switch (*p)
-            {
-                case '!':
-                {
-                    if (buf.empty())
-                    {
-                        good = false;
-                        break;
-                    }
-
-                    if (buf.equals("REF"))
-                    {
-                        value = formula_error_t::ref_result_not_available;
-                    }
-                    else if (buf.equals("DIV/0"))
-                    {
-                        value = formula_error_t::division_by_zero;
-                    }
-                    else if (buf.equals("VALUE"))
-                        value = formula_error_t::invalid_value_type;
-                    else
-                    {
-                        good = false;
-                        break;
-                    }
-
-                    type = result_type::error;
-                    return;
-                }
-                case '?':
-                {
-                    if (buf.empty())
-                    {
-                        good = false;
-                        break;
-                    }
-
-                    if (buf.equals("NAME"))
-                    {
-                        value = formula_error_t::name_not_found;
-                    }
-                    else
-                    {
-                        good = false;
-                        break;
-                    }
-
-                    type = result_type::error;
-                    return;
-                }
-            }
-
-            if (!good)
-                // parse failure.
-                break;
-
-            if (buf.empty())
-                buf.set_start(p);
-            else
-                buf.inc();
+            std::ostringstream os;
+            os << "malformed error string: " << s;
+            throw general_error(os.str());
         }
 
-        std::ostringstream os;
-        os << "malformed error string: " << s;
-        throw general_error(os.str());
+        value = err;
+        type = result_type::error;
     }
 
     void parse_string(std::string_view s)

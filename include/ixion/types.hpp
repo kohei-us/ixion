@@ -267,6 +267,14 @@ struct IXION_DLLPUBLIC formula_group_t
  */
 IXION_DLLPUBLIC std::string_view get_formula_error_name(formula_error_t fe);
 
+/**
+ * Parse a formula error string and convert it to a corresponding enum value.
+ *
+ * @param s string representation of a formula error type.
+ * @return enum value for a formula error type.
+ */
+IXION_DLLPUBLIC formula_error_t to_formula_error_type(std::string_view s);
+
 using column_block_handle = void*;
 
 enum class column_block_t : int
