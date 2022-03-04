@@ -56,31 +56,26 @@ bool get_boolean_value(const model_context& cxt, const stack_value& v)
 
 double get_numeric_value(const model_context& cxt, const stack_value& v)
 {
-    double ret = 0.0;
     switch (v.get_type())
     {
         case stack_value_t::boolean:
-            ret = v.get_boolean() ? 1.0 : 0.0;
-            break;
+            return v.get_boolean() ? 1.0 : 0.0;
         case stack_value_t::value:
         case stack_value_t::matrix:
-            ret = v.get_value();
-            break;
+            return v.get_value();
         case stack_value_t::single_ref:
         {
             // reference to a single cell.
             const abs_address_t& addr = v.get_address();
-            ret = cxt.get_numeric_value(addr);
-            break;
+            return cxt.get_numeric_value(addr);
         }
-        default:
-            IXION_DEBUG("inappropriate stack value type.");
-            throw formula_error(formula_error_t::stack_error);
+        default:;
     }
-    return ret;
+
+    throw formula_error(formula_error_t::invalid_value_type);
 }
 
-}
+} // anonymous namespace
 
 stack_value::stack_value(bool b) :
     m_type(stack_value_t::boolean), m_value(b) {}
