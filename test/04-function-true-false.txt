@@ -1,0 +1,8 @@
+%mode init
+A1=TRUE()
+A2=FALSE()
+%calc
+%mode result
+A1=true
+A2=false
+%check

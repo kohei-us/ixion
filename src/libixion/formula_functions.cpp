@@ -547,6 +547,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_counta:
             fnc_counta(args);
             break;
+        case formula_function_t::func_false:
+            fnc_false(args);
+            break;
         case formula_function_t::func_if:
             fnc_if(args);
             break;
@@ -612,6 +615,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_sum:
             fnc_sum(args);
+            break;
+        case formula_function_t::func_true:
+            fnc_true(args);
             break;
         case formula_function_t::func_wait:
             fnc_wait(args);
@@ -1049,6 +1055,22 @@ void formula_functions::fnc_if(formula_value_stack& args) const
     formula_value_stack ret(m_context);
     ret.push_back(args.release(pos));
     args.swap(ret);
+}
+
+void formula_functions::fnc_true(formula_value_stack& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("TRUE takes no arguments.");
+
+    args.push_boolean(true);
+}
+
+void formula_functions::fnc_false(formula_value_stack& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("FALSE takes no arguments.");
+
+    args.push_boolean(false);
 }
 
 void formula_functions::fnc_isblank(formula_value_stack& args) const
