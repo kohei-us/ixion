@@ -136,12 +136,14 @@ count:
   params:
     max: null
     min: null
+  return: numeric
 counta:
   category: statistical
   implemented: true
   params:
     max: null
     min: null
+  return: numeric
 countblank:
   implemented: false
 countif:
