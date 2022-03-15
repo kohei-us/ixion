@@ -1,0 +1,35 @@
+%% Test for COUNT function.  COUNT only counts numeric cells whereas COUNTA
+%% also counts string cells.
+%mode init
+A1:1
+A2:2
+A3:3
+B1@A
+B2@B
+B3@C
+C1:true
+C2:false
+C3:false
+D1=COUNT(A1:A3)
+D2=COUNT(A1:A4)
+D3=COUNT(A1:B3)
+D4=COUNT(A1:C3)
+D5=COUNT(A1:C1)
+D6=COUNT(A100:A120)
+%% D7=COUNT(A:A)
+D8=COUNT(1,2,3,4)
+D9=COUNT(1,"str",3)
+D10=COUNT()
+%calc
+%mode result
+D1=3
+D2=3
+D3=3
+D4=6
+D5=2
+D6=0
+%% D7=3
+D8=4
+D9=2
+D10=0
+%check

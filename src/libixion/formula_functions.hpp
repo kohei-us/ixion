@@ -49,6 +49,7 @@ private:
     void fnc_max(formula_value_stack& args) const;
     void fnc_min(formula_value_stack& args) const;
     void fnc_sum(formula_value_stack& args) const;
+    void fnc_count(formula_value_stack& args) const;
     void fnc_counta(formula_value_stack& args) const;
     void fnc_abs(formula_value_stack& args) const;
     void fnc_average(formula_value_stack& args) const;

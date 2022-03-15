@@ -544,6 +544,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_concatenate:
             fnc_concatenate(args);
             break;
+        case formula_function_t::func_count:
+            fnc_count(args);
+            break;
         case formula_function_t::func_counta:
             fnc_counta(args);
             break;
@@ -693,6 +696,40 @@ void formula_functions::fnc_sum(formula_value_stack& args) const
     args.push_value(ret);
 
     IXION_TRACE("function: sum end (result=" << ret << ")");
+}
+
+void formula_functions::fnc_count(formula_value_stack& args) const
+{
+    double ret = 0;
+
+    while (!args.empty())
+    {
+        switch (args.get_type())
+        {
+            case stack_value_t::value:
+                args.pop_value();
+                ++ret;
+                break;
+            case stack_value_t::range_ref:
+            {
+                abs_range_t range = args.pop_range_ref();
+                ret += m_context.count_range(range, value_numeric | value_boolean);
+                break;
+            }
+            case stack_value_t::single_ref:
+            {
+                abs_address_t pos = args.pop_single_ref();
+                abs_range_t range;
+                range.first = range.last = pos;
+                ret += m_context.count_range(range, value_numeric | value_boolean);
+                break;
+            }
+            default:
+                args.pop_back();
+        }
+    }
+
+    args.push_value(ret);
 }
 
 void formula_functions::fnc_counta(formula_value_stack& args) const
