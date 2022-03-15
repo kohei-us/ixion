@@ -159,7 +159,7 @@ public:
     const column_store_t* get_column(sheet_t sheet, col_t col) const;
     const column_stores_t* get_columns(sheet_t sheet) const;
 
-    double count_range(const abs_range_t& range, const values_t& values_type) const;
+    double count_range(abs_range_t range, values_t values_type) const;
 
     void walk(sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const;
 

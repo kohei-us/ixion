@@ -169,7 +169,7 @@ public:
      */
     const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const;
 
-    double count_range(const abs_range_t& range, const values_t& values_type) const;
+    double count_range(const abs_range_t& range, values_t values_type) const;
 
     /**
      * Obtain range value in matrix form.  Multi-sheet ranges are not

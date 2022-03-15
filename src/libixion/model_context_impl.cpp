@@ -182,6 +182,14 @@ void check_named_exp_name_or_throw(const char* p, size_t n)
     }
 }
 
+void clip_range(abs_range_t& range, const rc_size_t& sheet_size)
+{
+    if (range.first.row == row_unset)
+        range.first.row = 0;
+    if (range.last.row == row_unset)
+        range.last.row = sheet_size.row - 1;
+}
+
 } // anonymous namespace
 
 model_context_impl::model_context_impl(model_context& parent, const rc_size_t& sheet_size) :
@@ -461,10 +469,12 @@ column_block_t map_column_block_type(const mdds::mtv::element_t mtv_type)
 
 } // anonymous namespace
 
-double model_context_impl::count_range(const abs_range_t& range, const values_t& values_type) const
+double model_context_impl::count_range(abs_range_t range, values_t values_type) const
 {
     if (m_sheets.empty())
         return 0.0;
+
+    clip_range(range, m_sheet_size);
 
     double ret = 0.0;
     sheet_t last_sheet = range.last.sheet;

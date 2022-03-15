@@ -226,7 +226,7 @@ formula_result model_context::get_formula_result(const abs_address_t& addr) cons
     return mp_impl->get_formula_result(addr);
 }
 
-double model_context::count_range(const abs_range_t& range, const values_t& values_type) const
+double model_context::count_range(const abs_range_t& range, values_t values_type) const
 {
     return mp_impl->count_range(range, values_type);
 }
