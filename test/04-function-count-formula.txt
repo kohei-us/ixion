@@ -1,0 +1,14 @@
+%% Another COUNT function test that involves formula cells as inputs.
+%mode init
+A1="str"
+A2=1+2
+A3=A2*2
+B1=COUNT(A1,A2,A3)
+B2=COUNT(A1:A3)
+B3=COUNT(B1:B2)
+%calc
+%mode result
+B1=2
+B2=2
+B3=2
+%check
