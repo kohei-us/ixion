@@ -1,0 +1,12 @@
+%% Test for COUNTA() function with static value arguments.
+%mode init
+A1=COUNTA(1,2,3)
+A2=COUNTA(1,"str",3)
+A3=COUNTA()
+%calc
+%mode result
+A1=3
+A2=3
+A3=0
+%check
+

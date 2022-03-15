@@ -707,7 +707,7 @@ void formula_functions::fnc_count(formula_value_stack& args) const
         switch (args.get_type())
         {
             case stack_value_t::value:
-                args.pop_value();
+                args.pop_back();
                 ++ret;
                 break;
             case stack_value_t::range_ref:
@@ -734,17 +734,15 @@ void formula_functions::fnc_count(formula_value_stack& args) const
 
 void formula_functions::fnc_counta(formula_value_stack& args) const
 {
-    if (args.empty())
-        throw formula_functions::invalid_arg("COUNTA requires one or more arguments.");
-
     double ret = 0;
+
     while (!args.empty())
     {
         switch (args.get_type())
         {
             case stack_value_t::string:
             case stack_value_t::value:
-                args.pop_value();
+                args.pop_back();
                 ++ret;
                 break;
             case stack_value_t::range_ref:
@@ -762,7 +760,7 @@ void formula_functions::fnc_counta(formula_value_stack& args) const
                 break;
             }
             default:
-                args.pop_value();
+                args.pop_back();
         }
 
     }
