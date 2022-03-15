@@ -131,7 +131,11 @@ cot:
 coth:
   implemented: false
 count:
-  implemented: false
+  category: statistical
+  implemented: true
+  params:
+    max: null
+    min: null
 counta:
   category: statistical
   implemented: true
