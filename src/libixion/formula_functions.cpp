@@ -550,6 +550,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_counta:
             fnc_counta(args);
             break;
+        case formula_function_t::func_countblank:
+            fnc_countblank(args);
+            break;
         case formula_function_t::func_false:
             fnc_false(args);
             break;
@@ -766,6 +769,26 @@ void formula_functions::fnc_counta(formula_value_stack& args) const
     }
 
     args.push_value(ret);
+}
+
+void formula_functions::fnc_countblank(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("COUNTBLANK requires exactly 1 argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
+        {
+            abs_range_t range = args.pop_range_ref();
+            double ret = m_context.count_range(range, value_empty);
+            args.push_value(ret);
+            break;
+        }
+        default:
+            throw formula_functions::invalid_arg("COUNTBLANK only takes a reference argument.");
+    }
 }
 
 void formula_functions::fnc_abs(formula_value_stack& args) const

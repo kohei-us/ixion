@@ -447,12 +447,24 @@ abs_range_t formula_value_stack::pop_range_ref()
         throw formula_error(formula_error_t::stack_error);
 
     const stack_value& v = m_stack.back();
-    if (v.get_type() != stack_value_t::range_ref)
-        throw formula_error(formula_error_t::stack_error);
 
-    abs_range_t range = v.get_range();
-    m_stack.pop_back();
-    return range;
+    switch (v.get_type())
+    {
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = v.get_address();
+            m_stack.pop_back();
+            return addr;
+        }
+        case stack_value_t::range_ref:
+        {
+            abs_range_t range = v.get_range();
+            m_stack.pop_back();
+            return range;
+        }
+        default:
+            throw formula_error(formula_error_t::stack_error);
+    }
 }
 
 matrix formula_value_stack::pop_range_value()
