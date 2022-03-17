@@ -145,7 +145,15 @@ counta:
     min: null
   return: numeric
 countblank:
-  implemented: false
+  category: statistical
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: numeric
+  note:
+    Unlike COUNT() or COUNTA(), this function only takes one argument, and that
+    argument must be a cell or range reference.
 countif:
   implemented: false
 countifs:
