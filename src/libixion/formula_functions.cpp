@@ -622,6 +622,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_pi:
             fnc_pi(args);
             break;
+        case formula_function_t::func_row:
+            fnc_row(args);
+            break;
         case formula_function_t::func_subtotal:
             fnc_subtotal(args);
             break;
@@ -1439,6 +1442,31 @@ void formula_functions::fnc_column(formula_value_stack& args) const
         {
             abs_address_t addr = args.pop_single_ref();
             args.push_value(addr.column + 1);
+            break;
+        }
+        default:
+            throw formula_error(formula_error_t::invalid_value_type);
+    }
+}
+
+void formula_functions::fnc_row(formula_value_stack& args) const
+{
+    if (args.empty())
+    {
+        args.push_value(m_pos.row + 1);
+        return;
+    }
+
+    if (args.size() > 1)
+        throw formula_functions::invalid_arg("ROW requires 1 argument or less.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            args.push_value(addr.row + 1);
             break;
         }
         default:
