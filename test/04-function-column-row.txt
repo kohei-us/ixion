@@ -1,0 +1,18 @@
+%mode init
+A1=COLUMN()
+B2=COLUMN()
+C3=COLUMN()
+D1=COLUMN(A1)
+D2=COLUMN(B10)
+D4=COLUMN(B2:B5)
+G3=COLUMN(C1:F3)
+%calc
+%mode result
+A1=1
+B2=2
+C3=3
+D1=1
+D2=2
+D4=2
+G3=3
+%check

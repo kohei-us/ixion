@@ -519,8 +519,8 @@ std::string_view formula_functions::get_function_name(formula_function_t oc)
     return unknown_func_name;
 }
 
-formula_functions::formula_functions(model_context& cxt) :
-    m_context(cxt)
+formula_functions::formula_functions(model_context& cxt, const abs_address_t& pos) :
+    m_context(cxt), m_pos(pos)
 {
 }
 
@@ -540,6 +540,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_average:
             fnc_average(args);
+            break;
+        case formula_function_t::func_column:
+            fnc_column(args);
             break;
         case formula_function_t::func_concatenate:
             fnc_concatenate(args);
@@ -1415,6 +1418,31 @@ void formula_functions::fnc_subtotal(formula_value_stack& args) const
             os << "SUBTOTAL: function type " << subtype << " not implemented yet";
             throw formula_functions::invalid_arg(os.str());
         }
+    }
+}
+
+void formula_functions::fnc_column(formula_value_stack& args) const
+{
+    if (args.empty())
+    {
+        args.push_value(m_pos.column + 1);
+        return;
+    }
+
+    if (args.size() > 1)
+        throw formula_functions::invalid_arg("COLUMN requires 1 argument or less.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            args.push_value(addr.column + 1);
+            break;
+        }
+        default:
+            throw formula_error(formula_error_t::invalid_value_type);
     }
 }
 

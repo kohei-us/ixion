@@ -36,7 +36,7 @@ public:
         invalid_arg(const ::std::string& msg);
     };
 
-    formula_functions(model_context& cxt);
+    formula_functions(model_context& cxt, const abs_address_t& pos);
     ~formula_functions();
 
     static formula_function_t get_function_opcode(const formula_token& token);
@@ -86,8 +86,11 @@ private:
 
     void fnc_subtotal(formula_value_stack& args) const;
 
+    void fnc_column(formula_value_stack& args) const;
+
 private:
     model_context& m_context;
+    abs_address_t m_pos;
 };
 
 }

@@ -900,7 +900,7 @@ void formula_interpreter::function()
 
     // Function call pops all stack values pushed onto the stack this far, and
     // pushes the result onto the stack.
-    formula_functions(m_context).interpret(func_oc, get_stack());
+    formula_functions(m_context, m_pos).interpret(func_oc, get_stack());
     assert(get_stack().size() == 1);
 
     pop_stack();
