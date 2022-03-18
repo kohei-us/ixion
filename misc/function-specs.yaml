@@ -103,7 +103,12 @@ code:
 color:
   implemented: false
 column:
-  implemented: false
+  category: spreadsheet
+  implemented: true
+  params:
+    max: 1
+    min: null
+  return: numeric
 columns:
   implemented: false
 combin:
@@ -661,7 +666,12 @@ roundsig:
 roundup:
   implemented: false
 row:
-  implemented: false
+  category: spreadsheet
+  implemented: true
+  params:
+    max: 1
+    min: null
+  return: numeric
 rows:
   implemented: false
 rri:
