@@ -110,7 +110,12 @@ column:
     min: null
   return: numeric
 columns:
-  implemented: false
+  category: spreadsheet
+  implemented: true
+  params:
+    max: null
+    min: null
+  return: numeric
 combin:
   implemented: false
 combina:
@@ -673,7 +678,12 @@ row:
     min: null
   return: numeric
 rows:
-  implemented: false
+  category: spreadsheet
+  implemented: true
+  params:
+    max: null
+    min: null
+  return: numeric
 rri:
   implemented: false
 rsq:
