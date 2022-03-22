@@ -1,0 +1,20 @@
+%mode init
+A1=COLUMNS(A2:B10)
+A2=COLUMNS(C1)
+A3=COLUMNS(B2,A4:D100)
+%calc
+%mode result
+A1=2
+A2=1
+A3=5
+%check
+%mode edit
+A1=ROWS(A2:B10)
+A2=ROWS(C1)
+A3=ROWS(B2,A4:D100)
+%recalc
+%mode result
+A1=9
+A2=1
+A3=98
+%check

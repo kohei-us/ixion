@@ -544,6 +544,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_column:
             fnc_column(args);
             break;
+        case formula_function_t::func_columns:
+            fnc_columns(args);
+            break;
         case formula_function_t::func_concatenate:
             fnc_concatenate(args);
             break;
@@ -624,6 +627,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_row:
             fnc_row(args);
+            break;
+        case formula_function_t::func_rows:
+            fnc_rows(args);
             break;
         case formula_function_t::func_subtotal:
             fnc_subtotal(args);
@@ -1449,6 +1455,29 @@ void formula_functions::fnc_column(formula_value_stack& args) const
     }
 }
 
+void formula_functions::fnc_columns(formula_value_stack& args) const
+{
+    double res = 0.0;
+
+    while (!args.empty())
+    {
+        switch (args.get_type())
+        {
+            case stack_value_t::single_ref:
+            case stack_value_t::range_ref:
+            {
+                abs_range_t range = args.pop_range_ref();
+                res += range.last.column - range.first.column + 1;
+                break;
+            }
+            default:
+                throw formula_error(formula_error_t::invalid_value_type);
+        }
+    }
+
+    args.push_value(res);
+}
+
 void formula_functions::fnc_row(formula_value_stack& args) const
 {
     if (args.empty())
@@ -1472,6 +1501,29 @@ void formula_functions::fnc_row(formula_value_stack& args) const
         default:
             throw formula_error(formula_error_t::invalid_value_type);
     }
+}
+
+void formula_functions::fnc_rows(formula_value_stack& args) const
+{
+    double res = 0.0;
+
+    while (!args.empty())
+    {
+        switch (args.get_type())
+        {
+            case stack_value_t::single_ref:
+            case stack_value_t::range_ref:
+            {
+                abs_range_t range = args.pop_range_ref();
+                res += range.last.row - range.first.row + 1;
+                break;
+            }
+            default:
+                throw formula_error(formula_error_t::invalid_value_type);
+        }
+    }
+
+    args.push_value(res);
 }
 
 }

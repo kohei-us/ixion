@@ -87,7 +87,9 @@ private:
     void fnc_subtotal(formula_value_stack& args) const;
 
     void fnc_column(formula_value_stack& args) const;
+    void fnc_columns(formula_value_stack& args) const;
     void fnc_row(formula_value_stack& args) const;
+    void fnc_rows(formula_value_stack& args) const;
 
 private:
     model_context& m_context;
