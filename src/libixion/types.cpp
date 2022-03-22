@@ -25,6 +25,7 @@ constexpr std::string_view formula_error_names[] = {
     "#NAME?",  // 4: name not found
     "#NULL!",  // 5: no range intersection
     "#VALUE!", // 6: invalid value type
+    "#N/A",    // 7: no value available
 };
 
 } // anonymous namespace

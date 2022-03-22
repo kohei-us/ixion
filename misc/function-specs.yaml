@@ -699,7 +699,12 @@ sech:
 second:
   implemented: false
 sheet:
-  implemented: false
+  category: spreadsheet
+  implemented: true
+  params:
+    max: 1
+    min: null
+  return: numeric
 sheets:
   implemented: false
 sign:

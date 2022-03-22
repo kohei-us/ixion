@@ -218,11 +218,13 @@ public:
     const std::string* get_string(string_id_t identifier) const;
 
     /**
-     * Get the index of sheet from sheet name.
+     * Get the index of sheet from sheet name.  If the sheet name doesn't exist,
+     * it returns a value equal to <code>ixion::invalid_sheet</code>.
      *
      * @param name sheet name.
      *
-     * @return sheet index
+     * @return 0-based sheet index, or <code>ixion::invalid_sheet</code> in case
+     *         the document doesn't have a sheet by the specified name.
      */
     sheet_t get_sheet_index(std::string_view name) const;
     std::string get_sheet_name(sheet_t sheet) const;

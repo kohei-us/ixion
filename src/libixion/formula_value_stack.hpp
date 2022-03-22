@@ -118,7 +118,7 @@ public:
 
     bool pop_boolean();
     double pop_value();
-    const std::string pop_string();
+    std::string pop_string();
     abs_address_t pop_single_ref();
     abs_range_t pop_range_ref();
     matrix pop_range_value();

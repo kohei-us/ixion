@@ -186,6 +186,7 @@ enum class formula_error_t : uint8_t
     name_not_found           = 4,
     no_range_intersection    = 5,
     invalid_value_type       = 6,
+    no_value_available       = 7,
 
     no_result_error          = 253, // internal only error
     stack_error              = 254, // internal only error

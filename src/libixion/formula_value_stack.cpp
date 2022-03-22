@@ -331,7 +331,7 @@ double formula_value_stack::pop_value()
     return ret;
 }
 
-const std::string formula_value_stack::pop_string()
+std::string formula_value_stack::pop_string()
 {
     IXION_TRACE("pop_string");
 

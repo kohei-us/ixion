@@ -1,0 +1,36 @@
+%mode session
+insert-sheet:Sheet1
+insert-sheet:Sheet2
+insert-sheet:Sheet3
+current-sheet:Sheet1
+%mode init
+A1=SHEET(Sheet1!B1)
+A2=SHEET(Sheet2!B1)
+A3=SHEET(Sheet3!B1)
+B1=SHEET(Sheet1!D1:F10)
+B2=SHEET(Sheet2!D1:F10)
+B3=SHEET(Sheet3!D1:F10)
+C1=SHEET("Sheet1")
+C2=SHEET("Sheet2")
+C3=SHEET("Sheet3")
+C4=SHEET("DoesNotExist")
+D1=SHEET()
+%calc
+%mode result
+A1=1
+A2=2
+A3=3
+B1=1
+B2=2
+B3=3
+C1=1
+C2=2
+C3=3
+C4=#N/A
+D1=1
+%check
+
+
+
+
+

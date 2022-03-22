@@ -631,6 +631,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_rows:
             fnc_rows(args);
             break;
+        case formula_function_t::func_sheet:
+            fnc_sheet(args);
+            break;
         case formula_function_t::func_subtotal:
             fnc_subtotal(args);
             break;
@@ -1524,6 +1527,43 @@ void formula_functions::fnc_rows(formula_value_stack& args) const
     }
 
     args.push_value(res);
+}
+
+void formula_functions::fnc_sheet(formula_value_stack& args) const
+{
+    if (args.empty())
+    {
+        // Take the current sheet index.
+        args.push_value(m_pos.sheet + 1);
+        return;
+    }
+
+    if (args.size() > 1u)
+        throw formula_functions::invalid_arg("SHEET only takes one argument or less.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
+        {
+            abs_range_t range = args.pop_range_ref();
+            args.push_value(range.first.sheet + 1);
+            break;
+        }
+        case stack_value_t::string:
+        {
+            // TODO: we need to make this case insensitive.
+            std::string sheet_name = args.pop_string();
+            sheet_t sheet_id = m_context.get_sheet_index(sheet_name);
+            if (sheet_id == invalid_sheet)
+                throw formula_error(formula_error_t::no_value_available);
+
+            args.push_value(sheet_id + 1);
+            break;
+        }
+        default:
+            throw formula_error(formula_error_t::invalid_value_type);
+    }
 }
 
 }
