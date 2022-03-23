@@ -1,0 +1,20 @@
+%% TODO : Add tests for 3D references when it becomes supported.
+%mode session
+insert-sheet:Sheet1
+insert-sheet:Sheet2
+insert-sheet:Sheet3
+current-sheet:Sheet1
+%mode init
+A1=SHEETS()
+A2=SHEETS(A1)
+A3=SHEETS(Sheet2!B1:C4)
+A4=SHEETS("str")
+A5=SHEETS(1.2)
+%calc
+%mode result
+A1=3
+A2=1
+A3=1
+A4=#N/A
+A5=#N/A
+%check

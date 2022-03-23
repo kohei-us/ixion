@@ -706,7 +706,15 @@ sheet:
     min: null
   return: numeric
 sheets:
-  implemented: false
+  category: spreadsheet
+  implemented: true
+  params:
+    max: 1
+    min: null
+  return: numeric
+  note:
+    It triggers an '#'N/A error upon string and numeric input.  It returns the
+    number of sheets in the document when no arguments are given.
 sign:
   implemented: false
 sin:

@@ -91,6 +91,7 @@ private:
     void fnc_row(formula_value_stack& args) const;
     void fnc_rows(formula_value_stack& args) const;
     void fnc_sheet(formula_value_stack& args) const;
+    void fnc_sheets(formula_value_stack& args) const;
 
 private:
     model_context& m_context;

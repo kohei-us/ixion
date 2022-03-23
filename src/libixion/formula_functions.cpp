@@ -634,6 +634,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_sheet:
             fnc_sheet(args);
             break;
+        case formula_function_t::func_sheets:
+            fnc_sheets(args);
+            break;
         case formula_function_t::func_subtotal:
             fnc_subtotal(args);
             break;
@@ -1563,6 +1566,32 @@ void formula_functions::fnc_sheet(formula_value_stack& args) const
         }
         default:
             throw formula_error(formula_error_t::invalid_value_type);
+    }
+}
+
+void formula_functions::fnc_sheets(formula_value_stack& args) const
+{
+    if (args.empty())
+    {
+        args.push_value(m_context.get_sheet_count());
+        return;
+    }
+
+    if (args.size() != 1u)
+        throw formula_functions::invalid_arg("SHEETS only takes one argument or less.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
+        {
+            abs_range_t range = args.pop_range_ref();
+            sheet_t n = range.last.sheet - range.first.sheet + 1;
+            args.push_value(n);
+            break;
+        }
+        default:
+            throw formula_error(formula_error_t::no_value_available);
     }
 }
 
