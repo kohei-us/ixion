@@ -25,6 +25,7 @@ namespace ixion {
 enum class stack_value_t
 {
     boolean,
+    error,
     value,
     string,
     single_ref,
@@ -37,7 +38,7 @@ enum class stack_value_t
  */
 class stack_value
 {
-    using stored_value_type = std::variant<bool, double, abs_address_t, abs_range_t, matrix, std::string>;
+    using stored_value_type = std::variant<bool, double, abs_address_t, abs_range_t, formula_error_t, matrix, std::string>;
 
     stack_value_t m_type;
     stored_value_type m_value;
@@ -52,6 +53,7 @@ public:
     explicit stack_value(std::string str);
     explicit stack_value(const abs_address_t& val);
     explicit stack_value(const abs_range_t& val);
+    explicit stack_value(formula_error_t err);
     explicit stack_value(matrix mtx);
     stack_value(stack_value&& other);
     ~stack_value() = default;
@@ -64,6 +66,7 @@ public:
     const std::string& get_string() const;
     const abs_address_t& get_address() const;
     const abs_range_t& get_range() const;
+    formula_error_t get_error() const;
 
     /**
      * Move the matrix value out from storage.  The internal matrix content
@@ -115,6 +118,7 @@ public:
     void push_single_ref(const abs_address_t& val);
     void push_range_ref(const abs_range_t& val);
     void push_matrix(matrix mtx);
+    void push_error(formula_error_t err);
 
     bool pop_boolean();
     double pop_value();
@@ -122,6 +126,7 @@ public:
     abs_address_t pop_single_ref();
     abs_range_t pop_range_ref();
     matrix pop_range_value();
+    formula_error_t pop_error();
 
     void pop_back();
 

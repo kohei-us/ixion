@@ -1,8 +1,20 @@
 %mode init
 B1=NA()
 B2=B1
+B3=ISNA(B1)
+B4=ISNA(B2)
+B5=ISNA(B3)
+B6=ISNA(1)
+B7=ISNA("str")
+B8=ISNA(NA())
 %calc
 %mode result
 B1=#N/A
 B2=#N/A
+B3=true
+B4=true
+B5=false
+B6=false
+B7=false
+B8=true
 %check

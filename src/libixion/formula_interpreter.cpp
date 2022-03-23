@@ -226,8 +226,9 @@ void formula_interpreter::pop_result()
         case stack_value_t::matrix:
             m_result.set_matrix(res.pop_matrix());
             break;
-        default:
-            ;
+        case stack_value_t::error:
+            m_result.set_error(res.get_error());
+            break;
     }
 
     if (mp_handler)

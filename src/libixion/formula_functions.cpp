@@ -435,9 +435,9 @@ bool pop_and_check_for_odd_value(formula_value_stack& args)
 
 /**
  * Pop a single-value argument from the stack and interpret it as a boolean
- * value if it's either boolean or numeric type, or ignore if it's a string
- * type.  The behavior is undefined if called for non-single-value argument
- * type.
+ * value if it's either boolean or numeric type, or ignore if it's a string or
+ * error type.  The behavior is undefined if called for non-single-value
+ * argument type.
  */
 std::optional<bool> pop_one_value_as_boolean(const model_context& cxt, formula_value_stack& args)
 {
@@ -466,6 +466,7 @@ std::optional<bool> pop_one_value_as_boolean(const model_context& cxt, formula_v
             ret = args.pop_boolean();
             break;
         case stack_value_t::string:
+        case stack_value_t::error:
             // ignore string type
             args.pop_back();
             break;
@@ -579,6 +580,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_islogical:
             fnc_islogical(args);
+            break;
+        case formula_function_t::func_isna:
+            fnc_isna(args);
             break;
         case formula_function_t::func_isnontext:
             fnc_isnontext(args);
@@ -1259,6 +1263,35 @@ void formula_functions::fnc_islogical(formula_value_stack& args) const
     }
 }
 
+void formula_functions::fnc_isna(formula_value_stack& args) const
+{
+    if (args.size() != 1u)
+        throw formula_functions::invalid_arg("ISNA requires exactly one argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            auto ca = m_context.get_cell_access(addr);
+            formula_error_t err = ca.get_error_value();
+            args.push_boolean(err == formula_error_t::no_value_available);
+            break;
+        }
+        case stack_value_t::error:
+        {
+            bool res = args.pop_error() == formula_error_t::no_value_available;
+            args.push_boolean(res);
+            break;
+        }
+        default:
+        {
+            args.clear();
+            args.push_boolean(false);
+        }
+    }
+}
+
 void formula_functions::fnc_isnontext(formula_value_stack& args) const
 {
     if (args.size() != 1)
@@ -1363,7 +1396,7 @@ void formula_functions::fnc_na(formula_value_stack& args) const
     if (!args.empty())
         throw formula_functions::invalid_arg("NA takes no arguments.");
 
-    throw formula_error(formula_error_t::no_value_available);
+    args.push_error(formula_error_t::no_value_available);
 }
 
 void formula_functions::fnc_len(formula_value_stack& args) const

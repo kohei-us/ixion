@@ -92,6 +92,9 @@ stack_value::stack_value(const abs_address_t& val) :
 stack_value::stack_value(const abs_range_t& val) :
     m_type(stack_value_t::range_ref), m_value(val) {}
 
+stack_value::stack_value(formula_error_t err) :
+    m_type(stack_value_t::error), m_value(err) {}
+
 stack_value::stack_value(matrix mtx) :
     m_type(stack_value_t::matrix), m_value(std::move(mtx)) {}
 
@@ -156,6 +159,11 @@ const abs_address_t& stack_value::get_address() const
 const abs_range_t& stack_value::get_range() const
 {
     return std::get<abs_range_t>(m_value);
+}
+
+formula_error_t stack_value::get_error() const
+{
+    return std::get<formula_error_t>(m_value);
 }
 
 matrix stack_value::pop_matrix()
@@ -304,6 +312,12 @@ void formula_value_stack::push_matrix(matrix mtx)
 {
     IXION_TRACE("push_matrix");
     m_stack.emplace_back(std::move(mtx));
+}
+
+void formula_value_stack::push_error(formula_error_t err)
+{
+    IXION_TRACE("err=" << short(err) << " (" << get_formula_error_name(err) << ")");
+    m_stack.emplace_back(err);
 }
 
 bool formula_value_stack::pop_boolean()
@@ -493,6 +507,22 @@ matrix formula_value_stack::pop_range_value()
         throw formula_error(formula_error_t::stack_error);
 
     matrix ret = m_context.get_range_value(v.get_range());
+    m_stack.pop_back();
+    return ret;
+}
+
+formula_error_t formula_value_stack::pop_error()
+{
+    IXION_TRACE("pop_error");
+
+    if (m_stack.empty())
+        throw formula_error(formula_error_t::stack_error);
+
+    const stack_value& v = m_stack.back();
+    if (v.get_type() != stack_value_t::error)
+        throw formula_error(formula_error_t::stack_error);
+
+    formula_error_t ret = v.get_error();
     m_stack.pop_back();
     return ret;
 }

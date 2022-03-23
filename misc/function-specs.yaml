@@ -397,11 +397,12 @@ islogical:
     min: 1
   return: boolean
 isna:
-  implemented: false
-  note:
-    We first need to have a way to invoke an '#'N/A value as a formula result,
-    which typically happens when a value lookup fails in functions such as LOOKUP,
-    VLOOKUP etc.
+  category: information
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: boolean
 isnontext:
   category: information
   implemented: true
