@@ -613,6 +613,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_mmult:
             fnc_mmult(args);
             break;
+        case formula_function_t::func_na:
+            fnc_na(args);
+            break;
         case formula_function_t::func_not:
             fnc_not(args);
             break;
@@ -1353,6 +1356,14 @@ void formula_functions::fnc_istext(formula_value_stack& args) const
             args.clear();
             args.push_boolean(false);
     }
+}
+
+void formula_functions::fnc_na(formula_value_stack& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("NA takes no arguments.");
+
+    throw formula_error(formula_error_t::no_value_available);
 }
 
 void formula_functions::fnc_len(formula_value_stack& args) const

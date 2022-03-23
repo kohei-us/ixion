@@ -551,7 +551,12 @@ mvalue:
 n:
   implemented: false
 na:
-  implemented: false
+  category: information
+  implemented: true
+  params:
+    max: 0
+    min: 0
+  return: error
 neg:
   implemented: false
 negbinomdist:

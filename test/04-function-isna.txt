@@ -1,0 +1,8 @@
+%mode init
+B1=NA()
+B2=B1
+%calc
+%mode result
+B1=#N/A
+B2=#N/A
+%check
