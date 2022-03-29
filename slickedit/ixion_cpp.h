@@ -1,0 +1,2 @@
+#define IXION_DLLPUBLIC 
+
