@@ -617,6 +617,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_mmult:
             fnc_mmult(args);
             break;
+        case formula_function_t::func_n:
+            fnc_n(args);
+            break;
         case formula_function_t::func_na:
             fnc_na(args);
             break;
@@ -1392,6 +1395,15 @@ void formula_functions::fnc_istext(formula_value_stack& args) const
             args.clear();
             args.push_boolean(false);
     }
+}
+
+void formula_functions::fnc_n(formula_value_stack& args) const
+{
+    if (args.size() != 1u)
+        throw formula_functions::invalid_arg("N takes exactly one argument.");
+
+    double v = args.pop_value();
+    args.push_value(v);
 }
 
 void formula_functions::fnc_na(formula_value_stack& args) const

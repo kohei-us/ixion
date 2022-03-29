@@ -76,6 +76,7 @@ private:
     void fnc_isodd(formula_value_stack& args) const;
     void fnc_isref(formula_value_stack& args) const;
     void fnc_istext(formula_value_stack& args) const;
+    void fnc_n(formula_value_stack& args) const;
     void fnc_na(formula_value_stack& args) const;
     void fnc_type(formula_value_stack& args) const;
 

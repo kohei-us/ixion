@@ -1,0 +1,26 @@
+%mode init
+A1=N(12)
+A2=N("str")
+A3=N(TRUE())
+A4=N(FALSE())
+B1:12
+B2:true
+B3:false
+B4@string value
+C1=N(B1)
+C2=N(B2)
+C3=N(B3)
+C4=N(B4)
+C5=N(B5)
+%calc
+%mode result
+A1=12
+A2=0
+A3=1
+A4=0
+C1=12
+C2=1
+C3=0
+C4=0
+C5=0
+%check

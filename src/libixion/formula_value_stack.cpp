@@ -63,6 +63,8 @@ double get_numeric_value(const model_context& cxt, const stack_value& v)
         case stack_value_t::value:
         case stack_value_t::matrix:
             return v.get_value();
+        case stack_value_t::string:
+            return 0.0;
         case stack_value_t::single_ref:
         {
             // reference to a single cell.

@@ -550,7 +550,12 @@ munit:
 mvalue:
   implemented: false
 n:
-  implemented: false
+  category: information
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: numeric
 na:
   category: information
   implemented: true
