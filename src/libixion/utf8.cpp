@@ -9,6 +9,7 @@
 
 #include <ixion/exceptions.hpp>
 #include <sstream>
+#include <limits>
 
 namespace ixion { namespace detail {
 
