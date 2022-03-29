@@ -267,26 +267,17 @@ struct formula_result::impl
 
     void parse_string(std::string_view s)
     {
-        if (s.size() <= 1u)
+        if (s.size() < 2u)
+            // It needs to at least have the opening and closing quotes.
             return;
 
         assert(s[0] == '"');
-        const char* p = s.data();
-        ++p;
-        const char* p_first = p;
-        std::size_t len = 0;
-        for (std::size_t i = 1; i < s.size(); ++i, ++len, ++p)
-        {
-            char c = *p;
-            if (c == '"')
-                break;
-        }
-
-        if (!len)
+        auto pos = s.find_first_of('"', 1);
+        if (pos == std::string_view::npos)
             throw general_error("failed to parse string result.");
 
         type = result_type::string;
-        value = std::string(p_first, len);
+        value = std::string(&s[1], pos - 1);
     }
 };
 

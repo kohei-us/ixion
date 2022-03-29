@@ -314,6 +314,8 @@
                 <F N="../src/libixion/queue_entry.hpp"/>
                 <F N="../src/libixion/table.cpp"/>
                 <F N="../src/libixion/types.cpp"/>
+                <F N="../src/libixion/utf8.cpp"/>
+                <F N="../src/libixion/utf8.hpp"/>
                 <F N="../src/libixion/utils.cpp"/>
                 <F N="../src/libixion/utils.hpp"/>
                 <F N="../src/libixion/vulkan_obj.cpp"/>

@@ -71,6 +71,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	queue_entry.cpp \
 	table.cpp \
 	types.cpp \
+	utf8.hpp \
+	utf8.cpp \
 	utils.hpp \
 	utils.cpp \
 	workbook.hpp \

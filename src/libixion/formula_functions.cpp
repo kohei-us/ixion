@@ -9,6 +9,7 @@
 #include "debug.hpp"
 #include "column_store_type.hpp" // internal mdds::multi_type_vector
 #include "utils.hpp"
+#include "utf8.hpp"
 
 #include <ixion/formula_tokens.hpp>
 #include <ixion/formula_result.hpp>
@@ -1495,15 +1496,24 @@ void formula_functions::fnc_left(formula_value_stack& args) const
         throw formula_functions::invalid_arg(
             "LEFT requires at least one argument but no more than 2.");
 
-    size_t n = 1; // when the 2nd arg is skipped, it defaults to 1.
+    int n = 1; // when the 2nd arg is skipped, it defaults to 1.
     if (args.size() == 2)
         n = std::floor(args.pop_value());
 
+    if (n < 0)
+    {
+        args.clear();
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
     std::string s = args.pop_string();
 
+    auto positions = detail::calc_utf8_byte_positions(s);
+
     // Resize ONLY when the desired length is lower than the original string length.
-    if (n < s.size())
-        s.resize(n);
+    if (std::size_t(n) < positions.size())
+        s.resize(positions[n]);
 
     args.push_string(std::move(s));
 }

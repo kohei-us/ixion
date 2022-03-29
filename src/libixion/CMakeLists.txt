@@ -39,6 +39,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     queue_entry.cpp
     table.cpp
     types.cpp
+    utf8.cpp
     utils.cpp
     workbook.cpp
 )
