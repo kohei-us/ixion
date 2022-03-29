@@ -826,7 +826,12 @@ trunc:
 ttest:
   implemented: false
 type:
-  implemented: false
+  category: information
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: numeric
 unichar:
   implemented: false
 unicode:

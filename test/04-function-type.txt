@@ -1,0 +1,42 @@
+%mode init
+A1=TYPE(1)
+A2=TYPE("str")
+A3=TYPE(TRUE())
+A4=TYPE(FALSE())
+A5=TYPE(NA())
+A6=TYPE(B1:E2)
+A7=TYPE(MMULT(D1:D3,E1:G1))
+B1@string value
+B2:12
+B3:true
+B4:false
+B5=1/2
+B6=NA()
+B7="str"
+B8=ISEVEN(12)
+C1=TYPE(B1)
+C2=TYPE(B2)
+C3=TYPE(B3)
+C4=TYPE(B4)
+C5=TYPE(B5)
+C6=TYPE(B6)
+C7=TYPE(B7)
+C8=TYPE(B8)
+%calc
+%mode result
+A1=1
+A2=2
+A3=4
+A4=4
+A5=16
+A6=64
+A7=64
+C1=2
+C2=1
+C3=4
+C4=4
+C5=1
+C6=16
+C7=2
+C8=4
+%check

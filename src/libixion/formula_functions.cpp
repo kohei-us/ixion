@@ -653,6 +653,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_true:
             fnc_true(args);
             break;
+        case formula_function_t::func_type:
+            fnc_type(args);
+            break;
         case formula_function_t::func_wait:
             fnc_wait(args);
             break;
@@ -1397,6 +1400,63 @@ void formula_functions::fnc_na(formula_value_stack& args) const
         throw formula_functions::invalid_arg("NA takes no arguments.");
 
     args.push_error(formula_error_t::no_value_available);
+}
+
+void formula_functions::fnc_type(formula_value_stack& args) const
+{
+    if (args.size() != 1u)
+        throw formula_functions::invalid_arg("TYPE requires exactly one argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::boolean:
+            args.pop_back();
+            args.push_value(4);
+            break;
+        case stack_value_t::error:
+            args.pop_back();
+            args.push_value(16);
+            break;
+        case stack_value_t::matrix:
+        case stack_value_t::range_ref:
+            args.pop_back();
+            args.push_value(64);
+            break;
+        case stack_value_t::string:
+            args.pop_back();
+            args.push_value(2);
+            break;
+        case stack_value_t::value:
+            args.pop_back();
+            args.push_value(1);
+            break;
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            cell_access ca = m_context.get_cell_access(addr);
+
+            switch (ca.get_value_type())
+            {
+                case cell_value_t::boolean:
+                    args.push_value(4);
+                    break;
+                case cell_value_t::empty:
+                case cell_value_t::numeric:
+                    args.push_value(1);
+                    break;
+                case cell_value_t::error:
+                    args.push_value(16);
+                    break;
+                case cell_value_t::string:
+                    args.push_value(2);
+                    break;
+                case cell_value_t::unknown:
+                    throw formula_error(formula_error_t::no_result_error);
+            }
+
+            break;
+        }
+    }
 }
 
 void formula_functions::fnc_len(formula_value_stack& args) const

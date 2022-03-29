@@ -77,6 +77,7 @@ private:
     void fnc_isref(formula_value_stack& args) const;
     void fnc_istext(formula_value_stack& args) const;
     void fnc_na(formula_value_stack& args) const;
+    void fnc_type(formula_value_stack& args) const;
 
     void fnc_len(formula_value_stack& args) const;
     void fnc_concatenate(formula_value_stack& args) const;
