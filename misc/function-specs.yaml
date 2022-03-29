@@ -532,11 +532,12 @@ minverse:
 mirr:
   implemented: false
 mmult:
-  category: matrix
+  category: mathematical
   implemented: true
   params:
     max: 2
     min: 2
+  return: array
 mod:
   implemented: false
 mode:

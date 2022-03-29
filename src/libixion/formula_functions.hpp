@@ -46,25 +46,32 @@ public:
     void interpret(formula_function_t oc, formula_value_stack& args);
 
 private:
-    void fnc_max(formula_value_stack& args) const;
-    void fnc_min(formula_value_stack& args) const;
-    void fnc_sum(formula_value_stack& args) const;
+
+    // category: statistical
+    void fnc_abs(formula_value_stack& args) const;
+    void fnc_average(formula_value_stack& args) const;
     void fnc_count(formula_value_stack& args) const;
     void fnc_counta(formula_value_stack& args) const;
     void fnc_countblank(formula_value_stack& args) const;
-    void fnc_abs(formula_value_stack& args) const;
-    void fnc_average(formula_value_stack& args) const;
-    void fnc_mmult(formula_value_stack& args) const;
+    void fnc_max(formula_value_stack& args) const;
+    void fnc_min(formula_value_stack& args) const;
     void fnc_pi(formula_value_stack& args) const;
+
+    // category: mathematical
     void fnc_int(formula_value_stack& args) const;
+    void fnc_mmult(formula_value_stack& args) const;
+    void fnc_subtotal(formula_value_stack& args) const;
+    void fnc_sum(formula_value_stack& args) const;
 
+    // category: logical
     void fnc_and(formula_value_stack& args) const;
-    void fnc_or(formula_value_stack& args) const;
-    void fnc_if(formula_value_stack& args) const;
-    void fnc_true(formula_value_stack& args) const;
     void fnc_false(formula_value_stack& args) const;
+    void fnc_if(formula_value_stack& args) const;
     void fnc_not(formula_value_stack& args) const;
+    void fnc_or(formula_value_stack& args) const;
+    void fnc_true(formula_value_stack& args) const;
 
+    // category: information
     void fnc_isblank(formula_value_stack& args) const;
     void fnc_iserror(formula_value_stack& args) const;
     void fnc_iseven(formula_value_stack& args) const;
@@ -80,22 +87,24 @@ private:
     void fnc_na(formula_value_stack& args) const;
     void fnc_type(formula_value_stack& args) const;
 
-    void fnc_len(formula_value_stack& args) const;
+    // category: text
     void fnc_concatenate(formula_value_stack& args) const;
     void fnc_left(formula_value_stack& args) const;
+    void fnc_len(formula_value_stack& args) const;
 
+    // category: date & time
     void fnc_now(formula_value_stack& args) const;
 
-    void fnc_wait(formula_value_stack& args) const;
-
-    void fnc_subtotal(formula_value_stack& args) const;
-
+    // cateogry: spreadsheet
     void fnc_column(formula_value_stack& args) const;
     void fnc_columns(formula_value_stack& args) const;
     void fnc_row(formula_value_stack& args) const;
     void fnc_rows(formula_value_stack& args) const;
     void fnc_sheet(formula_value_stack& args) const;
     void fnc_sheets(formula_value_stack& args) const;
+
+    // category: development
+    void fnc_wait(formula_value_stack& args) const;
 
 private:
     model_context& m_context;
