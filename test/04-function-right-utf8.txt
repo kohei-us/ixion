@@ -1,0 +1,31 @@
+%mode init
+A1@今日は姉の誕生日です。
+B1=RIGHT(A1,0)
+B2=RIGHT(A1,1)
+B3=RIGHT(A1,2)
+B4=RIGHT(A1,3)
+B5=RIGHT(A1,4)
+B6=RIGHT(A1,5)
+B7=RIGHT(A1,6)
+B8=RIGHT(A1,7)
+B9=RIGHT(A1,8)
+B10=RIGHT(A1,9)
+B11=RIGHT(A1,10)
+B12=RIGHT(A1,11)
+B13=RIGHT(A1,12)
+%calc
+%mode result
+B1=""
+B2="。"
+B3="す。"
+B4="です。"
+B5="日です。"
+B6="生日です。"
+B7="誕生日です。"
+B8="の誕生日です。"
+B9="姉の誕生日です。"
+B10="は姉の誕生日です。"
+B11="日は姉の誕生日です。"
+B12="今日は姉の誕生日です。"
+B13="今日は姉の誕生日です。"
+%check

@@ -636,6 +636,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_pi:
             fnc_pi(args);
             break;
+        case formula_function_t::func_right:
+            fnc_right(args);
+            break;
         case formula_function_t::func_row:
             fnc_row(args);
             break;
@@ -1514,6 +1517,49 @@ void formula_functions::fnc_left(formula_value_stack& args) const
     // Resize ONLY when the desired length is lower than the original string length.
     if (std::size_t(n) < positions.size())
         s.resize(positions[n]);
+
+    args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_right(formula_value_stack& args) const
+{
+    if (args.empty() || args.size() > 2)
+        throw formula_functions::invalid_arg(
+            "RIGHT requires at least one argument but no more than 2.");
+
+    int n = 1; // when the 2nd arg is skipped, it defaults to 1.
+    if (args.size() == 2)
+        n = std::floor(args.pop_value());
+
+    if (n < 0)
+    {
+        args.clear();
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    if (n == 0)
+    {
+        args.clear();
+        args.push_string(std::string{});
+        return;
+    }
+
+    std::string s = args.pop_string();
+
+    auto positions = detail::calc_utf8_byte_positions(s);
+
+    // determine how many logical characters to skip.
+    n = int(positions.size()) - n;
+
+    if (n > 0)
+    {
+        assert(std::size_t(n) < positions.size());
+        auto it = std::next(s.begin(), positions[n]);
+        std::string s_skipped;
+        std::copy(it, s.end(), std::back_inserter(s_skipped));
+        s.swap(s_skipped);
+    }
 
     args.push_string(std::move(s));
 }
