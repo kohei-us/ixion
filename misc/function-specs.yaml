@@ -128,6 +128,7 @@ concatenate:
   params:
     max: null
     min: null
+  return: string
 confidence:
   implemented: false
 correl:
@@ -467,6 +468,7 @@ left:
   params:
     max: 2
     min: 1
+  return: string
 leftb:
   implemented: false
 len:
@@ -669,7 +671,12 @@ replaceb:
 rept:
   implemented: false
 right:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 2
+    min: 1
+  return: string
 rightb:
   implemented: false
 roman:
