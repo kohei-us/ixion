@@ -1,0 +1,12 @@
+%mode init
+A1@富士の高嶺に
+A2="雪はふりつつ"
+B1=LEN(A1)
+B2=LEN(A2)
+B3=LEN("ふりさけ見れば春日なる")
+%calc
+%mode result
+B1=6
+B2=6
+B3=11
+%check

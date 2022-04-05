@@ -1484,8 +1484,9 @@ void formula_functions::fnc_len(formula_value_stack& args) const
         throw formula_functions::invalid_arg("LEN requires exactly one argument.");
 
     std::string s = args.pop_string();
-    args.clear();
-    args.push_value(s.size());
+
+    auto positions = detail::calc_utf8_byte_positions(s);
+    args.push_value(positions.size());
 }
 
 void formula_functions::fnc_mid(formula_value_stack& args) const
