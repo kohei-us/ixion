@@ -514,7 +514,12 @@ mdeterm:
 median:
   implemented: false
 mid:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 3
+    min: 3
+  return: string
 midb:
   implemented: false
 min:

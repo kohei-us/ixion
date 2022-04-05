@@ -612,6 +612,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_max:
             fnc_max(args);
             break;
+        case formula_function_t::func_mid:
+            fnc_mid(args);
+            break;
         case formula_function_t::func_min:
             fnc_min(args);
             break;
@@ -1483,6 +1486,48 @@ void formula_functions::fnc_len(formula_value_stack& args) const
     std::string s = args.pop_string();
     args.clear();
     args.push_value(s.size());
+}
+
+void formula_functions::fnc_mid(formula_value_stack& args) const
+{
+    if (args.size() != 3)
+        throw formula_functions::invalid_arg("MID requires exactly 3 arguments.");
+
+    int len = std::floor(args.pop_value());
+    int start = std::floor(args.pop_value()); // 1-based
+
+    if (len < 0 || start < 1)
+    {
+        args.clear();
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    std::string s = args.pop_string();
+
+    auto positions = detail::calc_utf8_byte_positions(s);
+
+    start -= 1; // convert to 0-based start position
+
+    if (std::size_t(start) >= positions.size())
+    {
+        args.push_string(std::string{});
+        return;
+    }
+
+    std::size_t skip_front = positions[start];
+    std::size_t skip_back = 0;
+
+    int max_length = positions.size() - start;
+    if (len < max_length)
+        skip_back = s.size() - positions[start + len];
+
+    auto it_head = s.cbegin() + skip_front;
+    auto it_end = s.cend() - skip_back;
+
+    std::string truncated;
+    std::copy(it_head, it_end, std::back_inserter(truncated));
+    args.push_string(truncated);
 }
 
 void formula_functions::fnc_concatenate(formula_value_stack& args) const

@@ -91,6 +91,7 @@ private:
     void fnc_concatenate(formula_value_stack& args) const;
     void fnc_left(formula_value_stack& args) const;
     void fnc_len(formula_value_stack& args) const;
+    void fnc_mid(formula_value_stack& args) const;
     void fnc_right(formula_value_stack& args) const;
 
     // category: date & time

@@ -1,0 +1,28 @@
+%mode init
+A1@ABCDE
+A2:12345
+B1=MID(A1,1,5)
+B2=MID(A1,1,6)
+B3=MID(A1,2,3)
+B4=MID(A1,3,3)
+B5=MID(A1,3,0)
+B6=MID(A1,0,1)
+B7=MID(A1,10,2)
+C1=MID(A2,1,5)
+C2=MID(A2,1,6)
+C3=MID(A2,2,3)
+C4=MID(A2,5,10)
+%calc
+%mode result
+B1="ABCDE"
+B2="ABCDE"
+B3="BCD"
+B4="CDE"
+B5=""
+B6=#VALUE!
+B7=""
+C1="12345"
+C2="12345"
+C3="234"
+C4="5"
+%check
