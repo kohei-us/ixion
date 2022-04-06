@@ -31,6 +31,7 @@
 #include <chrono>
 #include <cmath>
 #include <optional>
+#include <iterator>
 
 #include <mdds/sorted_string_map.hpp>
 
@@ -659,6 +660,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_sum:
             fnc_sum(args);
+            break;
+        case formula_function_t::func_trim:
+            fnc_trim(args);
             break;
         case formula_function_t::func_true:
             fnc_true(args);
@@ -1608,6 +1612,52 @@ void formula_functions::fnc_right(formula_value_stack& args) const
     }
 
     args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_trim(formula_value_stack& args) const
+{
+    if (args.size() != 1u)
+        throw formula_functions::invalid_arg("TRIM takes exactly one argument.");
+
+    std::string s = args.pop_string();
+    const char* p = s.data();
+    const char* p_end = p + s.size();
+    const char* p_head = nullptr;
+
+    std::vector<std::string> tokens;
+
+    for (; p != p_end; ++p)
+    {
+        if (*p == ' ')
+        {
+            if (p_head)
+            {
+                tokens.emplace_back(p_head, std::distance(p_head, p));
+                p_head = nullptr;
+            }
+
+            continue;
+        }
+
+        if (!p_head)
+            // keep track of the head of each token.
+            p_head = p;
+    }
+
+    if (p_head)
+        tokens.emplace_back(p_head, std::distance(p_head, p));
+
+    if (tokens.empty())
+    {
+        args.push_string(std::string{});
+        return;
+    }
+
+    std::ostringstream os;
+    std::copy(tokens.cbegin(), std::prev(tokens.cend()), std::ostream_iterator<std::string>(os, " "));
+    os << tokens.back();
+
+    args.push_string(os.str());
 }
 
 void formula_functions::fnc_now(formula_value_stack& args) const

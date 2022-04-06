@@ -829,7 +829,12 @@ transpose:
 trend:
   implemented: false
 trim:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: string
 trimmean:
   implemented: false
 'true':

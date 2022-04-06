@@ -1,0 +1,21 @@
+%mode init
+A1=TRIM("one two three")
+A2=TRIM(" one two  three")
+A3=TRIM("  one  two three  ")
+A4=TRIM("A")
+A5=TRIM("A B")
+A6=TRIM("")
+A7=TRIM(12345)
+B1@    日本    韓国  中国
+B2=TRIM(B1)
+%calc
+%mode result
+A1="one two three"
+A2="one two three"
+A3="one two three"
+A4="A"
+A5="A B"
+A6=""
+A7="12345"
+B2="日本 韓国 中国"
+%check

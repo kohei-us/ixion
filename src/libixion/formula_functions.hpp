@@ -93,6 +93,7 @@ private:
     void fnc_len(formula_value_stack& args) const;
     void fnc_mid(formula_value_stack& args) const;
     void fnc_right(formula_value_stack& args) const;
+    void fnc_trim(formula_value_stack& args) const;
 
     // category: date & time
     void fnc_now(formula_value_stack& args) const;
