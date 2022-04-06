@@ -1,0 +1,74 @@
+%% Test case for T() function.
+%mode init
+A1@text value
+A2:12345
+A3:true
+A4:false
+A5=CONCATENATE("text"," in ","formula")
+A8=1/2
+A9=TRUE()
+A10=FALSE()
+B1=T(A1)
+B2=T(A2)
+B3=T(A3)
+B4=T(A4)
+B5=T(A5)
+B6=T(A6)
+B7=T("inline")
+B8=T(A8)
+B9=T(A9)
+B10=T(A10)
+C1=ISTEXT(B1)
+C2=ISTEXT(B2)
+C3=ISTEXT(B3)
+C4=ISTEXT(B4)
+C5=ISTEXT(B5)
+C6=ISTEXT(B6)
+C7=ISTEXT(B7)
+C8=ISTEXT(B8)
+C9=ISTEXT(B9)
+C10=ISTEXT(B10)
+D1=LEN(B1)
+D2=LEN(B2)
+D3=LEN(B3)
+D4=LEN(B4)
+D5=LEN(B5)
+D6=LEN(B6)
+D7=LEN(B7)
+D8=LEN(B8)
+D9=LEN(B9)
+D10=LEN(B10)
+%calc
+%mode result
+B1="text value"
+B2=""
+B3=""
+B4=""
+B5="text in formula"
+B6=""
+B7="inline"
+B8=""
+B9=""
+B10=""
+C1=true
+C2=true
+C3=true
+C4=true
+C5=true
+C6=true
+C7=true
+C8=true
+C9=true
+C10=true
+D1=10
+D2=0
+D3=0
+D4=0
+D5=15
+D6=0
+D7=6
+D8=0
+D9=0
+D10=0
+%check
+

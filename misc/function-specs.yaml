@@ -810,7 +810,12 @@ switch:
 syd:
   implemented: false
 t:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 1
+    min: 1
+  return: string
 tan:
   implemented: false
 tanh:

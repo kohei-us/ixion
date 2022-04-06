@@ -664,6 +664,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_sum:
             fnc_sum(args);
             break;
+        case formula_function_t::func_t:
+            fnc_t(args);
+            break;
         case formula_function_t::func_trim:
             fnc_trim(args);
             break;
@@ -1636,6 +1639,38 @@ void formula_functions::fnc_right(formula_value_stack& args) const
     }
 
     args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_t(formula_value_stack& args) const
+{
+    if (args.size() != 1u)
+        throw formula_functions::invalid_arg("T takes exactly one argument.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::string:
+            // Do nothing and reuse the string value as the return value.
+            break;
+        case stack_value_t::single_ref:
+        case stack_value_t::range_ref:
+        {
+            auto addr = args.pop_single_ref();
+            auto ca = m_context.get_cell_access(addr);
+
+            std::string s;
+
+            if (ca.get_value_type() == cell_value_t::string)
+                s = ca.get_string_value();
+
+            args.push_string(std::move(s));
+            break;
+        }
+        default:
+        {
+            args.pop_back();
+            args.push_string(std::string{});
+        }
+    }
 }
 
 void formula_functions::fnc_trim(formula_value_stack& args) const
