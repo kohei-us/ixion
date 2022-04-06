@@ -640,6 +640,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_pi:
             fnc_pi(args);
             break;
+        case formula_function_t::func_rept:
+            fnc_rept(args);
+            break;
         case formula_function_t::func_right:
             fnc_right(args);
             break;
@@ -1569,6 +1572,27 @@ void formula_functions::fnc_left(formula_value_stack& args) const
         s.resize(positions[n]);
 
     args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_rept(formula_value_stack& args) const
+{
+    if (args.size() != 2u)
+        throw formula_functions::invalid_arg("REPT requires 2 arguments.");
+
+    int count = args.pop_value();
+    if (count < 0)
+    {
+        args.clear();
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    std::string s = args.pop_string();
+    std::ostringstream os;
+    for (int i = 0; i < count; ++i)
+        os << s;
+
+    args.push_string(os.str());
 }
 
 void formula_functions::fnc_right(formula_value_stack& args) const

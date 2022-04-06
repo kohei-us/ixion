@@ -1,0 +1,19 @@
+%mode init
+A1=REPT("a", 0)
+A2=REPT("a", 1)
+A3=REPT("a", 2)
+A4=REPT("a", 3)
+A5=REPT("a", -1)
+B1=REPT("<->", 5)
+B2=REPT(RIGHT("abcdef", 3), 2)
+%calc
+%mode result
+A1=""
+A2="a"
+A3="aa"
+A4="aaa"
+A5=#VALUE!
+B1="<-><-><-><-><->"
+B2="defdef"
+%check
+

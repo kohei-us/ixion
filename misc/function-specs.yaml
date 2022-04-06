@@ -674,7 +674,12 @@ replace:
 replaceb:
   implemented: false
 rept:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 2
+    min: 2
+  return: string
 right:
   category: text
   implemented: true
