@@ -89,6 +89,7 @@ private:
 
     // category: text
     void fnc_concatenate(formula_value_stack& args) const;
+    void fnc_exact(formula_value_stack& args) const;
     void fnc_left(formula_value_stack& args) const;
     void fnc_len(formula_value_stack& args) const;
     void fnc_mid(formula_value_stack& args) const;

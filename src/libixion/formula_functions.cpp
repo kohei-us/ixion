@@ -562,6 +562,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_countblank:
             fnc_countblank(args);
             break;
+        case formula_function_t::func_exact:
+            fnc_exact(args);
+            break;
         case formula_function_t::func_false:
             fnc_false(args);
             break;
@@ -1547,6 +1550,17 @@ void formula_functions::fnc_concatenate(formula_value_stack& args) const
     while (!args.empty())
         s = args.pop_string() + s;
     args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_exact(formula_value_stack& args) const
+{
+    if (args.size() != 2u)
+        throw formula_functions::invalid_arg("EXACT requires exactly 2 arguments.");
+
+    std::string right = args.pop_string();
+    std::string left = args.pop_string();
+
+    return args.push_boolean(right == left);
 }
 
 void formula_functions::fnc_left(formula_value_stack& args) const

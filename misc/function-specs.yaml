@@ -246,7 +246,12 @@ euroconvert:
 even:
   implemented: false
 exact:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 2
+    min: 2
+  return: string
 exp:
   implemented: false
 expondist:

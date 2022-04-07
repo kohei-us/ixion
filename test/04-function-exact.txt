@@ -1,0 +1,16 @@
+%mode init
+A1=EXACT("aaa", "aaa")
+A2=EXACT("AaA", "aAa")
+A3=EXACT(1234, 1234)
+A4=EXACT(1234, "1234")
+B1@salvation
+B2="salvation"
+B3=EXACT(B1, B2)
+%calc
+%mode result
+A1=true
+A2=false
+A3=true
+A4=true
+B3=true
+%check
