@@ -74,7 +74,21 @@ void session_handler::end_cell_interpret()
 
 void session_handler::set_result(const formula_result& result)
 {
-    mp_impl->m_buf << endl << mp_impl->m_cell_name << ": result = " << result.str(mp_impl->m_context) << endl;
+    mp_impl->m_buf << std::endl << mp_impl->m_cell_name << ": result = ";
+
+    switch (result.get_type())
+    {
+        case formula_result::result_type::string:
+        {
+            constexpr char quote = '\'';
+            mp_impl->m_buf << quote << result.str(mp_impl->m_context) << quote;
+            break;
+        }
+        default:
+            mp_impl->m_buf << result.str(mp_impl->m_context);
+    }
+
+    mp_impl->m_buf << " [" << result.get_type() << ']' << std::endl;
 }
 
 void session_handler::set_invalid_expression(std::string_view msg)
