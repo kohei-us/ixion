@@ -276,6 +276,7 @@ find:
     max: 3
     min: 2
   return: string
+  note: This function performs a case-sensitive search.
 findb:
   implemented: false
 finv:
