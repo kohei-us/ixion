@@ -1,0 +1,35 @@
+%mode init
+A1@ABCDEFGABC
+A2=FIND("ABC",A1)
+A3=FIND("ABC",A1,2)
+A4=FIND("Z",A1)
+A5=FIND("BC",A1,100)
+A6=FIND("BC",A1, 2.9)
+A7=FIND("BC",A1, 3.9)
+B1@かささぎの渡せる橋におく霜の白きを見れば夜ぞふけにける
+B2=FIND("かささぎ",B1)
+B3=FIND("渡せる橋",B1)
+B4=FIND("ふけにける",B1)
+C1@ダミー文章。ダミー文章。
+C2=FIND("ミー",C1)
+C3=FIND("ミー",C1,2)
+C4=FIND("ミー",C1,3)
+C5=FIND("ミー",C1,8)
+C6=FIND("ミー",C1,9)
+%calc
+%mode result
+A2=1
+A3=8
+A4=#VALUE!
+A5=#VALUE!
+A6=2
+A7=9
+B2=1
+B3=6
+B4=23
+C2=2
+C3=2
+C4=8
+C5=8
+C6=#VALUE!
+%check

@@ -270,7 +270,12 @@ fdist:
 filterxml:
   implemented: false
 find:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 3
+    min: 2
+  return: string
 findb:
   implemented: false
 finv:

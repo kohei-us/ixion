@@ -568,6 +568,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_false:
             fnc_false(args);
             break;
+        case formula_function_t::func_find:
+            fnc_find(args);
+            break;
         case formula_function_t::func_if:
             fnc_if(args);
             break;
@@ -1561,6 +1564,58 @@ void formula_functions::fnc_exact(formula_value_stack& args) const
     std::string left = args.pop_string();
 
     return args.push_boolean(right == left);
+}
+
+void formula_functions::fnc_find(formula_value_stack& args) const
+{
+    if (args.size() < 2u || args.size() > 3u)
+        throw formula_functions::invalid_arg("FIND requires at least 2 and no more than 3 arguments.");
+
+    int start_pos = 0;
+    if (args.size() == 3u)
+        start_pos = std::floor(args.pop_value()) - 1; // to 0-based
+
+    if (start_pos < 0)
+    {
+        args.clear();
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    std::string content = args.pop_string();
+    std::string part = args.pop_string();
+
+    auto positions = detail::calc_utf8_byte_positions(content);
+
+    // convert the logical utf-8 start position to a corresponding byte start position
+
+    if (std::size_t(start_pos) >= positions.size())
+    {
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    start_pos = positions[start_pos];
+    std::size_t pos = content.find(part, start_pos);
+
+    if (pos == std::string::npos)
+    {
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    // convert the byte position to a logical utf-8 character position.
+    auto it = std::lower_bound(positions.begin(), positions.end(), pos);
+
+    if (it == positions.end() || *it != pos)
+    {
+        // perhaps invalid utf-8 string...
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    pos = std::distance(positions.begin(), it);
+    args.push_value(pos + 1); // back to 1-based
 }
 
 void formula_functions::fnc_left(formula_value_stack& args) const
