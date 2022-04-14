@@ -1233,16 +1233,27 @@ void formula_functions::fnc_iserror(formula_value_stack& args) const
     if (args.size() != 1)
         throw formula_functions::invalid_arg("ISERROR requires exactly one argument.");
 
-    if (args.get_type() != stack_value_t::single_ref)
+    switch (args.get_type())
     {
-        args.clear();
-        args.push_boolean(false);
-        return;
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            bool res = m_context.get_cell_value_type(addr) == cell_value_t::error;
+            args.push_boolean(res);
+            break;
+        }
+        case stack_value_t::error:
+        {
+            args.clear();
+            args.push_boolean(true);
+            break;
+        }
+        default:
+        {
+            args.clear();
+            args.push_boolean(false);
+        }
     }
-
-    abs_address_t addr = args.pop_single_ref();
-    bool res = m_context.get_cell_value_type(addr) == cell_value_t::error;
-    args.push_boolean(res);
 }
 
 void formula_functions::fnc_iseven(formula_value_stack& args) const

@@ -10,6 +10,7 @@ B3=ISERROR(A3)
 B4=ISERROR(A4)
 C4=ISERROR(5.2)
 C5=ISERROR("inline text")
+C6=ISERROR(NA())
 %calc
 %mode result
 B1=false
@@ -18,5 +19,6 @@ B3=true
 B4=true
 C4=false
 C5=false
+C6=true
 %check
 
