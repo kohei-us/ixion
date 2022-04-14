@@ -7,6 +7,7 @@ B3=REPLACE(B1,100,100,"でもうるさい。")
 B4=REPLACE(B1,1,0,"我が")
 B5=REPLACE(B1,-1,0,"foo")
 B6=REPLACE(B1,1,-1,"foo")
+B7=REPLACE(B1,FIND("犬",B1),1,"倉庫")
 %calc
 %mode result
 A2="My elephant is not big."
@@ -15,4 +16,5 @@ B3="家の犬は大きくない。でもうるさい。"
 B4="我が家の犬は大きくない。"
 B5=#VALUE!
 B6=#VALUE!
+B7="家の倉庫は大きくない。"
 %check
