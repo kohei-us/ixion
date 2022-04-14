@@ -646,6 +646,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_pi:
             fnc_pi(args);
             break;
+        case formula_function_t::func_replace:
+            fnc_replace(args);
+            break;
         case formula_function_t::func_rept:
             fnc_rept(args);
             break;
@@ -1644,6 +1647,47 @@ void formula_functions::fnc_left(formula_value_stack& args) const
         s.resize(positions[n]);
 
     args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_replace(formula_value_stack& args) const
+{
+    if (args.size() != 4u)
+        throw formula_functions::invalid_arg("REPLACE requires exactly 4 arguments.");
+
+    std::string new_text = args.pop_string();
+    int n_segment = std::floor(args.pop_value());
+    int pos_segment = std::floor(args.pop_value()) - 1; // to 0-based
+
+    if (n_segment < 0 || pos_segment < 0)
+    {
+        args.clear();
+        args.push_error(formula_error_t::invalid_value_type);
+        return;
+    }
+
+    std::string content = args.pop_string();
+
+    auto positions = detail::calc_utf8_byte_positions(content);
+
+    pos_segment = std::min<int>(pos_segment, positions.size());
+    n_segment = std::min<int>(n_segment, positions.size() - pos_segment);
+
+    // convert to its byte position.
+    std::size_t pos_bytes = std::size_t(pos_segment) < positions.size() ? positions[pos_segment] : content.size();
+
+    // copy the leading segment.
+    auto it = std::next(content.begin(), pos_bytes);
+    std::string content_new{content.begin(), it};
+
+    content_new += new_text;
+
+    // copy the trailing segment.
+    std::size_t pos_logical = pos_segment + n_segment;
+    pos_bytes = pos_logical < positions.size() ? positions[pos_logical] : content.size();
+    it = std::next(content.begin(), pos_bytes);
+    std::copy(it, content.end(), std::back_inserter(content_new));
+
+    args.push_string(content_new);
 }
 
 void formula_functions::fnc_rept(formula_value_stack& args) const

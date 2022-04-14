@@ -1,0 +1,18 @@
+%mode init
+A1@My dog is not big.
+A2=REPLACE(A1,4,3,"elephant")
+B1@家の犬は大きくない。
+B2=REPLACE(B1,3,1,"子猫")
+B3=REPLACE(B1,100,100,"でもうるさい。")
+B4=REPLACE(B1,1,0,"我が")
+B5=REPLACE(B1,-1,0,"foo")
+B6=REPLACE(B1,1,-1,"foo")
+%calc
+%mode result
+A2="My elephant is not big."
+B2="家の子猫は大きくない。"
+B3="家の犬は大きくない。でもうるさい。"
+B4="我が家の犬は大きくない。"
+B5=#VALUE!
+B6=#VALUE!
+%check

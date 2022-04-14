@@ -94,6 +94,7 @@ private:
     void fnc_left(formula_value_stack& args) const;
     void fnc_len(formula_value_stack& args) const;
     void fnc_mid(formula_value_stack& args) const;
+    void fnc_replace(formula_value_stack& args) const;
     void fnc_rept(formula_value_stack& args) const;
     void fnc_right(formula_value_stack& args) const;
     void fnc_t(formula_value_stack& args) const;

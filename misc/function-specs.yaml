@@ -681,7 +681,12 @@ rawsubtract:
 regex:
   implemented: false
 replace:
-  implemented: false
+  cateogory: text
+  implemented: true
+  params:
+    max: 4
+    min: 4
+  return: string
 replaceb:
   implemented: false
 rept:
