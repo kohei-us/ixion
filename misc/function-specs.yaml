@@ -793,7 +793,13 @@ steyx:
 style:
   implemented: false
 substitute:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: 4
+    min: 3
+  return: string
+  note: This function is case-sensitive.
 subtotal:
   category: mathematical
   implemented: true

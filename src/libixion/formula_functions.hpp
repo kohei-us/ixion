@@ -97,6 +97,7 @@ private:
     void fnc_replace(formula_value_stack& args) const;
     void fnc_rept(formula_value_stack& args) const;
     void fnc_right(formula_value_stack& args) const;
+    void fnc_substitute(formula_value_stack& args) const;
     void fnc_t(formula_value_stack& args) const;
     void fnc_trim(formula_value_stack& args) const;
 

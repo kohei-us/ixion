@@ -667,6 +667,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_sheets:
             fnc_sheets(args);
             break;
+        case formula_function_t::func_substitute:
+            fnc_substitute(args);
+            break;
         case formula_function_t::func_subtotal:
             fnc_subtotal(args);
             break;
@@ -1763,6 +1766,57 @@ void formula_functions::fnc_right(formula_value_stack& args) const
     }
 
     args.push_string(std::move(s));
+}
+
+void formula_functions::fnc_substitute(formula_value_stack& args) const
+{
+    if (args.size() < 3 || args.size() > 4)
+        throw formula_functions::invalid_arg(
+            "SUBSTITUTE requires at least 3 arguments but no more than 4.");
+
+    constexpr int replace_all = -1;
+    int which = replace_all;
+
+    if (args.size() == 4)
+    {
+        // explicit which value provided.
+        which = std::floor(args.pop_value());
+
+        if (which < 1)
+        {
+            args.clear();
+            args.push_error(formula_error_t::invalid_value_type);
+            return;
+        }
+    }
+
+    const std::string text_new = args.pop_string();
+    const std::string text_old = args.pop_string();
+    const std::string content = args.pop_string();
+    std::string content_new;
+
+    std::size_t pos = 0;
+    int which_found = 0;
+
+    while (true)
+    {
+        std::size_t found_pos = content.find(text_old, pos);
+        if (found_pos == std::string::npos)
+        {
+            // Copy the rest of the string to the new buffer and exit.
+            content_new.append(content, pos, std::string::npos);
+            break;
+        }
+
+        ++which_found;
+        bool replace_this = which_found == which || which == replace_all;
+        content_new.append(content, pos, found_pos - pos);
+        content_new.append(replace_this ? text_new : text_old);
+        pos = found_pos + text_old.size();
+    }
+
+    args.clear();
+    args.push_string(std::move(content_new));
 }
 
 void formula_functions::fnc_t(formula_value_stack& args) const

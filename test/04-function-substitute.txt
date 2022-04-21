@@ -1,0 +1,34 @@
+%mode init
+A1=SUBSTITUTE("I like my dogs.","dog","cat")
+A2=SUBSTITUTE("dog dog dog","dog","cat", 1)
+A3=SUBSTITUTE("dog dog dog","dog","cat", 2)
+A4=SUBSTITUTE("dog dog dog","dog","cat", 3)
+A5=SUBSTITUTE("dog dog dog","dog","cat", 4)
+A6=SUBSTITUTE("dog dog dog","dog","cat")
+A7=SUBSTITUTE("dogdogdog","dog","cat")
+A8=SUBSTITUTE("Dog and dog","dog","bird")
+A9=SUBSTITUTE("t","a","b",0)
+A10=SUBSTITUTE(111101,1,8)
+A11=SUBSTITUTE(111101,1,8,3)
+A12=SUBSTITUTE("いちにいちにいちに","いち","壱")
+A13=SUBSTITUTE("いちにいちにいちに","いち","壱",1)
+A14=SUBSTITUTE("いちにいちにいちに","いち","壱",2)
+A15=SUBSTITUTE("いちにいちにいちに","いち","壱",3)
+%calc
+%mode result
+A1="I like my cats."
+A2="cat dog dog"
+A3="dog cat dog"
+A4="dog dog cat"
+A5="dog dog dog"
+A6="cat cat cat"
+A7="catcatcat"
+A8="Dog and bird"
+A9=#VALUE!
+A10="888808"
+A11="118101"
+A12="壱に壱に壱に"
+A13="壱にいちにいちに"
+A14="いちに壱にいちに"
+A15="いちにいちに壱に"
+%check
