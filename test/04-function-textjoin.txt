@@ -1,0 +1,30 @@
+%mode init
+A1@A
+A2@C
+A3:2.3
+A4:true
+A5=21/3
+B1@B
+B2="D"
+B10=REPT("Z",2)
+C1=TEXTJOIN(", ",0,A1:B2)
+C2=TEXTJOIN(", ",0,A1:A2,B1:B2)
+C3=TEXTJOIN(", ",0,A1:B1,A2:B2)
+C4=TEXTJOIN(":",0,A1,B2,A2,B1,A1)
+C5=TEXTJOIN(":",0,A1:A4)
+C6=TEXTJOIN(",",0,B1:B10)
+C7=TEXTJOIN(",",1,B1:B10)
+C8=TEXTJOIN("@",1,A1:A5)
+%calc
+%mode result
+C1="A, B, C, D"
+C2="A, C, B, D"
+C3="A, B, C, D"
+C4="A:D:C:B:A"
+C5="A:C:2.3:true"
+C6="B,D,,,,,,,,ZZ"
+C7="B,D,ZZ"
+C8="A@C@2.3@true@7"
+%check
+
+

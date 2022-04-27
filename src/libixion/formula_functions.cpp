@@ -15,6 +15,7 @@
 #include <ixion/formula_result.hpp>
 #include <ixion/matrix.hpp>
 #include <ixion/macros.hpp>
+#include <ixion/model_iterator.hpp>
 #include <ixion/cell_access.hpp>
 
 #ifdef max
@@ -678,6 +679,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             break;
         case formula_function_t::func_t:
             fnc_t(args);
+            break;
+        case formula_function_t::func_textjoin:
+            fnc_textjoin(args);
             break;
         case formula_function_t::func_trim:
             fnc_trim(args);
@@ -1849,6 +1853,92 @@ void formula_functions::fnc_t(formula_value_stack& args) const
             args.push_string(std::string{});
         }
     }
+}
+
+void formula_functions::fnc_textjoin(formula_value_stack& args) const
+{
+    if (args.size() < 3u)
+        throw formula_functions::invalid_arg("TEXTJOIN requires at least 3 arguments.");
+
+    std::deque<abs_range_t> ranges;
+
+    while (args.size() > 2u)
+        ranges.push_front(args.pop_range_ref());
+
+    bool skip_empty = args.pop_boolean();
+    std::string delim = args.pop_string();
+    std::vector<std::string> tokens;
+
+    for (const abs_range_t& range : ranges)
+    {
+        for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
+        {
+            model_iterator miter = m_context.get_model_iterator(sheet, rc_direction_t::horizontal, range);
+
+            for (; miter.has(); miter.next())
+            {
+                auto& cell = miter.get();
+
+                switch (cell.type)
+                {
+                    case celltype_t::string:
+                    {
+                        auto sid = std::get<string_id_t>(cell.value);
+                        const std::string* s = m_context.get_string(sid);
+                        assert(s);
+                        tokens.emplace_back(*s);
+                        break;
+                    }
+                    case celltype_t::numeric:
+                    {
+                        std::ostringstream os;
+                        os << std::get<double>(cell.value);
+                        tokens.emplace_back(os.str());
+                        break;
+                    }
+                    case celltype_t::boolean:
+                    {
+                        std::ostringstream os;
+                        os << std::boolalpha << std::get<bool>(cell.value);
+                        tokens.emplace_back(os.str());
+                        break;
+                    }
+                    case celltype_t::formula:
+                    {
+                        const auto* fc = std::get<const formula_cell*>(cell.value);
+                        formula_result res = fc->get_result_cache(m_context.get_formula_result_wait_policy());
+                        tokens.emplace_back(res.str(m_context));
+                        break;
+                    }
+                    case celltype_t::empty:
+                    {
+                        if (!skip_empty)
+                            tokens.emplace_back();
+                        break;
+                    }
+                    case celltype_t::unknown:
+                        // logic error - this should never happen!
+                        throw formula_error(formula_error_t::no_result_error);
+                }
+            }
+        }
+    }
+
+    if (tokens.empty())
+    {
+        args.push_string(std::string{});
+        return;
+    }
+
+    std::string result = std::move(tokens.front());
+
+    for (auto it = std::next(tokens.begin()); it != tokens.end(); ++it)
+    {
+        result.append(delim);
+        result.append(*it);
+    }
+
+    args.push_string(std::move(result));
 }
 
 void formula_functions::fnc_trim(formula_value_stack& args) const

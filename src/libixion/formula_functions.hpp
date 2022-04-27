@@ -99,6 +99,7 @@ private:
     void fnc_right(formula_value_stack& args) const;
     void fnc_substitute(formula_value_stack& args) const;
     void fnc_t(formula_value_stack& args) const;
+    void fnc_textjoin(formula_value_stack& args) const;
     void fnc_trim(formula_value_stack& args) const;
 
     // category: date & time

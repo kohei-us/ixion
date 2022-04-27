@@ -847,7 +847,12 @@ tdist:
 text:
   implemented: false
 textjoin:
-  implemented: false
+  category: text
+  implemented: true
+  params:
+    max: null
+    min: 3
+  return: string
 time:
   implemented: false
 timevalue:
