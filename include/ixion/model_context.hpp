@@ -405,8 +405,7 @@ public:
      * content does not change for the duration of the iteration.</i>
      *
      * @param sheet sheet index.
-     * @param dir direction of the iteration.  Currently, only horizontal
-     *            direction is supported.
+     * @param dir direction of the iteration.
      * @param range range on the specified sheet to iterate over.
      *
      * @return model iterator instance.
