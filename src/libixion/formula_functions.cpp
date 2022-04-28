@@ -534,179 +534,193 @@ formula_functions::~formula_functions()
 
 void formula_functions::interpret(formula_function_t oc, formula_value_stack& args)
 {
-    switch (oc)
+    try
     {
-        case formula_function_t::func_abs:
-            fnc_abs(args);
-            break;
-        case formula_function_t::func_and:
-            fnc_and(args);
-            break;
-        case formula_function_t::func_average:
-            fnc_average(args);
-            break;
-        case formula_function_t::func_column:
-            fnc_column(args);
-            break;
-        case formula_function_t::func_columns:
-            fnc_columns(args);
-            break;
-        case formula_function_t::func_concatenate:
-            fnc_concatenate(args);
-            break;
-        case formula_function_t::func_count:
-            fnc_count(args);
-            break;
-        case formula_function_t::func_counta:
-            fnc_counta(args);
-            break;
-        case formula_function_t::func_countblank:
-            fnc_countblank(args);
-            break;
-        case formula_function_t::func_exact:
-            fnc_exact(args);
-            break;
-        case formula_function_t::func_false:
-            fnc_false(args);
-            break;
-        case formula_function_t::func_find:
-            fnc_find(args);
-            break;
-        case formula_function_t::func_if:
-            fnc_if(args);
-            break;
-        case formula_function_t::func_isblank:
-            fnc_isblank(args);
-            break;
-        case formula_function_t::func_iserror:
-            fnc_iserror(args);
-            break;
-        case formula_function_t::func_iseven:
-            fnc_iseven(args);
-            break;
-        case formula_function_t::func_isformula:
-            fnc_isformula(args);
-            break;
-        case formula_function_t::func_islogical:
-            fnc_islogical(args);
-            break;
-        case formula_function_t::func_isna:
-            fnc_isna(args);
-            break;
-        case formula_function_t::func_isnontext:
-            fnc_isnontext(args);
-            break;
-        case formula_function_t::func_isnumber:
-            fnc_isnumber(args);
-            break;
-        case formula_function_t::func_isodd:
-            fnc_isodd(args);
-            break;
-        case formula_function_t::func_isref:
-            fnc_isref(args);
-            break;
-        case formula_function_t::func_istext:
-            fnc_istext(args);
-            break;
-        case formula_function_t::func_int:
-            fnc_int(args);
-            break;
-        case formula_function_t::func_left:
-            fnc_left(args);
-            break;
-        case formula_function_t::func_len:
-            fnc_len(args);
-            break;
-        case formula_function_t::func_max:
-            fnc_max(args);
-            break;
-        case formula_function_t::func_median:
-            fnc_median(args);
-            break;
-        case formula_function_t::func_mid:
-            fnc_mid(args);
-            break;
-        case formula_function_t::func_min:
-            fnc_min(args);
-            break;
-        case formula_function_t::func_mmult:
-            fnc_mmult(args);
-            break;
-        case formula_function_t::func_n:
-            fnc_n(args);
-            break;
-        case formula_function_t::func_na:
-            fnc_na(args);
-            break;
-        case formula_function_t::func_not:
-            fnc_not(args);
-            break;
-        case formula_function_t::func_now:
-            fnc_now(args);
-            break;
-        case formula_function_t::func_or:
-            fnc_or(args);
-            break;
-        case formula_function_t::func_pi:
-            fnc_pi(args);
-            break;
-        case formula_function_t::func_replace:
-            fnc_replace(args);
-            break;
-        case formula_function_t::func_rept:
-            fnc_rept(args);
-            break;
-        case formula_function_t::func_right:
-            fnc_right(args);
-            break;
-        case formula_function_t::func_row:
-            fnc_row(args);
-            break;
-        case formula_function_t::func_rows:
-            fnc_rows(args);
-            break;
-        case formula_function_t::func_sheet:
-            fnc_sheet(args);
-            break;
-        case formula_function_t::func_sheets:
-            fnc_sheets(args);
-            break;
-        case formula_function_t::func_substitute:
-            fnc_substitute(args);
-            break;
-        case formula_function_t::func_subtotal:
-            fnc_subtotal(args);
-            break;
-        case formula_function_t::func_sum:
-            fnc_sum(args);
-            break;
-        case formula_function_t::func_t:
-            fnc_t(args);
-            break;
-        case formula_function_t::func_textjoin:
-            fnc_textjoin(args);
-            break;
-        case formula_function_t::func_trim:
-            fnc_trim(args);
-            break;
-        case formula_function_t::func_true:
-            fnc_true(args);
-            break;
-        case formula_function_t::func_type:
-            fnc_type(args);
-            break;
-        case formula_function_t::func_wait:
-            fnc_wait(args);
-            break;
-        case formula_function_t::func_unknown:
-        default:
+        switch (oc)
         {
-            std::ostringstream os;
-            os << "formula function not implemented yet (name="
-                << get_formula_function_name(oc)
-                << ")";
-            throw not_implemented_error(os.str());
+            case formula_function_t::func_abs:
+                fnc_abs(args);
+                break;
+            case formula_function_t::func_and:
+                fnc_and(args);
+                break;
+            case formula_function_t::func_average:
+                fnc_average(args);
+                break;
+            case formula_function_t::func_column:
+                fnc_column(args);
+                break;
+            case formula_function_t::func_columns:
+                fnc_columns(args);
+                break;
+            case formula_function_t::func_concatenate:
+                fnc_concatenate(args);
+                break;
+            case formula_function_t::func_count:
+                fnc_count(args);
+                break;
+            case formula_function_t::func_counta:
+                fnc_counta(args);
+                break;
+            case formula_function_t::func_countblank:
+                fnc_countblank(args);
+                break;
+            case formula_function_t::func_exact:
+                fnc_exact(args);
+                break;
+            case formula_function_t::func_false:
+                fnc_false(args);
+                break;
+            case formula_function_t::func_find:
+                fnc_find(args);
+                break;
+            case formula_function_t::func_if:
+                fnc_if(args);
+                break;
+            case formula_function_t::func_isblank:
+                fnc_isblank(args);
+                break;
+            case formula_function_t::func_iserror:
+                fnc_iserror(args);
+                break;
+            case formula_function_t::func_iseven:
+                fnc_iseven(args);
+                break;
+            case formula_function_t::func_isformula:
+                fnc_isformula(args);
+                break;
+            case formula_function_t::func_islogical:
+                fnc_islogical(args);
+                break;
+            case formula_function_t::func_isna:
+                fnc_isna(args);
+                break;
+            case formula_function_t::func_isnontext:
+                fnc_isnontext(args);
+                break;
+            case formula_function_t::func_isnumber:
+                fnc_isnumber(args);
+                break;
+            case formula_function_t::func_isodd:
+                fnc_isodd(args);
+                break;
+            case formula_function_t::func_isref:
+                fnc_isref(args);
+                break;
+            case formula_function_t::func_istext:
+                fnc_istext(args);
+                break;
+            case formula_function_t::func_int:
+                fnc_int(args);
+                break;
+            case formula_function_t::func_left:
+                fnc_left(args);
+                break;
+            case formula_function_t::func_len:
+                fnc_len(args);
+                break;
+            case formula_function_t::func_max:
+                fnc_max(args);
+                break;
+            case formula_function_t::func_median:
+                fnc_median(args);
+                break;
+            case formula_function_t::func_mid:
+                fnc_mid(args);
+                break;
+            case formula_function_t::func_min:
+                fnc_min(args);
+                break;
+            case formula_function_t::func_mmult:
+                fnc_mmult(args);
+                break;
+            case formula_function_t::func_n:
+                fnc_n(args);
+                break;
+            case formula_function_t::func_na:
+                fnc_na(args);
+                break;
+            case formula_function_t::func_not:
+                fnc_not(args);
+                break;
+            case formula_function_t::func_now:
+                fnc_now(args);
+                break;
+            case formula_function_t::func_or:
+                fnc_or(args);
+                break;
+            case formula_function_t::func_pi:
+                fnc_pi(args);
+                break;
+            case formula_function_t::func_replace:
+                fnc_replace(args);
+                break;
+            case formula_function_t::func_rept:
+                fnc_rept(args);
+                break;
+            case formula_function_t::func_right:
+                fnc_right(args);
+                break;
+            case formula_function_t::func_row:
+                fnc_row(args);
+                break;
+            case formula_function_t::func_rows:
+                fnc_rows(args);
+                break;
+            case formula_function_t::func_sheet:
+                fnc_sheet(args);
+                break;
+            case formula_function_t::func_sheets:
+                fnc_sheets(args);
+                break;
+            case formula_function_t::func_substitute:
+                fnc_substitute(args);
+                break;
+            case formula_function_t::func_subtotal:
+                fnc_subtotal(args);
+                break;
+            case formula_function_t::func_sum:
+                fnc_sum(args);
+                break;
+            case formula_function_t::func_t:
+                fnc_t(args);
+                break;
+            case formula_function_t::func_textjoin:
+                fnc_textjoin(args);
+                break;
+            case formula_function_t::func_trim:
+                fnc_trim(args);
+                break;
+            case formula_function_t::func_true:
+                fnc_true(args);
+                break;
+            case formula_function_t::func_type:
+                fnc_type(args);
+                break;
+            case formula_function_t::func_wait:
+                fnc_wait(args);
+                break;
+            case formula_function_t::func_unknown:
+            default:
+            {
+                std::ostringstream os;
+                os << "formula function not implemented yet (name="
+                    << get_formula_function_name(oc)
+                    << ")";
+                throw not_implemented_error(os.str());
+            }
         }
+    }
+    catch (const formula_error& e)
+    {
+        using t = std::underlying_type<formula_error_t>::type;
+        formula_error_t err = e.get_error();
+        if (static_cast<t>(err) >= 200u)
+            // re-throw if it's an internal error.
+            throw;
+
+        args.clear();
+        args.push_error(err);
     }
 }
 
