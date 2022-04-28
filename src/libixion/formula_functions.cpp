@@ -45,7 +45,7 @@ namespace builtin_funcs {
 typedef mdds::sorted_string_map<formula_function_t> map_type;
 
 // Keys must be sorted.
-const std::vector<map_type::entry> entries =
+constexpr map_type::entry entries[] =
 {
     { IXION_ASCII("ABS"), formula_function_t::func_abs },
     { IXION_ASCII("ACOS"), formula_function_t::func_acos },
@@ -374,7 +374,7 @@ const std::vector<map_type::entry> entries =
 
 const map_type& get()
 {
-    static map_type mt(entries.data(), entries.size(), formula_function_t::func_unknown);
+    static map_type mt(entries, std::size(entries), formula_function_t::func_unknown);
     return mt;
 }
 
