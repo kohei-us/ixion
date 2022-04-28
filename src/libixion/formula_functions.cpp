@@ -380,7 +380,7 @@ const map_type& get()
 
 } // builtin_funcs namespace
 
-std::string_view unknown_func_name = "unknown";
+constexpr std::string_view unknown_func_name = "unknown";
 
 /**
  * Traverse all elements of a passed matrix to sum up their values.
