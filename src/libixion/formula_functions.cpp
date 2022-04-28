@@ -620,6 +620,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
         case formula_function_t::func_max:
             fnc_max(args);
             break;
+        case formula_function_t::func_median:
+            fnc_median(args);
+            break;
         case formula_function_t::func_mid:
             fnc_mid(args);
             break;
@@ -720,6 +723,117 @@ void formula_functions::fnc_max(formula_value_stack& args) const
             ret = v;
     }
     args.push_value(ret);
+}
+
+void formula_functions::fnc_median(formula_value_stack& args) const
+{
+    if (args.empty())
+        throw formula_functions::invalid_arg("MEDIAN requires one or more arguments.");
+
+    std::vector<double> seq;
+
+    while (!args.empty())
+    {
+        switch (args.get_type())
+        {
+            case stack_value_t::boolean:
+            case stack_value_t::value:
+                seq.push_back(args.pop_value());
+                break;
+            case stack_value_t::single_ref:
+            {
+                abs_address_t addr = args.pop_single_ref();
+                auto ca = m_context.get_cell_access(addr);
+                switch (ca.get_value_type())
+                {
+                    case cell_value_t::boolean:
+                        seq.push_back(ca.get_boolean_value() ? 1.0 : 0.0);
+                        break;
+                    case cell_value_t::numeric:
+                        seq.push_back(ca.get_numeric_value());
+                        break;
+                    default:;
+                }
+                break;
+            }
+            case stack_value_t::range_ref:
+            {
+                const formula_result_wait_policy_t wait_policy = m_context.get_formula_result_wait_policy();
+                abs_range_t range = args.pop_range_ref();
+
+                column_block_callback_t cb = [&seq, wait_policy](
+                    col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
+                {
+                    assert(row1 <= row2);
+                    row_t length = row2 - row1 + 1;
+
+                    switch (node.type)
+                    {
+                        case column_block_t::boolean:
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
+                            auto func = [](bool b) { return b ? 1.0 : 0.0; };
+                            std::transform(blk_range.begin(), blk_range.end(), std::back_inserter(seq), func);
+                            break;
+                        }
+                        case column_block_t::numeric:
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
+                            std::copy(blk_range.begin(), blk_range.end(), std::back_inserter(seq));
+                            break;
+                        }
+                        case column_block_t::formula:
+                        {
+                            auto blk_range = detail::make_element_range<column_block_t::formula>{}(node, length);
+
+                            for (const formula_cell* fc : blk_range)
+                            {
+                                formula_result res = fc->get_result_cache(wait_policy);
+                                switch (res.get_type())
+                                {
+                                    case formula_result::result_type::boolean:
+                                        seq.push_back(res.get_boolean() ? 1.0 : 0.0);
+                                        break;
+                                    case formula_result::result_type::value:
+                                        seq.push_back(res.get_value());
+                                        break;
+                                    default:;
+                                }
+                            }
+
+                            break;
+                        }
+                        default:;
+                    }
+                    return true;
+                };
+
+                for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
+                    m_context.walk(sheet, range, cb);
+
+                break;
+            }
+            default:
+                args.pop_back();
+        }
+    }
+
+    std::size_t mid_pos = seq.size() / 2;
+
+    if (seq.size() & 0x01)
+    {
+        // odd number of values
+        auto it_mid = seq.begin() + mid_pos;
+        std::nth_element(seq.begin(), it_mid, seq.end());
+        args.push_value(seq[mid_pos]);
+    }
+    else
+    {
+        // even number of values.  Take the average of the two mid values.
+        std::sort(seq.begin(), seq.end());
+        double v = seq[mid_pos - 1] + seq[mid_pos];
+        args.push_value(v / 2.0);
+    }
 }
 
 void formula_functions::fnc_min(formula_value_stack& args) const

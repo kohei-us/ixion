@@ -54,6 +54,7 @@ private:
     void fnc_counta(formula_value_stack& args) const;
     void fnc_countblank(formula_value_stack& args) const;
     void fnc_max(formula_value_stack& args) const;
+    void fnc_median(formula_value_stack& args) const;
     void fnc_min(formula_value_stack& args) const;
     void fnc_pi(formula_value_stack& args) const;
 

@@ -523,7 +523,12 @@ maxifs:
 mdeterm:
   implemented: false
 median:
-  implemented: false
+  category: statistical
+  implemented: true
+  params:
+    max: null
+    min: 1
+  return: numeric
 mid:
   category: text
   implemented: true
