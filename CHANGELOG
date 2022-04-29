@@ -1,3 +1,56 @@
+ixion <next version>
+
+* C++ API
+
+  * removed the formula_model_access interface from model_context, and switched
+    to using model_context directly everywhere.
+
+* formula interpreter
+
+  * added the following 41 built-in functions:
+
+    * ABS
+    * AND
+    * COLUMN
+    * COLUMNS
+    * COUNT
+    * COUNTBLANK
+    * EXACT
+    * FALSE
+    * FIND
+    * ISBLANK
+    * ISERROR
+    * ISEVEN
+    * ISFORMULA
+    * ISLOGICAL
+    * ISNA
+    * ISNONTEXT
+    * ISNUMBER
+    * ISODD
+    * ISREF
+    * ISTEXT
+    * LEFT
+    * MEDIAN
+    * MID
+    * MODE
+    * N
+    * NA
+    * NOT
+    * OR
+    * REPLACE
+    * REPT
+    * RIGHT
+    * ROW
+    * ROWS
+    * SHEET
+    * SHEETS
+    * SUBSTITUTE
+    * T
+    * TEXTJOIN
+    * TRIM
+    * TRUE
+    * TYPE
+
 ixion 0.17.0
 
 * C++ API
