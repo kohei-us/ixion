@@ -56,6 +56,7 @@ private:
     void fnc_max(formula_value_stack& args) const;
     void fnc_median(formula_value_stack& args) const;
     void fnc_min(formula_value_stack& args) const;
+    void fnc_mode(formula_value_stack& args) const;
     void fnc_pi(formula_value_stack& args) const;
 
     // category: mathematical

@@ -730,6 +730,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             case formula_function_t::func_mmult:
                 fnc_mmult(args);
                 break;
+            case formula_function_t::func_mode:
+                fnc_mode(args);
+                break;
             case formula_function_t::func_n:
                 fnc_n(args);
                 break;
@@ -876,6 +879,62 @@ void formula_functions::fnc_min(formula_value_stack& args) const
             ret = v;
     }
     args.push_value(ret);
+}
+
+void formula_functions::fnc_mode(formula_value_stack& args) const
+{
+    if (args.empty())
+        throw formula_functions::invalid_arg("MODE requires one or more arguments.");
+
+    std::vector<double> seq;
+
+    while (!args.empty())
+        append_values_from_stack(m_context, args, std::back_inserter(seq));
+
+    if (seq.empty())
+    {
+        args.push_error(formula_error_t::no_value_available);
+        return;
+    }
+
+    std::sort(seq.begin(), seq.end());
+
+    // keep counting the number of adjacent equal values in the sorted sequence.
+
+    using value_count_type = std::tuple<double, std::size_t>;
+    std::vector<value_count_type> value_counts;
+
+    for (auto it = seq.begin(); it != seq.end(); )
+    {
+        double cur_v = *it;
+        auto it_tail = std::find_if(it, seq.end(), [cur_v](double v) { return cur_v < v; });
+        std::size_t len = std::distance(it, it_tail);
+        value_counts.emplace_back(cur_v, len);
+        it = it_tail;
+    }
+
+    assert(!value_counts.empty());
+
+    // Sort the results by the frequency in descending order first, then the
+    // value in ascending order.
+    auto func_comp = [](value_count_type lhs, value_count_type rhs)
+    {
+        if (std::get<1>(lhs) > std::get<1>(rhs))
+            return true;
+
+        return std::get<0>(lhs) < std::get<0>(rhs);
+    };
+
+    std::sort(value_counts.begin(), value_counts.end(), func_comp);
+    auto [top_value, top_count] = value_counts[0];
+
+    if (top_count == 1)
+    {
+        args.push_error(formula_error_t::no_value_available);
+        return;
+    }
+
+    args.push_value(top_value);
 }
 
 void formula_functions::fnc_sum(formula_value_stack& args) const

@@ -1,0 +1,26 @@
+%mode init
+A1=MODE(5,1,2,2,3,4,5,5,3,3)
+A2=MODE(1,1)
+A3=MODE(1)
+A4=MODE(1,3,2)
+A5=MODE("A","B")
+C1:4
+C2:9
+C3=4
+C4:9
+C5:2
+C6:0
+C7=10
+C8:9
+C9@string
+C10:9
+C12=MODE(C1:C4,C5:C10)
+%calc
+%mode result
+A1=3
+A2=1
+A3=#N/A
+A4=#N/A
+A5=#N/A
+C12=9
+%check

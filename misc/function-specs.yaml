@@ -564,7 +564,12 @@ mmult:
 mod:
   implemented: false
 mode:
-  implemented: false
+  category: statistical
+  implemented: true
+  params:
+    max: null
+    min: 1
+  return: numeric
 month:
   implemented: false
 multirange:
