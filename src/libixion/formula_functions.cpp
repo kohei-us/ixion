@@ -482,6 +482,102 @@ std::optional<bool> pop_one_value_as_boolean(const model_context& cxt, formula_v
     return ret;
 }
 
+/**
+ * Pop a value from the stack, and insert one or more numeric values to the
+ * specified sequence container.
+ */
+template<typename ContT>
+void append_values_from_stack(
+    const model_context& cxt, formula_value_stack& args, std::back_insert_iterator<ContT> insert_it)
+{
+    static_assert(
+        std::is_floating_point_v<typename ContT::value_type>,
+        "this function only supports a container of floating point values.");
+
+    switch (args.get_type())
+    {
+        case stack_value_t::boolean:
+        case stack_value_t::value:
+            insert_it = args.pop_value();
+            break;
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            auto ca = cxt.get_cell_access(addr);
+            switch (ca.get_value_type())
+            {
+                case cell_value_t::boolean:
+                    insert_it = ca.get_boolean_value() ? 1.0 : 0.0;
+                    break;
+                case cell_value_t::numeric:
+                    insert_it = ca.get_numeric_value();
+                    break;
+                default:;
+            }
+            break;
+        }
+        case stack_value_t::range_ref:
+        {
+            const formula_result_wait_policy_t wait_policy = cxt.get_formula_result_wait_policy();
+            abs_range_t range = args.pop_range_ref();
+
+            column_block_callback_t cb = [&insert_it, wait_policy](
+                col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
+            {
+                assert(row1 <= row2);
+                row_t length = row2 - row1 + 1;
+
+                switch (node.type)
+                {
+                    case column_block_t::boolean:
+                    {
+                        auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
+                        auto func = [](bool b) { return b ? 1.0 : 0.0; };
+                        std::transform(blk_range.begin(), blk_range.end(), insert_it, func);
+                        break;
+                    }
+                    case column_block_t::numeric:
+                    {
+                        auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
+                        std::copy(blk_range.begin(), blk_range.end(), insert_it);
+                        break;
+                    }
+                    case column_block_t::formula:
+                    {
+                        auto blk_range = detail::make_element_range<column_block_t::formula>{}(node, length);
+
+                        for (const formula_cell* fc : blk_range)
+                        {
+                            formula_result res = fc->get_result_cache(wait_policy);
+                            switch (res.get_type())
+                            {
+                                case formula_result::result_type::boolean:
+                                    insert_it = res.get_boolean() ? 1.0 : 0.0;
+                                    break;
+                                case formula_result::result_type::value:
+                                    insert_it = res.get_value();
+                                    break;
+                                default:;
+                            }
+                        }
+
+                        break;
+                    }
+                    default:;
+                }
+                return true;
+            };
+
+            for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
+                cxt.walk(sheet, range, cb);
+
+            break;
+        }
+        default:
+            args.pop_back();
+    }
+}
+
 } // anonymous namespace
 
 // ============================================================================
@@ -747,90 +843,7 @@ void formula_functions::fnc_median(formula_value_stack& args) const
     std::vector<double> seq;
 
     while (!args.empty())
-    {
-        switch (args.get_type())
-        {
-            case stack_value_t::boolean:
-            case stack_value_t::value:
-                seq.push_back(args.pop_value());
-                break;
-            case stack_value_t::single_ref:
-            {
-                abs_address_t addr = args.pop_single_ref();
-                auto ca = m_context.get_cell_access(addr);
-                switch (ca.get_value_type())
-                {
-                    case cell_value_t::boolean:
-                        seq.push_back(ca.get_boolean_value() ? 1.0 : 0.0);
-                        break;
-                    case cell_value_t::numeric:
-                        seq.push_back(ca.get_numeric_value());
-                        break;
-                    default:;
-                }
-                break;
-            }
-            case stack_value_t::range_ref:
-            {
-                const formula_result_wait_policy_t wait_policy = m_context.get_formula_result_wait_policy();
-                abs_range_t range = args.pop_range_ref();
-
-                column_block_callback_t cb = [&seq, wait_policy](
-                    col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
-                {
-                    assert(row1 <= row2);
-                    row_t length = row2 - row1 + 1;
-
-                    switch (node.type)
-                    {
-                        case column_block_t::boolean:
-                        {
-                            auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
-                            auto func = [](bool b) { return b ? 1.0 : 0.0; };
-                            std::transform(blk_range.begin(), blk_range.end(), std::back_inserter(seq), func);
-                            break;
-                        }
-                        case column_block_t::numeric:
-                        {
-                            auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
-                            std::copy(blk_range.begin(), blk_range.end(), std::back_inserter(seq));
-                            break;
-                        }
-                        case column_block_t::formula:
-                        {
-                            auto blk_range = detail::make_element_range<column_block_t::formula>{}(node, length);
-
-                            for (const formula_cell* fc : blk_range)
-                            {
-                                formula_result res = fc->get_result_cache(wait_policy);
-                                switch (res.get_type())
-                                {
-                                    case formula_result::result_type::boolean:
-                                        seq.push_back(res.get_boolean() ? 1.0 : 0.0);
-                                        break;
-                                    case formula_result::result_type::value:
-                                        seq.push_back(res.get_value());
-                                        break;
-                                    default:;
-                                }
-                            }
-
-                            break;
-                        }
-                        default:;
-                    }
-                    return true;
-                };
-
-                for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
-                    m_context.walk(sheet, range, cb);
-
-                break;
-            }
-            default:
-                args.pop_back();
-        }
-    }
+        append_values_from_stack(m_context, args, std::back_inserter(seq));
 
     std::size_t mid_pos = seq.size() / 2;
 
