@@ -11,11 +11,10 @@
 #include "ixion/types.hpp"
 #include "ixion/cell.hpp"
 
-#include <mdds/multi_type_vector_trait.hpp>
-#include <mdds/multi_type_vector_types.hpp>
+#include <mdds/multi_type_vector/types.hpp>
+#include <mdds/multi_type_vector/macro.hpp>
+#include <mdds/multi_type_vector/block_funcs.hpp>
 #include <mdds/multi_type_vector.hpp>
-#include <mdds/multi_type_vector_macro.hpp>
-#include <mdds/multi_type_vector_custom_func1.hpp>
 #include <mdds/multi_type_matrix.hpp>
 
 #include <deque>
@@ -41,10 +40,17 @@ using formula_element_block =
 
 MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(formula_cell, element_type_formula, nullptr, formula_element_block)
 
-using ixion_element_block_func = mdds::mtv::custom_block_func1<formula_element_block>;
+struct column_store_trait : mdds::mtv::default_trait
+{
+    using block_funcs = mdds::mtv::element_block_funcs<
+        boolean_element_block,
+        numeric_element_block,
+        string_element_block,
+        formula_element_block>;
+};
 
 /** Type that represents a whole column. */
-using column_store_t = mdds::multi_type_vector<ixion_element_block_func>;
+using column_store_t = mdds::multi_type_vector<column_store_trait>;
 
 /** Type that represents a collection of columns. */
 using column_stores_t = std::deque<column_store_t>;
@@ -57,8 +63,6 @@ struct matrix_store_trait
 {
     typedef mdds::mtv::int64_element_block integer_element_block;
     typedef mdds::mtv::string_element_block string_element_block;
-
-    typedef mdds::mtv::element_block_func element_block_func;
 };
 
 using matrix_store_t = mdds::multi_type_matrix<matrix_store_trait>;
