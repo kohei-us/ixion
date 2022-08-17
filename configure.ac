@@ -15,8 +15,8 @@ m4_define([ixion_api_version],
           [ixion_major_api_version.ixion_minor_api_version])
 
 
-AC_PREREQ([2.63])
-AC_INIT([libixion], [ixion_version])
+AC_PREREQ([2.71])
+AC_INIT([libixion],[ixion_version])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -40,7 +40,7 @@ esac
 # Development Utilities
 # =====================
 AC_ARG_ENABLE(debug-utils,
-        AC_HELP_STRING([--enable-debug-utils], [Build with extra checks useful during development.]),
+        AS_HELP_STRING([--enable-debug-utils],[Build with extra checks useful during development.]),
         [enable_debug_utils="$enableval"],
         [enable_debug_utils=no]
 )
