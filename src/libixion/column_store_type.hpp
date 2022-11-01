@@ -40,7 +40,7 @@ using formula_element_block =
 
 MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(formula_cell, element_type_formula, nullptr, formula_element_block)
 
-struct column_store_trait : mdds::mtv::default_trait
+struct column_store_traits : mdds::mtv::default_traits
 {
     using block_funcs = mdds::mtv::element_block_funcs<
         boolean_element_block,
@@ -50,7 +50,7 @@ struct column_store_trait : mdds::mtv::default_trait
 };
 
 /** Type that represents a whole column. */
-using column_store_t = mdds::multi_type_vector<column_store_trait>;
+using column_store_t = mdds::multi_type_vector<column_store_traits>;
 
 /** Type that represents a collection of columns. */
 using column_stores_t = std::deque<column_store_t>;
