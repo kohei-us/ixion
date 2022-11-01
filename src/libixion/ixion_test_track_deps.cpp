@@ -5,10 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/model_context.hpp"
-#include "ixion/macros.hpp"
-#include "ixion/formula_name_resolver.hpp"
-#include "ixion/formula.hpp"
+#include "test_global.hpp" // This must be the first header to be included.
+
+#include <ixion/model_context.hpp>
+#include <ixion/macros.hpp>
+#include <ixion/formula_name_resolver.hpp>
+#include <ixion/formula.hpp>
 
 #include <cassert>
 #include <iostream>

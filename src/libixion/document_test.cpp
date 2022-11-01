@@ -5,10 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/document.hpp"
-#include "ixion/address.hpp"
-#include "ixion/macros.hpp"
-#include "ixion/cell_access.hpp"
+#include "test_global.hpp" // This must be the first header to be included.
+
+#include <ixion/document.hpp>
+#include <ixion/address.hpp>
+#include <ixion/macros.hpp>
+#include <ixion/cell_access.hpp>
 
 #include <iostream>
 #include <cassert>
