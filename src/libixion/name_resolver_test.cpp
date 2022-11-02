@@ -24,7 +24,7 @@ struct ref_name_entry
     bool sheet_name;
 };
 
-void test_name_resolver_calc_a1()
+void test_calc_a1()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -220,7 +220,7 @@ void test_name_resolver_calc_a1()
     }
 }
 
-void test_name_resolver_excel_a1()
+void test_excel_a1()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -395,7 +395,7 @@ void test_name_resolver_excel_a1()
     }
 }
 
-void test_name_resolver_named_expression()
+void test_named_expression()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -429,7 +429,7 @@ void test_name_resolver_named_expression()
     }
 }
 
-void test_name_resolver_table_excel_a1()
+void test_table_excel_a1()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -507,7 +507,7 @@ void test_name_resolver_table_excel_a1()
     }
 }
 
-void test_name_resolver_excel_r1c1()
+void test_excel_r1c1()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -724,7 +724,7 @@ void test_name_resolver_excel_r1c1()
     }
 }
 
-void test_name_resolver_odff()
+void test_odff()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -896,7 +896,7 @@ void test_name_resolver_odff()
     }
 }
 
-void test_name_resolver_odf_cra()
+void test_odf_cra()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -1014,13 +1014,13 @@ void test_name_resolver_odf_cra()
 
 int main()
 {
-    test_name_resolver_calc_a1();
-    test_name_resolver_excel_a1();
-    test_name_resolver_named_expression();
-    test_name_resolver_table_excel_a1();
-    test_name_resolver_excel_r1c1();
-    test_name_resolver_odff();
-    test_name_resolver_odf_cra();
+    test_calc_a1();
+    test_excel_a1();
+    test_named_expression();
+    test_table_excel_a1();
+    test_excel_r1c1();
+    test_odff();
+    test_odf_cra();
 
     return EXIT_SUCCESS;
 }
