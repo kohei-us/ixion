@@ -124,24 +124,29 @@ EXTRA_DIST = makefile.mk
 
 document_test_SOURCES = document_test.cpp
 document_test_LDADD = \
-	libixion-@IXION_API_VERSION@.la
+	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a
 
 ixion_test_SOURCES = ixion_test.cpp
 ixion_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)
 
 ixion_test_track_deps_SOURCES = ixion_test_track_deps.cpp
 ixion_test_track_deps_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)
 
 compute_engine_test_SOURCES = compute_engine_test.cpp
 compute_engine_test_LDADD = \
+	../test/libixion-test.a \
 	libixion-@IXION_API_VERSION@.la
 
 dirty_cell_tracker_test_SOURCES = dirty_cell_tracker_test.cpp
 dirty_cell_tracker_test_LDADD = \
+	../test/libixion-test.a \
 	libixion-@IXION_API_VERSION@.la
 
 AM_TESTS_ENVIRONMENT =

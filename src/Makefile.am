@@ -1,4 +1,4 @@
-SUBDIRS = include libixion python
+SUBDIRS = include test libixion python
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \

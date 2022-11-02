@@ -28,7 +28,7 @@ ranks_type create_ranks(const std::vector<abs_range_t>& sorted)
 
 void test_empty_query()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -59,7 +59,7 @@ void test_empty_query()
 
 void test_cell_to_cell()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -109,7 +109,7 @@ void test_cell_to_cell()
 
 void test_cell_to_range()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -154,7 +154,7 @@ void test_cell_to_range()
 
 void test_volatile_cells()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -204,7 +204,7 @@ void test_volatile_cells()
 
 void test_volatile_cells_2()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -246,7 +246,7 @@ void test_volatile_cells_2()
 
 void test_multi_sheets()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -268,7 +268,7 @@ void test_multi_sheets()
 
 void test_recursive_tracking()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -286,7 +286,7 @@ void test_recursive_tracking()
 
 void test_listen_to_cell_in_range()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 
@@ -332,7 +332,7 @@ void test_listen_to_cell_in_range()
 
 void test_listen_to_3d_range()
 {
-    cout << "--" << endl << __FUNCTION__ << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     dirty_cell_tracker tracker;
 

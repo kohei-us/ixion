@@ -38,6 +38,8 @@ namespace {
 
 void test_size()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     cout << "test size" << endl;
     cout << "* int: " << sizeof(int) << endl;
     cout << "* long: " << sizeof(long) << endl;
@@ -53,7 +55,8 @@ void test_size()
 
 void test_string_to_double()
 {
-    cout << "test string to double" << endl;
+    IXION_TEST_FUNC_SCOPE;
+
     struct { const char* s; double v; } tests[] = {
         { "12", 12.0 },
         { "0", 0.0 },
@@ -72,7 +75,8 @@ void test_string_to_double()
 
 void test_string_pool()
 {
-    cout << "test string pool" << endl;
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt;
 
     string_id_t s_table1 = cxt.append_string("Table1");
@@ -91,6 +95,8 @@ void test_string_pool()
 
 void test_formula_tokens_store()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     formula_tokens_store_ptr_t p = formula_tokens_store::create();
     assert(p->get_reference_count() == 1);
     auto p2 = p;
@@ -115,6 +121,8 @@ void test_formula_tokens_store()
 
 void test_matrix()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     struct check
     {
         size_t row;
@@ -150,6 +158,8 @@ void test_matrix()
 
 void test_matrix_non_numeric_values()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     matrix mtx(2, 2);
     mtx.set(0, 0, 1.1);
     mtx.set(1, 0, formula_error_t::division_by_zero);
@@ -179,7 +189,7 @@ struct ref_name_entry
 
 void test_name_resolver_calc_a1()
 {
-    cout << "test name resolver calc a1" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt;
     cxt.append_sheet("One");
@@ -375,7 +385,7 @@ void test_name_resolver_calc_a1()
 
 void test_name_resolver_excel_a1()
 {
-    cout << "test name resolver excel a1" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt;
     cxt.append_sheet("One");
@@ -550,7 +560,7 @@ void test_name_resolver_excel_a1()
 
 void test_name_resolver_named_expression()
 {
-    cout << "Testing the name resolvers for parsing named expressions." << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt;
     cxt.append_sheet("Sheet");
@@ -584,7 +594,8 @@ void test_name_resolver_named_expression()
 
 void test_name_resolver_table_excel_a1()
 {
-    cout << "Testing the Excel A1 name resolver for parsing table references." << endl;
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt;
     cxt.append_sheet("Sheet");
     string_id_t s_table1 = cxt.append_string("Table1");
@@ -662,7 +673,8 @@ void test_name_resolver_table_excel_a1()
 
 void test_name_resolver_excel_r1c1()
 {
-    cout << "test name resolver excel r1c1" << endl;
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt;
     cxt.append_sheet("One");
     cxt.append_sheet("Two");
@@ -878,7 +890,7 @@ void test_name_resolver_excel_r1c1()
 
 void test_name_resolver_odff()
 {
-    cout << "test name resolver odff" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt;
     cxt.append_sheet("One");
@@ -1050,7 +1062,7 @@ void test_name_resolver_odff()
 
 void test_name_resolver_odf_cra()
 {
-    cout << "test name resolver odf-cra" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt;
     cxt.append_sheet("One");
@@ -1164,7 +1176,8 @@ void test_name_resolver_odf_cra()
 
 void test_address()
 {
-    cout << "test address" << endl;
+    IXION_TEST_FUNC_SCOPE;
+
     {
         address_t addr(-1, 0, 0, false, false, false);
         abs_address_t pos(1, 0, 0);
@@ -1244,7 +1257,7 @@ bool check_formula_expression(
  */
 void test_parse_and_print_expressions()
 {
-    cout << "test public formula api" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     // Excel A1
 
@@ -1338,7 +1351,7 @@ void test_parse_and_print_expressions()
  */
 void test_function_name_resolution()
 {
-    cout << "test function name resolution" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     const char* valid_names[] = {
         "SUM", "sum", "Sum", "Average", "max", "min"
@@ -1388,7 +1401,8 @@ formula_cell* insert_formula(
 
 void test_model_context_storage()
 {
-    cout << "test model context storage" << endl;
+    IXION_TEST_FUNC_SCOPE;
+
     {
         model_context cxt;
         auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
@@ -1543,7 +1557,7 @@ void test_model_context_storage()
 
 void test_model_context_direct_string_access()
 {
-    cout << "test model context direct string access" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt{{400, 20}};
     cxt.append_sheet("test");
@@ -1587,6 +1601,8 @@ void test_model_context_direct_string_access()
 
 void test_model_context_named_expression()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt{{400, 20}};
     cxt.append_sheet("test");
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
@@ -1711,6 +1727,8 @@ bool check_model_iterator_output(model_iterator& iter, const std::vector<model_i
 
 void test_model_context_iterator_horizontal()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     const row_t row_size = 5;
     const col_t col_size = 2;
     model_context cxt{{row_size, col_size}};
@@ -1796,6 +1814,8 @@ void test_model_context_iterator_horizontal()
 
 void test_model_context_iterator_horizontal_range()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     nullptr_t empty = nullptr;
     model_context cxt{{10, 5}};
     cxt.append_sheet("Values");
@@ -1896,6 +1916,8 @@ void test_model_context_iterator_horizontal_range()
 
 void test_model_context_iterator_vertical()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     const row_t row_size = 5;
     const col_t col_size = 2;
     model_context cxt{{row_size, col_size}};
@@ -1979,6 +2001,8 @@ void test_model_context_iterator_vertical()
 
 void test_model_context_iterator_vertical_range()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     nullptr_t empty = nullptr;
     model_context cxt{{10, 5}};
     cxt.append_sheet("Values");
@@ -2094,6 +2118,8 @@ void test_model_context_iterator_vertical_range()
 
 void test_model_context_iterator_named_exps()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     struct check
     {
         std::string name;
@@ -2200,6 +2226,8 @@ void test_model_context_iterator_named_exps()
 
 void test_model_context_fill_down()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     nullptr_t empty = nullptr;
     model_context cxt{{100, 10}};
     cxt.append_sheet("test");
@@ -2247,7 +2275,7 @@ void test_model_context_fill_down()
 
 void test_model_context_error_value()
 {
-    cout << "test model context error value" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt{{100, 10}};
     cxt.append_sheet("test");
@@ -2269,7 +2297,7 @@ void test_model_context_error_value()
 
 void test_volatile_function()
 {
-    cout << "test volatile function" << endl;
+    IXION_TEST_FUNC_SCOPE;
 
     model_context cxt{{1048576, 16384}};
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
@@ -2347,6 +2375,8 @@ void test_volatile_function()
 
 void test_invalid_formula_tokens()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt;
     std::string_view invalid_formula("invalid formula");
     std::string_view error_msg("failed to parse formula");
@@ -2369,6 +2399,8 @@ void test_invalid_formula_tokens()
 
 void test_grouped_formula_string_results()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt;
     cxt.append_sheet("test");
 

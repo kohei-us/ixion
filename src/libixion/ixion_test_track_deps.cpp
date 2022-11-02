@@ -20,6 +20,8 @@ using namespace std;
 
 void test_single_cell_dependency()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt{{400, 200}};
     cxt.append_sheet("One");
 
@@ -57,6 +59,8 @@ void test_single_cell_dependency()
 
 void test_range_dependency()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt{{400, 200}};
     cxt.append_sheet("One");
 
@@ -97,6 +101,8 @@ void test_range_dependency()
 
 void test_matrix_dependency()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     model_context cxt{{400, 200}};
     cxt.append_sheet("One");
 

@@ -23,35 +23,6 @@ using std::endl;
 
 namespace {
 
-class stack_printer
-{
-public:
-    explicit stack_printer(std::string msg) :
-        m_msg(std::move(msg))
-    {
-        m_start_time = get_time();
-    }
-
-    ~stack_printer()
-    {
-        double end_time = get_time();
-        std::cout << m_msg << ": duration = " << (end_time-m_start_time) << " sec" << std::endl;
-    }
-
-private:
-    double get_time() const
-    {
-        unsigned long usec_since_epoch =
-            std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::system_clock::now().time_since_epoch()).count();
-
-        return usec_since_epoch / 1000000.0;
-    }
-
-    std::string m_msg;
-    double m_start_time;
-};
-
 using test_func_t = std::function<void()>;
 
 std::vector<std::pair<std::string, test_func_t>> tests;
@@ -103,7 +74,7 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
     {
         std::ostringstream os;
         os << "fibonacci (n=" << values.size() << ")";
-        stack_printer __stack_printer__(os.str());
+        ixion::test::stack_printer __stack_printer__(os.str());
         engine->compute_fibonacci(io);
     }
     print_values("fibonacci output", values);
@@ -113,6 +84,8 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
 
 void test_create_default()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create();
     assert(p);
     assert(p->get_name() == "default");
@@ -121,6 +94,8 @@ void test_create_default()
 
 void test_create_vulkan()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     std::shared_ptr<ixion::draft::compute_engine> p = ixion::draft::compute_engine::create("vulkan");
     assert(p);
     assert(p->get_name() == "vulkan");

@@ -5,8 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_SRC_TEST_GLOBAL_HPP
-#define INCLUDED_IXION_SRC_TEST_GLOBAL_HPP
+#pragma once
 
 #ifdef NDEBUG
 // release build
@@ -18,6 +17,27 @@
 #include <cassert>
 #endif
 
-#endif
+#include <iostream>
+#include <chrono>
+#include <string>
+
+namespace ixion { namespace test {
+
+class stack_printer
+{
+public:
+    explicit stack_printer(std::string msg);
+    ~stack_printer();
+
+private:
+    double get_time() const;
+
+    std::string m_msg;
+    double m_start_time;
+};
+
+}}
+
+#define IXION_TEST_FUNC_SCOPE ixion::test::stack_printer __sp__(__func__)
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

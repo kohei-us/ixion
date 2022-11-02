@@ -204,7 +204,9 @@ AC_CONFIG_FILES([Makefile
                  src/include/Makefile
                  src/libixion/Makefile
                  src/libixion/constants.inl
-                 src/python/Makefile])
+                 src/python/Makefile
+                 src/test/Makefile
+])
 AC_OUTPUT
 
 AC_MSG_NOTICE([

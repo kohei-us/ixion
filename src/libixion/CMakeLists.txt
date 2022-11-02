@@ -104,11 +104,11 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
 
 target_include_directories(compute-engine-test PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
 
-target_link_libraries(document-test ixion-${IXION_API_VERSION})
-target_link_libraries(ixion-test ixion-${IXION_API_VERSION})
-target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION})
-target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION})
-target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION})
+target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(ixion-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION} ixion-test)
 
 add_dependencies(check
     document-test

@@ -35,6 +35,8 @@ bool equal(double v1, double v2)
 
 void test_basic_calc()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     abs_address_t A1(0, 0, 0);
     abs_address_t A2(0, 1, 0);
     abs_address_t A3(0, 2, 0);
@@ -63,6 +65,8 @@ void test_basic_calc()
 
 void test_string_io()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     document doc;
     doc.append_sheet("test");
 
@@ -95,6 +99,8 @@ void test_string_io()
 
 void test_boolean_io()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     document doc;
     doc.append_sheet("test1");
     doc.append_sheet("test2");
@@ -124,6 +130,8 @@ void test_boolean_io()
 
 void test_custom_cell_address_syntax()
 {
+    IXION_TEST_FUNC_SCOPE;
+
     document doc(formula_name_resolver_t::excel_r1c1);
     doc.append_sheet("MySheet");
 

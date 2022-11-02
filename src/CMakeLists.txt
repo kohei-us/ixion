@@ -1,5 +1,6 @@
 
 add_subdirectory(libixion)
+add_subdirectory(test)
 
 add_executable(ixion-parser
     ixion_parser.cpp

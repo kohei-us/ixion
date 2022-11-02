@@ -333,6 +333,9 @@
                 <F N="../src/python/sheet.cpp"/>
                 <F N="../src/python/sheet.hpp"/>
             </Folder>
+            <Folder Name="test">
+                <F N="../src/test/test_global.cpp"/>
+            </Folder>
             <F N="../src/app_common.cpp"/>
             <F N="../src/app_common.hpp"/>
             <F N="../src/ixion_formula_tokenizer.cpp"/>
