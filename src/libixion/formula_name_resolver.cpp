@@ -965,7 +965,7 @@ parse_address_result parse_address_odf_cra(
 }
 
 parse_address_result_type parse_address_excel_a1(
-    const ixion::model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+    const ixion::model_context* cxt, const char*& p, const char* p_end, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
@@ -976,11 +976,11 @@ parse_address_result_type parse_address_excel_a1(
     if (cxt)
     {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        if (parse_sheet_name(*cxt, '!', p, p_last+1, addr.sheet))
+        if (parse_sheet_name(*cxt, '!', p, p_end, addr.sheet))
             ++p; // skip the separator
     }
 
-    return parse_address_a1(p, ++p_last, addr);
+    return parse_address_a1(p, p_end, addr);
 }
 
 parse_address_result_type parse_address_excel_r1c1(
@@ -1200,13 +1200,12 @@ public:
         if (resolve_table(mp_cxt, p, n, ret))
             return ret;
 
-        const char* p_last = p;
-        std::advance(p_last, n-1);
+        const char* p_end = p + n;
 
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
-        parse_address_result_type parse_res = parse_address_excel_a1(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result_type parse_res = parse_address_excel_a1(mp_cxt, p, p_end, parsed_addr);
 
         if (parse_res != invalid)
         {
@@ -1232,11 +1231,12 @@ public:
 
         if (parse_res == range_expected)
         {
-            if (p == p_last)
+            assert(*p == ':');
+            ++p; // skip ':'
+
+            if (p == p_end)
                 // ':' occurs as the last character.  This is not allowed.
                 return ret;
-
-            ++p; // skip ':'
 
             range_t v;
             to_relative_address(parsed_addr, pos, true);
@@ -1244,7 +1244,7 @@ public:
 
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
-            parse_res = parse_address_excel_a1(NULL, p, p_last, parsed_addr);
+            parse_res = parse_address_excel_a1(nullptr, p, p_end, parsed_addr);
             if (parse_res != valid_address)
             {
                 // The 2nd part after the ':' is not valid.
