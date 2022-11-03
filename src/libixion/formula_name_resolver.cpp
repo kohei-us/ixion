@@ -537,35 +537,36 @@ std::string to_string(parse_address_result_type rt)
 #endif
 
 bool parse_sheet_name_quoted(
-    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_last, sheet_t& sheet)
+    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_end, sheet_t& sheet)
 {
+    assert(*p == '\'');
+
     ++p; // skip the open quote.
-    size_t len = 0;
-    string buffer; // used only when the name contains at least one single quote.
+    std::size_t len = 0;
+    std::string buffer; // used only when the name contains at least one single quote.
     const char* p1 = p;
 
     // parse until the closing quote is reached.
-    while (true)
+    for (; p < p_end; ++p)
     {
         if (*p == '\'')
         {
-            if (p == p_last)
+            ++p; // skip the quote
+            if (p == p_end)
                 break;
 
-            if (*(p+1) == '\'')
+            if (*p == '\'')
             {
                 // next character is a quote too.  Store the parsed string
                 // segment to the buffer and move on.
-                ++p;
                 ++len;
-                buffer += string(p1, len);
-                ++p;
-                p1 = p;
+                buffer += std::string(p1, len);
+                p1 = p + 1;
                 len = 0;
                 continue;
             }
 
-            if (*(p+1) != sep)
+            if (*p != sep)
                 // the next char must be the separator.  Parse failed.
                 break;
 
@@ -578,16 +579,11 @@ bool parse_sheet_name_quoted(
                 sheet = cxt.get_sheet_index({buffer.data(), buffer.size()});
             }
 
-            ++p; // skip the closing quote.
-            if (p != p_last)
+            if (p != p_end - 1)
                 ++p; // skip the separator.
             return true;
         }
 
-        if (p == p_last)
-            break;
-
-        ++p;
         ++len;
     }
 
@@ -612,7 +608,7 @@ bool parse_sheet_name(
 
     if (*p == '\'')
     {
-        bool success = parse_sheet_name_quoted(cxt, sep, p, p_last, sheet);
+        bool success = parse_sheet_name_quoted(cxt, sep, p, p_last+1, sheet);
         if (!success)
             p = p_old;
         return success;
