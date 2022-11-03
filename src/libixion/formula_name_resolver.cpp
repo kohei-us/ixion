@@ -689,14 +689,13 @@ T parse_number(const char*&p, const char* p_last)
  * Parse A1-style single cell address.
  *
  * @param p it must point to the first character of a cell address.
- * @param p_last it must point to the last character of a whole string
- *               sequence.  It doesn't have to be the last character of a
- *               cell address.
+ * @param p_end end position that is one character past the last character of
+ *              a parsable character sequence.
  * @param addr resolved cell address.
  *
  * @return parsing result.
  */
-parse_address_result_type parse_address_a1(const char*& p, const char* p_last, address_t& addr)
+parse_address_result_type parse_address_a1(const char*& p, const char* p_end, address_t& addr)
 {
     // NOTE: Row and column IDs are 1-based during parsing, while 0 is used as
     // the state of a value-not-set.  They are subtracted by one before
@@ -704,7 +703,7 @@ parse_address_result_type parse_address_a1(const char*& p, const char* p_last, a
 
     resolver_parse_mode mode = resolver_parse_mode::column;
 
-    while (true)
+    for (; p < p_end; ++p)
     {
         char c = *p;
         if ('a' <= c && c <= 'z')
@@ -796,11 +795,6 @@ parse_address_result_type parse_address_a1(const char*& p, const char* p_last, a
         }
         else
             return invalid;
-
-        if (p == p_last)
-            // last character reached.
-            break;
-        ++p;
     }
 
     if (mode == resolver_parse_mode::row)
@@ -954,7 +948,7 @@ parse_address_result parse_address_calc_a1(
             addr.abs_sheet = (*p0 == '$');
     }
 
-    res.result = parse_address_a1(p, p_last, addr);
+    res.result = parse_address_a1(p, ++p_last, addr);
     return res;
 }
 
@@ -989,7 +983,7 @@ parse_address_result_type parse_address_excel_a1(
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
         parse_sheet_name(*cxt, '!', p, p_last, addr.sheet);
 
-    return parse_address_a1(p, p_last, addr);
+    return parse_address_a1(p, ++p_last, addr);
 }
 
 parse_address_result_type parse_address_excel_r1c1(
@@ -1042,7 +1036,7 @@ parse_address_result parse_address_odff(
             parse_sheet_name(*cxt, '.', p, p_last, addr.sheet);
     }
 
-    res.result = parse_address_a1(p, p_last, addr);
+    res.result = parse_address_a1(p, ++p_last, addr);
     return res;
 }
 
