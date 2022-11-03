@@ -19,6 +19,7 @@
 #include <limits>
 #include <algorithm>
 #include <cctype>
+#include <optional>
 
 using namespace std;
 
@@ -539,8 +540,8 @@ std::string to_string(parse_address_result_type rt)
 /**
  * Upon successful parsing, the position should be on the separator character.
  */
-bool parse_sheet_name_quoted(
-    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_end, sheet_t& sheet)
+std::optional<sheet_t> parse_sheet_name_quoted(
+    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_end)
 {
     assert(*p == '\'');
 
@@ -573,6 +574,8 @@ bool parse_sheet_name_quoted(
                 // the next char must be the separator.  Parse failed.
                 break;
 
+            std::optional<sheet_t> sheet;
+
             if (buffer.empty())
                 // Name contains no single quotes.
                 sheet = cxt.get_sheet_index({p1, len});
@@ -582,13 +585,13 @@ bool parse_sheet_name_quoted(
                 sheet = cxt.get_sheet_index({buffer.data(), buffer.size()});
             }
 
-            return true;
+            return sheet;
         }
 
         ++len;
     }
 
-    return false;
+    return std::optional<sheet_t>{};
 }
 
 /**
@@ -597,10 +600,19 @@ bool parse_sheet_name_quoted(
  *
  * Upon successful parsing, the position should be on the separator character.
  *
- * @return true if the string contains a valid sheet name, false otherwise.
+ * @param cxt model context used to query sheet names.
+ * @param sep separator character between sheet name and the cell address.
+ * @param p pointer to the first character. When the parsing is succesful,
+ *          this will point to the separator character, but if the parsing
+ *          fails, it will point to the same character it pointed to prior to
+ *          calling this function.
+ * @param p_end end position that is one character past the last parsable
+ *              character.
+ *
+ * @return value containing sheet index upon success, or empty upon failure.
  */
-bool parse_sheet_name(
-    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_end, sheet_t& sheet)
+std::optional<sheet_t> parse_sheet_name(
+    const ixion::model_context& cxt, const char sep, const char*& p, const char* p_end)
 {
     assert(p < p_end);
 
@@ -611,10 +623,10 @@ bool parse_sheet_name(
 
     if (*p == '\'')
     {
-        bool success = parse_sheet_name_quoted(cxt, sep, p, p_end, sheet);
-        if (!success)
+        auto sheet = parse_sheet_name_quoted(cxt, sep, p, p_end);
+        if (!sheet)
             p = p_old;
-        return success;
+        return sheet;
     }
 
     const char* p0 = p;
@@ -624,14 +636,11 @@ bool parse_sheet_name(
     for (; p < p_end; ++p, ++len)
     {
         if (*p == sep)
-        {
-            sheet = cxt.get_sheet_index({p0, len});
-            return true;
-        }
+            return cxt.get_sheet_index({p0, len});
     }
 
     p = p_old;
-    return false;
+    return std::optional<sheet_t>{};
 }
 
 /**
@@ -934,10 +943,12 @@ parse_address_result parse_address_calc_a1(
     {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
         const char* p0 = p;
-        res.sheet_name = parse_sheet_name(*cxt, '.', p, p_last+1, addr.sheet);
-        if (res.sheet_name)
+        auto sheet = parse_sheet_name(*cxt, '.', p, p_last + 1);
+        res.sheet_name = sheet.has_value();
+        if (sheet)
         {
             ++p; // skip the separator
+            addr.sheet = *sheet;
             addr.abs_sheet = (*p0 == '$');
         }
     }
@@ -976,8 +987,12 @@ parse_address_result_type parse_address_excel_a1(
     if (cxt)
     {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        if (parse_sheet_name(*cxt, '!', p, p_end, addr.sheet))
+        auto sheet = parse_sheet_name(*cxt, '!', p, p_end);
+        if (sheet)
+        {
             ++p; // skip the separator
+            addr.sheet = *sheet;
+        }
     }
 
     return parse_address_a1(p, p_end, addr);
@@ -995,8 +1010,12 @@ parse_address_result_type parse_address_excel_r1c1(
     if (cxt)
     {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        if (parse_sheet_name(*cxt, '!', p, p_last+1, addr.sheet))
+        auto sheet = parse_sheet_name(*cxt, '!', p, p_last + 1);
+        if (sheet)
+        {
             ++p; // skip the separator
+            addr.sheet = *sheet;
+        }
     }
 
     return parse_address_r1c1(p, p_last, addr);
@@ -1034,8 +1053,12 @@ parse_address_result parse_address_odff(
 
         if (p <= p_last)
         {
-            if (parse_sheet_name(*cxt, '.', p, p_last+1, addr.sheet))
+            auto sheet = parse_sheet_name(*cxt, '.', p, p_last + 1);
+            if (sheet)
+            {
                 ++p; // skip the separator
+                addr.sheet = *sheet;
+            }
         }
     }
 
