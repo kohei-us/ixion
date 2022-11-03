@@ -536,6 +536,9 @@ std::string to_string(parse_address_result_type rt)
 
 #endif
 
+/**
+ * Upon successful parsing, the position should be on the separator character.
+ */
 bool parse_sheet_name_quoted(
     const ixion::model_context& cxt, const char sep, const char*& p, const char* p_end, sheet_t& sheet)
 {
@@ -579,8 +582,6 @@ bool parse_sheet_name_quoted(
                 sheet = cxt.get_sheet_index({buffer.data(), buffer.size()});
             }
 
-            if (p != p_end - 1)
-                ++p; // skip the separator.
             return true;
         }
 
@@ -593,6 +594,8 @@ bool parse_sheet_name_quoted(
 /**
  * Try to parse a sheet name prefix in the string.  If this fails, revert
  * the current position back to the original position prior to the call.
+ *
+ * Upon successful parsing, the position should be on the separator character.
  *
  * @return true if the string contains a valid sheet name, false otherwise.
  */
@@ -623,8 +626,6 @@ bool parse_sheet_name(
         if (*p == sep)
         {
             sheet = cxt.get_sheet_index({p0, len});
-            if (p != p_end - 1)
-                ++p; // skip the separator.
             return true;
         }
     }
@@ -935,7 +936,10 @@ parse_address_result parse_address_calc_a1(
         const char* p0 = p;
         res.sheet_name = parse_sheet_name(*cxt, '.', p, p_last+1, addr.sheet);
         if (res.sheet_name)
+        {
+            ++p; // skip the separator
             addr.abs_sheet = (*p0 == '$');
+        }
     }
 
     res.result = parse_address_a1(p, ++p_last, addr);
@@ -970,8 +974,11 @@ parse_address_result_type parse_address_excel_a1(
     addr.abs_column = false;
 
     if (cxt)
+    {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        parse_sheet_name(*cxt, '!', p, p_last+1, addr.sheet);
+        if (parse_sheet_name(*cxt, '!', p, p_last+1, addr.sheet))
+            ++p; // skip the separator
+    }
 
     return parse_address_a1(p, ++p_last, addr);
 }
@@ -986,8 +993,11 @@ parse_address_result_type parse_address_excel_r1c1(
     addr.abs_column = false;
 
     if (cxt)
+    {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        parse_sheet_name(*cxt, '!', p, p_last+1, addr.sheet);
+        if (parse_sheet_name(*cxt, '!', p, p_last+1, addr.sheet))
+            ++p; // skip the separator
+    }
 
     return parse_address_r1c1(p, p_last, addr);
 }
@@ -1023,7 +1033,10 @@ parse_address_result parse_address_odff(
         }
 
         if (p <= p_last)
-            parse_sheet_name(*cxt, '.', p, p_last+1, addr.sheet);
+        {
+            if (parse_sheet_name(*cxt, '.', p, p_last+1, addr.sheet))
+                ++p; // skip the separator
+        }
     }
 
     res.result = parse_address_a1(p, ++p_last, addr);
