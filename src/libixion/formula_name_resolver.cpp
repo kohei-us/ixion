@@ -704,6 +704,7 @@ sheet_range_t parse_excel_sheet_name_quoted(const ixion::model_context& cxt, con
                 ret.sheet1 = cxt.get_sheet_index(buf);
                 p0 = nullptr;
                 buf.clear();
+                was_quote = false;
                 break;
             }
             case '\'':
@@ -716,9 +717,12 @@ sheet_range_t parse_excel_sheet_name_quoted(const ixion::model_context& cxt, con
                     p0 = nullptr;
                 }
 
+                // if more than two quotes occur, set the flag only on the 1st, 3rd, 5th etc.
                 was_quote = !was_quote;
                 break;
             }
+            default:
+                was_quote = false;
         }
     }
 
