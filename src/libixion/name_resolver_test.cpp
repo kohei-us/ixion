@@ -390,9 +390,17 @@ void test_excel_a1()
         assert(res.type == name_tests[i].type);
     }
 
+    std::string_view invalid_names[] = {
+        "NotExists!A1", // non-existing sheet name
+        "A B C!B2", // sheet name with space not being quoted
+        "A''B!D10", // sheet name with quote must be quoted
+    };
+
+    for (const auto& name: invalid_names)
     {
-        // Parse address with non-existing sheet name.  It should be flagged invalid.
-        formula_name_t res = resolver->resolve("NotExists!A1", abs_address_t());
+        std::cout << "invalid name: " << name << std::endl;
+        formula_name_t res = resolver->resolve(name, abs_address_t());
+        std::cout << "parsed name: " << res.to_string() << std::endl;
         assert(res.type == formula_name_t::invalid);
     }
 }

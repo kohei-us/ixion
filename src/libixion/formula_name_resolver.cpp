@@ -770,6 +770,21 @@ sheet_range_t parse_excel_sheet_name(const ixion::model_context& cxt, const char
                 p0 = nullptr;
                 break;
             }
+            case ' ':
+            case '\'':
+            {
+                // invalid char. Check if a '!' occurs at a later position.
+                for (++p; p < p_end; ++p)
+                {
+                    if (*p == '!')
+                    {
+                        ret.present = true;
+                        p = p_end;
+                        break;
+                    }
+                }
+                break;
+            }
         }
     }
 
