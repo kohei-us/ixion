@@ -229,7 +229,8 @@ void test_excel_a1()
     cxt.append_sheet("Two");
     cxt.append_sheet("Three");
     cxt.append_sheet("A B C"); // name with space
-    cxt.append_sheet("'quote'"); // quoted name
+    cxt.append_sheet("A'B"); // name with quote
+    cxt.append_sheet("C'''D"); // name with multiple consecutive quotes
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
@@ -260,7 +261,8 @@ void test_excel_a1()
             { "Two!$B$10", true },
             { "Three!CFD234", true },
             { "'A B C'!Z12", true },
-            { "'''quote'''!Z12", true },
+            { "'A''B'!Z12", true },
+            { "'C''''''D'!BB23", true },
             { 0, false }
         };
 
@@ -392,6 +394,48 @@ void test_excel_a1()
         // Parse address with non-existing sheet name.  It should be flagged invalid.
         formula_name_t res = resolver->resolve("NotExists!A1", abs_address_t());
         assert(res.type == formula_name_t::invalid);
+    }
+}
+
+void test_excel_a1_multisheet()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    model_context cxt;
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("Three");
+    cxt.append_sheet("A B C"); // name with space
+    cxt.append_sheet("A'B"); // name with quote
+    cxt.append_sheet("C'D''E"); // name with two quotes
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    struct check_type
+    {
+        std::string_view name;
+        address_t address1;
+        address_t address2;
+    };
+
+    // NB: sheet positions are always absolute in Excel.
+    const check_type checks[] = {
+        { "One:Two!C4", {0, 3, 2, true, false, false}, {1, 3, 2, true, false, false} },
+        { "One:Three!A1:B2", {0, 0, 0, true, false, false}, {2, 1, 1, true, false, false} },
+        { "'Two:A''B'!$F$10", {1, 9, 5, true, true, true}, {4, 9, 5, true, true, true} },
+        { "'A''B:C''D''''E'!B$2:D$10", {4, 1, 1, true, true, false}, {5, 9, 3, true, true, false} },
+    };
+
+    for (const auto& c : checks)
+    {
+        std::cout << "name: " << c.name << std::endl;
+        formula_name_t res = resolver->resolve(c.name, abs_address_t());
+        assert(res.type == formula_name_t::name_type::range_reference);
+
+        auto v = std::get<range_t>(res.value);
+        assert(v.first == c.address1);
+        assert(v.last == c.address2);
     }
 }
 
@@ -1016,6 +1060,7 @@ int main()
 {
     test_calc_a1();
     test_excel_a1();
+    test_excel_a1_multisheet();
     test_named_expression();
     test_table_excel_a1();
     test_excel_r1c1();

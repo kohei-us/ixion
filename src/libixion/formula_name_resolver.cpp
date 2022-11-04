@@ -643,6 +643,141 @@ std::optional<sheet_t> parse_sheet_name(
     return std::optional<sheet_t>{};
 }
 
+struct sheet_range_t
+{
+    bool present = false; // whether or not the address contains sheet name segment
+    sheet_t sheet1 = invalid_sheet;
+    sheet_t sheet2 = invalid_sheet;
+
+    bool valid() const
+    {
+        return sheet1 != invalid_sheet || sheet2 != invalid_sheet;
+    }
+};
+
+sheet_range_t parse_excel_sheet_name_quoted(const ixion::model_context& cxt, const char*& p, const char* p_end)
+{
+    assert(*p == '\'');
+    const char* p_old = p; // old position to revert to in case we fail to parse a sheet name.
+
+    ++p; // skip the quote
+
+    sheet_range_t ret;
+    bool was_quote = false; // record if the last char was a quote, but only when it followed a non-quote char.
+    std::string buf; // for name containing quote(s)
+
+    for (const char* p0 = nullptr; p < p_end; ++p)
+    {
+        if (!p0)
+            p0 = p;
+
+        switch (*p)
+        {
+            case '!':
+            {
+                if (!was_quote)
+                {
+                    // Fail
+                    p = p_end;
+                    break;
+                }
+
+                assert(ret.sheet2 == invalid_sheet);
+                buf += std::string_view{p0, std::distance(p0, p) - 1};
+                ret.sheet2 = cxt.get_sheet_index(buf);
+                ret.present = true;
+                return ret;
+            }
+            case ':':
+            {
+                if (ret.sheet1 != invalid_sheet)
+                {
+                    // likely the second range separator, which is not allowed. Fail.
+                    p = p_end;
+                    break;
+                }
+
+                buf += std::string_view{p0, std::distance(p0, p)};
+                ret.sheet1 = cxt.get_sheet_index(buf);
+                p0 = nullptr;
+                buf.clear();
+                break;
+            }
+            case '\'':
+            {
+                if (was_quote)
+                {
+                    // two consequtive quotes are treated as a single quote.
+                    buf += std::string_view{p0, std::distance(p0, p)};
+                    p0 = nullptr;
+                }
+
+                was_quote = !was_quote;
+                break;
+            }
+        }
+    }
+
+    p = p_old;
+    ret.sheet1 = ret.sheet2 = invalid_sheet;
+    return ret;
+}
+
+/**
+ * Parse an Excel sheet name string.  An Excel name can be a range of sheets
+ * separated by a ':' e.g. Sheet1:Sheet2!A1:B2.
+ *
+ * @return sheet range values. It can either contain 1) two valid sheet
+ *         indices for a range of sheets, 2) sheet1 invalid and sheet2 valid
+ *         for a single sheet name, or 3) both sheet indices are invalid.
+ */
+sheet_range_t parse_excel_sheet_name(const ixion::model_context& cxt, const char*& p, const char* p_end)
+{
+    assert(p < p_end);
+    if (*p == '\'')
+        return parse_excel_sheet_name_quoted(cxt, p, p_end);
+
+    sheet_range_t ret;
+
+    const char* p_old = p; // old position to revert to in case we fail to parse a sheet name.
+
+    for (const char* p0 = nullptr; p < p_end; ++p)
+    {
+        if (!p0)
+            p0 = p;
+
+        switch (*p)
+        {
+            case '!':
+            {
+                assert(ret.sheet2 == invalid_sheet);
+                std::string_view name{p0, std::distance(p0, p)};
+                ret.sheet2 = cxt.get_sheet_index(name);
+                ret.present = true;
+                return ret;
+            }
+            case ':':
+            {
+                if (ret.sheet1 != invalid_sheet)
+                {
+                    // likely the second range separator, which is not allowed. Fail.
+                    p = p_end;
+                    break;
+                }
+
+                std::string_view name{p0, std::distance(p0, p)};
+                ret.sheet1 = cxt.get_sheet_index(name);
+                p0 = nullptr;
+                break;
+            }
+        }
+    }
+
+    p = p_old;
+    ret.sheet1 = ret.sheet2 = invalid_sheet;
+    return ret;
+}
+
 /**
  * If there is no number to parse, it returns 0 and the p will not
  * increment. Otherwise, p will point to the last digit of the number when
@@ -975,25 +1110,13 @@ parse_address_result parse_address_odf_cra(
     return parse_address_calc_a1(cxt, p, p_last, addr);
 }
 
-parse_address_result_type parse_address_excel_a1(
-    const ixion::model_context* cxt, const char*& p, const char* p_end, address_t& addr)
+parse_address_result_type parse_address_excel_a1(const char*& p, const char* p_end, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
     addr.abs_sheet = true; // Excel's sheet position is always absolute.
     addr.abs_row = false;
     addr.abs_column = false;
-
-    if (cxt)
-    {
-        // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        auto sheet = parse_sheet_name(*cxt, '!', p, p_end);
-        if (sheet)
-        {
-            ++p; // skip the separator
-            addr.sheet = *sheet;
-        }
-    }
 
     return parse_address_a1(p, p_end, addr);
 }
@@ -1225,18 +1348,30 @@ public:
 
         const char* p_end = p + n;
 
+        sheet_range_t sheets;
+
+        if (mp_cxt)
+        {
+            sheets = parse_excel_sheet_name(*mp_cxt, p, p_end);
+            if (sheets.present && sheets.sheet2 == invalid_sheet)
+                // Sheet name(s) given but is not found in the model.
+                return ret;
+
+            if (sheets.present)
+            {
+                assert(*p == '!');
+                ++p; // skip the '!'
+            }
+        }
+
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0, false, false, false);
 
-        parse_address_result_type parse_res = parse_address_excel_a1(mp_cxt, p, p_end, parsed_addr);
+        parse_address_result_type parse_res = parse_address_excel_a1(p, p_end, parsed_addr);
 
         if (parse_res != invalid)
         {
             // This is a valid A1-style address syntax-wise.
-
-            if (parsed_addr.sheet == invalid_sheet)
-                // sheet name is not found in the model.  Report back as invalid.
-                return ret;
 
             if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
                 parse_res = invalid;
@@ -1247,7 +1382,28 @@ public:
         {
             // This is a single cell address.
             to_relative_address(parsed_addr, pos, true);
-            set_cell_reference(ret, parsed_addr);
+
+            if (sheets.present)
+            {
+                if (sheets.sheet1 != invalid_sheet)
+                {
+                    // range of sheets is given. Switch to a range.
+                    range_t v{parsed_addr, parsed_addr};
+                    v.first.sheet = sheets.sheet1;
+                    v.last.sheet = sheets.sheet2;
+
+                    ret.value = v;
+                    ret.type = formula_name_t::range_reference;
+                }
+                else
+                {
+                    // single sheet is given.
+                    parsed_addr.sheet = sheets.sheet2;
+                    set_cell_reference(ret, parsed_addr);
+                }
+            }
+            else
+                set_cell_reference(ret, parsed_addr);
 
             return ret;
         }
@@ -1267,7 +1423,7 @@ public:
 
             // For now, we assume the sheet index of the end address is identical
             // to that of the begin address.
-            parse_res = parse_address_excel_a1(nullptr, p, p_end, parsed_addr);
+            parse_res = parse_address_excel_a1(p, p_end, parsed_addr);
             if (parse_res != valid_address)
             {
                 // The 2nd part after the ':' is not valid.
@@ -1278,6 +1434,22 @@ public:
             to_relative_address(parsed_addr, pos, true);
             v.last = parsed_addr;
             v.last.sheet = v.first.sheet; // re-use the sheet index of the begin address.
+
+            if (sheets.present)
+            {
+                if (sheets.sheet1 != invalid_sheet)
+                {
+                    // range of sheets is given
+                    v.first.sheet = sheets.sheet1;
+                    v.last.sheet = sheets.sheet2;
+                }
+                else
+                {
+                    // single sheet is given
+                    v.first.sheet = v.last.sheet = sheets.sheet2;
+                }
+            }
+
             ret.value = v;
             ret.type = formula_name_t::range_reference;
             return ret;
