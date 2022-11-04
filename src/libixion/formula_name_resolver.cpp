@@ -684,7 +684,8 @@ sheet_range_t parse_excel_sheet_name_quoted(const ixion::model_context& cxt, con
                 }
 
                 assert(ret.sheet2 == invalid_sheet);
-                buf += std::string_view{p0, std::distance(p0, p) - 1};
+                std::size_t n = std::distance(p0, p) - 1u;
+                buf += std::string_view{p0, n};
                 ret.sheet2 = cxt.get_sheet_index(buf);
                 ret.present = true;
                 return ret;
@@ -698,7 +699,8 @@ sheet_range_t parse_excel_sheet_name_quoted(const ixion::model_context& cxt, con
                     break;
                 }
 
-                buf += std::string_view{p0, std::distance(p0, p)};
+                std::size_t n = std::distance(p0, p);
+                buf += std::string_view{p0, n};
                 ret.sheet1 = cxt.get_sheet_index(buf);
                 p0 = nullptr;
                 buf.clear();
@@ -709,7 +711,8 @@ sheet_range_t parse_excel_sheet_name_quoted(const ixion::model_context& cxt, con
                 if (was_quote)
                 {
                     // two consequtive quotes are treated as a single quote.
-                    buf += std::string_view{p0, std::distance(p0, p)};
+                    std::size_t n = std::distance(p0, p);
+                    buf += std::string_view{p0, n};
                     p0 = nullptr;
                 }
 
@@ -752,7 +755,8 @@ sheet_range_t parse_excel_sheet_name(const ixion::model_context& cxt, const char
             case '!':
             {
                 assert(ret.sheet2 == invalid_sheet);
-                std::string_view name{p0, std::distance(p0, p)};
+                std::size_t n = std::distance(p0, p);
+                std::string_view name{p0, n};
                 ret.sheet2 = cxt.get_sheet_index(name);
                 ret.present = true;
                 return ret;
@@ -766,7 +770,8 @@ sheet_range_t parse_excel_sheet_name(const ixion::model_context& cxt, const char
                     break;
                 }
 
-                std::string_view name{p0, std::distance(p0, p)};
+                std::size_t n = std::distance(p0, p);
+                std::string_view name{p0, n};
                 ret.sheet1 = cxt.get_sheet_index(name);
                 p0 = nullptr;
                 break;

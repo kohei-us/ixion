@@ -14,7 +14,7 @@ endif # BUILD_VULKAN
 
 check_PROGRAMS = \
 	document-test \
-	ixion-test \
+	general-test \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \
@@ -128,8 +128,8 @@ document_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
 	../test/libixion-test.a
 
-ixion_test_SOURCES = ixion_test.cpp
-ixion_test_LDADD = \
+general_test_SOURCES = general_test.cpp
+general_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
 	../test/libixion-test.a \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)
@@ -160,7 +160,7 @@ AM_TESTS_ENVIRONMENT =
 
 TESTS = \
 	document-test \
-	ixion-test \
+	general-test \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \

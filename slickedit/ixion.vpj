@@ -293,10 +293,10 @@
                 <F N="../src/libixion/formula_tokens.cpp"/>
                 <F N="../src/libixion/formula_value_stack.cpp"/>
                 <F N="../src/libixion/formula_value_stack.hpp"/>
+                <F N="../src/libixion/general_test.cpp"/>
                 <F N="../src/libixion/global.cpp"/>
                 <F N="../src/libixion/info.cpp"/>
                 <F N="../src/libixion/interface.cpp"/>
-                <F N="../src/libixion/ixion_test.cpp"/>
                 <F N="../src/libixion/ixion_test_track_deps.cpp"/>
                 <F N="../src/libixion/lexer_tokens.cpp"/>
                 <F N="../src/libixion/lexer_tokens.hpp"/>

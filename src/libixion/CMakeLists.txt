@@ -86,8 +86,8 @@ add_executable(document-test EXCLUDE_FROM_ALL
     document_test.cpp
 )
 
-add_executable(ixion-test EXCLUDE_FROM_ALL
-    ixion_test.cpp
+add_executable(general-test EXCLUDE_FROM_ALL
+    general_test.cpp
 )
 
 add_executable(name-resolver-test EXCLUDE_FROM_ALL
@@ -109,15 +109,15 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
 target_include_directories(compute-engine-test PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
 
 target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
-target_link_libraries(ixion-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(general-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION} ixion-test)
-target_link_libraries(name-resolver-test ixion-${IXION_API_VERSION} name-resolver-test)
+target_link_libraries(name-resolver-test ixion-${IXION_API_VERSION} ixion-test)
 
 add_dependencies(check
     document-test
-    ixion-test
+    general-test
     ixion-test-track-deps
     dirty-cell-tracker-test
     compute-engine-test
@@ -125,7 +125,7 @@ add_dependencies(check
 )
 
 add_test(document-test document-test)
-add_test(ixion-test ixion-test)
+add_test(general-test general-test)
 add_test(ixion-test-track-deps ixion-test-track-deps)
 add_test(dirty-cell-tracker-test dirty-cell-tracker-test)
 add_test(compute-engine-test compute-engine-test)
