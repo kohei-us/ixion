@@ -231,6 +231,7 @@ void test_excel_a1()
     cxt.append_sheet("A B C"); // name with space
     cxt.append_sheet("A'B"); // name with quote
     cxt.append_sheet("C'''D"); // name with multiple consecutive quotes
+    cxt.append_sheet("\"Quoted\""); // name with double quotes
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
@@ -263,6 +264,7 @@ void test_excel_a1()
             { "'A B C'!Z12", true },
             { "'A''B'!Z12", true },
             { "'C''''''D'!BB23", true },
+            { "'\"Quoted\"'!A2", true },
             { 0, false }
         };
 
@@ -394,6 +396,7 @@ void test_excel_a1()
         "NotExists!A1", // non-existing sheet name
         "A B C!B2", // sheet name with space not being quoted
         "A''B!D10", // sheet name with quote must be quoted
+        "\"Quoted\"!E12", // sheet name with double quotes must be quoted
     };
 
     for (const auto& name: invalid_names)
@@ -416,6 +419,7 @@ void test_excel_a1_multisheet()
     cxt.append_sheet("A B C"); // name with space
     cxt.append_sheet("A'B"); // name with quote
     cxt.append_sheet("C'D''E"); // name with two quotes
+    cxt.append_sheet("\"Quoted\""); // name with double quotes
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -433,6 +437,7 @@ void test_excel_a1_multisheet()
         { "One:Three!A1:B2", {0, 0, 0, true, false, false}, {2, 1, 1, true, false, false} },
         { "'Two:A''B'!$F$10", {1, 9, 5, true, true, true}, {4, 9, 5, true, true, true} },
         { "'A''B:C''D''''E'!B$2:D$10", {4, 1, 1, true, true, false}, {5, 9, 3, true, true, false} },
+        { "'Three:\"Quoted\"'!B10", {2, 9, 1, true, false, false}, {6, 9, 1, true, false, false} },
     };
 
     for (const auto& c : checks)

@@ -271,6 +271,7 @@ void append_sheet_name(ostringstream& os, const ixion::model_context& cxt, sheet
         switch (*p)
         {
             case ' ':
+            case '"':
                 quote = true;
             break;
             case '\'':
@@ -772,6 +773,7 @@ sheet_range_t parse_excel_sheet_name(const ixion::model_context& cxt, const char
             }
             case ' ':
             case '\'':
+            case '"':
             {
                 // invalid char. Check if a '!' occurs at a later position.
                 for (++p; p < p_end; ++p)
