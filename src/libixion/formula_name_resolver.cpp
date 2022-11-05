@@ -976,8 +976,10 @@ parse_address_result_type parse_address_a1(const char*& p, const char* p_end, ad
     return valid_address;
 }
 
-parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last, address_t& addr)
+parse_address_result_type parse_address_r1c1(const char*& p, const char* p_end, address_t& addr)
 {
+    assert(p < p_end);
+
     addr.row = row_unset;
     addr.column = column_unset;
 
@@ -985,12 +987,12 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
     {
         addr.row = 0;
         addr.abs_row = false;
+        ++p;
 
-        if (p == p_last)
+        if (p == p_end)
             // Just 'R'.  Not sure if this is valid or invalid, but let's call it invalid for now.
             return parse_address_result_type::invalid;
 
-        ++p;
         if (*p != 'C' && *p != 'c')
         {
             addr.abs_row = (*p != '[');
@@ -1001,22 +1003,22 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
                 if (!std::isdigit(*p) && *p != '-' && *p != '+')
                     return parse_address_result_type::invalid;
 
-                addr.row = parse_number<row_t>(p, p_last + 1);
-                if (p == p_last)
+                addr.row = parse_number<row_t>(p, p_end);
+                if (p + 1 == p_end)
                     return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
                 ++p;
             }
             else if (std::isdigit(*p))
             {
                 // Absolute row address.
-                addr.row = parse_number<row_t>(p, p_last + 1);
+                addr.row = parse_number<row_t>(p, p_end);
                 if (addr.row <= 0)
                     // absolute address with 0 or negative value is invalid.
                     return parse_address_result_type::invalid;
 
                 --addr.row; // 1-based to 0-based.
 
-                if (p == p_last + 1)
+                if (p == p_end)
                     // 'R' followed by a number without 'C' is valid.
                     return parse_address_result_type::valid_address;
             }
@@ -1028,7 +1030,8 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
         addr.column = 0;
         addr.abs_column = false;
 
-        if (p == p_last)
+        ++p;
+        if (p == p_end)
         {
             if (addr.row == row_unset)
                 // Just 'C'.  Row must be set.
@@ -1041,16 +1044,18 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
             return parse_address_result_type::valid_address;
         }
 
-        ++p;
         if (*p == '[')
         {
             // Relative column address.
             ++p;
+            if (p == p_end)
+                return parse_address_result_type::invalid;
+
             if (!std::isdigit(*p) && *p != '-' && *p != '+')
                 return parse_address_result_type::invalid;
 
-            addr.column = parse_number<col_t>(p, p_last + 1);
-            if (p == p_last)
+            addr.column = parse_number<col_t>(p, p_end);
+            if (p + 1 == p_end)
                 return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
 
             ++p;
@@ -1059,20 +1064,20 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
         {
             // Absolute column address.
             addr.abs_column = true;
-            addr.column = parse_number<col_t>(p, p_last + 1);
+            addr.column = parse_number<col_t>(p, p_end);
             if (addr.column <= 0)
                 // absolute address with 0 or negative value is invalid.
                 return parse_address_result_type::invalid;
 
             --addr.column; // 1-based to 0-based.
 
-            if (p == p_last + 1)
+            if (p == p_end)
                 return parse_address_result_type::valid_address;
         }
     }
 
     if (*p == ':')
-        return (p == p_last) ? parse_address_result_type::invalid : parse_address_result_type::range_expected;
+        return (p + 1 == p_end) ? parse_address_result_type::invalid : parse_address_result_type::range_expected;
 
     return parse_address_result_type::invalid;
 }
@@ -1154,7 +1159,7 @@ parse_address_result_type parse_address_excel_r1c1(
         }
     }
 
-    return parse_address_r1c1(p, p_last, addr);
+    return parse_address_r1c1(p, p_last + 1, addr);
 }
 
 parse_address_result parse_address_odff(
