@@ -1140,7 +1140,7 @@ parse_address_result_type parse_address_excel_a1(const char*& p, const char* p_e
 }
 
 parse_address_result_type parse_address_excel_r1c1(
-    const model_context* cxt, const char*& p, const char* p_last, address_t& addr)
+    const model_context* cxt, const char*& p, const char* p_end, address_t& addr)
 {
     addr.row = 0;
     addr.column = 0;
@@ -1151,7 +1151,7 @@ parse_address_result_type parse_address_excel_r1c1(
     if (cxt)
     {
         // Overwrite the sheet index *only when* the sheet name is parsed successfully.
-        auto sheet = parse_sheet_name(*cxt, '!', p, p_last + 1);
+        auto sheet = parse_sheet_name(*cxt, '!', p, p_end);
         if (sheet)
         {
             ++p; // skip the separator
@@ -1159,7 +1159,7 @@ parse_address_result_type parse_address_excel_r1c1(
         }
     }
 
-    return parse_address_r1c1(p, p_last + 1, addr);
+    return parse_address_r1c1(p, p_end, addr);
 }
 
 parse_address_result parse_address_odff(
@@ -1570,13 +1570,11 @@ public:
             return ret;
 
         const char* p_end = p + n;
-        const char* p_last = p;
-        std::advance(p_last, n-1);
 
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0);
 
-        parse_address_result_type parse_res = parse_address_excel_r1c1(mp_cxt, p, p_last, parsed_addr);
+        parse_address_result_type parse_res = parse_address_excel_r1c1(mp_cxt, p, p_end, parsed_addr);
 
         if (parse_res != invalid)
         {
@@ -1604,7 +1602,7 @@ public:
                     return ret;
 
                 address_t parsed_addr2(0, 0, 0);
-                parse_address_result_type parse_res2 = parse_address_excel_r1c1(nullptr, p, p_last, parsed_addr2);
+                parse_address_result_type parse_res2 = parse_address_excel_r1c1(nullptr, p, p_end, parsed_addr2);
                 if (parse_res2 != parse_address_result_type::valid_address)
                     return ret;
 
