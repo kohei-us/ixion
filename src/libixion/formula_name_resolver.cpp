@@ -806,12 +806,14 @@ sheet_range_t parse_excel_sheet_name(const ixion::model_context& cxt, const char
 
 /**
  * If there is no number to parse, it returns 0 and the p will not
- * increment. Otherwise, p will point to the last digit of the number when
- * the call returns.
+ * increment. Otherwise, p will point to the position past the last parsed
+ * digit character.
  */
 template<typename T>
-T parse_number(const char*&p, const char* p_last)
+T parse_number(const char*&p, const char* p_end)
 {
+    assert(p < p_end);
+
     T num = 0;
 
     bool sign = false;
@@ -823,22 +825,12 @@ T parse_number(const char*&p, const char* p_last)
         sign = true;
     }
 
-    bool all_digits = false;
-    while (std::isdigit(*p))
+    for (; p < p_end && std::isdigit(*p); ++p)
     {
         // Parse number.
         num *= 10;
         num += *p - '0';
-        if (p == p_last)
-        {
-            all_digits = true;
-            break;
-        }
-        ++p;
     }
-
-    if (!all_digits)
-        --p;
 
     if (sign)
         num *= -1;
@@ -1009,8 +1001,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
                 if (!std::isdigit(*p) && *p != '-' && *p != '+')
                     return parse_address_result_type::invalid;
 
-                addr.row = parse_number<row_t>(p, p_last);
-                ++p;
+                addr.row = parse_number<row_t>(p, p_last + 1);
                 if (p == p_last)
                     return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
                 ++p;
@@ -1018,17 +1009,16 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
             else if (std::isdigit(*p))
             {
                 // Absolute row address.
-                addr.row = parse_number<row_t>(p, p_last);
+                addr.row = parse_number<row_t>(p, p_last + 1);
                 if (addr.row <= 0)
                     // absolute address with 0 or negative value is invalid.
                     return parse_address_result_type::invalid;
 
                 --addr.row; // 1-based to 0-based.
 
-                if (p == p_last && std::isdigit(*p))
+                if (p == p_last + 1)
                     // 'R' followed by a number without 'C' is valid.
                     return parse_address_result_type::valid_address;
-                ++p;
             }
         }
     }
@@ -1059,8 +1049,7 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
             if (!std::isdigit(*p) && *p != '-' && *p != '+')
                 return parse_address_result_type::invalid;
 
-            addr.column = parse_number<col_t>(p, p_last);
-            ++p;
+            addr.column = parse_number<col_t>(p, p_last + 1);
             if (p == p_last)
                 return (*p == ']') ? parse_address_result_type::valid_address : parse_address_result_type::invalid;
 
@@ -1070,17 +1059,15 @@ parse_address_result_type parse_address_r1c1(const char*& p, const char* p_last,
         {
             // Absolute column address.
             addr.abs_column = true;
-            addr.column = parse_number<col_t>(p, p_last);
+            addr.column = parse_number<col_t>(p, p_last + 1);
             if (addr.column <= 0)
                 // absolute address with 0 or negative value is invalid.
                 return parse_address_result_type::invalid;
 
             --addr.column; // 1-based to 0-based.
 
-            if (p == p_last)
+            if (p == p_last + 1)
                 return parse_address_result_type::valid_address;
-
-            ++p;
         }
     }
 
