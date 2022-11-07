@@ -1399,7 +1399,7 @@ public:
         if (parse_res == valid_address && parsed_addr.row != row_unset)
         {
             // This is a single cell address.
-            to_relative_address(parsed_addr, pos, true);
+            to_relative_address(parsed_addr, pos, false);
 
             if (sheets.present)
             {
@@ -1436,7 +1436,7 @@ public:
                 return ret;
 
             range_t v;
-            to_relative_address(parsed_addr, pos, true);
+            to_relative_address(parsed_addr, pos, false);
             v.first = parsed_addr;
 
             // For now, we assume the sheet index of the end address is identical
@@ -1449,7 +1449,7 @@ public:
                 return ret;
             }
 
-            to_relative_address(parsed_addr, pos, true);
+            to_relative_address(parsed_addr, pos, false);
             v.last = parsed_addr;
             v.last.sheet = v.first.sheet; // re-use the sheet index of the begin address.
 
@@ -1571,18 +1571,30 @@ public:
 
         const char* p_end = p + n;
 
+        sheet_range_t sheets;
+
+        if (mp_cxt)
+        {
+            sheets = parse_excel_sheet_name(*mp_cxt, p, p_end);
+            if (sheets.present && sheets.sheet2 == invalid_sheet)
+                // Sheet name(s) given but is not found in the model.
+                return ret;
+
+            if (sheets.present)
+            {
+                assert(*p == '!');
+                ++p; // skip the '!'
+            }
+        }
+
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0);
 
-        parse_address_result_type parse_res = parse_address_excel_r1c1(mp_cxt, p, p_end, parsed_addr);
+        parse_address_result_type parse_res = parse_address_excel_r1c1(nullptr, p, p_end, parsed_addr);
 
         if (parse_res != invalid)
         {
             // This is a valid R1C1-style address syntax-wise.
-
-            if (parsed_addr.sheet == invalid_sheet)
-                // sheet name is not found in the model.  Report back as invalid.
-                return ret;
 
             if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
                 parse_res = invalid;
@@ -1592,7 +1604,28 @@ public:
         {
             case parse_address_result_type::valid_address:
             {
-                set_cell_reference(ret, parsed_addr);
+                if (sheets.present)
+                {
+                    if (sheets.sheet1 != invalid_sheet)
+                    {
+                        // range of sheets is given. Switch to a range.
+                        range_t v{parsed_addr, parsed_addr};
+                        v.first.sheet = sheets.sheet1;
+                        v.last.sheet = sheets.sheet2;
+
+                        ret.value = v;
+                        ret.type = formula_name_t::range_reference;
+                    }
+                    else
+                    {
+                        // single sheet is given.
+                        parsed_addr.sheet = sheets.sheet2;
+                        set_cell_reference(ret, parsed_addr);
+                    }
+                }
+                else
+                    set_cell_reference(ret, parsed_addr);
+
                 return ret;
             }
             case parse_address_result_type::range_expected:
@@ -1606,15 +1639,26 @@ public:
                 if (parse_res2 != parse_address_result_type::valid_address)
                     return ret;
 
-                // For now, we assume the sheet index of the end address is identical
-                // to that of the begin address.
-                parsed_addr2.sheet = parsed_addr.sheet;
-
-                ret.type = formula_name_t::range_reference;
-
                 range_t v;
                 v.first = parsed_addr;
                 v.last = parsed_addr2;
+
+                if (sheets.present)
+                {
+                    if (sheets.sheet1 != invalid_sheet)
+                    {
+                        // range of sheets is given
+                        v.first.sheet = sheets.sheet1;
+                        v.last.sheet = sheets.sheet2;
+                    }
+                    else
+                    {
+                        // single sheet is given
+                        v.first.sheet = v.last.sheet = sheets.sheet2;
+                    }
+                }
+
+                ret.type = formula_name_t::range_reference;
                 ret.value = v;
 
                 return ret;

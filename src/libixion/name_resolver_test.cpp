@@ -781,6 +781,50 @@ void test_excel_r1c1()
     }
 }
 
+void test_excel_r1c1_multisheet()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    model_context cxt;
+    cxt.append_sheet("One");
+    cxt.append_sheet("Two");
+    cxt.append_sheet("Three");
+    cxt.append_sheet("A B C"); // name with space
+    cxt.append_sheet("A'B"); // name with quote
+    cxt.append_sheet("C'D''E"); // name with two quotes
+    cxt.append_sheet("\"Quoted\""); // name with double quotes
+
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_r1c1, &cxt);
+    assert(resolver);
+
+    struct check_type
+    {
+        std::string_view name;
+        address_t address1;
+        address_t address2;
+    };
+
+    // NB: sheet positions are always absolute in Excel.
+    const check_type checks[] = {
+        { "One:Two!R[3]C[2]", {0, 3, 2, true, false, false}, {1, 3, 2, true, false, false} },
+        { "One:Three!RC:R[1]C[1]", {0, 0, 0, true, false, false}, {2, 1, 1, true, false, false} },
+        { "'Two:A''B'!R10C6", {1, 9, 5, true, true, true}, {4, 9, 5, true, true, true} },
+        { "'A''B:C''D''''E'!R2C[1]:R10C[3]", {4, 1, 1, true, true, false}, {5, 9, 3, true, true, false} },
+        { "'Three:\"Quoted\"'!R[9]C[1]", {2, 9, 1, true, false, false}, {6, 9, 1, true, false, false} },
+    };
+
+    for (const auto& c : checks)
+    {
+        std::cout << "name: " << c.name << std::endl;
+        formula_name_t res = resolver->resolve(c.name, abs_address_t());
+        assert(res.type == formula_name_t::name_type::range_reference);
+
+        auto v = std::get<range_t>(res.value);
+        assert(v.first == c.address1);
+        assert(v.last == c.address2);
+    }
+}
+
 void test_odff()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1077,6 +1121,7 @@ int main()
     test_named_expression();
     test_table_excel_a1();
     test_excel_r1c1();
+    test_excel_r1c1_multisheet();
     test_odff();
     test_odf_cra();
 
