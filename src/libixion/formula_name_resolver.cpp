@@ -1622,14 +1622,14 @@ public:
                 if (p == p_end)
                     return ret;
 
-                address_t parsed_addr2(0, 0, 0);
-                parse_address_result_type parse_res2 = parse_address_excel_r1c1(p, p_end, parsed_addr2);
+                range_t v;
+                v.first = parsed_addr;
+
+                parse_address_result_type parse_res2 = parse_address_excel_r1c1(p, p_end, parsed_addr);
                 if (parse_res2 != parse_address_result_type::valid_address)
                     return ret;
 
-                range_t v;
-                v.first = parsed_addr;
-                v.last = parsed_addr2;
+                v.last = parsed_addr;
 
                 if (sheets.present)
                 {
