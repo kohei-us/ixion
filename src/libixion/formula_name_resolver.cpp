@@ -1577,16 +1577,7 @@ public:
 
         // Use the sheet where the cell is unless sheet name is explicitly given.
         address_t parsed_addr(pos.sheet, 0, 0);
-
         parse_address_result_type parse_res = parse_address_excel_r1c1(p, p_end, parsed_addr);
-
-        if (parse_res != invalid)
-        {
-            // This is a valid R1C1-style address syntax-wise.
-
-            if (!check_address_by_sheet_bounds(mp_cxt, parsed_addr))
-                parse_res = invalid;
-        }
 
         switch (parse_res)
         {
