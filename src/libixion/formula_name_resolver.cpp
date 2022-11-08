@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/formula_name_resolver.hpp"
-#include "ixion/table.hpp"
+#include <ixion/formula_name_resolver.hpp>
+#include <ixion/table.hpp>
 
 #include "formula_functions.hpp"
 #include "debug.hpp"
@@ -20,8 +20,6 @@
 #include <algorithm>
 #include <cctype>
 #include <optional>
-
-using namespace std;
 
 namespace ixion {
 
@@ -246,7 +244,7 @@ void set_cell_reference(formula_name_t& ret, const address_t& addr)
 
 enum class resolver_parse_mode { column, row };
 
-void append_sheet_name(ostringstream& os, const ixion::model_context& cxt, sheet_t sheet)
+void append_sheet_name(std::ostringstream& os, const ixion::model_context& cxt, sheet_t sheet)
 {
     if (!is_valid_sheet(sheet))
     {
@@ -254,8 +252,8 @@ void append_sheet_name(ostringstream& os, const ixion::model_context& cxt, sheet
         return;
     }
 
-    string sheet_name = cxt.get_sheet_name(sheet);
-    string buffer; // used only when the sheet name contains at least one single quote.
+    std::string sheet_name = cxt.get_sheet_name(sheet);
+    std::string buffer; // used only when the sheet name contains at least one single quote.
 
     const char* p = sheet_name.data();
     const char* p_end = p + sheet_name.size();
@@ -276,7 +274,7 @@ void append_sheet_name(ostringstream& os, const ixion::model_context& cxt, sheet
             break;
             case '\'':
                 quote = true;
-                buffer += string(p0, p-p0);
+                buffer += std::string(p0, p-p0);
                 buffer.push_back(*p);
                 buffer.push_back(*p);
                 p0 = nullptr;
@@ -292,7 +290,7 @@ void append_sheet_name(ostringstream& os, const ixion::model_context& cxt, sheet
     else
     {
         if (p0)
-            buffer += string(p0, p-p0);
+            buffer += std::string(p0, p-p0);
         os << buffer;
     }
 
@@ -330,10 +328,10 @@ void append_sheet_name_odf_cra(
     os << '.';
 }
 
-void append_column_name_a1(ostringstream& os, col_t col)
+void append_column_name_a1(std::ostringstream& os, col_t col)
 {
     const col_t div = 26;
-    string col_name;
+    std::string col_name;
     while (true)
     {
         col_t rem = col % div;
@@ -423,7 +421,7 @@ void append_address_a1_with_sheet_name_sep(
 }
 
 void append_address_r1c1(
-    ostringstream& os, const address_t& addr, const abs_address_t& pos)
+    std::ostringstream& os, const address_t& addr, const abs_address_t& pos)
 {
     if (addr.row != row_unset)
     {
@@ -454,17 +452,17 @@ void append_address_r1c1(
     }
 }
 
-void append_name_string(ostringstream& os, const model_context* cxt, string_id_t sid)
+void append_name_string(std::ostringstream& os, const model_context* cxt, string_id_t sid)
 {
     if (!cxt)
         return;
 
-    const string* p = cxt->get_string(sid);
+    const std::string* p = cxt->get_string(sid);
     if (p)
         os << *p;
 }
 
-char append_table_areas(ostringstream& os, const table_t& table)
+char append_table_areas(std::ostringstream& os, const table_t& table)
 {
     if (table.areas == table_area_all)
     {
@@ -582,7 +580,7 @@ std::optional<sheet_t> parse_sheet_name_quoted(
                 sheet = cxt.get_sheet_index({p1, len});
             else
             {
-                buffer += string(p1, len);
+                buffer += std::string(p1, len);
                 sheet = cxt.get_sheet_index({buffer.data(), buffer.size()});
             }
 
@@ -1205,9 +1203,9 @@ void to_relative_address(address_t& addr, const abs_address_t& pos, bool sheet)
         addr.column -= pos.column;
 }
 
-string to_string(const model_context* cxt, const table_t& table)
+std::string to_string(const model_context* cxt, const table_t& table)
 {
-    ostringstream os;
+    std::ostringstream os;
     append_name_string(os, cxt, table.name);
 
     if (table.column_first == empty_string_id)
@@ -1285,7 +1283,7 @@ string to_string(const model_context* cxt, const table_t& table)
 formula_name_t::formula_name_t() :
     type(invalid), value(formula_function_t::func_unknown) {}
 
-string formula_name_t::to_string() const
+std::string formula_name_t::to_string() const
 {
     std::ostringstream os;
 
@@ -1324,9 +1322,9 @@ formula_name_resolver::~formula_name_resolver() {}
 
 namespace {
 
-string get_column_name_a1(col_t col)
+std::string get_column_name_a1(col_t col)
 {
-    ostringstream os;
+    std::ostringstream os;
     append_column_name_a1(os, col);
     return os.str();
 }
@@ -1465,18 +1463,18 @@ public:
         return ret;
     }
 
-    virtual string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
-        ostringstream os;
+        std::ostringstream os;
         append_address_a1(os, sheet_name ? mp_cxt : nullptr, addr, pos, '!');
         return os.str();
     }
 
-    virtual string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
+    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
         // For now, sheet index of the end-range address is ignored.
 
-        ostringstream os;
+        std::ostringstream os;
         col_t col = range.first.column;
         row_t row = range.first.row;
         sheet_t sheet = range.first.sheet;
@@ -1511,12 +1509,12 @@ public:
         return os.str();
     }
 
-    virtual string get_name(const table_t& table) const
+    virtual std::string get_name(const table_t& table) const
     {
         return to_string(mp_cxt, table);
     }
 
-    virtual string get_column_name(col_t col) const
+    virtual std::string get_column_name(col_t col) const
     {
         return get_column_name_a1(col);
     }
@@ -1529,7 +1527,7 @@ class excel_r1c1 : public formula_name_resolver
 {
     const model_context* mp_cxt;
 
-    void write_sheet_name(ostringstream& os, const address_t& addr, const abs_address_t& pos) const
+    void write_sheet_name(std::ostringstream& os, const address_t& addr, const abs_address_t& pos) const
     {
         if (mp_cxt)
         {
@@ -1652,7 +1650,7 @@ public:
 
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
-        ostringstream os;
+        std::ostringstream os;
 
         if (sheet_name)
             write_sheet_name(os, addr, pos);
@@ -1663,7 +1661,7 @@ public:
 
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
-        ostringstream os;
+        std::ostringstream os;
 
         if (sheet_name)
             write_sheet_name(os, range.first, pos);
@@ -1681,7 +1679,7 @@ public:
 
     virtual std::string get_column_name(col_t col) const
     {
-        ostringstream os;
+        std::ostringstream os;
         os << (col+1);
         return os.str();
     }
@@ -1822,7 +1820,7 @@ public:
 
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const override
     {
-        ostringstream os;
+        std::ostringstream os;
         col_t col = range.first.column;
         row_t row = range.first.row;
 
@@ -1944,12 +1942,12 @@ public:
         return ret;
     }
 
-    virtual string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
+    virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const
     {
         if (!mp_cxt)
             sheet_name = false;
 
-        ostringstream os;
+        std::ostringstream os;
         os << '[';
         if (sheet_name)
         {
@@ -1966,12 +1964,12 @@ public:
         return os.str();
     }
 
-    virtual string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
+    virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const
     {
         if (!mp_cxt)
             sheet_name = false;
 
-        ostringstream os;
+        std::ostringstream os;
         os << '[';
 
         if (sheet_name)
@@ -2011,13 +2009,13 @@ public:
         return os.str();
     }
 
-    virtual string get_name(const table_t& table) const
+    virtual std::string get_name(const table_t& table) const
     {
         // TODO : ODF doesn't support table reference yet.
-        return string();
+        return std::string();
     }
 
-    virtual string get_column_name(col_t col) const
+    virtual std::string get_column_name(col_t col) const
     {
         return get_column_name_a1(col);
     }
