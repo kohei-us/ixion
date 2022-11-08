@@ -2,7 +2,7 @@
 Formula Tokens
 ==============
 
-.. doxygenclass:: ixion::formula_token
+.. doxygenstruct:: ixion::formula_token
    :members:
 
 .. doxygenclass:: ixion::formula_tokens_store
