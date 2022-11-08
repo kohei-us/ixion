@@ -17,7 +17,6 @@
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
 #include "debug.hpp"
-#include "concrete_formula_tokens.hpp"
 
 #include <sstream>
 #include <algorithm>
@@ -73,13 +72,14 @@ formula_tokens_t create_formula_error_tokens(
     std::string_view error)
 {
     formula_tokens_t tokens;
-    tokens.push_back(std::make_unique<error_token>(2));
+    tokens.push_back(std::make_unique<formula_token>(fop_error));
+    tokens.back()->value = std::size_t{2u};
 
     string_id_t sid_src_formula = cxt.add_string(src_formula);
-    tokens.push_back(std::make_unique<string_token>(sid_src_formula));
+    tokens.push_back(std::make_unique<formula_token>(sid_src_formula));
 
     string_id_t sid_error = cxt.add_string(error);
-    tokens.push_back(std::make_unique<string_token>(sid_error));
+    tokens.push_back(std::make_unique<formula_token>(sid_error));
 
     return tokens;
 }
@@ -108,7 +108,7 @@ public:
 
     void operator() (const formula_token& token)
     {
-        switch (token.get_opcode())
+        switch (token.opcode)
         {
             case fop_close:
                 m_os << ')';
@@ -135,40 +135,40 @@ public:
                 m_os << '+';
                 break;
             case fop_value:
-                m_os << token.get_value();
+                m_os << std::get<double>(token.value);
                 break;
             case fop_sep:
                 m_os << m_cxt.get_config().sep_function_arg;
                 break;
             case fop_function:
             {
-                formula_function_t fop = static_cast<formula_function_t>(token.get_uint32());
+                auto fop = std::get<formula_function_t>(token.value);
                 m_os << formula_functions::get_function_name(fop);
                 break;
             }
             case fop_single_ref:
             {
-                address_t addr = token.get_single_ref();
+                const address_t& addr = std::get<address_t>(token.value);
                 bool sheet_name = addr.to_abs(m_pos).sheet != m_pos.sheet;
                 m_os << m_resolver.get_name(addr, m_pos, sheet_name);
                 break;
             }
             case fop_range_ref:
             {
-                range_t range = token.get_range_ref();
+                const range_t& range = std::get<range_t>(token.value);
                 bool sheet_name = range.to_abs(m_pos).first.sheet != m_pos.sheet;
                 m_os << m_resolver.get_name(range, m_pos, sheet_name);
                 break;
             }
             case fop_table_ref:
             {
-                table_t tbl = token.get_table_ref();
+                const table_t& tbl = std::get<table_t>(token.value);
                 m_os << m_resolver.get_name(tbl);
                 break;
             }
             case fop_string:
             {
-                const std::string* p = m_cxt.get_string(token.get_uint32());
+                const std::string* p = m_cxt.get_string(std::get<string_id_t>(token.value));
                 if (p)
                     m_os << "\"" << *p << "\"";
                 else
@@ -195,7 +195,7 @@ public:
                 m_os << ">=";
                 break;
             case fop_named_expression:
-                m_os << token.get_name();
+                m_os << std::get<std::string>(token.value);
                 break;
             case fop_unknown:
             default:
@@ -220,7 +220,7 @@ std::string print_formula_tokens(
 {
     std::ostringstream os;
 
-    if (!tokens.empty() && tokens[0]->get_opcode() == fop_error)
+    if (!tokens.empty() && tokens[0]->opcode == fop_error)
         // Let's not print anything on error tokens.
         return std::string();
 
@@ -258,10 +258,10 @@ bool has_volatile(const formula_tokens_t& tokens)
     for (; i != iend; ++i)
     {
         const formula_token& t = **i;
-        if (t.get_opcode() != fop_function)
+        if (t.opcode != fop_function)
             continue;
 
-        formula_function_t func = static_cast<formula_function_t>(t.get_uint32());
+        auto func = std::get<formula_function_t>(t.value);
         if (is_volatile(func))
             return true;
     }
@@ -330,18 +330,18 @@ void register_formula_cell(
     {
         IXION_TRACE("ref token: " << detail::print_formula_token_repr(*p));
 
-        switch (p->get_opcode())
+        switch (p->opcode)
         {
             case fop_single_ref:
             {
-                abs_address_t addr = p->get_single_ref().to_abs(pos);
+                abs_address_t addr = std::get<address_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("register_formula_cell", addr.sheet, cxt, pos, *cell);
                 tracker.add(src_pos, addr);
                 break;
             }
             case fop_range_ref:
             {
-                abs_range_t range = p->get_range_ref().to_abs(pos);
+                abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("register_formula_cell", range.first.sheet, cxt, pos, *cell);
                 rc_size_t sheet_size = cxt.get_sheet_size();
                 if (range.all_columns())
@@ -389,18 +389,18 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
     for (const formula_token* p : ref_tokens)
     {
 
-        switch (p->get_opcode())
+        switch (p->opcode)
         {
             case fop_single_ref:
             {
-                abs_address_t addr = p->get_single_ref().to_abs(pos);
+                abs_address_t addr = std::get<address_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("unregister_formula_cell", addr.sheet, cxt, pos, *fcell);
                 tracker.remove(pos, addr);
                 break;
             }
             case fop_range_ref:
             {
-                abs_range_t range = p->get_range_ref().to_abs(pos);
+                abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("unregister_formula_cell", range.first.sheet, cxt, pos, *fcell);
                 tracker.remove(pos, range);
                 break;

@@ -266,8 +266,6 @@
                 <F N="../src/libixion/compute_engine_test.cpp"/>
                 <F N="../src/libixion/compute_engine_vulkan.cpp"/>
                 <F N="../src/libixion/compute_engine_vulkan.hpp"/>
-                <F N="../src/libixion/concrete_formula_tokens.cpp"/>
-                <F N="../src/libixion/concrete_formula_tokens.hpp"/>
                 <F N="../src/libixion/config.cpp"/>
                 <F N="../src/libixion/constants.inl"/>
                 <F N="../src/libixion/debug.cpp"/>

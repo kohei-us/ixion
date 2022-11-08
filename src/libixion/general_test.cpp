@@ -1387,16 +1387,16 @@ void test_invalid_formula_tokens()
 
     formula_tokens_t tokens = create_formula_error_tokens(cxt, invalid_formula, error_msg);
 
-    assert(tokens[0]->get_opcode() == fop_error);
-    assert(tokens.size() == (tokens[0]->get_uint32() + 1));
+    assert(tokens[0]->opcode == fop_error);
+    assert(tokens.size() == (std::get<std::size_t>(tokens[0]->value) + 1));
 
-    assert(tokens[1]->get_opcode() == fop_string);
-    string_id_t sid = tokens[1]->get_uint32();
+    assert(tokens[1]->opcode == fop_string);
+    string_id_t sid = std::get<string_id_t>(tokens[1]->value);
     const std::string* s = cxt.get_string(sid);
     assert(invalid_formula == *s);
 
-    assert(tokens[2]->get_opcode() == fop_string);
-    sid = tokens[2]->get_uint32();
+    assert(tokens[2]->opcode == fop_string);
+    sid = std::get<string_id_t>(tokens[2]->value);
     s = cxt.get_string(sid);
     assert(error_msg == *s);
 }

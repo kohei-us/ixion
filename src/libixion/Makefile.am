@@ -30,8 +30,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	cell_access.cpp \
 	column_store_type.hpp \
 	compute_engine.cpp \
-	concrete_formula_tokens.hpp \
-	concrete_formula_tokens.cpp \
 	config.cpp \
 	debug.hpp \
 	debug.cpp \

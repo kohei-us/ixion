@@ -7,7 +7,6 @@
 
 #include "formula_interpreter.hpp"
 #include "formula_functions.hpp"
-#include "concrete_formula_tokens.hpp"
 #include "debug.hpp"
 
 #include "ixion/cell.hpp"
@@ -36,8 +35,8 @@ public:
     invalid_expression(const string& msg) : general_error(msg) {}
 };
 
-opcode_token paren_open = opcode_token(fop_open);
-opcode_token paren_close = opcode_token(fop_close);
+const formula_token paren_open = formula_token{fop_open};
+const formula_token paren_close = formula_token{fop_close};
 
 }
 
@@ -143,13 +142,14 @@ void formula_interpreter::init_tokens()
 
     for (const std::unique_ptr<formula_token>& p : src_tokens)
     {
-        if (p->get_opcode() == fop_named_expression)
+        if (p->opcode == fop_named_expression)
         {
             // Named expression.  Expand it.
+            const auto& name = std::get<std::string>(p->value);
             const named_expression_t* expr = m_context.get_named_expression(
-                m_pos.sheet, p->get_name());
+                m_pos.sheet, name);
 
-            used_names.insert(p->get_name());
+            used_names.insert(name);
             expand_named_expression(expr, used_names);
         }
         else
@@ -244,9 +244,9 @@ void formula_interpreter::expand_named_expression(const named_expression_t* expr
     for (const auto& token : expr->tokens)
     {
         const formula_token& t = *token;
-        if (t.get_opcode() == fop_named_expression)
+        if (t.opcode == fop_named_expression)
         {
-            string expr_name = t.get_name();
+            const auto& expr_name = std::get<std::string>(t.value);
             if (used_names.count(expr_name) > 0)
             {
                 // Circular reference detected.
@@ -542,7 +542,7 @@ void formula_interpreter::expression()
     term();
     while (has_token())
     {
-        fopcode_t oc = token().get_opcode();
+        fopcode_t oc = token().opcode;
         if (!valid_expression_op(oc))
             return;
 
@@ -601,7 +601,7 @@ void formula_interpreter::term()
     if (!has_token())
         return;
 
-    fopcode_t oc = token().get_opcode();
+    fopcode_t oc = token().opcode;
     switch (oc)
     {
         case fop_multiply:
@@ -664,7 +664,7 @@ void formula_interpreter::factor()
     // <constant> || <variable> || '(' <expression> ')' || <function>
 
     bool negative_sign = sign(); // NB: may be precedeed by a '+' or '-' sign.
-    fopcode_t oc = token().get_opcode();
+    fopcode_t oc = token().opcode;
 
     switch (oc)
     {
@@ -714,7 +714,7 @@ bool formula_interpreter::sign()
 {
     ensure_token_exists();
 
-    fopcode_t oc = token().get_opcode();
+    fopcode_t oc = token().opcode;
     bool sign_set = false;
 
     switch (oc)
@@ -746,7 +746,7 @@ void formula_interpreter::paren()
 
     next();
     expression();
-    if (token_or_throw().get_opcode() != fop_close)
+    if (token_or_throw().opcode != fop_close)
         throw invalid_expression("paren: expected close paren");
 
     if (mp_handler)
@@ -757,7 +757,7 @@ void formula_interpreter::paren()
 
 void formula_interpreter::single_ref()
 {
-    address_t addr = token().get_single_ref();
+    const address_t& addr = std::get<address_t>(token().value);
     IXION_TRACE("ref=" << addr.get_name() << "; origin=" << m_pos.get_name());
 
     if (mp_handler)
@@ -778,7 +778,7 @@ void formula_interpreter::single_ref()
 
 void formula_interpreter::range_ref()
 {
-    range_t range = token().get_range_ref();
+    const range_t& range = std::get<range_t>(token().value);
     IXION_TRACE("ref-start=" << range.first.get_name() << "; ref-end=" << range.last.get_name() << "; origin=" << m_pos.get_name());
 
     if (mp_handler)
@@ -809,7 +809,7 @@ void formula_interpreter::table_ref()
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 
-    table_t table = token().get_table_ref();
+    const table_t& table = std::get<table_t>(token().value);
 
     if (mp_handler)
         mp_handler->push_table_ref(table);
@@ -832,7 +832,7 @@ void formula_interpreter::table_ref()
 
 void formula_interpreter::constant()
 {
-    double val = token().get_value();
+    double val = std::get<double>(token().value);
     next();
     get_stack().push_value(val);
     if (mp_handler)
@@ -841,7 +841,7 @@ void formula_interpreter::constant()
 
 void formula_interpreter::literal()
 {
-    string_id_t sid = token().get_uint32();
+    const string_id_t sid = std::get<string_id_t>(token().value);
     const std::string* p = m_context.get_string(sid);
     if (!p)
         throw general_error("no string found for the specified string ID.");
@@ -856,7 +856,7 @@ void formula_interpreter::function()
 {
     // <func name> '(' <expression> ',' <expression> ',' ... ',' <expression> ')'
     ensure_token_exists();
-    assert(token().get_opcode() == fop_function);
+    assert(token().opcode == fop_function);
     formula_function_t func_oc = formula_functions::get_function_opcode(token());
     if (mp_handler)
         mp_handler->push_function(func_oc);
@@ -866,13 +866,13 @@ void formula_interpreter::function()
     IXION_TRACE("function='" << get_formula_function_name(func_oc) << "'");
     assert(get_stack().empty());
 
-    if (next_token().get_opcode() != fop_open)
+    if (next_token().opcode != fop_open)
         throw invalid_expression("expecting a '(' after a function name.");
 
     if (mp_handler)
         mp_handler->push_token(fop_open);
 
-    fopcode_t oc = next_token().get_opcode();
+    fopcode_t oc = next_token().opcode;
     bool expect_sep = false;
     while (oc != fop_close)
     {
@@ -891,7 +891,7 @@ void formula_interpreter::function()
             expression();
             expect_sep = true;
         }
-        oc = token_or_throw().get_opcode();
+        oc = token_or_throw().opcode;
     }
 
     if (mp_handler)

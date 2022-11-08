@@ -11,9 +11,11 @@
 #include "address.hpp"
 #include "table.hpp"
 #include "formula_opcode.hpp"
+#include "formula_function_opcode.hpp"
 #include "formula_tokens_fwd.hpp"
 
 #include <string>
+#include <variant>
 
 namespace ixion {
 
@@ -37,29 +39,33 @@ IXION_DLLPUBLIC std::string_view get_opcode_name(fopcode_t oc);
  */
 IXION_DLLPUBLIC std::string_view get_formula_opcode_string(fopcode_t oc);
 
-class IXION_DLLPUBLIC formula_token
+struct IXION_DLLPUBLIC formula_token final
 {
-    fopcode_t m_opcode;
+    using value_type = std::variant<
+        address_t, range_t, table_t, formula_function_t,
+        double, string_id_t, std::size_t, std::string>;
 
-public:
+    fopcode_t opcode;
+    value_type value;
+
     formula_token() = delete;
 
     formula_token(fopcode_t op);
+    formula_token(const address_t& addr);
+    formula_token(const range_t& range);
+    formula_token(const table_t& table);
+    formula_token(formula_function_t func);
+    formula_token(double v);
+    formula_token(string_id_t sid);
+    formula_token(std::string name);
     formula_token(const formula_token& r);
-    virtual ~formula_token() = 0;
-
-    fopcode_t get_opcode() const;
+    formula_token(formula_token&& r);
+    ~formula_token();
 
     bool operator== (const formula_token& r) const;
     bool operator!= (const formula_token& r) const;
 
-    virtual address_t get_single_ref() const;
-    virtual range_t get_range_ref() const;
-    virtual table_t get_table_ref() const;
-    virtual double get_value() const;
-    virtual uint32_t get_uint32() const;
-    virtual std::string get_name() const;
-    virtual void write_string(std::ostream& os) const;
+    void write_string(std::ostream& os) const;
 };
 
 class IXION_DLLPUBLIC formula_tokens_store

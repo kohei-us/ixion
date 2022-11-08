@@ -89,57 +89,53 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
 // ============================================================================
 
 formula_token::formula_token(fopcode_t op) :
-    m_opcode(op)
+    opcode(op)
 {
 }
 
-formula_token::formula_token(const formula_token& r) :
-    m_opcode(r.m_opcode)
+formula_token::formula_token(const address_t& addr) :
+    opcode(fop_single_ref), value(addr)
 {
 }
 
-formula_token::~formula_token()
+formula_token::formula_token(const range_t& range) :
+    opcode(fop_range_ref), value(range)
 {
 }
 
-fopcode_t formula_token::get_opcode() const
+formula_token::formula_token(const table_t& table) :
+    opcode(fop_table_ref), value(table)
 {
-    return m_opcode;
 }
+
+formula_token::formula_token(formula_function_t func) :
+    opcode(fop_function), value(func)
+{
+}
+
+formula_token::formula_token(double v) :
+    opcode(fop_value), value(v)
+{
+}
+
+formula_token::formula_token(string_id_t sid) :
+    opcode(fop_string), value(sid)
+{
+}
+
+formula_token::formula_token(std::string name) :
+    opcode(fop_named_expression), value(std::move(name))
+{
+}
+
+
+formula_token::formula_token(const formula_token& r) = default;
+formula_token::formula_token(formula_token&& r) = default;
+formula_token::~formula_token() = default;
 
 bool formula_token::operator== (const formula_token& r) const
 {
-    if (m_opcode != r.m_opcode)
-        return false;
-
-    switch (m_opcode)
-    {
-        case fop_close:
-        case fop_divide:
-        case fop_minus:
-        case fop_multiply:
-        case fop_exponent:
-        case fop_concat:
-        case fop_open:
-        case fop_plus:
-        case fop_sep:
-            return true;
-        case fop_single_ref:
-            return get_single_ref() == r.get_single_ref();
-        case fop_range_ref:
-            return get_range_ref() == r.get_range_ref();
-        case fop_named_expression:
-            return get_name() == r.get_name();
-        case fop_string:
-            return get_uint32() == r.get_uint32();
-        case fop_value:
-            return get_value() == r.get_value();
-        case fop_function:
-            return get_uint32() == r.get_uint32();
-        default:
-            ;
-    }
-    return false;
+    return opcode == r.opcode && value == r.value;
 }
 
 bool formula_token::operator!= (const formula_token& r) const
@@ -147,38 +143,69 @@ bool formula_token::operator!= (const formula_token& r) const
     return !operator== (r);
 }
 
-address_t formula_token::get_single_ref() const
+void formula_token::write_string(std::ostream& os) const
 {
-    return address_t();
-}
+    switch (opcode)
+    {
+        case fop_string:
+        {
+            os << "string token: (identifier=" << std::get<string_id_t>(value) << ")";
+            break;
+        }
+        case fop_value:
+        {
+            os << "value token: " << std::get<double>(value);
+            break;
+        }
+        case fop_single_ref:
+        {
+            os << "single ref token: " << std::get<address_t>(value);
+            break;
+        }
+        case fop_range_ref:
+        {
+            os << "range ref token: " << std::get<range_t>(value);
+            break;
+        }
+        case fop_table_ref:
+        {
+            os << "table ref token: " << "TODO";
+            break;
+        }
+        case fop_named_expression:
+        {
+            os << "named expression token: '" << std::get<std::string>(value) << "'";
+            break;
+        }
+        case fop_function:
+        {
+            using _int_type = std::underlying_type_t<formula_function_t>;
 
-range_t formula_token::get_range_ref() const
-{
-    return range_t();
-}
-
-table_t formula_token::get_table_ref() const
-{
-    return table_t();
-}
-
-double formula_token::get_value() const
-{
-    return 0.0;
-}
-
-uint32_t formula_token::get_uint32() const
-{
-    return 0;
-}
-
-std::string formula_token::get_name() const
-{
-    return std::string();
-}
-
-void formula_token::write_string(std::ostream& /*os*/) const
-{
+            formula_function_t v = std::get<formula_function_t>(value);
+            os << "function token: (opcode=" << _int_type(v) << "; name='" << get_formula_function_name(v) << "')";
+            break;
+        }
+        case fop_plus:
+        case fop_minus:
+        case fop_divide:
+        case fop_multiply:
+        case fop_exponent:
+        case fop_concat:
+        case fop_equal:
+        case fop_not_equal:
+        case fop_less:
+        case fop_greater:
+        case fop_less_equal:
+        case fop_greater_equal:
+        case fop_open:
+        case fop_close:
+        case fop_sep:
+        case fop_error:
+        case fop_unknown:
+            os << "opcode token: (name=" << get_opcode_name(opcode) << "; s='"
+                << get_formula_opcode_string(opcode) << "')";
+            break;
+    }
 }
 
 struct formula_tokens_store::impl

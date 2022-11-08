@@ -587,8 +587,8 @@ formula_functions::invalid_arg::invalid_arg(const std::string& msg) :
 
 formula_function_t formula_functions::get_function_opcode(const formula_token& token)
 {
-    assert(token.get_opcode() == fop_function);
-    return static_cast<formula_function_t>(token.get_uint32());
+    assert(token.opcode == fop_function);
+    return std::get<formula_function_t>(token.value);
 }
 
 formula_function_t formula_functions::get_function_opcode(std::string_view s)
