@@ -25,6 +25,8 @@ struct IXION_DLLPUBLIC table_t
     bool operator!= (const table_t& r) const;
 };
 
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const table_t& table);
+
 }
 
 #endif

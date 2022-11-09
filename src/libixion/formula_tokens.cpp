@@ -241,7 +241,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         }
         case fop_table_ref:
         {
-            os << "table ref token: " << "TODO";
+            os << "table ref token: " << std::get<table_t>(ft.value);
             break;
         }
         case fop_named_expression:
