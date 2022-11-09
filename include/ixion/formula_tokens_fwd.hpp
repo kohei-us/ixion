@@ -17,7 +17,7 @@ namespace ixion {
 class formula_token;
 class formula_tokens_store;
 using formula_tokens_store_ptr_t = boost::intrusive_ptr<formula_tokens_store>;
-using formula_tokens_t = std::vector<std::unique_ptr<formula_token>>;
+using formula_tokens_t = std::vector<formula_token>;
 struct named_expression_t;
 
 }

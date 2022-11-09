@@ -140,12 +140,12 @@ void formula_interpreter::init_tokens()
 
     const formula_tokens_t& src_tokens = ts->get();
 
-    for (const std::unique_ptr<formula_token>& p : src_tokens)
+    for (const formula_token& t : src_tokens)
     {
-        if (p->opcode == fop_named_expression)
+        if (t.opcode == fop_named_expression)
         {
             // Named expression.  Expand it.
-            const auto& name = std::get<std::string>(p->value);
+            const auto& name = std::get<std::string>(t.value);
             const named_expression_t* expr = m_context.get_named_expression(
                 m_pos.sheet, name);
 
@@ -154,7 +154,7 @@ void formula_interpreter::init_tokens()
         }
         else
             // Normal token.
-            m_tokens.push_back(p.get());
+            m_tokens.push_back(&t);
     }
 
     m_end_token_pos = m_tokens.end();
@@ -241,9 +241,8 @@ void formula_interpreter::expand_named_expression(const named_expression_t* expr
         throw formula_error(formula_error_t::name_not_found);
 
     m_tokens.push_back(&paren_open);
-    for (const auto& token : expr->tokens)
+    for (const auto& t : expr->tokens)
     {
-        const formula_token& t = *token;
         if (t.opcode == fop_named_expression)
         {
             const auto& expr_name = std::get<std::string>(t.value);

@@ -421,13 +421,13 @@ void formula_cell::check_circular(const model_context& cxt, const abs_address_t&
 {
     // TODO: Check to make sure this is being run on the main thread only.
     const formula_tokens_t& tokens = mp_impl->m_tokens->get();
-    for (const std::unique_ptr<formula_token>& t : tokens)
+    for (const formula_token& t : tokens)
     {
-        switch (t->opcode)
+        switch (t.opcode)
         {
             case fop_single_ref:
             {
-                abs_address_t addr = std::get<address_t>(t->value).to_abs(pos);
+                abs_address_t addr = std::get<address_t>(t.value).to_abs(pos);
                 const formula_cell* ref = cxt.get_formula_cell(addr);
 
                 if (!ref)
@@ -440,7 +440,7 @@ void formula_cell::check_circular(const model_context& cxt, const abs_address_t&
             }
             case fop_range_ref:
             {
-                abs_range_t range = std::get<range_t>(t->value).to_abs(pos);
+                abs_range_t range = std::get<range_t>(t.value).to_abs(pos);
                 for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
                 {
                     rc_size_t sheet_size = cxt.get_sheet_size();
@@ -499,16 +499,16 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
 
     std::function<void(const formula_tokens_t::value_type&)> get_refs = [&](const formula_tokens_t::value_type& t)
     {
-        switch (t->opcode)
+        switch (t.opcode)
         {
             case fop_single_ref:
             case fop_range_ref:
-                ret.push_back(t.get());
+                ret.push_back(&t);
                 break;
             case fop_named_expression:
             {
                 const named_expression_t* named_exp =
-                    cxt.get_named_expression(pos.sheet, std::get<std::string>(t->value));
+                    cxt.get_named_expression(pos.sheet, std::get<std::string>(t.value));
 
                 if (!named_exp)
                     // silently ignore non-existing names.

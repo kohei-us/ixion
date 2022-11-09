@@ -72,14 +72,14 @@ formula_tokens_t create_formula_error_tokens(
     std::string_view error)
 {
     formula_tokens_t tokens;
-    tokens.push_back(std::make_unique<formula_token>(fop_error));
-    tokens.back()->value = std::size_t{2u};
+    tokens.emplace_back(fop_error);
+    tokens.back().value = std::size_t{2u};
 
     string_id_t sid_src_formula = cxt.add_string(src_formula);
-    tokens.push_back(std::make_unique<formula_token>(sid_src_formula));
+    tokens.emplace_back(sid_src_formula);
 
     string_id_t sid_error = cxt.add_string(error);
-    tokens.push_back(std::make_unique<formula_token>(sid_error));
+    tokens.emplace_back(sid_error);
 
     return tokens;
 }
@@ -100,11 +100,6 @@ public:
         m_pos(pos),
         m_resolver(resolver),
         m_os(os) {}
-
-    void operator() (const formula_tokens_t::value_type& token)
-    {
-        operator() (*token);
-    }
 
     void operator() (const formula_token& token)
     {
@@ -220,7 +215,7 @@ std::string print_formula_tokens(
 {
     std::ostringstream os;
 
-    if (!tokens.empty() && tokens[0]->opcode == fop_error)
+    if (!tokens.empty() && tokens[0].opcode == fop_error)
         // Let's not print anything on error tokens.
         return std::string();
 
@@ -254,10 +249,8 @@ bool is_volatile(formula_function_t func)
 
 bool has_volatile(const formula_tokens_t& tokens)
 {
-    formula_tokens_t::const_iterator i = tokens.begin(), iend = tokens.end();
-    for (; i != iend; ++i)
+    for (const auto& t : tokens)
     {
-        const formula_token& t = **i;
         if (t.opcode != fop_function)
             continue;
 

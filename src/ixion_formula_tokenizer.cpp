@@ -78,8 +78,8 @@ void tokenize_formula(const std::string& formula, const std::string& sheets)
     cout << "* normalized formula string: " << normalized << endl;
 
     cout << "* individual tokens:" << endl;
-    for (const formula_tokens_t::value_type& tp : tokens)
-        cout << "  * " << *tp << endl;
+    for (const auto& t : tokens)
+        cout << "  * " << t << endl;
 }
 
 int main (int argc, char** argv)
