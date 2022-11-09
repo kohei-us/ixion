@@ -27,13 +27,13 @@ namespace {
 
 #if IXION_LOGGING
 
-std::string debug_print_formula_tokens(const formula_tokens_t& tokens)
+[[maybe_unused]] std::string debug_print_formula_tokens(const formula_tokens_t& tokens)
 {
     std::ostringstream os;
 
-    for (const std::unique_ptr<formula_token>& t : tokens)
+    for (const formula_token& t : tokens)
     {
-        os << std::endl << "  * " << *t;
+        os << std::endl << "  * " << t;
     }
 
     return os.str();
@@ -163,11 +163,12 @@ public:
             }
             case fop_string:
             {
-                const std::string* p = m_cxt.get_string(std::get<string_id_t>(token.value));
+                auto sid = std::get<string_id_t>(token.value);
+                const std::string* p = m_cxt.get_string(sid);
                 if (p)
                     m_os << "\"" << *p << "\"";
                 else
-                    IXION_DEBUG("failed to get a string value for the identifier value of " << token.get_uint32());
+                    IXION_DEBUG("failed to get a string value for the identifier value of " << sid);
 
                 break;
             }
@@ -199,8 +200,8 @@ public:
                 repr << token;
                 IXION_DEBUG(
                     "token not printed (repr='" << repr.str()
-                    << "'; name='" << get_opcode_name(token.get_opcode())
-                    << "'; opcode='" << get_formula_opcode_string(token.get_opcode())
+                    << "'; name='" << get_opcode_name(token.opcode)
+                    << "'; opcode='" << get_formula_opcode_string(token.opcode)
                     << "')");
             }
         }

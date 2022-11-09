@@ -40,7 +40,7 @@ namespace {
 
 #if IXION_LOGGING
 
-std::string gen_trace_output(const formula_cell& fc, const model_context& cxt, const abs_address_t& pos)
+[[maybe_unused]] std::string gen_trace_output(const formula_cell& fc, const model_context& cxt, const abs_address_t& pos)
 {
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     std::ostringstream os;
@@ -420,8 +420,7 @@ void formula_cell::interpret(model_context& context, const abs_address_t& pos)
 void formula_cell::check_circular(const model_context& cxt, const abs_address_t& pos)
 {
     // TODO: Check to make sure this is being run on the main thread only.
-    const formula_tokens_t& tokens = mp_impl->m_tokens->get();
-    for (const formula_token& t : tokens)
+    for (const formula_token& t : mp_impl->m_tokens->get())
     {
         switch (t.opcode)
         {

@@ -138,9 +138,7 @@ void formula_interpreter::init_tokens()
     if (!ts)
         return;
 
-    const formula_tokens_t& src_tokens = ts->get();
-
-    for (const formula_token& t : src_tokens)
+    for (const formula_token& t : ts->get())
     {
         if (t.opcode == fop_named_expression)
         {

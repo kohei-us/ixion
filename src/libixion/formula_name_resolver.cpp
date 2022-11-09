@@ -515,7 +515,7 @@ struct parse_address_result
 
 #if IXION_LOGGING
 
-std::ostream& operator<< (std::ostream& os, parse_address_result_type rt)
+[[maybe_unused]] std::ostream& operator<< (std::ostream& os, parse_address_result_type rt)
 {
     static const char* names[] = {
         "invalid",
@@ -527,7 +527,7 @@ std::ostream& operator<< (std::ostream& os, parse_address_result_type rt)
     return os;
 }
 
-std::string to_string(parse_address_result_type rt)
+[[maybe_unused]] std::string to_string(parse_address_result_type rt)
 {
     std::ostringstream os;
     os << rt;

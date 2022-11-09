@@ -31,7 +31,7 @@
 namespace ixion {
 
 class formula_cell;
-class formula_token;
+struct formula_token;
 struct abs_address_t;
 class model_context;
 
