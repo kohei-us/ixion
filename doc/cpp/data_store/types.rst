@@ -17,6 +17,8 @@ Primitive Types
 .. doxygenenum:: ixion::table_area_t
 .. doxygenenum:: ixion::formula_name_resolver_t
 .. doxygenenum:: ixion::formula_error_t
+.. doxygenenum:: ixion::formula_result_wait_policy_t
+.. doxygenenum:: ixion::formula_event_t
 .. doxygenenum:: ixion::rc_direction_t
 
 .. doxygentypedef:: ixion::col_t
@@ -35,8 +37,8 @@ Primitive Types
 .. doxygenstruct:: ixion::formula_group_t
 
 
-Address Types
--------------
+Cell Addresses
+--------------
 
 .. doxygenstruct:: ixion::address_t
    :members:
@@ -69,7 +71,19 @@ Address Types
 .. doxygentypedef:: ixion::abs_rc_range_set_t
 
 
+Column Blocks
+-------------
+
+.. doxygentypedef:: ixion::column_block_handle
+.. doxygentypedef:: ixion::column_block_callback_t
+.. doxygenenum:: ixion::column_block_t
+
+.. doxygenstruct:: ixion::column_block_shape_t
+   :members:
+
 Utility Functions
 -----------------
 
 .. doxygenfunction:: ixion::get_formula_error_name
+
+.. doxygenfunction:: ixion::to_formula_error_type
