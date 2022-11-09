@@ -257,6 +257,11 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
             os << "function token: (opcode=" << _int_type(v) << "; name='" << get_formula_function_name(v) << "')";
             break;
         }
+        case fop_error:
+        {
+            os << "invalid error token: (count=" << std::get<std::size_t>(ft.value) << ")";
+            break;
+        }
         case fop_plus:
         case fop_minus:
         case fop_divide:
@@ -272,7 +277,6 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         case fop_open:
         case fop_close:
         case fop_sep:
-        case fop_error:
         case fop_unknown:
             os << "opcode token: (name=" << get_opcode_name(ft.opcode) << "; s='"
                 << get_formula_opcode_string(ft.opcode) << "')";

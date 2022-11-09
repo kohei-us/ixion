@@ -36,14 +36,19 @@ IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
 /**
  * Create a set of tokens that represent an invalid formula.
  *
+ * This can be used for a cell containing an invalid formula expression, and
+ * the error information needs to be preserved.
+ *
  * @param cxt model context.
  * @param src_formula original formula string.
  * @param error error string.
  *
  * @return a set of tokens, the first of which is a token of type fop_error,
- *         followed by two string tokens.  The first string token stores
- *         original formula string, whereas the second one stores the error
- *         string.
+ *         followed by two string tokens.  The second token stores the
+ *         original formula string, whereas the third one stores the error
+ *         string.  The first token stores the number of tokens that follows
+ *         as its value of type std::size_t, which is always 2 in the current
+ *         implementation.
  */
 IXION_DLLPUBLIC formula_tokens_t create_formula_error_tokens(
     model_context& cxt, std::string_view src_formula,

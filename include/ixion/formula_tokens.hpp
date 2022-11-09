@@ -45,7 +45,7 @@ struct IXION_DLLPUBLIC formula_token final
         address_t, range_t, table_t, formula_function_t,
         double, string_id_t, std::size_t, std::string>;
 
-    fopcode_t opcode;
+    const fopcode_t opcode;
     value_type value;
 
     formula_token() = delete;
