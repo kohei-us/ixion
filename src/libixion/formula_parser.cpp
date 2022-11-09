@@ -145,9 +145,9 @@ void formula_parser::primitive(lexer_opcode_t oc)
 
 void formula_parser::name(const lexer_token_base& t)
 {
-    mem_str_buf name = t.get_string();
+    std::string_view name = t.get_string();
 
-    formula_name_t fn = m_resolver.resolve({name.get(), name.size()}, m_pos);
+    formula_name_t fn = m_resolver.resolve(name, m_pos);
 
     switch (fn.type)
     {
@@ -174,12 +174,12 @@ void formula_parser::name(const lexer_token_base& t)
             m_formula_tokens.emplace_back(std::get<formula_function_t>(fn.value));
             break;
         case formula_name_t::named_expression:
-            m_formula_tokens.emplace_back(name.str());
+            m_formula_tokens.emplace_back(std::string{name});
             break;
         default:
         {
             std::ostringstream os;
-            os << "failed to resolve a name token '" << name.str() << "'.";
+            os << "failed to resolve a name token '" << name << "'.";
             throw parse_error(os.str());
         }
     }
@@ -187,8 +187,7 @@ void formula_parser::name(const lexer_token_base& t)
 
 void formula_parser::literal(const lexer_token_base& t)
 {
-    mem_str_buf s = t.get_string();
-    string_id_t sid = m_context.add_string({s.get(), s.size()});
+    string_id_t sid = m_context.add_string(t.get_string());
     m_formula_tokens.emplace_back(sid);
 }
 

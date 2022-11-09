@@ -96,9 +96,9 @@ double lexer_token_base::get_value() const
     return 0.0;
 }
 
-mem_str_buf lexer_token_base::get_string() const
+std::string_view lexer_token_base::get_string() const
 {
-    return mem_str_buf();
+    return std::string_view{};
 }
 
 // ============================================================================
@@ -189,14 +189,14 @@ lexer_string_token::lexer_string_token(const lexer_string_token& r) :
 
 lexer_string_token::~lexer_string_token() {}
 
-mem_str_buf lexer_string_token::get_string() const
+std::string_view lexer_string_token::get_string() const
 {
     return m_str;
 }
 
-string lexer_string_token::print() const
+std::string lexer_string_token::print() const
 {
-    return m_str.str();
+    return std::string{m_str};
 }
 
 // ============================================================================
@@ -209,14 +209,14 @@ lexer_name_token::lexer_name_token(const lexer_name_token& r) :
 
 lexer_name_token::~lexer_name_token() {}
 
-mem_str_buf lexer_name_token::get_string() const
+std::string_view lexer_name_token::get_string() const
 {
     return m_str;
 }
 
-string lexer_name_token::print() const
+std::string lexer_name_token::print() const
 {
-    return m_str.str();
+    return std::string{m_str};
 }
 
 // ============================================================================

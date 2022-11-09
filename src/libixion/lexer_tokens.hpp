@@ -65,7 +65,7 @@ public:
     virtual ~lexer_token_base();
 
     virtual double get_value() const;
-    virtual mem_str_buf get_string() const;
+    virtual std::string_view get_string() const;
     virtual ::std::string print() const = 0;
 
     lexer_opcode_t get_opcode() const;
@@ -80,7 +80,7 @@ class lexer_token : public lexer_token_base
 public:
     lexer_token(lexer_opcode_t oc);
     virtual ~lexer_token();
-    virtual ::std::string print() const;
+    virtual std::string print() const;
 };
 
 // ============================================================================
@@ -93,7 +93,7 @@ public:
     virtual ~lexer_value_token();
 
     virtual double get_value() const;
-    virtual ::std::string print() const;
+    virtual std::string print() const;
 
 private:
     double m_val;
@@ -108,10 +108,10 @@ public:
     lexer_string_token(const lexer_string_token& r);
     virtual ~lexer_string_token();
 
-    virtual mem_str_buf get_string() const;
-    virtual ::std::string print() const;
+    virtual std::string_view get_string() const;
+    virtual std::string print() const;
 private:
-    mem_str_buf m_str;
+    std::string_view m_str;
 };
 
 // ============================================================================
@@ -123,10 +123,10 @@ public:
     lexer_name_token(const lexer_name_token& r);
     virtual ~lexer_name_token();
 
-    virtual mem_str_buf get_string() const;
-    virtual ::std::string print() const;
+    virtual std::string_view get_string() const;
+    virtual std::string print() const;
 private:
-    mem_str_buf m_str;
+    std::string_view m_str;
 };
 
 }
