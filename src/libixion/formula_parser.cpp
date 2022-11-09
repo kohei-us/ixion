@@ -13,8 +13,6 @@
 #include <iostream>
 #include <sstream>
 
-using namespace std;
-
 namespace ixion {
 
 namespace {
@@ -22,7 +20,7 @@ namespace {
 class ref_error : public general_error
 {
 public:
-    ref_error(const string& msg) :
+    ref_error(const std::string& msg) :
         general_error(msg) {}
 };
 
@@ -30,7 +28,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-formula_parser::parse_error::parse_error(const string& msg) :
+formula_parser::parse_error::parse_error(const std::string& msg) :
     general_error(msg) {}
 
 // ----------------------------------------------------------------------------

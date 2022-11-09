@@ -10,12 +10,10 @@
 #include <sstream>
 #include <limits>
 
-using namespace std;
-
 namespace ixion {
 
-static const row_t row_max = numeric_limits<row_t>::max();
-static const col_t column_max = numeric_limits<col_t>::max();
+static const row_t row_max = std::numeric_limits<row_t>::max();
+static const col_t column_max = std::numeric_limits<col_t>::max();
 
 const row_t row_unset = row_max - 9;
 const row_t row_upper_bound = row_max - 10;
@@ -37,14 +35,14 @@ bool abs_address_t::valid() const
     return sheet >= 0 && row >= 0 && column >= 0 && row <= row_unset && column <= column_unset;
 }
 
-string abs_address_t::get_name() const
+std::string abs_address_t::get_name() const
 {
-    ostringstream os;
+    std::ostringstream os;
     os << "(sheet=" << sheet << "; row=" << row << "; column=" << column << ")";
     return os.str();
 }
 
-size_t abs_address_t::hash::operator()(const abs_address_t& addr) const
+std::size_t abs_address_t::hash::operator()(const abs_address_t& addr) const
 {
     return addr.sheet + addr.row + addr.column;
 }
@@ -148,9 +146,9 @@ abs_address_t address_t::to_abs(const abs_address_t& origin) const
     return abs_addr;
 }
 
-string address_t::get_name() const
+std::string address_t::get_name() const
 {
-    ostringstream os;
+    std::ostringstream os;
     os << "(row=" << row << " [";
     if (abs_row)
         os << "abs";
@@ -172,7 +170,7 @@ void address_t::set_absolute(bool abs)
     abs_column = abs;
 }
 
-size_t address_t::hash::operator()(const address_t& addr) const
+std::size_t address_t::hash::operator()(const address_t& addr) const
 {
     return 0;
 }
@@ -237,7 +235,7 @@ bool abs_rc_address_t::valid() const
     return row >= 0 && column >= 0 && row <= row_unset && column <= column_unset;
 }
 
-size_t abs_rc_address_t::hash::operator() (const abs_rc_address_t& addr) const
+std::size_t abs_rc_address_t::hash::operator() (const abs_rc_address_t& addr) const
 {
     size_t hv = addr.column;
     hv <<= 16;
@@ -272,9 +270,9 @@ rc_address_t::rc_address_t(row_t _row, col_t _column, bool _abs_row, bool _abs_c
 rc_address_t::rc_address_t(const rc_address_t& r) :
     row(r.row), column(r.column), abs_row(r.abs_row), abs_column(r.abs_column) {}
 
-size_t rc_address_t::hash::operator()(const rc_address_t& addr) const
+std::size_t rc_address_t::hash::operator()(const rc_address_t& addr) const
 {
-    size_t hv = addr.column;
+    std::size_t hv = addr.column;
     hv <<= 16;
     hv += addr.row;
     return hv;
@@ -310,7 +308,7 @@ abs_range_t::abs_range_t(const abs_address_t& addr, row_t row_span, col_t col_sp
 abs_range_t::abs_range_t(const abs_address_t& addr) :
     first(addr), last(addr) {}
 
-size_t abs_range_t::hash::operator() (const abs_range_t& range) const
+std::size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 {
     abs_address_t::hash adr_hash;
     return adr_hash(range.first) + 65536*adr_hash(range.last);
@@ -511,7 +509,7 @@ void range_t::set_absolute(bool abs)
     last.set_absolute(abs);
 }
 
-size_t range_t::hash::operator() (const range_t& range) const
+std::size_t range_t::hash::operator() (const range_t& range) const
 {
     address_t::hash adr_hash;
     return adr_hash(range.first) + 65536*adr_hash(range.last);

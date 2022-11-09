@@ -14,8 +14,6 @@
 #include <sstream>
 #include <cctype>
 
-using namespace std;
-
 namespace ixion {
 
 class tokenizer
@@ -234,7 +232,7 @@ void tokenizer::numeral()
         return;
     }
     double val = to_double({p, len});
-    m_tokens.push_back(make_unique<lexer_value_token>(val));
+    m_tokens.push_back(std::make_unique<lexer_value_token>(val));
 }
 
 void tokenizer::space()
@@ -277,12 +275,12 @@ void tokenizer::name()
             break;
     }
 
-    m_tokens.push_back(make_unique<lexer_name_token>(p, len));
+    m_tokens.push_back(std::make_unique<lexer_name_token>(p, len));
 }
 
 void tokenizer::op(lexer_opcode_t oc)
 {
-    m_tokens.push_back(make_unique<lexer_token>(oc));
+    m_tokens.push_back(std::make_unique<lexer_token>(oc));
     next();
 }
 
@@ -294,7 +292,7 @@ void tokenizer::string()
     for (; *mp_char != '"' && has_char(); ++len)
         next();
 
-    m_tokens.push_back(make_unique<lexer_string_token>(p, len));
+    m_tokens.push_back(std::make_unique<lexer_string_token>(p, len));
 
     if (*mp_char == '"')
         next();
@@ -328,7 +326,7 @@ bool tokenizer::has_char() const
 
 // ============================================================================
 
-formula_lexer::tokenize_error::tokenize_error(const string& msg) : general_error(msg) {}
+formula_lexer::tokenize_error::tokenize_error(const std::string& msg) : general_error(msg) {}
 
 formula_lexer::formula_lexer(const config& config, const char* p, size_t n) :
     m_config(config), mp_first(p), m_size(n) {}
