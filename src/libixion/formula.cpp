@@ -196,7 +196,7 @@ public:
             default:
             {
                 std::ostringstream repr;
-                token.write_string(repr);
+                repr << token;
                 IXION_DEBUG(
                     "token not printed (repr='" << repr.str()
                     << "'; name='" << get_opcode_name(token.get_opcode())

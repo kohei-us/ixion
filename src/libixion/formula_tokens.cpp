@@ -143,71 +143,6 @@ bool formula_token::operator!= (const formula_token& r) const
     return !operator== (r);
 }
 
-void formula_token::write_string(std::ostream& os) const
-{
-    switch (opcode)
-    {
-        case fop_string:
-        {
-            os << "string token: (identifier=" << std::get<string_id_t>(value) << ")";
-            break;
-        }
-        case fop_value:
-        {
-            os << "value token: " << std::get<double>(value);
-            break;
-        }
-        case fop_single_ref:
-        {
-            os << "single ref token: " << std::get<address_t>(value);
-            break;
-        }
-        case fop_range_ref:
-        {
-            os << "range ref token: " << std::get<range_t>(value);
-            break;
-        }
-        case fop_table_ref:
-        {
-            os << "table ref token: " << "TODO";
-            break;
-        }
-        case fop_named_expression:
-        {
-            os << "named expression token: '" << std::get<std::string>(value) << "'";
-            break;
-        }
-        case fop_function:
-        {
-            using _int_type = std::underlying_type_t<formula_function_t>;
-
-            formula_function_t v = std::get<formula_function_t>(value);
-            os << "function token: (opcode=" << _int_type(v) << "; name='" << get_formula_function_name(v) << "')";
-            break;
-        }
-        case fop_plus:
-        case fop_minus:
-        case fop_divide:
-        case fop_multiply:
-        case fop_exponent:
-        case fop_concat:
-        case fop_equal:
-        case fop_not_equal:
-        case fop_less:
-        case fop_greater:
-        case fop_less_equal:
-        case fop_greater_equal:
-        case fop_open:
-        case fop_close:
-        case fop_sep:
-        case fop_error:
-        case fop_unknown:
-            os << "opcode token: (name=" << get_opcode_name(opcode) << "; s='"
-                << get_formula_opcode_string(opcode) << "')";
-            break;
-    }
-}
-
 struct formula_tokens_store::impl
 {
     formula_tokens_t m_tokens;
@@ -282,7 +217,68 @@ bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
 
 std::ostream& operator<< (std::ostream& os, const formula_token& ft)
 {
-    ft.write_string(os);
+    switch (ft.opcode)
+    {
+        case fop_string:
+        {
+            os << "string token: (identifier=" << std::get<string_id_t>(ft.value) << ")";
+            break;
+        }
+        case fop_value:
+        {
+            os << "value token: " << std::get<double>(ft.value);
+            break;
+        }
+        case fop_single_ref:
+        {
+            os << "single ref token: " << std::get<address_t>(ft.value);
+            break;
+        }
+        case fop_range_ref:
+        {
+            os << "range ref token: " << std::get<range_t>(ft.value);
+            break;
+        }
+        case fop_table_ref:
+        {
+            os << "table ref token: " << "TODO";
+            break;
+        }
+        case fop_named_expression:
+        {
+            os << "named expression token: '" << std::get<std::string>(ft.value) << "'";
+            break;
+        }
+        case fop_function:
+        {
+            using _int_type = std::underlying_type_t<formula_function_t>;
+
+            formula_function_t v = std::get<formula_function_t>(ft.value);
+            os << "function token: (opcode=" << _int_type(v) << "; name='" << get_formula_function_name(v) << "')";
+            break;
+        }
+        case fop_plus:
+        case fop_minus:
+        case fop_divide:
+        case fop_multiply:
+        case fop_exponent:
+        case fop_concat:
+        case fop_equal:
+        case fop_not_equal:
+        case fop_less:
+        case fop_greater:
+        case fop_less_equal:
+        case fop_greater_equal:
+        case fop_open:
+        case fop_close:
+        case fop_sep:
+        case fop_error:
+        case fop_unknown:
+            os << "opcode token: (name=" << get_opcode_name(ft.opcode) << "; s='"
+                << get_formula_opcode_string(ft.opcode) << "')";
+            break;
+    }
+
     return os;
 }
 

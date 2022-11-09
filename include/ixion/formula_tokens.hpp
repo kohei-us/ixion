@@ -64,8 +64,6 @@ struct IXION_DLLPUBLIC formula_token final
 
     bool operator== (const formula_token& r) const;
     bool operator!= (const formula_token& r) const;
-
-    void write_string(std::ostream& os) const;
 };
 
 class IXION_DLLPUBLIC formula_tokens_store
