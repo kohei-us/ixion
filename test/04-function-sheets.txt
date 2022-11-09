@@ -1,4 +1,5 @@
-%% TODO : Add tests for 3D references when it becomes supported.
+%% SHEETS returns the number of sheets contained in the reference, or the total
+%% number of sheets in the whole document.
 %mode session
 insert-sheet:Sheet1
 insert-sheet:Sheet2
@@ -10,6 +11,9 @@ A2=SHEETS(A1)
 A3=SHEETS(Sheet2!B1:C4)
 A4=SHEETS("str")
 A5=SHEETS(1.2)
+A6=SHEETS(Sheet1:Sheet2!A1)
+A7=SHEETS(Sheet2:Sheet3!B2)
+A8=SHEETS(Sheet1:Sheet3!B10)
 %calc
 %mode result
 A1=3
@@ -17,4 +21,7 @@ A2=1
 A3=1
 A4=#N/A
 A5=#N/A
+A6=2
+A7=2
+A8=3
 %check
