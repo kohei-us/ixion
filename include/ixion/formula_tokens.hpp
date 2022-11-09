@@ -206,8 +206,6 @@ struct IXION_DLLPUBLIC named_expression_t
     ~named_expression_t();
 };
 
-IXION_DLLPUBLIC bool operator== (const formula_tokens_t& left, const formula_tokens_t& right);
-
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const formula_token& ft);
 
 }

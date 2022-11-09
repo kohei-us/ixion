@@ -218,21 +218,6 @@ named_expression_t::named_expression_t(named_expression_t&& other) :
 
 named_expression_t::~named_expression_t() {}
 
-bool operator== (const formula_tokens_t& left, const formula_tokens_t& right)
-{
-    size_t n = left.size();
-    if (n != right.size())
-        return false;
-
-    formula_tokens_t::const_iterator itr = left.begin(), itr_end = left.end(), itr2 = right.begin();
-    for (; itr != itr_end; ++itr, ++itr2)
-    {
-        if (*itr != *itr2)
-            return false;
-    }
-    return true;
-}
-
 std::ostream& operator<< (std::ostream& os, const formula_token& ft)
 {
     switch (ft.opcode)
