@@ -10,3 +10,10 @@ Formula Tokens
 
 .. doxygenstruct:: ixion::named_expression_t
    :members:
+
+Utility Functions
+-----------------
+
+.. doxygenfunction:: ixion::get_opcode_name
+
+.. doxygenfunction:: ixion::get_formula_opcode_string

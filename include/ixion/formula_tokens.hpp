@@ -39,6 +39,9 @@ IXION_DLLPUBLIC std::string_view get_opcode_name(fopcode_t oc);
  */
 IXION_DLLPUBLIC std::string_view get_formula_opcode_string(fopcode_t oc);
 
+/**
+ * Represents a single formula token.
+ */
 struct IXION_DLLPUBLIC formula_token final
 {
     using value_type = std::variant<
@@ -141,6 +144,9 @@ struct IXION_DLLPUBLIC formula_token final
     bool operator!= (const formula_token& r) const;
 };
 
+/**
+ * Storage for a series of formula tokens.
+ */
 class IXION_DLLPUBLIC formula_tokens_store
 {
     friend void intrusive_ptr_add_ref(formula_tokens_store*);
@@ -179,9 +185,18 @@ inline void intrusive_ptr_release(formula_tokens_store* p)
     p->release_ref();
 }
 
+/**
+ * Represents a named expression which stores a series of formula tokens.
+ */
 struct IXION_DLLPUBLIC named_expression_t
 {
+    /**
+     * Origin cell position which affects any relative references stored in
+     * the named expression.
+     */
     abs_address_t origin;
+
+    /** Formula tokens. */
     formula_tokens_t tokens;
 
     named_expression_t();
