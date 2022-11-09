@@ -59,6 +59,9 @@ Address Types
 .. doxygenstruct:: ixion::abs_rc_range_t
    :members:
 
+.. doxygenstruct:: ixion::table_t
+   :members:
+
 .. doxygentypedef:: ixion::abs_address_set_t
 
 .. doxygentypedef:: ixion::abs_range_set_t

@@ -2,6 +2,8 @@
 Types
 =====
 
+.. doxygenenum:: ixion::fopcode_t
+
 Matrix
 ------
 

@@ -45,21 +45,96 @@ struct IXION_DLLPUBLIC formula_token final
         address_t, range_t, table_t, formula_function_t,
         double, string_id_t, std::size_t, std::string>;
 
+    /**
+     * Opcode that specifies the type of token.  The value of this data member
+     * should <i>not</i> be modified after construction.
+     */
     const fopcode_t opcode;
+
+    /**
+     * Value stored in the token. The type of this value varies depending on the
+     * token opcode value.
+     */
     value_type value;
 
     formula_token() = delete;
 
+    /**
+     * Constructor for opcode-only token.
+     *
+     * @param op formula opcode.
+     */
     formula_token(fopcode_t op);
+
+    /**
+     * Constructor for a single-cell reference token.  The opcode will be
+     * implicitly set to fop_single_ref.
+     *
+     * @param addr single-cell reference.
+     */
     formula_token(const address_t& addr);
+
+    /**
+     * Constructor for a range reference token.  The opcode will be
+     * implicitly set to fop_range_ref.
+     *
+     * @param range range reference.
+     */
     formula_token(const range_t& range);
+
+    /**
+     * Constructor for a table reference token.  The opcode will be implicitly
+     * set to fop_table_ref.
+     *
+     * @param table table reference.
+     */
     formula_token(const table_t& table);
+
+    /**
+     * Constructor for a formula function token.  The opcode will be implicitly
+     * set to fop_function.
+     *
+     * @param func function name enum value.
+     */
     formula_token(formula_function_t func);
+
+    /**
+     * Constructor for a numeric value token.  The opcode will be implicitly set
+     * to fop_value.
+     *
+     * @param v numeric value to be stored in the token.
+     */
     formula_token(double v);
+
+    /**
+     * Constructor for a string value token.  The opcode will be implicitly
+     * set to fop_string.
+     *
+     * @param sid string ID to be stored in the token.
+     */
     formula_token(string_id_t sid);
+
+    /**
+     * Constructor for a named-expression token.  The opcode will be implicitly
+     * set to fop_named_expression.
+     *
+     * @param name named expression to be stored in the token.
+     */
     formula_token(std::string name);
+
+    /**
+     * Copy constructor.
+     */
     formula_token(const formula_token& r);
+
+    /**
+     * Move constructor.
+     *
+     * @note This will be the same as the copy constructor if the stored value
+     *       is not movable.
+     */
     formula_token(formula_token&& r);
+
     ~formula_token();
 
     bool operator== (const formula_token& r) const;

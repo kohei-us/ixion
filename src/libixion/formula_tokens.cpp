@@ -10,6 +10,8 @@
 #include <ixion/global.hpp>
 #include <ixion/macros.hpp>
 
+#include <sstream>
+
 namespace ixion {
 
 std::string_view get_opcode_name(fopcode_t oc)
@@ -91,6 +93,22 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
 formula_token::formula_token(fopcode_t op) :
     opcode(op)
 {
+    switch (opcode)
+    {
+        case fop_single_ref:
+        case fop_range_ref:
+        case fop_table_ref:
+        case fop_named_expression:
+        case fop_string:
+        case fop_value:
+        case fop_function:
+        {
+            std::ostringstream os;
+            os << "this opcode named '" << get_opcode_name(op) << "' cannot be instantiated by this constructor";
+            throw std::invalid_argument(os.str());
+        }
+        default:;
+    }
 }
 
 formula_token::formula_token(const address_t& addr) :
