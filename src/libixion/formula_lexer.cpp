@@ -232,7 +232,7 @@ void tokenizer::numeral()
         return;
     }
     double val = to_double({p, len});
-    m_tokens.push_back(std::make_unique<lexer_value_token>(val));
+    m_tokens.emplace_back(val);
 }
 
 void tokenizer::space()
@@ -275,12 +275,12 @@ void tokenizer::name()
             break;
     }
 
-    m_tokens.push_back(std::make_unique<lexer_name_token>(p, len));
+    m_tokens.emplace_back(lexer_opcode_t::name, std::string_view{p, len});
 }
 
 void tokenizer::op(lexer_opcode_t oc)
 {
-    m_tokens.push_back(std::make_unique<lexer_token>(oc));
+    m_tokens.emplace_back(oc);
     next();
 }
 
@@ -292,7 +292,7 @@ void tokenizer::string()
     for (; *mp_char != '"' && has_char(); ++len)
         next();
 
-    m_tokens.push_back(std::make_unique<lexer_string_token>(p, len));
+    m_tokens.emplace_back(lexer_opcode_t::string, std::string_view{p, len});
 
     if (*mp_char == '"')
         next();

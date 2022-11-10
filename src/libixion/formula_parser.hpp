@@ -50,13 +50,13 @@ public:
 private:
 
     void primitive(lexer_opcode_t oc);
-    void name(const lexer_token_base& t);
-    void literal(const lexer_token_base& t);
-    void value(const lexer_token_base& t);
-    void less(const lexer_token_base& t);
-    void greater(const lexer_token_base& t);
+    void name(const lexer_token& t);
+    void literal(const lexer_token& t);
+    void value(const lexer_token& t);
+    void less();
+    void greater();
 
-    const lexer_token_base& get_token() const;
+    const lexer_token& get_token() const;
     bool has_token() const;
     bool has_next() const;
     void next();

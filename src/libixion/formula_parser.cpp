@@ -56,9 +56,9 @@ void formula_parser::parse()
 {
     for (m_itr_cur = m_tokens.begin(); has_token(); next())
     {
-        const lexer_token_base& t = get_token();
-        lexer_opcode_t oc = t.get_opcode();
-        switch (oc)
+        const lexer_token& t = get_token();
+
+        switch (t.opcode)
         {
             case lexer_opcode_t::open:
             case lexer_opcode_t::close:
@@ -70,7 +70,7 @@ void formula_parser::parse()
             case lexer_opcode_t::equal:
             case lexer_opcode_t::divide:
             case lexer_opcode_t::sep:
-                primitive(oc);
+                primitive(t.opcode);
                 break;
             case lexer_opcode_t::name:
                 name(t);
@@ -82,10 +82,10 @@ void formula_parser::parse()
                 value(t);
                 break;
             case lexer_opcode_t::less:
-                less(t);
+                less();
                 break;
             case lexer_opcode_t::greater:
-                greater(t);
+                greater();
                 break;
             default:
                 ;
@@ -143,9 +143,9 @@ void formula_parser::primitive(lexer_opcode_t oc)
     m_formula_tokens.emplace_back(foc);
 }
 
-void formula_parser::name(const lexer_token_base& t)
+void formula_parser::name(const lexer_token& t)
 {
-    std::string_view name = t.get_string();
+    std::string_view name = std::get<std::string_view>(t.value);
 
     formula_name_t fn = m_resolver.resolve(name, m_pos);
 
@@ -185,24 +185,23 @@ void formula_parser::name(const lexer_token_base& t)
     }
 }
 
-void formula_parser::literal(const lexer_token_base& t)
+void formula_parser::literal(const lexer_token& t)
 {
-    string_id_t sid = m_context.add_string(t.get_string());
+    string_id_t sid = m_context.add_string(std::get<std::string_view>(t.value));
     m_formula_tokens.emplace_back(sid);
 }
 
-void formula_parser::value(const lexer_token_base& t)
+void formula_parser::value(const lexer_token& t)
 {
-    double val = t.get_value();
-    m_formula_tokens.emplace_back(val);
+    m_formula_tokens.emplace_back(std::get<double>(t.value));
 }
 
-void formula_parser::less(const lexer_token_base& t)
+void formula_parser::less()
 {
     if (has_next())
     {
         next();
-        switch (get_token().get_opcode())
+        switch (get_token().opcode)
         {
             case lexer_opcode_t::equal:
                 m_formula_tokens.emplace_back(fop_less_equal);
@@ -218,12 +217,12 @@ void formula_parser::less(const lexer_token_base& t)
     m_formula_tokens.emplace_back(fop_less);
 }
 
-void formula_parser::greater(const lexer_token_base& t)
+void formula_parser::greater()
 {
     if (has_next())
     {
         next();
-        if (get_token().get_opcode() == lexer_opcode_t::equal)
+        if (get_token().opcode == lexer_opcode_t::equal)
         {
             m_formula_tokens.emplace_back(fop_greater_equal);
             return;
@@ -234,9 +233,9 @@ void formula_parser::greater(const lexer_token_base& t)
 
 }
 
-const lexer_token_base& formula_parser::get_token() const
+const lexer_token& formula_parser::get_token() const
 {
-    return **m_itr_cur;
+    return *m_itr_cur;
 }
 
 bool formula_parser::has_token() const

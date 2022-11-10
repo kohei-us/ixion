@@ -15,35 +15,20 @@ using namespace std;
 
 namespace ixion {
 
-namespace {
-
-class token_printer
+std::string print_tokens(const lexer_tokens_t& tokens, bool verbose)
 {
-public:
-    token_printer(ostringstream& os, bool verbose) : m_os(os), m_verbose(verbose) {}
-    void operator() (const unique_ptr<lexer_token_base>& r) const
+    std::ostringstream os;
+
+    for (const auto& t : tokens)
     {
-        lexer_opcode_t oc = r->get_opcode();
-        if (m_verbose)
-            m_os << "(" << get_opcode_name(oc) << ")'" << r->print() << "' ";
+        if (verbose)
+            os << "(" << get_opcode_name(t.opcode) << ")'" << t << "' ";
         else
-            m_os << r->print();
+            os << t;
     }
-private:
-    ostringstream& m_os;
-    bool m_verbose;
-};
 
-}
-
-string print_tokens(const lexer_tokens_t& tokens, bool verbose)
-{
-    ostringstream os;
-    for_each(tokens.begin(), tokens.end(), token_printer(os, verbose));
     return os.str();
 }
-
-// ============================================================================
 
 const char* get_opcode_name(lexer_opcode_t oc)
 {
@@ -70,157 +55,74 @@ const char* get_opcode_name(lexer_opcode_t oc)
     return "";
 }
 
-// ============================================================================
-
-lexer_token_base::lexer_token_base(lexer_opcode_t oc) :
-    m_opcode(oc)
+lexer_token::lexer_token(lexer_opcode_t _opcode) :
+    opcode(_opcode)
 {
 }
 
-lexer_token_base::lexer_token_base(const lexer_token_base& r) :
-    m_opcode(r.m_opcode)
+lexer_token::lexer_token(lexer_opcode_t _opcode, std::string_view _value) :
+    opcode(_opcode), value(_value)
 {
 }
 
-lexer_token_base::~lexer_token_base()
+lexer_token::lexer_token(double _value) :
+    opcode(lexer_opcode_t::value), value(_value)
 {
 }
 
-lexer_opcode_t lexer_token_base::get_opcode() const
-{
-    return m_opcode;
-}
 
-double lexer_token_base::get_value() const
+std::ostream& operator<<(std::ostream& os, const lexer_token& t)
 {
-    return 0.0;
-}
-
-std::string_view lexer_token_base::get_string() const
-{
-    return std::string_view{};
-}
-
-// ============================================================================
-
-lexer_token::lexer_token(lexer_opcode_t oc) :
-    lexer_token_base(oc)
-{
-}
-
-lexer_token::~lexer_token()
-{
-}
-
-string lexer_token::print() const
-{
-    switch (get_opcode())
+    switch (t.opcode)
     {
         case lexer_opcode_t::plus:
-            return "+";
+            os << "+";
+            break;
         case lexer_opcode_t::minus:
-            return "-";
+            os << "-";
+            break;
         case lexer_opcode_t::divide:
-            return "/";
+            os << "/";
+            break;
         case lexer_opcode_t::multiply:
-            return "*";
+            os << "*";
+            break;
         case lexer_opcode_t::exponent:
-            return "^";
+            os << "^";
+            break;
         case lexer_opcode_t::concat:
-            return "&";
+            os << "&";
+            break;
         case lexer_opcode_t::equal:
-            return "=";
+            os << "=";
+            break;
         case lexer_opcode_t::less:
-            return "<";
+            os << "<";
+            break;
         case lexer_opcode_t::greater:
-            return ">";
+            os << ">";
+            break;
         case lexer_opcode_t::open:
-            return "(";
+            os << "(";
+            break;
         case lexer_opcode_t::close:
-            return ")";
+            os << ")";
+            break;
         case lexer_opcode_t::sep:
-            return ",";
+            os << ",";
+            break;
         case lexer_opcode_t::name:
         case lexer_opcode_t::string:
+            os << std::get<std::string_view>(t.value);
+            break;
         case lexer_opcode_t::value:
-        default:
-            ;
+            os << std::get<double>(t.value);
+            break;
     }
-    return "";
+
+    return os;
 }
 
-// ============================================================================
-
-lexer_value_token::lexer_value_token(double val) :
-    lexer_token_base(lexer_opcode_t::value),
-    m_val(val)
-{
-}
-
-lexer_value_token::lexer_value_token(const lexer_value_token& r) :
-    lexer_token_base(r),
-    m_val(r.m_val)
-{
-}
-
-lexer_value_token::~lexer_value_token()
-{
-}
-
-double lexer_value_token::get_value() const
-{
-    return m_val;
-}
-
-string lexer_value_token::print() const
-{
-    ostringstream os;
-    os << m_val;
-    return os.str();
-}
-
-// ============================================================================
-
-lexer_string_token::lexer_string_token(const char* p, size_t n) :
-    lexer_token_base(lexer_opcode_t::string), m_str(p, n) {}
-
-lexer_string_token::lexer_string_token(const lexer_string_token& r) :
-    lexer_token_base(r), m_str(r.m_str) {}
-
-lexer_string_token::~lexer_string_token() {}
-
-std::string_view lexer_string_token::get_string() const
-{
-    return m_str;
-}
-
-std::string lexer_string_token::print() const
-{
-    return std::string{m_str};
-}
-
-// ============================================================================
-
-lexer_name_token::lexer_name_token(const char* p, size_t n) :
-    lexer_token_base(lexer_opcode_t::name), m_str(p, n) {}
-
-lexer_name_token::lexer_name_token(const lexer_name_token& r) :
-    lexer_token_base(r), m_str(r.m_str) {}
-
-lexer_name_token::~lexer_name_token() {}
-
-std::string_view lexer_name_token::get_string() const
-{
-    return m_str;
-}
-
-std::string lexer_name_token::print() const
-{
-    return std::string{m_str};
-}
-
-// ============================================================================
-
-}
+} // namespace ixion
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

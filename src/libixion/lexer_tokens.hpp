@@ -14,16 +14,9 @@
 
 #include <vector>
 #include <memory>
+#include <variant>
 
 namespace ixion {
-
-class lexer_token_base;
-
-typedef std::vector<std::unique_ptr<lexer_token_base>> lexer_tokens_t;
-
-std::string print_tokens(const lexer_tokens_t& tokens, bool verbose);
-
-// ============================================================================
 
 enum class lexer_opcode_t
 {
@@ -55,81 +48,25 @@ enum class lexer_opcode_t
 
 const char* get_opcode_name(lexer_opcode_t oc);
 
-// ============================================================================
-
-class lexer_token_base
+struct lexer_token
 {
-public:
-    lexer_token_base(lexer_opcode_t oc);
-    lexer_token_base(const lexer_token_base& r);
-    virtual ~lexer_token_base();
+    using value_type = std::variant<double, std::string_view>;
 
-    virtual double get_value() const;
-    virtual std::string_view get_string() const;
-    virtual ::std::string print() const = 0;
+    lexer_opcode_t opcode;
+    value_type value;
 
-    lexer_opcode_t get_opcode() const;
-private:
-    lexer_opcode_t m_opcode;
+    lexer_token(lexer_opcode_t _opcode);
+    lexer_token(lexer_opcode_t _opcode, std::string_view _value);
+    lexer_token(double _value);
 };
 
-// ============================================================================
+std::ostream& operator<<(std::ostream& os, const lexer_token& t);
 
-class lexer_token : public lexer_token_base
-{
-public:
-    lexer_token(lexer_opcode_t oc);
-    virtual ~lexer_token();
-    virtual std::string print() const;
-};
+using lexer_tokens_t = std::vector<lexer_token>;
 
-// ============================================================================
+std::string print_tokens(const lexer_tokens_t& tokens, bool verbose);
 
-class lexer_value_token : public lexer_token_base
-{
-public:
-    lexer_value_token(double val);
-    lexer_value_token(const lexer_value_token& r);
-    virtual ~lexer_value_token();
-
-    virtual double get_value() const;
-    virtual std::string print() const;
-
-private:
-    double m_val;
-};
-
-// ============================================================================
-
-class lexer_string_token : public lexer_token_base
-{
-public:
-    lexer_string_token(const char* p, size_t n);
-    lexer_string_token(const lexer_string_token& r);
-    virtual ~lexer_string_token();
-
-    virtual std::string_view get_string() const;
-    virtual std::string print() const;
-private:
-    std::string_view m_str;
-};
-
-// ============================================================================
-
-class lexer_name_token : public lexer_token_base
-{
-public:
-    lexer_name_token(const char* p, size_t n);
-    lexer_name_token(const lexer_name_token& r);
-    virtual ~lexer_name_token();
-
-    virtual std::string_view get_string() const;
-    virtual std::string print() const;
-private:
-    std::string_view m_str;
-};
-
-}
+} // namespace ixion
 
 #endif
 
