@@ -43,7 +43,6 @@ public:
 
     void set_origin(const abs_address_t& pos);
     void parse();
-    void print_tokens() const;
 
     formula_tokens_t& get_tokens();
 

@@ -91,10 +91,6 @@ void formula_parser::parse()
     }
 }
 
-void formula_parser::print_tokens() const
-{
-}
-
 formula_tokens_t& formula_parser::get_tokens()
 {
     return m_formula_tokens;
