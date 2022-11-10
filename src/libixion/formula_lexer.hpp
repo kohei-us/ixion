@@ -15,7 +15,6 @@
 #include "ixion/config.hpp"
 
 #include "lexer_tokens.hpp"
-#include "mem_str_buf.hpp"
 
 namespace ixion {
 
@@ -48,7 +47,6 @@ private:
     lexer_tokens_t m_tokens;
     const char* mp_first;
     size_t m_size;
-    mem_str_buf m_formula;
 };
 
 }
