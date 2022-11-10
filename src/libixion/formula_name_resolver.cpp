@@ -87,7 +87,7 @@ bool resolve_table(const model_context* cxt, const char* p, size_t n, formula_na
 
     short scope = 0;
     size_t last_column_pos = std::numeric_limits<size_t>::max();
-    mem_str_buf buf;
+    std::string_view buf;
     std::string_view table_name;
     std::vector<std::string_view> names;
 
@@ -109,8 +109,8 @@ bool resolve_table(const model_context* cxt, const char* p, size_t n, formula_na
                     if (scope != 0)
                         return false;
 
-                    table_name = { buf.get(), buf.size() };
-                    buf.clear();
+                    table_name = buf;
+                    buf = std::string_view{};
                 }
 
                 ++scope;
@@ -124,8 +124,8 @@ bool resolve_table(const model_context* cxt, const char* p, size_t n, formula_na
 
                 if (!buf.empty())
                 {
-                    names.emplace_back(buf.get(), buf.size());
-                    buf.clear();
+                    names.push_back(buf);
+                    buf = std::string_view{};
                 }
 
                 --scope;
@@ -154,9 +154,9 @@ bool resolve_table(const model_context* cxt, const char* p, size_t n, formula_na
             break;
             default:
                 if (buf.empty())
-                    buf.set_start(p);
+                    buf = std::string_view{p, 1u};
                 else
-                    buf.inc();
+                    buf = std::string_view{buf.data(), buf.size() + 1u};
         }
     }
 
