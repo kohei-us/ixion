@@ -206,10 +206,8 @@ PyObject* document_get_sheet(pyobj_document* self, PyObject* arg)
 
     // Iterate through all sheets to find a match.
     // TODO : Use string hash to speed up the lookup.
-    vector<PyObject*>::const_iterator i = sheets.begin(), ie = sheets.end();
-    for (; i != ie; ++i)
+    for (PyObject* sh : sheets)
     {
-        PyObject* sh = *i;
         PyObject* obj = get_sheet_name(sh);
         if (!obj)
             continue;
