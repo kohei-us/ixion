@@ -119,8 +119,6 @@ libixion_@IXION_API_VERSION@_la_LDFLAGS = \
 libixion_@IXION_API_VERSION@_la_LIBADD = \
 	$(BOOST_FILESYSTEM_LIBS)
 
-EXTRA_DIST = makefile.mk
-
 document_test_SOURCES = document_test.cpp
 document_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
