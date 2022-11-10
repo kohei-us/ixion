@@ -475,13 +475,12 @@ void model_parser::parse_init()
         const abs_address_t& pos = cell_def.pos.first;
 
         formula_tokens_t tokens =
-            parse_formula_string(
-                m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
+            parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_formula_cells.insert(cell_def.pos);
 
-        cout << "{" << get_display_range_string(cell_def.pos) << "}: (m) " << cell_def.value.str() << endl;
+        std::cout << "{" << get_display_range_string(cell_def.pos) << "}: (m) " << cell_def.value << std::endl;
         return;
     }
 
@@ -496,38 +495,37 @@ void model_parser::parse_init()
             case ct_formula:
             {
                 formula_tokens_t tokens =
-                    parse_formula_string(
-                        m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
+                    parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
                 auto ts = formula_tokens_store::create();
                 ts->get() = std::move(tokens);
                 m_context.set_formula_cell(pos, ts);
                 m_dirty_formula_cells.insert(pos);
 
-                cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
+                std::cout << get_display_cell_string(pos) << ": (f) " << cell_def.value << std::endl;
                 break;
             }
             case ct_string:
             {
-                m_context.set_string_cell(pos, { cell_def.value.get(), cell_def.value.size() });
+                m_context.set_string_cell(pos, cell_def.value);
 
-                cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
+                std::cout << get_display_cell_string(pos) << ": (s) " << cell_def.value << std::endl;
                 break;
             }
             case ct_value:
             {
-                double v = to_double({cell_def.value.get(), cell_def.value.size()});
+                double v = to_double(cell_def.value);
                 m_context.set_numeric_cell(pos, v);
 
-                cout << get_display_cell_string(pos) << ": (n) " << v << endl;
+                std::cout << get_display_cell_string(pos) << ": (n) " << v << std::endl;
                 break;
             }
             case ct_boolean:
             {
-                bool b = to_bool({cell_def.value.get(), cell_def.value.size()});
+                bool b = to_bool(cell_def.value);
                 m_context.set_boolean_cell(pos, b);
 
-                cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << endl;
+                std::cout << get_display_cell_string(pos) << ": (b) " << (b ? "true" : "false") << std::endl;
                 break;
             }
             default:
@@ -551,8 +549,7 @@ void model_parser::parse_edit()
         unregister_formula_cell(m_context, pos);
 
         formula_tokens_t tokens =
-            parse_formula_string(
-                m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
+            parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_formula_cells.insert(cell_def.pos);
@@ -580,30 +577,29 @@ void model_parser::parse_edit()
             case ct_formula:
             {
                 formula_tokens_t tokens =
-                    parse_formula_string(
-                        m_context, pos, *mp_name_resolver, {cell_def.value.get(), cell_def.value.size()});
+                    parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
                 auto ts = formula_tokens_store::create();
                 ts->get() = std::move(tokens);
                 m_context.set_formula_cell(pos, ts);
                 m_dirty_formula_cells.insert(pos);
                 register_formula_cell(m_context, pos);
-                cout << get_display_cell_string(pos) << ": (f) " << cell_def.value.str() << endl;
+                std::cout << get_display_cell_string(pos) << ": (f) " << cell_def.value << std::endl;
+                break;
             }
-            break;
             case ct_string:
             {
-                m_context.set_string_cell(pos, { cell_def.value.get(), cell_def.value.size() });
-                cout << get_display_cell_string(pos) << ": (s) " << cell_def.value.str() << endl;
+                m_context.set_string_cell(pos, cell_def.value);
+                std::cout << get_display_cell_string(pos) << ": (s) " << cell_def.value << std::endl;
+                break;
             }
-            break;
             case ct_value:
             {
-                double v = to_double({cell_def.value.get(), cell_def.value.size()});
+                double v = to_double(cell_def.value);
                 m_context.set_numeric_cell(pos, v);
-                cout << get_display_cell_string(pos) << ": (n) " << v << endl;
+                std::cout << get_display_cell_string(pos) << ": (n) " << v << std::endl;
+                break;
             }
-            break;
             default:
                 throw model_parser::parse_error("unknown content type");
         }
@@ -917,7 +913,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
 
     char skip_next = 0;
 
-    mem_str_buf buf;
+    std::string_view buf;
 
     const char* line_head = mp_char;
 
@@ -953,7 +949,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
                         throw model_parser::parse_error("left hand side is empty");
 
                     ret.name = buf;
-                    buf.clear();
+                    buf = std::string_view{};
 
                     switch (*mp_char)
                     {
@@ -981,7 +977,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
                 if (*mp_char == '}')
                 {
                     ret.name = buf;
-                    buf.clear();
+                    buf = std::string_view{};
                     section = section_type::after_braced_name;
                     continue;
                 }
@@ -1026,9 +1022,9 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
         }
 
         if (buf.empty())
-            buf.set_start(mp_char);
+            buf = std::string_view{mp_char, 1u};
         else
-            buf.inc();
+            buf = std::string_view{buf.data(), buf.size() + 1u};
     }
 
     ret.value = buf;
@@ -1050,7 +1046,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
             os << "'}' was expected at the end of a braced value, but '" << last << "' was found.";
             model_parser::parse_error(os.str());
         }
-        ret.value.dec();
+        ret.value = std::string_view{ret.value.data(), ret.value.size() - 1u};
         ret.matrix_value = true;
     }
 
@@ -1066,8 +1062,7 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
         throw model_parser::parse_error(os.str());
     }
 
-    formula_name_t fnt = mp_name_resolver->resolve(
-        {ret.name.get(), ret.name.size()}, abs_address_t(m_current_sheet,0,0));
+    formula_name_t fnt = mp_name_resolver->resolve(ret.name, abs_address_t(m_current_sheet, 0, 0));
 
     switch (fnt.type)
     {
@@ -1084,8 +1079,8 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
         }
         default:
         {
-            ostringstream os;
-            os << "invalid cell name: " << ret.name.str();
+            std::ostringstream os;
+            os << "invalid cell name: " << ret.name;
             throw model_parser::parse_error(os.str());
         }
     }

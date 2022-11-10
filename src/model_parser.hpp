@@ -62,8 +62,8 @@ class model_parser
 
     struct cell_def_type
     {
-        mem_str_buf name;
-        mem_str_buf value;
+        std::string_view name;
+        std::string_view value;
         cell_type type;
         abs_range_t pos;
 
