@@ -8,13 +8,12 @@
 #ifndef INCLUDED_IXION_LEXER_TOKENS_HPP
 #define INCLUDED_IXION_LEXER_TOKENS_HPP
 
-#include "ixion/env.hpp"
-
-#include "mem_str_buf.hpp"
+#include <ixion/env.hpp>
 
 #include <vector>
 #include <memory>
 #include <variant>
+#include <string_view>
 
 namespace ixion {
 
