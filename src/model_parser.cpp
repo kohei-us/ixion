@@ -36,14 +36,14 @@ namespace ixion {
 
 namespace {
 
-long to_long(const mem_str_buf& value)
+long to_long(std::string_view value)
 {
     char* pe = nullptr;
-    long ret = std::strtol(value.get(), &pe, 10);
+    long ret = std::strtol(value.data(), &pe, 10);
 
-    if (value.get() == pe)
+    if (value.data() == pe)
     {
-        ostringstream os;
+        std::ostringstream os;
         os << "'" << value << "' is not a valid integer.";
         throw model_parser::parse_error(os.str());
     }
@@ -401,8 +401,8 @@ void model_parser::parse_command()
 
 void model_parser::parse_session()
 {
-    mem_str_buf cmd, value;
-    mem_str_buf* buf = &cmd;
+    std::string_view cmd, value;
+    std::string_view* buf = &cmd;
 
     for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
     {
@@ -416,9 +416,9 @@ void model_parser::parse_session()
         }
 
         if (buf->empty())
-            buf->set_start(mp_char);
+            *buf = std::string_view{mp_char, 1u};
         else
-            buf->inc();
+            *buf = std::string_view{buf->data(), buf->size() + 1u};
     }
 
     if (cmd == "row-limit")
@@ -435,12 +435,12 @@ void model_parser::parse_session()
     }
     else if (cmd == "insert-sheet")
     {
-        m_context.append_sheet({value.get(), value.size()});
+        m_context.append_sheet(std::string{value});
         cout << "sheet: (name: " << value << ")" << endl;
     }
     else if (cmd == "current-sheet")
     {
-        m_current_sheet = m_context.get_sheet_index({value.get(), value.size()});
+        m_current_sheet = m_context.get_sheet_index(value);
 
         if (m_current_sheet == invalid_sheet)
         {
@@ -454,7 +454,7 @@ void model_parser::parse_session()
     else if (cmd == "display-sheet-name")
     {
         cout << "display sheet name: " << value << endl;
-        m_print_sheet_name = to_bool({value.get(), value.size()});
+        m_print_sheet_name = to_bool(value);
         m_session_handler_factory.show_sheet_name(m_print_sheet_name);
     }
 }
