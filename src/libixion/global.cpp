@@ -12,8 +12,6 @@
 #include "ixion/exceptions.hpp"
 #include "ixion/formula_result.hpp"
 
-#include "mem_str_buf.hpp"
-
 #include <iostream>
 #include <cstdlib>
 #include <sstream>

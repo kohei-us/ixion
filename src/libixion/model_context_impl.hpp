@@ -13,7 +13,6 @@
 #include "ixion/config.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
 
-#include "mem_str_buf.hpp"
 #include "workbook.hpp"
 #include "column_store_type.hpp"
 

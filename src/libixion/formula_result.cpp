@@ -11,8 +11,6 @@
 #include <ixion/matrix.hpp>
 #include <ixion/model_context.hpp>
 
-#include "mem_str_buf.hpp"
-
 #include <cassert>
 #include <sstream>
 #include <iomanip>
