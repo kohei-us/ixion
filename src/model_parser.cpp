@@ -66,22 +66,24 @@ bool is_separator(char c)
     return false;
 }
 
-mem_str_buf parse_command_to_buffer(const char*& p, const char* p_end)
+std::string_view parse_command_to_buffer(const char*& p, const char* p_end)
 {
-    mem_str_buf buf;
     ++p; // skip '%'.
-    buf.set_start(p);
+    std::size_t n = 1;
+
     if (*p == '%')
     {
         // This line is a comment.  Skip the rest of the line.
+        std::string_view ret{p, n}; // return it as command named '%'
         while (p != p_end && *p != '\n') ++p;
-        return buf;
+        return ret;
     }
 
+    auto* p_head = p;
     for (++p; p != p_end && *p != '\n'; ++p)
-        buf.inc();
+        ++n;
 
-    return buf;
+    return std::string_view{p_head, n};
 }
 
 class string_printer
@@ -265,8 +267,8 @@ void model_parser::init_model()
 void model_parser::parse_command()
 {
     // This line contains a command.
-    mem_str_buf buf_cmd = parse_command_to_buffer(mp_char, mp_end);
-    commands::type cmd = commands::get().find(buf_cmd.get(), buf_cmd.size());
+    std::string_view buf_cmd = parse_command_to_buffer(mp_char, mp_end);
+    commands::type cmd = commands::get().find(buf_cmd.data(), buf_cmd.size());
 
     switch (cmd)
     {
@@ -391,7 +393,7 @@ void model_parser::parse_command()
         case commands::type::unknown:
         {
             ostringstream os;
-            os << "unknown command: " << buf_cmd.str() << endl;
+            os << "unknown command: " << buf_cmd << endl;
             throw parse_error(os.str());
         }
         default:
