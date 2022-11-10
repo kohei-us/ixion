@@ -614,10 +614,10 @@ void model_parser::parse_result()
 {
     parsed_assignment_type res = parse_assignment();
 
-    string name_s = res.first.str();
+    auto name_s = std::string{res.first};
 
     formula_result fres;
-    fres.parse({res.second.get(), res.second.size()});
+    fres.parse(res.second);
     model_parser::results_type::iterator itr = m_formula_results.find(name_s);
     if (itr == m_formula_results.end())
     {
@@ -635,10 +635,10 @@ void model_parser::parse_result_cache()
 {
     parsed_assignment_type res = parse_assignment();
 
-    string name_s = res.first.str();
+    auto name_s = std::string{res.first};
 
     formula_result fres;
-    fres.parse({res.second.get(), res.second.size()});
+    fres.parse(res.second);
 
     formula_name_t fnt = mp_name_resolver->resolve(name_s, abs_address_t(m_current_sheet,0,0));
 
@@ -677,20 +677,21 @@ void model_parser::parse_table()
 
     // In table mode, each line must be attribute=value.
     parsed_assignment_type res = parse_assignment();
-    const mem_str_buf& name = res.first;
-    const mem_str_buf& value = res.second;
+    const auto [name, value] = res;
+//  const std::string_view name = res.first;
+//  const std::string_view value = res.second;
 
     table_handler::entry& entry = *mp_table_entry;
 
     if (name == "name")
-        entry.name = m_context.add_string({value.get(), value.size()});
+        entry.name = m_context.add_string(value);
     else if (name == "range")
     {
         if (!mp_name_resolver)
             return;
 
         abs_address_t pos(m_current_sheet,0,0);
-        formula_name_t ret = mp_name_resolver->resolve({value.get(), value.size()}, pos);
+        formula_name_t ret = mp_name_resolver->resolve(value, pos);
         if (ret.type != formula_name_t::range_reference)
             throw parse_error("range of a table is expected to be given as a range reference.");
 
@@ -699,7 +700,7 @@ void model_parser::parse_table()
     else if (name == "columns")
         parse_table_columns(value);
     else if (name == "totals-row-count")
-        entry.totals_row_count = to_double({value.get(), value.size()});
+        entry.totals_row_count = to_double(value);
 }
 
 void model_parser::push_table()
@@ -733,20 +734,19 @@ void model_parser::parse_named_expression()
 
     parsed_assignment_type res = parse_assignment();
     if (res.first == "name")
-        mp_named_expression->name = std::move(res.second.str());
+        mp_named_expression->name = std::string{res.second};
     else if (res.first == "expression")
-        mp_named_expression->expression = std::move(res.second.str());
+        mp_named_expression->expression = std::string{res.second};
     else if (res.first == "origin")
     {
-        const mem_str_buf& s = res.second;
+        const std::string_view s = res.second;
 
         formula_name_t name =
-            mp_name_resolver->resolve(
-                {s.get(), s.size()}, abs_address_t(m_current_sheet,0,0));
+            mp_name_resolver->resolve(s, abs_address_t(m_current_sheet,0,0));
 
         if (name.type != formula_name_t::name_type::cell_reference)
         {
-            ostringstream os;
+            std::ostringstream os;
             os << "'" << s << "' is not a valid named expression origin.";
             throw parse_error(os.str());
         }
@@ -756,18 +756,17 @@ void model_parser::parse_named_expression()
     else if (res.first == "scope")
     {
         // Resolve it as a sheet name and store the sheet index if found.
-        const mem_str_buf& s = res.second;
-        mp_named_expression->scope = m_context.get_sheet_index({s.get(), s.size()});
+        mp_named_expression->scope = m_context.get_sheet_index(res.second);
         if (mp_named_expression->scope == invalid_sheet)
         {
-            ostringstream os;
-            os << "no sheet named '" << s << "' exists in the model.";
+            std::ostringstream os;
+            os << "no sheet named '" << res.second << "' exists in the model.";
             throw parse_error(os.str());
         }
     }
     else
     {
-        ostringstream os;
+        std::ostringstream os;
         os << "unknown property of named expression '" << res.first << "'";
         throw parse_error(os.str());
     }
@@ -828,14 +827,14 @@ void model_parser::print_dependency()
     std::cout << m_context.get_cell_tracker().to_string() << std::endl;
 }
 
-void model_parser::parse_table_columns(const mem_str_buf& str)
+void model_parser::parse_table_columns(std::string_view str)
 {
     assert(mp_table_entry);
     table_handler::entry& entry = *mp_table_entry;
 
-    const char* p = str.get();
+    const char* p = str.data();
     const char* pend = p + str.size();
-    mem_str_buf buf;
+    std::string_view buf;
     for (; p != pend; ++p)
     {
         if (*p == ',')
@@ -843,23 +842,23 @@ void model_parser::parse_table_columns(const mem_str_buf& str)
             // Flush the current column name buffer.
             string_id_t col_name = empty_string_id;
             if (!buf.empty())
-                col_name = m_context.add_string({buf.get(), buf.size()});
+                col_name = m_context.add_string(buf);
 
             entry.columns.push_back(col_name);
-            buf.clear();
+            buf = std::string_view{};
         }
         else
         {
             if (buf.empty())
-                buf.set_start(p);
+                buf = std::string_view{p, 1u};
             else
-                buf.inc();
+                buf = std::string_view{buf.data(), buf.size() + 1u};
         }
     }
 
     string_id_t col_name = empty_string_id;
     if (!buf.empty())
-        col_name = m_context.add_string({buf.get(), buf.size()});
+        col_name = m_context.add_string(buf);
 
     entry.columns.push_back(col_name);
 }
@@ -868,7 +867,7 @@ model_parser::parsed_assignment_type model_parser::parse_assignment()
 {
     // Parse to get name and value strings.
     parsed_assignment_type res;
-    mem_str_buf buf;
+    std::string_view buf;
 
     for (; mp_char != mp_end && *mp_char != '\n'; ++mp_char)
     {
@@ -878,14 +877,14 @@ model_parser::parsed_assignment_type model_parser::parse_assignment()
                 throw model_parser::parse_error("left hand side is empty");
 
             res.first = buf;
-            buf.clear();
+            buf = std::string_view{};
         }
         else
         {
             if (buf.empty())
-                buf.set_start(mp_char);
+                buf = std::string_view{mp_char, 1u};
             else
-                buf.inc();
+                buf = std::string_view{buf.data(), buf.size() + 1u};
         }
     }
 

@@ -38,7 +38,7 @@ class model_parser
         parse_mode_exit
     };
 
-    using parsed_assignment_type = std::pair<mem_str_buf, mem_str_buf>;
+    using parsed_assignment_type = std::pair<std::string_view, std::string_view>;
 
     struct named_expression_type
     {
@@ -106,7 +106,7 @@ private:
     void parse_result_cache();
 
     void parse_table();
-    void parse_table_columns(const mem_str_buf& str);
+    void parse_table_columns(std::string_view str);
     void push_table();
 
     void parse_named_expression();
