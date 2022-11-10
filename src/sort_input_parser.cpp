@@ -8,7 +8,7 @@
 #include "sort_input_parser.hpp"
 #include "app_common.hpp"
 
-#include "ixion/global.hpp"
+#include <ixion/global.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -18,7 +18,7 @@ using namespace std;
 
 namespace ixion {
 
-size_t hash_value(const ixion::mem_str_buf& s)
+size_t hash_value(const std::string_view& s)
 {
     size_t n = s.size();
     size_t hash_val = 0;
@@ -32,9 +32,9 @@ namespace {
 
 struct mem_str_buf_printer
 {
-    void operator() (const mem_str_buf& r) const
+    void operator() (const std::string_view& r) const
     {
-        cout << r.str() << endl;
+        std::cout << r << std::endl;
     }
 };
 
@@ -64,7 +64,7 @@ void sort_input_parser::parse()
 
     mp = &m_content[0];
     mp_last = &m_content[m_content.size()-1];
-    mem_str_buf cell, dep;
+    std::string_view cell, dep;
     bool in_name = true;
     for (;mp != mp_last; ++mp)
     {
@@ -88,8 +88,8 @@ void sort_input_parser::parse()
                         insert_depend(cell, dep);
                 }
 
-                cell.clear();
-                dep.clear();
+                cell = std::string_view{};
+                dep = std::string_view{};
                 in_name = true;
             break;
             case ':':
@@ -101,9 +101,19 @@ void sort_input_parser::parse()
             break;
             default:
                 if (in_name)
-                    cell.append(mp);
+                {
+                    if (cell.empty())
+                        cell = std::string_view{mp, 1u};
+                    else
+                        cell = std::string_view{cell.data(), cell.size() + 1u};
+                }
                 else
-                    dep.append(mp);
+                {
+                    if (dep.empty())
+                        dep = std::string_view{mp, 1u};
+                    else
+                        dep = std::string_view{dep.data(), dep.size() + 1u};
+                }
         }
     }
 }
@@ -113,7 +123,7 @@ void sort_input_parser::print()
     remove_duplicate_cells();
 
     // Run the depth first search.
-    vector<mem_str_buf> sorted;
+    vector<std::string_view> sorted;
     sorted.reserve(m_all_cells.size());
     dfs_type::back_inserter handler(sorted);
     dfs_type dfs(m_all_cells.begin(), m_all_cells.end(), m_set, handler);
@@ -126,11 +136,11 @@ void sort_input_parser::print()
 void sort_input_parser::remove_duplicate_cells()
 {
     sort(m_all_cells.begin(), m_all_cells.end());
-    vector<mem_str_buf>::iterator itr = unique(m_all_cells.begin(), m_all_cells.end());
+    vector<std::string_view>::iterator itr = unique(m_all_cells.begin(), m_all_cells.end());
     m_all_cells.erase(itr, m_all_cells.end());
 }
 
-void sort_input_parser::insert_depend(const mem_str_buf& cell, const mem_str_buf& dep)
+void sort_input_parser::insert_depend(const std::string_view& cell, const std::string_view& dep)
 {
     m_set.insert(cell, dep);
     m_all_cells.push_back(cell);

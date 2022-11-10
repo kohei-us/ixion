@@ -8,12 +8,12 @@
 #ifndef __IXION_SORT_INPUT_PARSER_HXX__
 #define __IXION_SORT_INPUT_PARSER_HXX__
 
-#include "ixion/exceptions.hpp"
+#include <ixion/exceptions.hpp>
 
 #include "depth_first_search.hpp"
-#include "mem_str_buf.hpp"
 
 #include <vector>
+#include <string>
 
 namespace ixion {
 
@@ -26,7 +26,7 @@ class sort_input_parser
         virtual ~parse_error() throw();
     };
 
-    using dfs_type = depth_first_search<mem_str_buf, mem_str_buf::hash>;
+    using dfs_type = depth_first_search<std::string_view, std::hash<std::string_view>>;
 
 public:
     sort_input_parser(const ::std::string& filepath);
@@ -37,12 +37,12 @@ public:
 
 private:
     void remove_duplicate_cells();
-    void insert_depend(const mem_str_buf& cell, const mem_str_buf& dep);
+    void insert_depend(const std::string_view& cell, const std::string_view& dep);
 
 private:
     dfs_type::relations    m_set;
-    ::std::string           m_content;
-    ::std::vector<mem_str_buf>   m_all_cells;
+    std::string m_content;
+    std::vector<std::string_view> m_all_cells;
 
     const char* mp;
     const char* mp_last;
