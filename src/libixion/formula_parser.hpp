@@ -49,10 +49,10 @@ public:
 
 private:
 
-    void primitive(lexer_opcode_t oc);
-    void name(const lexer_token& t);
-    void literal(const lexer_token& t);
-    void value(const lexer_token& t);
+    void primitive();
+    void name();
+    void literal();
+    void value();
     void less();
     void greater();
 

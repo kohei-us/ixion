@@ -56,9 +56,7 @@ void formula_parser::parse()
 {
     for (m_itr_cur = m_tokens.begin(); has_token(); next())
     {
-        const lexer_token& t = get_token();
-
-        switch (t.opcode)
+        switch (get_token().opcode)
         {
             case lexer_opcode_t::open:
             case lexer_opcode_t::close:
@@ -70,16 +68,16 @@ void formula_parser::parse()
             case lexer_opcode_t::equal:
             case lexer_opcode_t::divide:
             case lexer_opcode_t::sep:
-                primitive(t.opcode);
+                primitive();
                 break;
             case lexer_opcode_t::name:
-                name(t);
+                name();
                 break;
             case lexer_opcode_t::string:
-                literal(t);
+                literal();
                 break;
             case lexer_opcode_t::value:
-                value(t);
+                value();
                 break;
             case lexer_opcode_t::less:
                 less();
@@ -102,10 +100,10 @@ formula_tokens_t& formula_parser::get_tokens()
     return m_formula_tokens;
 }
 
-void formula_parser::primitive(lexer_opcode_t oc)
+void formula_parser::primitive()
 {
     fopcode_t foc = fop_unknown;
-    switch (oc)
+    switch (get_token().opcode)
     {
         case lexer_opcode_t::close:
             foc = fop_close;
@@ -143,9 +141,9 @@ void formula_parser::primitive(lexer_opcode_t oc)
     m_formula_tokens.emplace_back(foc);
 }
 
-void formula_parser::name(const lexer_token& t)
+void formula_parser::name()
 {
-    std::string_view name = std::get<std::string_view>(t.value);
+    std::string_view name = std::get<std::string_view>(get_token().value);
 
     formula_name_t fn = m_resolver.resolve(name, m_pos);
 
@@ -185,15 +183,15 @@ void formula_parser::name(const lexer_token& t)
     }
 }
 
-void formula_parser::literal(const lexer_token& t)
+void formula_parser::literal()
 {
-    string_id_t sid = m_context.add_string(std::get<std::string_view>(t.value));
+    string_id_t sid = m_context.add_string(std::get<std::string_view>(get_token().value));
     m_formula_tokens.emplace_back(sid);
 }
 
-void formula_parser::value(const lexer_token& t)
+void formula_parser::value()
 {
-    m_formula_tokens.emplace_back(std::get<double>(t.value));
+    m_formula_tokens.emplace_back(std::get<double>(get_token().value));
 }
 
 void formula_parser::less()
