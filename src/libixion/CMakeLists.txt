@@ -28,7 +28,6 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     interface.cpp
     lexer_tokens.cpp
     matrix.cpp
-    mem_str_buf.cpp
     model_context.cpp
     model_context_impl.cpp
     model_iterator.cpp

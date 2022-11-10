@@ -57,7 +57,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	lexer_tokens.hpp \
 	lexer_tokens.cpp \
 	matrix.cpp \
-	mem_str_buf.cpp \
 	model_context.cpp \
 	model_context_impl.hpp \
 	model_context_impl.cpp \

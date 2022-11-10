@@ -249,7 +249,6 @@
         <Folder Name="../src">
             <Folder Name="include">
                 <F N="../src/include/depth_first_search.hpp"/>
-                <F N="../src/include/mem_str_buf.hpp"/>
                 <F N="../src/include/test_global.hpp"/>
             </Folder>
             <Folder Name="libixion">
@@ -299,7 +298,6 @@
                 <F N="../src/libixion/lexer_tokens.cpp"/>
                 <F N="../src/libixion/lexer_tokens.hpp"/>
                 <F N="../src/libixion/matrix.cpp"/>
-                <F N="../src/libixion/mem_str_buf.cpp"/>
                 <F N="../src/libixion/model_context.cpp"/>
                 <F N="../src/libixion/model_context_impl.cpp"/>
                 <F N="../src/libixion/model_context_impl.hpp"/>
