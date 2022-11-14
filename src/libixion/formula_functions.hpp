@@ -19,7 +19,7 @@
 
 namespace ixion {
 
-class formula_token;
+struct formula_token;
 
 /**
  * Collection of built-in cell function implementations.  Note that those
