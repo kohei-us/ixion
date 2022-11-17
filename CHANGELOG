@@ -1,9 +1,14 @@
-ixion <next version>
+ixion 0.18.0
 
 * C++ API
 
   * removed the formula_model_access interface from model_context, and switched
     to using model_context directly everywhere.
+
+  * revised formula_tokens_t type to remove use of std::unique_ptr for each
+    formula_token instance.  This should improve memory locality when
+    iterating through an array of formula token values.  A similar change has
+    also been made to lexer_tokens_t and lexer_token types.
 
 * formula interpreter
 
@@ -50,6 +55,9 @@ ixion <next version>
     * TRIM
     * TRUE
     * TYPE
+
+* added support for multi-sheet references in Excel A1 and Excel R1C1
+  grammers.
 
 ixion 0.17.0
 
