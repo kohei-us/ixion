@@ -1,5 +1,7 @@
 .. highlight:: cpp
 
+.. _root:
+
 C++ API
 =======
 
