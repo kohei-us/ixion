@@ -1,6 +1,6 @@
 .. highlight:: cpp
 
-.. _root:
+.. _index:
 
 C++ API
 =======
