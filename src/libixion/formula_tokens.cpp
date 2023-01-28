@@ -262,7 +262,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         }
         case fop_error:
         {
-            os << "invalid error token: (count=" << std::get<std::size_t>(ft.value) << ")";
+            os << "invalid error token: (count=" << std::get<string_id_t>(ft.value) << ")";
             break;
         }
         case fop_plus:

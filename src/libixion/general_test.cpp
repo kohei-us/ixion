@@ -1388,7 +1388,7 @@ void test_invalid_formula_tokens()
     formula_tokens_t tokens = create_formula_error_tokens(cxt, invalid_formula, error_msg);
 
     assert(tokens[0].opcode == fop_error);
-    assert(tokens.size() == (std::get<std::size_t>(tokens[0].value) + 1));
+    assert(tokens.size() == (std::get<string_id_t>(tokens[0].value) + 1));
 
     assert(tokens[1].opcode == fop_string);
     string_id_t sid = std::get<string_id_t>(tokens[1].value);

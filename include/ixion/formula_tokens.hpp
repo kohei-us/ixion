@@ -46,7 +46,7 @@ struct IXION_DLLPUBLIC formula_token final
 {
     using value_type = std::variant<
         address_t, range_t, table_t, formula_function_t,
-        double, string_id_t, std::size_t, std::string>;
+        double, string_id_t, std::string>;
 
     /**
      * Opcode that specifies the type of token.  The value of this data member
