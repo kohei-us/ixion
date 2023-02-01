@@ -1,3 +1,8 @@
+ixion 0.18.1
+
+* fixed a 32-bit Linux build issue as discovered on Debian, due to a clash on
+  two 32-bit unsigned integer types being used with std::variant.
+
 ixion 0.18.0
 
 * C++ API
