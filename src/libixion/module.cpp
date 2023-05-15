@@ -65,7 +65,8 @@ void init_modules()
             continue;
 
         fp_register_module_type fp_register_module;
-        *(void**)(&fp_register_module) = GetProcAddress(hdl, "register_module");
+        *(void**)(&fp_register_module) =
+            reinterpret_cast<void **>(GetProcAddress(hdl, "register_module"));
 
         register_module(hdl, mod_name, fp_register_module);
     }
