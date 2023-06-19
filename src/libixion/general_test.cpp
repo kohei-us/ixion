@@ -1299,6 +1299,43 @@ void test_model_context_error_value()
     assert(ca.get_error_value() == formula_error_t::division_by_zero);
 }
 
+void test_model_context_rename_sheets()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+    cxt.append_sheet("sheet2");
+    cxt.append_sheet("sheet3");
+
+    assert(cxt.get_sheet_index("sheet1") == 0);
+    assert(cxt.get_sheet_index("sheet2") == 1);
+    assert(cxt.get_sheet_index("sheet3") == 2);
+
+    cxt.set_sheet_name(0, "sheet1"); // Setting it to the current name is a no-op.
+    try
+    {
+        cxt.set_sheet_name(0, "sheet3");
+        assert(!"exception should have been thrown!");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::sheet_name_conflict);
+    }
+    catch (...)
+    {
+        assert(!"wrong exception caught");
+    }
+
+    cxt.set_sheet_name(0, "one");
+    cxt.set_sheet_name(1, "two");
+    cxt.set_sheet_name(2, "three");
+
+    assert(cxt.get_sheet_index("one") == 0);
+    assert(cxt.get_sheet_index("two") == 1);
+    assert(cxt.get_sheet_index("three") == 2);
+}
+
 void test_volatile_function()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1447,6 +1484,7 @@ int main()
     test_model_context_iterator_named_exps();
     test_model_context_fill_down();
     test_model_context_error_value();
+    test_model_context_rename_sheets();
     test_volatile_function();
     test_invalid_formula_tokens();
     test_grouped_formula_string_results();

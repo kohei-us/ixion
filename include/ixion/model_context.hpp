@@ -230,6 +230,14 @@ public:
     std::string get_sheet_name(sheet_t sheet) const;
 
     /**
+     * Set a new name to an existing sheet.
+     *
+     * @param sheet 0-based sheet index.
+     * @param name New name of a sheet.
+     */
+    void set_sheet_name(sheet_t sheet, std::string name);
+
+    /**
      * Get the size of a sheet.
      *
      * @return sheet size.

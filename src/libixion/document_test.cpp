@@ -141,12 +141,48 @@ void test_custom_cell_address_syntax()
     assert(v == 345.0);
 }
 
+void test_rename_sheets()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    document doc(formula_name_resolver_t::excel_r1c1);
+    doc.append_sheet("Sheet1");
+    doc.append_sheet("Sheet2");
+    doc.append_sheet("Sheet3");
+    doc.set_numeric_cell("Sheet3!R3C3", 456.0);
+
+    double v = doc.get_numeric_value("Sheet3!R3C3");
+    assert(v == 456.0);
+
+    doc.set_sheet_name(0, "S1");
+    doc.set_sheet_name(1, "S2");
+    doc.set_sheet_name(2, "S3");
+
+    v = doc.get_numeric_value("S3!R3C3");
+    assert(v == 456.0);
+
+    doc.set_numeric_cell("S2!R4C2", 789.0);
+    v = doc.get_numeric_value("S2!R4C2");
+    assert(v == 789.0);
+
+    try
+    {
+        doc.get_numeric_value("Sheet3!R3C3");
+        assert(!"Exception should've been thrown.");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // correct exception
+    }
+}
+
 int main()
 {
     test_basic_calc();
     test_string_io();
     test_boolean_io();
     test_custom_cell_address_syntax();
+    test_rename_sheets();
 
     return EXIT_SUCCESS;
 }

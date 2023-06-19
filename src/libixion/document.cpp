@@ -95,6 +95,11 @@ struct document::impl
         cxt.append_sheet(std::move(name));
     }
 
+    void set_sheet_name(sheet_t sheet, std::string name)
+    {
+        cxt.set_sheet_name(sheet, std::move(name));
+    }
+
     cell_access get_cell_access(cell_pos pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
@@ -175,6 +180,11 @@ document::~document() {}
 void document::append_sheet(std::string name)
 {
     mp_impl->append_sheet(std::move(name));
+}
+
+void document::set_sheet_name(sheet_t sheet, std::string name)
+{
+    mp_impl->set_sheet_name(sheet, std::move(name));
 }
 
 cell_access document::get_cell_access(cell_pos pos) const

@@ -315,6 +315,11 @@ std::string model_context::get_sheet_name(sheet_t sheet) const
     return mp_impl->get_sheet_name(sheet);
 }
 
+void model_context::set_sheet_name(sheet_t sheet, std::string name)
+{
+    mp_impl->set_sheet_name(sheet, std::move(name));
+}
+
 rc_size_t model_context::get_sheet_size() const
 {
     return mp_impl->get_sheet_size();

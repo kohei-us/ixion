@@ -54,6 +54,14 @@ public:
 
     void append_sheet(std::string name);
 
+    /**
+     * Set a new name to an existing sheet.
+     *
+     * @param sheet 0-based sheet index.
+     * @param name New name of a sheet.
+     */
+    void set_sheet_name(sheet_t sheet, std::string name);
+
     cell_access get_cell_access(cell_pos pos) const;
 
     void set_numeric_cell(cell_pos pos, double val);

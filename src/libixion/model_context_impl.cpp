@@ -190,6 +190,14 @@ void clip_range(abs_range_t& range, const rc_size_t& sheet_size)
         range.last.row = sheet_size.row - 1;
 }
 
+void throw_sheet_name_conflict(const std::string& name)
+{
+    // This sheet name is already taken.
+    std::ostringstream os;
+    os << "Sheet name '" << name << "' already exists.";
+    throw model_context_error(os.str(), model_context_error::sheet_name_conflict);
+}
+
 } // anonymous namespace
 
 model_context_impl::model_context_impl(model_context& parent, const rc_size_t& sheet_size) :
@@ -285,10 +293,34 @@ sheet_t model_context_impl::get_sheet_index(std::string_view name) const
 
 std::string model_context_impl::get_sheet_name(sheet_t sheet) const
 {
-    if (m_sheet_names.size() <= static_cast<size_t>(sheet))
+    if (sheet < 0 || m_sheet_names.size() <= std::size_t(sheet))
         return std::string();
 
     return m_sheet_names[sheet];
+}
+
+void model_context_impl::set_sheet_name(sheet_t sheet, std::string name)
+{
+    if (sheet < 0 || m_sheet_names.size() <= std::size_t(sheet))
+    {
+        std::ostringstream os;
+        os << "invalid sheet index: " << sheet;
+        throw std::invalid_argument(os.str());
+    }
+
+    for (std::size_t i = 0; i < m_sheet_names.size(); ++i)
+    {
+        if (m_sheet_names[i] == name)
+        {
+            if (i == std::size_t(sheet))
+                // Same sheet name is given. No point updating it.
+                return;
+            else
+                throw_sheet_name_conflict(name);
+        }
+    }
+
+    m_sheet_names[sheet] = std::move(name);
 }
 
 rc_size_t model_context_impl::get_sheet_size() const
@@ -309,12 +341,7 @@ sheet_t model_context_impl::append_sheet(std::string&& name)
     strings_type::const_iterator it =
         std::find(m_sheet_names.begin(), m_sheet_names.end(), name);
     if (it != m_sheet_names.end())
-    {
-        // This sheet name is already taken.
-        std::ostringstream os;
-        os << "Sheet name '" << name << "' already exists.";
-        throw model_context_error(os.str(), model_context_error::sheet_name_conflict);
-    }
+        throw_sheet_name_conflict(name);
 
     // index of the new sheet.
     sheet_t sheet_index = m_sheets.size();
