@@ -41,6 +41,114 @@ namespace {
 
 #endif
 
+void print_token(
+    const model_context& cxt, const abs_address_t& pos, const formula_name_resolver& resolver,
+    const formula_token& token, std::ostream& os)
+{
+    switch (token.opcode)
+    {
+        case fop_close:
+            os << ')';
+            break;
+        case fop_divide:
+            os << '/';
+            break;
+        case fop_minus:
+            os << '-';
+            break;
+        case fop_multiply:
+            os << '*';
+            break;
+        case fop_exponent:
+            os << '^';
+            break;
+        case fop_concat:
+            os << '&';
+            break;
+        case fop_open:
+            os << '(';
+            break;
+        case fop_plus:
+            os << '+';
+            break;
+        case fop_value:
+            os << std::get<double>(token.value);
+            break;
+        case fop_sep:
+            os << cxt.get_config().sep_function_arg;
+            break;
+        case fop_function:
+        {
+            auto fop = std::get<formula_function_t>(token.value);
+            os << formula_functions::get_function_name(fop);
+            break;
+        }
+        case fop_single_ref:
+        {
+            const address_t& addr = std::get<address_t>(token.value);
+            bool sheet_name = addr.to_abs(pos).sheet != pos.sheet;
+            os << resolver.get_name(addr, pos, sheet_name);
+            break;
+        }
+        case fop_range_ref:
+        {
+            const range_t& range = std::get<range_t>(token.value);
+            bool sheet_name = range.to_abs(pos).first.sheet != pos.sheet;
+            os << resolver.get_name(range, pos, sheet_name);
+            break;
+        }
+        case fop_table_ref:
+        {
+            const table_t& tbl = std::get<table_t>(token.value);
+            os << resolver.get_name(tbl);
+            break;
+        }
+        case fop_string:
+        {
+            auto sid = std::get<string_id_t>(token.value);
+            const std::string* p = cxt.get_string(sid);
+            if (p)
+                os << "\"" << *p << "\"";
+            else
+                IXION_DEBUG("failed to get a string value for the identifier value of " << sid);
+
+            break;
+        }
+        case fop_equal:
+            os << "=";
+            break;
+        case fop_not_equal:
+            os << "<>";
+            break;
+        case fop_less:
+            os << "<";
+            break;
+        case fop_greater:
+            os << ">";
+            break;
+        case fop_less_equal:
+            os << "<=";
+            break;
+        case fop_greater_equal:
+            os << ">=";
+            break;
+        case fop_named_expression:
+            os << std::get<std::string>(token.value);
+            break;
+        case fop_unknown:
+        default:
+        {
+            std::ostringstream repr;
+            repr << token;
+            IXION_DEBUG(
+                "token not printed (repr='" << repr.str()
+                << "'; name='" << get_opcode_name(token.opcode)
+                << "'; opcode='" << get_formula_opcode_string(token.opcode)
+                << "')");
+        }
+    }
+}
+
 }
 
 formula_tokens_t parse_formula_string(
@@ -84,132 +192,6 @@ formula_tokens_t create_formula_error_tokens(
     return tokens;
 }
 
-namespace {
-
-class func_print_formula_token
-{
-    const model_context& m_cxt;
-    const abs_address_t& m_pos;
-    const formula_name_resolver& m_resolver;
-    std::ostringstream& m_os;
-public:
-    func_print_formula_token(
-        const model_context& cxt, const abs_address_t& pos,
-        const formula_name_resolver& resolver, std::ostringstream& os) :
-        m_cxt(cxt),
-        m_pos(pos),
-        m_resolver(resolver),
-        m_os(os) {}
-
-    void operator() (const formula_token& token)
-    {
-        switch (token.opcode)
-        {
-            case fop_close:
-                m_os << ')';
-                break;
-            case fop_divide:
-                m_os << '/';
-                break;
-            case fop_minus:
-                m_os << '-';
-                break;
-            case fop_multiply:
-                m_os << '*';
-                break;
-            case fop_exponent:
-                m_os << '^';
-                break;
-            case fop_concat:
-                m_os << '&';
-                break;
-            case fop_open:
-                m_os << '(';
-                break;
-            case fop_plus:
-                m_os << '+';
-                break;
-            case fop_value:
-                m_os << std::get<double>(token.value);
-                break;
-            case fop_sep:
-                m_os << m_cxt.get_config().sep_function_arg;
-                break;
-            case fop_function:
-            {
-                auto fop = std::get<formula_function_t>(token.value);
-                m_os << formula_functions::get_function_name(fop);
-                break;
-            }
-            case fop_single_ref:
-            {
-                const address_t& addr = std::get<address_t>(token.value);
-                bool sheet_name = addr.to_abs(m_pos).sheet != m_pos.sheet;
-                m_os << m_resolver.get_name(addr, m_pos, sheet_name);
-                break;
-            }
-            case fop_range_ref:
-            {
-                const range_t& range = std::get<range_t>(token.value);
-                bool sheet_name = range.to_abs(m_pos).first.sheet != m_pos.sheet;
-                m_os << m_resolver.get_name(range, m_pos, sheet_name);
-                break;
-            }
-            case fop_table_ref:
-            {
-                const table_t& tbl = std::get<table_t>(token.value);
-                m_os << m_resolver.get_name(tbl);
-                break;
-            }
-            case fop_string:
-            {
-                auto sid = std::get<string_id_t>(token.value);
-                const std::string* p = m_cxt.get_string(sid);
-                if (p)
-                    m_os << "\"" << *p << "\"";
-                else
-                    IXION_DEBUG("failed to get a string value for the identifier value of " << sid);
-
-                break;
-            }
-            case fop_equal:
-                m_os << "=";
-                break;
-            case fop_not_equal:
-                m_os << "<>";
-                break;
-            case fop_less:
-                m_os << "<";
-                break;
-            case fop_greater:
-                m_os << ">";
-                break;
-            case fop_less_equal:
-                m_os << "<=";
-                break;
-            case fop_greater_equal:
-                m_os << ">=";
-                break;
-            case fop_named_expression:
-                m_os << std::get<std::string>(token.value);
-                break;
-            case fop_unknown:
-            default:
-            {
-                std::ostringstream repr;
-                repr << token;
-                IXION_DEBUG(
-                    "token not printed (repr='" << repr.str()
-                    << "'; name='" << get_opcode_name(token.opcode)
-                    << "'; opcode='" << get_formula_opcode_string(token.opcode)
-                    << "')");
-            }
-        }
-    }
-};
-
-}
-
 std::string print_formula_tokens(
     const model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_tokens_t& tokens)
@@ -220,7 +202,9 @@ std::string print_formula_tokens(
         // Let's not print anything on error tokens.
         return std::string();
 
-    std::for_each(tokens.begin(), tokens.end(), func_print_formula_token(cxt, pos, resolver, os));
+    for (const formula_token& token : tokens)
+        print_token(cxt, pos, resolver, token, os);
+
     return os.str();
 }
 
@@ -229,8 +213,7 @@ std::string print_formula_token(
     const formula_name_resolver& resolver, const formula_token& token)
 {
     std::ostringstream os;
-    func_print_formula_token func(cxt, pos, resolver, os);
-    func(token);
+    print_token(cxt, pos, resolver, token, os);
     return os.str();
 }
 
