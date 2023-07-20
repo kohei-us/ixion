@@ -40,9 +40,10 @@ named_expressions_iterator::named_expressions_iterator(const model_context& cxt,
 named_expressions_iterator::named_expressions_iterator(const named_expressions_iterator& other) :
     mp_impl(std::make_unique<impl>(*other.mp_impl)) {}
 
-named_expressions_iterator::~named_expressions_iterator()
-{
-}
+named_expressions_iterator::named_expressions_iterator(named_expressions_iterator&& other) :
+    mp_impl(std::move(other.mp_impl)) {}
+
+named_expressions_iterator::~named_expressions_iterator() = default;
 
 size_t named_expressions_iterator::size() const
 {

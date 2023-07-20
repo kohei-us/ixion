@@ -32,6 +32,7 @@ class IXION_DLLPUBLIC named_expressions_iterator
 public:
     named_expressions_iterator();
     named_expressions_iterator(const named_expressions_iterator& other);
+    named_expressions_iterator(named_expressions_iterator&& other);
     ~named_expressions_iterator();
 
     struct named_expression
