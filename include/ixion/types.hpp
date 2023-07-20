@@ -338,7 +338,35 @@ using column_block_callback_t = std::function<bool(col_t, row_t, row_t, const co
 
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const column_block_shape_t& v);
 
-}
+/**
+ * Specifies how to determine whether or not to display a sheet name of a cell
+ * or range reference.
+ */
+enum class display_sheet_t
+{
+    /** Sheet name display preference is not specified. */
+    unspecified,
+    /** Sheet name should be always displayed. */
+    always,
+    /** Sheet name should never be displayed. */
+    never,
+    /**
+     * Sheet name should be displayed only when the sheet index of a reference
+     * is different from that of the position of a referencing cell.
+     */
+    only_if_different,
+};
+
+struct IXION_DLLPUBLIC print_config
+{
+    display_sheet_t display_sheet = display_sheet_t::only_if_different;
+
+    print_config();
+    print_config(const print_config& other);
+    ~print_config();
+};
+
+} // namespace ixion
 
 #endif
 

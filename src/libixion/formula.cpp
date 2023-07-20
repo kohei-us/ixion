@@ -42,9 +42,25 @@ namespace {
 #endif
 
 void print_token(
-    const model_context& cxt, const abs_address_t& pos, const formula_name_resolver& resolver,
-    const formula_token& token, std::ostream& os)
+    const print_config& config, const model_context& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_token& token, std::ostream& os)
 {
+    auto sheet_to_print = [&config, &pos](const address_t& ref_addr) -> bool
+    {
+        switch (config.display_sheet)
+        {
+            case display_sheet_t::always:
+                return true;
+            case display_sheet_t::never:
+                return false;
+            case display_sheet_t::only_if_different:
+                return ref_addr.to_abs(pos).sheet != pos.sheet;
+            case display_sheet_t::unspecified:
+                break;
+        }
+        return false;
+    };
+
     switch (token.opcode)
     {
         case fop_close:
@@ -86,14 +102,14 @@ void print_token(
         case fop_single_ref:
         {
             const address_t& addr = std::get<address_t>(token.value);
-            bool sheet_name = addr.to_abs(pos).sheet != pos.sheet;
+            bool sheet_name = sheet_to_print(addr);
             os << resolver.get_name(addr, pos, sheet_name);
             break;
         }
         case fop_range_ref:
         {
             const range_t& range = std::get<range_t>(token.value);
-            bool sheet_name = range.to_abs(pos).first.sheet != pos.sheet;
+            bool sheet_name = sheet_to_print(range.first);
             os << resolver.get_name(range, pos, sheet_name);
             break;
         }
@@ -196,6 +212,15 @@ std::string print_formula_tokens(
     const model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_tokens_t& tokens)
 {
+    print_config config;
+    config.display_sheet = display_sheet_t::only_if_different;
+    return print_formula_tokens(config, cxt, pos, resolver, tokens);
+}
+
+std::string print_formula_tokens(
+    const print_config& config, const model_context& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_tokens_t& tokens)
+{
     std::ostringstream os;
 
     if (!tokens.empty() && tokens[0].opcode == fop_error)
@@ -203,7 +228,7 @@ std::string print_formula_tokens(
         return std::string();
 
     for (const formula_token& token : tokens)
-        print_token(cxt, pos, resolver, token, os);
+        print_token(config, cxt, pos, resolver, token, os);
 
     return os.str();
 }
@@ -212,8 +237,17 @@ std::string print_formula_token(
     const model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_token& token)
 {
+    print_config config;
+    config.display_sheet = display_sheet_t::only_if_different;
+    return print_formula_token(config, cxt, pos, resolver, token);
+}
+
+std::string print_formula_token(
+    const print_config& config, const model_context& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_token& token)
+{
     std::ostringstream os;
-    print_token(cxt, pos, resolver, token, os);
+    print_token(config, cxt, pos, resolver, token, os);
     return os.str();
 }
 

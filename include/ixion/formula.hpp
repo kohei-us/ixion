@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_FORMULA_HPP
 
 #include "formula_tokens.hpp"
+#include "types.hpp"
 #include "env.hpp"
 
 #include <string>
@@ -69,6 +70,21 @@ IXION_DLLPUBLIC std::string print_formula_tokens(
     const formula_name_resolver& resolver, const formula_tokens_t& tokens);
 
 /**
+ * Convert formula tokens into a human-readable string representation.
+ *
+ * @param config Configuration options for printing preferences.
+ * @param cxt Model context.
+ * @param pos Address of the cell that has the formula tokens.
+ * @param resolver Name resolver object used to print name tokens.
+ * @param tokens Formula tokens to print.
+ *
+ * @return string representation of the formula tokens.
+ */
+IXION_DLLPUBLIC std::string print_formula_tokens(
+    const print_config& config, const model_context& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_tokens_t& tokens);
+
+/**
  * Convert an individual formula token into a human-readable string
  * representation.
  *
@@ -81,6 +97,22 @@ IXION_DLLPUBLIC std::string print_formula_tokens(
  */
 IXION_DLLPUBLIC std::string print_formula_token(
     const model_context& cxt, const abs_address_t& pos,
+    const formula_name_resolver& resolver, const formula_token& token);
+
+/**
+ * Convert an individual formula token into a human-readable string
+ * representation.
+ *
+ * @param config Configuration options for printing preferences.
+ * @param cxt Model context.
+ * @param pos Address of the cell that has the formula tokens.
+ * @param resolver Name resolver object used to print name tokens.
+ * @param token Formula token to convert.
+ *
+ * @return string representation of the formula token.
+ */
+IXION_DLLPUBLIC std::string print_formula_token(
+    const print_config& config, const model_context& cxt, const abs_address_t& pos,
     const formula_name_resolver& resolver, const formula_token& token);
 
 /**

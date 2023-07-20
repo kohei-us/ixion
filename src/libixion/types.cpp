@@ -124,6 +124,10 @@ std::ostream& operator<< (std::ostream& os, const column_block_shape_t& v)
     return os;
 }
 
-}
+print_config::print_config() = default;
+print_config::print_config(const print_config&) = default;
+print_config::~print_config() = default;
+
+} // namespace ixion
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
