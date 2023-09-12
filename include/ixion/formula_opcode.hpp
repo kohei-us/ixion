@@ -46,6 +46,7 @@ enum fopcode_t
     fop_open,
     fop_close,
     fop_sep,
+    fop_array_row_sep,
     fop_array_open,
     fop_array_close,
 

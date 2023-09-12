@@ -41,6 +41,7 @@ std::string_view get_opcode_name(fopcode_t oc)
         "open", // fop_open
         "close", // fop_close
         "sep", // fop_sep
+        "array-row-sep", // fop_array_row_sep
         "array-open", // fop_array_open
         "array-close", // fop_array_close
         "error", // fop_error
@@ -81,6 +82,7 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
         "(", // fop_open
         ")", // fop_close
         empty, // fop_sep
+        empty, // fop_array_row_sep
         "{",   // fop_array_open
         "}",   // fop_array_close
         empty, // fop_error
@@ -284,6 +286,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         case fop_open:
         case fop_close:
         case fop_sep:
+        case fop_array_row_sep:
         case fop_array_open:
         case fop_array_close:
         case fop_unknown:

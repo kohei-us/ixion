@@ -70,6 +70,7 @@ void formula_parser::parse()
             case lexer_opcode_t::equal:
             case lexer_opcode_t::divide:
             case lexer_opcode_t::sep:
+            case lexer_opcode_t::array_row_sep:
                 primitive();
                 break;
             case lexer_opcode_t::name:
@@ -132,6 +133,9 @@ void formula_parser::primitive()
             break;
         case lexer_opcode_t::sep:
             foc = fop_sep;
+            break;
+        case lexer_opcode_t::array_row_sep:
+            foc = fop_array_row_sep;
             break;
         case lexer_opcode_t::array_open:
             foc = fop_array_open;

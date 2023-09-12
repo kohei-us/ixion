@@ -64,6 +64,8 @@ const char* get_opcode_name(lexer_opcode_t oc)
             return "close";
         case lexer_opcode_t::sep:
             return "sep";
+        case lexer_opcode_t::array_row_sep:
+            return "array-row-sep";
         case lexer_opcode_t::array_open:
             return "array-open";
         case lexer_opcode_t::array_close:
@@ -133,6 +135,9 @@ std::ostream& operator<<(std::ostream& os, const lexer_token& t)
             break;
         case lexer_opcode_t::sep:
             os << ',';
+            break;
+        case lexer_opcode_t::array_row_sep:
+            os << ';';
             break;
         case lexer_opcode_t::name:
         case lexer_opcode_t::string:

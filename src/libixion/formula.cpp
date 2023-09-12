@@ -99,6 +99,9 @@ void print_token(
         case fop_sep:
             os << cxt.get_config().sep_function_arg;
             break;
+        case fop_array_row_sep:
+            os << cxt.get_config().sep_matrix_row;
+            break;
         case fop_function:
         {
             auto fop = std::get<formula_function_t>(token.value);

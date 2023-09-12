@@ -52,6 +52,7 @@ public:
     explicit tokenizer(lexer_tokens_t& tokens, const char* p, size_t n) :
         m_tokens(tokens),
         m_sep_arg(','),
+        m_sep_array_row(';'),
         m_sep_decimal('.'),
         mp_first(p),
         mp_char(NULL),
@@ -68,6 +69,7 @@ public:
 
 private:
     bool is_arg_sep(char c) const;
+    bool is_array_row_sep(char c) const;
     bool is_decimal_sep(char c) const;
     bool is_op(char c) const;
 
@@ -88,6 +90,7 @@ private:
     lexer_tokens_t& m_tokens;
 
     char m_sep_arg;
+    char m_sep_array_row;
     char m_sep_decimal;
 
     const char* mp_first;
@@ -144,6 +147,12 @@ void tokenizer::run()
             continue;
         }
 
+        if (is_array_row_sep(*mp_char))
+        {
+            op(lexer_opcode_t::array_row_sep);
+            continue;
+        }
+
         name();
     }
 }
@@ -156,6 +165,11 @@ void tokenizer::set_sep_arg(char c)
 bool tokenizer::is_arg_sep(char c) const
 {
     return c == m_sep_arg;
+}
+
+bool tokenizer::is_array_row_sep(char c) const
+{
+    return c == m_sep_array_row;
 }
 
 bool tokenizer::is_decimal_sep(char c) const
