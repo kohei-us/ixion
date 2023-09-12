@@ -177,7 +177,7 @@ formula_tokens_t parse_formula_string(
     lexer.tokenize();
     lexer.swap_tokens(lxr_tokens);
 
-    IXION_TRACE(print_tokens(lxr_tokens, true));
+    IXION_TRACE("lexer tokens: " << print_tokens(lxr_tokens, true));
 
     formula_tokens_t tokens;
     formula_parser parser(lxr_tokens, cxt, resolver);
