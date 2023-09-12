@@ -63,6 +63,12 @@ void print_token(
 
     switch (token.opcode)
     {
+        case fop_array_open:
+            os << '{';
+            break;
+        case fop_array_close:
+            os << '}';
+            break;
         case fop_close:
             os << ')';
             break;

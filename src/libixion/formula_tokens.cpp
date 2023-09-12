@@ -17,7 +17,7 @@ namespace ixion {
 std::string_view get_opcode_name(fopcode_t oc)
 {
     // Make sure the names are ordered identically to the ordering of the enum members.
-    static const std::string_view names[] = {
+    static constexpr std::string_view names[] = {
         "unknown", // fop_unknown
         "single ref", // fop_single_ref
         "range ref", // fop_range_ref
@@ -41,6 +41,8 @@ std::string_view get_opcode_name(fopcode_t oc)
         "open", // fop_open
         "close", // fop_close
         "sep", // fop_sep
+        "array open", // fop_array_open
+        "array close", // fop_array_close
         "error", // fop_error
     };
 
@@ -52,10 +54,10 @@ std::string_view get_opcode_name(fopcode_t oc)
 
 std::string_view get_formula_opcode_string(fopcode_t oc)
 {
-    static const char* empty = "";
+    static constexpr std::string_view empty = "";
 
     // Make sure the names are ordered identically to the ordering of the enum members.
-    static const std::string_view names[] = {
+    static constexpr std::string_view names[] = {
         empty, // fop_unknown
         empty, // fop_single_ref
         empty, // fop_range_ref
@@ -79,6 +81,8 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
         "(", // fop_open
         ")", // fop_close
         empty, // fop_sep
+        "{",   // fop_array_open
+        "}",   // fop_array_close
         empty, // fop_error
     };
 
@@ -280,6 +284,8 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         case fop_open:
         case fop_close:
         case fop_sep:
+        case fop_array_open:
+        case fop_array_close:
         case fop_unknown:
             os << "opcode token: (name=" << get_opcode_name(ft.opcode) << "; s='"
                 << get_formula_opcode_string(ft.opcode) << "')";

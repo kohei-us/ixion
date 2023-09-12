@@ -31,6 +31,8 @@ const std::unordered_map<char, lexer_opcode_t> ops_map = {
     { '=', lexer_opcode_t::equal },
     { '>', lexer_opcode_t::greater },
     { '^', lexer_opcode_t::exponent },
+    { '{', lexer_opcode_t::array_open },
+    { '}', lexer_opcode_t::array_close },
 };
 
 } // anonymous namespace

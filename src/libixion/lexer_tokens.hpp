@@ -43,6 +43,8 @@ enum class lexer_opcode_t
     open,
     close,
     sep,
+    array_open,
+    array_close,
 };
 
 const char* get_opcode_name(lexer_opcode_t oc);

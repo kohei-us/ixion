@@ -34,23 +34,40 @@ const char* get_opcode_name(lexer_opcode_t oc)
 {
     switch (oc)
     {
-        case lexer_opcode_t::value:      return "value";
-        case lexer_opcode_t::string:     return "string";
-        case lexer_opcode_t::name:       return "name";
-        case lexer_opcode_t::divide:     return "divide";
-        case lexer_opcode_t::minus:      return "minus";
-        case lexer_opcode_t::multiply:   return "multiply";
-        case lexer_opcode_t::exponent:   return "exponent";
-        case lexer_opcode_t::concat:     return "concat";
-        case lexer_opcode_t::equal:      return "equal";
-        case lexer_opcode_t::less:       return "less";
-        case lexer_opcode_t::greater:    return "greater";
-        case lexer_opcode_t::plus:       return "plus";
-        case lexer_opcode_t::open:       return "open";
-        case lexer_opcode_t::close:      return "close";
-        case lexer_opcode_t::sep:        return "sep";
-        default:
-            ;
+        case lexer_opcode_t::value:
+            return "value";
+        case lexer_opcode_t::string:
+            return "string";
+        case lexer_opcode_t::name:
+            return "name";
+        case lexer_opcode_t::divide:
+            return "divide";
+        case lexer_opcode_t::minus:
+            return "minus";
+        case lexer_opcode_t::multiply:
+            return "multiply";
+        case lexer_opcode_t::exponent:
+            return "exponent";
+        case lexer_opcode_t::concat:
+            return "concat";
+        case lexer_opcode_t::equal:
+            return "equal";
+        case lexer_opcode_t::less:
+            return "less";
+        case lexer_opcode_t::greater:
+            return "greater";
+        case lexer_opcode_t::plus:
+            return "plus";
+        case lexer_opcode_t::open:
+            return "open";
+        case lexer_opcode_t::close:
+            return "close";
+        case lexer_opcode_t::sep:
+            return "sep";
+        case lexer_opcode_t::array_open:
+            return "array-open";
+        case lexer_opcode_t::array_close:
+            return "array-close";
     }
     return "";
 }
@@ -76,40 +93,46 @@ std::ostream& operator<<(std::ostream& os, const lexer_token& t)
     switch (t.opcode)
     {
         case lexer_opcode_t::plus:
-            os << "+";
+            os << '+';
             break;
         case lexer_opcode_t::minus:
-            os << "-";
+            os << '-';
             break;
         case lexer_opcode_t::divide:
-            os << "/";
+            os << '/';
             break;
         case lexer_opcode_t::multiply:
-            os << "*";
+            os << '*';
             break;
         case lexer_opcode_t::exponent:
-            os << "^";
+            os << '^';
             break;
         case lexer_opcode_t::concat:
-            os << "&";
+            os << '&';
             break;
         case lexer_opcode_t::equal:
-            os << "=";
+            os << '=';
             break;
         case lexer_opcode_t::less:
-            os << "<";
+            os << '<';
             break;
         case lexer_opcode_t::greater:
-            os << ">";
+            os << '>';
             break;
         case lexer_opcode_t::open:
-            os << "(";
+            os << '(';
             break;
         case lexer_opcode_t::close:
-            os << ")";
+            os << ')';
+            break;
+        case lexer_opcode_t::array_open:
+            os << '{';
+            break;
+        case lexer_opcode_t::array_close:
+            os << '}';
             break;
         case lexer_opcode_t::sep:
-            os << ",";
+            os << ',';
             break;
         case lexer_opcode_t::name:
         case lexer_opcode_t::string:

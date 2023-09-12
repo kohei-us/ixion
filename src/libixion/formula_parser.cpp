@@ -58,6 +58,8 @@ void formula_parser::parse()
     {
         switch (get_token().opcode)
         {
+            case lexer_opcode_t::array_open:
+            case lexer_opcode_t::array_close:
             case lexer_opcode_t::open:
             case lexer_opcode_t::close:
             case lexer_opcode_t::plus:
@@ -130,6 +132,12 @@ void formula_parser::primitive()
             break;
         case lexer_opcode_t::sep:
             foc = fop_sep;
+            break;
+        case lexer_opcode_t::array_open:
+            foc = fop_array_open;
+            break;
+        case lexer_opcode_t::array_close:
+            foc = fop_array_close;
             break;
         default:
             throw parse_error("unknown primitive token received");

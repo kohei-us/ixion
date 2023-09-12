@@ -46,6 +46,8 @@ enum fopcode_t
     fop_open,
     fop_close,
     fop_sep,
+    fop_array_open,
+    fop_array_close,
 
     // special conditions
     fop_error, //< used to signify a special set of tokens representing formula cell with error.
