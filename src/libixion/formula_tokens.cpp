@@ -19,10 +19,10 @@ std::string_view get_opcode_name(fopcode_t oc)
     // Make sure the names are ordered identically to the ordering of the enum members.
     static constexpr std::string_view names[] = {
         "unknown", // fop_unknown
-        "single ref", // fop_single_ref
-        "range ref", // fop_range_ref
-        "table ref", // fop_table_ref
-        "named expression", // fop_named_expression
+        "single-ref", // fop_single_ref
+        "range-ref", // fop_range_ref
+        "table-ref", // fop_table_ref
+        "named-expression", // fop_named_expression
         "string", // fop_string
         "value", // fop_value
         "function", // fop_function
@@ -33,16 +33,16 @@ std::string_view get_opcode_name(fopcode_t oc)
         "exponent", // fop_exponent
         "concat", // fop_concat
         "equal", // fop_equal
-        "not equal", // fop_not_equal
+        "not-equal", // fop_not_equal
         "less", // fop_less
         "greater", // fop_greater
-        "less equal", // fop_less_equal
-        "greater equal", // fop_greater_equal
+        "less-equal", // fop_less_equal
+        "greater-equal", // fop_greater_equal
         "open", // fop_open
         "close", // fop_close
         "sep", // fop_sep
-        "array open", // fop_array_open
-        "array close", // fop_array_close
+        "array-open", // fop_array_open
+        "array-close", // fop_array_close
         "error", // fop_error
     };
 
