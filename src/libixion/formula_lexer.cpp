@@ -13,8 +13,27 @@
 #include <iostream>
 #include <sstream>
 #include <cctype>
+#include <unordered_map>
 
 namespace ixion {
+
+namespace {
+
+const std::unordered_map<char, lexer_opcode_t> ops_map = {
+    { '&', lexer_opcode_t::concat },
+    { '(', lexer_opcode_t::open },
+    { ')', lexer_opcode_t::close },
+    { '*', lexer_opcode_t::multiply },
+    { '+', lexer_opcode_t::plus },
+    { '-', lexer_opcode_t::minus },
+    { '/', lexer_opcode_t::divide },
+    { '<', lexer_opcode_t::less },
+    { '=', lexer_opcode_t::equal },
+    { '>', lexer_opcode_t::greater },
+    { '^', lexer_opcode_t::exponent },
+};
+
+} // anonymous namespace
 
 class tokenizer
 {
@@ -101,10 +120,20 @@ void tokenizer::run()
             continue;
         }
 
-        if (!is_op(*mp_char))
+        if (auto it = ops_map.find(*mp_char); it != ops_map.end())
         {
-            name();
+            op(it->second);
             continue;
+        }
+
+        switch (*mp_char)
+        {
+            case ' ':
+                space();
+                continue;
+            case '"':
+                string();
+                continue;
         }
 
         if (is_arg_sep(*mp_char))
@@ -113,48 +142,7 @@ void tokenizer::run()
             continue;
         }
 
-        switch (*mp_char)
-        {
-            case ' ':
-                space();
-                break;
-            case '+':
-                op(lexer_opcode_t::plus);
-                break;
-            case '-':
-                op(lexer_opcode_t::minus);
-                break;
-            case '/':
-                op(lexer_opcode_t::divide);
-                break;
-            case '*':
-                op(lexer_opcode_t::multiply);
-                break;
-            case '^':
-                op(lexer_opcode_t::exponent);
-                break;
-            case '&':
-                op(lexer_opcode_t::concat);
-                break;
-            case '=':
-                op(lexer_opcode_t::equal);
-                break;
-            case '<':
-                op(lexer_opcode_t::less);
-                break;
-            case '>':
-                op(lexer_opcode_t::greater);
-                break;
-            case '(':
-                op(lexer_opcode_t::open);
-                break;
-            case ')':
-                op(lexer_opcode_t::close);
-                break;
-            case '"':
-                string();
-                break;
-        }
+        name();
     }
 }
 
@@ -178,21 +166,13 @@ bool tokenizer::is_op(char c) const
     if (is_arg_sep(c))
         return true;
 
+    if (ops_map.count(c) > 0)
+        return true;
+
     switch (*mp_char)
     {
         case ' ':
-        case '+':
-        case '-':
-        case '/':
-        case '*':
-        case '(':
-        case ')':
         case '"':
-        case '=':
-        case '<':
-        case '>':
-        case '^':
-        case '&':
             return true;
     }
     return false;
