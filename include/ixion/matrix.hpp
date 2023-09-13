@@ -93,6 +93,14 @@ class IXION_DLLPUBLIC numeric_matrix
 public:
     numeric_matrix();
     numeric_matrix(size_t rows, size_t cols);
+
+    /**
+     * Constructor with initial values.
+     *
+     * @param array  Array of initial values stored in column-major order.
+     * @param rows Number of rows.
+     * @param cols Number of columns.
+     */
     numeric_matrix(std::vector<double> array, size_t rows, size_t cols);
     numeric_matrix(numeric_matrix&& r);
     ~numeric_matrix();

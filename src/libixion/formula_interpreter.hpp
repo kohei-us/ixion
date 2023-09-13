@@ -94,6 +94,7 @@ private:
     void table_ref();
     void constant();
     void literal();
+    void array();
     void function();
 
     void clear_stacks();

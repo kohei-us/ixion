@@ -103,10 +103,21 @@ void session_handler::set_formula_error(std::string_view msg)
 
 void session_handler::push_token(fopcode_t fop)
 {
-    if (fop == fop_sep)
-        mp_impl->m_buf << mp_impl->m_context.get_config().sep_function_arg;
-    else
-        mp_impl->m_buf << get_formula_opcode_string(fop);
+    switch (fop)
+    {
+        case fop_sep:
+        {
+            mp_impl->m_buf << mp_impl->m_context.get_config().sep_function_arg;
+            break;
+        }
+        case fop_array_row_sep:
+        {
+            mp_impl->m_buf << mp_impl->m_context.get_config().sep_matrix_row;
+            break;
+        }
+        default:
+            mp_impl->m_buf << get_formula_opcode_string(fop);
+    }
 }
 
 void session_handler::push_value(double val)

@@ -22,6 +22,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <optional>
 
 using namespace std;
 
@@ -694,6 +695,9 @@ void formula_interpreter::factor()
         case fop_string:
             literal();
             break;
+        case fop_array_open:
+            array();
+            break;
         default:
             ostringstream os;
             os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
@@ -847,6 +851,118 @@ void formula_interpreter::literal()
     get_stack().push_string(*p);
     if (mp_handler)
         mp_handler->push_string(sid);
+}
+
+void formula_interpreter::array()
+{
+    // '{' <constant> ',' or ';' <constant> ',' or ';' .... '}'
+    assert(token().opcode == fop_array_open);
+
+    if (mp_handler)
+        mp_handler->push_token(fop_array_open);
+
+    next(); // skip '{'
+
+    std::vector<double> values;
+    std::size_t rows = 0;
+    std::size_t cols = 0;
+    std::optional<std::size_t> prev_cols;
+
+    fopcode_t prev_op = fop_array_open;
+
+    for (; has_token(); next())
+    {
+        switch (token().opcode)
+        {
+            case fop_value:
+            {
+                switch (prev_op)
+                {
+                    case fop_array_open:
+                    case fop_sep:
+                    case fop_array_row_sep:
+                        break;
+                    default:
+                        throw invalid_expression("array: invalid placement of value");
+                }
+
+                double v = std::get<double>(token().value);
+                values.push_back(v);
+
+                if (mp_handler)
+                    mp_handler->push_value(v);
+
+                ++cols;
+                break;
+            }
+            case fop_sep:
+            {
+                if (prev_op != fop_value)
+                    throw invalid_expression("array: unexpected separator");
+
+                if (mp_handler)
+                    mp_handler->push_token(fop_sep);
+                break;
+            }
+            case fop_array_row_sep:
+            {
+                if (prev_op != fop_value)
+                    throw invalid_expression("array: unexpected row separator");
+
+                if (mp_handler)
+                    mp_handler->push_token(fop_array_row_sep);
+                ++rows;
+
+                if (prev_cols && *prev_cols != cols)
+                    throw invalid_expression("array: inconsistent column width");
+
+                prev_cols = cols;
+                cols = 0;
+                break;
+            }
+            case fop_array_close:
+            {
+                switch (prev_op)
+                {
+                    case fop_array_open:
+                    case fop_value:
+                        break;
+                    default:
+                        throw invalid_expression("array: invalid placement of array close operator");
+                }
+
+                if (prev_cols && *prev_cols != cols)
+                    throw invalid_expression("array: inconsistent column width");
+
+                ++rows;
+
+                // Stored values are in row-major order, but the matrix expects a column-major array.
+                numeric_matrix mtx_transposed(std::move(values), cols, rows);
+                numeric_matrix mtx(rows, cols);
+
+                for (std::size_t row = 0; row < rows; ++row)
+                    for (std::size_t col = 0; col < cols; ++col)
+                        mtx(row, col) = mtx_transposed(col, row);
+
+                get_stack().push_matrix(std::move(mtx));
+                if (mp_handler)
+                    mp_handler->push_token(fop_array_close);
+
+                next(); // skip '}'
+                return;
+            }
+            default:
+            {
+                std::ostringstream os;
+                os << "array: unexpected token type: <" << get_opcode_name(token().opcode) << ">";
+                throw invalid_expression(os.str());
+            }
+        }
+
+        prev_op = token().opcode;
+    }
+
+    throw invalid_expression("array: ended prematurely");
 }
 
 void formula_interpreter::function()
