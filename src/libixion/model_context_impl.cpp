@@ -34,8 +34,8 @@ string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
     assert(!s.empty());
 
     string_id_t str_id = m_strings.size();
-    m_strings.push_back(std::make_unique<std::string>(s));
-    s = *m_strings.back();
+    m_strings.push_back(std::string{s});
+    s = m_strings.back();
     m_string_map.insert(string_map_type::value_type(s, str_id));
     return str_id;
 }
@@ -72,7 +72,7 @@ const std::string* safe_string_pool::get_string(string_id_t identifier) const
     if (identifier >= m_strings.size())
         return nullptr;
 
-    return m_strings[identifier].get();
+    return &m_strings[identifier];
 }
 
 size_t safe_string_pool::size() const
@@ -87,7 +87,7 @@ void safe_string_pool::dump_strings() const
         auto it = m_strings.begin(), ite = m_strings.end();
         for (string_id_t sid = 0; it != ite; ++it, ++sid)
         {
-            const std::string& s = **it;
+            const std::string& s = *it;
             cout << "* " << sid << ": '" << s << "' (" << (void*)s.data() << ")" << endl;
         }
     }
