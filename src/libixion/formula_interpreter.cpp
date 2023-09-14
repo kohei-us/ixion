@@ -855,7 +855,7 @@ void formula_interpreter::literal()
 
 void formula_interpreter::array()
 {
-    // '{' <constant> ',' or ';' <constant> ',' or ';' .... '}'
+    // '{' <constant> or <literal> ',' or ';' <constant> or <literal> ',' or ';' .... '}'
     assert(token().opcode == fop_array_open);
 
     if (mp_handler)
@@ -873,6 +873,18 @@ void formula_interpreter::array()
 
     for (; has_token(); next())
     {
+        bool has_sign = false;
+
+        switch (prev_op)
+        {
+            case fop_array_open:
+            case fop_sep:
+            case fop_array_row_sep:
+                has_sign = sign();
+                break;
+            default:;
+        }
+
         switch (token().opcode)
         {
             case fop_string:
@@ -893,7 +905,7 @@ void formula_interpreter::array()
                     throw general_error("no string found for the specified string ID.");
 
                 strings.emplace_back(row, col, *p);
-                values.push_back(0);
+                values.push_back(0); // placeholder value, will be replaced
 
                 if (mp_handler)
                     mp_handler->push_string(sid);
@@ -905,6 +917,8 @@ void formula_interpreter::array()
             {
                 switch (prev_op)
                 {
+                    case fop_minus:
+                    case fop_plus:
                     case fop_array_open:
                     case fop_sep:
                     case fop_array_row_sep:
@@ -914,10 +928,14 @@ void formula_interpreter::array()
                 }
 
                 double v = std::get<double>(token().value);
-                values.push_back(v);
 
                 if (mp_handler)
                     mp_handler->push_value(v);
+
+                if (has_sign)
+                    v = -v;
+
+                values.push_back(v);
 
                 ++col;
                 break;
