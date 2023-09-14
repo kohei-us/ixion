@@ -78,6 +78,7 @@ private:
     const formula_token& token() const;
     const formula_token& token_or_throw() const;
     const formula_token& next_token();
+    const std::string& string_or_throw() const;
 
     // The following methods are handlers.  In each handler, the initial
     // position is always set to the first unprocessed token.  Each handler is

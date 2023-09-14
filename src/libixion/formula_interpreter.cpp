@@ -295,6 +295,21 @@ const formula_token& formula_interpreter::next_token()
     return token();
 }
 
+const std::string& formula_interpreter::string_or_throw() const
+{
+    assert(token().opcode == fop_string);
+
+    const string_id_t sid = std::get<string_id_t>(token().value);
+    const std::string* p = m_context.get_string(sid);
+    if (!p)
+        throw general_error("no string found for the specified string ID.");
+
+    if (mp_handler)
+        mp_handler->push_string(sid);
+
+    return *p;
+}
+
 namespace {
 
 bool valid_expression_op(fopcode_t oc)
@@ -840,15 +855,10 @@ void formula_interpreter::constant()
 
 void formula_interpreter::literal()
 {
-    const string_id_t sid = std::get<string_id_t>(token().value);
-    const std::string* p = m_context.get_string(sid);
-    if (!p)
-        throw general_error("no string found for the specified string ID.");
+    const std::string& s = string_or_throw();
 
     next();
-    get_stack().push_string(*p);
-    if (mp_handler)
-        mp_handler->push_string(sid);
+    get_stack().push_string(s);
 }
 
 void formula_interpreter::array()
@@ -897,16 +907,8 @@ void formula_interpreter::array()
                         throw invalid_expression("array: invalid placement of value");
                 }
 
-                const string_id_t sid = std::get<string_id_t>(token().value);
-                const std::string* p = m_context.get_string(sid);
-                if (!p)
-                    throw general_error("no string found for the specified string ID.");
-
-                strings.emplace_back(row, col, *p);
+                strings.emplace_back(row, col, string_or_throw());
                 values.push_back(0); // placeholder value, will be replaced
-
-                if (mp_handler)
-                    mp_handler->push_string(sid);
 
                 ++col;
                 break;
