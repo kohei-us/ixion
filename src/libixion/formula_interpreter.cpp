@@ -24,8 +24,6 @@
 #include <cmath>
 #include <optional>
 
-using namespace std;
-
 namespace ixion {
 
 namespace {
@@ -33,7 +31,7 @@ namespace {
 class invalid_expression : public general_error
 {
 public:
-    invalid_expression(const string& msg) : general_error(msg) {}
+    invalid_expression(const std::string& msg) : general_error(msg) {}
 };
 
 const formula_token paren_open = formula_token{fop_open};
@@ -319,7 +317,7 @@ bool valid_expression_op(fopcode_t oc)
 }
 
 bool pop_stack_value_or_string(const model_context& cxt,
-    formula_value_stack& stack, stack_value_t& vt, double& val, string& str)
+    formula_value_stack& stack, stack_value_t& vt, double& val, std::string& str)
 {
     vt = stack.get_type();
     switch (vt)
@@ -360,7 +358,7 @@ bool pop_stack_value_or_string(const model_context& cxt,
                 {
                     vt = stack_value_t::string;
                     size_t strid = cxt.get_string_identifier(addr);
-                    const string* ps = cxt.get_string(strid);
+                    const std::string* ps = cxt.get_string(strid);
                     if (!ps)
                         return false;
                     str = *ps;
@@ -545,7 +543,7 @@ void formula_interpreter::expression()
             return;
 
         double val1 = 0.0, val2 = 0.0;
-        string str1, str2;
+        std::string str1, str2;
         bool is_val1 = true, is_val2 = true;
 
         stack_value_t vt;
@@ -699,7 +697,7 @@ void formula_interpreter::factor()
             array();
             break;
         default:
-            ostringstream os;
+            std::ostringstream os;
             os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
             throw invalid_expression(os.str());
     }
