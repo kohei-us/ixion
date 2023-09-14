@@ -1,0 +1,29 @@
+%% Test for inline arrays
+%mode init
+{A1:C2}{={1,2,3;4,5,6}}
+{A4:B6}{={1,2;3,4;5,6}}
+{C8:D8}{={"A","B"}}
+{B10:D11}{={-1,2,"red";-5.1,-4,"blue"}}
+%calc
+%mode result
+A1=1
+B1=2
+C1=3
+A2=4
+B2=5
+C2=6
+A4=1
+B4=2
+A5=3
+B5=4
+A6=5
+B6=6
+C8="A"
+D8="B"
+B10=-1
+C10=2
+D10="red"
+B11=-5.1
+C11=-4
+D11="blue"
+%check
