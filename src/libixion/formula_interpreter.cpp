@@ -864,9 +864,10 @@ void formula_interpreter::array()
     next(); // skip '{'
 
     std::vector<double> values;
-    std::size_t rows = 0;
-    std::size_t cols = 0;
-    std::optional<std::size_t> prev_cols;
+    std::vector<std::tuple<std::size_t, std::size_t, std::string>> strings;
+    std::size_t row = 0;
+    std::size_t col = 0;
+    std::optional<std::size_t> prev_col;
 
     fopcode_t prev_op = fop_array_open;
 
@@ -874,6 +875,32 @@ void formula_interpreter::array()
     {
         switch (token().opcode)
         {
+            case fop_string:
+            {
+                switch (prev_op)
+                {
+                    case fop_array_open:
+                    case fop_sep:
+                    case fop_array_row_sep:
+                        break;
+                    default:
+                        throw invalid_expression("array: invalid placement of value");
+                }
+
+                const string_id_t sid = std::get<string_id_t>(token().value);
+                const std::string* p = m_context.get_string(sid);
+                if (!p)
+                    throw general_error("no string found for the specified string ID.");
+
+                strings.emplace_back(row, col, *p);
+                values.push_back(0);
+
+                if (mp_handler)
+                    mp_handler->push_string(sid);
+
+                ++col;
+                break;
+            }
             case fop_value:
             {
                 switch (prev_op)
@@ -892,13 +919,19 @@ void formula_interpreter::array()
                 if (mp_handler)
                     mp_handler->push_value(v);
 
-                ++cols;
+                ++col;
                 break;
             }
             case fop_sep:
             {
-                if (prev_op != fop_value)
-                    throw invalid_expression("array: unexpected separator");
+                switch (prev_op)
+                {
+                    case fop_value:
+                    case fop_string:
+                        break;
+                    default:
+                        throw invalid_expression("array: unexpected separator");
+                }
 
                 if (mp_handler)
                     mp_handler->push_token(fop_sep);
@@ -906,18 +939,25 @@ void formula_interpreter::array()
             }
             case fop_array_row_sep:
             {
-                if (prev_op != fop_value)
-                    throw invalid_expression("array: unexpected row separator");
+                switch (prev_op)
+                {
+                    case fop_value:
+                    case fop_string:
+                        break;
+                    default:
+                        throw invalid_expression("array: unexpected row separator");
+                }
 
                 if (mp_handler)
                     mp_handler->push_token(fop_array_row_sep);
-                ++rows;
 
-                if (prev_cols && *prev_cols != cols)
+                ++row;
+
+                if (prev_col && *prev_col != col)
                     throw invalid_expression("array: inconsistent column width");
 
-                prev_cols = cols;
-                cols = 0;
+                prev_col = col;
+                col = 0;
                 break;
             }
             case fop_array_close:
@@ -926,25 +966,38 @@ void formula_interpreter::array()
                 {
                     case fop_array_open:
                     case fop_value:
+                    case fop_string:
                         break;
                     default:
                         throw invalid_expression("array: invalid placement of array close operator");
                 }
 
-                if (prev_cols && *prev_cols != cols)
+                if (prev_col && *prev_col != col)
                     throw invalid_expression("array: inconsistent column width");
 
-                ++rows;
+                ++row;
 
                 // Stored values are in row-major order, but the matrix expects a column-major array.
-                numeric_matrix mtx_transposed(std::move(values), cols, rows);
-                numeric_matrix mtx(rows, cols);
+                numeric_matrix num_mtx_transposed(std::move(values), col, row);
+                numeric_matrix num_mtx(row, col);
 
-                for (std::size_t row = 0; row < rows; ++row)
-                    for (std::size_t col = 0; col < cols; ++col)
-                        mtx(row, col) = mtx_transposed(col, row);
+                for (std::size_t r = 0; r < row; ++r)
+                    for (std::size_t c = 0; c < col; ++c)
+                        num_mtx(r, c) = num_mtx_transposed(c, r);
 
-                get_stack().push_matrix(std::move(mtx));
+                if (strings.empty())
+                    // pure numeric matrix
+                    get_stack().push_matrix(std::move(num_mtx));
+                else
+                {
+                    // multi-type matrix
+                    matrix mtx(num_mtx);
+                    for (const auto& [r, c, str] : strings)
+                        mtx.set(r, c, str);
+
+                    get_stack().push_matrix(std::move(mtx));
+                }
+
                 if (mp_handler)
                     mp_handler->push_token(fop_array_close);
 
