@@ -56,7 +56,7 @@ public:
     explicit stack_value(formula_error_t err);
     explicit stack_value(matrix mtx);
     stack_value(stack_value&& other);
-    ~stack_value() = default;
+    ~stack_value();
 
     stack_value& operator= (stack_value&& other);
 

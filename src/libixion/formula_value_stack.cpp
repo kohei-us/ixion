@@ -103,6 +103,8 @@ stack_value::stack_value(matrix mtx) :
 stack_value::stack_value(stack_value&& other) :
     m_type(other.m_type), m_value(std::move(other.m_value)) {}
 
+stack_value::~stack_value() = default;
+
 stack_value& stack_value::operator= (stack_value&& other)
 {
     m_type = other.m_type;

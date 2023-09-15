@@ -9,13 +9,14 @@
 #include "formula_functions.hpp"
 #include "debug.hpp"
 
-#include "ixion/cell.hpp"
-#include "ixion/global.hpp"
-#include "ixion/matrix.hpp"
-#include "ixion/formula.hpp"
-#include "ixion/interface/session_handler.hpp"
-#include "ixion/interface/table_handler.hpp"
-#include "ixion/config.hpp"
+#include <ixion/cell.hpp>
+#include <ixion/global.hpp>
+#include <ixion/matrix.hpp>
+#include <ixion/formula.hpp>
+#include <ixion/interface/session_handler.hpp>
+#include <ixion/interface/table_handler.hpp>
+#include <ixion/config.hpp>
+#include <ixion/cell_access.hpp>
 
 #include <cassert>
 #include <string>
@@ -331,33 +332,36 @@ bool valid_expression_op(fopcode_t oc)
     return false;
 }
 
-bool pop_stack_value_or_string(const model_context& cxt,
-    formula_value_stack& stack, stack_value_t& vt, double& val, std::string& str)
+/**
+ * Pop the value off of the stack but only as one of the following type:
+ *
+ * <ul>
+ * <li>value</li>
+ * <li>string</li>
+ * <li>matrix</li>
+ * </ul>
+ */
+std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_value_stack& stack)
 {
-    vt = stack.get_type();
-    switch (vt)
+    switch (stack.get_type())
     {
         case stack_value_t::boolean:
-            val = stack.pop_boolean() ? 1.0 : 0.0;
-            break;
+            return stack_value{stack.pop_boolean() ? 1.0 : 0.0};
         case stack_value_t::value:
-            val = stack.pop_value();
-            break;
+            return stack_value{stack.pop_value()};
         case stack_value_t::string:
-            str = stack.pop_string();
-            break;
+            return stack_value{stack.pop_string()};
         case stack_value_t::single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
+            auto ca = cxt.get_cell_access(addr);
 
-            switch (cxt.get_celltype(addr))
+            switch (ca.get_type())
             {
                 case celltype_t::empty:
                 {
                     // empty cell has a value of 0.
-                    vt = stack_value_t::value;
-                    val = 0.0;
-                    return true;
+                    return stack_value{0.0};
                 }
                 case celltype_t::boolean:
                     // TODO : Decide whether we need to treat this as a
@@ -365,59 +369,48 @@ bool pop_stack_value_or_string(const model_context& cxt,
                     // numeric value equivalent.
                 case celltype_t::numeric:
                 {
-                    vt = stack_value_t::value;
-                    val = cxt.get_numeric_value(addr);
-                    return true;
+                    double val = ca.get_numeric_value();
+                    return stack_value{val};
                 }
                 case celltype_t::string:
                 {
-                    vt = stack_value_t::string;
-                    size_t strid = cxt.get_string_identifier(addr);
+                    std::size_t strid = ca.get_string_identifier();
                     const std::string* ps = cxt.get_string(strid);
                     if (!ps)
-                        return false;
-                    str = *ps;
-                    return true;
+                    {
+                        IXION_DEBUG("fail to get a string value for the id of " << strid);
+                        return {};
+                    }
+
+                    return stack_value{*ps};
                 }
                 case celltype_t::formula:
                 {
-                    formula_result res = cxt.get_formula_result(addr);
+                    formula_result res = ca.get_formula_result();
 
                     switch (res.get_type())
                     {
                         case formula_result::result_type::boolean:
-                        {
-                            vt = stack_value_t::value;
-                            val = res.get_boolean() ? 1.0 : 0.0;
-                            return true;
-                        }
+                            return stack_value{res.get_boolean() ? 1.0 : 0.0};
                         case formula_result::result_type::value:
-                        {
-                            vt = stack_value_t::value;
-                            val = res.get_value();
-                            return true;
-                        }
+                            return stack_value{res.get_value()};
                         case formula_result::result_type::string:
-                        {
-                            vt = stack_value_t::string;
-                            str = res.get_string();
-                            return true;
-                        }
+                            return stack_value{res.get_string()};
                         case formula_result::result_type::error:
                         default:
-                            return false;
+                            return {};
                     }
                 }
                 default:
-                    return false;
+                    return {};
             }
             break;
         }
         case stack_value_t::range_ref:
-        default:
-            return false;
+        default:;
     }
-    return true;
+
+    return {};
 }
 
 void compare_values(formula_value_stack& vs, fopcode_t oc, double val1, double val2)
@@ -557,14 +550,13 @@ void formula_interpreter::expression()
         if (!valid_expression_op(oc))
             return;
 
-        double val1 = 0.0, val2 = 0.0;
-        std::string str1, str2;
-        bool is_val1 = true, is_val2 = true;
-
-        stack_value_t vt;
-        if (!pop_stack_value_or_string(m_context, get_stack(), vt, val1, str1))
+        auto sv1 = pop_stack_value(m_context, get_stack());
+        if (!sv1)
+        {
+            IXION_DEBUG("failed to pop value from the stack");
             throw formula_error(formula_error_t::general_error);
-        is_val1 = vt == stack_value_t::value;
+        }
+        bool is_val1 = sv1->get_type() == stack_value_t::value;
 
         if (mp_handler)
             mp_handler->push_token(oc);
@@ -572,20 +564,24 @@ void formula_interpreter::expression()
         next();
         term();
 
-        if (!pop_stack_value_or_string(m_context, get_stack(), vt, val2, str2))
+        auto sv2 = pop_stack_value(m_context, get_stack());
+        if (!sv2)
+        {
+            IXION_DEBUG("failed to pop value from the stack");
             throw formula_error(formula_error_t::general_error);
-        is_val2 = vt == stack_value_t::value;
+        }
+        bool is_val2 = sv2->get_type() == stack_value_t::value;
 
         if (is_val1)
         {
             if (is_val2)
             {
                 // Both are numeric values.
-                compare_values(get_stack(), oc, val1, val2);
+                compare_values(get_stack(), oc, sv1->get_value(), sv2->get_value());
             }
             else
             {
-                compare_value_to_string(get_stack(), oc, val1, str2);
+                compare_value_to_string(get_stack(), oc, sv1->get_value(), sv2->get_string());
             }
         }
         else
@@ -593,12 +589,12 @@ void formula_interpreter::expression()
             if (is_val2)
             {
                 // Value 1 is string while value 2 is numeric.
-                compare_string_to_value(get_stack(), oc, str1, val2);
+                compare_string_to_value(get_stack(), oc, sv1->get_string(), sv2->get_value());
             }
             else
             {
                 // Both are strings.
-                compare_strings(get_stack(), oc, str1, str2);
+                compare_strings(get_stack(), oc, sv1->get_string(), sv2->get_string());
             }
         }
     }
