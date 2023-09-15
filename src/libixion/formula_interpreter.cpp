@@ -538,6 +538,99 @@ void compare_string_to_value(
     }
 }
 
+namespace {
+
+template<typename Op>
+matrix operate_all_elements(const matrix& mtx, double val)
+{
+    matrix res = mtx;
+
+    for (std::size_t col = 0; col < mtx.col_size(); ++col)
+    {
+        for (std::size_t row = 0; row < mtx.row_size(); ++row)
+        {
+            auto elem = mtx.get(row, col);
+
+            switch (elem.type)
+            {
+                case matrix::element_type::numeric:
+                    res.set(row, col, Op{}(std::get<double>(elem.value), val));
+                    break;
+                case matrix::element_type::string:
+                    break;
+                case matrix::element_type::boolean:
+                    res.set(row, col, Op{}(std::get<bool>(elem.value), val));
+                    break;
+                case matrix::element_type::error:
+                    res.set(row, col, std::get<formula_error_t>(elem.value));
+                    break;
+                case matrix::element_type::empty:
+                    break;
+            }
+        }
+    }
+
+    return res;
+}
+
+struct add_op
+{
+    double operator()(double v1, double v2) const
+    {
+        return v1 + v2;
+    }
+};
+
+struct equal_op
+{
+    bool operator()(double v1, double v2) const
+    {
+        return v1 == v2;
+    }
+};
+
+struct not_equal_op
+{
+    bool operator()(double v1, double v2) const
+    {
+        return v1 != v2;
+    }
+};
+
+struct less_op
+{
+    bool operator()(double v1, double v2) const
+    {
+        return v1 < v2;
+    }
+};
+
+struct less_equal_op
+{
+    bool operator()(double v1, double v2) const
+    {
+        return v1 <= v2;
+    }
+};
+
+struct greater_op
+{
+    bool operator()(double v1, double v2) const
+    {
+        return v1 > v2;
+    }
+};
+
+struct greater_equal_op
+{
+    bool operator()(double v1, double v2) const
+    {
+        return v1 >= v2;
+    }
+};
+
+}
+
 void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix& mtx, double val)
 {
     switch (oc)
@@ -547,43 +640,46 @@ void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix
             // fallthrough
         case fop_plus:
         {
-            matrix res = mtx;
-
-            for (std::size_t col = 0; col < mtx.col_size(); ++col)
-            {
-                for (std::size_t row = 0; row < mtx.row_size(); ++row)
-                {
-                    auto elem = mtx.get(row, col);
-
-                    switch (elem.type)
-                    {
-                        case matrix::element_type::numeric:
-                            res.set(row, col, std::get<double>(elem.value) + val);
-                            break;
-                        case matrix::element_type::string:
-                            break;
-                        case matrix::element_type::boolean:
-                            res.set(row, col, std::get<bool>(elem.value) + val);
-                            break;
-                        case matrix::element_type::error:
-                            res.set(row, col, std::get<formula_error_t>(elem.value));
-                            break;
-                        case matrix::element_type::empty:
-                            break;
-                    }
-                }
-            }
-
+            matrix res = operate_all_elements<add_op>(mtx, val);
             vs.push_matrix(res);
             break;
         }
         case fop_equal:
+        {
+            matrix res = operate_all_elements<equal_op>(mtx, val);
+            vs.push_matrix(res);
+            break;
+        }
         case fop_not_equal:
+        {
+            matrix res = operate_all_elements<not_equal_op>(mtx, val);
+            vs.push_matrix(res);
+            break;
+        }
         case fop_less:
+        {
+            matrix res = operate_all_elements<less_op>(mtx, val);
+            vs.push_matrix(res);
+            break;
+        }
         case fop_less_equal:
+        {
+            matrix res = operate_all_elements<less_equal_op>(mtx, val);
+            vs.push_matrix(res);
+            break;
+        }
         case fop_greater:
+        {
+            matrix res = operate_all_elements<greater_op>(mtx, val);
+            vs.push_matrix(res);
+            break;
+        }
         case fop_greater_equal:
-            // TODO: support these oprators
+        {
+            matrix res = operate_all_elements<greater_equal_op>(mtx, val);
+            vs.push_matrix(res);
+            break;
+        }
         default:
             throw invalid_expression("unknown expression operator.");
     }
