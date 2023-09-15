@@ -542,6 +542,9 @@ void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix
 {
     switch (oc)
     {
+        case fop_minus:
+            val = -val;
+            // fallthrough
         case fop_plus:
         {
             matrix res = mtx;
@@ -574,7 +577,6 @@ void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix
             vs.push_matrix(res);
             break;
         }
-        case fop_minus:
         case fop_equal:
         case fop_not_equal:
         case fop_less:
