@@ -97,7 +97,7 @@ matrix::matrix(const numeric_matrix& other) :
 {
 }
 
-matrix::~matrix() {}
+matrix::~matrix() = default;
 
 matrix& matrix::operator= (matrix other)
 {

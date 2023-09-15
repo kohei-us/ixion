@@ -351,6 +351,8 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
             return stack_value{stack.pop_value()};
         case stack_value_t::string:
             return stack_value{stack.pop_string()};
+        case stack_value_t::matrix:
+            return stack_value{stack.pop_matrix()};
         case stack_value_t::single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
@@ -536,7 +538,56 @@ void compare_string_to_value(
     }
 }
 
+void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix& mtx, double val)
+{
+    switch (oc)
+    {
+        case fop_plus:
+        {
+            matrix res = mtx;
+
+            for (std::size_t col = 0; col < mtx.col_size(); ++col)
+            {
+                for (std::size_t row = 0; row < mtx.row_size(); ++row)
+                {
+                    auto elem = mtx.get(row, col);
+
+                    switch (elem.type)
+                    {
+                        case matrix::element_type::numeric:
+                            res.set(row, col, std::get<double>(elem.value) + val);
+                            break;
+                        case matrix::element_type::string:
+                            break;
+                        case matrix::element_type::boolean:
+                            res.set(row, col, std::get<bool>(elem.value) + val);
+                            break;
+                        case matrix::element_type::error:
+                            res.set(row, col, std::get<formula_error_t>(elem.value));
+                            break;
+                        case matrix::element_type::empty:
+                            break;
+                    }
+                }
+            }
+
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_minus:
+        case fop_equal:
+        case fop_not_equal:
+        case fop_less:
+        case fop_less_equal:
+        case fop_greater:
+        case fop_greater_equal:
+            // TODO: support these oprators
+        default:
+            throw invalid_expression("unknown expression operator.");
+    }
 }
+
+} // anonymous namespace
 
 void formula_interpreter::expression()
 {
@@ -556,7 +607,6 @@ void formula_interpreter::expression()
             IXION_DEBUG("failed to pop value from the stack");
             throw formula_error(formula_error_t::general_error);
         }
-        bool is_val1 = sv1->get_type() == stack_value_t::value;
 
         if (mp_handler)
             mp_handler->push_token(oc);
@@ -570,31 +620,77 @@ void formula_interpreter::expression()
             IXION_DEBUG("failed to pop value from the stack");
             throw formula_error(formula_error_t::general_error);
         }
-        bool is_val2 = sv2->get_type() == stack_value_t::value;
 
-        if (is_val1)
+        switch (sv1->get_type())
         {
-            if (is_val2)
+            case stack_value_t::value:
             {
-                // Both are numeric values.
-                compare_values(get_stack(), oc, sv1->get_value(), sv2->get_value());
+                switch (sv2->get_type())
+                {
+                    case stack_value_t::value:
+                    {
+                        // Both are numeric values.
+                        compare_values(get_stack(), oc, sv1->get_value(), sv2->get_value());
+                        break;
+                    }
+                    case stack_value_t::string:
+                    {
+                        compare_value_to_string(get_stack(), oc, sv1->get_value(), sv2->get_string());
+                        break;
+                    }
+                    default:
+                    {
+                        IXION_DEBUG("unsupported value type for value 2: " << sv2->get_type());
+                        throw formula_error(formula_error_t::general_error);
+                    }
+                }
+                break;
             }
-            else
+            case stack_value_t::string:
             {
-                compare_value_to_string(get_stack(), oc, sv1->get_value(), sv2->get_string());
+                switch (sv2->get_type())
+                {
+                    case stack_value_t::value:
+                    {
+                        // Value 1 is string while value 2 is numeric.
+                        compare_string_to_value(get_stack(), oc, sv1->get_string(), sv2->get_value());
+                        break;
+                    }
+                    case stack_value_t::string:
+                    {
+                        // Both are strings.
+                        compare_strings(get_stack(), oc, sv1->get_string(), sv2->get_string());
+                        break;
+                    }
+                    default:
+                    {
+                        IXION_DEBUG("unsupported value type for value 2: " << sv2->get_type());
+                        throw formula_error(formula_error_t::general_error);
+                    }
+                }
+                break;
             }
-        }
-        else
-        {
-            if (is_val2)
+            case stack_value_t::matrix:
             {
-                // Value 1 is string while value 2 is numeric.
-                compare_string_to_value(get_stack(), oc, sv1->get_string(), sv2->get_value());
+                switch (sv2->get_type())
+                {
+                    case stack_value_t::value:
+                    {
+                        compare_matrix_to_value(get_stack(), oc, sv1->get_matrix(), sv2->get_value());
+                        break;
+                    }
+                    default:
+                    {
+                        IXION_DEBUG("unsupported value type for value 2: " << sv2->get_type());
+                        throw formula_error(formula_error_t::general_error);
+                    }
+                }
+                break;
             }
-            else
+            default:
             {
-                // Both are strings.
-                compare_strings(get_stack(), oc, sv1->get_string(), sv2->get_string());
+                IXION_DEBUG("unsupported value type for value 1: " << sv1->get_type());
+                throw formula_error(formula_error_t::general_error);
             }
         }
     }

@@ -59,13 +59,13 @@ using column_stores_t = std::deque<column_store_t>;
  * The integer element blocks are used to store string ID's.  The actual
  * string element blocks are not used in the matrix store in ixion.
  */
-struct matrix_store_trait
+struct matrix_store_traits
 {
     typedef mdds::mtv::int64_element_block integer_element_block;
     typedef mdds::mtv::string_element_block string_element_block;
 };
 
-using matrix_store_t = mdds::multi_type_matrix<matrix_store_trait>;
+using matrix_store_t = mdds::multi_type_matrix<matrix_store_traits>;
 
 }
 

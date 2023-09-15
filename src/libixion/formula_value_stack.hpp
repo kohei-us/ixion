@@ -15,6 +15,7 @@
 
 #include <deque>
 #include <variant>
+#include <ostream>
 
 namespace ixion {
 
@@ -32,6 +33,8 @@ enum class stack_value_t
     range_ref,
     matrix,
 };
+
+std::ostream& operator<<(std::ostream& os, stack_value_t sv);
 
 /**
  * Individual stack value storage.
@@ -67,6 +70,8 @@ public:
     const abs_address_t& get_address() const;
     const abs_range_t& get_range() const;
     formula_error_t get_error() const;
+
+    const matrix& get_matrix() const;
 
     /**
      * Move the matrix value out from storage.  The internal matrix content
@@ -123,6 +128,7 @@ public:
     bool pop_boolean();
     double pop_value();
     std::string pop_string();
+    matrix pop_matrix();
     abs_address_t pop_single_ref();
     abs_range_t pop_range_ref();
     matrix pop_range_value();

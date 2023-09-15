@@ -79,6 +79,27 @@ double get_numeric_value(const model_context& cxt, const stack_value& v)
 
 } // anonymous namespace
 
+std::ostream& operator<<(std::ostream& os, stack_value_t sv)
+{
+    static constexpr std::string_view names[] = {
+        "boolean",
+        "error",
+        "value",
+        "string",
+        "single_ref",
+        "range_ref",
+        "matrix",
+    };
+
+    auto pos = static_cast<std::size_t>(sv);
+    if (pos < std::size(names))
+        os << names[pos];
+    else
+        os << "???";
+
+    return os;
+}
+
 stack_value::stack_value(bool b) :
     m_type(stack_value_t::boolean), m_value(b) {}
 
@@ -168,6 +189,11 @@ const abs_range_t& stack_value::get_range() const
 formula_error_t stack_value::get_error() const
 {
     return std::get<formula_error_t>(m_value);
+}
+
+const matrix& stack_value::get_matrix() const
+{
+    return std::get<matrix>(m_value);
 }
 
 matrix stack_value::pop_matrix()
@@ -439,6 +465,26 @@ std::string formula_value_stack::pop_string()
         default:
             ;
     }
+    throw formula_error(formula_error_t::stack_error);
+}
+
+matrix formula_value_stack::pop_matrix()
+{
+    if (m_stack.empty())
+        throw formula_error(formula_error_t::stack_error);
+
+    stack_value& v = m_stack.back();
+    switch (v.get_type())
+    {
+        case stack_value_t::matrix:
+        {
+            auto mtx = v.pop_matrix();
+            m_stack.pop_back();
+            return mtx;
+        }
+        default:;
+    }
+
     throw formula_error(formula_error_t::stack_error);
 }
 
