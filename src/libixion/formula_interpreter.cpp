@@ -573,11 +573,52 @@ matrix operate_all_elements(const matrix& mtx, double val)
     return res;
 }
 
+template<typename Op>
+matrix operate_all_elements(double val, const matrix& mtx)
+{
+    matrix res = mtx;
+
+    for (std::size_t col = 0; col < mtx.col_size(); ++col)
+    {
+        for (std::size_t row = 0; row < mtx.row_size(); ++row)
+        {
+            auto elem = mtx.get(row, col);
+
+            switch (elem.type)
+            {
+                case matrix::element_type::numeric:
+                    res.set(row, col, Op{}(val, std::get<double>(elem.value)));
+                    break;
+                case matrix::element_type::string:
+                    break;
+                case matrix::element_type::boolean:
+                    res.set(row, col, Op{}(val, std::get<bool>(elem.value)));
+                    break;
+                case matrix::element_type::error:
+                    res.set(row, col, std::get<formula_error_t>(elem.value));
+                    break;
+                case matrix::element_type::empty:
+                    break;
+            }
+        }
+    }
+
+    return res;
+}
+
 struct add_op
 {
     double operator()(double v1, double v2) const
     {
         return v1 + v2;
+    }
+};
+
+struct sub_op
+{
+    double operator()(double v1, double v2) const
+    {
+        return v1 - v2;
     }
 };
 
@@ -685,6 +726,63 @@ void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix
     }
 }
 
+void compare_value_to_matrix(formula_value_stack& vs, fopcode_t oc, double val, const matrix& mtx)
+{
+    switch (oc)
+    {
+        case fop_minus:
+        {
+            matrix res = operate_all_elements<sub_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_plus:
+        {
+            matrix res = operate_all_elements<add_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_equal:
+        {
+            matrix res = operate_all_elements<equal_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_not_equal:
+        {
+            matrix res = operate_all_elements<not_equal_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_less:
+        {
+            matrix res = operate_all_elements<less_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_less_equal:
+        {
+            matrix res = operate_all_elements<less_equal_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_greater:
+        {
+            matrix res = operate_all_elements<greater_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        case fop_greater_equal:
+        {
+            matrix res = operate_all_elements<greater_equal_op>(val, mtx);
+            vs.push_matrix(res);
+            break;
+        }
+        default:
+            throw invalid_expression("unknown expression operator.");
+    }
+}
+
 } // anonymous namespace
 
 void formula_interpreter::expression()
@@ -734,6 +832,11 @@ void formula_interpreter::expression()
                     case stack_value_t::string:
                     {
                         compare_value_to_string(get_stack(), oc, sv1->get_value(), sv2->get_string());
+                        break;
+                    }
+                    case stack_value_t::matrix:
+                    {
+                        compare_value_to_matrix(get_stack(), oc, sv1->get_value(), sv2->get_matrix());
                         break;
                     }
                     default:
