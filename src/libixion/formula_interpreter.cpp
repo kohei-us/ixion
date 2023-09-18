@@ -538,8 +538,6 @@ void compare_string_to_value(
     }
 }
 
-namespace {
-
 template<typename Op>
 matrix operate_all_elements(const matrix& mtx, double val)
 {
@@ -669,8 +667,6 @@ struct greater_equal_op
         return v1 >= v2;
     }
 };
-
-}
 
 void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix& mtx, double val)
 {
