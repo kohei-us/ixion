@@ -1001,9 +1001,11 @@ void formula_interpreter::factor()
             array();
             break;
         default:
+        {
             std::ostringstream os;
             os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
             throw invalid_expression(os.str());
+        }
     }
 
     if (negative_sign)
