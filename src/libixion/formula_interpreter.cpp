@@ -791,6 +791,22 @@ void compare_value_to_matrix(formula_value_stack& vs, fopcode_t oc, double val, 
 
 matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const matrix_or_value_t& rhs)
 {
+    auto elem_to_numeric = [](const matrix::element& e) -> std::optional<double>
+    {
+        switch (e.type)
+        {
+            case matrix::element_type::numeric:
+                return std::get<double>(e.value);
+            case matrix::element_type::boolean:
+                return std::get<bool>(e.value) ? 1.0 : 0.0;
+            case matrix::element_type::empty:
+                return 0.0;
+            default:;
+        }
+
+        return {};
+    };
+
     switch (lhs.index())
     {
         case 0: // matrix
@@ -798,7 +814,33 @@ matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const m
             switch (rhs.index())
             {
                 case 0: // matrix * matrix
-                    throw invalid_expression("TODO: matrix by matrix not supported yet");
+                {
+                    const matrix& m1 = std::get<matrix>(lhs);
+                    const matrix& m2 = std::get<matrix>(rhs);
+
+                    if (m1.row_size() != m2.row_size() || m1.col_size() != m2.col_size())
+                        throw invalid_expression("matrix size mis-match");
+
+                    matrix res = m1; // copy
+
+                    for (std::size_t col = 0; col < res.col_size(); ++col)
+                    {
+                        for (std::size_t row = 0; row < res.row_size(); ++row)
+                        {
+                            auto elem1 = res.get(row, col);
+                            auto elem2 = m2.get(row, col);
+
+                            std::optional<double> v1 = elem_to_numeric(elem1);
+                            std::optional<double> v2 = elem_to_numeric(elem2);
+
+                            if (v1 && v2)
+                                res.set(row, col, multiply_op{}(*v1, *v2));
+                            else
+                                res.set(row, col, formula_error_t::invalid_value_type);
+                        }
+                    }
+                    return res;
+                }
                 case 1: // matrix * value
                     return operate_all_elements<multiply_op>(
                         std::get<matrix>(lhs),
@@ -817,7 +859,7 @@ matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const m
                         std::get<matrix>(rhs)
                     );
                 case 1: // value * value
-                    return std::get<double>(lhs) * std::get<double>(rhs);
+                    return multiply_op{}(std::get<double>(lhs), std::get<double>(rhs));
             }
             break;
         }
