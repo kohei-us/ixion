@@ -789,24 +789,25 @@ void compare_value_to_matrix(formula_value_stack& vs, fopcode_t oc, double val, 
     }
 }
 
-matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const matrix_or_value_t& rhs)
+std::optional<double> elem_to_numeric(const matrix::element& e)
 {
-    auto elem_to_numeric = [](const matrix::element& e) -> std::optional<double>
+    switch (e.type)
     {
-        switch (e.type)
-        {
-            case matrix::element_type::numeric:
-                return std::get<double>(e.value);
-            case matrix::element_type::boolean:
-                return std::get<bool>(e.value) ? 1.0 : 0.0;
-            case matrix::element_type::empty:
-                return 0.0;
-            default:;
-        }
+        case matrix::element_type::numeric:
+            return std::get<double>(e.value);
+        case matrix::element_type::boolean:
+            return std::get<bool>(e.value) ? 1.0 : 0.0;
+        case matrix::element_type::empty:
+            return 0.0;
+        default:;
+    }
 
-        return {};
-    };
+    return {};
+};
 
+template<typename Op>
+matrix_or_value_t op_matrix_or_value(const matrix_or_value_t& lhs, const matrix_or_value_t& rhs)
+{
     switch (lhs.index())
     {
         case 0: // matrix
@@ -834,7 +835,7 @@ matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const m
                             std::optional<double> v2 = elem_to_numeric(elem2);
 
                             if (v1 && v2)
-                                res.set(row, col, multiply_op{}(*v1, *v2));
+                                res.set(row, col, Op{}(*v1, *v2));
                             else
                                 res.set(row, col, formula_error_t::invalid_value_type);
                         }
@@ -842,7 +843,7 @@ matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const m
                     return res;
                 }
                 case 1: // matrix * value
-                    return operate_all_elements<multiply_op>(
+                    return operate_all_elements<Op>(
                         std::get<matrix>(lhs),
                         std::get<double>(rhs)
                     );
@@ -854,12 +855,12 @@ matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const m
             switch (rhs.index())
             {
                 case 0: // value * matrix
-                    return operate_all_elements<multiply_op>(
+                    return operate_all_elements<Op>(
                         std::get<double>(lhs),
                         std::get<matrix>(rhs)
                     );
                 case 1: // value * value
-                    return multiply_op{}(std::get<double>(lhs), std::get<double>(rhs));
+                    return Op{}(std::get<double>(lhs), std::get<double>(rhs));
             }
             break;
         }
@@ -1005,7 +1006,7 @@ void formula_interpreter::term()
             term();
             auto rhs = get_stack().pop_matrix_or_value();
 
-            auto res = multiply_matrix_or_value(lhs, rhs);
+            auto res = op_matrix_or_value<multiply_op>(lhs, rhs);
             switch (res.index())
             {
                 case 0: // matrix
