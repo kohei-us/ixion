@@ -591,6 +591,8 @@ matrix_or_value_t formula_value_stack::pop_matrix_or_value()
             m_stack.pop_back();
             return mtx;
         }
+        case stack_value_t::range_ref:
+            return pop_range_value();
         default:;
     }
 
