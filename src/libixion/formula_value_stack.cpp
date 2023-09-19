@@ -577,6 +577,27 @@ formula_error_t formula_value_stack::pop_error()
     return ret;
 }
 
+matrix_or_value_t formula_value_stack::pop_matrix_or_value()
+{
+    if (m_stack.empty())
+        throw formula_error(formula_error_t::stack_error);
+
+    stack_value& v = m_stack.back();
+    switch (v.get_type())
+    {
+        case stack_value_t::matrix:
+        {
+            auto mtx = v.pop_matrix();
+            m_stack.pop_back();
+            return mtx;
+        }
+        default:;
+    }
+
+    // fall back to numeric value
+    return pop_value();
+}
+
 void formula_value_stack::pop_back()
 {
     m_stack.pop_back();

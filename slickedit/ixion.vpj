@@ -292,6 +292,7 @@
                 <F N="../src/libixion/formula_value_stack.hpp"/>
                 <F N="../src/libixion/general_test.cpp"/>
                 <F N="../src/libixion/global.cpp"/>
+                <F N="../src/libixion/impl_types.hpp"/>
                 <F N="../src/libixion/info.cpp"/>
                 <F N="../src/libixion/interface.cpp"/>
                 <F N="../src/libixion/ixion_test_track_deps.cpp"/>

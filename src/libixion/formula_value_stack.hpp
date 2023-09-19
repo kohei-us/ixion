@@ -13,6 +13,8 @@
 #include <ixion/matrix.hpp>
 #include <ixion/model_context.hpp>
 
+#include "impl_types.hpp"
+
 #include <deque>
 #include <variant>
 #include <ostream>
@@ -133,6 +135,8 @@ public:
     abs_range_t pop_range_ref();
     matrix pop_range_value();
     formula_error_t pop_error();
+
+    matrix_or_value_t pop_matrix_or_value();
 
     void pop_back();
 

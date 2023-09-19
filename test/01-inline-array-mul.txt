@@ -1,0 +1,15 @@
+%% Test for inline array with multiplication.
+%mode init
+{A1:B2}{={1,2;3,4}*10}
+{A3:B4}{=10*{2,3;4,5}}
+%calc
+%mode result
+A1=10
+B1=20
+A2=30
+B2=40
+A3=20
+B3=30
+A4=40
+B4=50
+%check

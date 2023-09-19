@@ -96,6 +96,8 @@ bool formula_interpreter::interpret()
     }
     catch (const invalid_expression& e)
     {
+        IXION_DEBUG("invalid expression: " << e.what());
+
         if (mp_handler)
             mp_handler->set_invalid_expression(e.what());
 
@@ -668,6 +670,14 @@ struct greater_equal_op
     }
 };
 
+struct multiply_op
+{
+    double operator()(double v1, double v2) const
+    {
+        return v1 * v2;
+    }
+};
+
 void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix& mtx, double val)
 {
     switch (oc)
@@ -777,6 +787,45 @@ void compare_value_to_matrix(formula_value_stack& vs, fopcode_t oc, double val, 
         default:
             throw invalid_expression("unknown expression operator.");
     }
+}
+
+matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const matrix_or_value_t& rhs)
+{
+    switch (lhs.index())
+    {
+        case 0: // matrix
+        {
+            switch (rhs.index())
+            {
+                case 0: // matrix * matrix
+                    throw invalid_expression("TODO: not supported yet");
+                case 1: // matrix * value
+                    return operate_all_elements<multiply_op>(
+                        std::get<matrix>(lhs),
+                        std::get<double>(rhs)
+                    );
+            }
+            break;
+        }
+        case 1: // value
+        {
+            switch (rhs.index())
+            {
+                case 0: // value * matrix
+                    return operate_all_elements<multiply_op>(
+                        std::get<double>(lhs),
+                        std::get<matrix>(rhs)
+                    );
+                case 1: // value * value
+                    return std::get<double>(lhs) * std::get<double>(rhs);
+            }
+            break;
+        }
+    }
+
+    std::ostringstream os;
+    os << "unhandled variant index: lhs=" << lhs.index() << "; rhs=" << rhs.index();
+    throw invalid_expression(os.str());
 }
 
 } // anonymous namespace
@@ -910,9 +959,22 @@ void formula_interpreter::term()
                 mp_handler->push_token(oc);
 
             next();
-            double val = get_stack().pop_value();
+            auto lhs = get_stack().pop_matrix_or_value();
             term();
-            get_stack().push_value(val*get_stack().pop_value());
+            auto rhs = get_stack().pop_matrix_or_value();
+
+            auto res = multiply_matrix_or_value(lhs, rhs);
+            switch (res.index())
+            {
+                case 0: // matrix
+                    get_stack().push_matrix(std::get<matrix>(res));
+                    break;
+                case 1: // double
+                    get_stack().push_value(std::get<double>(res));
+                    break;
+                default:
+                    throw invalid_expression("result must be either matrix or double");
+            }
             return;
         }
         case fop_exponent:
