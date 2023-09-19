@@ -798,7 +798,7 @@ matrix_or_value_t multiply_matrix_or_value(const matrix_or_value_t& lhs, const m
             switch (rhs.index())
             {
                 case 0: // matrix * matrix
-                    throw invalid_expression("TODO: not supported yet");
+                    throw invalid_expression("TODO: matrix by matrix not supported yet");
                 case 1: // matrix * value
                     return operate_all_elements<multiply_op>(
                         std::get<matrix>(lhs),
