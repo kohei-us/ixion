@@ -554,13 +554,25 @@ matrix operate_all_elements(const matrix& mtx, double val)
             switch (elem.type)
             {
                 case matrix::element_type::numeric:
-                    res.set(row, col, Op{}(std::get<double>(elem.value), val));
+                {
+                    auto v = Op{}(std::get<double>(elem.value), val);
+                    if (v)
+                        res.set(row, col, *v);
+                    else
+                        res.set(row, col, v.error());
                     break;
+                }
                 case matrix::element_type::string:
                     break;
                 case matrix::element_type::boolean:
-                    res.set(row, col, Op{}(std::get<bool>(elem.value), val));
+                {
+                    auto v = Op{}(std::get<bool>(elem.value), val);
+                    if (v)
+                        res.set(row, col, *v);
+                    else
+                        res.set(row, col, v.error());
                     break;
+                }
                 case matrix::element_type::error:
                     res.set(row, col, std::get<formula_error_t>(elem.value));
                     break;
@@ -587,13 +599,25 @@ matrix operate_all_elements(double val, const matrix& mtx)
             switch (elem.type)
             {
                 case matrix::element_type::numeric:
-                    res.set(row, col, Op{}(val, std::get<double>(elem.value)));
+                {
+                    auto v = Op{}(val, std::get<double>(elem.value));
+                    if (v)
+                        res.set(row, col, *v);
+                    else
+                        res.set(row, col, v.error());
                     break;
+                }
                 case matrix::element_type::string:
                     break;
                 case matrix::element_type::boolean:
-                    res.set(row, col, Op{}(val, std::get<bool>(elem.value)));
+                {
+                    auto v = Op{}(val, std::get<bool>(elem.value));
+                    if (v)
+                        res.set(row, col, *v);
+                    else
+                        res.set(row, col, v.error());
                     break;
+                }
                 case matrix::element_type::error:
                     res.set(row, col, std::get<formula_error_t>(elem.value));
                     break;
@@ -608,7 +632,7 @@ matrix operate_all_elements(double val, const matrix& mtx)
 
 struct add_op
 {
-    double operator()(double v1, double v2) const
+    formula_op_result<double> operator()(double v1, double v2) const
     {
         return v1 + v2;
     }
@@ -616,7 +640,7 @@ struct add_op
 
 struct sub_op
 {
-    double operator()(double v1, double v2) const
+    formula_op_result<double> operator()(double v1, double v2) const
     {
         return v1 - v2;
     }
@@ -624,7 +648,7 @@ struct sub_op
 
 struct equal_op
 {
-    bool operator()(double v1, double v2) const
+    formula_op_result<double> operator()(double v1, double v2) const
     {
         return v1 == v2;
     }
@@ -632,7 +656,7 @@ struct equal_op
 
 struct not_equal_op
 {
-    bool operator()(double v1, double v2) const
+    formula_op_result<bool> operator()(double v1, double v2) const
     {
         return v1 != v2;
     }
@@ -640,7 +664,7 @@ struct not_equal_op
 
 struct less_op
 {
-    bool operator()(double v1, double v2) const
+    formula_op_result<bool> operator()(double v1, double v2) const
     {
         return v1 < v2;
     }
@@ -648,7 +672,7 @@ struct less_op
 
 struct less_equal_op
 {
-    bool operator()(double v1, double v2) const
+    formula_op_result<bool> operator()(double v1, double v2) const
     {
         return v1 <= v2;
     }
@@ -656,7 +680,7 @@ struct less_equal_op
 
 struct greater_op
 {
-    bool operator()(double v1, double v2) const
+    formula_op_result<bool> operator()(double v1, double v2) const
     {
         return v1 > v2;
     }
@@ -664,7 +688,7 @@ struct greater_op
 
 struct greater_equal_op
 {
-    bool operator()(double v1, double v2) const
+    formula_op_result<bool> operator()(double v1, double v2) const
     {
         return v1 >= v2;
     }
@@ -672,7 +696,7 @@ struct greater_equal_op
 
 struct multiply_op
 {
-    double operator()(double v1, double v2) const
+    formula_op_result<double> operator()(double v1, double v2) const
     {
         return v1 * v2;
     }
@@ -680,7 +704,7 @@ struct multiply_op
 
 struct exponent_op
 {
-    double operator()(double v1, double v2) const
+    formula_op_result<double> operator()(double v1, double v2) const
     {
         return std::pow(v1, v2);
     }
@@ -843,7 +867,13 @@ matrix_or_numeric_t op_matrix_or_numeric(const matrix_or_numeric_t& lhs, const m
                             std::optional<double> v2 = elem_to_numeric(elem2);
 
                             if (v1 && v2)
-                                res.set(row, col, Op{}(*v1, *v2));
+                            {
+                                auto v = Op{}(*v1, *v2);
+                                if (v)
+                                    res.set(row, col, *v);
+                                else
+                                    res.set(row, col, v.error());
+                            }
                             else
                                 res.set(row, col, formula_error_t::invalid_value_type);
                         }
@@ -862,7 +892,13 @@ matrix_or_numeric_t op_matrix_or_numeric(const matrix_or_numeric_t& lhs, const m
                 case matrix_or_numeric_t::value_type::matrix: // value * matrix
                     return operate_all_elements<Op>(lhs.get_numeric(), rhs.get_matrix());
                 case matrix_or_numeric_t::value_type::numeric: // value * value
-                    return Op{}(lhs.get_numeric(), rhs.get_numeric());
+                {
+                    auto v = Op{}(lhs.get_numeric(), rhs.get_numeric());
+                    if (!v)
+                        throw formula_error(v.error());
+
+                    return *v;
+                }
             }
             break;
         }

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <ixion/matrix.hpp>
+#include <ixion/types.hpp>
 
 #include <variant>
 
@@ -30,6 +31,29 @@ public:
 
     const matrix& get_matrix() const;
     double get_numeric() const;
+};
+
+template<typename T>
+class formula_op_result
+{
+    using store_type = std::variant<T, formula_error_t>;
+    store_type m_value;
+
+public:
+    formula_op_result(T v) : m_value(std::move(v)) {}
+    formula_op_result(formula_error_t err) : m_value(err) {}
+
+    operator bool() const { return m_value.index() == 0; }
+
+    T operator*() const
+    {
+        return std::get<T>(m_value);
+    }
+
+    formula_error_t error() const
+    {
+        return std::get<formula_error_t>(m_value);
+    }
 };
 
 } // namespace ixion
