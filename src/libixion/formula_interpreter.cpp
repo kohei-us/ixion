@@ -678,6 +678,14 @@ struct multiply_op
     }
 };
 
+struct exponent_op
+{
+    double operator()(double v1, double v2) const
+    {
+        return std::pow(v1, v2);
+    }
+};
+
 void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix& mtx, double val)
 {
     switch (oc)
@@ -987,13 +995,38 @@ void formula_interpreter::expression()
 
 void formula_interpreter::term()
 {
-    // <factor> || <factor> * <term>
+    // <factor> || <factor> (*|^|&|/) <term>
 
     factor();
     if (!has_token())
         return;
 
     fopcode_t oc = token().opcode;
+
+    auto pop_matrix_or_values = [this]() -> std::pair<matrix_or_value_t, matrix_or_value_t>
+    {
+        auto v1 = get_stack().pop_matrix_or_value();
+        next(); // skip the op token
+        term();
+        auto v2 = get_stack().pop_matrix_or_value();
+        return std::make_pair(std::move(v1), std::move(v2));
+    };
+
+    auto push_to_stack = [this](const matrix_or_value_t& v)
+    {
+        switch (v.index())
+        {
+            case 0: // matrix
+                get_stack().push_matrix(std::get<matrix>(v));
+                break;
+            case 1: // double
+                get_stack().push_value(std::get<double>(v));
+                break;
+            default:
+                throw invalid_expression("result must be either matrix or double");
+        }
+    };
+
     switch (oc)
     {
         case fop_multiply:
@@ -1001,23 +1034,9 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
-            next();
-            auto lhs = get_stack().pop_matrix_or_value();
-            term();
-            auto rhs = get_stack().pop_matrix_or_value();
-
+            const auto& [lhs, rhs] = pop_matrix_or_values();
             auto res = op_matrix_or_value<multiply_op>(lhs, rhs);
-            switch (res.index())
-            {
-                case 0: // matrix
-                    get_stack().push_matrix(std::get<matrix>(res));
-                    break;
-                case 1: // double
-                    get_stack().push_value(std::get<double>(res));
-                    break;
-                default:
-                    throw invalid_expression("result must be either matrix or double");
-            }
+            push_to_stack(res);
             return;
         }
         case fop_exponent:
@@ -1025,11 +1044,9 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
-            next();
-            double base = get_stack().pop_value();
-            term();
-            double exp = get_stack().pop_value();
-            get_stack().push_value(std::pow(base, exp));
+            const auto& [base, exp] = pop_matrix_or_values();
+            auto res = op_matrix_or_value<exponent_op>(base, exp);
+            push_to_stack(res);
             return;
         }
         case fop_concat:
