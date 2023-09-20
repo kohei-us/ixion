@@ -814,18 +814,18 @@ std::optional<double> elem_to_numeric(const matrix::element& e)
 };
 
 template<typename Op>
-matrix_or_value_t op_matrix_or_value(const matrix_or_value_t& lhs, const matrix_or_value_t& rhs)
+matrix_or_numeric_t op_matrix_or_numeric(const matrix_or_numeric_t& lhs, const matrix_or_numeric_t& rhs)
 {
-    switch (lhs.index())
+    switch (lhs.type())
     {
-        case 0: // matrix
+        case matrix_or_numeric_t::value_type::matrix:
         {
-            switch (rhs.index())
+            switch (rhs.type())
             {
-                case 0: // matrix * matrix
+                case matrix_or_numeric_t::value_type::matrix: // matrix * matrix
                 {
-                    const matrix& m1 = std::get<matrix>(lhs);
-                    const matrix& m2 = std::get<matrix>(rhs);
+                    const matrix& m1 = lhs.get_matrix();
+                    const matrix& m2 = rhs.get_matrix();
 
                     if (m1.row_size() != m2.row_size() || m1.col_size() != m2.col_size())
                         throw invalid_expression("matrix size mis-match");
@@ -850,32 +850,26 @@ matrix_or_value_t op_matrix_or_value(const matrix_or_value_t& lhs, const matrix_
                     }
                     return res;
                 }
-                case 1: // matrix * value
-                    return operate_all_elements<Op>(
-                        std::get<matrix>(lhs),
-                        std::get<double>(rhs)
-                    );
+                case matrix_or_numeric_t::value_type::numeric: // matrix * value
+                    return operate_all_elements<Op>(lhs.get_matrix(), rhs.get_numeric());
             }
             break;
         }
-        case 1: // value
+        case matrix_or_numeric_t::value_type::numeric:
         {
-            switch (rhs.index())
+            switch (rhs.type())
             {
-                case 0: // value * matrix
-                    return operate_all_elements<Op>(
-                        std::get<double>(lhs),
-                        std::get<matrix>(rhs)
-                    );
-                case 1: // value * value
-                    return Op{}(std::get<double>(lhs), std::get<double>(rhs));
+                case matrix_or_numeric_t::value_type::matrix: // value * matrix
+                    return operate_all_elements<Op>(lhs.get_numeric(), rhs.get_matrix());
+                case matrix_or_numeric_t::value_type::numeric: // value * value
+                    return Op{}(lhs.get_numeric(), rhs.get_numeric());
             }
             break;
         }
     }
 
     std::ostringstream os;
-    os << "unhandled variant index: lhs=" << lhs.index() << "; rhs=" << rhs.index();
+    os << "unhandled variant type: lhs=" << int(lhs.type()) << "; rhs=" << int(rhs.type());
     throw invalid_expression(os.str());
 }
 
@@ -1003,7 +997,7 @@ void formula_interpreter::term()
 
     fopcode_t oc = token().opcode;
 
-    auto pop_matrix_or_values = [this]() -> std::pair<matrix_or_value_t, matrix_or_value_t>
+    auto pop_matrix_or_values = [this]() -> std::pair<matrix_or_numeric_t, matrix_or_numeric_t>
     {
         auto v1 = get_stack().pop_matrix_or_value();
         next(); // skip the op token
@@ -1012,15 +1006,15 @@ void formula_interpreter::term()
         return std::make_pair(std::move(v1), std::move(v2));
     };
 
-    auto push_to_stack = [this](const matrix_or_value_t& v)
+    auto push_to_stack = [this](const matrix_or_numeric_t& v)
     {
-        switch (v.index())
+        switch (v.type())
         {
-            case 0: // matrix
-                get_stack().push_matrix(std::get<matrix>(v));
+            case matrix_or_numeric_t::value_type::matrix:
+                get_stack().push_matrix(v.get_matrix());
                 break;
-            case 1: // double
-                get_stack().push_value(std::get<double>(v));
+            case matrix_or_numeric_t::value_type::numeric:
+                get_stack().push_value(v.get_numeric());
                 break;
             default:
                 throw invalid_expression("result must be either matrix or double");
@@ -1035,7 +1029,7 @@ void formula_interpreter::term()
                 mp_handler->push_token(oc);
 
             const auto& [lhs, rhs] = pop_matrix_or_values();
-            auto res = op_matrix_or_value<multiply_op>(lhs, rhs);
+            auto res = op_matrix_or_numeric<multiply_op>(lhs, rhs);
             push_to_stack(res);
             return;
         }
@@ -1045,7 +1039,7 @@ void formula_interpreter::term()
                 mp_handler->push_token(oc);
 
             const auto& [base, exp] = pop_matrix_or_values();
-            auto res = op_matrix_or_value<exponent_op>(base, exp);
+            auto res = op_matrix_or_numeric<exponent_op>(base, exp);
             push_to_stack(res);
             return;
         }

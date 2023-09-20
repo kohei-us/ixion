@@ -24,6 +24,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     formula_tokens.cpp
     formula_value_stack.cpp
     global.cpp
+    impl_types.cpp
     info.cpp
     interface.cpp
     lexer_tokens.cpp

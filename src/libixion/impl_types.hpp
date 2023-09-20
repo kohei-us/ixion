@@ -7,14 +7,31 @@
 
 #pragma once
 
+#include <ixion/matrix.hpp>
+
 #include <variant>
 
 namespace ixion {
 
 class matrix;
 
-using matrix_or_value_t = std::variant<matrix, double>;
+class matrix_or_numeric_t
+{
+    using store_type = std::variant<matrix, double>;
+    store_type m_value;
+public:
 
-}
+    enum class value_type { matrix, numeric };
+
+    matrix_or_numeric_t(matrix v);
+    matrix_or_numeric_t(double v);
+
+    value_type type() const;
+
+    const matrix& get_matrix() const;
+    double get_numeric() const;
+};
+
+} // namespace ixion
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -54,6 +54,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	formula_value_stack.cpp \
 	global.cpp \
 	impl_types.hpp \
+	impl_types.cpp \
 	info.cpp \
 	lexer_tokens.hpp \
 	lexer_tokens.cpp \

@@ -577,7 +577,7 @@ formula_error_t formula_value_stack::pop_error()
     return ret;
 }
 
-matrix_or_value_t formula_value_stack::pop_matrix_or_value()
+matrix_or_numeric_t formula_value_stack::pop_matrix_or_value()
 {
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
