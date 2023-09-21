@@ -136,7 +136,7 @@ public:
     matrix pop_range_value();
     formula_error_t pop_error();
 
-    matrix_or_numeric_t pop_matrix_or_value();
+    matrix_or_numeric_t pop_matrix_or_numeric();
 
     void pop_back();
 

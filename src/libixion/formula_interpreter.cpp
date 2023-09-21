@@ -1044,12 +1044,12 @@ void formula_interpreter::term()
 
     fopcode_t oc = token().opcode;
 
-    auto pop_matrix_or_values = [this]() -> std::pair<matrix_or_numeric_t, matrix_or_numeric_t>
+    auto pop_matrix_or_numeric_values = [this]()
     {
-        auto v1 = get_stack().pop_matrix_or_value();
+        auto v1 = get_stack().pop_matrix_or_numeric();
         next(); // skip the op token
         term();
-        auto v2 = get_stack().pop_matrix_or_value();
+        auto v2 = get_stack().pop_matrix_or_numeric();
         return std::make_pair(std::move(v1), std::move(v2));
     };
 
@@ -1075,7 +1075,7 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
-            const auto& [lhs, rhs] = pop_matrix_or_values();
+            const auto& [lhs, rhs] = pop_matrix_or_numeric_values();
             auto res = op_matrix_or_numeric<multiply_op>(lhs, rhs);
             push_to_stack(res);
             return;
@@ -1085,7 +1085,7 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
-            const auto& [base, exp] = pop_matrix_or_values();
+            const auto& [base, exp] = pop_matrix_or_numeric_values();
             auto res = op_matrix_or_numeric<exponent_op>(base, exp);
             push_to_stack(res);
             return;
@@ -1108,7 +1108,7 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
-            const auto& [lhs, rhs] = pop_matrix_or_values();
+            const auto& [lhs, rhs] = pop_matrix_or_numeric_values();
             auto res = op_matrix_or_numeric<divide_op>(lhs, rhs);
             push_to_stack(res);
             return;
