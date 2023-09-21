@@ -849,15 +849,15 @@ std::optional<double> elem_to_numeric(const matrix::element& e)
 };
 
 template<typename Op>
-matrix_or_numeric_t op_matrix_or_numeric(const matrix_or_numeric_t& lhs, const matrix_or_numeric_t& rhs)
+resolved_stack_value op_matrix_or_numeric(const resolved_stack_value& lhs, const resolved_stack_value& rhs)
 {
     switch (lhs.type())
     {
-        case matrix_or_numeric_t::value_type::matrix:
+        case resolved_stack_value::value_type::matrix:
         {
             switch (rhs.type())
             {
-                case matrix_or_numeric_t::value_type::matrix: // matrix * matrix
+                case resolved_stack_value::value_type::matrix: // matrix * matrix
                 {
                     const matrix& m1 = lhs.get_matrix();
                     const matrix& m2 = rhs.get_matrix();
@@ -891,18 +891,20 @@ matrix_or_numeric_t op_matrix_or_numeric(const matrix_or_numeric_t& lhs, const m
                     }
                     return res;
                 }
-                case matrix_or_numeric_t::value_type::numeric: // matrix * value
+                case resolved_stack_value::value_type::numeric: // matrix * value
                     return operate_all_elements<Op>(lhs.get_matrix(), rhs.get_numeric());
+                case resolved_stack_value::value_type::string:
+                    throw invalid_expression("unexpected string value");
             }
             break;
         }
-        case matrix_or_numeric_t::value_type::numeric:
+        case resolved_stack_value::value_type::numeric:
         {
             switch (rhs.type())
             {
-                case matrix_or_numeric_t::value_type::matrix: // value * matrix
+                case resolved_stack_value::value_type::matrix: // value * matrix
                     return operate_all_elements<Op>(lhs.get_numeric(), rhs.get_matrix());
-                case matrix_or_numeric_t::value_type::numeric: // value * value
+                case resolved_stack_value::value_type::numeric: // value * value
                 {
                     auto v = Op{}(lhs.get_numeric(), rhs.get_numeric());
                     if (!v)
@@ -910,9 +912,13 @@ matrix_or_numeric_t op_matrix_or_numeric(const matrix_or_numeric_t& lhs, const m
 
                     return *v;
                 }
+                case resolved_stack_value::value_type::string:
+                    throw invalid_expression("unexpected string value");
             }
             break;
         }
+        case resolved_stack_value::value_type::string:
+            throw invalid_expression("unexpected string value");
     }
 
     std::ostringstream os;
@@ -1053,14 +1059,14 @@ void formula_interpreter::term()
         return std::make_pair(std::move(v1), std::move(v2));
     };
 
-    auto push_to_stack = [this](const matrix_or_numeric_t& v)
+    auto push_to_stack = [this](const resolved_stack_value& v)
     {
         switch (v.type())
         {
-            case matrix_or_numeric_t::value_type::matrix:
+            case resolved_stack_value::value_type::matrix:
                 get_stack().push_matrix(v.get_matrix());
                 break;
-            case matrix_or_numeric_t::value_type::numeric:
+            case resolved_stack_value::value_type::numeric:
                 get_stack().push_value(v.get_numeric());
                 break;
             default:

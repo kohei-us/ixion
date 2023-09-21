@@ -11,30 +11,27 @@
 
 namespace ixion {
 
-matrix_or_numeric_t::matrix_or_numeric_t(matrix v) : m_value(std::move(v)) {}
-matrix_or_numeric_t::matrix_or_numeric_t(double v) : m_value(v) {}
+resolved_stack_value::resolved_stack_value(matrix v) : m_value(std::move(v)) {}
+resolved_stack_value::resolved_stack_value(double v) : m_value(v) {}
 
-matrix_or_numeric_t::value_type matrix_or_numeric_t::type() const
+resolved_stack_value::value_type resolved_stack_value::type() const
 {
-    switch (m_value.index())
-    {
-        case 0:
-            return value_type::matrix;
-        case 1:
-            return value_type::numeric;
-    }
-
-    throw std::logic_error{"invalid type index"};
+    return value_type{m_value.index()};
 }
 
-const matrix& matrix_or_numeric_t::get_matrix() const
+const matrix& resolved_stack_value::get_matrix() const
 {
     return std::get<matrix>(m_value);
 }
 
-double matrix_or_numeric_t::get_numeric() const
+double resolved_stack_value::get_numeric() const
 {
     return std::get<double>(m_value);
+}
+
+const std::string& resolved_stack_value::get_string() const
+{
+    return std::get<std::string>(m_value);
 }
 
 } // namespace ixion

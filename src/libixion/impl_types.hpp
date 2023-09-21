@@ -11,26 +11,28 @@
 #include <ixion/types.hpp>
 
 #include <variant>
+#include <string>
 
 namespace ixion {
 
 class matrix;
 
-class matrix_or_numeric_t
+class resolved_stack_value
 {
-    using store_type = std::variant<matrix, double>;
+    using store_type = std::variant<matrix, double, std::string>;
     store_type m_value;
 public:
 
-    enum class value_type { matrix, numeric };
+    enum class value_type { matrix, numeric, string };
 
-    matrix_or_numeric_t(matrix v);
-    matrix_or_numeric_t(double v);
+    resolved_stack_value(matrix v);
+    resolved_stack_value(double v);
 
     value_type type() const;
 
     const matrix& get_matrix() const;
     double get_numeric() const;
+    const std::string& get_string() const;
 };
 
 template<typename T>

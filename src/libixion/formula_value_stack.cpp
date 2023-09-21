@@ -463,7 +463,9 @@ std::string formula_value_stack::pop_string()
             break;
         }
         default:
-            ;
+        {
+            IXION_DEBUG("unhandled type: " << v.get_type());
+        }
     }
     throw formula_error(formula_error_t::stack_error);
 }
@@ -577,7 +579,7 @@ formula_error_t formula_value_stack::pop_error()
     return ret;
 }
 
-matrix_or_numeric_t formula_value_stack::pop_matrix_or_numeric()
+resolved_stack_value formula_value_stack::pop_matrix_or_numeric()
 {
     if (m_stack.empty())
         throw formula_error(formula_error_t::stack_error);
