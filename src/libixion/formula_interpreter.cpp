@@ -702,6 +702,17 @@ struct multiply_op
     }
 };
 
+struct divide_op
+{
+    formula_op_result<double> operator()(double v1, double v2) const
+    {
+        if (v2 == 0.0)
+            return formula_error_t::division_by_zero;
+
+        return v1 / v2;
+    }
+};
+
 struct exponent_op
 {
     formula_op_result<double> operator()(double v1, double v2) const
@@ -1097,13 +1108,9 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
-            next();
-            double val = get_stack().pop_value();
-            term();
-            double val2 = get_stack().pop_value();
-            if (val2 == 0.0)
-                throw formula_error(formula_error_t::division_by_zero);
-            get_stack().push_value(val/val2);
+            const auto& [lhs, rhs] = pop_matrix_or_values();
+            auto res = op_matrix_or_numeric<divide_op>(lhs, rhs);
+            push_to_stack(res);
             return;
         }
         default:
