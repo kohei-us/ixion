@@ -585,6 +585,51 @@ matrix operate_all_elements(const matrix& mtx, double val)
     return res;
 }
 
+matrix operate_all_elements(const matrix& mtx, std::string_view val)
+{
+    matrix res = mtx;
+
+    for (std::size_t col = 0; col < mtx.col_size(); ++col)
+    {
+        for (std::size_t row = 0; row < mtx.row_size(); ++row)
+        {
+            auto elem = mtx.get(row, col);
+
+            switch (elem.type)
+            {
+                case matrix::element_type::numeric:
+                {
+                    std::ostringstream os;
+                    os << std::get<double>(elem.value) << val;
+                    res.set(row, col, os.str());
+                    break;
+                }
+                case matrix::element_type::string:
+                {
+                    std::ostringstream os;
+                    os << std::get<std::string_view>(elem.value) << val;
+                    res.set(row, col, os.str());
+                    break;
+                }
+                case matrix::element_type::boolean:
+                {
+                    std::ostringstream os;
+                    os << std::boolalpha << std::get<bool>(elem.value) << val;
+                    res.set(row, col, os.str());
+                    break;
+                }
+                case matrix::element_type::error:
+                    res.set(row, col, std::get<formula_error_t>(elem.value));
+                    break;
+                case matrix::element_type::empty:
+                    break;
+            }
+        }
+    }
+
+    return res;
+}
+
 template<typename Op>
 matrix operate_all_elements(double val, const matrix& mtx)
 {
@@ -926,6 +971,45 @@ resolved_stack_value op_matrix_or_numeric(const resolved_stack_value& lhs, const
     throw invalid_expression(os.str());
 }
 
+resolved_stack_value concat_matrix_or_string(const resolved_stack_value& lhs, const resolved_stack_value& rhs)
+{
+    switch (lhs.type())
+    {
+        case resolved_stack_value::value_type::matrix:
+        {
+            switch (rhs.type())
+            {
+                case resolved_stack_value::value_type::matrix: // matrix & matrix
+                    throw std::runtime_error("WIP");
+                case resolved_stack_value::value_type::string: // matrix & string
+                    return operate_all_elements(lhs.get_matrix(), rhs.get_string());
+                case resolved_stack_value::value_type::numeric: // matrix & string
+                    throw invalid_expression("unexpected numeric value");
+            }
+            break;
+        }
+        case resolved_stack_value::value_type::string:
+        {
+            switch (rhs.type())
+            {
+                case resolved_stack_value::value_type::matrix: // string & matrix
+                    throw std::runtime_error("WIP");
+                case resolved_stack_value::value_type::string: // string & string
+                    return lhs.get_string() + rhs.get_string();
+                case resolved_stack_value::value_type::numeric:
+                    throw invalid_expression("unexpected numeric value");
+            }
+            break;
+        }
+        case resolved_stack_value::value_type::numeric:
+            throw invalid_expression("unexpected numeric value");
+    }
+
+    std::ostringstream os;
+    os << "unhandled variant type: lhs=" << int(lhs.type()) << "; rhs=" << int(rhs.type());
+    throw invalid_expression(os.str());
+}
+
 } // anonymous namespace
 
 void formula_interpreter::expression()
@@ -1069,6 +1153,9 @@ void formula_interpreter::term()
             case resolved_stack_value::value_type::numeric:
                 get_stack().push_value(v.get_numeric());
                 break;
+            case resolved_stack_value::value_type::string:
+                get_stack().push_string(v.get_string());
+                break;
             default:
                 throw invalid_expression("result must be either matrix or double");
         }
@@ -1101,12 +1188,12 @@ void formula_interpreter::term()
             if (mp_handler)
                 mp_handler->push_token(oc);
 
+            auto lhs = get_stack().pop_matrix_or_string();
             next();
-            std::string s1 = get_stack().pop_string();
             term();
-            std::string s2 = get_stack().pop_string();
-            std::string s = s1 + s2;
-            get_stack().push_string(std::move(s));
+            auto rhs = get_stack().pop_matrix_or_string();
+            auto res = concat_matrix_or_string(lhs, rhs);
+            push_to_stack(res);
             return;
         }
         case fop_divide:

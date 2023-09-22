@@ -17,8 +17,13 @@ namespace ixion {
 
 class matrix;
 
+/**
+ * Similar to stack_value but does not store a reference; it only stores a
+ * static value.
+ */
 class resolved_stack_value
 {
+    // Keep the type ordering in sync with value_type's.
     using store_type = std::variant<matrix, double, std::string>;
     store_type m_value;
 public:
@@ -27,6 +32,7 @@ public:
 
     resolved_stack_value(matrix v);
     resolved_stack_value(double v);
+    resolved_stack_value(std::string v);
 
     value_type type() const;
 

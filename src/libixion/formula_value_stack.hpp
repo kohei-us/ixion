@@ -18,6 +18,7 @@
 #include <deque>
 #include <variant>
 #include <ostream>
+#include <optional>
 
 namespace ixion {
 
@@ -137,10 +138,14 @@ public:
     formula_error_t pop_error();
 
     resolved_stack_value pop_matrix_or_numeric();
+    resolved_stack_value pop_matrix_or_string();
 
     void pop_back();
 
     stack_value_t get_type() const;
+
+private:
+    std::optional<matrix> maybe_pop_matrix();
 };
 
 }

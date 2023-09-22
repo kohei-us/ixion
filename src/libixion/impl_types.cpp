@@ -13,6 +13,7 @@ namespace ixion {
 
 resolved_stack_value::resolved_stack_value(matrix v) : m_value(std::move(v)) {}
 resolved_stack_value::resolved_stack_value(double v) : m_value(v) {}
+resolved_stack_value::resolved_stack_value(std::string v) : m_value(std::move(v)) {}
 
 resolved_stack_value::value_type resolved_stack_value::type() const
 {
