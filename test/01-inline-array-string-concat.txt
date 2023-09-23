@@ -1,0 +1,19 @@
+%% Test for inline array with multiplication.
+%mode init
+{A1:B2}{={1,2;3,4}&"A"}
+{A3:B4}{="B"&{2,3;4,"D"}}
+{A5:C5}{={"a","b","c"}&{"d","e","f"}}
+%calc
+%mode result
+A1="1A"
+B1="2A"
+A2="3A"
+B2="4A"
+A3="B2"
+B3="B3"
+A4="B4"
+B4="BD"
+A5="ad"
+B5="be"
+C5="cf"
+%check

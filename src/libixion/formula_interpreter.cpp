@@ -1016,6 +1016,26 @@ resolved_stack_value op_matrix_or_numeric(const resolved_stack_value& lhs, const
     throw invalid_expression(os.str());
 }
 
+std::ostream& operator<<(std::ostream& os, const matrix::element& e)
+{
+    switch (e.type)
+    {
+        case matrix::element_type::numeric:
+            os << std::get<double>(e.value);
+            break;
+        case matrix::element_type::string:
+            os << std::get<std::string_view>(e.value);
+            break;
+        case matrix::element_type::boolean:
+            os << std::boolalpha << std::get<bool>(e.value);
+            break;
+        case matrix::element_type::error:
+        case matrix::element_type::empty:
+            break;
+    }
+    return os;
+}
+
 resolved_stack_value concat_matrix_or_string(const resolved_stack_value& lhs, const resolved_stack_value& rhs)
 {
     switch (lhs.type())
@@ -1025,7 +1045,30 @@ resolved_stack_value concat_matrix_or_string(const resolved_stack_value& lhs, co
             switch (rhs.type())
             {
                 case resolved_stack_value::value_type::matrix: // matrix & matrix
-                    throw std::runtime_error("WIP");
+                {
+                    const matrix& m1 = lhs.get_matrix();
+                    const matrix& m2 = rhs.get_matrix();
+
+                    if (m1.row_size() != m2.row_size() || m1.col_size() != m2.col_size())
+                        throw invalid_expression("matrix size mis-match");
+
+                    matrix res = m1; // copy
+
+                    for (std::size_t col = 0; col < res.col_size(); ++col)
+                    {
+                        for (std::size_t row = 0; row < res.row_size(); ++row)
+                        {
+                            auto elem1 = res.get(row, col);
+                            auto elem2 = m2.get(row, col);
+
+                            std::ostringstream os;
+                            os << elem1 << elem2;
+
+                            res.set(row, col, os.str());
+                        }
+                    }
+                    return res;
+                }
                 case resolved_stack_value::value_type::string: // matrix & string
                     return operate_all_elements(lhs.get_matrix(), rhs.get_string());
                 case resolved_stack_value::value_type::numeric: // matrix & string
