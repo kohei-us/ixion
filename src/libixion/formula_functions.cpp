@@ -1119,27 +1119,21 @@ void formula_functions::fnc_mmult(formula_value_stack& args) const
 
     while (!args.empty())
     {
-        switch (args.get_type())
+        if (mxp == mxp_end)
         {
-            case stack_value_t::range_ref:
-            {
-                if (mxp == mxp_end)
-                {
-                    is_arg_invalid = true;
-                    break;
-                }
-
-                matrix m = args.pop_range_value();
-                mxp->swap(m);
-                ++mxp;
-                break;
-            }
-            default:
-                is_arg_invalid = true;
+            is_arg_invalid = true;
+            break;
         }
 
-        if (is_arg_invalid)
+        auto m = args.maybe_pop_matrix();
+        if (!m)
+        {
+            is_arg_invalid = true;
             break;
+        }
+
+        mxp->swap(*m);
+        ++mxp;
     }
 
     if (mxp != mxp_end)

@@ -1,0 +1,14 @@
+%mode init
+{A1:C3}{=mmult({1;2;3},{4,5,6})}
+%calc
+%mode result
+A1=4
+B1=5
+C1=6
+A2=8
+B2=10
+C2=12
+A3=12
+B3=15
+C3=18
+%check

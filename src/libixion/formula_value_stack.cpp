@@ -478,6 +478,28 @@ matrix formula_value_stack::pop_matrix()
     throw formula_error(formula_error_t::stack_error);
 }
 
+std::optional<matrix> formula_value_stack::maybe_pop_matrix()
+{
+    if (m_stack.empty())
+        throw formula_error(formula_error_t::stack_error);
+
+    stack_value& v = m_stack.back();
+    switch (v.get_type())
+    {
+        case stack_value_t::matrix:
+        {
+            auto mtx = v.pop_matrix();
+            m_stack.pop_back();
+            return mtx;
+        }
+        case stack_value_t::range_ref:
+            return pop_range_value();
+        default:;
+    }
+
+    return {};
+}
+
 abs_address_t formula_value_stack::pop_single_ref()
 {
     IXION_TRACE("pop_single_ref");
@@ -596,28 +618,6 @@ stack_value_t formula_value_stack::get_type() const
         throw formula_error(formula_error_t::stack_error);
 
     return m_stack.back().get_type();
-}
-
-std::optional<matrix> formula_value_stack::maybe_pop_matrix()
-{
-    if (m_stack.empty())
-        throw formula_error(formula_error_t::stack_error);
-
-    stack_value& v = m_stack.back();
-    switch (v.get_type())
-    {
-        case stack_value_t::matrix:
-        {
-            auto mtx = v.pop_matrix();
-            m_stack.pop_back();
-            return mtx;
-        }
-        case stack_value_t::range_ref:
-            return pop_range_value();
-        default:;
-    }
-
-    return {};
 }
 
 }

@@ -132,6 +132,7 @@ public:
     double pop_value();
     std::string pop_string();
     matrix pop_matrix();
+    std::optional<matrix> maybe_pop_matrix();
     abs_address_t pop_single_ref();
     abs_range_t pop_range_ref();
     matrix pop_range_value();
@@ -143,9 +144,6 @@ public:
     void pop_back();
 
     stack_value_t get_type() const;
-
-private:
-    std::optional<matrix> maybe_pop_matrix();
 };
 
 }
