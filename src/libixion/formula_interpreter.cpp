@@ -630,6 +630,51 @@ matrix operate_all_elements(const matrix& mtx, std::string_view val)
     return res;
 }
 
+matrix operate_all_elements(std::string_view val, const matrix& mtx)
+{
+    matrix res = mtx;
+
+    for (std::size_t col = 0; col < mtx.col_size(); ++col)
+    {
+        for (std::size_t row = 0; row < mtx.row_size(); ++row)
+        {
+            auto elem = mtx.get(row, col);
+
+            switch (elem.type)
+            {
+                case matrix::element_type::numeric:
+                {
+                    std::ostringstream os;
+                    os << val << std::get<double>(elem.value);
+                    res.set(row, col, os.str());
+                    break;
+                }
+                case matrix::element_type::string:
+                {
+                    std::ostringstream os;
+                    os << val << std::get<std::string_view>(elem.value);
+                    res.set(row, col, os.str());
+                    break;
+                }
+                case matrix::element_type::boolean:
+                {
+                    std::ostringstream os;
+                    os << val << std::boolalpha << std::get<bool>(elem.value);
+                    res.set(row, col, os.str());
+                    break;
+                }
+                case matrix::element_type::error:
+                    res.set(row, col, std::get<formula_error_t>(elem.value));
+                    break;
+                case matrix::element_type::empty:
+                    break;
+            }
+        }
+    }
+
+    return res;
+}
+
 template<typename Op>
 matrix operate_all_elements(double val, const matrix& mtx)
 {
@@ -993,7 +1038,7 @@ resolved_stack_value concat_matrix_or_string(const resolved_stack_value& lhs, co
             switch (rhs.type())
             {
                 case resolved_stack_value::value_type::matrix: // string & matrix
-                    throw std::runtime_error("WIP");
+                    return operate_all_elements(lhs.get_string(), rhs.get_matrix());
                 case resolved_stack_value::value_type::string: // string & string
                     return lhs.get_string() + rhs.get_string();
                 case resolved_stack_value::value_type::numeric:
