@@ -35,6 +35,7 @@ for both full and partial calculation modes.
 * 3D cell and range references.
 * Dependency tracking during both full calculation and partial re-calculation.
 * Inline strings.
+* Inline arrays.
 * Volatile functions. The framework for volatile functions is implemented. We
   just need to implement more functions.
 * C++ API.
