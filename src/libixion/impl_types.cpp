@@ -17,7 +17,7 @@ resolved_stack_value::resolved_stack_value(std::string v) : m_value(std::move(v)
 
 resolved_stack_value::value_type resolved_stack_value::type() const
 {
-    return value_type{m_value.index()};
+    return value_type(m_value.index());
 }
 
 const matrix& resolved_stack_value::get_matrix() const
