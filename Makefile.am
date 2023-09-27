@@ -7,13 +7,10 @@ pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
 bin_data = \
-	bin/ixion-test-mem.sh \
-	bin/ixion-test-gdb.sh \
-	bin/ixion-test.sh \
-	bin/ixion-parser-mem.sh \
-	bin/ixion-parser.sh \
-	bin/ixion-parser-gdb.sh \
-	bin/run-python-test-osx.sh
+	bin/gen-gfm-release-table.sh \
+	bin/gen-spirv-shader-arrays.py \
+	bin/run-python-test-osx.sh \
+	bin/run-python.sh
 
 test_data = \
 	test/01-simple-arithmetic.txt \
