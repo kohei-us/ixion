@@ -13,18 +13,82 @@ bin_data = \
 	bin/run-python.sh
 
 test_data = \
+	test/00-command-exit.txt \
+	test/01-concat-operator.txt \
+	test/01-exponent-operator.txt \
+	test/01-inline-array-div.txt \
+	test/01-inline-array-exp.txt \
+	test/01-inline-array-mul.txt \
+	test/01-inline-array-op-lhs.txt \
+	test/01-inline-array-op-rhs.txt \
+	test/01-inline-array-string-concat.txt \
+	test/01-inline-array.txt \
+	test/01-ranged-definitions-dups.txt \
 	test/01-simple-arithmetic.txt \
 	test/02-circular-01.txt \
 	test/02-circular-02.txt \
 	test/03-expression.txt \
-	test/04-function-logical.txt \
-	test/04-function-single.txt \
+	test/03-leading-signs.txt \
+	test/04-function-abs.txt \
+	test/04-function-and-boolean.txt \
+	test/04-function-and.txt \
 	test/04-function-average.txt \
+	test/04-function-column-row.txt \
+	test/04-function-columns-rows.txt \
+	test/04-function-concatenate.txt \
+	test/04-function-count-formula.txt \
+	test/04-function-count.txt \
+	test/04-function-counta-edit.txt \
+	test/04-function-counta-static-args.txt \
+	test/04-function-countblank.txt \
+	test/04-function-exact.txt \
+	test/04-function-find.txt \
+	test/04-function-invalid-name.txt \
+	test/04-function-isblank.txt \
+	test/04-function-iserror.txt \
+	test/04-function-iseven.txt \
+	test/04-function-isformula.txt \
+	test/04-function-islogical.txt \
+	test/04-function-isna.txt \
+	test/04-function-isnumber.txt \
+	test/04-function-isref.txt \
+	test/04-function-istext.txt \
+	test/04-function-left-utf8.txt \
+	test/04-function-left.txt \
+	test/04-function-len.txt \
+	test/04-function-logical.txt \
+	test/04-function-median.txt \
+	test/04-function-mid-utf8.txt \
+	test/04-function-mid.txt \
+	test/04-function-mmult-inline.txt \
+	test/04-function-mmult.txt \
+	test/04-function-mode.txt \
+	test/04-function-n.txt \
+	test/04-function-nested.txt \
+	test/04-function-or.txt \
+	test/04-function-pi-int.txt \
+	test/04-function-replace.txt \
+	test/04-function-rept.txt \
+	test/04-function-right-utf8.txt \
+	test/04-function-right.txt \
+	test/04-function-sheet.txt \
+	test/04-function-sheets.txt \
+	test/04-function-single.txt \
+	test/04-function-substitute.txt \
+	test/04-function-t.txt \
+	test/04-function-textjoin.txt \
+	test/04-function-trim.txt \
+	test/04-function-true-false.txt \
+	test/04-function-type.txt \
 	test/05-range-reference.txt \
 	test/06-range-reference-basic-01.txt \
 	test/06-range-reference-basic-02.txt \
 	test/06-range-reference-circular-01.txt \
+	test/06-range-reference-unordered.txt \
+	test/06-range-reference-whole-column.txt \
+	test/06-range-reference-whole-row.txt \
 	test/07-fraction-numbers.txt \
+	test/08-boolean-cells.txt \
 	test/08-numeric-cells.txt \
 	test/09-string-cells.txt \
 	test/10-shared-formulas-01.txt \
@@ -33,10 +97,11 @@ test_data = \
 	test/13-relational-operators-01.txt \
 	test/13-relational-operators-02.txt \
 	test/13-relational-operators-03.txt \
-	test/python/document.py \
-	test/python/module.py \
-	test/thread/function-parallel.txt \
-	test/thread/function-wait-simple.txt \
+	test/20-table-reference-01.txt \
+	test/21-named-exp-workbook-01.txt \
+	test/21-named-exp-worksheet-01.txt \
+	test/22-formulas-with-cached-results.txt \
+	test/22-grouped-formulas-with-cached-results.txt \
 	test/parser-test-func.sh \
 	test/parser-test-t0.sh \
 	test/parser-test-t1.sh \
@@ -46,34 +111,40 @@ test_data = \
 	test/parser-test-t5.sh \
 	test/parser-test-t6.sh \
 	test/parser-test-t7.sh \
-	test/parser-test-t8.sh
+	test/parser-test-t8.sh \
+	test/python/document.py \
+	test/python/module.py \
+	test/thread/function-parallel.txt \
+	test/thread/function-wait-simple.txt
 
 doc_data = \
 	doc/conf.py \
-	doc/doxygen.conf \
-	doc/overview/index.rst \
-	doc/cpp/data_store/types.rst \
-	doc/cpp/data_store/model_context.rst \
-	doc/cpp/data_store/index.rst \
 	doc/cpp/data_store/cell_access.rst \
-	doc/cpp/data_store/document.rst \
 	doc/cpp/data_store/dirty_cell_tracker.rst \
-	doc/cpp/formula/types.rst \
-	doc/cpp/formula/formula_tokens.rst \
+	doc/cpp/data_store/document.rst \
+	doc/cpp/data_store/index.rst \
+	doc/cpp/data_store/model_context.rst \
+	doc/cpp/data_store/types.rst \
 	doc/cpp/formula/formula_cell.rst \
 	doc/cpp/formula/formula_engine.rst \
-	doc/cpp/formula/index.rst \
 	doc/cpp/formula/formula_name_resolver.rst \
+	doc/cpp/formula/formula_tokens.rst \
+	doc/cpp/formula/index.rst \
+	doc/cpp/formula/types.rst \
 	doc/cpp/index.rst \
 	doc/cpp/interface/index.rst \
-	doc/cpp/quickstart/using_model_context.rst \
 	doc/cpp/quickstart/index.rst \
 	doc/cpp/quickstart/using_document.rst \
+	doc/cpp/quickstart/using_model_context.rst \
+	doc/doxygen.conf \
+	doc/environment.yml \
 	doc/index.rst \
-	doc/python/quickstart.rst \
-	doc/python/index.rst \
+	doc/overview/index.rst \
 	doc/python/document.rst \
-	doc/python/sheet.rst
+	doc/python/index.rst \
+	doc/python/quickstart.rst \
+	doc/python/sheet.rst \
+	doc/requirements.txt
 
 EXTRA_DIST = \
 	LICENSE \
