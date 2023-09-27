@@ -1,3 +1,13 @@
+ixion 0.19.0
+
+* C++ API
+
+  * added support for renaming sheets after they have been created.
+
+* formula interpreter
+
+  * added support for inline arrays.
+
 ixion 0.18.1
 
 * fixed a 32-bit Linux build issue as discovered on Debian, due to a clash on
