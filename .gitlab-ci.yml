@@ -2,12 +2,17 @@ image: gcc
 
 build:
   stage: build
-  before_script: 
+  before_script:
     - apt update
     - apt -y install gfortran-12
     - update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-12 999
     - apt -y install make autoconf automake libtool pkg-config git python3-dev
     - apt -y install libboost-all-dev
-    - git clone https://gitlab.com/mdds/mdds.git /mdds && (cd /mdds && ./autogen.sh && make install)
-  script: 
+    - git clone https://gitlab.com/mdds/mdds.git /mdds
+    - pushd /mdds
+    - git checkout 2.1.1
+    - ./autogen.sh
+    - make install
+    - popd
+  script:
     - (./autogen.sh || cat config.log) && (make -j $(nproc) || cat config.log) && make -j $(nproc) check
