@@ -6,6 +6,12 @@ AM_CPPFLAGS = \
 	$(MDDS_CFLAGS) \
 	$(BOOST_CPPFLAGS)
 
+if WINDOWS
+
+AM_CPPFLAGS += -D_USE_MATH_DEFINES
+
+endif # WINDOWS
+
 if BUILD_VULKAN
 
 AM_CPPFLAGS += -DBUILD_VULKAN
@@ -114,8 +120,13 @@ endif
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS = \
 	-no-undefined \
-	-Wl,-rpath,'$$ORIGIN' -Wl,-rpath,'$$ORIGIN/$(PACKAGE)' \
 	$(BOOST_FILESYSTEM_LDFLAGS)
+
+if !WINDOWS
+
+libixion_@IXION_API_VERSION@_la_LDFLAGS += -Wl,-rpath,'$$ORIGIN' -Wl,-rpath,'$$ORIGIN/$(PACKAGE)'
+
+endif # !WINDOWS
 
 libixion_@IXION_API_VERSION@_la_LIBADD = \
 	$(BOOST_FILESYSTEM_LIBS)

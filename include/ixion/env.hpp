@@ -9,10 +9,7 @@
 #define INCLUDED_IXION_ENV_HPP
 
 #if defined _WIN32 || defined __CYGWIN__
-  #if defined __MINGW32__
-    #define IXION_DLLPUBLIC
-    #define IXION_DLLPUBLIC_VAR extern
-  #elif defined IXION_BUILD
+  #if defined IXION_BUILD
      #ifdef DLL_EXPORT
        #define IXION_DLLPUBLIC __declspec(dllexport)
        #define IXION_DLLPUBLIC_VAR extern __declspec(dllexport)

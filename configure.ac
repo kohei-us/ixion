@@ -29,6 +29,10 @@ case $host_os in
         _os=Darwin
         LDFLAGS="$LDFLAGS -L/usr/local/lib"
     ;;
+    mingw*)
+        _os=Windows
+        LDFLAGS="$LDFLAGS -lpthread"
+    ;;
     *)
         _os=
         LDFLAGS="$LDFLAGS -Wl,--no-as-needed -pthread -ldl"
@@ -172,6 +176,7 @@ AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" != "xno"])
 AM_CONDITIONAL([IXION_THREADS], [test "x$enable_threads" != "xno"])
 AM_CONDITIONAL([BUILD_VULKAN], [test "x$enable_vulkan" != "xno"])
 AM_CONDITIONAL([OSX], [test "x$_os" = "xDarwin"])
+AM_CONDITIONAL([WINDOWS], [test "x$_os" = "xWindows"])
 
 BOOST_PROGRAM_OPTIONS
 
