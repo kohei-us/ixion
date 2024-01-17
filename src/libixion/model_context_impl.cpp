@@ -198,6 +198,13 @@ void throw_sheet_name_conflict(const std::string& name)
     throw model_context_error(os.str(), model_context_error::sheet_name_conflict);
 }
 
+void throw_invalid_sheet_index(sheet_t sheet)
+{
+    std::ostringstream os;
+    os << "invalid sheet index: " << sheet;
+    throw std::invalid_argument(os.str());
+}
+
 } // anonymous namespace
 
 model_context_impl::model_context_impl(model_context& parent, const rc_size_t& sheet_size) :
@@ -294,7 +301,7 @@ sheet_t model_context_impl::get_sheet_index(std::string_view name) const
 std::string_view model_context_impl::get_sheet_name(sheet_t sheet) const
 {
     if (sheet < 0 || m_sheet_names.size() <= std::size_t(sheet))
-        return {};
+        throw_invalid_sheet_index(sheet);
 
     return m_sheet_names[sheet];
 }
@@ -302,11 +309,7 @@ std::string_view model_context_impl::get_sheet_name(sheet_t sheet) const
 void model_context_impl::set_sheet_name(sheet_t sheet, std::string name)
 {
     if (sheet < 0 || m_sheet_names.size() <= std::size_t(sheet))
-    {
-        std::ostringstream os;
-        os << "invalid sheet index: " << sheet;
-        throw std::invalid_argument(os.str());
-    }
+        throw_invalid_sheet_index(sheet);
 
     for (std::size_t i = 0; i < m_sheet_names.size(); ++i)
     {

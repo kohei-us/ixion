@@ -227,6 +227,16 @@ public:
      *         the document doesn't have a sheet by the specified name.
      */
     sheet_t get_sheet_index(std::string_view name) const;
+
+    /**
+     * Get the name of a sheet specified by a 0-based sheet index.
+     *
+     * @param sheet 0-based sheet index.
+     *
+     * @return Name of the sheet if the sheet index is valid.
+     *
+     * @exception std::invalid_argument When the sheet index is invalid.
+     */
     std::string_view get_sheet_name(sheet_t sheet) const;
 
     /**
@@ -234,6 +244,8 @@ public:
      *
      * @param sheet 0-based sheet index.
      * @param name New name of a sheet.
+     *
+     * @exception std::invalid_argument When the sheet index is invalid.
      */
     void set_sheet_name(sheet_t sheet, std::string name);
 
