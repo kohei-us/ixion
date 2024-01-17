@@ -138,27 +138,27 @@ enum class type
 typedef mdds::sorted_string_map<type> map_type;
 
 // Keys must be sorted.
-const std::vector<map_type::entry> entries =
+constexpr map_type::entry_type entries[] =
 {
-    { IXION_ASCII("%"),                     type::comment               },
-    { IXION_ASCII("calc"),                  type::calc                  },
-    { IXION_ASCII("check"),                 type::check                 },
-    { IXION_ASCII("exit"),                  type::exit                  },
-    { IXION_ASCII("mode edit"),             type::mode_edit             },
-    { IXION_ASCII("mode init"),             type::mode_init             },
-    { IXION_ASCII("mode named-expression"), type::mode_named_expression },
-    { IXION_ASCII("mode result"),           type::mode_result           },
-    { IXION_ASCII("mode result-cache"),     type::mode_result_cache     },
-    { IXION_ASCII("mode session"),          type::mode_session          },
-    { IXION_ASCII("mode table"),            type::mode_table            },
-    { IXION_ASCII("print dependency"),      type::print_dependency      },
-    { IXION_ASCII("push"),                  type::push                  },
-    { IXION_ASCII("recalc"),                type::recalc                },
+    { "%",                     type::comment               },
+    { "calc",                  type::calc                  },
+    { "check",                 type::check                 },
+    { "exit",                  type::exit                  },
+    { "mode edit",             type::mode_edit             },
+    { "mode init",             type::mode_init             },
+    { "mode named-expression", type::mode_named_expression },
+    { "mode result",           type::mode_result           },
+    { "mode result-cache",     type::mode_result_cache     },
+    { "mode session",          type::mode_session          },
+    { "mode table",            type::mode_table            },
+    { "print dependency",      type::print_dependency      },
+    { "push",                  type::push                  },
+    { "recalc",                type::recalc                },
 };
 
 const map_type& get()
 {
-    static map_type mt(entries.data(), entries.size(), type::unknown);
+    static map_type mt(entries, std::size(entries), type::unknown);
     return mt;
 }
 

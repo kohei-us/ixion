@@ -130,7 +130,7 @@ AS_IF([test "x$enable_debug" != "xno"], [
 	AC_DEFINE([NDEBUG], [], [Disable debugging information])
 ])
 
-PKG_CHECK_MODULES([MDDS],[mdds-2.1 >= 2.0.99])
+PKG_CHECK_MODULES([MDDS],[mdds-3.0 >= 2.1.99])
 
 AC_ARG_ENABLE(log-debug,
 	AS_HELP_STRING([--enable-log-debug], [Enable debug outputs.])],
