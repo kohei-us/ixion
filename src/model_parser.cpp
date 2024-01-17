@@ -28,8 +28,6 @@
 
 #include <mdds/sorted_string_map.hpp>
 
-using namespace std;
-
 #define DEBUG_MODEL_PARSER 0
 
 namespace ixion {
@@ -101,11 +99,11 @@ public:
         if (m_first)
             m_first = false;
         else
-            cout << m_sep;
+            std::cout << m_sep;
 
         const std::string* p = m_cxt.get_string(sid);
         if (p)
-            cout << *p;
+            std::cout << *p;
     }
 };
 
@@ -166,21 +164,21 @@ const map_type& get()
 
 } // anonymous namespace
 
-model_parser::parse_error::parse_error(const string& msg) : general_error()
+model_parser::parse_error::parse_error(const std::string& msg) : general_error()
 {
-    ostringstream os;
+    std::ostringstream os;
     os << "parse error: " << msg;
     set_message(os.str());
 }
 
 // ============================================================================
 
-model_parser::check_error::check_error(const string& msg) :
+model_parser::check_error::check_error(const std::string& msg) :
     general_error(msg) {}
 
 // ============================================================================
 
-model_parser::model_parser(const string& filepath, size_t thread_count) :
+model_parser::model_parser(const std::string& filepath, std::size_t thread_count) :
     m_context({1048576, 1024}),
     m_table_handler(),
     m_session_handler_factory(m_context),
@@ -226,7 +224,7 @@ void model_parser::parse()
         if (m_print_separator)
         {
             m_print_separator = false;
-            cout << detail::get_formula_result_output_separator() << endl;
+            std::cout << detail::get_formula_result_output_separator() << std::endl;
         }
 
         switch (m_parse_mode)
@@ -392,8 +390,8 @@ void model_parser::parse_command()
         }
         case commands::type::unknown:
         {
-            ostringstream os;
-            os << "unknown command: " << buf_cmd << endl;
+            std::ostringstream os;
+            os << "unknown command: " << buf_cmd << std::endl;
             throw parse_error(os.str());
         }
         default:
@@ -438,7 +436,7 @@ void model_parser::parse_session()
     else if (cmd == "insert-sheet")
     {
         m_context.append_sheet(std::string{value});
-        cout << "sheet: (name: " << value << ")" << endl;
+        std::cout << "sheet: (name: " << value << ")" << std::endl;
     }
     else if (cmd == "current-sheet")
     {
@@ -446,16 +444,16 @@ void model_parser::parse_session()
 
         if (m_current_sheet == invalid_sheet)
         {
-            ostringstream os;
+            std::ostringstream os;
             os << "No sheet named '" << value << "' found.";
             throw parse_error(os.str());
         }
 
-        cout << "current sheet: " << value << endl;
+        std::cout << "current sheet: " << value << std::endl;
     }
     else if (cmd == "display-sheet-name")
     {
-        cout << "display sheet name: " << value << endl;
+        std::cout << "display sheet name: " << value << std::endl;
         m_print_sheet_name = to_bool(value);
         m_session_handler_factory.show_sheet_name(m_print_sheet_name);
     }
@@ -618,8 +616,7 @@ void model_parser::parse_result()
     if (itr == m_formula_results.end())
     {
         // This cell doesn't exist yet.
-        pair<model_parser::results_type::iterator, bool> r =
-            m_formula_results.insert(model_parser::results_type::value_type(name_s, fres));
+        auto r = m_formula_results.insert(model_parser::results_type::value_type(name_s, fres));
         if (!r.second)
             throw model_parser::parse_error("failed to insert a new result.");
     }
@@ -653,7 +650,7 @@ void model_parser::parse_result_cache()
 
             fc->set_result_cache(fres);
 
-            cout << get_display_cell_string(pos) << ": " << fres.str(m_context) << endl;
+            std::cout << get_display_cell_string(pos) << ": " << fres.str(m_context) << std::endl;
             break;
         }
         case formula_name_t::range_reference:
@@ -674,8 +671,6 @@ void model_parser::parse_table()
     // In table mode, each line must be attribute=value.
     parsed_assignment_type res = parse_assignment();
     const auto [name, value] = res;
-//  const std::string_view name = res.first;
-//  const std::string_view value = res.second;
 
     table_handler::entry& entry = *mp_table_entry;
 
@@ -701,25 +696,29 @@ void model_parser::parse_table()
 
 void model_parser::push_table()
 {
-    cout << detail::get_formula_result_output_separator() << endl;
+    std::cout << detail::get_formula_result_output_separator() << std::endl;
 
     if (!mp_table_entry)
         return;
 
     table_handler::entry& entry = *mp_table_entry;
 
-    const string* ps = m_context.get_string(entry.name);
+    const std::string* ps = m_context.get_string(entry.name);
     if (ps)
-        cout << "name: " << *ps << endl;
+        std::cout << "name: " << *ps << std::endl;
 
     if (mp_name_resolver)
-        cout << "range: " << mp_name_resolver->get_name(entry.range, abs_address_t(m_current_sheet,0,0), false) << endl;
+    {
+        std::cout << "range: "
+            << mp_name_resolver->get_name(entry.range, abs_address_t(m_current_sheet,0,0), false)
+            << std::endl;
+    }
 
-    cout << "columns: ";
+    std::cout << "columns: ";
     std::for_each(entry.columns.begin(), entry.columns.end(), string_printer(m_context, ','));
-    cout << endl;
+    std::cout << std::endl;
 
-    cout << "totals row count: " << mp_table_entry->totals_row_count << endl;
+    std::cout << "totals row count: " << mp_table_entry->totals_row_count << std::endl;
     m_table_handler.insert(mp_table_entry);
     assert(!mp_table_entry);
 }
@@ -779,29 +778,29 @@ void model_parser::push_named_expression()
     std::string exp_s = print_formula_tokens(
         m_context, mp_named_expression->origin, *mp_name_resolver, tokens);
 
-    cout << "name: " << mp_named_expression->name << endl;
-    cout << "expression: " << exp_s << endl;
-    cout << "origin: " << mp_named_expression->origin << endl;
+    std::cout << "name: " << mp_named_expression->name << std::endl;
+    std::cout << "expression: " << exp_s << std::endl;
+    std::cout << "origin: " << mp_named_expression->origin << std::endl;
 
-    cout << "scope: ";
+    std::cout << "scope: ";
 
     if (mp_named_expression->scope == global_scope)
-        cout << "(global)";
+        std::cout << "(global)";
     else
     {
         auto sheet_name = m_context.get_sheet_name(mp_named_expression->scope);
 
         if (sheet_name.empty())
         {
-            ostringstream os;
+            std::ostringstream os;
             os << "no sheet exists with a sheet index of " << mp_named_expression->scope;
             throw std::runtime_error(os.str());
         }
 
-        cout << sheet_name;
+        std::cout << sheet_name;
     }
 
-    cout << endl;
+    std::cout << std::endl;
 
     if (mp_named_expression->scope == global_scope)
     {
@@ -1089,24 +1088,21 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
 
 void model_parser::check()
 {
-    cout << detail::get_formula_result_output_separator() << endl
-         << "checking results" << endl
-         << detail::get_formula_result_output_separator() << endl;
+    std::cout << detail::get_formula_result_output_separator() << std::endl
+         << "checking results" << std::endl
+         << detail::get_formula_result_output_separator() << std::endl;
 
-    results_type::const_iterator itr = m_formula_results.begin(), itr_end = m_formula_results.end();
-    for (; itr != itr_end; ++itr)
+    for (const auto& [name, res] : m_formula_results)
     {
-        const string& name = itr->first;
         if (name.empty())
             throw check_error("empty cell name");
 
-        const formula_result& res = itr->second;
-        cout << name << ": " << res.str(m_context) << endl;
+        std::cout << name << ": " << res.str(m_context) << std::endl;
 
         formula_name_t name_type = mp_name_resolver->resolve(name, abs_address_t());
         if (name_type.type != formula_name_t::cell_reference)
         {
-            ostringstream os;
+            std::ostringstream os;
             os << "unrecognized cell address: " << name;
             throw std::runtime_error(os.str());
         }
@@ -1122,7 +1118,7 @@ void model_parser::check()
 
                 if (res_cell != res)
                 {
-                    ostringstream os;
+                    std::ostringstream os;
                     os << "unexpected result: (expected: " << res.str(m_context) << "; actual: " << res_cell.str(m_context) << ")";
                     throw check_error(os.str());
                 }
@@ -1133,7 +1129,7 @@ void model_parser::check()
                 double actual_val = ca.get_numeric_value();
                 if (actual_val != res.get_value())
                 {
-                    ostringstream os;
+                    std::ostringstream os;
                     os << "unexpected numeric result: (expected: " << res.get_value() << "; actual: " << actual_val << ")";
                     throw check_error(os.str());
                 }
@@ -1145,7 +1141,7 @@ void model_parser::check()
                 bool expected = res.get_boolean();
                 if (actual != expected)
                 {
-                    ostringstream os;
+                    std::ostringstream os;
                     os << std::boolalpha;
                     os << "unexpected boolean result: (expected: " << expected << "; actual: " << actual << ")";
                     throw check_error(os.str());
