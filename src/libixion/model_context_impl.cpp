@@ -291,10 +291,10 @@ sheet_t model_context_impl::get_sheet_index(std::string_view name) const
     return invalid_sheet;
 }
 
-std::string model_context_impl::get_sheet_name(sheet_t sheet) const
+std::string_view model_context_impl::get_sheet_name(sheet_t sheet) const
 {
     if (sheet < 0 || m_sheet_names.size() <= std::size_t(sheet))
-        return std::string();
+        return {};
 
     return m_sheet_names[sheet];
 }

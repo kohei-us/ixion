@@ -789,8 +789,7 @@ void model_parser::push_named_expression()
         cout << "(global)";
     else
     {
-        std::string sheet_name =
-            m_context.get_sheet_name(mp_named_expression->scope);
+        auto sheet_name = m_context.get_sheet_name(mp_named_expression->scope);
 
         if (sheet_name.empty())
         {

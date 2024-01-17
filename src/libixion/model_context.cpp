@@ -310,7 +310,7 @@ sheet_t model_context::get_sheet_index(std::string_view name) const
     return mp_impl->get_sheet_index(name);
 }
 
-std::string model_context::get_sheet_name(sheet_t sheet) const
+std::string_view model_context::get_sheet_name(sheet_t sheet) const
 {
     return mp_impl->get_sheet_name(sheet);
 }

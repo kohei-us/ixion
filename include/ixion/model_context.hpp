@@ -227,7 +227,7 @@ public:
      *         the document doesn't have a sheet by the specified name.
      */
     sheet_t get_sheet_index(std::string_view name) const;
-    std::string get_sheet_name(sheet_t sheet) const;
+    std::string_view get_sheet_name(sheet_t sheet) const;
 
     /**
      * Set a new name to an existing sheet.

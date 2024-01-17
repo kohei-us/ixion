@@ -251,7 +251,7 @@ void append_sheet_name(std::ostringstream& os, const ixion::model_context& cxt, 
         return;
     }
 
-    std::string sheet_name = cxt.get_sheet_name(sheet);
+    std::string_view sheet_name = cxt.get_sheet_name(sheet);
     std::string buffer; // used only when the sheet name contains at least one single quote.
 
     const char* p = sheet_name.data();

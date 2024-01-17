@@ -237,8 +237,8 @@ PyObject* document_getter_sheet_names(pyobj_document* self, void* closure)
     PyObject* t = PyTuple_New(n);
     for (size_t i = 0; i < n; ++i)
     {
-        std::string name = cxt.get_sheet_name(i);
-        PyObject* o = PyUnicode_FromString(name.c_str());
+        std::string_view name = cxt.get_sheet_name(i);
+        PyObject* o = PyUnicode_FromStringAndSize(name.data(), name.size());
         PyTuple_SetItem(t, i, o);
     }
 
