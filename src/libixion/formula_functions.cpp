@@ -42,7 +42,7 @@ namespace {
 
 namespace builtin_funcs {
 
-typedef mdds::sorted_string_map<formula_function_t> map_type;
+using map_type = mdds::sorted_string_map<formula_function_t, mdds::ssmap::hash_key_finder>;
 
 // Keys must be sorted.
 constexpr map_type::entry_type entries[] =
@@ -380,8 +380,6 @@ const map_type& get()
 
 } // builtin_funcs namespace
 
-constexpr std::string_view unknown_func_name = "unknown";
-
 /**
  * Traverse all elements of a passed matrix to sum up their values.
  */
@@ -611,12 +609,7 @@ formula_function_t formula_functions::get_function_opcode(std::string_view s)
 
 std::string_view formula_functions::get_function_name(formula_function_t oc)
 {
-    for (const auto& e : builtin_funcs::entries)
-    {
-        if (e.value == oc)
-            return e.key;
-    }
-    return unknown_func_name;
+    return builtin_funcs::get().find_key(oc);
 }
 
 formula_functions::formula_functions(model_context& cxt, const abs_address_t& pos) :
