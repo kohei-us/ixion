@@ -28,8 +28,6 @@
 
 #include <mdds/sorted_string_map.hpp>
 
-#define DEBUG_MODEL_PARSER 0
-
 namespace ixion {
 
 namespace {
