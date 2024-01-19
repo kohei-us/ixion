@@ -45,7 +45,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
 
 if(BUILD_VULKAN)
 
-    add_library(ixion-${IXION_API_VERSION}-vulkan SHARED
+    add_library(ixion-${IXION_API_VERSION}-vulkan MODULE
         compute_engine_vulkan.cpp
         vulkan_obj.cpp
     )

@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost COMPONENTS program_options filesystem)
 find_package(Threads)
-find_package(Python3)
+find_package(Python3 COMPONENTS Interpreter Development.Module)
 
 include(GNUInstallDirs)
 
