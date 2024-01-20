@@ -71,24 +71,13 @@
             Filters=""
             GUID="{EEE5816B-3E30-4A5F-356E-91A01D02E88B}"></Folder>
     </CustomFolders>
+    <List Name="RTE">
+    </List>
     <Files AutoFolders="DirectoryView">
-        <Folder Name="..">
-            <F N="../CMakeLists.txt"/>
-        </Folder>
-        <Folder Name="../include">
-            <Folder Name="ixion">
-                <Folder Name="interface">
-                    <F N="../include/ixion/interface/CMakeLists.txt"/>
-                </Folder>
-                <F N="../include/ixion/CMakeLists.txt"/>
-            </Folder>
-            <F N="../include/CMakeLists.txt"/>
-        </Folder>
-        <Folder Name="../src">
-            <Folder Name="libixion">
-                <F N="../src/libixion/CMakeLists.txt"/>
-            </Folder>
-            <F N="../src/CMakeLists.txt"/>
-        </Folder>
+        <F
+            N="../**/CMakeLists.txt"
+            Recurse="0"
+            Excludes=""
+            L="1"/>
     </Files>
 </Project>

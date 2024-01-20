@@ -9,4 +9,6 @@ add_library(ixion MODULE
 target_compile_definitions(ixion PRIVATE IXION_BUILD DLL_EXPORT)
 target_link_libraries(ixion Python3::Module ixion-${IXION_API_VERSION})
 
-#TODO : decide where to install the python module.
+install(TARGETS ixion
+    DESTINATION ${PYTHON3_SITE_PACKAGES_DIR}
+)

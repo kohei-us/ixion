@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0048 NEW)
 
 set(IXION_MAJOR_VERSION 0)
@@ -17,6 +17,16 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Boost COMPONENTS program_options filesystem)
 find_package(Threads)
 find_package(Python3 COMPONENTS Interpreter Development.Module)
+
+if(Python3_FOUND)
+    message(STATUS "Python3 executable: ${Python3_EXECUTABLE}")
+    execute_process(
+        COMMAND "${Python3_EXECUTABLE}" -c "import sysconfig as sc; print(sc.get_paths()['purelib'])"
+        OUTPUT_VARIABLE PYTHON3_SITE_PACKAGES_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    message(STATUS "Python3 site-packages directory: ${PYTHON3_SITE_PACKAGES_DIR}")
+endif()
 
 include(GNUInstallDirs)
 
