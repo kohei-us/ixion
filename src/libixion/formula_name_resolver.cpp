@@ -47,6 +47,17 @@ bool check_address_by_sheet_bounds(const model_context* cxt, const address_t& po
     return true;
 }
 
+bool resolve_error(std::string_view s, formula_name_t& ret)
+{
+    auto err = to_formula_error_type(s);
+    if (err == formula_error_t::no_error)
+        return false;
+
+    ret.type = formula_name_t::error;
+    ret.value = err;
+    return true;
+}
+
 bool resolve_function(const char* p, size_t n, formula_name_t& ret)
 {
     formula_function_t func_oc = formula_functions::get_function_opcode({p, n});
@@ -1297,6 +1308,12 @@ std::string formula_name_t::to_string() const
             os << "function: " << get_formula_function_name(v);
             break;
         }
+        case error:
+        {
+            auto v = std::get<formula_error_t>(value);
+            os << "error: " << get_formula_error_name(v);
+            break;
+        }
         case invalid:
             os << "invalid";
             break;
@@ -1341,6 +1358,9 @@ public:
 
         formula_name_t ret;
         if (!n)
+            return ret;
+
+        if (resolve_error(s, ret))
             return ret;
 
         if (resolve_function(p, n, ret))

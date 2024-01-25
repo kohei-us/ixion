@@ -179,6 +179,9 @@ void formula_parser::name()
         case formula_name_t::function:
             m_formula_tokens.emplace_back(std::get<formula_function_t>(fn.value));
             break;
+        case formula_name_t::error:
+            m_formula_tokens.emplace_back(std::get<formula_error_t>(fn.value));
+            break;
         case formula_name_t::named_expression:
             m_formula_tokens.emplace_back(std::string{name});
             break;

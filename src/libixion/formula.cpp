@@ -108,6 +108,12 @@ void print_token(
             os << formula_functions::get_function_name(fop);
             break;
         }
+        case fop_error:
+        {
+            auto err = std::get<formula_error_t>(token.value);
+            os << get_formula_error_name(err);
+            break;
+        }
         case fop_single_ref:
         {
             const address_t& addr = std::get<address_t>(token.value);
