@@ -51,7 +51,7 @@ enum fopcode_t
     fop_array_close,
 
     // special conditions
-    fop_error, //< used to signify a special set of tokens representing formula cell with error.
+    fop_invalid_formula, //< used to signify a special set of tokens representing formula cell with error.
 };
 
 }

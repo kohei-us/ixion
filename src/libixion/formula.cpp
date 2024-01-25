@@ -205,7 +205,7 @@ formula_tokens_t create_formula_error_tokens(
     std::string_view error)
 {
     formula_tokens_t tokens;
-    tokens.emplace_back(fop_error);
+    tokens.emplace_back(fop_invalid_formula);
     tokens.back().value = 2u;
 
     string_id_t sid_src_formula = cxt.add_string(src_formula);
@@ -232,7 +232,7 @@ std::string print_formula_tokens(
 {
     std::ostringstream os;
 
-    if (!tokens.empty() && tokens[0].opcode == fop_error)
+    if (!tokens.empty() && tokens[0].opcode == fop_invalid_formula)
         // Let's not print anything on error tokens.
         return std::string();
 

@@ -266,7 +266,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
             os << "function token: (opcode=" << _int_type(v) << "; name='" << get_formula_function_name(v) << "')";
             break;
         }
-        case fop_error:
+        case fop_invalid_formula:
         {
             os << "invalid error token: (count=" << std::get<string_id_t>(ft.value) << ")";
             break;
