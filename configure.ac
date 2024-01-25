@@ -43,7 +43,7 @@ esac
 # Development Utilities
 # =====================
 AC_ARG_ENABLE(debug-utils,
-        AS_HELP_STRING([--enable-debug-utils],[Build with extra checks useful during development.]),
+        AS_HELP_STRING([--enable-debug-utils],[Build with extra checks useful during development]),
         [enable_debug_utils="$enableval"],
         [enable_debug_utils=no]
 )
@@ -119,7 +119,7 @@ BOOST_FILESYSTEM
 # Debug
 # =====
 AC_ARG_ENABLE(debug,
-	AS_HELP_STRING([--enable-debug], [Build with debug features in mind.])],
+	AS_HELP_STRING([--enable-debug], [Build with debug information]),
 	[enable_debug="$enableval"],
 	[enable_debug=no]
 )
@@ -133,7 +133,7 @@ AS_IF([test "x$enable_debug" != "xno"], [
 PKG_CHECK_MODULES([MDDS],[mdds-3.0 >= 2.1.99])
 
 AC_ARG_ENABLE(log-debug,
-	AS_HELP_STRING([--enable-log-debug], [Enable debug outputs.])],
+	AS_HELP_STRING([--enable-log-debug], [Enable debug outputs]),
 	[enable_log_debug="$enableval"],
 	[enable_log_debug=no    ]
 )
@@ -143,7 +143,7 @@ AS_IF([test "x$enable_log_debug" != "xno"], [
 ],)
 
 AC_ARG_ENABLE(log-trace,
-	AS_HELP_STRING([--enable-log-trace], [Enable trace outputs.])],
+	AS_HELP_STRING([--enable-log-trace], [Enable trace outputs]),
 	[enable_log_trace="$enableval"],
 	[enable_log_trace=no]
 )
