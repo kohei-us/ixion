@@ -23,6 +23,7 @@ enum fopcode_t
     fop_string,
     fop_value,
     fop_function,
+    fop_error,
 
     // arithmetic operators
     fop_plus,

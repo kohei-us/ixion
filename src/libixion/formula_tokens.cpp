@@ -26,6 +26,7 @@ std::string_view get_opcode_name(fopcode_t oc)
         "string", // fop_string
         "value", // fop_value
         "function", // fop_function
+        "error", // fop_error
         "plus", // fop_plus
         "minus", // fop_minus
         "divide", // fop_divide
@@ -44,7 +45,6 @@ std::string_view get_opcode_name(fopcode_t oc)
         "array-row-sep", // fop_array_row_sep
         "array-open", // fop_array_open
         "array-close", // fop_array_close
-        "error", // fop_error
     };
 
     if (std::size_t(oc) >= std::size(names))
@@ -67,6 +67,7 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
         empty, // fop_string
         empty, // fop_value
         empty, // fop_function
+        empty, // fop_error
         "+", // fop_plus
         "-", // fop_minus
         "/", // fop_divide
@@ -85,7 +86,6 @@ std::string_view get_formula_opcode_string(fopcode_t oc)
         empty, // fop_array_row_sep
         "{",   // fop_array_open
         "}",   // fop_array_close
-        empty, // fop_error
     };
 
     if (std::size_t(oc) >= std::size(names))
@@ -134,6 +134,11 @@ formula_token::formula_token(const table_t& table) :
 
 formula_token::formula_token(formula_function_t func) :
     opcode(fop_function), value(func)
+{
+}
+
+formula_token::formula_token(formula_error_t err) :
+    opcode(fop_error), value(err)
 {
 }
 
@@ -264,6 +269,13 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
 
             formula_function_t v = std::get<formula_function_t>(ft.value);
             os << "function token: (opcode=" << _int_type(v) << "; name='" << get_formula_function_name(v) << "')";
+            break;
+        }
+        case fop_error:
+        {
+            using _int_type = std::underlying_type_t<formula_error_t>;
+            auto err = std::get<formula_error_t>(ft.value);
+            os << "error token: (opcode=" << _int_type(err) << "; name='" << get_formula_error_name(err) << "')";
             break;
         }
         case fop_invalid_formula:

@@ -45,7 +45,7 @@ IXION_DLLPUBLIC std::string_view get_formula_opcode_string(fopcode_t oc);
 struct IXION_DLLPUBLIC formula_token final
 {
     using value_type = std::variant<
-        address_t, range_t, table_t, formula_function_t,
+        address_t, range_t, table_t, formula_error_t, formula_function_t,
         double, string_id_t, std::string>;
 
     /**
@@ -100,6 +100,14 @@ struct IXION_DLLPUBLIC formula_token final
      * @param func function name enum value.
      */
     formula_token(formula_function_t func);
+
+    /**
+     * Constructor for a formula error token.  The opcode will be implicitly set
+     * to fop_error.
+     *
+     * @param err error token value.
+     */
+    formula_token(formula_error_t err);
 
     /**
      * Constructor for a numeric value token.  The opcode will be implicitly set
