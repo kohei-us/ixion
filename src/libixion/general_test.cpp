@@ -50,6 +50,94 @@ void test_size()
     cout << "* formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
 }
 
+void test_formula_opcode_name()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    constexpr std::tuple<fopcode_t, std::string_view> checks[] =
+    {
+        { fop_unknown, "unknown" },
+        { fop_single_ref, "single-ref" },
+        { fop_range_ref, "range-ref" },
+        { fop_table_ref, "table-ref" },
+        { fop_named_expression, "named-expression" },
+        { fop_string, "string" },
+        { fop_value, "value" },
+        { fop_function, "function" },
+        { fop_error, "error" },
+        { fop_plus, "plus" },
+        { fop_minus, "minus" },
+        { fop_divide, "divide" },
+        { fop_multiply, "multiply" },
+        { fop_exponent, "exponent" },
+        { fop_concat, "concat" },
+        { fop_equal, "equal" },
+        { fop_not_equal, "not-equal" },
+        { fop_less, "less" },
+        { fop_greater, "greater" },
+        { fop_less_equal, "less-equal" },
+        { fop_greater_equal, "greater-equal" },
+        { fop_open, "open" },
+        { fop_close, "close" },
+        { fop_sep, "sep" },
+        { fop_array_row_sep, "array-row-sep" },
+        { fop_array_open, "array-open" },
+        { fop_array_close, "array-close" },
+        { fop_invalid_formula, "invalid-formula" },
+    };
+
+    for (const auto& [oc, expected] : checks)
+    {
+        if (auto actual = ixion::get_opcode_name(oc); actual != expected)
+        {
+            std::cout << "expected opcode name was '" << expected
+                << "' but the actual value was '" << actual
+                << "' (opcode=" << int(oc) << ")"
+                << std::endl;
+
+            assert(false);
+        }
+    }
+}
+
+void test_formula_opcode_string()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    constexpr std::tuple<fopcode_t, std::string_view> checks[] =
+    {
+        { fop_plus, "+", },
+        { fop_minus, "-", },
+        { fop_divide, "/", },
+        { fop_multiply, "*", },
+        { fop_exponent, "^", },
+        { fop_concat, "&", },
+        { fop_equal, "=", },
+        { fop_not_equal, "<>", },
+        { fop_less, "<", },
+        { fop_greater, ">", },
+        { fop_less_equal, "<=", },
+        { fop_greater_equal, ">=", },
+        { fop_open, "(", },
+        { fop_close, ")", },
+        { fop_array_open, "{", },
+        { fop_array_close, "}", },
+    };
+
+    for (const auto& [oc, expected] : checks)
+    {
+        if (auto actual = ixion::get_formula_opcode_string(oc); actual != expected)
+        {
+            std::cout << "expected opcode string was '" << expected
+                << "' but the actual value was '" << actual
+                << "' (opcode=" << int(oc) << ")"
+                << std::endl;
+
+            assert(false);
+        }
+    }
+}
+
 void test_string_to_double()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1465,6 +1553,8 @@ void test_grouped_formula_string_results()
 int main()
 {
     test_size();
+    test_formula_opcode_name();
+    test_formula_opcode_string();
     test_string_to_double();
     test_string_pool();
     test_formula_tokens_store();

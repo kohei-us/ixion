@@ -45,6 +45,7 @@ std::string_view get_opcode_name(fopcode_t oc)
         "array-row-sep", // fop_array_row_sep
         "array-open", // fop_array_open
         "array-close", // fop_array_close
+        "invalid-formula", // fop-invalid-formula
     };
 
     if (std::size_t(oc) >= std::size(names))
