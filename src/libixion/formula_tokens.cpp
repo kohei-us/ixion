@@ -14,7 +14,7 @@
 
 namespace ixion {
 
-std::string_view get_opcode_name(fopcode_t oc)
+std::string_view get_formula_opcode_name(fopcode_t oc)
 {
     // Make sure the names are ordered identically to the ordering of the enum members.
     static constexpr std::string_view names[] = {
@@ -111,7 +111,7 @@ formula_token::formula_token(fopcode_t op) :
         case fop_function:
         {
             std::ostringstream os;
-            os << "this opcode named '" << get_opcode_name(op) << "' cannot be instantiated by this constructor";
+            os << "this opcode named '" << get_formula_opcode_name(op) << "' cannot be instantiated by this constructor";
             throw std::invalid_argument(os.str());
         }
         default:;
@@ -303,7 +303,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         case fop_array_open:
         case fop_array_close:
         case fop_unknown:
-            os << "opcode token: (name=" << get_opcode_name(ft.opcode) << "; s='"
+            os << "opcode token: (name=" << get_formula_opcode_name(ft.opcode) << "; s='"
                 << get_formula_opcode_string(ft.opcode) << "')";
             break;
     }

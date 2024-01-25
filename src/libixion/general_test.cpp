@@ -88,7 +88,7 @@ void test_formula_opcode_name()
 
     for (const auto& [oc, expected] : checks)
     {
-        if (auto actual = ixion::get_opcode_name(oc); actual != expected)
+        if (auto actual = ixion::get_formula_opcode_name(oc); actual != expected)
         {
             std::cout << "expected opcode name was '" << expected
                 << "' but the actual value was '" << actual

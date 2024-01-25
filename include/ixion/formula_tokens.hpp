@@ -27,7 +27,7 @@ namespace ixion {
  *
  * @return printable name for a formula opcode.
  */
-IXION_DLLPUBLIC std::string_view get_opcode_name(fopcode_t oc);
+IXION_DLLPUBLIC std::string_view get_formula_opcode_name(fopcode_t oc);
 
 /**
  * Get the string representation of a simple formula opcode.  This function

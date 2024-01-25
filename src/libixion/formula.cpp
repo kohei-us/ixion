@@ -173,7 +173,7 @@ void print_token(
             repr << token;
             IXION_DEBUG(
                 "token not printed (repr='" << repr.str()
-                << "'; name='" << get_opcode_name(token.opcode)
+                << "'; name='" << get_formula_opcode_name(token.opcode)
                 << "'; opcode='" << get_formula_opcode_string(token.opcode)
                 << "')");
         }

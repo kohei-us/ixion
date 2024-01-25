@@ -1343,7 +1343,7 @@ void formula_interpreter::factor()
         default:
         {
             std::ostringstream os;
-            os << "factor: unexpected token type: <" << get_opcode_name(oc) << ">";
+            os << "factor: unexpected token type: <" << get_formula_opcode_name(oc) << ">";
             throw invalid_expression(os.str());
         }
     }
@@ -1656,7 +1656,7 @@ void formula_interpreter::array()
             default:
             {
                 std::ostringstream os;
-                os << "array: unexpected token type: <" << get_opcode_name(token().opcode) << ">";
+                os << "array: unexpected token type: <" << get_formula_opcode_name(token().opcode) << ">";
                 throw invalid_expression(os.str());
             }
         }

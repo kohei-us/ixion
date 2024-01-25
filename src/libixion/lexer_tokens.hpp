@@ -48,7 +48,7 @@ enum class lexer_opcode_t
     array_row_sep,
 };
 
-const char* get_opcode_name(lexer_opcode_t oc);
+const char* get_formula_opcode_name(lexer_opcode_t oc);
 
 struct lexer_token
 {

@@ -22,7 +22,7 @@ std::string print_tokens(const lexer_tokens_t& tokens, bool verbose)
     for (const auto& t : tokens)
     {
         if (verbose)
-            os << "(" << get_opcode_name(t.opcode) << ")'" << t << "' ";
+            os << "(" << get_formula_opcode_name(t.opcode) << ")'" << t << "' ";
         else
             os << t;
     }
@@ -30,7 +30,7 @@ std::string print_tokens(const lexer_tokens_t& tokens, bool verbose)
     return os.str();
 }
 
-const char* get_opcode_name(lexer_opcode_t oc)
+const char* get_formula_opcode_name(lexer_opcode_t oc)
 {
     switch (oc)
     {
