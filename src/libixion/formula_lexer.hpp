@@ -18,11 +18,8 @@
 
 namespace ixion {
 
-class formula_lexer 
+class formula_lexer
 {
-    formula_lexer() = delete;
-    formula_lexer(const formula_lexer&) = delete;
-    formula_lexer& operator= (const formula_lexer&) = delete;
 public:
     class tokenize_error : public general_error
     {
@@ -30,7 +27,11 @@ public:
         tokenize_error(const std::string& msg);
     };
 
-    formula_lexer(const config& config, const char* p, size_t n);
+    formula_lexer() = delete;
+    formula_lexer(const formula_lexer&) = delete;
+    formula_lexer& operator= (const formula_lexer&) = delete;
+
+    formula_lexer(const config& conf, const char* p, size_t n);
     ~formula_lexer();
 
     void tokenize();

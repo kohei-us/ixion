@@ -324,8 +324,8 @@ bool tokenizer::has_char() const
 
 formula_lexer::tokenize_error::tokenize_error(const std::string& msg) : general_error(msg) {}
 
-formula_lexer::formula_lexer(const config& config, const char* p, size_t n) :
-    m_config(config), mp_first(p), m_size(n) {}
+formula_lexer::formula_lexer(const config& conf, const char* p, size_t n) :
+    m_config(conf), mp_first(p), m_size(n) {}
 
 formula_lexer::~formula_lexer() {}
 
