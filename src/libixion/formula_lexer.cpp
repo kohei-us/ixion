@@ -80,6 +80,7 @@ private:
     void name();
     void op(lexer_opcode_t oc);
     void string();
+    void error();
 
     bool has_char() const;
     void next();
@@ -138,6 +139,9 @@ void tokenizer::run()
                 continue;
             case '"':
                 string();
+                continue;
+            case '#':
+                error();
                 continue;
         }
 
@@ -292,6 +296,40 @@ void tokenizer::string()
 
     if (*mp_char == '"')
         next();
+}
+
+void tokenizer::error()
+{
+    const char* p0 = mp_char;
+    next(); // skip '#'
+    std::size_t len = 1;
+
+    // TODO: re-implement this using mdds::trie_map later
+    // https://gitlab.com/mdds/mdds/-/issues/95
+
+    bool found = false;
+
+    for (; !found && has_char(); next(), ++len)
+    {
+        if (*mp_char == '!' || *mp_char == '?')
+            found = true;
+
+        if (*mp_char == 'A' && len == 3 && *(mp_char - 1) == '/' && *(mp_char - 2) == 'N')
+        {
+            // This is '#N/A'
+            found = true;
+        }
+    }
+
+    if (found)
+    {
+        m_tokens.emplace_back(lexer_opcode_t::error, std::string_view{p0, len});
+        return;
+    }
+
+    std::ostringstream os;
+    os << "failed to parse an error token in lexer tokenizer: '" << std::string_view{p0, mp_char - p0} << "'";
+    throw general_error(os.str());
 }
 
 void tokenizer::next()

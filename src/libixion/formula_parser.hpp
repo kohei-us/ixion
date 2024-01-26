@@ -50,6 +50,7 @@ private:
 
     void primitive();
     void name();
+    void error();
     void literal();
     void value();
     void less();

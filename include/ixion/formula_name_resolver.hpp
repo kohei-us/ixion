@@ -42,7 +42,6 @@ struct IXION_DLLPUBLIC formula_name_t
         table_reference,
         named_expression,
         function,
-        error
     };
 
     /**
@@ -58,7 +57,7 @@ struct IXION_DLLPUBLIC formula_name_t
         table_areas_t areas;
     };
 
-    using value_type = std::variant<address_t, range_t, table_type, formula_error_t, formula_function_t>;
+    using value_type = std::variant<address_t, range_t, table_type, formula_function_t>;
 
     name_type type;
     value_type value;

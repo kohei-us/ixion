@@ -22,7 +22,7 @@ std::string print_tokens(const lexer_tokens_t& tokens, bool verbose)
     for (const auto& t : tokens)
     {
         if (verbose)
-            os << "(" << get_formula_opcode_name(t.opcode) << ")'" << t << "' ";
+            os << "(" << get_lexer_opcode_name(t.opcode) << ")'" << t << "' ";
         else
             os << t;
     }
@@ -30,7 +30,7 @@ std::string print_tokens(const lexer_tokens_t& tokens, bool verbose)
     return os.str();
 }
 
-const char* get_formula_opcode_name(lexer_opcode_t oc)
+const char* get_lexer_opcode_name(lexer_opcode_t oc)
 {
     switch (oc)
     {
@@ -40,6 +40,8 @@ const char* get_formula_opcode_name(lexer_opcode_t oc)
             return "string";
         case lexer_opcode_t::name:
             return "name";
+        case lexer_opcode_t::error:
+            return "error";
         case lexer_opcode_t::divide:
             return "divide";
         case lexer_opcode_t::minus:
@@ -139,6 +141,7 @@ std::ostream& operator<<(std::ostream& os, const lexer_token& t)
         case lexer_opcode_t::array_row_sep:
             os << ';';
             break;
+        case lexer_opcode_t::error:
         case lexer_opcode_t::name:
         case lexer_opcode_t::string:
             os << std::get<std::string_view>(t.value);

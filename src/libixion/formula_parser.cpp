@@ -76,6 +76,9 @@ void formula_parser::parse()
             case lexer_opcode_t::name:
                 name();
                 break;
+            case lexer_opcode_t::error:
+                error();
+                break;
             case lexer_opcode_t::string:
                 literal();
                 break;
@@ -179,9 +182,6 @@ void formula_parser::name()
         case formula_name_t::function:
             m_formula_tokens.emplace_back(std::get<formula_function_t>(fn.value));
             break;
-        case formula_name_t::error:
-            m_formula_tokens.emplace_back(std::get<formula_error_t>(fn.value));
-            break;
         case formula_name_t::named_expression:
             m_formula_tokens.emplace_back(std::string{name});
             break;
@@ -192,6 +192,21 @@ void formula_parser::name()
             throw parse_error(os.str());
         }
     }
+}
+
+void formula_parser::error()
+{
+    auto s = std::get<std::string_view>(get_token().value);
+
+    auto err = to_formula_error_type(s);
+    if (err == formula_error_t::no_error)
+    {
+        std::ostringstream os;
+        os << "failed to parse an error token '" << s << "'";
+        throw parse_error(os.str());
+    }
+
+    m_formula_tokens.emplace_back(err);
 }
 
 void formula_parser::literal()

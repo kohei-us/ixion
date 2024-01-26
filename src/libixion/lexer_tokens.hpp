@@ -23,6 +23,7 @@ enum class lexer_opcode_t
     value,
     string,
     name,
+    error,
 
     // arithmetic operators
     plus,
@@ -48,7 +49,7 @@ enum class lexer_opcode_t
     array_row_sep,
 };
 
-const char* get_formula_opcode_name(lexer_opcode_t oc);
+const char* get_lexer_opcode_name(lexer_opcode_t oc);
 
 struct lexer_token
 {
