@@ -127,7 +127,7 @@ void session_handler::push_value(double val)
 
 void session_handler::push_error(formula_error_t err)
 {
-    mp_impl->m_buf << err;
+    mp_impl->m_buf << get_formula_error_name(err);
 }
 
 void session_handler::push_string(size_t sid)
