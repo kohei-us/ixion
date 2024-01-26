@@ -274,9 +274,8 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         }
         case fop_error:
         {
-            using _int_type = std::underlying_type_t<formula_error_t>;
             auto err = std::get<formula_error_t>(ft.value);
-            os << "error token: (opcode=" << _int_type(err) << "; name='" << get_formula_error_name(err) << "')";
+            os << "error token: (opcode=" << int(err) << "; name='" << get_formula_error_name(err) << "')";
             break;
         }
         case fop_invalid_formula:
