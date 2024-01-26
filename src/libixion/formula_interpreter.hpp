@@ -94,6 +94,7 @@ private:
     void range_ref();
     void table_ref();
     void constant();
+    void error();
     void literal();
     void array();
     void function();

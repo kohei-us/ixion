@@ -1301,9 +1301,9 @@ void formula_interpreter::term()
 
 void formula_interpreter::factor()
 {
-    // <constant> || <variable> || '(' <expression> ')' || <function>
+    // <constant> || <error> || <variable> || '(' <expression> ')' || <function>
 
-    bool negative_sign = sign(); // NB: may be precedeed by a '+' or '-' sign.
+    bool negative_sign = sign(); // NB: may be preceded by a '+' or '-' sign.
     fopcode_t oc = token().opcode;
 
     switch (oc)
@@ -1320,6 +1320,11 @@ void formula_interpreter::factor()
         case fop_value:
         {
             constant();
+            break;
+        }
+        case fop_error:
+        {
+            error();
             break;
         }
         case fop_single_ref:
@@ -1482,6 +1487,15 @@ void formula_interpreter::constant()
     get_stack().push_value(val);
     if (mp_handler)
         mp_handler->push_value(val);
+}
+
+void formula_interpreter::error()
+{
+    auto err = std::get<formula_error_t>(token().value);
+    next();
+    get_stack().push_error(err);
+    if (mp_handler)
+        mp_handler->push_error(err);
 }
 
 void formula_interpreter::literal()

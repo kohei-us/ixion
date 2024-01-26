@@ -32,6 +32,7 @@ public:
 
     virtual void push_token(fopcode_t fop) override;
     virtual void push_value(double val) override;
+    virtual void push_error(formula_error_t err) override;
     virtual void push_string(size_t sid) override;
     virtual void push_single_ref(const address_t& addr, const abs_address_t& pos) override;
     virtual void push_range_ref(const range_t& range, const abs_address_t& pos) override;

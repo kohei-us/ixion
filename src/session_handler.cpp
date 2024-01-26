@@ -125,6 +125,11 @@ void session_handler::push_value(double val)
     mp_impl->m_buf << val;
 }
 
+void session_handler::push_error(formula_error_t err)
+{
+    mp_impl->m_buf << err;
+}
+
 void session_handler::push_string(size_t sid)
 {
     const string* p = mp_impl->m_context.get_string(sid);

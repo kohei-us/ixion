@@ -18,13 +18,13 @@
 namespace ixion {
 
 /** Column index type. */
-using col_t = int32_t;
+using col_t = std::int32_t;
 
 /** Row index type. */
-using row_t = int32_t;
+using row_t = std::int32_t;
 
 /** Sheet index type.*/
-using sheet_t = int32_t;
+using sheet_t = std::int32_t;
 
 /**
  * Integer type that is large enough to store either a row or a column
@@ -39,7 +39,7 @@ using rc_t = row_t;
  * get_string() method of ixion::model_context to get the
  * actual string value.
  */
-using string_id_t = uint32_t;
+using string_id_t = std::uint32_t;
 
 /**
  * Special sheet ID that represents a global scope, as opposed to a
@@ -67,7 +67,7 @@ IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 /**
  * This type represents a raw cell type as stored in ixion::model_context.
  */
-enum class celltype_t : uint8_t
+enum class celltype_t : std::uint8_t
 {
     /** unknown cell type.*/
     unknown = 0,
@@ -88,7 +88,7 @@ enum class celltype_t : uint8_t
  * Instead it uses the formula result type to classify its type. The error
  * type refers to an error value in formula cell.
  */
-enum class cell_value_t : uint8_t
+enum class cell_value_t : std::uint8_t
 {
     /** unknown cell value type. */
     unknown = 0,
@@ -150,7 +150,7 @@ enum table_area_t
 };
 
 /** type that stores a mixture of ixion::table_area_t values. */
-using table_areas_t = int32_t;
+using table_areas_t = std::int32_t;
 
 /**
  * Formula name resolver type specifies how name tokens are resolved.
@@ -177,7 +177,7 @@ enum class formula_name_resolver_t
  * get_formula_error_name() function to convert an enum member value of this
  * type to its string representation.
  */
-enum class formula_error_t : uint8_t
+enum class formula_error_t : std::uint8_t
 {
     no_error                 = 0,
     ref_result_not_available = 1,
