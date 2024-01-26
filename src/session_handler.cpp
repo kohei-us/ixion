@@ -22,6 +22,22 @@ using namespace std;
 
 namespace ixion {
 
+namespace {
+
+/**
+ * Print string to stdout in a thread-safe way.
+ *
+ * @param msg string to print to stdout.
+ */
+void sync_print(const std::string& msg)
+{
+    static std::mutex mtx;
+    std::lock_guard<std::mutex> lock(mtx);
+    std::cout << msg;
+}
+
+} // anonymous namespace
+
 session_handler::factory::factory(const model_context& cxt) :
     m_context(cxt), m_show_sheet_name(false) {}
 
@@ -69,7 +85,7 @@ void session_handler::begin_cell_interpret(const abs_address_t& pos)
 
 void session_handler::end_cell_interpret()
 {
-    print(mp_impl->m_buf.str());
+    sync_print(mp_impl->m_buf.str());
 }
 
 void session_handler::set_result(const formula_result& result)
@@ -159,13 +175,6 @@ void session_handler::push_table_ref(const table_t& table)
 void session_handler::push_function(formula_function_t foc)
 {
     mp_impl->m_buf << get_formula_function_name(foc);
-}
-
-void session_handler::print(const std::string& msg)
-{
-    static std::mutex mtx;
-    std::lock_guard<std::mutex> lock(mtx);
-    cout << msg;
 }
 
 }

@@ -51,13 +51,6 @@ public:
 
         void show_sheet_name(bool b);
     };
-
-    /**
-     * Print string to stdout in a thread-safe way.
-     *
-     * @param msg string to print to stdout.
-     */
-    static void print(const std::string& msg);
 };
 
 }
