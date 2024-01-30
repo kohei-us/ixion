@@ -1118,7 +1118,7 @@ void formula_interpreter::expression()
         fopcode_t oc = token().opcode;
         if (!valid_expression_op(oc))
         {
-            IXION_TRACE(oc << " is not a valid expression operator");
+            IXION_TRACE("expression ends with " << oc);
             return;
         }
 
