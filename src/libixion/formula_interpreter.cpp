@@ -355,6 +355,8 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
             return stack_value{stack.pop_string()};
         case stack_value_t::matrix:
             return stack_value{stack.pop_matrix()};
+        case stack_value_t::error:
+            return stack_value{stack.pop_error()};
         case stack_value_t::single_ref:
         {
             const abs_address_t& addr = stack.pop_single_ref();
@@ -401,17 +403,22 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
                         case formula_result::result_type::string:
                             return stack_value{res.get_string()};
                         case formula_result::result_type::error:
-                        default:
-                            return {};
+                            return stack_value{res.get_error()};
+                        case formula_result::result_type::matrix:
+                            IXION_DEBUG("matrix formula result type not handled yet");
                     }
                 }
-                default:
+                case celltype_t::unknown:
+                {
+                    IXION_DEBUG("unknown cell type in resolving a single ref");
                     return {};
+                }
             }
             break;
         }
         case stack_value_t::range_ref:
-        default:;
+        default:
+            IXION_DEBUG("unhandled stack value type: " << stack.get_type());
     }
 
     return {};
@@ -1110,12 +1117,15 @@ void formula_interpreter::expression()
     {
         fopcode_t oc = token().opcode;
         if (!valid_expression_op(oc))
+        {
+            IXION_DEBUG(oc << " is not a valid expression operator");
             return;
+        }
 
         auto sv1 = pop_stack_value(m_context, get_stack());
         if (!sv1)
         {
-            IXION_DEBUG("failed to pop value from the stack");
+            IXION_DEBUG("failed to pop value 1 from the stack");
             throw formula_error(formula_error_t::general_error);
         }
 
@@ -1128,7 +1138,7 @@ void formula_interpreter::expression()
         auto sv2 = pop_stack_value(m_context, get_stack());
         if (!sv2)
         {
-            IXION_DEBUG("failed to pop value from the stack");
+            IXION_DEBUG("failed to pop value 2 from the stack");
             throw formula_error(formula_error_t::general_error);
         }
 
@@ -1152,6 +1162,11 @@ void formula_interpreter::expression()
                     case stack_value_t::matrix:
                     {
                         compare_value_to_matrix(get_stack(), oc, sv1->get_value(), sv2->get_matrix());
+                        break;
+                    }
+                    case stack_value_t::error:
+                    {
+                        get_stack().push_error(sv2->get_error());
                         break;
                     }
                     default:
@@ -1201,6 +1216,11 @@ void formula_interpreter::expression()
                         throw formula_error(formula_error_t::general_error);
                     }
                 }
+                break;
+            }
+            case stack_value_t::error:
+            {
+                get_stack().push_error(sv1->get_error());
                 break;
             }
             default:
