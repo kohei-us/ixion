@@ -11,6 +11,27 @@ B4=ISERROR(A4)
 C4=ISERROR(5.2)
 C5=ISERROR("inline text")
 C6=ISERROR(NA())
+D1=#REF!
+D2=#DIV/0!
+D3=#NUM!
+D4=#NAME?
+D5=#NULL!
+D6=#VALUE!
+D7=#N/A
+E1=ISERROR(D1)
+E2=ISERROR(D2)
+E3=ISERROR(D3)
+E4=ISERROR(D4)
+E5=ISERROR(D5)
+E6=ISERROR(D6)
+E7=ISERROR(D7)
+F1=ISERROR(#REF!)
+F2=ISERROR(#DIV/0!)
+F3=ISERROR(#NUM!)
+F4=ISERROR(#NAME?)
+F5=ISERROR(#NULL!)
+F6=ISERROR(#VALUE!)
+F7=ISERROR(#N/A)
 %calc
 %mode result
 B1=false
@@ -20,5 +41,19 @@ B4=true
 C4=false
 C5=false
 C6=true
+E1=true
+E2=true
+E3=true
+E4=true
+E5=true
+E6=true
+E7=true
+F1=true
+F2=true
+F3=true
+F4=true
+F5=true
+F6=true
+F7=true
 %check
 
