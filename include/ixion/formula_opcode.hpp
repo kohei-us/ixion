@@ -8,6 +8,8 @@
 #ifndef INCLUDED_IXION_FORMULA_OPCODE_HPP
 #define INCLUDED_IXION_FORMULA_OPCODE_HPP
 
+#include <iosfwd>
+
 namespace ixion {
 
 /** formula opcode type */
@@ -54,6 +56,8 @@ enum fopcode_t
     // special conditions
     fop_invalid_formula, //< used to signify a special set of tokens representing formula cell with error.
 };
+
+std::ostream& operator<<(std::ostream& os, fopcode_t oc);
 
 }
 
