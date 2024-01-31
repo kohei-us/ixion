@@ -20,5 +20,5 @@ build:
     - make install
     - popd
   script:
-    - ./autogen.sh --enable-werror
+    - ./autogen.sh --enable-werror --enable-debug-utils
     -  make -j $(nproc) check
