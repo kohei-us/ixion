@@ -20,4 +20,5 @@ build:
     - make install
     - popd
   script:
-    - (./autogen.sh || cat config.log) && (make -j $(nproc) || cat config.log) && make -j $(nproc) check
+    - ./autogen.sh --enable-werror
+    -  make -j $(nproc) check
