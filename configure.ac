@@ -218,6 +218,7 @@ AC_MSG_NOTICE([
 ==============================================================================
 Build configuration:
         debug-utils           $enable_debug_utils
+        werror:               $enable_werror
         host os:              $host_os
         python:               $enable_python
         threads:              $enable_threads
