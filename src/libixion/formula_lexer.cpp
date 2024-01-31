@@ -328,7 +328,7 @@ void tokenizer::error()
     }
 
     std::ostringstream os;
-    os << "failed to parse an error token in lexer tokenizer: '" << std::string_view{p0, mp_char - p0} << "'";
+    os << "failed to parse an error token in lexer tokenizer: '" << std::string_view{p0, len} << "'";
     throw general_error(os.str());
 }
 
