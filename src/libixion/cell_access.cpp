@@ -159,7 +159,8 @@ string_id_t cell_access::get_string_identifier() const
 formula_error_t cell_access::get_error_value() const
 {
     if (mp_impl->pos.first->type != element_type_formula)
-        // this is not a formula cell.
+        // only a formula cell can store an error value; an error value cannot
+        // be stored as a normal cell value
         return formula_error_t::no_error;
 
     const formula_cell* fc = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);

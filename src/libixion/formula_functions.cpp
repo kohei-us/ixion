@@ -669,6 +669,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             case formula_function_t::func_isblank:
                 fnc_isblank(args);
                 break;
+            case formula_function_t::func_iserr:
+                fnc_iserr(args);
+                break;
             case formula_function_t::func_iserror:
                 fnc_iserror(args);
                 break;
@@ -1412,6 +1415,43 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
             abs_range_t range = args.pop_range_ref();
             bool res = m_context.is_empty(range);
             args.push_boolean(res);
+            break;
+        }
+        default:
+        {
+            args.clear();
+            args.push_boolean(false);
+        }
+    }
+}
+
+void formula_functions::fnc_iserr(formula_value_stack& args) const
+{
+    if (args.size() != 1)
+        throw formula_functions::invalid_arg("ISERR requires exactly one argument.");
+
+    using _int_type = std::underlying_type_t<formula_error_t>;
+
+    switch (args.get_type())
+    {
+        case stack_value_t::single_ref:
+        {
+            abs_address_t addr = args.pop_single_ref();
+            auto ca = m_context.get_cell_access(addr);
+            if (ca.get_value_type() != cell_value_t::error)
+            {
+                args.push_boolean(false);
+                break;
+            }
+
+            auto v = static_cast<_int_type>(ca.get_error_value());
+            args.push_boolean(1u <= v && v <= 6u);
+            break;
+        }
+        case stack_value_t::error:
+        {
+            auto v = static_cast<_int_type>(args.pop_error());
+            args.push_boolean(1u <= v && v <= 6u);
             break;
         }
         default:
