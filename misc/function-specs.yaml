@@ -372,10 +372,14 @@ isblank:
     min: 1
   return: boolean
 iserr:
-  implemented: false
+  category: information
+  implemented: true
   note:
-    ISNA needs to be implemented first.  This is the same as ISERROR except when
-    the error value is '#'N/A it returns false.
+    This is the same as ISERROR except when the error value is '#'N/A it returns false.
+  params:
+    max: 1
+    min: 1
+  return: boolean
 iserror:
   category: information
   implemented: true
