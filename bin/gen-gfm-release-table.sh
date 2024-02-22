@@ -15,16 +15,15 @@ echo "## Release Notes"
 echo ""
 echo "* add item"
 echo ""
-echo "## Source packages for distribution"
+echo "## Checksums for Packages"
 echo ""
 
-echo "| URL | sha256sum | size |"
+echo "| name | sha256sum | size |"
 echo "|-----|-----------|------|"
 
 for _PKG in $PKGS; do
-    _URL="[$_PKG](https://kohei.us/files/$PROJ_PREFIX/src/$_PKG)"
     _HASH=$(sha256sum $_PKG | sed -e "s/^\(.*\)$PKG_PREFIX.*/\1/g" | tr -d "[:space:]")
     _SIZE=$(stat -c "%s" $_PKG)
-    echo "| $_URL | $_HASH | $_SIZE |"
+    echo "| $_PKG | $_HASH | $_SIZE |"
 done
 
