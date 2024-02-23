@@ -49,21 +49,14 @@ public:
     tokenizer(const tokenizer&) = delete;
     tokenizer& operator= (tokenizer) = delete;
 
-    explicit tokenizer(lexer_tokens_t& tokens, const char* p, size_t n) :
-        m_tokens(tokens),
-        m_sep_arg(','),
-        m_sep_array_row(';'),
-        m_sep_decimal('.'),
+    explicit tokenizer(const char* p, size_t n) :
         mp_first(p),
-        mp_char(NULL),
-        m_size(n),
-        m_pos(0),
-        mp_char_stored(nullptr),
-        m_pos_stored(0)
+        m_size(n)
     {
     }
 
     void run();
+    lexer_tokens_t pop_tokens();
 
     void set_sep_arg(char c);
 
@@ -88,19 +81,19 @@ private:
     void pop_pos();
 
 private:
-    lexer_tokens_t& m_tokens;
+    lexer_tokens_t m_tokens;
 
-    char m_sep_arg;
-    char m_sep_array_row;
-    char m_sep_decimal;
+    char m_sep_arg = ',';
+    char m_sep_array_row = ';';
+    char m_sep_decimal = '.';
 
-    const char* mp_first;
-    const char* mp_char;
-    const size_t m_size;
-    size_t m_pos;
+    const char* mp_first = nullptr;
+    const char* mp_char = nullptr;
+    const std::size_t m_size = 0;
+    std::size_t m_pos = 0;
 
-    const char* mp_char_stored;
-    size_t m_pos_stored;
+    const char* mp_char_stored = nullptr;
+    std::size_t m_pos_stored = 0;
 };
 
 void tokenizer::init()
@@ -159,6 +152,11 @@ void tokenizer::run()
 
         name();
     }
+}
+
+lexer_tokens_t tokenizer::pop_tokens()
+{
+    return std::move(m_tokens);
 }
 
 void tokenizer::set_sep_arg(char c)
@@ -369,9 +367,10 @@ formula_lexer::~formula_lexer() {}
 
 void formula_lexer::tokenize()
 {
-    tokenizer tkr(m_tokens, mp_first, m_size);
+    tokenizer tkr(mp_first, m_size);
     tkr.set_sep_arg(m_config.sep_function_arg);
     tkr.run();
+    m_tokens = tkr.pop_tokens();
 }
 
 void formula_lexer::swap_tokens(lexer_tokens_t& tokens)
