@@ -196,16 +196,8 @@ void formula_parser::name()
 
 void formula_parser::error()
 {
-    auto s = std::get<std::string_view>(get_token().value);
-
-    auto err = to_formula_error_type(s);
-    if (err == formula_error_t::no_error)
-    {
-        std::ostringstream os;
-        os << "failed to parse an error token '" << s << "'";
-        throw parse_error(os.str());
-    }
-
+    auto err = std::get<formula_error_t>(get_token().value);
+    assert(err != formula_error_t::no_error);
     m_formula_tokens.emplace_back(err);
 }
 

@@ -86,6 +86,11 @@ lexer_token::lexer_token(lexer_opcode_t _opcode, std::string_view _value) :
 {
 }
 
+lexer_token::lexer_token(formula_error_t err) :
+    opcode(lexer_opcode_t::error), value(err)
+{
+}
+
 lexer_token::lexer_token(double _value) :
     opcode(lexer_opcode_t::value), value(_value)
 {
@@ -142,6 +147,11 @@ std::ostream& operator<<(std::ostream& os, const lexer_token& t)
             os << ';';
             break;
         case lexer_opcode_t::error:
+        {
+            auto err = std::get<formula_error_t>(t.value);
+            os << get_formula_error_name(err);
+            break;
+        }
         case lexer_opcode_t::name:
         case lexer_opcode_t::string:
             os << std::get<std::string_view>(t.value);

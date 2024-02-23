@@ -9,6 +9,7 @@
 #define INCLUDED_IXION_LEXER_TOKENS_HPP
 
 #include <ixion/env.hpp>
+#include <ixion/types.hpp>
 
 #include <vector>
 #include <memory>
@@ -53,13 +54,14 @@ const char* get_lexer_opcode_name(lexer_opcode_t oc);
 
 struct lexer_token
 {
-    using value_type = std::variant<double, std::string_view>;
+    using value_type = std::variant<double, std::string_view, formula_error_t>;
 
     lexer_opcode_t opcode;
     value_type value;
 
     lexer_token(lexer_opcode_t _opcode);
     lexer_token(lexer_opcode_t _opcode, std::string_view _value);
+    lexer_token(formula_error_t err);
     lexer_token(double _value);
 };
 

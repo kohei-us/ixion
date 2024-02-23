@@ -14,6 +14,7 @@
 #include <sstream>
 #include <cctype>
 #include <unordered_map>
+#include <optional>
 
 #include <mdds/trie_map.hpp>
 
@@ -39,17 +40,17 @@ const std::unordered_map<char, lexer_opcode_t> ops_map = {
 
 namespace errors {
 
-using map_type = mdds::packed_trie_map<std::string, bool>;
+using map_type = mdds::packed_trie_map<std::string, formula_error_t>;
 
 // Keys must be sorted in ascending order.
 const map_type::entry entries[] = {
-    { MDDS_ASCII("DIV/0!"), true },
-    { MDDS_ASCII("N/A"), true },
-    { MDDS_ASCII("NAME?"), true },
-    { MDDS_ASCII("NULL!"), true },
-    { MDDS_ASCII("NUM!"), true },
-    { MDDS_ASCII("REF!"), true },
-    { MDDS_ASCII("VALUE!"), true },
+    { MDDS_ASCII("DIV/0!"), formula_error_t::division_by_zero },
+    { MDDS_ASCII("N/A"), formula_error_t::no_value_available },
+    { MDDS_ASCII("NAME?"), formula_error_t::name_not_found },
+    { MDDS_ASCII("NULL!"), formula_error_t::no_range_intersection },
+    { MDDS_ASCII("NUM!"), formula_error_t::invalid_expression },
+    { MDDS_ASCII("REF!"), formula_error_t::ref_result_not_available },
+    { MDDS_ASCII("VALUE!"), formula_error_t::invalid_value_type },
 };
 
 const map_type& get()
@@ -330,9 +331,9 @@ void tokenizer::error()
     auto node = errors::get().root_node();
     assert(node.valid());
 
-    bool found = false;
+    std::optional<formula_error_t> error_value;
 
-    for (; !found && has_char(); next(), ++len)
+    for (; !error_value && has_char(); next(), ++len)
     {
         node = node.child(*mp_char);
         if (!node.valid())
@@ -340,14 +341,14 @@ void tokenizer::error()
 
         if (node.has_value())
         {
-            found = true;
+            error_value = node.value();
             continue;
         }
     }
 
-    if (found)
+    if (error_value)
     {
-        m_tokens.emplace_back(lexer_opcode_t::error, std::string_view{p0, len});
+        m_tokens.emplace_back(*error_value);
         return;
     }
 
