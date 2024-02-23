@@ -15,6 +15,8 @@
 #include <cctype>
 #include <unordered_map>
 
+#include <mdds/trie_map.hpp>
+
 namespace ixion {
 
 namespace {
@@ -34,6 +36,29 @@ const std::unordered_map<char, lexer_opcode_t> ops_map = {
     { '{', lexer_opcode_t::array_open },
     { '}', lexer_opcode_t::array_close },
 };
+
+namespace errors {
+
+using map_type = mdds::packed_trie_map<std::string, bool>;
+
+// Keys must be sorted in ascending order.
+const map_type::entry entries[] = {
+    { MDDS_ASCII("DIV/0!"), true },
+    { MDDS_ASCII("N/A"), true },
+    { MDDS_ASCII("NAME?"), true },
+    { MDDS_ASCII("NULL!"), true },
+    { MDDS_ASCII("NUM!"), true },
+    { MDDS_ASCII("REF!"), true },
+    { MDDS_ASCII("VALUE!"), true },
+};
+
+const map_type& get()
+{
+    static map_type errors(entries, std::size(entries));
+    return errors;
+}
+
+} // namespace errors
 
 } // anonymous namespace
 
@@ -302,20 +327,21 @@ void tokenizer::error()
     next(); // skip '#'
     std::size_t len = 1;
 
-    // TODO: re-implement this using mdds::trie_map later
-    // https://gitlab.com/mdds/mdds/-/issues/95
+    auto node = errors::get().root_node();
+    assert(node.valid());
 
     bool found = false;
 
     for (; !found && has_char(); next(), ++len)
     {
-        if (*mp_char == '!' || *mp_char == '?')
-            found = true;
+        node = node.child(*mp_char);
+        if (!node.valid())
+            break;
 
-        if (*mp_char == 'A' && len == 3 && *(mp_char - 1) == '/' && *(mp_char - 2) == 'N')
+        if (node.has_value())
         {
-            // This is '#N/A'
             found = true;
+            continue;
         }
     }
 
