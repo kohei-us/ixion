@@ -55,7 +55,7 @@ const map_type::entry entries[] = {
 
 const map_type& get()
 {
-    static map_type errors(entries, std::size(entries));
+    static const map_type errors(entries, std::size(entries));
     return errors;
 }
 
