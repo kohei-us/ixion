@@ -40,7 +40,12 @@ const std::unordered_map<char, lexer_opcode_t> ops_map = {
 
 namespace errors {
 
-using map_type = mdds::packed_trie_map<std::string, formula_error_t>;
+struct trie_traits : mdds::trie::default_traits
+{
+    using pack_value_type = std::uint8_t;
+};
+
+using map_type = mdds::packed_trie_map<std::string, formula_error_t, trie_traits>;
 
 // Keys must be sorted in ascending order.
 const map_type::entry entries[] = {
