@@ -33,7 +33,7 @@
   #define IXION_DLLPUBLIC_VAR IXION_DLLPUBLIC extern
 #endif
 
-#if _WIN32
+#ifdef _WIN32
 #define IXION_MOD_EXPORT __declspec(dllexport)
 #else
 #define IXION_MOD_EXPORT __attribute__ ((visibility ("default")))
