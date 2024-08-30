@@ -11,6 +11,7 @@
 #include <vulkan/vulkan.h>
 #include <memory>
 #include <limits>
+#include <initializer_list>
 
 namespace ixion { namespace draft {
 
