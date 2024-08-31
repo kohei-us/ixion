@@ -15,6 +15,7 @@
 #include <memory>
 #include <variant>
 #include <string_view>
+#include <string>
 
 namespace ixion {
 
