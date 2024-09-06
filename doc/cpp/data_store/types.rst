@@ -55,6 +55,9 @@ Cell Addresses
 .. doxygenstruct:: ixion::range_t
    :members:
 
+.. doxygenstruct:: ixion::rc_range_t
+   :members:
+
 .. doxygenstruct:: ixion::abs_range_t
    :members:
 

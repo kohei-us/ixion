@@ -270,12 +270,46 @@ rc_address_t::rc_address_t(row_t _row, col_t _column, bool _abs_row, bool _abs_c
 rc_address_t::rc_address_t(const rc_address_t& r) :
     row(r.row), column(r.column), abs_row(r.abs_row), abs_column(r.abs_column) {}
 
+rc_address_t::rc_address_t(const abs_rc_address_t& r) :
+    row(r.row), column(r.column), abs_row(true), abs_column(true) {}
+
 std::size_t rc_address_t::hash::operator()(const rc_address_t& addr) const
 {
     std::size_t hv = addr.column;
     hv <<= 16;
     hv += addr.row;
     return hv;
+}
+
+bool operator== (const rc_address_t& left, const rc_address_t& right)
+{
+    return left.row == right.row &&
+        left.column == right.column &&
+        left.abs_row == right.abs_row &&
+        left.abs_column == right.abs_column;
+}
+
+bool operator!=(const rc_address_t& left, const rc_address_t& right)
+{
+    return !operator==(left, right);
+}
+
+bool operator< (const rc_address_t& left, const rc_address_t& right)
+{
+    // Not sure how to compare absolute and relative addresses, but let's make
+    // absolute address always greater than relative one until we find a
+    // better way.
+
+    if (left.abs_row != right.abs_row)
+        return left.abs_row < right.abs_row;
+
+    if (left.abs_column != right.abs_column)
+        return left.abs_column < right.abs_column;
+
+    if (left.row != right.row)
+        return left.row < right.row;
+
+    return left.column < right.column;
 }
 
 abs_range_t::abs_range_t() {}
@@ -525,6 +559,51 @@ bool operator!=(const range_t& left, const range_t& right)
     return !operator==(left, right);
 }
 
+rc_range_t::rc_range_t() {}
+rc_range_t::rc_range_t(const rc_address_t& _first, const rc_address_t& _last) :
+    first(_first), last(_last) {}
+
+rc_range_t::rc_range_t(const rc_range_t& r) : first(r.first), last(r.last) {}
+rc_range_t::rc_range_t(const abs_rc_range_t& r) : first(r.first), last(r.last) {}
+
+void rc_range_t::set_all_columns()
+{
+    first.column = column_unset;
+    last.column = column_unset;
+}
+
+void rc_range_t::set_all_rows()
+{
+    first.row = row_unset;
+    last.row = row_unset;
+}
+
+bool rc_range_t::all_columns() const
+{
+    return first.column == column_unset && last.column == column_unset;
+}
+
+bool rc_range_t::all_rows() const
+{
+    return first.row == row_unset && last.row == row_unset;
+}
+
+std::size_t rc_range_t::hash::operator() (const rc_range_t& range) const
+{
+    rc_address_t::hash adr_hash;
+    return adr_hash(range.first) + 65536*adr_hash(range.last);
+}
+
+bool operator==(const rc_range_t& left, const rc_range_t& right)
+{
+    return left.first == right.first && left.last == right.last;
+}
+
+bool operator!=(const rc_range_t& left, const rc_range_t& right)
+{
+    return !operator==(left, right);
+}
+
 std::ostream& operator<<(std::ostream& os, const abs_address_t& addr)
 {
     os << "(sheet:" << addr.sheet << "; row:" << addr.row << "; column:" << addr.column << ")";
@@ -545,6 +624,13 @@ std::ostream& operator<<(std::ostream& os, const address_t& addr)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const rc_address_t& addr)
+{
+    os << "(row:" << addr.row << " " << (addr.abs_row?"abs":"rel")
+       <<"; column:" << addr.column << " " << (addr.abs_column?"abs":"rel") << ")";
+    return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const abs_range_t& range)
 {
     os << range.first << "-" << range.last;
@@ -558,6 +644,12 @@ std::ostream& operator<<(std::ostream& os, const abs_rc_range_t& range)
 }
 
 std::ostream& operator<<(std::ostream& os, const range_t& range)
+{
+    os << range.first << "-" << range.last;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const rc_range_t& range)
 {
     os << range.first << "-" << range.last;
     return os;

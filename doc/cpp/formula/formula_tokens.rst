@@ -14,6 +14,4 @@ Formula Tokens
 Utility Functions
 -----------------
 
-.. doxygenfunction:: ixion::get_opcode_name
-
 .. doxygenfunction:: ixion::get_formula_opcode_string

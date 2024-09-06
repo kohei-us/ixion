@@ -143,12 +143,17 @@ struct IXION_DLLPUBLIC rc_address_t
     rc_address_t();
     rc_address_t(row_t _row, col_t _column, bool _abs_row=true, bool _abs_column=true);
     rc_address_t(const rc_address_t& r);
+    rc_address_t(const abs_rc_address_t& r);
 
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const rc_address_t& addr) const;
     };
 };
+
+IXION_DLLPUBLIC bool operator==(const rc_address_t& left, const rc_address_t& right);
+IXION_DLLPUBLIC bool operator!=(const rc_address_t& left, const rc_address_t& right);
+IXION_DLLPUBLIC bool operator<(const rc_address_t& left, const rc_address_t& right);
 
 /**
  * Stores absolute range address.
@@ -326,12 +331,59 @@ struct IXION_DLLPUBLIC range_t
 IXION_DLLPUBLIC bool operator==(const range_t& left, const range_t& right);
 IXION_DLLPUBLIC bool operator!=(const range_t& left, const range_t& right);
 
+struct IXION_DLLPUBLIC rc_range_t
+{
+    rc_address_t first;
+    rc_address_t last;
+
+    rc_range_t();
+    rc_range_t(const rc_address_t& _first, const rc_address_t& _last);
+    rc_range_t(const rc_range_t& r);
+    rc_range_t(const abs_rc_range_t& r);
+
+    bool valid() const;
+
+    /**
+     * Expand the range horizontally to include all columns.  The row range
+     * will remain unchanged.
+     */
+    void set_all_columns();
+
+    /**
+     * Expand the range vertically to include all rows.  The column range will
+     * remain unchanged.
+     */
+    void set_all_rows();
+
+    /**
+     * @return true if the range is unspecified in the horizontal direction
+     *         i.e. all columns are selected, false otherwise.
+     */
+    bool all_columns() const;
+
+    /**
+     * @return true if the range is unspecified in the vertical direction i.e.
+     *         all rows are selected, false otherwise.
+     */
+    bool all_rows() const;
+
+    struct hash
+    {
+        IXION_DLLPUBLIC size_t operator() (const rc_range_t& range) const;
+    };
+};
+
+IXION_DLLPUBLIC bool operator==(const rc_range_t& left, const rc_range_t& right);
+IXION_DLLPUBLIC bool operator!=(const rc_range_t& left, const rc_range_t& right);
+
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_address_t& addr);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_rc_address_t& addr);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const address_t& addr);
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const rc_address_t& addr);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_range_t& range);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_rc_range_t& range);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const range_t& range);
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const rc_range_t& range);
 
 /**
  * Type that represents a collection of multiple absolute cell addresses.
