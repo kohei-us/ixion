@@ -30,7 +30,7 @@ public:
      * @param column_first name of the starting column within the table.
      * @param column_last name of the ending column within the table, or
      *                    empty_string_id if it's a single column.
-     * @param areas area specifiter value, which may consist of one or more
+     * @param areas area specifier value, which may consist of one or more
      *              values of table_area_t.
      *
      * @return referenced data range.
@@ -46,7 +46,7 @@ public:
      * @param column_first name of the starting column within the table.
      * @param column_last name of the ending column within the table, or
      *                    empty_string_id if it's a single column.
-     * @param areas area specifiter value, which may consist of one or more
+     * @param areas area specifier value, which may consist of one or more
      *              values of table_area_t.
      *
      * @return referenced data range.
