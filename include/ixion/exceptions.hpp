@@ -39,6 +39,7 @@ class IXION_DLLPUBLIC formula_error : public std::exception
 public:
     explicit formula_error(formula_error_t fe);
     explicit formula_error(formula_error_t fe, std::string msg);
+    formula_error(const formula_error& other);
     formula_error(formula_error&& other);
 
     virtual ~formula_error();

@@ -47,6 +47,9 @@ formula_error::formula_error(formula_error_t fe) :
 formula_error::formula_error(formula_error_t fe, std::string msg) :
     mp_impl(std::make_unique<impl>(fe, std::move(msg))) {}
 
+formula_error::formula_error(const formula_error& other) :
+    mp_impl(std::make_unique<impl>(*other.mp_impl)) {}
+
 formula_error::formula_error(formula_error&& other) :
     mp_impl(std::move(other.mp_impl))
 {
