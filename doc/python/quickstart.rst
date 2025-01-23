@@ -1,8 +1,8 @@
 
 .. py:currentmodule:: ixion
 
-Quickstart
-==========
+Quick start
+===========
 
 Let's go over very quickly how to create a document and populate some cells inside spreadsheet.
 

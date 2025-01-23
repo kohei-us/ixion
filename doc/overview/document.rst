@@ -1,12 +1,12 @@
 
 .. highlight:: cpp
 
-.. _quickstart-document:
+.. _use-document:
 
-Using document class
-====================
+Use document class
+==================
 
-In the :ref:`quickstart-model-context` section, we saw an example of how to
+In the :ref:`use-model-context` section, we saw an example of how to
 set up a cell value store and run some simple calculations using the
 :cpp:class:`~ixion::model_context` class.  While that approach certainly works
 fine, one large drawback is that you do need to manually handle formula tokenization,
@@ -20,7 +20,7 @@ Luckily, Ixion also provides a higher level document class called
 :cpp:class:`~ixion::document` which internally uses :cpp:class:`~ixion::model_context`
 and handles all the formula cell related operations internally.  This section
 provides an overview of how to use the :cpp:class:`~ixion::document` class to
-do more or less similar things we did in the :ref:`quickstart-model-context`
+do more or less similar things we did in the :ref:`use-model-context`
 section.
 
 First, we need to instantiate the :cpp:class:`~ixion::document` instance and
@@ -134,7 +134,7 @@ of dirty formula cells.
 Conclusion
 ----------
 
-In this section, we have performed the same thing we did in the :ref:`quickstart-model-context`
+In this section, we have performed the same thing we did in the :ref:`use-model-context`
 section, but with much less code, and without the complexity of low-level formula expression
 tokenization, formula cell registration, or manual tracking of modified cells.  If you are
 looking to leverage the functionality of Ixion but don't want to deal with lower-level formula

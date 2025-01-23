@@ -7,7 +7,7 @@ Model Context
 Examples
 --------
 
-Refer to the :ref:`quickstart-model-context` section for code examples on how
+Refer to the :ref:`use-model-context` section for code examples on how
 to use the :cpp:class:`~ixion::model_context` class.
 
 API Reference

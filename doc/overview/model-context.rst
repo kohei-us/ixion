@@ -1,10 +1,10 @@
 
 .. highlight:: cpp
 
-.. _quickstart-model-context:
+.. _use-model-context:
 
-Using model_context class
-=========================
+Use model_context class
+=======================
 
 Create a model context instance
 -------------------------------

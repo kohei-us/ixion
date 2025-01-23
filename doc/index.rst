@@ -15,7 +15,7 @@ expressions.
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    overview/index.rst
    cpp/index.rst
