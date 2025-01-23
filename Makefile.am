@@ -183,3 +183,8 @@ doc-sphinx:
 
 doc: doc-doxygen doc-sphinx
 
+doc-open:
+	@xdg-open ./doc/_build/index.html
+
+doc-clean:
+	@rm -rf ./doc/_build ./doc/_doxygen
