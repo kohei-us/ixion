@@ -27,7 +27,6 @@
  ************************************************************************/
 
 #include <ixion/model_context.hpp>
-#include <ixion/macros.hpp>
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/formula.hpp>
 #include <iostream>

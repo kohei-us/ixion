@@ -11,7 +11,6 @@
 #include "ixion/formula.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
-#include "ixion/macros.hpp"
 #include "ixion/address_iterator.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/cell_access.hpp"

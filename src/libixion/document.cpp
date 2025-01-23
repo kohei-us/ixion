@@ -54,9 +54,9 @@ document::cell_pos::cell_pos(const char* p) :
 {
 }
 
-document::cell_pos::cell_pos(const char* p, size_t n) :
+document::cell_pos::cell_pos(std::string_view s) :
     type(cp_type::string),
-    value(std::string_view(p, n))
+    value(s)
 {
 }
 
@@ -71,6 +71,10 @@ document::cell_pos::cell_pos(const abs_address_t& addr) :
     value(addr)
 {
 }
+
+document::cell_pos::cell_pos(const cell_pos& other) = default;
+
+document::cell_pos& document::cell_pos::operator=(const cell_pos& other) = default;
 
 struct document::impl
 {

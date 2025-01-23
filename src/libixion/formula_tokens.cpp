@@ -8,7 +8,6 @@
 #include <ixion/formula_tokens.hpp>
 #include <ixion/exceptions.hpp>
 #include <ixion/global.hpp>
-#include <ixion/macros.hpp>
 
 #include <sstream>
 

@@ -14,7 +14,6 @@
 #include <ixion/formula_tokens.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/matrix.hpp>
-#include <ixion/macros.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/cell_access.hpp>
 

@@ -8,8 +8,6 @@
 #include "vulkan_obj.hpp"
 #include "debug.hpp"
 
-#include "ixion/macros.hpp"
-
 #include <vector>
 #include <cstring>
 #include <iostream>

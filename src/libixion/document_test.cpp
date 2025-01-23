@@ -9,7 +9,6 @@
 
 #include <ixion/document.hpp>
 #include <ixion/address.hpp>
-#include <ixion/macros.hpp>
 #include <ixion/cell_access.hpp>
 
 #include <iostream>
@@ -40,12 +39,13 @@ void test_basic_calc()
     abs_address_t A1(0, 0, 0);
     abs_address_t A2(0, 1, 0);
     abs_address_t A3(0, 2, 0);
+    std::string_view A3_sv("A3");
 
     document doc;
     doc.append_sheet("test");
     doc.set_numeric_cell("A1", 1.1);
     doc.set_numeric_cell(A2, 1.2);
-    doc.set_numeric_cell({IXION_ASCII("A3")}, 1.3);
+    doc.set_numeric_cell(A3_sv, 1.3);
 
     assert(doc.get_numeric_value(A1) == 1.1);
     assert(doc.get_numeric_value("A2") == 1.2);

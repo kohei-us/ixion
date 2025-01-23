@@ -14,7 +14,6 @@
 #include <ixion/model_iterator.hpp>
 #include <ixion/named_expressions_iterator.hpp>
 #include <ixion/global.hpp>
-#include <ixion/macros.hpp>
 #include <ixion/interface/table_handler.hpp>
 #include <ixion/config.hpp>
 #include <ixion/matrix.hpp>

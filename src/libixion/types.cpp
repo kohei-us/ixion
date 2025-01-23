@@ -6,7 +6,6 @@
  */
 
 #include <ixion/types.hpp>
-#include <ixion/macros.hpp>
 
 #include "column_store_type.hpp"
 

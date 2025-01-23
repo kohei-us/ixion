@@ -46,10 +46,14 @@ public:
 
         std::variant<std::string_view, ixion::abs_address_t> value;
 
+        cell_pos() = delete;
         cell_pos(const char* p);
-        cell_pos(const char* p, size_t n);
+        cell_pos(std::string_view s);
         cell_pos(const std::string& s);
         cell_pos(const abs_address_t& addr);
+        cell_pos(const cell_pos& other);
+
+        cell_pos& operator=(const cell_pos& other);
     };
 
     void append_sheet(std::string name);

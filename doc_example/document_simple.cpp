@@ -28,7 +28,6 @@
 
 #include <ixion/document.hpp>
 #include <ixion/address.hpp>
-#include <ixion/macros.hpp>
 #include <iostream>
 
 using namespace std;
