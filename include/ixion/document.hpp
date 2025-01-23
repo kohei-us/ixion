@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <variant>
 
 namespace ixion {
@@ -66,21 +67,21 @@ public:
      */
     void set_sheet_name(sheet_t sheet, std::string name);
 
-    cell_access get_cell_access(cell_pos pos) const;
+    cell_access get_cell_access(const cell_pos& pos) const;
 
-    void set_numeric_cell(cell_pos pos, double val);
+    void set_numeric_cell(const cell_pos& pos, double val);
 
-    void set_string_cell(cell_pos pos, std::string_view s);
+    void set_string_cell(const cell_pos& pos, std::string_view s);
 
-    void set_boolean_cell(cell_pos pos, bool val);
+    void set_boolean_cell(const cell_pos& pos, bool val);
 
-    void empty_cell(cell_pos pos);
+    void empty_cell(const cell_pos& pos);
 
-    double get_numeric_value(cell_pos pos) const;
+    double get_numeric_value(const cell_pos& pos) const;
 
-    std::string_view get_string_value(cell_pos pos) const;
+    std::string_view get_string_value(const cell_pos& pos) const;
 
-    void set_formula_cell(cell_pos pos, std::string_view formula);
+    void set_formula_cell(const cell_pos& pos, std::string_view formula);
 
     /**
      * Calculate all the "dirty" formula cells in the document.

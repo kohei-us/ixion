@@ -104,13 +104,13 @@ struct document::impl
         cxt.set_sheet_name(sheet, std::move(name));
     }
 
-    cell_access get_cell_access(cell_pos pos) const
+    cell_access get_cell_access(const cell_pos& pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         return cxt.get_cell_access(addr);
     }
 
-    void set_numeric_cell(cell_pos pos, double val)
+    void set_numeric_cell(const cell_pos& pos, double val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -118,7 +118,7 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
-    void set_string_cell(cell_pos pos, std::string_view s)
+    void set_string_cell(const cell_pos& pos, std::string_view s)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -126,7 +126,7 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
-    void set_boolean_cell(cell_pos pos, bool val)
+    void set_boolean_cell(const cell_pos& pos, bool val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -134,7 +134,7 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
-    void empty_cell(cell_pos pos)
+    void empty_cell(const cell_pos& pos)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -142,19 +142,19 @@ struct document::impl
         modified_cells.insert(addr);
     }
 
-    double get_numeric_value(cell_pos pos) const
+    double get_numeric_value(const cell_pos& pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         return cxt.get_numeric_value(addr);
     }
 
-    std::string_view get_string_value(cell_pos pos) const
+    std::string_view get_string_value(const cell_pos& pos) const
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         return cxt.get_string_value(addr);
     }
 
-    void set_formula_cell(cell_pos pos, std::string_view formula)
+    void set_formula_cell(const cell_pos& pos, std::string_view formula)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
         unregister_formula_cell(cxt, addr);
@@ -191,42 +191,42 @@ void document::set_sheet_name(sheet_t sheet, std::string name)
     mp_impl->set_sheet_name(sheet, std::move(name));
 }
 
-cell_access document::get_cell_access(cell_pos pos) const
+cell_access document::get_cell_access(const cell_pos& pos) const
 {
     return mp_impl->get_cell_access(pos);
 }
 
-void document::set_numeric_cell(cell_pos pos, double val)
+void document::set_numeric_cell(const cell_pos& pos, double val)
 {
     mp_impl->set_numeric_cell(pos, val);
 }
 
-void document::set_string_cell(cell_pos pos, std::string_view s)
+void document::set_string_cell(const cell_pos& pos, std::string_view s)
 {
     mp_impl->set_string_cell(pos, s);
 }
 
-void document::set_boolean_cell(cell_pos pos, bool val)
+void document::set_boolean_cell(const cell_pos& pos, bool val)
 {
     mp_impl->set_boolean_cell(pos, val);
 }
 
-void document::empty_cell(cell_pos pos)
+void document::empty_cell(const cell_pos& pos)
 {
     mp_impl->empty_cell(pos);
 }
 
-double document::get_numeric_value(cell_pos pos) const
+double document::get_numeric_value(const cell_pos& pos) const
 {
     return mp_impl->get_numeric_value(pos);
 }
 
-std::string_view document::get_string_value(cell_pos pos) const
+std::string_view document::get_string_value(const cell_pos& pos) const
 {
     return mp_impl->get_string_value(pos);
 }
 
-void document::set_formula_cell(cell_pos pos, std::string_view formula)
+void document::set_formula_cell(const cell_pos& pos, std::string_view formula)
 {
     mp_impl->set_formula_cell(pos, formula);
 }
