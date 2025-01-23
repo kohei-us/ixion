@@ -3,8 +3,8 @@
 
 .. _use-model-context:
 
-Use model_context class
-=======================
+Use model_context
+=================
 
 Create a model context instance
 -------------------------------
