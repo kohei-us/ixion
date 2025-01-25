@@ -46,11 +46,9 @@ class model_context_impl;
 }
 
 /**
- * This class stores all data relevant to current session.  You can think of
- * this like a document model for each formula calculation run.  Note that
- * only those methods called from the formula interpreter are specified in
- * the interface; this explains why accessors for the most part only have
- * the 'get' method not paired with its 'set' counterpart.
+ * This class stores all cell values of different types organized in multiple
+ * sheets. It also stores named expressions both in global scope and
+ * sheet-local scope.
  */
 class IXION_DLLPUBLIC model_context final
 {
