@@ -119,27 +119,17 @@ test_data = \
 
 doc_data = \
 	doc/conf.py \
-	doc/cpp/data_store/cell_access.rst \
-	doc/cpp/data_store/dirty_cell_tracker.rst \
-	doc/cpp/data_store/document.rst \
-	doc/cpp/data_store/index.rst \
-	doc/cpp/data_store/model_context.rst \
-	doc/cpp/data_store/types.rst \
-	doc/cpp/formula/formula_cell.rst \
-	doc/cpp/formula/formula_engine.rst \
-	doc/cpp/formula/formula_name_resolver.rst \
-	doc/cpp/formula/formula_tokens.rst \
-	doc/cpp/formula/index.rst \
-	doc/cpp/formula/types.rst \
 	doc/cpp/index.rst \
-	doc/cpp/interface/index.rst \
-	doc/cpp/quickstart/index.rst \
-	doc/cpp/quickstart/using_document.rst \
-	doc/cpp/quickstart/using_model_context.rst \
+	doc/cpp/ixion/draft/index.rst \
+	doc/cpp/ixion/iface/index.rst \
+	doc/cpp/ixion/index.rst \
 	doc/doxygen.conf \
 	doc/environment.yml \
 	doc/index.rst \
+	doc/overview/cell-access.rst \
+	doc/overview/document.rst \
 	doc/overview/index.rst \
+	doc/overview/model-context.rst \
 	doc/python/document.rst \
 	doc/python/index.rst \
 	doc/python/quickstart.rst \

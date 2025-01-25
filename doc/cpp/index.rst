@@ -1,15 +1,11 @@
-.. highlight:: cpp
+.. _cpp-api:
 
-.. _index:
+C++ API Reference
+=================
 
-C++ API
-=======
-
+Child namespaces
+----------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   formula/index.rst
-   data_store/index.rst
-   interface/index.rst
-
-
+   ixion/index.rst
