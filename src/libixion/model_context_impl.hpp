@@ -124,7 +124,7 @@ public:
 
     bool is_empty(const abs_address_t& addr) const;
     bool is_empty(abs_range_t range) const;
-    celltype_t get_celltype(const abs_address_t& addr) const;
+    cell_t get_celltype(const abs_address_t& addr) const;
     cell_value_t get_cell_value_type(const abs_address_t& addr) const;
     double get_numeric_value(const abs_address_t& addr) const;
     bool get_boolean_value(const abs_address_t& addr) const;

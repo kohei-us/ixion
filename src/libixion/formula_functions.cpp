@@ -1405,7 +1405,7 @@ void formula_functions::fnc_isblank(formula_value_stack& args) const
         case stack_value_t::single_ref:
         {
             abs_address_t addr = args.pop_single_ref();
-            bool res = m_context.get_celltype(addr) == celltype_t::empty;
+            bool res = m_context.get_celltype(addr) == cell_t::empty;
             args.push_boolean(res);
             break;
         }
@@ -1511,7 +1511,7 @@ void formula_functions::fnc_isformula(formula_value_stack& args) const
     }
 
     abs_address_t addr = args.pop_single_ref();
-    bool res = m_context.get_celltype(addr) == celltype_t::formula;
+    bool res = m_context.get_celltype(addr) == cell_t::formula;
     args.push_boolean(res);
 }
 
@@ -2107,7 +2107,7 @@ void formula_functions::fnc_textjoin(formula_value_stack& args) const
 
                 switch (cell.type)
                 {
-                    case celltype_t::string:
+                    case cell_t::string:
                     {
                         auto sid = std::get<string_id_t>(cell.value);
                         const std::string* s = m_context.get_string(sid);
@@ -2115,34 +2115,34 @@ void formula_functions::fnc_textjoin(formula_value_stack& args) const
                         tokens.emplace_back(*s);
                         break;
                     }
-                    case celltype_t::numeric:
+                    case cell_t::numeric:
                     {
                         std::ostringstream os;
                         os << std::get<double>(cell.value);
                         tokens.emplace_back(os.str());
                         break;
                     }
-                    case celltype_t::boolean:
+                    case cell_t::boolean:
                     {
                         std::ostringstream os;
                         os << std::boolalpha << std::get<bool>(cell.value);
                         tokens.emplace_back(os.str());
                         break;
                     }
-                    case celltype_t::formula:
+                    case cell_t::formula:
                     {
                         const auto* fc = std::get<const formula_cell*>(cell.value);
                         formula_result res = fc->get_result_cache(m_context.get_formula_result_wait_policy());
                         tokens.emplace_back(res.str(m_context));
                         break;
                     }
-                    case celltype_t::empty:
+                    case cell_t::empty:
                     {
                         if (!skip_empty)
                             tokens.emplace_back();
                         break;
                     }
-                    case celltype_t::unknown:
+                    case cell_t::unknown:
                         // logic error - this should never happen!
                         throw formula_error(formula_error_t::no_result_error);
                 }

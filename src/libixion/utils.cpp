@@ -13,20 +13,20 @@
 
 namespace ixion { namespace detail {
 
-celltype_t to_celltype(mdds::mtv::element_t mtv_type)
+cell_t to_celltype(mdds::mtv::element_t mtv_type)
 {
     switch (mtv_type)
     {
         case element_type_empty:
-            return celltype_t::empty;
+            return cell_t::empty;
         case element_type_numeric:
-            return celltype_t::numeric;
+            return cell_t::numeric;
         case element_type_boolean:
-            return celltype_t::boolean;
+            return cell_t::boolean;
         case element_type_string:
-            return celltype_t::string;
+            return cell_t::string;
         case element_type_formula:
-            return celltype_t::formula;
+            return cell_t::formula;
         default:
             ;
     }
@@ -39,10 +39,10 @@ celltype_t to_celltype(mdds::mtv::element_t mtv_type)
 cell_value_t to_cell_value_type(
     const column_store_t::const_position_type& pos, formula_result_wait_policy_t policy)
 {
-    celltype_t raw_type = to_celltype(pos.first->type);
+    cell_t raw_type = to_celltype(pos.first->type);
 
-    if (raw_type != celltype_t::formula)
-        // celltype_t and cell_result_t are numerically equivalent except for the formula slot.
+    if (raw_type != cell_t::formula)
+        // cell_t and cell_value_t are numerically equivalent except for the formula slot.
         return static_cast<cell_value_t>(raw_type);
 
     const formula_cell* fc = formula_element_block::at(*pos.first->data, pos.second);

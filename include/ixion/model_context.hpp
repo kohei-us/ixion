@@ -73,7 +73,7 @@ public:
     {
         using value_type = std::variant<bool, double, std::string_view>;
 
-        celltype_t type;
+        cell_t type;
         value_type value;
 
         /** Initializes the cell to be empty. */
@@ -121,7 +121,7 @@ public:
 
     bool is_empty(const abs_address_t& addr) const;
     bool is_empty(const abs_range_t& range) const;
-    celltype_t get_celltype(const abs_address_t& addr) const;
+    cell_t get_celltype(const abs_address_t& addr) const;
     cell_value_t get_cell_value_type(const abs_address_t& addr) const;
 
     /**

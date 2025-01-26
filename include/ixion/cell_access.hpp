@@ -41,7 +41,7 @@ public:
     cell_access& operator= (cell_access&& other);
     ~cell_access();
 
-    celltype_t get_type() const;
+    cell_t get_type() const;
 
     cell_value_t get_value_type() const;
 

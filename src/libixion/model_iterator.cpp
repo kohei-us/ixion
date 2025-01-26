@@ -16,22 +16,22 @@
 
 namespace ixion {
 
-model_iterator::cell::cell() : row(0), col(0), type(celltype_t::empty), value(false) {}
+model_iterator::cell::cell() : row(0), col(0), type(cell_t::empty), value(false) {}
 
 model_iterator::cell::cell(row_t _row, col_t _col) :
-    row(_row), col(_col), type(celltype_t::empty), value(false) {}
+    row(_row), col(_col), type(cell_t::empty), value(false) {}
 
 model_iterator::cell::cell(row_t _row, col_t _col, bool _b) :
-    row(_row), col(_col), type(celltype_t::boolean), value(_b) {}
+    row(_row), col(_col), type(cell_t::boolean), value(_b) {}
 
 model_iterator::cell::cell(row_t _row, col_t _col, string_id_t _s) :
-    row(_row), col(_col), type(celltype_t::string), value(_s) {}
+    row(_row), col(_col), type(cell_t::string), value(_s) {}
 
 model_iterator::cell::cell(row_t _row, col_t _col, double _v) :
-    row(_row), col(_col), type(celltype_t::numeric), value(_v) {}
+    row(_row), col(_col), type(cell_t::numeric), value(_v) {}
 
 model_iterator::cell::cell(row_t _row, col_t _col, const formula_cell* _f) :
-    row(_row), col(_col), type(celltype_t::formula), value(_f) {}
+    row(_row), col(_col), type(cell_t::formula), value(_f) {}
 
 bool model_iterator::cell::operator== (const cell& other) const
 {
@@ -90,23 +90,23 @@ class iterator_core_horizontal : public model_iterator::impl
         switch (m_current_pos->type)
         {
             case element_type_boolean:
-                m_current_cell.type = celltype_t::boolean;
+                m_current_cell.type = cell_t::boolean;
                 m_current_cell.value = m_current_pos->get<boolean_element_block>();
                 break;
             case element_type_numeric:
-                m_current_cell.type = celltype_t::numeric;
+                m_current_cell.type = cell_t::numeric;
                 m_current_cell.value = m_current_pos->get<numeric_element_block>();
                 break;
             case element_type_string:
-                m_current_cell.type = celltype_t::string;
+                m_current_cell.type = cell_t::string;
                 m_current_cell.value = m_current_pos->get<string_element_block>();
                 break;
             case element_type_formula:
-                m_current_cell.type = celltype_t::formula;
+                m_current_cell.type = cell_t::formula;
                 m_current_cell.value = m_current_pos->get<formula_element_block>();
                 break;
             case element_type_empty:
-                m_current_cell.type = celltype_t::empty;
+                m_current_cell.type = cell_t::empty;
                 m_current_cell.value = false;
             default:
                 ;
@@ -198,23 +198,23 @@ class iterator_core_vertical : public model_iterator::impl
         switch (blk_pos->type)
         {
             case element_type_empty:
-                m_current_cell.type = celltype_t::empty;
+                m_current_cell.type = cell_t::empty;
                 m_current_cell.value = false;
                 break;
             case element_type_boolean:
-                m_current_cell.type = celltype_t::boolean;
+                m_current_cell.type = cell_t::boolean;
                 m_current_cell.value = column_store_t::get<boolean_element_block>(m_current_pos);
                 break;
             case element_type_numeric:
-                m_current_cell.type = celltype_t::numeric;
+                m_current_cell.type = cell_t::numeric;
                 m_current_cell.value = column_store_t::get<numeric_element_block>(m_current_pos);
                 break;
             case element_type_string:
-                m_current_cell.type = celltype_t::string;
+                m_current_cell.type = cell_t::string;
                 m_current_cell.value = column_store_t::get<string_element_block>(m_current_pos);
                 break;
             case element_type_formula:
-                m_current_cell.type = celltype_t::formula;
+                m_current_cell.type = cell_t::formula;
                 m_current_cell.value = column_store_t::get<formula_element_block>(m_current_pos);
                 break;
             default:
@@ -379,22 +379,22 @@ std::ostream& operator<< (std::ostream& os, const model_iterator::cell& c)
 
     switch (c.type)
     {
-        case celltype_t::boolean:
+        case cell_t::boolean:
             os << "; boolean=" << std::get<bool>(c.value);
             break;
-        case celltype_t::formula:
+        case cell_t::formula:
             os << "; formula=" << std::get<const formula_cell*>(c.value);
             break;
-        case celltype_t::numeric:
+        case cell_t::numeric:
             os << "; numeric=" << std::get<double>(c.value);
             break;
-        case celltype_t::string:
+        case cell_t::string:
             os << "; string=" << std::get<string_id_t>(c.value);
             break;
-        case celltype_t::empty:
+        case cell_t::empty:
             os << "; empty";
             break;
-        case celltype_t::unknown:
+        case cell_t::unknown:
         default:
             ;
     }

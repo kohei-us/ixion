@@ -46,7 +46,7 @@ cell_access& cell_access::operator= (cell_access&& other)
 
 cell_access::~cell_access() {}
 
-celltype_t cell_access::get_type() const
+cell_t cell_access::get_type() const
 {
     return detail::to_celltype(mp_impl->pos.first->type);
 }

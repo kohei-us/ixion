@@ -372,16 +372,16 @@ void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<mo
         {
             switch (c.type)
             {
-                case celltype_t::numeric:
+                case cell_t::numeric:
                     set_numeric_cell(pos, std::get<double>(c.value));
                     break;
-                case celltype_t::string:
+                case cell_t::string:
                 {
                     auto s = std::get<std::string_view>(c.value);
                     set_string_cell(pos, s);
                     break;
                 }
-                case celltype_t::boolean:
+                case cell_t::boolean:
                     set_boolean_cell(pos, std::get<bool>(c.value));
                     break;
                 default:
@@ -947,7 +947,7 @@ bool model_context_impl::is_empty(abs_range_t range) const
     return true;
 }
 
-celltype_t model_context_impl::get_celltype(const abs_address_t& addr) const
+cell_t model_context_impl::get_celltype(const abs_address_t& addr) const
 {
     mdds::mtv::element_t gmcell_type =
         m_sheets.at(addr.sheet).at(addr.column).get_type(addr.row);

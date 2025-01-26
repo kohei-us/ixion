@@ -67,7 +67,7 @@ IXION_DLLPUBLIC_VAR const string_id_t empty_string_id;
 /**
  * This type represents a raw cell type as stored in ixion::model_context.
  */
-enum class celltype_t : std::uint8_t
+enum class cell_t : std::uint8_t
 {
     /** unknown cell type.*/
     unknown = 0,
@@ -84,9 +84,9 @@ enum class celltype_t : std::uint8_t
 };
 
 /**
- * Similar to celltype_t, except that it does not include a formula type.
- * Instead it uses the formula result type to classify its type. The error
- * type refers to an error value in formula cell.
+ * Similar to cell_t, except that it does not include a formula type. Instead
+ * it uses the formula result type to classify its type. The error type refers
+ * to an error value in formula cell.
  */
 enum class cell_value_t : std::uint8_t
 {

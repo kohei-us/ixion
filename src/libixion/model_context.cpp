@@ -18,18 +18,18 @@
 
 namespace ixion {
 
-model_context::input_cell::input_cell(std::nullptr_t) : type(celltype_t::empty) {}
-model_context::input_cell::input_cell(bool b) : type(celltype_t::boolean)
+model_context::input_cell::input_cell(std::nullptr_t) : type(cell_t::empty) {}
+model_context::input_cell::input_cell(bool b) : type(cell_t::boolean)
 {
     value = b;
 }
 
-model_context::input_cell::input_cell(const char* s) : type(celltype_t::string)
+model_context::input_cell::input_cell(const char* s) : type(cell_t::string)
 {
     value = std::string_view(s);
 }
 
-model_context::input_cell::input_cell(double v) : type(celltype_t::numeric)
+model_context::input_cell::input_cell(double v) : type(cell_t::numeric)
 {
     value = v;
 }
@@ -169,7 +169,7 @@ bool model_context::is_empty(const abs_range_t& range) const
     return mp_impl->is_empty(range);
 }
 
-celltype_t model_context::get_celltype(const abs_address_t& addr) const
+cell_t model_context::get_celltype(const abs_address_t& addr) const
 {
     return mp_impl->get_celltype(addr);
 }

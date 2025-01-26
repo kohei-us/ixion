@@ -6,13 +6,13 @@ namespace ixion
 Enum
 ----
 
+cell_t
+^^^^^^
+.. doxygenenum:: ixion::cell_t
+
 cell_value_t
 ^^^^^^^^^^^^
 .. doxygenenum:: ixion::cell_value_t
-
-celltype_t
-^^^^^^^^^^
-.. doxygenenum:: ixion::celltype_t
 
 column_block_t
 ^^^^^^^^^^^^^^

@@ -38,7 +38,7 @@ public:
 
         row_t row;
         col_t col;
-        celltype_t type;
+        cell_t type;
         value_type value;
 
         cell();

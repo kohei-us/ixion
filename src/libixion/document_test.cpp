@@ -120,11 +120,11 @@ void test_boolean_io()
     assert(v == 2.0);
 
     cell_access ca = doc.get_cell_access("test2!B2");
-    assert(ca.get_type() == celltype_t::boolean);
+    assert(ca.get_type() == cell_t::boolean);
     assert(ca.get_value_type() == cell_value_t::boolean);
 
     ca = doc.get_cell_access("test2!C3");
-    assert(ca.get_type() == celltype_t::boolean);
+    assert(ca.get_type() == cell_t::boolean);
     assert(ca.get_value_type() == cell_value_t::boolean);
 }
 

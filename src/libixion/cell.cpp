@@ -463,7 +463,7 @@ void formula_cell::check_circular(const model_context& cxt, const abs_address_t&
                         for (row_t row = row_first; row <= row_last; ++row)
                         {
                             abs_address_t addr(sheet, row, col);
-                            if (cxt.get_celltype(addr) != celltype_t::formula)
+                            if (cxt.get_celltype(addr) != cell_t::formula)
                                 continue;
 
                             if (!mp_impl->check_ref_for_circular_safety(*cxt.get_formula_cell(addr), addr))

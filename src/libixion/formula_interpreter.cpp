@@ -166,24 +166,24 @@ void get_result_from_cell(const model_context& cxt, const abs_address_t& addr, f
 {
     switch (cxt.get_celltype(addr))
     {
-        case celltype_t::formula:
+        case cell_t::formula:
         {
             res = cxt.get_formula_result(addr);
             break;
         }
-        case celltype_t::boolean:
+        case cell_t::boolean:
             res.set_boolean(cxt.get_boolean_value(addr));
             break;
-        case celltype_t::numeric:
+        case cell_t::numeric:
             res.set_value(cxt.get_numeric_value(addr));
             break;
-        case celltype_t::string:
+        case cell_t::string:
         {
             std::string_view s = cxt.get_string_value(addr);
             res.set_string_value(std::string{s});
             break;
         }
-        case celltype_t::unknown:
+        case cell_t::unknown:
         default:
             ;
     }
@@ -364,21 +364,21 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
 
             switch (ca.get_type())
             {
-                case celltype_t::empty:
+                case cell_t::empty:
                 {
                     // empty cell has a value of 0.
                     return stack_value{0.0};
                 }
-                case celltype_t::boolean:
+                case cell_t::boolean:
                     // TODO : Decide whether we need to treat this as a
                     // distinct boolean value.  For now, let's treat this as a
                     // numeric value equivalent.
-                case celltype_t::numeric:
+                case cell_t::numeric:
                 {
                     double val = ca.get_numeric_value();
                     return stack_value{val};
                 }
-                case celltype_t::string:
+                case cell_t::string:
                 {
                     std::size_t strid = ca.get_string_identifier();
                     const std::string* ps = cxt.get_string(strid);
@@ -390,7 +390,7 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
 
                     return stack_value{*ps};
                 }
-                case celltype_t::formula:
+                case cell_t::formula:
                 {
                     formula_result res = ca.get_formula_result();
 
@@ -408,7 +408,7 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
                             IXION_DEBUG("matrix formula result type not handled yet");
                     }
                 }
-                case celltype_t::unknown:
+                case cell_t::unknown:
                 {
                     IXION_DEBUG("unknown cell type in resolving a single ref");
                     return {};

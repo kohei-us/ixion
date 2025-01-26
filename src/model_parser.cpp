@@ -1109,7 +1109,7 @@ void model_parser::check()
 
         switch (ca.get_type())
         {
-            case celltype_t::formula:
+            case cell_t::formula:
             {
                 formula_result res_cell = ca.get_formula_result();
 
@@ -1121,7 +1121,7 @@ void model_parser::check()
                 }
                 break;
             }
-            case celltype_t::numeric:
+            case cell_t::numeric:
             {
                 double actual_val = ca.get_numeric_value();
                 if (actual_val != res.get_value())
@@ -1132,7 +1132,7 @@ void model_parser::check()
                 }
                 break;
             }
-            case celltype_t::boolean:
+            case cell_t::boolean:
             {
                 bool actual = ca.get_boolean_value();
                 bool expected = res.get_boolean();
@@ -1145,7 +1145,7 @@ void model_parser::check()
                 }
                 break;
             }
-            case celltype_t::string:
+            case cell_t::string:
             {
                 std::string_view actual = ca.get_string_value();
                 const std::string& s_expected = res.get_string();
@@ -1159,13 +1159,13 @@ void model_parser::check()
 
                 break;
             }
-            case celltype_t::empty:
+            case cell_t::empty:
             {
                 std::ostringstream os;
                 os << "cell " << name << " is empty.";
                 throw check_error(os.str());
             }
-            case celltype_t::unknown:
+            case cell_t::unknown:
             {
                 std::ostringstream os;
                 os << "cell type is unknown for cell " << name;

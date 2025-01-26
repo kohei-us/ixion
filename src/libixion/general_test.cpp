@@ -44,7 +44,7 @@ void test_size()
     cout << "* string_id_t: " << sizeof(string_id_t)
         << " (min:" << std::numeric_limits<string_id_t>::min()
         << "; max:" << std::numeric_limits<string_id_t>::max() << ")" << endl;
-    cout << "* celltype_t: " << sizeof(celltype_t) << endl;
+    cout << "* cell_t: " << sizeof(cell_t) << endl;
     cout << "* formula_cell: " << sizeof(formula_cell) << endl;
     cout << "* formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
 }
@@ -503,7 +503,7 @@ void test_model_context_storage()
 
         // Test empty cell access.
         cell_access ca = cxt.get_cell_access(abs_address_t(0, 0, 0));
-        assert(ca.get_type() == celltype_t::empty);
+        assert(ca.get_type() == cell_t::empty);
         assert(ca.get_value_type() == cell_value_t::empty);
 
         // String value on an empty cell should be an empty string.
@@ -526,7 +526,7 @@ void test_model_context_storage()
                 assert(test == val);
 
                 ca = cxt.get_cell_access(pos);
-                assert(ca.get_type() == celltype_t::numeric);
+                assert(ca.get_type() == cell_t::numeric);
                 assert(ca.get_value_type() == cell_value_t::numeric);
                 test = ca.get_numeric_value();
                 assert(test == val);
@@ -549,7 +549,7 @@ void test_model_context_storage()
         p->interpret(cxt, pos);
 
         ca = cxt.get_cell_access(pos);
-        assert(ca.get_type() == celltype_t::formula);
+        assert(ca.get_type() == cell_t::formula);
         assert(ca.get_value_type() == cell_value_t::numeric);
         assert(ca.get_numeric_value() == 6.0);
     }
@@ -660,7 +660,7 @@ void test_model_context_direct_string_access()
     assert(s == "string cell");
 
     cell_access ca = cxt.get_cell_access(B2);
-    assert(ca.get_type() == celltype_t::string);
+    assert(ca.get_type() == cell_t::string);
     assert(ca.get_value_type() == cell_value_t::string);
     s = ca.get_string_value();
     assert(s == "string cell");
@@ -684,7 +684,7 @@ void test_model_context_direct_string_access()
     assert(s == "string value in formula");
 
     ca = cxt.get_cell_access(C4);
-    assert(ca.get_type() == celltype_t::formula);
+    assert(ca.get_type() == cell_t::formula);
     assert(ca.get_value_type() == cell_value_t::string);
     s = ca.get_string_value();
     assert(s == "string value in formula");
@@ -847,7 +847,7 @@ void test_model_context_iterator_horizontal()
             assert(iter.has());
             assert(iter.get().row == row);
             assert(iter.get().col == col);
-            assert(iter.get().type == celltype_t::empty);
+            assert(iter.get().type == cell_t::empty);
         }
     }
 
@@ -1037,7 +1037,7 @@ void test_model_context_iterator_vertical()
             assert(iter.has());
             assert(cell.row == row);
             assert(cell.col == col);
-            assert(cell.type == celltype_t::empty);
+            assert(cell.type == cell_t::empty);
         }
     }
 
@@ -1381,7 +1381,7 @@ void test_model_context_error_value()
     fc->interpret(cxt, pos);
 
     cell_access ca = cxt.get_cell_access(pos);
-    assert(ca.get_type() == celltype_t::formula);
+    assert(ca.get_type() == cell_t::formula);
     assert(ca.get_value_type() == cell_value_t::error);
     assert(ca.get_error_value() == formula_error_t::division_by_zero);
 }
