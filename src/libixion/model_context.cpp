@@ -52,17 +52,15 @@ std::unique_ptr<iface::session_handler> model_context::session_handler_factory::
     return std::unique_ptr<iface::session_handler>();
 }
 
-model_context::session_handler_factory::~session_handler_factory() {}
+model_context::session_handler_factory::~session_handler_factory() = default;
 
 model_context::model_context() :
-    mp_impl(new detail::model_context_impl(*this, {1048576, 16384})) {}
+    mp_impl(std::make_unique<detail::model_context_impl>(*this, rc_size_t{1048576, 16384})) {}
 
 model_context::model_context(const rc_size_t& sheet_size) :
-    mp_impl(new detail::model_context_impl(*this, sheet_size)) {}
+    mp_impl(std::make_unique<detail::model_context_impl>(*this, sheet_size)) {}
 
-model_context::~model_context()
-{
-}
+model_context::~model_context() = default;
 
 formula_result_wait_policy_t model_context::get_formula_result_wait_policy() const
 {
