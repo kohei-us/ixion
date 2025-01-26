@@ -30,50 +30,64 @@
 #include <ixion/address.hpp>
 #include <iostream>
 
-using namespace std;
-
 int main(int argc, char** argv)
 {
+    //!code-start: instantiate
     ixion::document doc;
     doc.append_sheet("MySheet");
+    //!code-end: instantiate
 
+    //!code-start: set-values
     // Now, populate it with some numeric values in A1:A10.
     for (ixion::abs_address_t pos(0, 0, 0); pos.row <= 9; ++pos.row)
     {
         double value = pos.row + 1.0; // Set the row position + 1 as the cell value.
         doc.set_numeric_cell(pos, value);
     }
+    //!code-end: set-values
 
+    //!code-start: insert-strings-1
     // Insert string values.
     std::string s = "This cell contains a string value.";
     doc.set_string_cell("B2", s);
     doc.set_string_cell("B3", "This too contains a string value.");
+    //!code-end: insert-strings-1
 
+    //!code-start: insert-string-2
     doc.set_string_cell("MySheet!B4", "Yet another string value.");
+    //!code-end: insert-string-2
 
+    //!code-start: set-formula-and-calc
     // Now, let's insert a formula into A11 to sum up values in A1:A10, and calculate it afterward.
     doc.set_formula_cell("A11", "SUM(A1:A10)");
     doc.calculate(0);
+    //!code-end: set-formula-and-calc
 
+    //!code-start: set-value-and-print
     double value = doc.get_numeric_value("A11");
-    cout << "value of A11: " << value << endl;
+    std::cout << "value of A11: " << value << std::endl;
+    //!code-end: set-value-and-print
 
+    //!code-start: update-a11-and-recalc
     // Insert a new formula to A11.
     doc.set_formula_cell("A11", "AVERAGE(A1:A10)");
     doc.calculate(0);
 
     value = doc.get_numeric_value("A11");
-    cout << "value of A11: " << value << endl;
+    std::cout << "value of A11: " << value << std::endl;
+    //!code-end: update-a11-and-recalc
 
+    //!code-start: update-a10-and-recalc
     // Overwrite A10 with a formula cell with no references.
     doc.set_formula_cell("A10", "(100+50)/2");
     doc.calculate(0);
 
     value = doc.get_numeric_value("A10");
-    cout << "value of A10: " << value << endl;
+    std::cout << "value of A10: " << value << std::endl;
 
     value = doc.get_numeric_value("A11");
-    cout << "value of A11: " << value << endl;
+    std::cout << "value of A11: " << value << std::endl;
+    //!code-end: update-a10-and-recalc
 
     return EXIT_SUCCESS;
 }

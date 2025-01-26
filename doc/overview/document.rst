@@ -26,27 +26,29 @@ section.
 First, we need to instantiate the :cpp:class:`~ixion::document` instance and
 insert a sheet named ``MySheet``.
 
-::
-
-    ixion::document doc;
-    doc.append_sheet("MySheet");
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: instantiate
+   :end-before: //!code-end: instantiate
+   :dedent: 4
 
 Next, like we did in the previous section, we will insert numbers 1 through 10
-in cells A1 through A10::
+in cells A1 through A10:
 
-    for (ixion::abs_address_t pos(0, 0, 0); pos.row <= 9; ++pos.row)
-    {
-        double value = pos.row + 1.0; // Set the row position + 1 as the cell value.
-        doc.set_numeric_cell(pos, value);
-    }
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: set-values
+   :end-before: //!code-end: set-values
+   :dedent: 4
 
 So far we don't see much of a difference from model_context.  Let's now insert
-string values into cells B2 and B3::
+string values into cells B2 and B3:
 
-    // Insert string values.
-    std::string s = "This cell contains a string value.";
-    doc.set_string_cell("B2", s);
-    doc.set_string_cell("B3", "This too contains a string value.");
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: insert-strings-1
+   :end-before: //!code-end: insert-strings-1
+   :dedent: 4
 
 Here we see the first difference.  When using :cpp:class:`~ixion::document`,
 You can specify the cell position either by :cpp:struct:`~ixion::abs_address_t`
@@ -57,25 +59,35 @@ is "Excel A1" syntax.  You can pick a different syntax by passing a value of typ
 
 It's worth noting that, when specifying the cell position as a string value and
 the sheet name is omitted, the first sheet is implied.  You can also specify
-the sheet name explicitly as in the following::
+the sheet name explicitly as in the following:
 
-    doc.set_string_cell("MySheet!B4", "Yet another string value.");
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: insert-string-2
+   :end-before: //!code-end: insert-string-2
+   :dedent: 4
 
 For a document with only one sheet, it makes no difference whether to include
 the sheet name or leave it out, but if you have more than one sheet, you need to
 specify the sheet name when specifying a cell position on sheets other than the
 first one.
 
-Now, let's insert a a formula into A11 to sum up values in A1:A10, and calculate
-it afterward::
+Now, let's insert a formula into A11 to sum up values in A1:A10, and calculate
+it afterward:
 
-    doc.set_formula_cell("A11", "SUM(A1:A10)");
-    doc.calculate(0);
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: set-formula-and-calc
+   :end-before: //!code-end: set-formula-and-calc
+   :dedent: 4
 
-And fetch the calculated value in A11 and see what the result is::
+And fetch the calculated value in A11 and see what the result is:
 
-    double value = doc.get_numeric_value("A11");
-    cout << "value of A11: " << value << endl;
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: set-value-and-print
+   :end-before: //!code-end: set-value-and-print
+   :dedent: 4
 
 You should see the following output:
 
@@ -88,14 +100,13 @@ argument that is the number of threads to use for the calculation.  We pass 0 he
 run the calculation using only the main thread.
 
 Now, let's re-write the formula in cell A11 to take the average of A1:A10 instead,
-run the calculation again, and check the value of A11::
+run the calculation again, and check the value of A11:
 
-    // Insert a new formula to A11.
-    doc.set_formula_cell("A11", "AVERAGE(A1:A10)");
-    doc.calculate(0);
-
-    value = doc.get_numeric_value("A11");
-    cout << "value of A11: " << value << endl;
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: update-a11-and-recalc
+   :end-before: //!code-end: update-a11-and-recalc
+   :dedent: 4
 
 The output says:
 
@@ -108,17 +119,13 @@ and register cell A11 before and after the edit.
 
 Lastly, let's insert into cell A10 a new formula that contains no references to other cells.
 As this will trigger a re-calculation of cell A11, we will check the values of both A10
-and A11::
+and A11:
 
-    // Overwrite A10 with a formula cell with no references.
-    doc.set_formula_cell("A10", "(100+50)/2");
-    doc.calculate(0);
-
-    value = doc.get_numeric_value("A10");
-    cout << "value of A10: " << value << endl;
-
-    value = doc.get_numeric_value("A11");
-    cout << "value of A11: " << value << endl;
+.. literalinclude:: ../../doc_example/document_simple.cpp
+   :language: C++
+   :start-after: //!code-start: update-a10-and-recalc
+   :end-before: //!code-end: update-a10-and-recalc
+   :dedent: 4
 
 The output will be:
 
