@@ -4,59 +4,62 @@
 #include <ixion/cell_access.hpp>
 #include <ixion/address.hpp>
 
-using namespace std;
-
 void access(const ixion::cell_access& ca)
 {
+    //!code-start: get-value
     switch (ca.get_value_type())
     {
         case ixion::cell_value_t::numeric:
         {
             double v = ca.get_numeric_value();
-            cout << "numeric value: " << v << endl;
+            std::cout << "numeric value: " << v << std::endl;
             break;
         }
         case ixion::cell_value_t::string:
         {
             std::string_view s = ca.get_string_value();
-            cout << "string value: " << s << endl;
+            std::cout << "string value: " << s << std::endl;
             break;
         }
         case ixion::cell_value_t::boolean:
         {
-            cout << "boolean value: " << ca.get_boolean_value() << endl;
+            std::cout << "boolean value: " << ca.get_boolean_value() << std::endl;
             break;
         }
         case ixion::cell_value_t::error:
         {
             ixion::formula_error_t err = ca.get_error_value();
-            cout << "error value: " << ixion::get_formula_error_name(err) << endl;
+            std::cout << "error value: " << ixion::get_formula_error_name(err) << std::endl;
             break;
         }
         case ixion::cell_value_t::empty:
         {
-            cout << "empty cell" << endl;
+            std::cout << "empty cell" << std::endl;
             break;
         }
         default:
-            cout << "???" << endl;
+            std::cout << "???" << std::endl;
     }
+    //!code-end: get-value
 }
 
 void from_document()
 {
+    //!code-start: get-from-document
     ixion::document doc;
     doc.append_sheet("Sheet");
 
     // fill this document
 
     ixion::cell_access ca = doc.get_cell_access("A1");
+    //!code-end: get-from-document
 
     access(ca);
 }
 
 void from_model_context()
 {
+    //!code-start: get-from-model-context
     ixion::model_context cxt;
     cxt.append_sheet("Sheet");
 
@@ -64,6 +67,7 @@ void from_model_context()
 
     ixion::abs_address_t A1(0, 0, 0);
     ixion::cell_access ca = cxt.get_cell_access(A1);
+    //!code-end: get-from-model-context
 
     access(ca);
 }
