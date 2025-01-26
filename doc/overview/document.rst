@@ -3,8 +3,8 @@
 
 .. _use-document:
 
-Use document
-============
+Using document for builtin formula management
+=============================================
 
 In the :ref:`use-model-context` section, we saw an example of how to
 set up a cell value store and run some simple calculations using the

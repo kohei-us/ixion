@@ -1,6 +1,6 @@
 
-Use cell_access
-===============
+Using cell_access for repeated operations on same cell
+======================================================
 
 You can obtain a :cpp:class:`~ixion::cell_access` instance either from
 :cpp:class:`~ixion::model_context` or :cpp:class:`~ixion::document` class.
