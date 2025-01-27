@@ -5,24 +5,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_WORKBOOK_HPP
-#define INCLUDED_IXION_WORKBOOK_HPP
+#pragma once
 
 #include "column_store_type.hpp"
 #include "model_types.hpp"
 
 #include <vector>
 
-namespace ixion {
+namespace ixion { namespace detail {
 
-class worksheet
+class sheet_store
 {
 public:
     typedef column_store_t::size_type size_type;
 
-    worksheet();
-    worksheet(size_type row_size, size_type col_size);
-    ~worksheet();
+    sheet_store();
+    sheet_store(size_type row_size, size_type col_size);
+    ~sheet_store();
 
     column_store_t& operator[](size_type n) { return m_columns[n]; }
     const column_store_t& operator[](size_type n) const { return m_columns[n]; }
@@ -50,29 +49,6 @@ private:
     detail::named_expressions_t m_named_expressions;
 };
 
-class workbook
-{
-public:
-    workbook();
-    workbook(size_t sheet_size, size_t row_size, size_t col_size);
-    ~workbook();
+}}
 
-    worksheet& operator[](size_t n) { return m_sheets[n]; }
-    const worksheet& operator[](size_t n) const { return m_sheets[n]; }
-
-    worksheet& at(size_t n) { return m_sheets.at(n); }
-    const worksheet& at(size_t n) const { return m_sheets.at(n); }
-
-    void push_back(size_t row_size, size_t col_size);
-
-    size_t size() const;
-    bool empty() const;
-
-private:
-    std::deque<worksheet> m_sheets;
-};
-
-}
-
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

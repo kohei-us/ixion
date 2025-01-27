@@ -12,7 +12,7 @@
 #include <ixion/exceptions.hpp>
 
 #include "model_context_impl.hpp"
-#include "workbook.hpp"
+#include "sheet_store.hpp"
 #include "utils.hpp"
 #include "model_types.hpp"
 

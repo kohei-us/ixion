@@ -41,7 +41,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     types.cpp
     utf8.cpp
     utils.cpp
-    workbook.cpp
+    sheet_store.cpp
 )
 
 if(BUILD_VULKAN)

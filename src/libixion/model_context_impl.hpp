@@ -13,7 +13,7 @@
 #include "ixion/config.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
 
-#include "workbook.hpp"
+#include "sheet_store.hpp"
 #include "column_store_type.hpp"
 
 #include <vector>
@@ -23,6 +23,8 @@
 #include <deque>
 
 namespace ixion { namespace detail {
+
+using sheet_stores_type = std::deque<sheet_store>;
 
 class safe_string_pool
 {
@@ -166,7 +168,7 @@ public:
 
     bool empty() const;
 
-    const worksheet* fetch_sheet(sheet_t sheet_index) const;
+    const sheet_store* fetch_sheet(sheet_t sheet_index) const;
 
     column_store_t::const_position_type get_cell_position(const abs_address_t& addr) const;
 
@@ -183,7 +185,7 @@ private:
     model_context& m_parent;
 
     rc_size_t m_sheet_size;
-    workbook m_sheets;
+    sheet_stores_type m_sheets;
 
     config m_config;
     dirty_cell_tracker m_tracker;

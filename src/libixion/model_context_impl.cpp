@@ -122,10 +122,10 @@ rc_size_t to_group_size(const abs_range_t& group_range)
 }
 
 void set_grouped_formula_cells_to_workbook(
-    workbook& wb, const abs_address_t& top_left, const rc_size_t& group_size,
+    sheet_stores_type& wb, const abs_address_t& top_left, const rc_size_t& group_size,
     const calc_status_ptr_t& cs, const formula_tokens_store_ptr_t& ts)
 {
-    worksheet& sheet = wb.at(top_left.sheet);
+    sheet_store& sheet = wb.at(top_left.sheet);
 
     for (col_t col_offset = 0; col_offset < group_size.column; ++col_offset)
     {
@@ -269,7 +269,7 @@ const named_expression_t* model_context_impl::get_named_expression(std::string_v
 
 const named_expression_t* model_context_impl::get_named_expression(sheet_t sheet, std::string_view name) const
 {
-    const worksheet* ws = fetch_sheet(sheet);
+    const sheet_store* ws = fetch_sheet(sheet);
 
     if (ws)
     {
@@ -350,7 +350,7 @@ sheet_t model_context_impl::append_sheet(std::string&& name)
     sheet_t sheet_index = m_sheets.size();
 
     m_sheet_names.push_back(std::move(name));
-    m_sheets.push_back(m_sheet_size.row, m_sheet_size.column);
+    m_sheets.emplace_back(m_sheet_size.row, m_sheet_size.column);
     return sheet_index;
 }
 
@@ -425,7 +425,7 @@ const column_store_t* model_context_impl::get_column(sheet_t sheet, col_t col) c
     if (static_cast<size_t>(sheet) >= m_sheets.size())
         return nullptr;
 
-    const worksheet& sh = m_sheets[sheet];
+    const sheet_store& sh = m_sheets[sheet];
 
     if (static_cast<size_t>(col) >= sh.size())
         return nullptr;
@@ -438,7 +438,7 @@ const column_stores_t* model_context_impl::get_columns(sheet_t sheet) const
     if (static_cast<size_t>(sheet) >= m_sheets.size())
         return nullptr;
 
-    const worksheet& sh = m_sheets[sheet];
+    const sheet_store& sh = m_sheets[sheet];
     return &sh.get_columns();
 }
 
@@ -513,7 +513,7 @@ double model_context_impl::count_range(abs_range_t range, values_t values_type) 
 
     for (sheet_t sheet = range.first.sheet; sheet <= last_sheet; ++sheet)
     {
-        const worksheet& ws = m_sheets.at(sheet);
+        const sheet_store& ws = m_sheets.at(sheet);
         for (col_t col = range.first.column; col <= range.last.column; ++col)
         {
             const column_store_t& cs = ws.at(col);
@@ -584,7 +584,7 @@ double model_context_impl::count_range(abs_range_t range, values_t values_type) 
 
 void model_context_impl::walk(sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const
 {
-    const worksheet& sh = m_sheets.at(sheet);
+    const sheet_store& sh = m_sheets.at(sheet);
 
     for (col_t ic = range.first.column; ic <= range.last.column; ++ic)
     {
@@ -621,7 +621,7 @@ bool model_context_impl::empty() const
     return m_sheets.empty();
 }
 
-const worksheet* model_context_impl::fetch_sheet(sheet_t sheet_index) const
+const sheet_store* model_context_impl::fetch_sheet(sheet_t sheet_index) const
 {
     if (sheet_index < 0 || m_sheets.size() <= size_t(sheet_index))
         return nullptr;
@@ -642,7 +642,7 @@ const detail::named_expressions_t& model_context_impl::get_named_expressions() c
 
 const detail::named_expressions_t& model_context_impl::get_named_expressions(sheet_t sheet) const
 {
-    const worksheet& sh = m_sheets.at(sheet);
+    const sheet_store& sh = m_sheets.at(sheet);
     return sh.get_named_expressions();
 }
 
@@ -669,7 +669,7 @@ std::unique_ptr<iface::session_handler> model_context_impl::create_session_handl
 
 void model_context_impl::empty_cell(const abs_address_t& addr)
 {
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set_empty(addr.row, addr.row);
@@ -677,7 +677,7 @@ void model_context_impl::empty_cell(const abs_address_t& addr)
 
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
@@ -685,7 +685,7 @@ void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 
 void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 {
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
@@ -693,7 +693,7 @@ void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, std::string_view s)
 {
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     string_id_t str_id = add_string(s);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
@@ -706,7 +706,7 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
         // Destination cell length is 0.  Nothing to copy to.
         return;
 
-    worksheet& sheet = m_sheets.at(src.sheet);
+    sheet_store& sheet = m_sheets.at(src.sheet);
     column_store_t& col_store = sheet.at(src.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(src.column);
 
@@ -757,7 +757,7 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, identifier);
@@ -768,7 +768,7 @@ formula_cell* model_context_impl::set_formula_cell(
 {
     std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
 
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     formula_cell* p = fcell.release();
@@ -781,7 +781,7 @@ formula_cell* model_context_impl::set_formula_cell(
 {
     std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
 
-    worksheet& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
     formula_cell* p = fcell.release();
@@ -822,7 +822,7 @@ void model_context_impl::set_grouped_formula_cells(
 
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 {
-    const worksheet& cols = m_sheets.at(sheet);
+    const sheet_store& cols = m_sheets.at(sheet);
     size_t col_size = cols.size();
     if (!col_size)
         return abs_range_t(abs_range_t::invalid);
@@ -1103,7 +1103,7 @@ abs_range_t model_context_impl::shrink_to_workbook(abs_range_t range) const
         throw general_error("out-of-bound sheet ranges");
 
     range.last.sheet = std::min<sheet_t>(range.last.sheet, m_sheets.size()-1);
-    const worksheet& ws = m_sheets[range.last.sheet];
+    const sheet_store& ws = m_sheets[range.last.sheet];
     const column_stores_t& cols = ws.get_columns();
 
     if (cols.empty())

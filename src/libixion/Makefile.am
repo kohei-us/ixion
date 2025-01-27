@@ -82,8 +82,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	utf8.cpp \
 	utils.hpp \
 	utils.cpp \
-	workbook.hpp \
-	workbook.cpp \
+	sheet_store.hpp \
+	sheet_store.cpp \
 	interface.cpp
 
 if BUILD_VULKAN
