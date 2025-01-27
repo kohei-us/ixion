@@ -31,4 +31,4 @@ print the value of the cell as follows:
    :dedent: 4
 
 The complete source code of this example is avaiable
-`here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/section_examples/cell_access.cpp>`_.
+`here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/cell_access.cpp>`_.
