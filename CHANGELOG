@@ -22,7 +22,7 @@ ixion 0.20.0
   * switched to mdds 3.0 and adjusted all uses of mdds::sorted_string_map to its
     new API.
 
-  * parsing of error values is more precise via use of std::packed_trie_map.
+  * parsing of error values is more precise via use of mdds::packed_trie_map.
 
 ixion 0.19.0
 
