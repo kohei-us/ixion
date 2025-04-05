@@ -10,15 +10,12 @@
 #include "ixion/compute_engine.hpp"
 #include <sstream>
 #include <vector>
-#include <boost/filesystem.hpp>
 
 #ifdef _WIN32
 #include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
-
-namespace fs = boost::filesystem;
 
 namespace ixion { namespace draft {
 
