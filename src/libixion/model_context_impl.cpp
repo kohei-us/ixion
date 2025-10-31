@@ -31,8 +31,6 @@ namespace ixion { namespace detail {
 
 string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
 {
-    assert(!s.empty());
-
     string_id_t str_id = m_strings.size();
     m_strings.push_back(std::string{s});
     s = m_strings.back();
@@ -42,10 +40,6 @@ string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
 
 string_id_t safe_string_pool::append_string(std::string_view s)
 {
-    if (s.empty())
-        // Never add an empty or invalid string.
-        return empty_string_id;
-
     std::unique_lock<std::mutex> lock(m_mtx);
     return append_string_unsafe(s);
 }

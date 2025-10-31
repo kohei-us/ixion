@@ -167,7 +167,7 @@ void test_string_pool()
     string_id_t s_table2 = cxt.append_string("Table2");
     string_id_t s_cat = cxt.append_string("Category");
     string_id_t s_val = cxt.append_string("Value");
-
+    string_id_t s_empty = cxt.append_string("");
     cxt.dump_strings();
 
     // Make sure these work correctly before proceeding further with the test.
@@ -175,6 +175,45 @@ void test_string_pool()
     assert(s_table2 == cxt.get_identifier_from_string("Table2"));
     assert(s_cat == cxt.get_identifier_from_string("Category"));
     assert(s_val == cxt.get_identifier_from_string("Value"));
+    assert(s_empty == cxt.get_identifier_from_string(""));
+}
+
+void test_string_pool_duplicate_strings()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    model_context cxt;
+
+    string_id_t s_value1 = cxt.append_string("value");
+    string_id_t s_value2 = cxt.append_string("value");
+    assert(s_value1 != s_value2);
+    string_id_t s_empty1 = cxt.append_string("");
+    string_id_t s_empty2 = cxt.append_string("");
+    assert(s_empty1 != s_empty2);
+
+    {
+        const auto* s = cxt.get_string(s_value1);
+        assert(s);
+        assert(*s == "value");
+    }
+
+    {
+        const auto* s = cxt.get_string(s_value2);
+        assert(s);
+        assert(*s == "value");
+    }
+
+    {
+        const auto* s = cxt.get_string(s_empty1);
+        assert(s);
+        assert(s->empty());
+    }
+
+    {
+        const auto* s = cxt.get_string(s_empty2);
+        assert(s);
+        assert(s->empty());
+    }
 }
 
 void test_formula_tokens_store()
@@ -1556,6 +1595,7 @@ int main()
     test_formula_opcode_string();
     test_string_to_double();
     test_string_pool();
+    test_string_pool_duplicate_strings();
     test_formula_tokens_store();
     test_matrix();
     test_matrix_non_numeric_values();

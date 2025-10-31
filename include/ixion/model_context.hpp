@@ -205,6 +205,20 @@ public:
     const iface::table_handler* get_table_handler() const;
 
     /**
+     * Append a new string to the string pool.  The string being passed will be
+     * inserted into the pool with a new string ID which is the current maximum
+     * ID incremented by one.
+     *
+     * @param s String to append to the pool.
+     *
+     * @return Integer value associated with the appended string.
+     *
+     * @note This function will not check for duplicates in the pool.  An empty
+     *       string will also be inserted into the pool.
+     */
+    string_id_t append_string(std::string_view s);
+
+    /**
      * Try to add a new string to the string pool. If the same string already
      * exists in the pool, the new string won't be added to the pool.
      *
@@ -213,6 +227,7 @@ public:
      * @return string_id_t integer value representing the string.
      */
     string_id_t add_string(std::string_view s);
+
     const std::string* get_string(string_id_t identifier) const;
 
     /**
@@ -260,8 +275,6 @@ public:
      * @return number of sheets.
      */
     size_t get_sheet_count() const;
-
-    string_id_t append_string(std::string_view s);
 
     void set_sheet_size(const rc_size_t& sheet_size);
     void set_config(const config& cfg);
