@@ -34,7 +34,7 @@ string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
     string_id_t str_id = m_strings.size();
     m_strings.push_back(std::string{s});
     s = m_strings.back();
-    m_string_map.insert(string_map_type::value_type(s, str_id));
+    m_string_map.insert({s, str_id});
     return str_id;
 }
 
