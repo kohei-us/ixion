@@ -19,7 +19,6 @@ AC_INIT([libixion],[ixion_version])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2 dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
 CXXFLAGS="$CXXFLAGS -fvisibility=hidden -Wall -Wshadow -Wno-write-strings -pthread"
 
 AC_CANONICAL_HOST
@@ -92,6 +91,7 @@ done
 
 # Checks for programs.
 AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
 LT_INIT([win32-dll disable-static pic-only])
 AC_CANONICAL_HOST
 
@@ -129,7 +129,7 @@ AS_IF([test "x$enable_debug" != "xno"], [
 	AC_DEFINE([NDEBUG], [], [Disable debugging information])
 ])
 
-PKG_CHECK_MODULES([MDDS],[mdds-3.0 >= 2.1.99])
+PKG_CHECK_MODULES([MDDS],[mdds-3.0 >= 3.2.0])
 
 AC_ARG_ENABLE(log-debug,
 	AS_HELP_STRING([--enable-log-debug], [Enable debug outputs]),
