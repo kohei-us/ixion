@@ -32,6 +32,7 @@
 #include <cmath>
 #include <optional>
 #include <iterator>
+#include <numbers>
 
 #include <mdds/sorted_string_map.hpp>
 
@@ -1153,7 +1154,7 @@ void formula_functions::fnc_pi(formula_value_stack& args) const
     if (!args.empty())
         throw formula_functions::invalid_arg("PI takes no arguments.");
 
-    args.push_value(M_PI);
+    args.push_value(std::numbers::pi_v<double>);
 }
 
 void formula_functions::fnc_int(formula_value_stack& args) const
