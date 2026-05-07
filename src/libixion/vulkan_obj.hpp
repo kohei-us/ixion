@@ -9,23 +9,24 @@
 #define INCLUDED_IXION_VULKAN_OBJ_HPP
 
 #include <vulkan/vulkan.h>
+#include <concepts>
 #include <memory>
 #include <limits>
 #include <initializer_list>
 
 namespace ixion { namespace draft {
 
-template<typename T, typename U = void>
+template<typename T>
 struct null_value;
 
-template<typename T>
-struct null_value<T, typename std::enable_if<std::is_pointer<T>::value>::type>
+template<typename T> requires std::is_pointer_v<T>
+struct null_value<T>
 {
     static constexpr std::nullptr_t value = nullptr;
 };
 
-template<typename T>
-struct null_value<T, typename std::enable_if<std::is_integral<T>::value>::type>
+template<std::integral T>
+struct null_value<T>
 {
     static constexpr T value = 0;
 };
