@@ -42,7 +42,7 @@ public:
 }
 
 void calculate_sorted_cells(
-    model_context& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count)
+    model_context& cxt, std::span<const abs_range_t> formula_cells, size_t thread_count)
 {
 #if IXION_THREADS == 0
     thread_count = 0;  // threads are disabled thus not to be used.

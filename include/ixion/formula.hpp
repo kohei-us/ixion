@@ -12,6 +12,7 @@
 #include "types.hpp"
 #include "env.hpp"
 
+#include <span>
 #include <string>
 
 namespace ixion {
@@ -208,7 +209,7 @@ IXION_DLLPUBLIC std::vector<abs_range_t> query_and_sort_dirty_cells(
  *                     manage the calculation threads.
  */
 void IXION_DLLPUBLIC calculate_sorted_cells(
-    model_context& cxt, const std::vector<abs_range_t>& formula_cells, size_t thread_count);
+    model_context& cxt, std::span<const abs_range_t> formula_cells, size_t thread_count);
 
 } // namespace ixion
 

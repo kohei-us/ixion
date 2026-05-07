@@ -156,7 +156,7 @@ Functions
 
 calculate_sorted_cells
 ^^^^^^^^^^^^^^^^^^^^^^
-.. doxygenfunction:: ixion::calculate_sorted_cells(model_context &cxt, const std::vector< abs_range_t > &formula_cells, size_t thread_count)
+.. doxygenfunction:: ixion::calculate_sorted_cells(model_context &cxt, std::span< const abs_range_t > formula_cells, size_t thread_count)
 
 create_formula_error_tokens
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
