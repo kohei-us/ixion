@@ -27,4 +27,5 @@ libixion_HEADERS = \
 	module.hpp \
 	named_expressions_iterator.hpp \
 	table.hpp \
-	types.hpp
+	types.hpp \
+	version.hpp

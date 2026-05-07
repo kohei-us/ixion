@@ -41,10 +41,10 @@ src/ixion-parser.exe
 src/ixion-sorter
 src/ixion-sorter.exe
 src/libixion/compute-engine-test
-src/libixion/constants.inl
 src/libixion/dirty-cell-tracker-test
 src/libixion/document-test
 src/libixion/general-test
 src/libixion/ixion-test-track-deps
 src/libixion/name-resolver-test
+src/libixion/version-test
 libixion-*.*.*.tar.*

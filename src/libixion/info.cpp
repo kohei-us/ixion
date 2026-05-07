@@ -5,35 +5,34 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/info.hpp"
-
-#include "constants.inl"
+#include <ixion/info.hpp>
+#include <ixion/version.hpp>
 
 namespace ixion {
 
 int get_version_major()
 {
-    return IXION_MAJOR_VERSION;
+    return IXION_VERSION_MAJOR;
 }
 
 int get_version_minor()
 {
-    return IXION_MINOR_VERSION;
+    return IXION_VERSION_MINOR;
 }
 
 int get_version_micro()
 {
-    return IXION_MICRO_VERSION;
+    return IXION_VERSION_MICRO;
 }
 
 int get_api_version_major()
 {
-    return IXION_MAJOR_API_VERSION;
+    return IXION_API_VERSION_MAJOR;
 }
 
 int get_api_version_minor()
 {
-    return IXION_MINOR_API_VERSION;
+    return IXION_API_VERSION_MINOR;
 }
 
 }

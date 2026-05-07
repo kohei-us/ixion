@@ -7,17 +7,13 @@
 
 #pragma once
 
-#include "./env.hpp"
+#define IXION_VERSION "@IXION_VERSION@"
+#define IXION_VERSION_MAJOR @IXION_VERSION_MAJOR@
+#define IXION_VERSION_MINOR @IXION_VERSION_MINOR@
+#define IXION_VERSION_MICRO @IXION_VERSION_MICRO@
 
-namespace ixion {
-
-IXION_DLLPUBLIC int get_version_major();
-IXION_DLLPUBLIC int get_version_minor();
-IXION_DLLPUBLIC int get_version_micro();
-
-IXION_DLLPUBLIC int get_api_version_major();
-IXION_DLLPUBLIC int get_api_version_minor();
-
-}
+#define IXION_API_VERSION "@IXION_API_VERSION@"
+#define IXION_API_VERSION_MAJOR @IXION_API_VERSION_MAJOR@
+#define IXION_API_VERSION_MINOR @IXION_API_VERSION_MINOR@
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

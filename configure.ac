@@ -1,18 +1,18 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-m4_define([ixion_major_version], [0])
-m4_define([ixion_minor_version], [20])
-m4_define([ixion_micro_version], [0])
+m4_define([ixion_version_major], [0])
+m4_define([ixion_version_minor], [20])
+m4_define([ixion_version_micro], [0])
 
-m4_define([ixion_major_api_version], [0])
-m4_define([ixion_minor_api_version], [20])
+m4_define([ixion_api_version_major], [0])
+m4_define([ixion_api_version_minor], [20])
 
 m4_define([ixion_version],
-          [ixion_major_version.ixion_minor_version.ixion_micro_version])
+          [ixion_version_major.ixion_version_minor.ixion_version_micro])
 
 m4_define([ixion_api_version],
-          [ixion_major_api_version.ixion_minor_api_version])
+          [ixion_api_version_major.ixion_api_version_minor])
 
 
 AC_INIT([libixion],[ixion_version])
@@ -66,19 +66,19 @@ AC_ARG_ENABLE([vulkan],
 )
 
 IXION_VERSION=ixion_version
+IXION_VERSION_MAJOR=ixion_version_major
+IXION_VERSION_MINOR=ixion_version_minor
+IXION_VERSION_MICRO=ixion_version_micro
 IXION_API_VERSION=ixion_api_version
-IXION_MAJOR_VERSION=ixion_major_version
-IXION_MINOR_VERSION=ixion_minor_version
-IXION_MICRO_VERSION=ixion_micro_version
-IXION_MAJOR_API_VERSION=ixion_major_api_version
-IXION_MINOR_API_VERSION=ixion_minor_api_version
+IXION_API_VERSION_MAJOR=ixion_api_version_major
+IXION_API_VERSION_MINOR=ixion_api_version_minor
 AC_SUBST(IXION_VERSION)
+AC_SUBST(IXION_VERSION_MAJOR)
+AC_SUBST(IXION_VERSION_MINOR)
+AC_SUBST(IXION_VERSION_MICRO)
 AC_SUBST(IXION_API_VERSION)
-AC_SUBST(IXION_MAJOR_VERSION)
-AC_SUBST(IXION_MINOR_VERSION)
-AC_SUBST(IXION_MICRO_VERSION)
-AC_SUBST(IXION_MAJOR_API_VERSION)
-AC_SUBST(IXION_MINOR_API_VERSION)
+AC_SUBST(IXION_API_VERSION_MAJOR)
+AC_SUBST(IXION_API_VERSION_MINOR)
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -201,12 +201,12 @@ AC_CONFIG_FILES([Makefile
                  doc_example/Makefile
                  include/Makefile
                  include/ixion/Makefile
+                 include/ixion/version.hpp
                  include/ixion/interface/Makefile
                  misc/libixion.spec
                  src/Makefile
                  src/include/Makefile
                  src/libixion/Makefile
-                 src/libixion/constants.inl
                  src/python/Makefile
                  src/test/Makefile
 ])

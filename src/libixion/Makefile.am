@@ -24,7 +24,8 @@ check_PROGRAMS = \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \
-	name-resolver-test
+	name-resolver-test \
+	version-test
 
 lib_LTLIBRARIES = libixion-@IXION_API_VERSION@.la
 libixion_@IXION_API_VERSION@_la_SOURCES = \
@@ -165,6 +166,11 @@ dirty_cell_tracker_test_LDADD = \
 	../test/libixion-test.a \
 	libixion-@IXION_API_VERSION@.la
 
+version_test_SOURCES = version_test.cpp
+version_test_LDADD = \
+	../test/libixion-test.a \
+	libixion-@IXION_API_VERSION@.la
+
 AM_TESTS_ENVIRONMENT =
 
 TESTS = \
@@ -173,4 +179,5 @@ TESTS = \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \
-	name-resolver-test
+	name-resolver-test \
+	version-test

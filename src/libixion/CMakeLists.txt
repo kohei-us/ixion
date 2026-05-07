@@ -64,10 +64,6 @@ if(BUILD_VULKAN)
 
 endif()
 
-configure_file(constants.inl.in ${CMAKE_CURRENT_BINARY_DIR}/inl/constants.inl)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/inl)
-
 target_compile_definitions(ixion-${IXION_API_VERSION} PRIVATE IXION_BUILD DLL_EXPORT)
 
 if(MSVC)
@@ -106,6 +102,10 @@ add_executable(compute-engine-test EXCLUDE_FROM_ALL
     compute_engine_test.cpp
 )
 
+add_executable(version-test EXCLUDE_FROM_ALL
+    version_test.cpp
+)
+
 target_include_directories(compute-engine-test PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
 
 target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
@@ -114,6 +114,7 @@ target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION} ixion-tes
 target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(name-resolver-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(version-test ixion-${IXION_API_VERSION} ixion-test)
 
 add_dependencies(check
     document-test
@@ -122,6 +123,7 @@ add_dependencies(check
     dirty-cell-tracker-test
     compute-engine-test
     name-resolver-test
+    version-test
 )
 
 add_test(document-test document-test)
@@ -130,3 +132,4 @@ add_test(ixion-test-track-deps ixion-test-track-deps)
 add_test(dirty-cell-tracker-test dirty-cell-tracker-test)
 add_test(compute-engine-test compute-engine-test)
 add_test(name-resolver-test name-resolver-test)
+add_test(version-test version-test)
