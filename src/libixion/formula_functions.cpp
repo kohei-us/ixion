@@ -30,6 +30,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <concepts>
 #include <optional>
 #include <iterator>
 #include <numbers>
@@ -484,14 +485,10 @@ std::optional<bool> pop_one_value_as_boolean(const model_context& cxt, formula_v
  * Pop a value from the stack, and insert one or more numeric values to the
  * specified sequence container.
  */
-template<typename ContT>
+template<typename ContT> requires std::floating_point<typename ContT::value_type>
 void append_values_from_stack(
     const model_context& cxt, formula_value_stack& args, std::back_insert_iterator<ContT> insert_it)
 {
-    static_assert(
-        std::is_floating_point_v<typename ContT::value_type>,
-        "this function only supports a container of floating point values.");
-
     switch (args.get_type())
     {
         case stack_value_t::boolean:
