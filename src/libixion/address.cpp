@@ -47,23 +47,8 @@ std::size_t abs_address_t::hash::operator()(const abs_address_t& addr) const
     return addr.sheet + addr.row + addr.column;
 }
 
-bool operator== (const abs_address_t& left, const abs_address_t& right)
-{
-    return left.sheet == right.sheet &&
-        left.row == right.row &&
-        left.column == right.column;
-}
-
-bool operator< (const abs_address_t& left, const abs_address_t& right)
-{
-    if (left.sheet != right.sheet)
-        return left.sheet < right.sheet;
-
-    if (left.row != right.row)
-        return left.row < right.row;
-
-    return left.column < right.column;
-}
+std::strong_ordering abs_address_t::operator<=>(const abs_address_t& r) const = default;
+bool abs_address_t::operator==(const abs_address_t& r) const = default;
 
 address_t::address_t() :
     sheet(0), row(0), column(0), abs_sheet(true), abs_row(true), abs_column(true) {}
@@ -170,39 +155,8 @@ std::size_t address_t::hash::operator()(const address_t& addr) const
     return 0;
 }
 
-bool operator== (const address_t& left, const address_t& right)
-{
-    return left.sheet == right.sheet &&
-        left.row == right.row &&
-        left.column == right.column &&
-        left.abs_sheet == right.abs_sheet &&
-        left.abs_row == right.abs_row &&
-        left.abs_column == right.abs_column;
-}
-
-bool operator< (const address_t& left, const address_t& right)
-{
-    // Not sure how to compare absolute and relative addresses, but let's make
-    // absolute address always greater than relative one until we find a
-    // better way.
-
-    if (left.abs_sheet != right.abs_sheet)
-        return left.abs_sheet < right.abs_sheet;
-
-    if (left.abs_row != right.abs_row)
-        return left.abs_row < right.abs_row;
-
-    if (left.abs_column != right.abs_column)
-        return left.abs_column < right.abs_column;
-
-    if (left.sheet != right.sheet)
-        return left.sheet < right.sheet;
-
-    if (left.row != right.row)
-        return left.row < right.row;
-
-    return left.column < right.column;
-}
+std::strong_ordering address_t::operator<=>(const address_t& r) const = default;
+bool address_t::operator==(const address_t& r) const = default;
 
 abs_rc_address_t::abs_rc_address_t() : row(0), column(0)
 {
@@ -233,18 +187,8 @@ std::size_t abs_rc_address_t::hash::operator() (const abs_rc_address_t& addr) co
     return hv;
 }
 
-bool operator== (const abs_rc_address_t& left, const abs_rc_address_t& right)
-{
-    return left.row == right.row && left.column == right.column;
-}
-
-bool operator< (const abs_rc_address_t& left, const abs_rc_address_t& right)
-{
-    if (left.row != right.row)
-        return left.row < right.row;
-
-    return left.column < right.column;
-}
+std::strong_ordering abs_rc_address_t::operator<=>(const abs_rc_address_t& r) const = default;
+bool abs_rc_address_t::operator==(const abs_rc_address_t& r) const = default;
 
 rc_address_t::rc_address_t() :
     row(0), column(0), abs_row(true), abs_column(true) {}
@@ -266,31 +210,8 @@ std::size_t rc_address_t::hash::operator()(const rc_address_t& addr) const
     return hv;
 }
 
-bool operator== (const rc_address_t& left, const rc_address_t& right)
-{
-    return left.row == right.row &&
-        left.column == right.column &&
-        left.abs_row == right.abs_row &&
-        left.abs_column == right.abs_column;
-}
-
-bool operator< (const rc_address_t& left, const rc_address_t& right)
-{
-    // Not sure how to compare absolute and relative addresses, but let's make
-    // absolute address always greater than relative one until we find a
-    // better way.
-
-    if (left.abs_row != right.abs_row)
-        return left.abs_row < right.abs_row;
-
-    if (left.abs_column != right.abs_column)
-        return left.abs_column < right.abs_column;
-
-    if (left.row != right.row)
-        return left.row < right.row;
-
-    return left.column < right.column;
-}
+std::strong_ordering rc_address_t::operator<=>(const rc_address_t& r) const = default;
+bool rc_address_t::operator==(const rc_address_t& r) const = default;
 
 abs_range_t::abs_range_t() {}
 abs_range_t::abs_range_t(init_invalid) :
@@ -377,17 +298,8 @@ void abs_range_t::reorder()
         std::swap(first.column, last.column);
 }
 
-bool operator==(const abs_range_t& left, const abs_range_t& right)
-{
-    return left.first == right.first && left.last == right.last;
-}
-
-bool operator<(const abs_range_t& left, const abs_range_t& right)
-{
-    if (left.first != right.first)
-        return left.first < right.first;
-    return left.last < right.last;
-}
+std::strong_ordering abs_range_t::operator<=>(const abs_range_t& r) const = default;
+bool abs_range_t::operator==(const abs_range_t& r) const = default;
 
 abs_rc_range_t::abs_rc_range_t() {}
 abs_rc_range_t::abs_rc_range_t(init_invalid) :
@@ -453,17 +365,8 @@ bool abs_rc_range_t::contains(const abs_rc_address_t& addr) const
         first.column <= addr.column && addr.column <= last.column;
 }
 
-bool operator==(const abs_rc_range_t& left, const abs_rc_range_t& right)
-{
-    return left.first == right.first && left.last == right.last;
-}
-
-bool operator<(const abs_rc_range_t& left, const abs_rc_range_t& right)
-{
-    if (left.first != right.first)
-        return left.first < right.first;
-    return left.last < right.last;
-}
+std::strong_ordering abs_rc_range_t::operator<=>(const abs_rc_range_t& r) const = default;
+bool abs_rc_range_t::operator==(const abs_rc_range_t& r) const = default;
 
 range_t::range_t() {}
 range_t::range_t(const address_t& _first, const address_t& _last) :

@@ -10,6 +10,7 @@
 
 #include "types.hpp"
 
+#include <compare>
 #include <string>
 #include <vector>
 #include <ostream>
@@ -60,14 +61,14 @@ struct IXION_DLLPUBLIC abs_address_t
     bool valid() const;
     ::std::string get_name() const;
 
+    std::strong_ordering operator<=>(const abs_address_t& r) const;
+    bool operator==(const abs_address_t& r) const;
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const abs_address_t& addr) const;
     };
 };
-
-IXION_DLLPUBLIC bool operator==(const abs_address_t& left, const abs_address_t& right);
-IXION_DLLPUBLIC bool operator<(const abs_address_t& left, const abs_address_t& right);
 
 /**
  * Stores either absolute or relative address.
@@ -93,14 +94,14 @@ struct IXION_DLLPUBLIC address_t
 
     void set_absolute(bool abs);
 
+    std::strong_ordering operator<=>(const address_t& r) const;
+    bool operator==(const address_t& r) const;
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const address_t& addr) const;
     };
 };
-
-IXION_DLLPUBLIC bool operator==(const address_t& left, const address_t& right);
-IXION_DLLPUBLIC bool operator<(const address_t& left, const address_t& right);
 
 struct IXION_DLLPUBLIC abs_rc_address_t
 {
@@ -117,14 +118,14 @@ struct IXION_DLLPUBLIC abs_rc_address_t
 
     bool valid() const;
 
+    std::strong_ordering operator<=>(const abs_rc_address_t& r) const;
+    bool operator==(const abs_rc_address_t& r) const;
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const abs_rc_address_t& addr) const;
     };
 };
-
-IXION_DLLPUBLIC bool operator==(const abs_rc_address_t& left, const abs_rc_address_t& right);
-IXION_DLLPUBLIC bool operator<(const abs_rc_address_t& left, const abs_rc_address_t& right);
 
 /**
  * Stores either absolute or relative address, but unlike the address_t
@@ -142,14 +143,14 @@ struct IXION_DLLPUBLIC rc_address_t
     rc_address_t(const rc_address_t& r);
     rc_address_t(const abs_rc_address_t& r);
 
+    std::strong_ordering operator<=>(const rc_address_t& r) const;
+    bool operator==(const rc_address_t& r) const;
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const rc_address_t& addr) const;
     };
 };
-
-IXION_DLLPUBLIC bool operator==(const rc_address_t& left, const rc_address_t& right);
-IXION_DLLPUBLIC bool operator<(const rc_address_t& left, const rc_address_t& right);
 
 /**
  * Stores absolute range address.
@@ -216,10 +217,10 @@ struct IXION_DLLPUBLIC abs_range_t
      * Reorder range values as needed to ensure the range is valid.
      */
     void reorder();
-};
 
-IXION_DLLPUBLIC bool operator==(const abs_range_t& left, const abs_range_t& right);
-IXION_DLLPUBLIC bool operator<(const abs_range_t& left, const abs_range_t& right);
+    std::strong_ordering operator<=>(const abs_range_t& r) const;
+    bool operator==(const abs_range_t& r) const;
+};
 
 struct IXION_DLLPUBLIC abs_rc_range_t
 {
@@ -268,10 +269,10 @@ struct IXION_DLLPUBLIC abs_rc_range_t
      * Check whether or not a given address is contained within this range.
      */
     bool contains(const abs_rc_address_t& addr) const;
-};
 
-IXION_DLLPUBLIC bool operator==(const abs_rc_range_t& left, const abs_rc_range_t& right);
-IXION_DLLPUBLIC bool operator<(const abs_rc_range_t& left, const abs_rc_range_t& right);
+    std::strong_ordering operator<=>(const abs_rc_range_t& r) const;
+    bool operator==(const abs_rc_range_t& r) const;
+};
 
 /**
  * Stores range whose component may be relative or absolute.
