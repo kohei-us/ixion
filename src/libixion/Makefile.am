@@ -120,18 +120,13 @@ libixion_@IXION_API_VERSION@_la_SOURCES += \
 
 endif
 
-libixion_@IXION_API_VERSION@_la_LDFLAGS = \
-	-no-undefined \
-	$(BOOST_FILESYSTEM_LDFLAGS)
+libixion_@IXION_API_VERSION@_la_LDFLAGS = -no-undefined
 
 if !WINDOWS
 
 libixion_@IXION_API_VERSION@_la_LDFLAGS += -Wl,-rpath,'$$ORIGIN' -Wl,-rpath,'$$ORIGIN/$(PACKAGE)'
 
 endif # !WINDOWS
-
-libixion_@IXION_API_VERSION@_la_LIBADD = \
-	$(BOOST_FILESYSTEM_LIBS)
 
 document_test_SOURCES = document_test.cpp
 document_test_LDADD = \

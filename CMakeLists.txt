@@ -15,7 +15,7 @@ set(IXION_VERSION_MICRO ${ixion_VERSION_PATCH})  # NB: PATCH -> MICRO
 message(STATUS "ixion version: ${IXION_VERSION}")
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(Boost COMPONENTS program_options filesystem)
+find_package(Boost COMPONENTS program_options)
 find_package(Threads)
 find_package(Python3 COMPONENTS Interpreter Development.Module)
 
