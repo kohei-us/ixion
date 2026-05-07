@@ -19,7 +19,7 @@ table_t::table_t() :
 
 bool table_t::operator== (const table_t& r) const
 {
-    return name == r.name && column_first == r.column_first && column_last == r.column_first && areas == r.areas;
+    return name == r.name && column_first == r.column_first && column_last == r.column_last && areas == r.areas;
 }
 
 std::ostream& operator<<(std::ostream& os, const table_t& table)

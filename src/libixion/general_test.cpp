@@ -21,6 +21,7 @@
 #include <ixion/cell_access.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/exceptions.hpp>
+#include <ixion/table.hpp>
 
 #include <string>
 #include <cstring>
@@ -348,6 +349,41 @@ void test_address()
         assert(rc_range.last.row == 3);
         assert(rc_range.last.column == 4);
     }
+}
+
+void test_table_t_equality()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    table_t a;
+    a.name = 1;
+    a.column_first = 2;
+    a.column_last = 3;
+    a.areas = table_area_data;
+
+    table_t same = a;
+    assert(a == same);
+    assert(!(a != same));
+
+    table_t diff_name = a;
+    diff_name.name = 99;
+    assert(!(a == diff_name));
+    assert(a != diff_name);
+
+    table_t diff_column_first = a;
+    diff_column_first.column_first = 99;
+    assert(!(a == diff_column_first));
+    assert(a != diff_column_first);
+
+    table_t diff_column_last = a;
+    diff_column_last.column_last = 99;
+    assert(!(a == diff_column_last));
+    assert(a != diff_column_last);
+
+    table_t diff_areas = a;
+    diff_areas.areas = table_area_headers;
+    assert(!(a == diff_areas));
+    assert(a != diff_areas);
 }
 
 bool check_formula_expression(
@@ -1601,6 +1637,7 @@ int main()
     test_matrix_non_numeric_values();
 
     test_address();
+    test_table_t_equality();
     test_parse_and_print_expressions();
     test_function_name_resolution();
     test_model_context_storage();
