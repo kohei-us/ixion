@@ -13,7 +13,7 @@ set(IXION_VERSION_MAJOR ${ixion_VERSION_MAJOR})
 set(IXION_VERSION_MINOR ${ixion_VERSION_MINOR})
 set(IXION_VERSION_MICRO ${ixion_VERSION_PATCH})  # NB: PATCH -> MICRO
 message(STATUS "ixion version: ${IXION_VERSION}")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 find_package(Boost COMPONENTS program_options filesystem)
 find_package(Threads)

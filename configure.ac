@@ -91,7 +91,7 @@ done
 
 # Checks for programs.
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
+AX_CXX_COMPILE_STDCXX([20], [noext], [mandatory])
 LT_INIT([win32-dll disable-static pic-only])
 AC_CANONICAL_HOST
 
