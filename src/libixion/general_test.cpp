@@ -28,62 +28,59 @@
 #include <sstream>
 #include <thread>
 
-using namespace std;
-using namespace ixion;
-
 namespace {
 
 void test_size()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    cout << "test size" << endl;
-    cout << "* int: " << sizeof(int) << endl;
-    cout << "* long: " << sizeof(long) << endl;
-    cout << "* double: " << sizeof(double) << endl;
-    cout << "* size_t: " << sizeof(size_t) << endl;
-    cout << "* string_id_t: " << sizeof(string_id_t)
-        << " (min:" << std::numeric_limits<string_id_t>::min()
-        << "; max:" << std::numeric_limits<string_id_t>::max() << ")" << endl;
-    cout << "* cell_t: " << sizeof(cell_t) << endl;
-    cout << "* formula_cell: " << sizeof(formula_cell) << endl;
-    cout << "* formula_tokens_t: " << sizeof(formula_tokens_t) << endl;
+    std::cout << "test size" << std::endl;
+    std::cout << "* int: " << sizeof(int) << std::endl;
+    std::cout << "* long: " << sizeof(long) << std::endl;
+    std::cout << "* double: " << sizeof(double) << std::endl;
+    std::cout << "* size_t: " << sizeof(size_t) << std::endl;
+    std::cout << "* string_id_t: " << sizeof(ixion::string_id_t)
+        << " (min:" << std::numeric_limits<ixion::string_id_t>::min()
+        << "; max:" << std::numeric_limits<ixion::string_id_t>::max() << ")" << std::endl;
+    std::cout << "* cell_t: " << sizeof(ixion::cell_t) << std::endl;
+    std::cout << "* ixion::formula_cell: " << sizeof(ixion::formula_cell) << std::endl;
+    std::cout << "* ixion::formula_tokens_t: " << sizeof(ixion::formula_tokens_t) << std::endl;
 }
 
 void test_formula_opcode_name()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    constexpr std::tuple<fopcode_t, std::string_view> checks[] =
+    constexpr std::tuple<ixion::fopcode_t, std::string_view> checks[] =
     {
-        { fop_unknown, "unknown" },
-        { fop_single_ref, "single-ref" },
-        { fop_range_ref, "range-ref" },
-        { fop_table_ref, "table-ref" },
-        { fop_named_expression, "named-expression" },
-        { fop_string, "string" },
-        { fop_value, "value" },
-        { fop_function, "function" },
-        { fop_error, "error" },
-        { fop_plus, "plus" },
-        { fop_minus, "minus" },
-        { fop_divide, "divide" },
-        { fop_multiply, "multiply" },
-        { fop_exponent, "exponent" },
-        { fop_concat, "concat" },
-        { fop_equal, "equal" },
-        { fop_not_equal, "not-equal" },
-        { fop_less, "less" },
-        { fop_greater, "greater" },
-        { fop_less_equal, "less-equal" },
-        { fop_greater_equal, "greater-equal" },
-        { fop_open, "open" },
-        { fop_close, "close" },
-        { fop_sep, "sep" },
-        { fop_array_row_sep, "array-row-sep" },
-        { fop_array_open, "array-open" },
-        { fop_array_close, "array-close" },
-        { fop_invalid_formula, "invalid-formula" },
+        { ixion::fop_unknown, "unknown" },
+        { ixion::fop_single_ref, "single-ref" },
+        { ixion::fop_range_ref, "range-ref" },
+        { ixion::fop_table_ref, "table-ref" },
+        { ixion::fop_named_expression, "named-expression" },
+        { ixion::fop_string, "string" },
+        { ixion::fop_value, "value" },
+        { ixion::fop_function, "function" },
+        { ixion::fop_error, "error" },
+        { ixion::fop_plus, "plus" },
+        { ixion::fop_minus, "minus" },
+        { ixion::fop_divide, "divide" },
+        { ixion::fop_multiply, "multiply" },
+        { ixion::fop_exponent, "exponent" },
+        { ixion::fop_concat, "concat" },
+        { ixion::fop_equal, "equal" },
+        { ixion::fop_not_equal, "not-equal" },
+        { ixion::fop_less, "less" },
+        { ixion::fop_greater, "greater" },
+        { ixion::fop_less_equal, "less-equal" },
+        { ixion::fop_greater_equal, "greater-equal" },
+        { ixion::fop_open, "open" },
+        { ixion::fop_close, "close" },
+        { ixion::fop_sep, "sep" },
+        { ixion::fop_array_row_sep, "array-row-sep" },
+        { ixion::fop_array_open, "array-open" },
+        { ixion::fop_array_close, "array-close" },
+        { ixion::fop_invalid_formula, "invalid-formula" },
     };
 
     for (const auto& [oc, expected] : checks)
@@ -104,24 +101,24 @@ void test_formula_opcode_string()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    constexpr std::tuple<fopcode_t, std::string_view> checks[] =
+    constexpr std::tuple<ixion::fopcode_t, std::string_view> checks[] =
     {
-        { fop_plus, "+", },
-        { fop_minus, "-", },
-        { fop_divide, "/", },
-        { fop_multiply, "*", },
-        { fop_exponent, "^", },
-        { fop_concat, "&", },
-        { fop_equal, "=", },
-        { fop_not_equal, "<>", },
-        { fop_less, "<", },
-        { fop_greater, ">", },
-        { fop_less_equal, "<=", },
-        { fop_greater_equal, ">=", },
-        { fop_open, "(", },
-        { fop_close, ")", },
-        { fop_array_open, "{", },
-        { fop_array_close, "}", },
+        { ixion::fop_plus, "+", },
+        { ixion::fop_minus, "-", },
+        { ixion::fop_divide, "/", },
+        { ixion::fop_multiply, "*", },
+        { ixion::fop_exponent, "^", },
+        { ixion::fop_concat, "&", },
+        { ixion::fop_equal, "=", },
+        { ixion::fop_not_equal, "<>", },
+        { ixion::fop_less, "<", },
+        { ixion::fop_greater, ">", },
+        { ixion::fop_less_equal, "<=", },
+        { ixion::fop_greater_equal, ">=", },
+        { ixion::fop_open, "(", },
+        { ixion::fop_close, ")", },
+        { ixion::fop_array_open, "{", },
+        { ixion::fop_array_close, "}", },
     };
 
     for (const auto& [oc, expected] : checks)
@@ -153,7 +150,7 @@ void test_string_to_double()
     size_t n = sizeof(tests) / sizeof(tests[0]);
     for (size_t i = 0; i < n; ++i)
     {
-        double v = to_double(tests[i].s);
+        double v = ixion::to_double(tests[i].s);
         assert(v == tests[i].v);
     }
 }
@@ -162,13 +159,13 @@ void test_string_pool()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt;
+    ixion::model_context cxt;
 
-    string_id_t s_table1 = cxt.append_string("Table1");
-    string_id_t s_table2 = cxt.append_string("Table2");
-    string_id_t s_cat = cxt.append_string("Category");
-    string_id_t s_val = cxt.append_string("Value");
-    string_id_t s_empty = cxt.append_string("");
+    ixion::string_id_t s_table1 = cxt.append_string("Table1");
+    ixion::string_id_t s_table2 = cxt.append_string("Table2");
+    ixion::string_id_t s_cat = cxt.append_string("Category");
+    ixion::string_id_t s_val = cxt.append_string("Value");
+    ixion::string_id_t s_empty = cxt.append_string("");
     cxt.dump_strings();
 
     // Make sure these work correctly before proceeding further with the test.
@@ -183,13 +180,13 @@ void test_string_pool_duplicate_strings()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt;
+    ixion::model_context cxt;
 
-    string_id_t s_value1 = cxt.append_string("value");
-    string_id_t s_value2 = cxt.append_string("value");
+    ixion::string_id_t s_value1 = cxt.append_string("value");
+    ixion::string_id_t s_value2 = cxt.append_string("value");
     assert(s_value1 != s_value2);
-    string_id_t s_empty1 = cxt.append_string("");
-    string_id_t s_empty2 = cxt.append_string("");
+    ixion::string_id_t s_empty1 = cxt.append_string("");
+    ixion::string_id_t s_empty2 = cxt.append_string("");
     assert(s_empty1 != s_empty2);
 
     {
@@ -221,7 +218,7 @@ void test_formula_tokens_store()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    formula_tokens_store_ptr_t p = formula_tokens_store::create();
+    ixion::formula_tokens_store_ptr_t p = ixion::formula_tokens_store::create();
     assert(p->get_reference_count() == 1);
     auto p2 = p;
 
@@ -262,7 +259,7 @@ void test_matrix()
         { 1, 1, 4.0 },
     };
 
-    numeric_matrix num_mtx(2, 2);
+    ixion::numeric_matrix num_mtx(2, 2);
 
     for (const check& c : checks)
         num_mtx(c.row, c.col) = c.val;
@@ -270,12 +267,12 @@ void test_matrix()
     for (const check& c : checks)
         assert(num_mtx(c.row, c.col) == c.val);
 
-    matrix mtx(num_mtx);
+    ixion::matrix mtx(num_mtx);
 
     for (const check& c : checks)
     {
-        matrix::element e = mtx.get(c.row, c.col);
-        assert(e.type == matrix::element_type::numeric);
+        ixion::matrix::element e = mtx.get(c.row, c.col);
+        assert(e.type == ixion::matrix::element_type::numeric);
         assert(std::get<double>(e.value) == c.val);
     }
 }
@@ -284,24 +281,24 @@ void test_matrix_non_numeric_values()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    matrix mtx(2, 2);
+    ixion::matrix mtx(2, 2);
     mtx.set(0, 0, 1.1);
-    mtx.set(1, 0, formula_error_t::division_by_zero);
+    mtx.set(1, 0, ixion::formula_error_t::division_by_zero);
     mtx.set(0, 1, std::string("foo"));
     mtx.set(1, 1, true);
 
     assert(mtx.get_numeric(0, 0) == 1.1);
 
-    matrix::element elem = mtx.get(1, 0);
-    assert(elem.type == matrix::element_type::error);
-    assert(std::get<formula_error_t>(elem.value) == formula_error_t::division_by_zero);
+    ixion::matrix::element elem = mtx.get(1, 0);
+    assert(elem.type == ixion::matrix::element_type::error);
+    assert(std::get<ixion::formula_error_t>(elem.value) == ixion::formula_error_t::division_by_zero);
 
     elem = mtx.get(0, 1);
-    assert(elem.type == matrix::element_type::string);
+    assert(elem.type == ixion::matrix::element_type::string);
     assert(std::get<std::string_view>(elem.value) == "foo");
 
     elem = mtx.get(1, 1);
-    assert(elem.type == matrix::element_type::boolean);
+    assert(elem.type == ixion::matrix::element_type::boolean);
     assert(std::get<bool>(elem.value) == true);
 }
 
@@ -310,29 +307,29 @@ void test_address()
     IXION_TEST_FUNC_SCOPE;
 
     {
-        address_t addr(-1, 0, 0, false, false, false);
-        abs_address_t pos(1, 0, 0);
-        abs_address_t abs_addr = addr.to_abs(pos);
+        ixion::address_t addr(-1, 0, 0, false, false, false);
+        ixion::abs_address_t pos(1, 0, 0);
+        ixion::abs_address_t abs_addr = addr.to_abs(pos);
         assert(abs_addr.sheet == 0 && abs_addr.row == 0 && abs_addr.column == 0);
 
-        abs_address_t pos_invalid_sheet(invalid_sheet, 2, 3);
+        ixion::abs_address_t pos_invalid_sheet(ixion::invalid_sheet, 2, 3);
         auto test = addr.to_abs(pos_invalid_sheet);
-        assert(test.sheet == invalid_sheet);
+        assert(test.sheet == ixion::invalid_sheet);
         assert(test.row == 2);
         assert(test.column == 3);
     }
 
 
     // Default constructor makes valid address.
-    assert(abs_address_t().valid());
-    assert(abs_range_t().valid());
+    assert(ixion::abs_address_t().valid());
+    assert(ixion::abs_range_t().valid());
 
     // These are invalid addresses.
-    assert(!abs_address_t(abs_address_t::invalid).valid());
-    assert(!abs_range_t(abs_range_t::invalid).valid());
+    assert(!ixion::abs_address_t(ixion::abs_address_t::invalid).valid());
+    assert(!ixion::abs_range_t(ixion::abs_range_t::invalid).valid());
 
     {
-        abs_range_t range(1, 1, 2, 3, 3);
+        ixion::abs_range_t range(1, 1, 2, 3, 3);
         assert(range.first.sheet == 1);
         assert(range.first.row == 1);
         assert(range.first.column == 2);
@@ -340,10 +337,10 @@ void test_address()
         assert(range.last.row == 3);
         assert(range.last.column == 4);
 
-        abs_range_t range2(range);
+        ixion::abs_range_t range2(range);
         assert(range2 == range);
 
-        abs_rc_range_t rc_range(range);
+        ixion::abs_rc_range_t rc_range(range);
         assert(rc_range.first.row == 1);
         assert(rc_range.first.column == 2);
         assert(rc_range.last.row == 3);
@@ -355,63 +352,64 @@ void test_table_t_equality()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    table_t a;
+    ixion::table_t a;
     a.name = 1;
     a.column_first = 2;
     a.column_last = 3;
-    a.areas = table_area_data;
+    a.areas = ixion::table_area_data;
 
-    table_t same = a;
+    ixion::table_t same = a;
     assert(a == same);
     assert(!(a != same));
 
-    table_t diff_name = a;
+    ixion::table_t diff_name = a;
     diff_name.name = 99;
     assert(!(a == diff_name));
     assert(a != diff_name);
 
-    table_t diff_column_first = a;
+    ixion::table_t diff_column_first = a;
     diff_column_first.column_first = 99;
     assert(!(a == diff_column_first));
     assert(a != diff_column_first);
 
-    table_t diff_column_last = a;
+    ixion::table_t diff_column_last = a;
     diff_column_last.column_last = 99;
     assert(!(a == diff_column_last));
     assert(a != diff_column_last);
 
-    table_t diff_areas = a;
-    diff_areas.areas = table_area_headers;
+    ixion::table_t diff_areas = a;
+    diff_areas.areas = ixion::table_area_headers;
     assert(!(a == diff_areas));
     assert(a != diff_areas);
 }
 
 bool check_formula_expression(
-    model_context& cxt, const formula_name_resolver& resolver, const char* p)
+    ixion::model_context& cxt, const ixion::formula_name_resolver& resolver, const char* p)
 {
     size_t n = strlen(p);
-    cout << "testing formula expression '" << p << "'" << endl;
+    std::cout << "testing formula expression '" << p << "'" << std::endl;
 
-    formula_tokens_t tokens = parse_formula_string(cxt, abs_address_t(), resolver, {p, n});
-    std::string expression = print_formula_tokens(cxt, abs_address_t(), resolver, tokens);
+    auto tokens = ixion::parse_formula_string(cxt, ixion::abs_address_t(), resolver, {p, n});
+    auto expression = ixion::print_formula_tokens(cxt, ixion::abs_address_t(), resolver, tokens);
 
-    int res = strcmp(p, expression.data());
+    int res = std::strcmp(p, expression.data());
     if (res)
     {
-        cout << "formula expressions differ: '" << p << "' (before) -> '" << expression << "' (after)" << endl;
+        std::cout << "formula expressions differ: '" << p << "' (before) -> '"
+            << expression << "' (after)" << std::endl;
         return false;
     }
 
     std::ostringstream os;
     for (const auto& t : tokens)
-        os << print_formula_token(cxt, abs_address_t(), resolver, t);
+        os << ixion::print_formula_token(cxt, ixion::abs_address_t(), resolver, t);
     std::string individual_tokens = os.str();
 
     if (expression != individual_tokens)
     {
-        cout << "whole expression differs from individual token strings:" << endl
-             << "  * expression='" << expression << "'" << endl
-             << "  * individual-tokens='" << individual_tokens << "'" << endl;
+        std::cout << "whole expression differs from individual token strings:" << std::endl
+             << "  * expression='" << expression << "'" << std::endl
+             << "  * individual-tokens='" << individual_tokens << "'" << std::endl;
         return false;
     }
 
@@ -458,14 +456,14 @@ void test_parse_and_print_expressions()
         "$'Ying & Yang'.$A$1:$H$54",
     };
 
-    model_context cxt;
+    ixion::model_context cxt;
     cxt.append_sheet("Test");
     cxt.append_string("Table1");
     cxt.append_string("Category");
     cxt.append_string("Value");
     cxt.append_sheet("Ying & Yang"); // name with '&'
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
     for (const char* exp : exps)
@@ -480,7 +478,7 @@ void test_parse_and_print_expressions()
         "SUM(R[-5]C:R[-1]C)",
     };
 
-    resolver = formula_name_resolver::get(formula_name_resolver_t::excel_r1c1, &cxt);
+    resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_r1c1, &cxt);
     assert(resolver);
 
     for (const char* exp : exps)
@@ -498,10 +496,10 @@ void test_parse_and_print_expressions()
         "IF(['Ying & Yang'.$A$1:.$O$200];2;0)",
     };
 
-    resolver = formula_name_resolver::get(formula_name_resolver_t::odff, &cxt);
+    resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::odff, &cxt);
     assert(resolver);
 
-    config cfg = cxt.get_config();
+    auto cfg = cxt.get_config();
     cfg.sep_function_arg = ';';
     cxt.set_config(cfg);
 
@@ -527,39 +525,39 @@ void test_function_name_resolution()
         "suma", "foo", "", "su", "maxx", "minmin"
     };
 
-    model_context cxt;
+    ixion::model_context cxt;
     cxt.append_sheet("Test");
-    auto resolver = formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     size_t n = std::size(valid_names);
     for (size_t i = 0; i < n; ++i)
     {
         const char* name = valid_names[i];
-        cout << "valid name: " << name << endl;
-        formula_name_t t = resolver->resolve(name, abs_address_t());
-        assert(t.type == formula_name_t::function);
+        std::cout << "valid name: " << name << std::endl;
+        ixion::formula_name_t t = resolver->resolve(name, ixion::abs_address_t());
+        assert(t.type == ixion::formula_name_t::function);
     }
 
     n = std::size(invalid_names);
     for (size_t i = 0; i < n; ++i)
     {
         const char* name = invalid_names[i];
-        cout << "invalid name: " << name << endl;
-        formula_name_t t = resolver->resolve(name, abs_address_t());
-        assert(t.type != formula_name_t::function);
+        std::cout << "invalid name: " << name << std::endl;
+        ixion::formula_name_t t = resolver->resolve(name, ixion::abs_address_t());
+        assert(t.type != ixion::formula_name_t::function);
     }
 }
 
-formula_cell* insert_formula(
-    model_context& cxt, const abs_address_t& pos, const char* exp,
-    const formula_name_resolver& resolver)
+ixion::formula_cell* insert_formula(
+    ixion::model_context& cxt, const ixion::abs_address_t& pos, const char* exp,
+    const ixion::formula_name_resolver& resolver)
 {
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, resolver, exp);
-    auto ts = formula_tokens_store::create();
+    auto tokens = ixion::parse_formula_string(cxt, pos, resolver, exp);
+    auto ts = ixion::formula_tokens_store::create();
     ts->get() = std::move(tokens);
-    formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
+    auto* p_inserted = cxt.set_formula_cell(pos, ts);
     assert(p_inserted);
-    register_formula_cell(cxt, pos);
-    formula_cell* p = cxt.get_formula_cell(pos);
+    ixion::register_formula_cell(cxt, pos);
+    auto* p = cxt.get_formula_cell(pos);
     assert(p);
     assert(p == p_inserted);
     return p;
@@ -570,39 +568,39 @@ void test_model_context_storage()
     IXION_TEST_FUNC_SCOPE;
 
     {
-        model_context cxt;
-        auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+        ixion::model_context cxt;
+        auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
         assert(resolver);
 
         cxt.append_sheet("test");
 
         // Test empty cell access.
-        cell_access ca = cxt.get_cell_access(abs_address_t(0, 0, 0));
-        assert(ca.get_type() == cell_t::empty);
-        assert(ca.get_value_type() == cell_value_t::empty);
+        ixion::cell_access ca = cxt.get_cell_access(ixion::abs_address_t(0, 0, 0));
+        assert(ca.get_type() == ixion::cell_t::empty);
+        assert(ca.get_value_type() == ixion::cell_value_t::empty);
 
         // String value on an empty cell should be an empty string.
         std::string_view s = ca.get_string_value();
         assert(s.empty());
 
         // Likewise...
-        s = cxt.get_string_value(abs_address_t(0, 0, 0));
+        s = cxt.get_string_value(ixion::abs_address_t(0, 0, 0));
         assert(s.empty());
 
         // Test storage of numeric values.
         volatile double val = 0.1;
-        for (col_t col = 0; col < 3; ++col)
+        for (ixion::col_t col = 0; col < 3; ++col)
         {
-            for (row_t row = 0; row < 3; ++row)
+            for (ixion::row_t row = 0; row < 3; ++row)
             {
-                abs_address_t pos(0, row, col);
+                ixion::abs_address_t pos(0, row, col);
                 cxt.set_numeric_cell(pos, val);
                 double test = cxt.get_numeric_value(pos);
                 assert(test == val);
 
                 ca = cxt.get_cell_access(pos);
-                assert(ca.get_type() == cell_t::numeric);
-                assert(ca.get_value_type() == cell_value_t::numeric);
+                assert(ca.get_type() == ixion::cell_t::numeric);
+                assert(ca.get_value_type() == ixion::cell_value_t::numeric);
                 test = ca.get_numeric_value();
                 assert(test == val);
 
@@ -611,52 +609,58 @@ void test_model_context_storage()
         }
 
         // Test formula cells.
-        abs_address_t pos(0,3,0);
+        ixion::abs_address_t pos(0,3,0);
         const char* exp = "SUM(1,2,3)";
-        formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp);
-        auto ts = formula_tokens_store::create();
+        auto tokens = ixion::parse_formula_string(cxt, pos, *resolver, exp);
+        auto ts = ixion::formula_tokens_store::create();
         ts->get() = std::move(tokens);
-        formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
+        ixion::formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
         assert(p_inserted);
-        formula_cell* p = cxt.get_formula_cell(pos);
+        ixion::formula_cell* p = cxt.get_formula_cell(pos);
         assert(p);
         assert(p_inserted == p);
         p->interpret(cxt, pos);
 
         ca = cxt.get_cell_access(pos);
-        assert(ca.get_type() == cell_t::formula);
-        assert(ca.get_value_type() == cell_value_t::numeric);
+        assert(ca.get_type() == ixion::cell_t::formula);
+        assert(ca.get_value_type() == ixion::cell_value_t::numeric);
         assert(ca.get_numeric_value() == 6.0);
     }
 
     {
-        model_context cxt;
-        auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+        ixion::model_context cxt;
+        auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
         assert(resolver);
 
         cxt.append_sheet("test");
-        string exp = "1";
-        cxt.set_formula_cell(abs_address_t(0,0,0), parse_formula_string(cxt, abs_address_t(0,0,0), *resolver, exp));
-        cxt.set_formula_cell(abs_address_t(0,2,0), parse_formula_string(cxt, abs_address_t(0,2,0), *resolver, exp));
-        cxt.set_formula_cell(abs_address_t(0,1,0), parse_formula_string(cxt, abs_address_t(0,1,0), *resolver, exp));
+        std::string exp = "1";
+        cxt.set_formula_cell(
+            ixion::abs_address_t(0,0,0),
+            ixion::parse_formula_string(cxt, ixion::abs_address_t(0,0,0), *resolver, exp));
+        cxt.set_formula_cell(
+            ixion::abs_address_t(0,2,0),
+            ixion::parse_formula_string(cxt, ixion::abs_address_t(0,2,0), *resolver, exp));
+        cxt.set_formula_cell(
+            ixion::abs_address_t(0,1,0),
+            ixion::parse_formula_string(cxt, ixion::abs_address_t(0,1,0), *resolver, exp));
     }
 
     {
         // Test data area.
-        model_context cxt;
+        ixion::model_context cxt;
         cxt.append_sheet("test");
 
-        abs_range_t area = cxt.get_data_range(0);
+        ixion::abs_range_t area = cxt.get_data_range(0);
         assert(!area.valid());
 
-        cxt.set_numeric_cell(abs_address_t(0, 6, 5), 1.1);
+        cxt.set_numeric_cell(ixion::abs_address_t(0, 6, 5), 1.1);
         area = cxt.get_data_range(0);
         assert(area.first == area.last);
         assert(area.first.sheet == 0);
         assert(area.first.row == 6);
         assert(area.first.column == 5);
 
-        cxt.set_numeric_cell(abs_address_t(0, 2, 3), 1.1);
+        cxt.set_numeric_cell(ixion::abs_address_t(0, 2, 3), 1.1);
         area = cxt.get_data_range(0);
         assert(area.first.sheet == 0);
         assert(area.first.row == 2);
@@ -665,7 +669,7 @@ void test_model_context_storage()
         assert(area.last.row == 6);
         assert(area.last.column == 5);
 
-        cxt.set_numeric_cell(abs_address_t(0, 7, 1), 1.1);
+        cxt.set_numeric_cell(ixion::abs_address_t(0, 7, 1), 1.1);
         area = cxt.get_data_range(0);
         assert(area.first.sheet == 0);
         assert(area.first.row == 2);
@@ -675,23 +679,23 @@ void test_model_context_storage()
         assert(area.last.column == 5);
 
         // This shouldn't change the data range.
-        cxt.set_numeric_cell(abs_address_t(0, 5, 5), 1.1);
-        abs_range_t test = cxt.get_data_range(0);
+        cxt.set_numeric_cell(ixion::abs_address_t(0, 5, 5), 1.1);
+        ixion::abs_range_t test = cxt.get_data_range(0);
         assert(test == area);
     }
 
     {
         // Fill up the document model and make sure the data range is still
         // correct.
-        const row_t row_size = 5;
-        const col_t col_size = 4;
-        model_context cxt({row_size, col_size});
+        const ixion::row_t row_size = 5;
+        const ixion::col_t col_size = 4;
+        ixion::model_context cxt({row_size, col_size});
         cxt.append_sheet("test");
-        for (row_t row = 0; row < row_size; ++row)
-            for (col_t col = 0; col < col_size; ++col)
-                cxt.set_numeric_cell(abs_address_t(0,row,col), 1.0);
+        for (ixion::row_t row = 0; row < row_size; ++row)
+            for (ixion::col_t col = 0; col < col_size; ++col)
+                cxt.set_numeric_cell(ixion::abs_address_t(0,row,col), 1.0);
 
-        abs_range_t test = cxt.get_data_range(0);
+        ixion::abs_range_t test = cxt.get_data_range(0);
 
         assert(test.first.sheet == 0);
         assert(test.first.row == 0);
@@ -702,15 +706,15 @@ void test_model_context_storage()
     }
 
     {
-        const row_t row_size = 5;
-        const col_t col_size = 4;
-        model_context cxt({row_size, col_size});
+        const ixion::row_t row_size = 5;
+        const ixion::col_t col_size = 4;
+        ixion::model_context cxt({row_size, col_size});
         cxt.append_sheet("test");
-        cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);
-        cxt.set_numeric_cell(abs_address_t(0,row_size-1,0), 1.0);
-        cxt.set_numeric_cell(abs_address_t(0,row_size/2,col_size/2), 1.0);
+        cxt.set_numeric_cell(ixion::abs_address_t(0,0,0), 1.0);
+        cxt.set_numeric_cell(ixion::abs_address_t(0,row_size-1,0), 1.0);
+        cxt.set_numeric_cell(ixion::abs_address_t(0,row_size/2,col_size/2), 1.0);
 
-        abs_range_t test = cxt.get_data_range(0);
+        ixion::abs_range_t test = cxt.get_data_range(0);
 
         assert(test.first.sheet == 0);
         assert(test.first.row == 0);
@@ -725,42 +729,42 @@ void test_model_context_direct_string_access()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt{{400, 20}};
+    ixion::model_context cxt{{400, 20}};
     cxt.append_sheet("test");
 
     // regular string cell
-    abs_address_t B2(0, 1, 1);
+    ixion::abs_address_t B2(0, 1, 1);
     cxt.set_string_cell(B2, "string cell");
     std::string_view s = cxt.get_string_value(B2);
     assert(s == "string cell");
 
-    cell_access ca = cxt.get_cell_access(B2);
-    assert(ca.get_type() == cell_t::string);
-    assert(ca.get_value_type() == cell_value_t::string);
+    ixion::cell_access ca = cxt.get_cell_access(B2);
+    assert(ca.get_type() == ixion::cell_t::string);
+    assert(ca.get_value_type() == ixion::cell_value_t::string);
     s = ca.get_string_value();
     assert(s == "string cell");
 
     // formula cell containing a string result.
-    abs_address_t C4(0, 3, 2);
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    ixion::abs_address_t C4(0, 3, 2);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::calc_a1, &cxt);
     assert(resolver);
 
     // Insert a formula containing one literal string token.
-    formula_tokens_t tokens = parse_formula_string(cxt, C4, *resolver, "\"string value in formula\"");
+    auto tokens = ixion::parse_formula_string(cxt, C4, *resolver, "\"string value in formula\"");
     assert(tokens.size() == 1);
     cxt.set_formula_cell(C4, std::move(tokens));
     // no need to register formula cell since it does not reference other cells.
 
-    abs_range_set_t formula_cells{C4};
-    auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &formula_cells);
-    calculate_sorted_cells(cxt, sorted, 1);
+    ixion::abs_range_set_t formula_cells{C4};
+    auto sorted = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &formula_cells);
+    ixion::calculate_sorted_cells(cxt, sorted, 1);
 
     s = cxt.get_string_value(C4);
     assert(s == "string value in formula");
 
     ca = cxt.get_cell_access(C4);
-    assert(ca.get_type() == cell_t::formula);
-    assert(ca.get_value_type() == cell_value_t::string);
+    assert(ca.get_type() == ixion::cell_t::formula);
+    assert(ca.get_value_type() == ixion::cell_value_t::string);
     s = ca.get_string_value();
     assert(s == "string value in formula");
 }
@@ -769,18 +773,18 @@ void test_model_context_named_expression()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt{{400, 20}};
+    ixion::model_context cxt{{400, 20}};
     cxt.append_sheet("test");
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::calc_a1, &cxt);
     assert(resolver);
 
-    abs_address_t B3(0, 2, 1);
+    ixion::abs_address_t B3(0, 2, 1);
 
     struct test_case
     {
         std::string name;
         std::string formula;
-        abs_address_t origin;
+        ixion::abs_address_t origin;
     };
 
     std::vector<test_case> tcs = {
@@ -790,8 +794,8 @@ void test_model_context_named_expression()
 
     for (const test_case& tc : tcs)
     {
-        formula_tokens_t tokens = parse_formula_string(cxt, tc.origin, *resolver, tc.formula);
-        std::string test = print_formula_tokens(cxt, tc.origin, *resolver, tokens);
+        auto tokens = ixion::parse_formula_string(cxt, tc.origin, *resolver, tc.formula);
+        auto test = ixion::print_formula_tokens(cxt, tc.origin, *resolver, tokens);
         assert(test == tc.formula);
 
         cxt.set_named_expression(tc.name, tc.origin, std::move(tokens));
@@ -799,10 +803,10 @@ void test_model_context_named_expression()
 
     for (const test_case& tc : tcs)
     {
-        const named_expression_t* exp = cxt.get_named_expression(0, tc.name);
+        const ixion::named_expression_t* exp = cxt.get_named_expression(0, tc.name);
         assert(exp);
         assert(exp->origin == tc.origin);
-        std::string test = print_formula_tokens(cxt, exp->origin, *resolver, exp->tokens);
+        auto test = ixion::print_formula_tokens(cxt, exp->origin, *resolver, exp->tokens);
         assert(test == tc.formula);
     }
 
@@ -825,57 +829,58 @@ void test_model_context_named_expression()
 
     for (const name_test_case& tc : invalid_names)
     {
-        abs_address_t origin;
+        ixion::abs_address_t origin;
         std::string formula = "1+2";
 
         if (tc.valid)
         {
-            formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
+            auto tokens = ixion::parse_formula_string(cxt, origin, *resolver, formula);
             cxt.set_named_expression(tc.name, origin, std::move(tokens));
 
-            tokens = parse_formula_string(cxt, origin, *resolver, formula);
+            tokens = ixion::parse_formula_string(cxt, origin, *resolver, formula);
             cxt.set_named_expression(0, tc.name, origin, std::move(tokens));
         }
         else
         {
             try
             {
-                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
+                auto tokens = ixion::parse_formula_string(cxt, origin, *resolver, formula);
                 cxt.set_named_expression(tc.name, origin, std::move(tokens));
                 assert(!"named expression with invalid name should have been rejected!");
             }
-            catch (const model_context_error& e)
+            catch (const ixion::model_context_error& e)
             {
-                assert(e.get_error_type() == model_context_error::invalid_named_expression);
+                assert(e.get_error_type() == ixion::model_context_error::invalid_named_expression);
             }
 
             try
             {
-                formula_tokens_t tokens = parse_formula_string(cxt, origin, *resolver, formula);
+                auto tokens = ixion::parse_formula_string(cxt, origin, *resolver, formula);
                 cxt.set_named_expression(0, tc.name, origin, std::move(tokens));
                 assert(!"named expression with invalid name should have been rejected!");
             }
-            catch (const model_context_error& e)
+            catch (const ixion::model_context_error& e)
             {
-                assert(e.get_error_type() == model_context_error::invalid_named_expression);
+                assert(e.get_error_type() == ixion::model_context_error::invalid_named_expression);
             }
         }
     }
 }
 
-bool check_model_iterator_output(model_iterator& iter, const std::vector<model_iterator::cell>& checks)
+bool check_model_iterator_output(
+    ixion::model_iterator& iter, const std::vector<ixion::model_iterator::cell>& checks)
 {
-    for (const model_iterator::cell& c : checks)
+    for (const ixion::model_iterator::cell& c : checks)
     {
         if (!iter.has())
         {
-            cerr << "a cell value was expected, but none found." << endl;
+            std::cerr << "a cell value was expected, but none found." << std::endl;
             return false;
         }
 
         if (iter.get() != c)
         {
-            cerr << "unexpected cell value: expected=" << c << "; observed=" << iter.get() << endl;
+            std::cerr << "unexpected cell value: expected=" << c << "; observed=" << iter.get() << std::endl;
             return false;
         }
 
@@ -884,7 +889,7 @@ bool check_model_iterator_output(model_iterator& iter, const std::vector<model_i
 
     if (iter.has())
     {
-        cerr << "an additional cell value was found, but none was expected." << endl;
+        std::cerr << "an additional cell value was found, but none was expected." << std::endl;
         return false;
     }
 
@@ -895,34 +900,34 @@ void test_model_context_iterator_horizontal()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    const row_t row_size = 5;
-    const col_t col_size = 2;
-    model_context cxt{{row_size, col_size}};
-    model_iterator iter;
+    const ixion::row_t row_size = 5;
+    const ixion::col_t col_size = 2;
+    ixion::model_context cxt{{row_size, col_size}};
+    ixion::model_iterator iter;
 
-    abs_rc_range_t whole_range;
+    ixion::abs_rc_range_t whole_range;
     whole_range.set_all_columns();
     whole_range.set_all_rows();
 
     // It should not crash or throw an exception on empty model.
-    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, whole_range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::horizontal, whole_range);
     assert(!iter.has());
 
     // Insert an actual sheet and try again.
 
     cxt.append_sheet("empty sheet");
-    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, whole_range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::horizontal, whole_range);
 
     // Make sure the cell position iterates correctly.
     size_t cell_count = 0;
-    for (row_t row = 0; row < row_size; ++row)
+    for (ixion::row_t row = 0; row < row_size; ++row)
     {
-        for (col_t col = 0; col < col_size; ++cell_count, ++col, iter.next())
+        for (ixion::col_t col = 0; col < col_size; ++cell_count, ++col, iter.next())
         {
             assert(iter.has());
             assert(iter.get().row == row);
             assert(iter.get().col == col);
-            assert(iter.get().type == cell_t::empty);
+            assert(iter.get().type == ixion::cell_t::empty);
         }
     }
 
@@ -930,35 +935,35 @@ void test_model_context_iterator_horizontal()
     assert(cell_count == 10);
 
     cxt.append_sheet("values");
-    cxt.set_string_cell(abs_address_t(1, 0, 0), "F1");
-    cxt.set_string_cell(abs_address_t(1, 0, 1), "F2");
-    cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
-    cxt.set_boolean_cell(abs_address_t(1, 1, 1), false);
-    cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
-    cxt.set_numeric_cell(abs_address_t(1, 2, 1), -12.5);
+    cxt.set_string_cell(ixion::abs_address_t(1, 0, 0), "F1");
+    cxt.set_string_cell(ixion::abs_address_t(1, 0, 1), "F2");
+    cxt.set_boolean_cell(ixion::abs_address_t(1, 1, 0), true);
+    cxt.set_boolean_cell(ixion::abs_address_t(1, 1, 1), false);
+    cxt.set_numeric_cell(ixion::abs_address_t(1, 2, 0), 3.14);
+    cxt.set_numeric_cell(ixion::abs_address_t(1, 2, 1), -12.5);
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
-    abs_range_set_t modified_cells;
-    abs_address_t pos(1, 3, 0);
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
-    formula_cell* p = cxt.set_formula_cell(pos, std::move(tokens));
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    ixion::abs_range_set_t modified_cells;
+    ixion::abs_address_t pos(1, 3, 0);
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
+    ixion::formula_cell* p = cxt.set_formula_cell(pos, std::move(tokens));
     assert(p);
-    const formula_tokens_t& t = p->get_tokens()->get();
+    const ixion::formula_tokens_t& t = p->get_tokens()->get();
     assert(t.size() == 8); // there should be 8 tokens.
-    register_formula_cell(cxt, pos, p);
+    ixion::register_formula_cell(cxt, pos, p);
     modified_cells.insert(pos);
 
     pos.column = 1;
-    tokens = parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
+    tokens = ixion::parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
     p = cxt.set_formula_cell(pos, std::move(tokens));
-    register_formula_cell(cxt, pos, p);
+    ixion::register_formula_cell(cxt, pos, p);
     modified_cells.insert(pos);
 
     // Calculate the formula cells.
-    auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &modified_cells);
-    calculate_sorted_cells(cxt, sorted, 1);
+    auto sorted = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_cells);
+    ixion::calculate_sorted_cells(cxt, sorted, 1);
 
-    std::vector<model_iterator::cell> checks =
+    std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
         { 0, 0, cxt.get_identifier_from_string("F1") },
@@ -967,14 +972,14 @@ void test_model_context_iterator_horizontal()
         { 1, 1, false },
         { 2, 0, 3.14 },
         { 2, 1, -12.5 },
-        { 3, 0, cxt.get_formula_cell(abs_address_t(1, 3, 0)) },
-        { 3, 1, cxt.get_formula_cell(abs_address_t(1, 3, 1)) },
+        { 3, 0, cxt.get_formula_cell(ixion::abs_address_t(1, 3, 0)) },
+        { 3, 1, cxt.get_formula_cell(ixion::abs_address_t(1, 3, 1)) },
         { 4, 0 },
         { 4, 1 },
     };
 
     // Iterator and check the individual cell values.
-    iter = cxt.get_model_iterator(1, rc_direction_t::horizontal, whole_range);
+    iter = cxt.get_model_iterator(1, ixion::rc_direction_t::horizontal, whole_range);
     assert(check_model_iterator_output(iter, checks));
 }
 
@@ -983,7 +988,7 @@ void test_model_context_iterator_horizontal_range()
     IXION_TEST_FUNC_SCOPE;
 
     nullptr_t empty = nullptr;
-    model_context cxt{{10, 5}};
+    ixion::model_context cxt{{10, 5}};
     cxt.append_sheet("Values");
     cxt.set_cell_values(0, {
         { "F1",  "F2",  "F3",  "F4",  "F5" },
@@ -999,14 +1004,14 @@ void test_model_context_iterator_horizontal_range()
     });
 
     // Only iterate over the first two rows.
-    abs_rc_range_t range;
+    ixion::abs_rc_range_t range;
     range.set_all_columns();
     range.first.row = 0;
     range.last.row = 1;
 
-    model_iterator iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, range);
+    ixion::model_iterator iter = cxt.get_model_iterator(0, ixion::rc_direction_t::horizontal, range);
 
-    std::vector<model_iterator::cell> checks =
+    std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
         { 0, 0, cxt.get_identifier_from_string("F1") },
@@ -1026,7 +1031,7 @@ void test_model_context_iterator_horizontal_range()
     // Only iterate over rows 2:4.
     range.first.row = 2;
     range.last.row = 4;
-    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::horizontal, range);
 
     checks =
     {
@@ -1055,7 +1060,7 @@ void test_model_context_iterator_horizontal_range()
     range.first.column = 1;
     range.last.column = 3;
     range.last.row = 4;
-    iter = cxt.get_model_iterator(0, rc_direction_t::horizontal, range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::horizontal, range);
 
     checks =
     {
@@ -1084,35 +1089,35 @@ void test_model_context_iterator_vertical()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    const row_t row_size = 5;
-    const col_t col_size = 2;
-    model_context cxt{{row_size, col_size}};
-    model_iterator iter;
+    const ixion::row_t row_size = 5;
+    const ixion::col_t col_size = 2;
+    ixion::model_context cxt{{row_size, col_size}};
+    ixion::model_iterator iter;
 
-    abs_rc_range_t whole_range;
+    ixion::abs_rc_range_t whole_range;
     whole_range.set_all_columns();
     whole_range.set_all_rows();
 
     // It should not crash or throw an exception on empty model.
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, whole_range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, whole_range);
     assert(!iter.has());
 
     // Insert an actual sheet and try again.
 
     cxt.append_sheet("empty sheet");
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, whole_range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, whole_range);
 
     // Make sure the cell position iterates correctly.
     size_t cell_count = 0;
-    for (col_t col = 0; col < col_size; ++col)
+    for (ixion::col_t col = 0; col < col_size; ++col)
     {
-        for (row_t row = 0; row < row_size; ++cell_count, ++row, iter.next())
+        for (ixion::row_t row = 0; row < row_size; ++cell_count, ++row, iter.next())
         {
-            const model_iterator::cell& cell = iter.get();
+            const ixion::model_iterator::cell& cell = iter.get();
             assert(iter.has());
             assert(cell.row == row);
             assert(cell.col == col);
-            assert(cell.type == cell_t::empty);
+            assert(cell.type == ixion::cell_t::empty);
         }
     }
 
@@ -1120,48 +1125,48 @@ void test_model_context_iterator_vertical()
     assert(cell_count == 10);
 
     cxt.append_sheet("values");
-    cxt.set_string_cell(abs_address_t(1, 0, 0), "F1");
-    cxt.set_string_cell(abs_address_t(1, 0, 1), "F2");
-    cxt.set_boolean_cell(abs_address_t(1, 1, 0), true);
-    cxt.set_boolean_cell(abs_address_t(1, 1, 1), false);
-    cxt.set_numeric_cell(abs_address_t(1, 2, 0), 3.14);
-    cxt.set_numeric_cell(abs_address_t(1, 2, 1), -12.5);
+    cxt.set_string_cell(ixion::abs_address_t(1, 0, 0), "F1");
+    cxt.set_string_cell(ixion::abs_address_t(1, 0, 1), "F2");
+    cxt.set_boolean_cell(ixion::abs_address_t(1, 1, 0), true);
+    cxt.set_boolean_cell(ixion::abs_address_t(1, 1, 1), false);
+    cxt.set_numeric_cell(ixion::abs_address_t(1, 2, 0), 3.14);
+    cxt.set_numeric_cell(ixion::abs_address_t(1, 2, 1), -12.5);
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
-    abs_range_set_t modified_cells;
-    abs_address_t pos(1, 3, 0);
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    ixion::abs_range_set_t modified_cells;
+    ixion::abs_address_t pos(1, 3, 0);
+    auto tokens = ixion::parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
     cxt.set_formula_cell(pos, std::move(tokens));
-    register_formula_cell(cxt, pos);
+    ixion::register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
 
     pos.column = 1;
-    tokens = parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
+    tokens = ixion::parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
     cxt.set_formula_cell(pos, std::move(tokens));
-    register_formula_cell(cxt, pos);
+    ixion::register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
 
     // Calculate the formula cells.
-    auto sorted = query_and_sort_dirty_cells(cxt, abs_range_set_t(), &modified_cells);
-    calculate_sorted_cells(cxt, sorted, 1);
+    auto sorted = ixion::query_and_sort_dirty_cells(cxt, ixion::abs_range_set_t(), &modified_cells);
+    ixion::calculate_sorted_cells(cxt, sorted, 1);
 
-    std::vector<model_iterator::cell> checks =
+    std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
         { 0, 0, cxt.get_identifier_from_string("F1") },
         { 1, 0, true },
         { 2, 0, 3.14 },
-        { 3, 0, cxt.get_formula_cell(abs_address_t(1, 3, 0)) },
+        { 3, 0, cxt.get_formula_cell(ixion::abs_address_t(1, 3, 0)) },
         { 4, 0 },
 
         { 0, 1, cxt.get_identifier_from_string("F2") },
         { 1, 1, false },
         { 2, 1, -12.5 },
-        { 3, 1, cxt.get_formula_cell(abs_address_t(1, 3, 1)) },
+        { 3, 1, cxt.get_formula_cell(ixion::abs_address_t(1, 3, 1)) },
         { 4, 1 },
     };
 
-    iter = cxt.get_model_iterator(1, rc_direction_t::vertical, whole_range);
+    iter = cxt.get_model_iterator(1, ixion::rc_direction_t::vertical, whole_range);
     assert(check_model_iterator_output(iter, checks));
 }
 
@@ -1170,7 +1175,7 @@ void test_model_context_iterator_vertical_range()
     IXION_TEST_FUNC_SCOPE;
 
     nullptr_t empty = nullptr;
-    model_context cxt{{10, 5}};
+    ixion::model_context cxt{{10, 5}};
     cxt.append_sheet("Values");
     cxt.set_cell_values(0, {
         { "F1",  "F2",  "F3",  "F4",  "F5" },
@@ -1186,14 +1191,14 @@ void test_model_context_iterator_vertical_range()
     });
 
     // Iterate over the top 2 rows.
-    abs_rc_range_t range;
+    ixion::abs_rc_range_t range;
     range.set_all_columns();
     range.set_all_rows();
     range.last.row = 1;
 
-    model_iterator iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+    ixion::model_iterator iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, range);
 
-    std::vector<model_iterator::cell> checks =
+    std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
         { 0, 0, cxt.get_identifier_from_string("F1") },
@@ -1214,7 +1219,7 @@ void test_model_context_iterator_vertical_range()
 
     range.set_all_rows();
     range.first.row = 8;
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, range);
 
     checks =
     {
@@ -1235,7 +1240,7 @@ void test_model_context_iterator_vertical_range()
 
     // Iterate over the bottom-left corners.
     range.last.column = 2;
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, range);
 
     checks =
     {
@@ -1252,10 +1257,10 @@ void test_model_context_iterator_vertical_range()
 
     // Iterate over the top-right corners.
     range.first.column = 3;
-    range.last.column = column_unset;
-    range.first.row = row_unset;
+    range.last.column = ixion::column_unset;
+    range.first.row = ixion::row_unset;
     range.last.row = 1;
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, range);
 
     checks =
     {
@@ -1273,7 +1278,7 @@ void test_model_context_iterator_vertical_range()
     range.first.column = 3;
     range.last.column = 3;
 
-    iter = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+    iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, range);
     checks =
     {
         { 5, 3, cxt.get_identifier_from_string("s5") },
@@ -1289,14 +1294,14 @@ void test_model_context_iterator_named_exps()
     struct check
     {
         std::string name;
-        const named_expression_t* exp;
+        const ixion::named_expression_t* exp;
     };
 
-    model_context cxt{{100, 10}};
+    ixion::model_context cxt{{100, 10}};
     cxt.append_sheet("test1");
     cxt.append_sheet("test2");
 
-    named_expressions_iterator iter;
+    ixion::named_expressions_iterator iter;
     assert(!iter.has());
     assert(iter.size() == 0);
 
@@ -1304,19 +1309,19 @@ void test_model_context_iterator_named_exps()
     assert(!iter.has());
     assert(iter.size() == 0);
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::calc_a1, &cxt);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::calc_a1, &cxt);
     assert(resolver);
 
-    auto tokenize = [&](const char* p) -> formula_tokens_t
+    auto tokenize = [&](const char* p) -> ixion::formula_tokens_t
     {
-        return parse_formula_string(cxt, abs_address_t(), *resolver, p);
+        return ixion::parse_formula_string(cxt, ixion::abs_address_t(), *resolver, p);
     };
 
-    auto validate = [](named_expressions_iterator _iter, const std::vector<check>& _expected) -> bool
+    auto validate = [](ixion::named_expressions_iterator _iter, const std::vector<check>& _expected) -> bool
     {
         if (_iter.size() != _expected.size())
         {
-            cout << "iterator's size() returns wrong value." << endl;
+            std::cout << "iterator's size() returns wrong value." << std::endl;
             return false;
         }
 
@@ -1324,19 +1329,19 @@ void test_model_context_iterator_named_exps()
         {
             if (!_iter.has())
             {
-                cout << "iterator has no more element, but it is expected to." << endl;
+                std::cout << "iterator has no more element, but it is expected to." << std::endl;
                 return false;
             }
 
             if (c.name != *_iter.get().name)
             {
-                cout << "names differ: expected='" << c.name << "'; actual='" << *_iter.get().name << endl;
+                std::cout << "names differ: expected='" << c.name << "'; actual='" << *_iter.get().name << std::endl;
                 return false;
             }
 
             if (c.exp != _iter.get().expression)
             {
-                cout << "expressions differ." << endl;
+                std::cout << "expressions differ." << std::endl;
                 return false;
             }
 
@@ -1345,7 +1350,7 @@ void test_model_context_iterator_named_exps()
 
         if (_iter.has())
         {
-            cout << "the iterator has more elements, but it is not expected to." << endl;
+            std::cout << "the iterator has more elements, but it is not expected to." << std::endl;
             return false;
         }
 
@@ -1395,7 +1400,7 @@ void test_model_context_fill_down()
     IXION_TEST_FUNC_SCOPE;
 
     nullptr_t empty = nullptr;
-    model_context cxt{{100, 10}};
+    ixion::model_context cxt{{100, 10}};
     cxt.append_sheet("test");
     cxt.set_cell_values(0, {
         { "numeric", "bool", "string",  "empty" },
@@ -1407,65 +1412,65 @@ void test_model_context_fill_down()
         {     empty,  empty,    empty,      1.1 },
     });
 
-    abs_address_t pos(0, 1, 0);
+    ixion::abs_address_t pos(0, 1, 0);
     cxt.fill_down_cells(pos, 2);
 
-    assert(cxt.get_numeric_value(abs_address_t(0, 1, 0)) == 12.3);
-    assert(cxt.get_numeric_value(abs_address_t(0, 2, 0)) == 12.3);
-    assert(cxt.get_numeric_value(abs_address_t(0, 3, 0)) == 12.3);
-    assert(cxt.is_empty(abs_address_t(0, 4, 0)));
+    assert(cxt.get_numeric_value(ixion::abs_address_t(0, 1, 0)) == 12.3);
+    assert(cxt.get_numeric_value(ixion::abs_address_t(0, 2, 0)) == 12.3);
+    assert(cxt.get_numeric_value(ixion::abs_address_t(0, 3, 0)) == 12.3);
+    assert(cxt.is_empty(ixion::abs_address_t(0, 4, 0)));
 
     pos.column = 1;
     cxt.fill_down_cells(pos, 1);
-    assert(cxt.get_boolean_value(abs_address_t(0, 1, 1)) == true);
-    assert(cxt.get_boolean_value(abs_address_t(0, 2, 1)) == true);
-    assert(cxt.is_empty(abs_address_t(0, 3, 1)));
+    assert(cxt.get_boolean_value(ixion::abs_address_t(0, 1, 1)) == true);
+    assert(cxt.get_boolean_value(ixion::abs_address_t(0, 2, 1)) == true);
+    assert(cxt.is_empty(ixion::abs_address_t(0, 3, 1)));
 
     pos.column = 2;
-    string_id_t s_foo = cxt.get_string_identifier(pos);
+    ixion::string_id_t s_foo = cxt.get_string_identifier(pos);
     const std::string* p = cxt.get_string(s_foo);
     assert(p && *p == "foo");
     cxt.fill_down_cells(pos, 3);
-    assert(cxt.get_string_identifier(abs_address_t(0, 2, 2)) == s_foo);
-    assert(cxt.get_string_identifier(abs_address_t(0, 3, 2)) == s_foo);
-    assert(cxt.get_string_identifier(abs_address_t(0, 4, 2)) == s_foo);
-    assert(cxt.is_empty(abs_address_t(0, 5, 2)));
+    assert(cxt.get_string_identifier(ixion::abs_address_t(0, 2, 2)) == s_foo);
+    assert(cxt.get_string_identifier(ixion::abs_address_t(0, 3, 2)) == s_foo);
+    assert(cxt.get_string_identifier(ixion::abs_address_t(0, 4, 2)) == s_foo);
+    assert(cxt.is_empty(ixion::abs_address_t(0, 5, 2)));
 
     pos.column = 3;
     cxt.fill_down_cells(pos, 2);
     assert(cxt.is_empty(pos));
-    assert(cxt.is_empty(abs_address_t(0, 2, 3)));
-    assert(cxt.is_empty(abs_address_t(0, 3, 3)));
-    assert(cxt.get_numeric_value(abs_address_t(0, 4, 3)) == 1.1);
+    assert(cxt.is_empty(ixion::abs_address_t(0, 2, 3)));
+    assert(cxt.is_empty(ixion::abs_address_t(0, 3, 3)));
+    assert(cxt.get_numeric_value(ixion::abs_address_t(0, 4, 3)) == 1.1);
 }
 
 void test_model_context_error_value()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt{{100, 10}};
+    ixion::model_context cxt{{100, 10}};
     cxt.append_sheet("test");
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
-    abs_address_t pos(0,3,0);
+    ixion::abs_address_t pos(0,3,0);
     const char* exp = "10/0";
-    formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, exp);
-    formula_cell* fc = cxt.set_formula_cell(pos, std::move(tokens));
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, pos, *resolver, exp);
+    ixion::formula_cell* fc = cxt.set_formula_cell(pos, std::move(tokens));
     fc->interpret(cxt, pos);
 
-    cell_access ca = cxt.get_cell_access(pos);
-    assert(ca.get_type() == cell_t::formula);
-    assert(ca.get_value_type() == cell_value_t::error);
-    assert(ca.get_error_value() == formula_error_t::division_by_zero);
+    ixion::cell_access ca = cxt.get_cell_access(pos);
+    assert(ca.get_type() == ixion::cell_t::formula);
+    assert(ca.get_value_type() == ixion::cell_value_t::error);
+    assert(ca.get_error_value() == ixion::formula_error_t::division_by_zero);
 }
 
 void test_model_context_rename_sheets()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt{{100, 10}};
+    ixion::model_context cxt{{100, 10}};
     cxt.append_sheet("sheet1");
     cxt.append_sheet("sheet2");
     cxt.append_sheet("sheet3");
@@ -1502,60 +1507,60 @@ void test_volatile_function()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt{{1048576, 16384}};
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    ixion::model_context cxt{{1048576, 16384}};
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
     cxt.append_sheet("test");
 
-    abs_range_set_t dirty_cells;
-    abs_range_set_t modified_cells;
+    ixion::abs_range_set_t dirty_cells;
+    ixion::abs_range_set_t modified_cells;
 
     // Set values into A1:A3.
-    cxt.set_numeric_cell(abs_address_t(0,0,0), 1.0);
-    cxt.set_numeric_cell(abs_address_t(0,1,0), 2.0);
-    cxt.set_numeric_cell(abs_address_t(0,2,0), 3.0);
+    cxt.set_numeric_cell(ixion::abs_address_t(0,0,0), 1.0);
+    cxt.set_numeric_cell(ixion::abs_address_t(0,1,0), 2.0);
+    cxt.set_numeric_cell(ixion::abs_address_t(0,2,0), 3.0);
 
     // Set formula in A4 that references A1:A3.
-    formula_cell* p = insert_formula(cxt, abs_address_t(0,3,0), "SUM(A1:A3)", *resolver);
+    auto* p = insert_formula(cxt, ixion::abs_address_t(0,3,0), "SUM(A1:A3)", *resolver);
     assert(p);
-    dirty_cells.insert(abs_address_t(0,3,0));
+    dirty_cells.insert(ixion::abs_address_t(0,3,0));
 
     // Initial full calculation.
     auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
     ixion::calculate_sorted_cells(cxt, sorted, 0);
 
-    double val = cxt.get_numeric_value(abs_address_t(0,3,0));
+    double val = cxt.get_numeric_value(ixion::abs_address_t(0,3,0));
     assert(val == 6);
 
     modified_cells.clear();
     dirty_cells.clear();
 
     // Modify the value of A2.  This should flag A4 dirty.
-    cxt.set_numeric_cell(abs_address_t(0,1,0), 10.0);
-    modified_cells.insert(abs_address_t(0,1,0));
+    cxt.set_numeric_cell(ixion::abs_address_t(0,1,0), 10.0);
+    modified_cells.insert(ixion::abs_address_t(0,1,0));
     sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
     assert(sorted.size() == 1);
 
     // Partial recalculation.
     ixion::calculate_sorted_cells(cxt, sorted, 0);
 
-    val = cxt.get_numeric_value(abs_address_t(0, 3, 0));
+    val = cxt.get_numeric_value(ixion::abs_address_t(0, 3, 0));
     assert(val == 14);
 
     modified_cells.clear();
     dirty_cells.clear();
 
     // Insert a volatile cell into B1.  At this point B1 should be the only dirty cell.
-    p = insert_formula(cxt, abs_address_t(0,0,1), "NOW()", *resolver);
+    p = insert_formula(cxt, ixion::abs_address_t(0,0,1), "NOW()", *resolver);
     assert(p);
-    dirty_cells.insert(abs_address_t(0,0,1));
+    dirty_cells.insert(ixion::abs_address_t(0,0,1));
     sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
     assert(sorted.size() == 1);
 
     // Partial recalc again.
     ixion::calculate_sorted_cells(cxt, sorted, 0);
-    double t1 = cxt.get_numeric_value(abs_address_t(0,0,1));
+    double t1 = cxt.get_numeric_value(ixion::abs_address_t(0,0,1));
 
     // Pause for 0.2 second.
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -1567,9 +1572,9 @@ void test_volatile_function()
     sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
     assert(sorted.size() == 1);
     ixion::calculate_sorted_cells(cxt, sorted, 0);
-    double t2 = cxt.get_numeric_value(abs_address_t(0,0,1));
+    double t2 = cxt.get_numeric_value(ixion::abs_address_t(0,0,1));
     double delta = (t2-t1)*24*60*60;
-    cout << "delta = " << delta << endl;
+    std::cout << "delta = " << delta << std::endl;
 
     // The delta should be close to 0.2.  It may be a little larger depending
     // on the CPU speed.
@@ -1580,22 +1585,23 @@ void test_invalid_formula_tokens()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt;
+    ixion::model_context cxt;
     std::string_view invalid_formula("invalid formula");
     std::string_view error_msg("failed to parse formula");
 
-    formula_tokens_t tokens = create_formula_error_tokens(cxt, invalid_formula, error_msg);
+    ixion::formula_tokens_t tokens =
+        ixion::create_formula_error_tokens(cxt, invalid_formula, error_msg);
 
-    assert(tokens[0].opcode == fop_invalid_formula);
-    assert(tokens.size() == (std::get<string_id_t>(tokens[0].value) + 1));
+    assert(tokens[0].opcode == ixion::fop_invalid_formula);
+    assert(tokens.size() == (std::get<ixion::string_id_t>(tokens[0].value) + 1));
 
-    assert(tokens[1].opcode == fop_string);
-    string_id_t sid = std::get<string_id_t>(tokens[1].value);
+    assert(tokens[1].opcode == ixion::fop_string);
+    ixion::string_id_t sid = std::get<ixion::string_id_t>(tokens[1].value);
     const std::string* s = cxt.get_string(sid);
     assert(invalid_formula == *s);
 
-    assert(tokens[2].opcode == fop_string);
-    sid = std::get<string_id_t>(tokens[2].value);
+    assert(tokens[2].opcode == ixion::fop_string);
+    sid = std::get<ixion::string_id_t>(tokens[2].value);
     s = cxt.get_string(sid);
     assert(error_msg == *s);
 }
@@ -1604,18 +1610,19 @@ void test_grouped_formula_string_results()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context cxt;
+    ixion::model_context cxt;
     cxt.append_sheet("test");
 
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
 
-    abs_range_t A1B2(0, 0, 0, 2, 2);
+    ixion::abs_range_t A1B2(0, 0, 0, 2, 2);
 
-    formula_tokens_t tokens = parse_formula_string(cxt, A1B2.first, *resolver, "\"literal string\"");
+    ixion::formula_tokens_t tokens =
+        ixion::parse_formula_string(cxt, A1B2.first, *resolver, "\"literal string\"");
 
-    matrix res_value(2, 2, std::string("literal string"));
-    formula_result res(std::move(res_value));
+    ixion::matrix res_value(2, 2, std::string("literal string"));
+    ixion::formula_result res(std::move(res_value));
     cxt.set_grouped_formula_cells(A1B2, std::move(tokens), std::move(res));
 
     std::string_view s = cxt.get_string_value(A1B2.last);
