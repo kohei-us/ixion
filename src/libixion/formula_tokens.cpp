@@ -167,11 +167,6 @@ bool formula_token::operator== (const formula_token& r) const
     return opcode == r.opcode && value == r.value;
 }
 
-bool formula_token::operator!= (const formula_token& r) const
-{
-    return !operator== (r);
-}
-
 struct formula_tokens_store::impl
 {
     formula_tokens_t m_tokens;

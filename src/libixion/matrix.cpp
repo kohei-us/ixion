@@ -275,11 +275,6 @@ bool matrix::operator== (const matrix& r) const
     return mp_impl->m_data == r.mp_impl->m_data;
 }
 
-bool matrix::operator!= (const matrix& r) const
-{
-    return !operator==(r);
-}
-
 numeric_matrix::numeric_matrix() : mp_impl(std::make_unique<impl>()) {}
 numeric_matrix::numeric_matrix(size_t rows, size_t cols) :
     mp_impl(std::make_unique<impl>(rows, cols)) {}

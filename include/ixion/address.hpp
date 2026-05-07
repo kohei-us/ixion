@@ -67,7 +67,6 @@ struct IXION_DLLPUBLIC abs_address_t
 };
 
 IXION_DLLPUBLIC bool operator==(const abs_address_t& left, const abs_address_t& right);
-IXION_DLLPUBLIC bool operator!=(const abs_address_t& left, const abs_address_t& right);
 IXION_DLLPUBLIC bool operator<(const abs_address_t& left, const abs_address_t& right);
 
 /**
@@ -101,7 +100,6 @@ struct IXION_DLLPUBLIC address_t
 };
 
 IXION_DLLPUBLIC bool operator==(const address_t& left, const address_t& right);
-IXION_DLLPUBLIC bool operator!=(const address_t& left, const address_t& right);
 IXION_DLLPUBLIC bool operator<(const address_t& left, const address_t& right);
 
 struct IXION_DLLPUBLIC abs_rc_address_t
@@ -126,7 +124,6 @@ struct IXION_DLLPUBLIC abs_rc_address_t
 };
 
 IXION_DLLPUBLIC bool operator==(const abs_rc_address_t& left, const abs_rc_address_t& right);
-IXION_DLLPUBLIC bool operator!=(const abs_rc_address_t& left, const abs_rc_address_t& right);
 IXION_DLLPUBLIC bool operator<(const abs_rc_address_t& left, const abs_rc_address_t& right);
 
 /**
@@ -152,7 +149,6 @@ struct IXION_DLLPUBLIC rc_address_t
 };
 
 IXION_DLLPUBLIC bool operator==(const rc_address_t& left, const rc_address_t& right);
-IXION_DLLPUBLIC bool operator!=(const rc_address_t& left, const rc_address_t& right);
 IXION_DLLPUBLIC bool operator<(const rc_address_t& left, const rc_address_t& right);
 
 /**
@@ -223,7 +219,6 @@ struct IXION_DLLPUBLIC abs_range_t
 };
 
 IXION_DLLPUBLIC bool operator==(const abs_range_t& left, const abs_range_t& right);
-IXION_DLLPUBLIC bool operator!=(const abs_range_t& left, const abs_range_t& right);
 IXION_DLLPUBLIC bool operator<(const abs_range_t& left, const abs_range_t& right);
 
 struct IXION_DLLPUBLIC abs_rc_range_t
@@ -276,7 +271,6 @@ struct IXION_DLLPUBLIC abs_rc_range_t
 };
 
 IXION_DLLPUBLIC bool operator==(const abs_rc_range_t& left, const abs_rc_range_t& right);
-IXION_DLLPUBLIC bool operator!=(const abs_rc_range_t& left, const abs_rc_range_t& right);
 IXION_DLLPUBLIC bool operator<(const abs_rc_range_t& left, const abs_rc_range_t& right);
 
 /**
@@ -329,7 +323,6 @@ struct IXION_DLLPUBLIC range_t
 };
 
 IXION_DLLPUBLIC bool operator==(const range_t& left, const range_t& right);
-IXION_DLLPUBLIC bool operator!=(const range_t& left, const range_t& right);
 
 struct IXION_DLLPUBLIC rc_range_t
 {
@@ -374,7 +367,6 @@ struct IXION_DLLPUBLIC rc_range_t
 };
 
 IXION_DLLPUBLIC bool operator==(const rc_range_t& left, const rc_range_t& right);
-IXION_DLLPUBLIC bool operator!=(const rc_range_t& left, const rc_range_t& right);
 
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_address_t& addr);
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const abs_rc_address_t& addr);

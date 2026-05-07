@@ -54,11 +54,6 @@ bool operator== (const abs_address_t& left, const abs_address_t& right)
         left.column == right.column;
 }
 
-bool operator!= (const abs_address_t& left, const abs_address_t& right)
-{
-    return !operator==(left, right);
-}
-
 bool operator< (const abs_address_t& left, const abs_address_t& right)
 {
     if (left.sheet != right.sheet)
@@ -185,11 +180,6 @@ bool operator== (const address_t& left, const address_t& right)
         left.abs_column == right.abs_column;
 }
 
-bool operator!=(const address_t& left, const address_t& right)
-{
-    return !operator==(left, right);
-}
-
 bool operator< (const address_t& left, const address_t& right)
 {
     // Not sure how to compare absolute and relative addresses, but let's make
@@ -248,11 +238,6 @@ bool operator== (const abs_rc_address_t& left, const abs_rc_address_t& right)
     return left.row == right.row && left.column == right.column;
 }
 
-bool operator!= (const abs_rc_address_t& left, const abs_rc_address_t& right)
-{
-    return !operator==(left, right);
-}
-
 bool operator< (const abs_rc_address_t& left, const abs_rc_address_t& right)
 {
     if (left.row != right.row)
@@ -287,11 +272,6 @@ bool operator== (const rc_address_t& left, const rc_address_t& right)
         left.column == right.column &&
         left.abs_row == right.abs_row &&
         left.abs_column == right.abs_column;
-}
-
-bool operator!=(const rc_address_t& left, const rc_address_t& right)
-{
-    return !operator==(left, right);
 }
 
 bool operator< (const rc_address_t& left, const rc_address_t& right)
@@ -402,11 +382,6 @@ bool operator==(const abs_range_t& left, const abs_range_t& right)
     return left.first == right.first && left.last == right.last;
 }
 
-bool operator!=(const abs_range_t& left, const abs_range_t& right)
-{
-    return !operator==(left, right);
-}
-
 bool operator<(const abs_range_t& left, const abs_range_t& right)
 {
     if (left.first != right.first)
@@ -483,11 +458,6 @@ bool operator==(const abs_rc_range_t& left, const abs_rc_range_t& right)
     return left.first == right.first && left.last == right.last;
 }
 
-bool operator!=(const abs_rc_range_t& left, const abs_rc_range_t& right)
-{
-    return !operator==(left, right);
-}
-
 bool operator<(const abs_rc_range_t& left, const abs_rc_range_t& right)
 {
     if (left.first != right.first)
@@ -554,11 +524,6 @@ bool operator==(const range_t& left, const range_t& right)
     return left.first == right.first && left.last == right.last;
 }
 
-bool operator!=(const range_t& left, const range_t& right)
-{
-    return !operator==(left, right);
-}
-
 rc_range_t::rc_range_t() {}
 rc_range_t::rc_range_t(const rc_address_t& _first, const rc_address_t& _last) :
     first(_first), last(_last) {}
@@ -597,11 +562,6 @@ std::size_t rc_range_t::hash::operator() (const rc_range_t& range) const
 bool operator==(const rc_range_t& left, const rc_range_t& right)
 {
     return left.first == right.first && left.last == right.last;
-}
-
-bool operator!=(const rc_range_t& left, const rc_range_t& right)
-{
-    return !operator==(left, right);
 }
 
 std::ostream& operator<<(std::ostream& os, const abs_address_t& addr)

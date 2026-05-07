@@ -41,11 +41,6 @@ bool model_iterator::cell::operator== (const cell& other) const
     return value == other.value;
 }
 
-bool model_iterator::cell::operator!= (const cell& other) const
-{
-    return !operator==(other);
-}
-
 class model_iterator::impl
 {
 public:

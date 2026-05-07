@@ -22,11 +22,6 @@ bool table_t::operator== (const table_t& r) const
     return name == r.name && column_first == r.column_first && column_last == r.column_first && areas == r.areas;
 }
 
-bool table_t::operator!= (const table_t& r) const
-{
-    return !operator==(r);
-}
-
 std::ostream& operator<<(std::ostream& os, const table_t& table)
 {
     os << "(name:" << table.name << "; column-first:" << table.column_first

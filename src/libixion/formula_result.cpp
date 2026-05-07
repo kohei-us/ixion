@@ -385,11 +385,6 @@ bool formula_result::operator== (const formula_result& r) const
     return mp_impl->equals(r);
 }
 
-bool formula_result::operator!= (const formula_result& r) const
-{
-    return !operator== (r);
-}
-
 std::ostream& operator<< (std::ostream& os, formula_result::result_type v)
 {
     switch (v)

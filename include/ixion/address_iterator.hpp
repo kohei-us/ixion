@@ -48,7 +48,6 @@ public:
         const value_type* operator->() const;
 
         bool operator== (const const_iterator& r) const;
-        bool operator!= (const const_iterator& r) const;
     };
 
     abs_address_iterator(const abs_range_t& range, rc_direction_t dir);

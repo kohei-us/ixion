@@ -281,11 +281,6 @@ bool abs_address_iterator::const_iterator::operator== (const const_iterator& r) 
     return mp_impl->equals(*r.mp_impl);
 }
 
-bool abs_address_iterator::const_iterator::operator!= (const const_iterator& r) const
-{
-    return !operator==(r);
-}
-
 abs_address_iterator::abs_address_iterator(const abs_range_t& range, rc_direction_t dir) :
     mp_impl(std::make_unique<impl>(range, dir)) {}
 

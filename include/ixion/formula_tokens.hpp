@@ -149,7 +149,6 @@ struct IXION_DLLPUBLIC formula_token final
     ~formula_token();
 
     bool operator== (const formula_token& r) const;
-    bool operator!= (const formula_token& r) const;
 };
 
 /**
