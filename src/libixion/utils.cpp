@@ -9,7 +9,7 @@
 #include <ixion/exceptions.hpp>
 #include <ixion/formula_result.hpp>
 
-#include <sstream>
+#include <format>
 
 namespace ixion { namespace detail {
 
@@ -31,9 +31,7 @@ cell_t to_celltype(mdds::mtv::element_t mtv_type)
             ;
     }
 
-    std::ostringstream os;
-    os << "unknown cell type (" << mtv_type << ")";
-    throw general_error(os.str());
+    throw general_error(std::format("unknown cell type ({})", mtv_type));
 }
 
 cell_value_t to_cell_value_type(

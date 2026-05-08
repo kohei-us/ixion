@@ -8,7 +8,7 @@
 #include "ixion/module.hpp"
 #include "ixion/info.hpp"
 #include "ixion/compute_engine.hpp"
-#include <sstream>
+#include <format>
 #include <vector>
 
 #ifdef _WIN32
@@ -25,9 +25,7 @@ const char* mod_names[] = { "vulkan" };
 
 std::string get_module_prefix()
 {
-    std::ostringstream os;
-    os << "ixion-" << get_api_version_major() << "." << get_api_version_minor() << "-";
-    return os.str();
+    return std::format("ixion-{}.{}-", get_api_version_major(), get_api_version_minor());
 }
 
 typedef module_def* (*fp_register_module_type)(void);
@@ -52,10 +50,7 @@ void init_modules()
 
     for (const char* mod_name : mod_names)
     {
-        std::ostringstream os;
-        os << mod_prefix << mod_name << ".dll";
-
-        std::string modfile_name = os.str();
+        std::string modfile_name = std::format("{}{}.dll", mod_prefix, mod_name);
 
         HMODULE hdl = LoadLibrary(modfile_name.c_str());
         if (!hdl)
@@ -82,10 +77,9 @@ void init_modules()
 
     for (const char* mod_name : mod_names)
     {
-        std::ostringstream os;
-        os << mod_prefix << mod_name << ".so";
+        std::string modfile_name = std::format("{}{}.so", mod_prefix, mod_name);
 
-        void* hdl = dlopen(os.str().data(), RTLD_NOW | RTLD_GLOBAL);
+        void* hdl = dlopen(modfile_name.data(), RTLD_NOW | RTLD_GLOBAL);
         if (!hdl)
             continue;
 

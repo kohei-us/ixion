@@ -13,7 +13,7 @@
 #include "ixion/cell_access.hpp"
 
 #include <cstring>
-#include <sstream>
+#include <format>
 
 namespace ixion {
 
@@ -30,9 +30,7 @@ abs_address_t to_address(
             formula_name_t name = resolver.resolve(s, abs_address_t());
             if (name.type != formula_name_t::cell_reference)
             {
-                std::ostringstream os;
-                os << "invalid cell address: " << s;
-                throw std::invalid_argument(os.str());
+                throw std::invalid_argument(std::format("invalid cell address: {}", s));
             }
 
             return std::get<address_t>(name.value).to_abs(abs_address_t());

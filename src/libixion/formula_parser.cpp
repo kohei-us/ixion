@@ -10,8 +10,8 @@
 
 #include "formula_functions.hpp"
 
+#include <format>
 #include <iostream>
-#include <sstream>
 
 namespace ixion {
 
@@ -187,9 +187,7 @@ void formula_parser::name()
             break;
         default:
         {
-            std::ostringstream os;
-            os << "failed to resolve a name token '" << name << "'.";
-            throw parse_error(os.str());
+            throw parse_error(std::format("failed to resolve a name token '{}'.", name));
         }
     }
 }

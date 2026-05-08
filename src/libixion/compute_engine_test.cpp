@@ -11,9 +11,9 @@
 #include <ixion/module.hpp>
 #include <algorithm>
 #include <chrono>
+#include <format>
 #include <iostream>
 #include <iterator>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <functional>
@@ -72,9 +72,7 @@ void print_summary(const std::shared_ptr<ixion::draft::compute_engine>& engine)
 
     print_values("fibonacci input", values);
     {
-        std::ostringstream os;
-        os << "fibonacci (n=" << values.size() << ")";
-        ixion::test::stack_printer __stack_printer__(os.str());
+        ixion::test::stack_printer __stack_printer__(std::format("fibonacci (n={})", values.size()));
         engine->compute_fibonacci(io);
     }
     print_values("fibonacci output", values);

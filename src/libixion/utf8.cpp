@@ -8,7 +8,7 @@
 #include "utf8.hpp"
 
 #include <ixion/exceptions.hpp>
-#include <sstream>
+#include <format>
 #include <limits>
 
 namespace ixion { namespace detail {
@@ -56,9 +56,7 @@ std::vector<std::size_t> calc_utf8_byte_positions(const std::string& s)
 
         if (n == invalid_utf8_byte_length)
         {
-            std::ostringstream os;
-            os << "invalid utf8 byte length in string '" << s << "'";
-            throw general_error(os.str());
+            throw general_error(std::format("invalid utf8 byte length in string '{}'", s));
         }
 
         p += n;

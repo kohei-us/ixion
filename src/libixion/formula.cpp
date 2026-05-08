@@ -18,6 +18,7 @@
 #include "formula_functions.hpp"
 #include "debug.hpp"
 
+#include <format>
 #include <sstream>
 #include <algorithm>
 
@@ -304,10 +305,9 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const model_cont
         << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
         << "'");
 
-    std::ostringstream os;
-    os << func_name << ": invalid sheet index in " << pos.get_name()
-        << ": formula='" << detail::print_formula_expression(cxt, pos, cell) << "'";
-    throw ixion::formula_registration_error(os.str());
+    throw ixion::formula_registration_error(std::format(
+        "{}: invalid sheet index in {}: formula='{}'",
+        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell)));
 }
 
 }

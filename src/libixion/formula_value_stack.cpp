@@ -16,6 +16,7 @@
 #include <ixion/config.hpp>
 #include <ixion/exceptions.hpp>
 
+#include <format>
 #include <string>
 #include <sstream>
 
@@ -393,10 +394,9 @@ std::string formula_value_stack::pop_string()
         }
         case stack_value_t::boolean:
         {
-            std::ostringstream os;
-            os << std::boolalpha << v.get_boolean();
+            std::string ret = std::format("{}", v.get_boolean());
             m_stack.pop_back();
-            return os.str();
+            return ret;
         }
         case stack_value_t::value:
         {
@@ -426,11 +426,7 @@ std::string formula_value_stack::pop_string()
                         case formula_result::result_type::string:
                             return res.get_string();
                         case formula_result::result_type::boolean:
-                        {
-                            std::ostringstream os;
-                            os << std::boolalpha << res.get_boolean();
-                            return os.str();
-                        }
+                            return std::format("{}", res.get_boolean());
                         case formula_result::result_type::value:
                         {
                             std::ostringstream os;

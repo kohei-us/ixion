@@ -7,7 +7,7 @@
 
 #include "ixion/exceptions.hpp"
 
-#include <sstream>
+#include <format>
 
 namespace ixion {
 
@@ -66,9 +66,7 @@ const char* formula_error::what() const noexcept
     if (mp_impl->msg.empty())
         return error_name.data();
 
-    std::ostringstream os;
-    os << mp_impl->msg << " (type: " << error_name << ")";
-    mp_impl->buffer = os.str();
+    mp_impl->buffer = std::format("{} (type: {})", mp_impl->msg, error_name);
     return mp_impl->buffer.data();
 }
 
@@ -79,9 +77,7 @@ formula_error_t formula_error::get_error() const
 
 formula_registration_error::formula_registration_error(const std::string& msg)
 {
-    std::ostringstream os;
-    os << "formula_registration_error: " << msg;
-    set_message(os.str());
+    set_message(std::format("formula_registration_error: {}", msg));
 }
 
 formula_registration_error::~formula_registration_error() {}
@@ -89,9 +85,7 @@ formula_registration_error::~formula_registration_error() {}
 file_not_found::file_not_found(const std::string& fpath) :
     general_error(fpath)
 {
-    std::ostringstream os;
-    os << "specified file not found: " << fpath;
-    set_message(os.str());
+    set_message(std::format("specified file not found: {}", fpath));
 }
 
 file_not_found::~file_not_found() {}
@@ -108,9 +102,7 @@ model_context_error::error_type model_context_error::get_error_type() const
 
 not_implemented_error::not_implemented_error(const std::string& msg)
 {
-    std::ostringstream os;
-    os << "not_implemented_error: " << msg;
-    set_message(os.str());
+    set_message(std::format("not_implemented_error: {}", msg));
 }
 
 not_implemented_error::~not_implemented_error() {}

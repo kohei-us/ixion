@@ -19,6 +19,7 @@
 #include <ixion/cell_access.hpp>
 
 #include <cassert>
+#include <format>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -613,16 +614,12 @@ matrix operate_all_elements(const matrix& mtx, std::string_view val)
                 }
                 case matrix::element_type::string:
                 {
-                    std::ostringstream os;
-                    os << std::get<std::string_view>(elem.value) << val;
-                    res.set(row, col, os.str());
+                    res.set(row, col, std::format("{}{}", std::get<std::string_view>(elem.value), val));
                     break;
                 }
                 case matrix::element_type::boolean:
                 {
-                    std::ostringstream os;
-                    os << std::boolalpha << std::get<bool>(elem.value) << val;
-                    res.set(row, col, os.str());
+                    res.set(row, col, std::format("{}{}", std::get<bool>(elem.value), val));
                     break;
                 }
                 case matrix::element_type::error:
@@ -658,16 +655,12 @@ matrix operate_all_elements(std::string_view val, const matrix& mtx)
                 }
                 case matrix::element_type::string:
                 {
-                    std::ostringstream os;
-                    os << val << std::get<std::string_view>(elem.value);
-                    res.set(row, col, os.str());
+                    res.set(row, col, std::format("{}{}", val, std::get<std::string_view>(elem.value)));
                     break;
                 }
                 case matrix::element_type::boolean:
                 {
-                    std::ostringstream os;
-                    os << val << std::boolalpha << std::get<bool>(elem.value);
-                    res.set(row, col, os.str());
+                    res.set(row, col, std::format("{}{}", val, std::get<bool>(elem.value)));
                     break;
                 }
                 case matrix::element_type::error:
@@ -1018,9 +1011,8 @@ resolved_stack_value op_matrix_or_numeric(const resolved_stack_value& lhs, const
             throw invalid_expression("unexpected string value");
     }
 
-    std::ostringstream os;
-    os << "unhandled variant type: lhs=" << int(lhs.type()) << "; rhs=" << int(rhs.type());
-    throw invalid_expression(os.str());
+    throw invalid_expression(std::format(
+        "unhandled variant type: lhs={}; rhs={}", int(lhs.type()), int(rhs.type())));
 }
 
 std::ostream& operator<<(std::ostream& os, const matrix::element& e)
@@ -1100,9 +1092,8 @@ resolved_stack_value concat_matrix_or_string(const resolved_stack_value& lhs, co
             throw invalid_expression("unexpected numeric value");
     }
 
-    std::ostringstream os;
-    os << "unhandled variant type: lhs=" << int(lhs.type()) << "; rhs=" << int(rhs.type());
-    throw invalid_expression(os.str());
+    throw invalid_expression(std::format(
+        "unhandled variant type: lhs={}; rhs={}", int(lhs.type()), int(rhs.type())));
 }
 
 } // anonymous namespace
@@ -1367,9 +1358,8 @@ void formula_interpreter::factor()
             break;
         default:
         {
-            std::ostringstream os;
-            os << "factor: unexpected token type: <" << get_formula_opcode_name(oc) << ">";
-            throw invalid_expression(os.str());
+            throw invalid_expression(std::format(
+                "factor: unexpected token type: <{}>", get_formula_opcode_name(oc)));
         }
     }
 
@@ -1689,9 +1679,8 @@ void formula_interpreter::array()
             }
             default:
             {
-                std::ostringstream os;
-                os << "array: unexpected token type: <" << get_formula_opcode_name(token().opcode) << ">";
-                throw invalid_expression(os.str());
+                throw invalid_expression(std::format(
+                    "array: unexpected token type: <{}>", get_formula_opcode_name(token().opcode)));
             }
         }
 

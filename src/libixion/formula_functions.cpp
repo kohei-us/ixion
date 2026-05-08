@@ -25,6 +25,7 @@
 #endif
 
 #include <cassert>
+#include <format>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -795,11 +796,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             case formula_function_t::func_unknown:
             default:
             {
-                std::ostringstream os;
-                os << "formula function not implemented yet (name="
-                    << get_formula_function_name(oc)
-                    << ")";
-                throw not_implemented_error(os.str());
+                throw not_implemented_error(std::format(
+                    "formula function not implemented yet (name={})",
+                    get_formula_function_name(oc)));
             }
         }
     }
@@ -2122,9 +2121,7 @@ void formula_functions::fnc_textjoin(formula_value_stack& args) const
                     }
                     case cell_t::boolean:
                     {
-                        std::ostringstream os;
-                        os << std::boolalpha << std::get<bool>(cell.value);
-                        tokens.emplace_back(os.str());
+                        tokens.emplace_back(std::format("{}", std::get<bool>(cell.value)));
                         break;
                     }
                     case cell_t::formula:
@@ -2248,9 +2245,8 @@ void formula_functions::fnc_subtotal(formula_value_stack& args) const
         }
         default:
         {
-            std::ostringstream os;
-            os << "SUBTOTAL: function type " << subtype << " not implemented yet";
-            throw formula_functions::invalid_arg(os.str());
+            throw formula_functions::invalid_arg(
+                std::format("SUBTOTAL: function type {} not implemented yet", subtype));
         }
     }
 }

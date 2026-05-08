@@ -10,8 +10,8 @@
 #include "ixion/global.hpp"
 
 #include <cassert>
+#include <format>
 #include <iostream>
-#include <sstream>
 #include <cctype>
 #include <unordered_map>
 #include <optional>
@@ -357,9 +357,9 @@ void tokenizer::error()
         return;
     }
 
-    std::ostringstream os;
-    os << "failed to parse an error token in lexer tokenizer: '" << std::string_view{p0, len} << "'";
-    throw general_error(os.str());
+    throw general_error(std::format(
+        "failed to parse an error token in lexer tokenizer: '{}'",
+        std::string_view{p0, len}));
 }
 
 void tokenizer::next()

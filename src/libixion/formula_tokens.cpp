@@ -9,7 +9,7 @@
 #include <ixion/exceptions.hpp>
 #include <ixion/global.hpp>
 
-#include <sstream>
+#include <format>
 
 namespace ixion {
 
@@ -109,9 +109,9 @@ formula_token::formula_token(fopcode_t op) :
         case fop_value:
         case fop_function:
         {
-            std::ostringstream os;
-            os << "this opcode named '" << get_formula_opcode_name(op) << "' cannot be instantiated by this constructor";
-            throw std::invalid_argument(os.str());
+            throw std::invalid_argument(std::format(
+                "this opcode named '{}' cannot be instantiated by this constructor",
+                get_formula_opcode_name(op)));
         }
         default:;
     }

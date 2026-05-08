@@ -21,6 +21,7 @@
 #include "debug.hpp"
 
 #include <cassert>
+#include <format>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -43,9 +44,9 @@ namespace {
 [[maybe_unused]] std::string gen_trace_output(const formula_cell& fc, const model_context& cxt, const abs_address_t& pos)
 {
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
-    std::ostringstream os;
-    os << "pos=" << pos.get_name() << "; formula='" << print_formula_tokens(cxt, pos, *resolver, fc.get_tokens()->get()) << "'";
-    return os.str();
+    return std::format("pos={}; formula='{}'",
+        pos.get_name(),
+        print_formula_tokens(cxt, pos, *resolver, fc.get_tokens()->get()));
 }
 
 #endif

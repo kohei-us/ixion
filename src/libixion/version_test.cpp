@@ -8,7 +8,7 @@
 #include "test_global.hpp"
 #include <ixion/version.hpp>
 
-#include <sstream>
+#include <format>
 
 void test_version()
 {
@@ -18,9 +18,7 @@ void test_version()
         std::string ver = IXION_VERSION; // it's a string literal
         std::cout << "version: " << ver << std::endl;
 
-        std::ostringstream os;
-        os << IXION_VERSION_MAJOR << '.' << IXION_VERSION_MINOR << '.' << IXION_VERSION_MICRO;
-        assert(ver == os.str());
+        assert(ver == std::format("{}.{}.{}", IXION_VERSION_MAJOR, IXION_VERSION_MINOR, IXION_VERSION_MICRO));
     }
 
     {
@@ -37,9 +35,7 @@ void test_version()
         std::string ver = IXION_API_VERSION; // it's a string literal
         std::cout << "API version: " << ver << std::endl;
 
-        std::ostringstream os;
-        os << IXION_API_VERSION_MAJOR << '.' << IXION_API_VERSION_MINOR;
-        assert(ver == os.str());
+        assert(ver == std::format("{}.{}", IXION_API_VERSION_MAJOR, IXION_API_VERSION_MINOR));
     }
 
     {

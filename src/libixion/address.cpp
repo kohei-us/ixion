@@ -7,7 +7,7 @@
 
 #include "ixion/address.hpp"
 
-#include <sstream>
+#include <format>
 #include <limits>
 
 namespace ixion {
@@ -37,9 +37,7 @@ bool abs_address_t::valid() const
 
 std::string abs_address_t::get_name() const
 {
-    std::ostringstream os;
-    os << "(sheet=" << sheet << "; row=" << row << "; column=" << column << ")";
-    return os.str();
+    return std::format("(sheet={}; row={}; column={})", sheet, row, column);
 }
 
 std::size_t abs_address_t::hash::operator()(const abs_address_t& addr) const
@@ -128,19 +126,9 @@ abs_address_t address_t::to_abs(const abs_address_t& origin) const
 
 std::string address_t::get_name() const
 {
-    std::ostringstream os;
-    os << "(row=" << row << " [";
-    if (abs_row)
-        os << "abs";
-    else
-        os << "rel";
-    os << "]; column=" << column << " [";
-    if (abs_column)
-        os << "abs";
-    else
-        os << "rel";
-    os << "])";
-    return os.str();
+    return std::format("(row={} [{}]; column={} [{}])",
+        row, abs_row ? "abs" : "rel",
+        column, abs_column ? "abs" : "rel");
 }
 
 void address_t::set_absolute(bool abs)
@@ -225,9 +213,8 @@ abs_range_t::abs_range_t(sheet_t _sheet, row_t _row, col_t _col, row_t _row_span
 {
     if (_row_span < 1 || _col_span < 1)
     {
-        std::ostringstream os;
-        os << "abs_range_t: invalid span (row=" << _row_span << "; col=" << _col_span << ")";
-        throw std::range_error(os.str());
+        throw std::range_error(
+            std::format("abs_range_t: invalid span (row={}; col={})", _row_span, _col_span));
     }
 }
 

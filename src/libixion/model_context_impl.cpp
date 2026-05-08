@@ -20,7 +20,7 @@
 #include "utils.hpp"
 #include "debug.hpp"
 
-#include <sstream>
+#include <format>
 #include <iostream>
 #include <cstring>
 
@@ -170,9 +170,9 @@ void check_named_exp_name_or_throw(const char* p, size_t n)
         if (c == '_' || c == '.')
             continue;
 
-        std::ostringstream os;
-        os << "name contains invalid character '" << c << "'";
-        throw model_context_error(os.str(), model_context_error::invalid_named_expression);
+        throw model_context_error(
+            std::format("name contains invalid character '{}'", c),
+            model_context_error::invalid_named_expression);
     }
 }
 
@@ -187,16 +187,14 @@ void clip_range(abs_range_t& range, const rc_size_t& sheet_size)
 void throw_sheet_name_conflict(const std::string& name)
 {
     // This sheet name is already taken.
-    std::ostringstream os;
-    os << "Sheet name '" << name << "' already exists.";
-    throw model_context_error(os.str(), model_context_error::sheet_name_conflict);
+    throw model_context_error(
+        std::format("Sheet name '{}' already exists.", name),
+        model_context_error::sheet_name_conflict);
 }
 
 void throw_invalid_sheet_index(sheet_t sheet)
 {
-    std::ostringstream os;
-    os << "invalid sheet index: " << sheet;
-    throw std::invalid_argument(os.str());
+    throw std::invalid_argument(std::format("invalid sheet index: {}", sheet));
 }
 
 } // anonymous namespace
@@ -554,9 +552,8 @@ double model_context_impl::count_range(abs_range_t range, values_t values_type) 
                         break;
                     default:
                     {
-                        std::ostringstream os;
-                        os << __FUNCTION__ << ": unhandled block type (" << itb->type << ")";
-                        throw general_error(os.str());
+                        throw general_error(std::format(
+                            "{}: unhandled block type ({})", __FUNCTION__, itb->type));
                     }
                 }
 
@@ -742,9 +739,8 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
             throw not_implemented_error("filling down of a formula cell is not yet supported.");
         default:
         {
-            std::ostringstream os;
-            os << __FUNCTION__ << ": unhandled block type (" << it->type << ")";
-            throw general_error(os.str());
+            throw general_error(std::format(
+                "{}: unhandled block type ({})", __FUNCTION__, it->type));
         }
     }
 }
