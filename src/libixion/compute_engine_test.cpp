@@ -35,21 +35,21 @@ void print_values(std::string_view msg, const T& values)
     cout << msg << ": ";
 
     if (values.size() <= 20)
-        std::copy(values.begin(), values.end(), std::ostream_iterator<typename T::value_type>(cout, " "));
+        std::ranges::copy(values, std::ostream_iterator<typename T::value_type>(cout, " "));
     else
     {
         // Print only the first 15 and last 5 values.
         auto it = values.begin();
         auto it_end = it + 15;
 
-        std::copy(it, it_end, std::ostream_iterator<typename T::value_type>(cout, " "));
+        std::ranges::copy(it, it_end, std::ostream_iterator<typename T::value_type>(cout, " "));
 
         cout << "... ";
 
         it_end = values.end();
         it = it_end - 5;
 
-        std::copy(it, it_end, std::ostream_iterator<typename T::value_type>(cout, " "));
+        std::ranges::copy(it, it_end, std::ostream_iterator<typename T::value_type>(cout, " "));
     }
 
     cout << endl;

@@ -529,13 +529,13 @@ void append_values_from_stack(
                     {
                         auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
                         auto func = [](bool b) { return b ? 1.0 : 0.0; };
-                        std::transform(blk_range.begin(), blk_range.end(), insert_it, func);
+                        std::ranges::transform(blk_range, insert_it, func);
                         break;
                     }
                     case column_block_t::numeric:
                     {
                         auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
-                        std::copy(blk_range.begin(), blk_range.end(), insert_it);
+                        std::ranges::copy(blk_range, insert_it);
                         break;
                     }
                     case column_block_t::formula:
@@ -846,13 +846,13 @@ void formula_functions::fnc_median(formula_value_stack& args) const
     {
         // odd number of values
         auto it_mid = seq.begin() + mid_pos;
-        std::nth_element(seq.begin(), it_mid, seq.end());
+        std::ranges::nth_element(seq, it_mid);
         args.push_value(seq[mid_pos]);
     }
     else
     {
         // even number of values.  Take the average of the two mid values.
-        std::sort(seq.begin(), seq.end());
+        std::ranges::sort(seq);
         double v = seq[mid_pos - 1] + seq[mid_pos];
         args.push_value(v / 2.0);
     }
@@ -889,7 +889,7 @@ void formula_functions::fnc_mode(formula_value_stack& args) const
         return;
     }
 
-    std::sort(seq.begin(), seq.end());
+    std::ranges::sort(seq);
 
     // keep counting the number of adjacent equal values in the sorted sequence.
 
@@ -917,7 +917,7 @@ void formula_functions::fnc_mode(formula_value_stack& args) const
         return std::get<0>(lhs) < std::get<0>(rhs);
     };
 
-    std::sort(value_counts.begin(), value_counts.end(), func_comp);
+    std::ranges::sort(value_counts, func_comp);
     auto [top_value, top_count] = value_counts[0];
 
     if (top_count == 1)
@@ -1202,14 +1202,14 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                         case column_block_t::boolean:
                         {
                             auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
-                            bool res = std::all_of(blk_range.begin(), blk_range.end(), [](bool v) { return v; });
+                            bool res = std::ranges::all_of(blk_range, [](bool v) { return v; });
                             final_result = res;
                             break;
                         }
                         case column_block_t::numeric:
                         {
                             auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
-                            bool res = std::all_of(blk_range.begin(), blk_range.end(), [](double v) { return v != 0.0; });
+                            bool res = std::ranges::all_of(blk_range, [](double v) { return v != 0.0; });
                             final_result = res;
                             break;
                         }
@@ -1295,13 +1295,13 @@ void formula_functions::fnc_or(formula_value_stack& args) const
                         case column_block_t::boolean:
                         {
                             auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
-                            this_result = std::any_of(blk_range.begin(), blk_range.end(), [](bool v) { return v; });
+                            this_result = std::ranges::any_of(blk_range, [](bool v) { return v; });
                             break;
                         }
                         case column_block_t::numeric:
                         {
                             auto blk_range = detail::make_element_range<column_block_t::numeric>{}(node, length);
-                            this_result = std::any_of(blk_range.begin(), blk_range.end(), [](double v) { return v != 0.0; });
+                            this_result = std::ranges::any_of(blk_range, [](double v) { return v != 0.0; });
                             break;
                         }
                         case column_block_t::formula:
@@ -1787,7 +1787,7 @@ void formula_functions::fnc_mid(formula_value_stack& args) const
     auto it_end = s.cend() - skip_back;
 
     std::string truncated;
-    std::copy(it_head, it_end, std::back_inserter(truncated));
+    std::ranges::copy(it_head, it_end, std::back_inserter(truncated));
     args.push_string(truncated);
 }
 
@@ -1849,7 +1849,7 @@ void formula_functions::fnc_find(formula_value_stack& args) const
     }
 
     // convert the byte position to a logical utf-8 character position.
-    auto it = std::lower_bound(positions.begin(), positions.end(), pos);
+    auto it = std::ranges::lower_bound(positions, pos);
 
     if (it == positions.end() || *it != pos)
     {
@@ -1926,7 +1926,7 @@ void formula_functions::fnc_replace(formula_value_stack& args) const
     std::size_t pos_logical = pos_segment + n_segment;
     pos_bytes = pos_logical < positions.size() ? positions[pos_logical] : content.size();
     it = std::next(content.begin(), pos_bytes);
-    std::copy(it, content.end(), std::back_inserter(content_new));
+    std::ranges::copy(it, content.end(), std::back_inserter(content_new));
 
     args.push_string(content_new);
 }
@@ -1988,7 +1988,7 @@ void formula_functions::fnc_right(formula_value_stack& args) const
         assert(std::size_t(n) < positions.size());
         auto it = std::next(s.begin(), positions[n]);
         std::string s_skipped;
-        std::copy(it, s.end(), std::back_inserter(s_skipped));
+        std::ranges::copy(it, s.end(), std::back_inserter(s_skipped));
         s.swap(s_skipped);
     }
 
@@ -2202,7 +2202,7 @@ void formula_functions::fnc_trim(formula_value_stack& args) const
     }
 
     std::ostringstream os;
-    std::copy(tokens.cbegin(), std::prev(tokens.cend()), std::ostream_iterator<std::string>(os, " "));
+    std::ranges::copy(tokens.cbegin(), std::prev(tokens.cend()), std::ostream_iterator<std::string>(os, " "));
     os << tokens.back();
 
     args.push_string(os.str());

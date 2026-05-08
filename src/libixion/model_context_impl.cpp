@@ -333,8 +333,7 @@ sheet_t model_context_impl::append_sheet(std::string&& name)
     IXION_TRACE("name='" << name << "'");
 
     // Check if the new sheet name already exists.
-    strings_type::const_iterator it =
-        std::find(m_sheet_names.begin(), m_sheet_names.end(), name);
+    auto it = std::ranges::find(m_sheet_names, name);
     if (it != m_sheet_names.end())
         throw_sheet_name_conflict(name);
 

@@ -80,7 +80,7 @@ formula_error_t to_formula_error_type(std::string_view s)
     const auto* p = formula_error_names;
     const auto* p_end = p + std::size(formula_error_names);
 
-    p = std::find(p, p_end, s);
+    p = std::ranges::find(p, p_end, s);
 
     if (p == p_end)
         return formula_error_t::no_error;
