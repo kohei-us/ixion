@@ -55,15 +55,17 @@ vk_instance::vk_instance()
     const char* validation_layer = "VK_LAYER_KHRONOS_validation";
     const char* validation_ext = "VK_EXT_debug_utils";
 
-    VkApplicationInfo app_info = {};
-    app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.pApplicationName = "ixion-compute-engine-vulkan";
-    app_info.pEngineName = "none";
-    app_info.apiVersion = VK_API_VERSION_1_0;
+    VkApplicationInfo app_info = {
+        .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+        .pApplicationName = "ixion-compute-engine-vulkan",
+        .pEngineName = "none",
+        .apiVersion = VK_API_VERSION_1_0,
+    };
 
-    VkInstanceCreateInfo instance_ci = {};
-    instance_ci.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instance_ci.pApplicationInfo = &app_info;
+    VkInstanceCreateInfo instance_ci = {
+        .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+        .pApplicationInfo = &app_info,
+    };
 
     uint32_t n_layers;
     vkEnumerateInstanceLayerProperties(&n_layers, nullptr);
@@ -98,18 +100,19 @@ vk_instance::vk_instance()
 
     if (has_validation_layer)
     {
-        VkDebugUtilsMessengerCreateInfoEXT debug_ci{};
-        debug_ci.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        debug_ci.messageSeverity =
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        debug_ci.messageType =
-            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        debug_ci.pfnUserCallback = vulkan_debug_callback;
-        debug_ci.pUserData = nullptr;
+        VkDebugUtilsMessengerCreateInfoEXT debug_ci = {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity =
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType =
+                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+            .pfnUserCallback = vulkan_debug_callback,
+            .pUserData = nullptr,
+        };
 
         auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
             m_instance, "vkCreateDebugUtilsMessengerEXT");
@@ -145,11 +148,12 @@ vk_queue::~vk_queue() {}
 
 void vk_queue::submit(vk_command_buffer& cmd, vk_fence& fence, VkPipelineStageFlags dst_stages)
 {
-    VkSubmitInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    info.pWaitDstStageMask = dst_stages ? &dst_stages : nullptr;
-    info.commandBufferCount = 1;
-    info.pCommandBuffers = &cmd.get();
+    VkSubmitInfo info = {
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .pWaitDstStageMask = dst_stages ? &dst_stages : nullptr,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &cmd.get(),
+    };
 
     VkResult res = vkQueueSubmit(m_queue, 1, &info, fence.get());
     if (res != VK_SUCCESS)
@@ -256,18 +260,19 @@ vk_device::vk_device(vk_instance& instance)
 
         IXION_TRACE("final queue family index: " << m_queue_family_index);
 
-        VkDeviceQueueCreateInfo queue_ci = {};
-
         const float queue_prio = 0.0f;
-        queue_ci.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queue_ci.queueFamilyIndex = m_queue_family_index;
-        queue_ci.queueCount = 1;
-        queue_ci.pQueuePriorities = &queue_prio;
+        VkDeviceQueueCreateInfo queue_ci = {
+            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .queueFamilyIndex = m_queue_family_index,
+            .queueCount = 1,
+            .pQueuePriorities = &queue_prio,
+        };
 
-        VkDeviceCreateInfo device_ci = {};
-        device_ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        device_ci.queueCreateInfoCount = 1;
-        device_ci.pQueueCreateInfos = &queue_ci;
+        VkDeviceCreateInfo device_ci = {
+            .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .queueCreateInfoCount = 1,
+            .pQueueCreateInfos = &queue_ci,
+        };
 		res = vkCreateDevice(m_physical_device, &device_ci, nullptr, &m_device);
         if (res != VK_SUCCESS)
             throw std::runtime_error("failed to create a logical device.");
@@ -319,10 +324,11 @@ VkCommandPool& vk_command_pool::get()
 vk_command_pool::vk_command_pool(vk_device& device) :
     m_device(device.get())
 {
-    VkCommandPoolCreateInfo ci = {};
-    ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    ci.queueFamilyIndex = device.get_queue_family_index();
-    ci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    VkCommandPoolCreateInfo ci = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+        .queueFamilyIndex = device.get_queue_family_index(),
+    };
     VkResult res = vkCreateCommandPool(device.get(), &ci, nullptr, &m_cmd_pool);
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to create command pool.");
@@ -341,11 +347,12 @@ vk_command_buffer vk_command_pool::create_command_buffer()
 vk_command_buffer::vk_command_buffer(vk_command_pool& cmd_pool) :
     m_cmd_pool(cmd_pool)
 {
-    VkCommandBufferAllocateInfo cb_ai {};
-    cb_ai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cb_ai.commandPool = m_cmd_pool.get();
-    cb_ai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    cb_ai.commandBufferCount = 1;
+    VkCommandBufferAllocateInfo cb_ai = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool = m_cmd_pool.get(),
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1,
+    };
 
     VkResult res = vkAllocateCommandBuffers(m_cmd_pool.get_device(), &cb_ai, &m_cmd_buffer);
     if (res != VK_SUCCESS)
@@ -364,8 +371,9 @@ VkCommandBuffer& vk_command_buffer::get()
 
 void vk_command_buffer::begin()
 {
-    VkCommandBufferBeginInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    VkCommandBufferBeginInfo info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+    };
     vkBeginCommandBuffer(m_cmd_buffer, &info);
 }
 
@@ -376,8 +384,9 @@ void vk_command_buffer::end()
 
 void vk_command_buffer::copy_buffer(vk_buffer& src, vk_buffer& dst, VkDeviceSize size)
 {
-    VkBufferCopy copy_region{};
-    copy_region.size = size;
+    VkBufferCopy copy_region = {
+        .size = size,
+    };
     vkCmdCopyBuffer(m_cmd_buffer, src.get(), dst.get(), 1, &copy_region);
 }
 
@@ -385,14 +394,15 @@ void vk_command_buffer::buffer_memory_barrier(
     const vk_buffer& buffer, VkAccessFlags src_access, VkAccessFlags dst_access,
     VkPipelineStageFlagBits src_stage, VkPipelineStageFlagBits dst_stage)
 {
-    VkBufferMemoryBarrier info{};
-    info.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-    info.buffer = buffer.get();
-    info.size = VK_WHOLE_SIZE;
-    info.srcAccessMask = src_access;
-    info.dstAccessMask = dst_access;
-    info.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    info.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    VkBufferMemoryBarrier info = {
+        .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+        .srcAccessMask = src_access,
+        .dstAccessMask = dst_access,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .buffer = buffer.get(),
+        .size = VK_WHOLE_SIZE,
+    };
 
     vkCmdPipelineBarrier(
         m_cmd_buffer,
@@ -483,11 +493,12 @@ vk_buffer::mem_type vk_buffer::find_memory_type(VkMemoryPropertyFlags mem_props)
 vk_buffer::vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags mem_props) :
     m_device(device)
 {
-    VkBufferCreateInfo buf_ci {};
-    buf_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    buf_ci.usage = usage;
-    buf_ci.size = size;
-    buf_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    VkBufferCreateInfo buf_ci = {
+        .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        .size = size,
+        .usage = usage,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+    };
 
     IXION_TRACE("buffer usage flags: " << std::bitset<32>(usage) << " (0x" << std::hex << usage << ")");
     IXION_TRACE("memory property flags: " << std::bitset<32>(mem_props) << " (0x" << std::hex << mem_props << ")");
@@ -501,10 +512,11 @@ vk_buffer::vk_buffer(vk_device& device, VkDeviceSize size, VkBufferUsageFlags us
 
     IXION_TRACE("memory type: (index=" << mt.index << "; size=" << mt.size << ")");
 
-    VkMemoryAllocateInfo mem_ai {};
-    mem_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    mem_ai.allocationSize = mt.size;
-    mem_ai.memoryTypeIndex = mt.index;
+    VkMemoryAllocateInfo mem_ai = {
+        .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .allocationSize = mt.size,
+        .memoryTypeIndex = mt.index,
+    };
 
     res = vkAllocateMemory(m_device.get(), &mem_ai, nullptr, &m_memory);
     if (res != VK_SUCCESS)
@@ -545,11 +557,12 @@ void vk_buffer::write_to_memory(void* data, VkDeviceSize size)
     memcpy(mapped, data, size);
 
     // flush the modified memory range.
-    VkMappedMemoryRange flush_range{};
-    flush_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    flush_range.memory = m_memory;
-    flush_range.offset = 0;
-    flush_range.size = padded_size;
+    VkMappedMemoryRange flush_range = {
+        .sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
+        .memory = m_memory,
+        .offset = 0,
+        .size = padded_size,
+    };
     vkFlushMappedMemoryRanges(m_device.get(), 1, &flush_range);
 
     vkUnmapMemory(m_device.get(), m_memory);
@@ -564,11 +577,12 @@ void vk_buffer::read_from_memory(void* data, VkDeviceSize size)
     void *mapped;
     vkMapMemory(m_device.get(), m_memory, 0, padded_size, 0, &mapped);
 
-    VkMappedMemoryRange invalidate_range{};
-    invalidate_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    invalidate_range.memory = m_memory;
-    invalidate_range.offset = 0;
-    invalidate_range.size = padded_size;
+    VkMappedMemoryRange invalidate_range = {
+        .sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
+        .memory = m_memory,
+        .offset = 0,
+        .size = padded_size,
+    };
     vkInvalidateMappedMemoryRanges(m_device.get(), 1, &invalidate_range);
 
     // Copy to output
@@ -579,9 +593,10 @@ void vk_buffer::read_from_memory(void* data, VkDeviceSize size)
 vk_fence::vk_fence(vk_device& device, VkFenceCreateFlags flags) :
     m_device(device)
 {
-    VkFenceCreateInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    info.flags = flags;
+    VkFenceCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .flags = flags,
+    };
 
     vkCreateFence(m_device.get(), &info, nullptr, &m_fence);
 }
@@ -612,11 +627,12 @@ vk_descriptor_pool::vk_descriptor_pool(
     vk_device& device, uint32_t max_sets, std::initializer_list<VkDescriptorPoolSize> sizes) :
     m_device(device)
 {
-    VkDescriptorPoolCreateInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    info.poolSizeCount = sizes.size();
-    info.pPoolSizes = sizes.begin();
-    info.maxSets = max_sets;
+    VkDescriptorPoolCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .maxSets = max_sets,
+        .poolSizeCount = static_cast<uint32_t>(sizes.size()),
+        .pPoolSizes = sizes.begin(),
+    };
 
     VkResult res = vkCreateDescriptorPool(m_device.get(), &info, nullptr, &m_pool);
     if (res != VK_SUCCESS)
@@ -630,11 +646,12 @@ vk_descriptor_pool::~vk_descriptor_pool()
 
 vk_descriptor_set vk_descriptor_pool::allocate(const vk_descriptor_set_layout& ds_layout)
 {
-    VkDescriptorSetAllocateInfo ai{};
-    ai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    ai.descriptorPool = m_pool;
-    ai.pSetLayouts = &ds_layout.get();
-    ai.descriptorSetCount = 1u;
+    VkDescriptorSetAllocateInfo ai = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .descriptorPool = m_pool,
+        .descriptorSetCount = 1u,
+        .pSetLayouts = &ds_layout.get(),
+    };
 
     VkDescriptorSet ds;
     VkResult res = vkAllocateDescriptorSets(m_device.get(), &ai, &ds);
@@ -648,10 +665,11 @@ vk_descriptor_set_layout::vk_descriptor_set_layout(
     vk_device& device, std::initializer_list<VkDescriptorSetLayoutBinding> bindings) :
     m_device(device)
 {
-    VkDescriptorSetLayoutCreateInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    info.pBindings = bindings.begin();
-    info.bindingCount = bindings.size();
+    VkDescriptorSetLayoutCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        .bindingCount = static_cast<uint32_t>(bindings.size()),
+        .pBindings = bindings.begin(),
+    };
 
     VkResult res = vkCreateDescriptorSetLayout(m_device.get(), &info, nullptr, &m_ds_layout);
     if (res != VK_SUCCESS)
@@ -694,13 +712,14 @@ void vk_descriptor_set::update(
 {
     VkDescriptorBufferInfo buffer_desc = { buffer.get(), 0, VK_WHOLE_SIZE };
 
-    VkWriteDescriptorSet write_ds{};
-    write_ds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write_ds.dstSet = m_set;
-    write_ds.descriptorType = type;
-    write_ds.dstBinding = binding;
-    write_ds.pBufferInfo = &buffer_desc;
-    write_ds.descriptorCount = 1u;
+    VkWriteDescriptorSet write_ds = {
+        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        .dstSet = m_set,
+        .dstBinding = binding,
+        .descriptorCount = 1u,
+        .descriptorType = type,
+        .pBufferInfo = &buffer_desc,
+    };
 
     vkUpdateDescriptorSets(device.get(), 1u, &write_ds, 0, nullptr);
 }
@@ -709,10 +728,11 @@ vk_pipeline_layout::vk_pipeline_layout(
     vk_device& device, vk_descriptor_set_layout& ds_layout) :
     m_device(device)
 {
-    VkPipelineLayoutCreateInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    info.setLayoutCount = 1;
-    info.pSetLayouts = &ds_layout.get();
+    VkPipelineLayoutCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount = 1,
+        .pSetLayouts = &ds_layout.get(),
+    };
 
     VkResult res = vkCreatePipelineLayout(m_device.get(), &info, nullptr, &m_layout);
     if (res != VK_SUCCESS)
@@ -737,8 +757,9 @@ const VkPipelineLayout& vk_pipeline_layout::get() const
 vk_pipeline_cache::vk_pipeline_cache(vk_device& device) :
     m_device(device)
 {
-    VkPipelineCacheCreateInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    VkPipelineCacheCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
+    };
     VkResult res = vkCreatePipelineCache(m_device.get(), &info, nullptr, &m_cache);
     if (res != VK_SUCCESS)
         throw std::runtime_error("failed to create a pipeline cache.");
@@ -780,10 +801,11 @@ vk_shader_module::vk_shader_module(vk_device& device, module_type mt) :
             throw std::runtime_error("invalid module type");
     }
 
-    VkShaderModuleCreateInfo ci{};
-    ci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    ci.codeSize = n_array;
-    ci.pCode = array;
+    VkShaderModuleCreateInfo ci = {
+        .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+        .codeSize = n_array,
+        .pCode = array,
+    };
 
     VkResult res = vkCreateShaderModule(m_device.get(), &ci, NULL, &m_module);
     if (res != VK_SUCCESS)
@@ -815,34 +837,39 @@ vk_pipeline::vk_pipeline(
         uint32_t BUFFER_ELEMENTS;
     };
 
-    sp_data_type sp_data;
-    sp_data.BUFFER_ELEMENTS = cxt.input_buffer_size;
+    sp_data_type sp_data = {
+        .BUFFER_ELEMENTS = cxt.input_buffer_size,
+    };
 
-    VkSpecializationMapEntry sp_map_entry{};
-    sp_map_entry.constantID = 0;
-    sp_map_entry.offset = 0;
-    sp_map_entry.size = sizeof(uint32_t);
+    VkSpecializationMapEntry sp_map_entry = {
+        .constantID = 0,
+        .offset = 0,
+        .size = sizeof(uint32_t),
+    };
 
-    VkSpecializationInfo sp_info{};
-    sp_info.mapEntryCount = 1;
-    sp_info.pMapEntries = &sp_map_entry;
-    sp_info.dataSize = sizeof(sp_data_type);
-    sp_info.pData = &sp_data;
+    VkSpecializationInfo sp_info = {
+        .mapEntryCount = 1,
+        .pMapEntries = &sp_map_entry,
+        .dataSize = sizeof(sp_data_type),
+        .pData = &sp_data,
+    };
 
     // Data about the shader module, with special constant data via specialiation
     // info member.
-    VkPipelineShaderStageCreateInfo shader_stage_ci{};
-    shader_stage_ci.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shader_stage_ci.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-    shader_stage_ci.module = shader.get();
-    shader_stage_ci.pName = "main";
-    shader_stage_ci.pSpecializationInfo = &sp_info;
+    VkPipelineShaderStageCreateInfo shader_stage_ci = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .stage = VK_SHADER_STAGE_COMPUTE_BIT,
+        .module = shader.get(),
+        .pName = "main",
+        .pSpecializationInfo = &sp_info,
+    };
 
-    VkComputePipelineCreateInfo pipeline_ci{};
-    pipeline_ci.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-    pipeline_ci.layout = pl_layout.get();
-    pipeline_ci.flags = 0;
-    pipeline_ci.stage = shader_stage_ci;
+    VkComputePipelineCreateInfo pipeline_ci = {
+        .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+        .flags = 0,
+        .stage = shader_stage_ci,
+        .layout = pl_layout.get(),
+    };
 
     vkCreateComputePipelines(
         m_device.get(), pl_cache.get(), 1, &pipeline_ci, nullptr, &m_pipeline);
