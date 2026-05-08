@@ -24,7 +24,7 @@ public:
     class tokenize_error : public general_error
     {
     public:
-        tokenize_error(const std::string& msg);
+        tokenize_error(std::string msg);
     };
 
     formula_lexer() = delete;

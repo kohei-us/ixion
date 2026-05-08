@@ -31,8 +31,8 @@ struct matrix::impl
     impl(size_t rows, size_t cols, bool boolean) :
         m_data(rows, cols, boolean) {}
 
-    impl(size_t rows, size_t cols, const std::string& str) :
-        m_data(rows, cols, str) {}
+    impl(size_t rows, size_t cols, std::string str) :
+        m_data(rows, cols, std::move(str)) {}
 
     impl(size_t rows, size_t cols, formula_error_t error) :
         m_data(rows, cols, -static_cast<int64_t>(error)) {}
@@ -75,8 +75,8 @@ matrix::matrix(size_t rows, size_t cols, double numeric) :
 matrix::matrix(size_t rows, size_t cols, bool boolean) :
     mp_impl(std::make_unique<impl>(rows, cols, boolean)) {}
 
-matrix::matrix(size_t rows, size_t cols, const std::string& str) :
-    mp_impl(std::make_unique<impl>(rows, cols, str)) {}
+matrix::matrix(size_t rows, size_t cols, std::string str) :
+    mp_impl(std::make_unique<impl>(rows, cols, std::move(str))) {}
 
 matrix::matrix(size_t rows, size_t cols, formula_error_t error) :
     mp_impl(std::make_unique<impl>(rows, cols, error)) {}
@@ -145,9 +145,9 @@ void matrix::set(size_t row, size_t col, bool val)
     mp_impl->m_data.set(row, col, val);
 }
 
-void matrix::set(size_t row, size_t col, const std::string& str)
+void matrix::set(size_t row, size_t col, std::string str)
 {
-    mp_impl->m_data.set(row, col, str);
+    mp_impl->m_data.set(row, col, std::move(str));
 }
 
 void matrix::set(size_t row, size_t col, formula_error_t val)

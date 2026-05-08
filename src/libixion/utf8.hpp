@@ -8,7 +8,7 @@
 #pragma once
 
 #include <vector>
-#include <string>
+#include <string_view>
 
 namespace ixion { namespace detail {
 
@@ -20,7 +20,7 @@ namespace ixion { namespace detail {
  * @return a sequence of the positions.  The size of the sequence equals the
  *         logical length of the utf-8 string.
  */
-std::vector<std::size_t> calc_utf8_byte_positions(const std::string& s);
+std::vector<std::size_t> calc_utf8_byte_positions(std::string_view s);
 
 }}
 

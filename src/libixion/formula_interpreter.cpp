@@ -33,7 +33,7 @@ namespace {
 class invalid_expression : public general_error
 {
 public:
-    invalid_expression(const std::string& msg) : general_error(msg) {}
+    invalid_expression(std::string msg) : general_error(std::move(msg)) {}
 };
 
 const formula_token paren_open = formula_token{fop_open};
@@ -458,7 +458,7 @@ void compare_values(formula_value_stack& vs, fopcode_t oc, double val1, double v
     }
 }
 
-void compare_strings(formula_value_stack& vs, fopcode_t oc, const std::string& str1, const std::string& str2)
+void compare_strings(formula_value_stack& vs, fopcode_t oc, std::string_view str1, std::string_view str2)
 {
     switch (oc)
     {

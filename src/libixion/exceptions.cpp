@@ -13,8 +13,8 @@ namespace ixion {
 
 general_error::general_error() : m_msg() {}
 
-general_error::general_error(const std::string& msg) :
-    m_msg(msg) {}
+general_error::general_error(std::string msg) :
+    m_msg(std::move(msg)) {}
 
 general_error::~general_error() {}
 
@@ -23,9 +23,9 @@ const char* general_error::what() const noexcept
     return m_msg.c_str();
 }
 
-void general_error::set_message(const std::string& msg)
+void general_error::set_message(std::string msg)
 {
-    m_msg = msg;
+    m_msg = std::move(msg);
 }
 
 struct formula_error::impl
@@ -75,23 +75,22 @@ formula_error_t formula_error::get_error() const
     return mp_impl->error;
 }
 
-formula_registration_error::formula_registration_error(const std::string& msg)
+formula_registration_error::formula_registration_error(std::string_view msg)
 {
     set_message(std::format("formula_registration_error: {}", msg));
 }
 
 formula_registration_error::~formula_registration_error() {}
 
-file_not_found::file_not_found(const std::string& fpath) :
-    general_error(fpath)
+file_not_found::file_not_found(std::string_view fpath)
 {
     set_message(std::format("specified file not found: {}", fpath));
 }
 
 file_not_found::~file_not_found() {}
 
-model_context_error::model_context_error(const std::string& msg, error_type type) :
-    general_error(msg), m_type(type) {}
+model_context_error::model_context_error(std::string msg, error_type type) :
+    general_error(std::move(msg)), m_type(type) {}
 
 model_context_error::~model_context_error() {}
 
@@ -100,7 +99,7 @@ model_context_error::error_type model_context_error::get_error_type() const
     return m_type;
 }
 
-not_implemented_error::not_implemented_error(const std::string& msg)
+not_implemented_error::not_implemented_error(std::string_view msg)
 {
     set_message(std::format("not_implemented_error: {}", msg));
 }

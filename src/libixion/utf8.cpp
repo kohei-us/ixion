@@ -40,7 +40,7 @@ uint8_t calc_utf8_byte_length(uint8_t c1)
 
 }
 
-std::vector<std::size_t> calc_utf8_byte_positions(const std::string& s)
+std::vector<std::size_t> calc_utf8_byte_positions(std::string_view s)
 {
     const char* p = s.data();
     const char* p0 = p; // head position

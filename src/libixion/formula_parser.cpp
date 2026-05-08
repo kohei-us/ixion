@@ -20,16 +20,16 @@ namespace {
 class ref_error : public general_error
 {
 public:
-    ref_error(const std::string& msg) :
-        general_error(msg) {}
+    ref_error(std::string msg) :
+        general_error(std::move(msg)) {}
 };
 
 }
 
 // ----------------------------------------------------------------------------
 
-formula_parser::parse_error::parse_error(const std::string& msg) :
-    general_error(msg) {}
+formula_parser::parse_error::parse_error(std::string msg) :
+    general_error(std::move(msg)) {}
 
 // ----------------------------------------------------------------------------
 

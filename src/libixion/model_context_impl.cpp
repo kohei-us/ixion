@@ -184,7 +184,7 @@ void clip_range(abs_range_t& range, const rc_size_t& sheet_size)
         range.last.row = sheet_size.row - 1;
 }
 
-void throw_sheet_name_conflict(const std::string& name)
+void throw_sheet_name_conflict(std::string_view name)
 {
     // This sheet name is already taken.
     throw model_context_error(

@@ -60,7 +60,7 @@ document::cell_pos::cell_pos(std::string_view s) :
 
 document::cell_pos::cell_pos(const std::string& s) :
     type(cp_type::string),
-    value(s)
+    value(std::string_view(s))
 {
 }
 

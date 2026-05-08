@@ -45,7 +45,7 @@ public:
     matrix(size_t rows, size_t cols);
     matrix(size_t rows, size_t cols, double numeric);
     matrix(size_t rows, size_t cols, bool boolean);
-    matrix(size_t rows, size_t cols, const std::string& str);
+    matrix(size_t rows, size_t cols, std::string str);
     matrix(size_t rows, size_t cols, formula_error_t error);
     matrix(const matrix& other);
     matrix(matrix&& other);
@@ -67,7 +67,7 @@ public:
     double get_numeric(size_t row, size_t col) const;
     void set(size_t row, size_t col, double val);
     void set(size_t row, size_t col, bool val);
-    void set(size_t row, size_t col, const std::string& str);
+    void set(size_t row, size_t col, std::string str);
     void set(size_t row, size_t col, formula_error_t val);
 
     element get(size_t row, size_t col) const;

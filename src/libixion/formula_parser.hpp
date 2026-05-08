@@ -35,7 +35,7 @@ public:
     class parse_error : public general_error
     {
     public:
-        parse_error(const ::std::string& msg);
+        parse_error(::std::string msg);
     };
 
     formula_parser(const lexer_tokens_t& tokens, model_context& cxt, const formula_name_resolver& resolver);

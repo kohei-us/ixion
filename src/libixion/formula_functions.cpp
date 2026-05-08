@@ -578,8 +578,8 @@ void append_values_from_stack(
 
 // ============================================================================
 
-formula_functions::invalid_arg::invalid_arg(const std::string& msg) :
-    general_error(msg) {}
+formula_functions::invalid_arg::invalid_arg(std::string msg) :
+    general_error(std::move(msg)) {}
 
 formula_function_t formula_functions::get_function_opcode(const formula_token& token)
 {

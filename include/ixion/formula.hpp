@@ -53,8 +53,7 @@ IXION_DLLPUBLIC formula_tokens_t parse_formula_string(
  *         implementation.
  */
 IXION_DLLPUBLIC formula_tokens_t create_formula_error_tokens(
-    model_context& cxt, std::string_view src_formula,
-    std::string_view error);
+    model_context& cxt, std::string_view src_formula, std::string_view error);
 
 /**
  * Convert formula tokens into a human-readable string representation.
@@ -140,8 +139,7 @@ void IXION_DLLPUBLIC register_formula_cell(
  * @param cxt model context.
  * @param pos address of the cell being unregistered.
  */
-void IXION_DLLPUBLIC unregister_formula_cell(
-    model_context& cxt, const abs_address_t& pos);
+void IXION_DLLPUBLIC unregister_formula_cell(model_context& cxt, const abs_address_t& pos);
 
 /**
  * Get the positions of those formula cells that directly or indirectly

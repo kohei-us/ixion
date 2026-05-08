@@ -33,7 +33,7 @@ public:
     class invalid_arg : public general_error
     {
     public:
-        invalid_arg(const ::std::string& msg);
+        invalid_arg(::std::string msg);
     };
 
     formula_functions(model_context& cxt, const abs_address_t& pos);

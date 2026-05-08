@@ -13,6 +13,7 @@
 
 #include <exception>
 #include <string>
+#include <string_view>
 #include <memory>
 
 namespace ixion {
@@ -21,12 +22,12 @@ class IXION_DLLPUBLIC general_error : public std::exception
 {
 public:
     general_error();
-    explicit general_error(const std::string& msg);
+    explicit general_error(std::string msg);
     virtual ~general_error();
     virtual const char* what() const noexcept override;
 
 protected:
-    void set_message(const std::string& msg);
+    void set_message(std::string msg);
 
 private:
     std::string m_msg;
@@ -51,14 +52,14 @@ public:
 class IXION_DLLPUBLIC file_not_found : public general_error
 {
 public:
-    explicit file_not_found(const std::string& fpath);
+    explicit file_not_found(std::string_view fpath);
     virtual ~file_not_found() override;
 };
 
 class IXION_DLLPUBLIC formula_registration_error : public general_error
 {
 public:
-    explicit formula_registration_error(const std::string& msg);
+    explicit formula_registration_error(std::string_view msg);
     virtual ~formula_registration_error() override;
 };
 
@@ -77,7 +78,7 @@ public:
         not_implemented
     };
 
-    explicit model_context_error(const std::string& msg, error_type type);
+    explicit model_context_error(std::string msg, error_type type);
     virtual ~model_context_error() override;
 
     error_type get_error_type() const;
@@ -89,7 +90,7 @@ private:
 class IXION_DLLPUBLIC not_implemented_error : public general_error
 {
 public:
-    explicit not_implemented_error(const std::string& msg);
+    explicit not_implemented_error(std::string_view msg);
     virtual ~not_implemented_error() override;
 };
 
