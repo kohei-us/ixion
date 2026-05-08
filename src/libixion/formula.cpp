@@ -448,12 +448,8 @@ abs_address_set_t query_dirty_cells(model_context& cxt, const abs_address_set_t&
 
     // Convert a set of ranges to a set of addresses.
     abs_address_set_t dirty_cells;
-    std::for_each(dirty_ranges.begin(), dirty_ranges.end(),
-        [&dirty_cells](const abs_range_t& r)
-        {
-            dirty_cells.insert(r.first);
-        }
-    );
+    for (const abs_range_t& r : dirty_ranges)
+        dirty_cells.insert(r.first);
     return dirty_cells;
 }
 

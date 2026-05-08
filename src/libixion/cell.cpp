@@ -514,7 +514,8 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
                     break;
 
                 // recursive call.
-                std::for_each(named_exp->tokens.begin(), named_exp->tokens.end(), get_refs);
+                for (const auto& nt : named_exp->tokens)
+                    get_refs(nt);
                 break;
             }
             default:
@@ -524,7 +525,8 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
 
     const formula_tokens_t& this_tokens = mp_impl->m_tokens->get();
 
-    std::for_each(this_tokens.begin(), this_tokens.end(), get_refs);
+    for (const auto& t : this_tokens)
+        get_refs(t);
 
     return ret;
 }

@@ -900,7 +900,7 @@ void formula_functions::fnc_mode(formula_value_stack& args) const
     for (auto it = seq.begin(); it != seq.end(); )
     {
         double cur_v = *it;
-        auto it_tail = std::find_if(it, seq.end(), [cur_v](double v) { return cur_v < v; });
+        auto it_tail = std::ranges::find_if(it, seq.end(), [cur_v](double v) { return cur_v < v; });
         std::size_t len = std::distance(it, it_tail);
         value_counts.emplace_back(cur_v, len);
         it = it_tail;

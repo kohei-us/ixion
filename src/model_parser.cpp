@@ -712,7 +712,9 @@ void model_parser::push_table()
     }
 
     std::cout << "columns: ";
-    std::for_each(entry.columns.begin(), entry.columns.end(), string_printer(m_context, ','));
+    string_printer printer(m_context, ',');
+    for (string_id_t sid : entry.columns)
+        printer(sid);
     std::cout << std::endl;
 
     std::cout << "totals row count: " << mp_table_entry->totals_row_count << std::endl;
