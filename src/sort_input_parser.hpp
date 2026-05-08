@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_SORT_INPUT_PARSER_HXX__
-#define __IXION_SORT_INPUT_PARSER_HXX__
-
+#pragma once
 #include <ixion/exceptions.hpp>
 
 #include "depth_first_search.hpp"
@@ -50,5 +48,4 @@ private:
 
 }
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

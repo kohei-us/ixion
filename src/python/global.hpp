@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_PYTHON_GLOBAL_HPP
-#define INCLUDED_IXION_PYTHON_GLOBAL_HPP
-
+#pragma once
 #include <Python.h>
 
 #include "ixion/model_context.hpp"
@@ -39,7 +37,5 @@ PyObject* get_python_sheet_error();
 PyObject* get_python_formula_error();
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

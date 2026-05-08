@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef IXION_COLUMN_STORE_TYPE_HPP
-#define IXION_COLUMN_STORE_TYPE_HPP
-
+#pragma once
 #include "ixion/types.hpp"
 #include "ixion/cell.hpp"
 
@@ -69,5 +67,4 @@ using matrix_store_t = mdds::multi_type_matrix<matrix_store_traits>;
 
 }
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

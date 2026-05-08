@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_OPCODE_HPP
-#define INCLUDED_IXION_FORMULA_OPCODE_HPP
-
+#pragma once
 #include <iosfwd>
 
 namespace ixion {
@@ -60,7 +58,5 @@ enum fopcode_t
 std::ostream& operator<<(std::ostream& os, fopcode_t oc);
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

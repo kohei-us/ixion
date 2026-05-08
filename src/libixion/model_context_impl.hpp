@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_MODEL_CONTEXT_IMPL_HPP
-#define INCLUDED_MODEL_CONTEXT_IMPL_HPP
-
+#pragma once
 #include "ixion/model_context.hpp"
 #include "ixion/types.hpp"
 #include "ixion/config.hpp"
@@ -202,7 +200,5 @@ private:
 };
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

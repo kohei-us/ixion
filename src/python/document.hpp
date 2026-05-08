@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_PYTHON_DOCUMENT_HPP
-#define INCLUDED_IXION_PYTHON_DOCUMENT_HPP
-
+#pragma once
 #include <Python.h>
 
 namespace ixion { namespace python {
@@ -15,7 +13,5 @@ namespace ixion { namespace python {
 PyTypeObject* get_document_type();
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

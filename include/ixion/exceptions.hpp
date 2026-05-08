@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_EXCEPTIONS_HPP
-#define INCLUDED_IXION_EXCEPTIONS_HPP
-
+#pragma once
 #include "env.hpp"
 #include "types.hpp"
 
@@ -96,5 +94,4 @@ public:
 
 }
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

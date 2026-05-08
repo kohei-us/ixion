@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_MODEL_ITERATOR_HPP
-#define INCLUDED_IXION_MODEL_ITERATOR_HPP
-
+#pragma once
 #include "types.hpp"
 
 #include <memory>
@@ -69,7 +67,5 @@ public:
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const model_iterator::cell& c);
 
 } // namespace ixion
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

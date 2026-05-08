@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_FORMULA_TOKENS_HPP
-#define INCLUDED_FORMULA_TOKENS_HPP
-
+#pragma once
 #include "address.hpp"
 #include "table.hpp"
 #include "formula_opcode.hpp"
@@ -216,7 +214,5 @@ struct IXION_DLLPUBLIC named_expression_t
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const formula_token& ft);
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

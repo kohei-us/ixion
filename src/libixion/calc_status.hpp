@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_CALC_STATUS_HPP
-#define INCLUDED_IXION_CALC_STATUS_HPP
-
+#pragma once
 #include "ixion/formula_result.hpp"
 
 #include <mutex>
@@ -51,7 +49,5 @@ inline void intrusive_ptr_release(calc_status* p)
 using calc_status_ptr_t = boost::intrusive_ptr<calc_status>;
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

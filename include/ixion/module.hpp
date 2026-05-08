@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_MODULE_HPP
-#define INCLUDED_IXION_MODULE_HPP
-
+#pragma once
 #include "env.hpp"
 
 namespace ixion { namespace draft {
@@ -31,7 +29,5 @@ struct module_def
 };
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_LEXER_TOKENS_HPP
-#define INCLUDED_IXION_LEXER_TOKENS_HPP
-
+#pragma once
 #include <ixion/env.hpp>
 #include <ixion/types.hpp>
 
@@ -73,7 +71,5 @@ using lexer_tokens_t = std::vector<lexer_token>;
 std::string print_tokens(const lexer_tokens_t& tokens, bool verbose);
 
 } // namespace ixion
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

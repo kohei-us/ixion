@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_TYPES_HPP
-#define INCLUDED_IXION_TYPES_HPP
-
+#pragma once
 #include "env.hpp"
 
 #include <cstdlib>
@@ -367,7 +365,5 @@ struct IXION_DLLPUBLIC print_config
 };
 
 } // namespace ixion
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

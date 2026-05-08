@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __IXION_INTERFACE_SESSION_HANDLER_HPP__
-#define __IXION_INTERFACE_SESSION_HANDLER_HPP__
-
+#pragma once
 #include "../formula_opcode.hpp"
 #include "../formula_function_opcode.hpp"
 #include "../env.hpp"
@@ -48,5 +46,4 @@ public:
 
 }}
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef IXION_INTERFACE_TABLE_HANDLER_HPP
-#define IXION_INTERFACE_TABLE_HANDLER_HPP
-
+#pragma once
 #include "../types.hpp"
 
 namespace ixion {
@@ -57,7 +55,5 @@ public:
 };
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

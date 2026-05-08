@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_DEBUG_HPP
-#define INCLUDED_IXION_DEBUG_HPP
-
+#pragma once
 #include <string>
 
 #if defined(IXION_DEBUG_ON) || defined(IXION_TRACE_ON)
@@ -41,7 +39,5 @@ std::string print_formula_expression(const model_context& cxt, const abs_address
 std::string print_formula_token_repr(const formula_token& t);
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

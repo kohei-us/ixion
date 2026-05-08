@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_NAME_RESOLVER_HPP
-#define INCLUDED_IXION_FORMULA_NAME_RESOLVER_HPP
-
+#pragma once
 #include "address.hpp"
 #include "formula_function_opcode.hpp"
 
@@ -123,7 +121,5 @@ public:
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

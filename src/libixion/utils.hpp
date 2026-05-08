@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_DETAIL_UTILS_HPP
-#define INCLUDED_IXION_DETAIL_UTILS_HPP
-
+#pragma once
 #include "ixion/types.hpp"
 #include "column_store_type.hpp"
 
@@ -105,7 +103,5 @@ struct make_element_range<column_block_t::formula>
 // TODO : add specialization for the other block types as needed.
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

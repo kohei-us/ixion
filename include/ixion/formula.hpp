@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_HPP
-#define INCLUDED_IXION_FORMULA_HPP
-
+#pragma once
 #include "formula_tokens.hpp"
 #include "types.hpp"
 #include "env.hpp"
@@ -210,7 +208,5 @@ void IXION_DLLPUBLIC calculate_sorted_cells(
     model_context& cxt, std::span<const abs_range_t> formula_cells, size_t thread_count);
 
 } // namespace ixion
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_DEPTH_FIRST_SEARCH_HPP
-#define INCLUDED_IXION_DEPTH_FIRST_SEARCH_HPP
-
+#pragma once
 #include "ixion/exceptions.hpp"
 
 #include <vector>
@@ -222,5 +220,4 @@ depth_first_search<_ValueType,_ValueHashType>::get_precedent_cells(value_type ce
 
 }
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

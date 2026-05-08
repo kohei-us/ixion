@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_COMPUTE_ENGINE_VULKAN_HPP
-#define INCLUDED_IXION_COMPUTE_ENGINE_VULKAN_HPP
-
+#pragma once
 #include "ixion/compute_engine.hpp"
 
 #include "vulkan_obj.hpp"
@@ -33,7 +31,5 @@ public:
 };
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

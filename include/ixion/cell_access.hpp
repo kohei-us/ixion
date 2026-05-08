@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_CELL_ACCESS_HPP
-#define INCLUDED_IXION_CELL_ACCESS_HPP
-
+#pragma once
 #include "types.hpp"
 
 #include <memory>
@@ -61,7 +59,5 @@ public:
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

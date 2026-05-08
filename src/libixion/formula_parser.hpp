@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_PARSER_HPP
-#define INCLUDED_IXION_FORMULA_PARSER_HPP
-
+#pragma once
 #include "ixion/exceptions.hpp"
 #include "ixion/formula_tokens.hpp"
 
@@ -75,7 +73,5 @@ private:
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

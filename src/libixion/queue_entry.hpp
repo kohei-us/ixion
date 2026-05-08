@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_QUEUE_ENTRY_HPP
-#define INCLUDED_QUEUE_ENTRY_HPP
-
+#pragma once
 #include "ixion/address.hpp"
 
 namespace ixion {
@@ -23,7 +21,5 @@ struct queue_entry
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

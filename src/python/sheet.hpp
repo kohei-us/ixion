@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_PYTHON_SHEET_HPP
-#define INCLUDED_IXION_PYTHON_SHEET_HPP
-
+#pragma once
 #include <Python.h>
 
 #include "ixion/types.hpp"
@@ -38,7 +36,5 @@ sheet_data* get_sheet_data(PyObject* obj);
 PyObject* get_sheet_name(PyObject* obj);
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

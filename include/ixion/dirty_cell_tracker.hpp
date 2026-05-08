@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_DIRTY_CELL_TRACKER_HPP
-#define INCLUDED_IXION_DIRTY_CELL_TRACKER_HPP
-
+#pragma once
 #include "address.hpp"
 
 #include <memory>
@@ -90,7 +88,5 @@ public:
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

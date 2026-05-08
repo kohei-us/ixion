@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_FUNCTION_OPCODE_HPP
-#define INCLUDED_IXION_FORMULA_FUNCTION_OPCODE_HPP
-
+#pragma once
 #include "env.hpp"
 
 #include <cstdint>
@@ -366,5 +364,4 @@ IXION_DLLPUBLIC formula_function_t get_formula_function_opcode(std::string_view 
 
 }
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

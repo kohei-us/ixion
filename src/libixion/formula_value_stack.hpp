@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
-#define INCLUDED_IXION_FORMULA_VALUE_STACK_HPP
-
+#pragma once
 #include <ixion/address.hpp>
 #include <ixion/global.hpp>
 #include <ixion/matrix.hpp>
@@ -147,7 +145,5 @@ public:
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

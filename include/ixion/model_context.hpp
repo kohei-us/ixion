@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_MODEL_CONTEXT_HPP
-#define INCLUDED_IXION_MODEL_CONTEXT_HPP
-
+#pragma once
 #include "env.hpp"
 #include "formula_tokens_fwd.hpp"
 #include "types.hpp"
@@ -465,5 +463,4 @@ public:
 
 }
 
-#endif
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

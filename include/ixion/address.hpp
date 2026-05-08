@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_ADDRESS_HPP
-#define INCLUDED_IXION_ADDRESS_HPP
-
+#pragma once
 #include "types.hpp"
 
 #include <compare>
@@ -386,7 +384,5 @@ using abs_range_set_t = std::unordered_set<abs_range_t, abs_range_t::hash>;
 using abs_rc_range_set_t = std::unordered_set<abs_rc_range_t, abs_rc_range_t::hash>;
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

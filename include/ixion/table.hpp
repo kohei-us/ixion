@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_TABLE_HPP
-#define INCLUDED_IXION_TABLE_HPP
-
+#pragma once
 #include "types.hpp"
 
 namespace ixion {
@@ -27,7 +25,5 @@ struct IXION_DLLPUBLIC table_t
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const table_t& table);
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

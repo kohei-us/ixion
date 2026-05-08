@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_RESULT_HPP
-#define INCLUDED_IXION_FORMULA_RESULT_HPP
-
+#pragma once
 #include "global.hpp"
 
 #include <string>
@@ -129,7 +127,5 @@ public:
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, formula_result::result_type v);
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

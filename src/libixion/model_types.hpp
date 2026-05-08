@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_MODEL_TYPES_HPP
-#define INCLUDED_IXION_MODEL_TYPES_HPP
-
+#pragma once
 #include <string>
 #include <map>
 #include <memory>
@@ -25,7 +23,5 @@ typedef std::map<std::string, named_expression_t> named_expressions_t;
 extern const std::string empty_string;
 
 }}
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

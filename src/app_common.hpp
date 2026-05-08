@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_SRC_APP_COMMON_HPP
-#define INCLUDED_IXION_SRC_APP_COMMON_HPP
-
+#pragma once
 #include <string>
 
 namespace ixion { namespace detail {
@@ -17,7 +15,5 @@ std::string_view get_formula_result_output_separator();
 std::string load_file_content(const std::string& filepath);
 
 }} // namespace ixion::detail
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

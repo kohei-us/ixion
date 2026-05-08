@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_FORMULA_TOKENS_FWD_HPP
-#define INCLUDED_IXION_FORMULA_TOKENS_FWD_HPP
-
+#pragma once
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <memory>
@@ -21,7 +19,5 @@ using formula_tokens_t = std::vector<formula_token>;
 struct named_expression_t;
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

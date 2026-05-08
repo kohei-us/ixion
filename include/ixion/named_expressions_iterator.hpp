@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_NAMED_EXPRESSIONS_ITERATOR_HPP
-#define INCLUDED_IXION_NAMED_EXPRESSIONS_ITERATOR_HPP
-
+#pragma once
 #include "types.hpp"
 #include "formula_tokens_fwd.hpp"
 
@@ -51,7 +49,5 @@ public:
 };
 
 }
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

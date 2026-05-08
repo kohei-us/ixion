@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef INCLUDED_IXION_ENV_HPP
-#define INCLUDED_IXION_ENV_HPP
-
+#pragma once
 #if defined _WIN32 || defined __CYGWIN__
   #if defined IXION_BUILD
      #ifdef DLL_EXPORT
@@ -51,8 +49,6 @@
   #define IXION_DEPRECATED __declspec(deprecated)
 #else
   #define IXION_DEPRECATED
-#endif
-
 #endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
