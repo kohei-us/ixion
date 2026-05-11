@@ -492,16 +492,6 @@ void test_table_excel_a1()
 
     model_context cxt;
     cxt.append_sheet("Sheet");
-    string_id_t s_table1 = cxt.append_string("Table1");
-    string_id_t s_table2 = cxt.append_string("Table2");
-    string_id_t s_cat = cxt.append_string("Category");
-    string_id_t s_val = cxt.append_string("Value");
-
-    // Make sure these work correctly before proceeding further with the test.
-    assert(s_table1 == cxt.get_identifier_from_string("Table1"));
-    assert(s_table2 == cxt.get_identifier_from_string("Table2"));
-    assert(s_cat == cxt.get_identifier_from_string("Category"));
-    assert(s_val == cxt.get_identifier_from_string("Value"));
 
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -511,26 +501,26 @@ void test_table_excel_a1()
         sheet_t sheet;
         row_t row;
         col_t col;
-        string_id_t table_name;
-        string_id_t column_first;
-        string_id_t column_last;
+        std::string_view table_name;
+        std::string_view column_first;
+        std::string_view column_last;
         table_areas_t areas;
     } tests[] = {
-        { "[Value]", 0, 9, 2, empty_string_id, s_val, empty_string_id, table_area_data },
-        { "Table1[Category]", 0, 9, 2, s_table1, s_cat, empty_string_id, table_area_data },
-        { "Table1[Value]", 0, 9, 2, s_table1, s_val, empty_string_id, table_area_data },
-        { "Table1[[#Headers],[Value]]", 0, 9, 2, s_table1, s_val, empty_string_id, table_area_headers },
-        { "Table1[[#Headers],[#Data],[Value]]", 0, 9, 2, s_table1, s_val, empty_string_id, table_area_headers | table_area_data },
-        { "Table1[[#All],[Category]]", 0, 9, 2, s_table1, s_cat, empty_string_id, table_area_all },
-        { "Table1[[#Totals],[Category]]", 0, 9, 2, s_table1, s_cat, empty_string_id, table_area_totals },
-        { "Table1[[#Data],[#Totals],[Value]]", 0, 9, 2, s_table1, s_val, empty_string_id, table_area_data | table_area_totals },
-        { "Table1[#All]", 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_all },
-        { "Table1[#Headers]", 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_headers },
-        { "Table1[#Data]", 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_data },
-        { "Table1[#Totals]", 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_totals },
-        { "Table1[[#Headers],[#Data]]", 0, 9, 2, s_table1, empty_string_id, empty_string_id, table_area_headers | table_area_data },
-        { "Table1[[#Totals],[Category]:[Value]]", 0, 9, 2, s_table1, s_cat, s_val, table_area_totals },
-        { "Table1[[#Data],[#Totals],[Category]:[Value]]", 0, 9, 2, s_table1, s_cat, s_val, table_area_data | table_area_totals },
+        { "[Value]", 0, 9, 2, "", "Value", "", table_area_data },
+        { "Table1[Category]", 0, 9, 2, "Table1", "Category", "", table_area_data },
+        { "Table1[Value]", 0, 9, 2, "Table1", "Value", "", table_area_data },
+        { "Table1[[#Headers],[Value]]", 0, 9, 2, "Table1", "Value", "", table_area_headers },
+        { "Table1[[#Headers],[#Data],[Value]]", 0, 9, 2, "Table1", "Value", "", table_area_headers | table_area_data },
+        { "Table1[[#All],[Category]]", 0, 9, 2, "Table1", "Category", "", table_area_all },
+        { "Table1[[#Totals],[Category]]", 0, 9, 2, "Table1", "Category", "", table_area_totals },
+        { "Table1[[#Data],[#Totals],[Value]]", 0, 9, 2, "Table1", "Value", "", table_area_data | table_area_totals },
+        { "Table1[#All]", 0, 9, 2, "Table1", "", "", table_area_all },
+        { "Table1[#Headers]", 0, 9, 2, "Table1", "", "", table_area_headers },
+        { "Table1[#Data]", 0, 9, 2, "Table1", "", "", table_area_data },
+        { "Table1[#Totals]", 0, 9, 2, "Table1", "", "", table_area_totals },
+        { "Table1[[#Headers],[#Data]]", 0, 9, 2, "Table1", "", "", table_area_headers | table_area_data },
+        { "Table1[[#Totals],[Category]:[Value]]", 0, 9, 2, "Table1", "Category", "Value", table_area_totals },
+        { "Table1[[#Data],[#Totals],[Category]:[Value]]", 0, 9, 2, "Table1", "Category", "Value", table_area_data | table_area_totals },
     };
 
     for (size_t i = 0, n = std::size(tests); i < n; ++i)
@@ -542,19 +532,16 @@ void test_table_excel_a1()
             assert(!"table reference expected.");
 
         auto table = std::get<formula_name_t::table_type>(res.value);
-        string_id_t table_name = cxt.get_identifier_from_string(table.name);
-        string_id_t column_first = cxt.get_identifier_from_string(table.column_first);
-        string_id_t column_last = cxt.get_identifier_from_string(table.column_last);
-        assert(table_name == tests[i].table_name);
-        assert(column_first == tests[i].column_first);
-        assert(column_last == tests[i].column_last);
+        assert(table.name == tests[i].table_name);
+        assert(table.column_first == tests[i].column_first);
+        assert(table.column_last == tests[i].column_last);
         assert(table.areas == tests[i].areas);
 
         // Make sure we get the same name back.
         table_t tb;
-        tb.name = table_name;
-        tb.column_first = column_first;
-        tb.column_last = column_last;
+        tb.name = cxt.add_string(table.name);
+        tb.column_first = cxt.add_string(table.column_first);
+        tb.column_last = cxt.add_string(table.column_last);
         tb.areas = table.areas;
         std::string original(tests[i].exp);
         std::string returned = resolver->get_name(tb);

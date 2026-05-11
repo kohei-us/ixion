@@ -381,15 +381,7 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
                 }
                 case cell_t::string:
                 {
-                    string_id_t strid = ca.get_string_identifier();
-                    const std::string* ps = cxt.get_string(strid);
-                    if (!ps)
-                    {
-                        IXION_DEBUG("fail to get a string value for the id of " << strid);
-                        return {};
-                    }
-
-                    return stack_value{*ps};
+                    return stack_value{std::string{ca.get_string_value()}};
                 }
                 case cell_t::formula:
                 {

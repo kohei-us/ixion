@@ -24,7 +24,7 @@ model_iterator::cell::cell(row_t _row, col_t _col) :
 model_iterator::cell::cell(row_t _row, col_t _col, bool _b) :
     row(_row), col(_col), type(cell_t::boolean), value(_b) {}
 
-model_iterator::cell::cell(row_t _row, col_t _col, string_id_t _s) :
+model_iterator::cell::cell(row_t _row, col_t _col, std::string_view _s) :
     row(_row), col(_col), type(cell_t::string), value(_s) {}
 
 model_iterator::cell::cell(row_t _row, col_t _col, double _v) :
@@ -32,9 +32,6 @@ model_iterator::cell::cell(row_t _row, col_t _col, double _v) :
 
 model_iterator::cell::cell(row_t _row, col_t _col, const formula_cell* _f) :
     row(_row), col(_col), type(cell_t::formula), value(_f) {}
-
-model_iterator::cell::cell(row_t _row, col_t _col, std::uint32_t _s) :
-    cell(_row, _col, string_id_t{_s}) {}
 
 bool model_iterator::cell::operator== (const cell& other) const
 {
@@ -74,6 +71,7 @@ class iterator_core_horizontal : public model_iterator::impl
 {
     using collection_type = mdds::mtv::collection<column_store_t>;
 
+    const detail::model_context_impl& m_cxt;
     collection_type m_collection;
     mutable model_iterator::cell m_current_cell;
     mutable bool m_update_current_cell;
@@ -96,8 +94,16 @@ class iterator_core_horizontal : public model_iterator::impl
                 m_current_cell.value = m_current_pos->get<numeric_element_block>();
                 break;
             case element_type_string:
+            {
                 m_current_cell.type = cell_t::string;
-                m_current_cell.value = string_id_t{m_current_pos->get<string_element_block>()};
+                string_id_t sid{m_current_pos->get<string_element_block>()};
+                const std::string* s = m_cxt.get_string(sid);
+                m_current_cell.value = s ? std::string_view{*s} : std::string_view{};
+                break;
+            }
+            case element_type_inline_string:
+                m_current_cell.type = cell_t::string;
+                m_current_cell.value = std::string_view{m_current_pos->get<inline_string_element_block>()};
                 break;
             case element_type_formula:
                 m_current_cell.type = cell_t::formula;
@@ -114,6 +120,7 @@ class iterator_core_horizontal : public model_iterator::impl
     }
 public:
     iterator_core_horizontal(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range) :
+        m_cxt(cxt),
         m_update_current_cell(true)
     {
         const column_stores_t* cols = cxt.get_columns(sheet);
@@ -175,6 +182,7 @@ public:
 
 class iterator_core_vertical : public model_iterator::impl
 {
+    const detail::model_context_impl& m_cxt;
     const column_stores_t* m_cols;
     mutable model_iterator::cell m_current_cell;
     mutable bool m_update_current_cell;
@@ -208,8 +216,16 @@ class iterator_core_vertical : public model_iterator::impl
                 m_current_cell.value = column_store_t::get<numeric_element_block>(m_current_pos);
                 break;
             case element_type_string:
+            {
                 m_current_cell.type = cell_t::string;
-                m_current_cell.value = string_id_t{column_store_t::get<string_element_block>(m_current_pos)};
+                string_id_t sid{column_store_t::get<string_element_block>(m_current_pos)};
+                const std::string* s = m_cxt.get_string(sid);
+                m_current_cell.value = s ? std::string_view{*s} : std::string_view{};
+                break;
+            }
+            case element_type_inline_string:
+                m_current_cell.type = cell_t::string;
+                m_current_cell.value = std::string_view{column_store_t::get<inline_string_element_block>(m_current_pos)};
                 break;
             case element_type_formula:
                 m_current_cell.type = cell_t::formula;
@@ -226,6 +242,7 @@ class iterator_core_vertical : public model_iterator::impl
 
 public:
     iterator_core_vertical(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range) :
+        m_cxt(cxt),
         m_update_current_cell(true),
         m_row_first(0),
         m_row_last(row_unset)
@@ -387,7 +404,7 @@ std::ostream& operator<< (std::ostream& os, const model_iterator::cell& c)
             os << "; numeric=" << std::get<double>(c.value);
             break;
         case cell_t::string:
-            os << "; string=" << std::get<string_id_t>(c.value);
+            os << "; string=\"" << std::get<std::string_view>(c.value) << '"';
             break;
         case cell_t::empty:
             os << "; empty";

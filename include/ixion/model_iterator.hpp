@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <iosfwd>
+#include <string_view>
 #include <variant>
 
 namespace ixion {
@@ -32,7 +33,7 @@ public:
 
     struct IXION_DLLPUBLIC cell
     {
-        using value_type = std::variant<bool, double, string_id_t, const formula_cell*>;
+        using value_type = std::variant<bool, double, std::string_view, const formula_cell*>;
 
         row_t row;
         col_t col;
@@ -42,17 +43,9 @@ public:
         cell();
         cell(row_t _row, col_t _col);
         cell(row_t _row, col_t _col, bool _b);
-        cell(row_t _row, col_t _col, string_id_t _s);
+        cell(row_t _row, col_t _col, std::string_view _s);
         cell(row_t _row, col_t _col, double _v);
         cell(row_t _row, col_t _col, const formula_cell* _f);
-
-        /**
-         * Source-compatibility overload for callers written against the prior
-         * `string_id_t = uint32_t` contract. Delegates to the `string_id_t`
-         * overload. New code should pass `string_id_t{sid}` explicitly.
-         */
-        [[deprecated("pass string_id_t{sid} explicitly")]]
-        cell(row_t _row, col_t _col, std::uint32_t _s);
 
         bool operator== (const cell& other) const;
     };

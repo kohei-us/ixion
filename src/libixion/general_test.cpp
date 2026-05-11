@@ -165,15 +165,17 @@ void test_string_pool()
     ixion::string_id_t s_table2 = cxt.append_string("Table2");
     ixion::string_id_t s_cat = cxt.append_string("Category");
     ixion::string_id_t s_val = cxt.append_string("Value");
-    ixion::string_id_t s_empty = cxt.append_string("");
     cxt.dump_strings();
 
-    // Make sure these work correctly before proceeding further with the test.
-    assert(s_table1 == cxt.get_identifier_from_string("Table1"));
-    assert(s_table2 == cxt.get_identifier_from_string("Table2"));
-    assert(s_cat == cxt.get_identifier_from_string("Category"));
-    assert(s_val == cxt.get_identifier_from_string("Value"));
-    assert(s_empty == cxt.get_identifier_from_string(""));
+    // Verify each id round-trips to the original string value.
+    const std::string* p = cxt.get_string(s_table1);
+    assert(p && *p == "Table1");
+    p = cxt.get_string(s_table2);
+    assert(p && *p == "Table2");
+    p = cxt.get_string(s_cat);
+    assert(p && *p == "Category");
+    p = cxt.get_string(s_val);
+    assert(p && *p == "Value");
 }
 
 void test_string_pool_duplicate_strings()
@@ -966,8 +968,8 @@ void test_model_context_iterator_horizontal()
     std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string("F1") },
-        { 0, 1, cxt.get_identifier_from_string("F2") },
+        { 0, 0, std::string_view("F1") },
+        { 0, 1, std::string_view("F2") },
         { 1, 0, true },
         { 1, 1, false },
         { 2, 0, 3.14 },
@@ -1014,14 +1016,14 @@ void test_model_context_iterator_horizontal_range()
     std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string("F1") },
-        { 0, 1, cxt.get_identifier_from_string("F2") },
-        { 0, 2, cxt.get_identifier_from_string("F3") },
-        { 0, 3, cxt.get_identifier_from_string("F4") },
-        { 0, 4, cxt.get_identifier_from_string("F5") },
+        { 0, 0, std::string_view("F1") },
+        { 0, 1, std::string_view("F2") },
+        { 0, 2, std::string_view("F3") },
+        { 0, 3, std::string_view("F4") },
+        { 0, 4, std::string_view("F5") },
         { 1, 0, 1.0 },
         { 1, 1, true },
-        { 1, 2, cxt.get_identifier_from_string("s1") },
+        { 1, 2, std::string_view("s1") },
         { 1, 3 },
         { 1, 4 },
     };
@@ -1039,17 +1041,17 @@ void test_model_context_iterator_horizontal_range()
         { 2, 0, 1.1 },
         { 2, 1, false },
         { 2, 2 },
-        { 2, 3, cxt.get_identifier_from_string("s2") },
+        { 2, 3, std::string_view("s2") },
         { 2, 4 },
         { 3, 0, 1.2 },
         { 3, 1, false },
         { 3, 2 },
-        { 3, 3, cxt.get_identifier_from_string("s3") },
+        { 3, 3, std::string_view("s3") },
         { 3, 4 },
         { 4, 0, 1.3 },
         { 4, 1, true },
         { 4, 2 },
-        { 4, 3, cxt.get_identifier_from_string("s4") },
+        { 4, 3, std::string_view("s4") },
         { 4, 4 },
     };
 
@@ -1065,21 +1067,21 @@ void test_model_context_iterator_horizontal_range()
     checks =
     {
         // row, column, value
-        { 0, 1, cxt.get_identifier_from_string("F2") },
-        { 0, 2, cxt.get_identifier_from_string("F3") },
-        { 0, 3, cxt.get_identifier_from_string("F4") },
+        { 0, 1, std::string_view("F2") },
+        { 0, 2, std::string_view("F3") },
+        { 0, 3, std::string_view("F4") },
         { 1, 1, true },
-        { 1, 2, cxt.get_identifier_from_string("s1") },
+        { 1, 2, std::string_view("s1") },
         { 1, 3 },
         { 2, 1, false },
         { 2, 2 },
-        { 2, 3, cxt.get_identifier_from_string("s2") },
+        { 2, 3, std::string_view("s2") },
         { 3, 1, false },
         { 3, 2 },
-        { 3, 3, cxt.get_identifier_from_string("s3") },
+        { 3, 3, std::string_view("s3") },
         { 4, 1, true },
         { 4, 2 },
-        { 4, 3, cxt.get_identifier_from_string("s4") },
+        { 4, 3, std::string_view("s4") },
     };
 
     assert(check_model_iterator_output(iter, checks));
@@ -1153,13 +1155,13 @@ void test_model_context_iterator_vertical()
     std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string("F1") },
+        { 0, 0, std::string_view("F1") },
         { 1, 0, true },
         { 2, 0, 3.14 },
         { 3, 0, cxt.get_formula_cell(ixion::abs_address_t(1, 3, 0)) },
         { 4, 0 },
 
-        { 0, 1, cxt.get_identifier_from_string("F2") },
+        { 0, 1, std::string_view("F2") },
         { 1, 1, false },
         { 2, 1, -12.5 },
         { 3, 1, cxt.get_formula_cell(ixion::abs_address_t(1, 3, 1)) },
@@ -1201,15 +1203,15 @@ void test_model_context_iterator_vertical_range()
     std::vector<ixion::model_iterator::cell> checks =
     {
         // row, column, value
-        { 0, 0, cxt.get_identifier_from_string("F1") },
+        { 0, 0, std::string_view("F1") },
         { 1, 0, 1.0 },
-        { 0, 1, cxt.get_identifier_from_string("F2") },
+        { 0, 1, std::string_view("F2") },
         { 1, 1, true },
-        { 0, 2, cxt.get_identifier_from_string("F3") },
-        { 1, 2, cxt.get_identifier_from_string("s1") },
-        { 0, 3, cxt.get_identifier_from_string("F4") },
+        { 0, 2, std::string_view("F3") },
+        { 1, 2, std::string_view("s1") },
+        { 0, 3, std::string_view("F4") },
         { 1, 3 },
-        { 0, 4, cxt.get_identifier_from_string("F5") },
+        { 0, 4, std::string_view("F5") },
         { 1, 4 },
     };
 
@@ -1230,10 +1232,10 @@ void test_model_context_iterator_vertical_range()
         { 9, 1, 299.9 },
         { 8, 2 },
         { 9, 2 },
-        { 8, 3, cxt.get_identifier_from_string("s8") },
-        { 9, 3, cxt.get_identifier_from_string("s9") },
+        { 8, 3, std::string_view("s8") },
+        { 9, 3, std::string_view("s9") },
         { 8, 4 },
-        { 9, 4, cxt.get_identifier_from_string("end") },
+        { 9, 4, std::string_view("end") },
     };
 
     assert(check_model_iterator_output(iter, checks));
@@ -1264,9 +1266,9 @@ void test_model_context_iterator_vertical_range()
 
     checks =
     {
-        { 0, 3, cxt.get_identifier_from_string("F4") },
+        { 0, 3, std::string_view("F4") },
         { 1, 3 },
-        { 0, 4, cxt.get_identifier_from_string("F5") },
+        { 0, 4, std::string_view("F5") },
         { 1, 4 },
     };
 
@@ -1281,7 +1283,7 @@ void test_model_context_iterator_vertical_range()
     iter = cxt.get_model_iterator(0, ixion::rc_direction_t::vertical, range);
     checks =
     {
-        { 5, 3, cxt.get_identifier_from_string("s5") },
+        { 5, 3, std::string_view("s5") },
     };
 
     assert(check_model_iterator_output(iter, checks));
@@ -1427,13 +1429,11 @@ void test_model_context_fill_down()
     assert(cxt.is_empty(ixion::abs_address_t(0, 3, 1)));
 
     pos.column = 2;
-    ixion::string_id_t s_foo = cxt.get_string_identifier(pos);
-    const std::string* p = cxt.get_string(s_foo);
-    assert(p && *p == "foo");
+    assert(cxt.get_string_value(pos) == "foo");
     cxt.fill_down_cells(pos, 3);
-    assert(cxt.get_string_identifier(ixion::abs_address_t(0, 2, 2)) == s_foo);
-    assert(cxt.get_string_identifier(ixion::abs_address_t(0, 3, 2)) == s_foo);
-    assert(cxt.get_string_identifier(ixion::abs_address_t(0, 4, 2)) == s_foo);
+    assert(cxt.get_string_value(ixion::abs_address_t(0, 2, 2)) == "foo");
+    assert(cxt.get_string_value(ixion::abs_address_t(0, 3, 2)) == "foo");
+    assert(cxt.get_string_value(ixion::abs_address_t(0, 4, 2)) == "foo");
     assert(cxt.is_empty(ixion::abs_address_t(0, 5, 2)));
 
     pos.column = 3;

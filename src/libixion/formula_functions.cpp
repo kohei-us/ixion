@@ -2108,10 +2108,7 @@ void formula_functions::fnc_textjoin(formula_value_stack& args) const
                 {
                     case cell_t::string:
                     {
-                        auto sid = std::get<string_id_t>(cell.value);
-                        const std::string* s = m_context.get_string(sid);
-                        assert(s);
-                        tokens.emplace_back(*s);
+                        tokens.emplace_back(std::get<std::string_view>(cell.value));
                         break;
                     }
                     case cell_t::numeric:

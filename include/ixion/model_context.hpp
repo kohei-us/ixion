@@ -421,11 +421,18 @@ public:
      * doesn't exist in the pool, the value equal to empty_string_id gets
      * returned.
      *
+     * @deprecated Only strings registered via @ref append_string or
+     *             @ref add_string live in the indexed string pool.  Strings
+     *             written through @ref set_string_cell with a `string_view`
+     *             go to a separate inline pool and are not visible here. Read
+     *             cell strings via get_string_value instead.
+     *
      * @param s string value.
      *
      * @return string_id_t integer string ID associated with the string value
      *         given.
      */
+    [[deprecated("indexed-pool lookup only finds strings added via append_string/add_string; use get_string_value for cell text")]]
     string_id_t get_identifier_from_string(std::string_view s) const;
 
     /**
