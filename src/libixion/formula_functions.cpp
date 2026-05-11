@@ -525,6 +525,10 @@ void append_values_from_stack(
 
                 switch (node.type)
                 {
+                    case column_block_t::string:
+                    case column_block_t::inline_string:
+                        // Numeric collectors skip string blocks.
+                        break;
                     case column_block_t::boolean:
                     {
                         auto blk_range = detail::make_element_range<column_block_t::boolean>{}(node, length);
