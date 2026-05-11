@@ -771,6 +771,142 @@ void test_model_context_direct_string_access()
     assert(s == "string value in formula");
 }
 
+void test_model_context_inline_string()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    using namespace ixion;
+
+    ixion::model_context cxt{{400, 20}};
+    cxt.append_sheet("test");
+
+    // Inline writes do not pollute the indexed pool. append_string should keep
+    // returning consecutive ids regardless of intervening inline-cell writes.
+    auto id_a = cxt.append_string("A");
+    assert(cxt.get_string_count() == 1);
+
+    ixion::abs_address_t inline_addr1(0, 0, 1); // B1
+    cxt.set_string_cell(inline_addr1, "raw inline 1");
+    assert(cxt.get_string_count() == 1); // unchanged
+
+    auto id_b = cxt.append_string("B");
+    assert(cxt.get_string_count() == 2);
+    assert(id_b.value == id_a.value + 1);
+
+    ixion::abs_address_t sid_addr(0, 1, 1); // B2
+    cxt.set_string_cell(sid_addr, id_a); // string ID variant
+
+    // get_string_value() handles both kinds
+    assert(cxt.get_string_value(inline_addr1) == "raw inline 1");
+    assert(cxt.get_string_value(sid_addr) == "A");
+
+    // get_string_identifier() returns the real ID for the string ID cell and
+    // empty_string_id for the inline string cell
+    assert(cxt.get_string_identifier(sid_addr) == id_a);
+    assert(cxt.get_string_identifier(inline_addr1) == empty_string_id);
+
+    // cell_t::string for both
+    assert(cxt.get_celltype(inline_addr1) == cell_t::string);
+    assert(cxt.get_celltype(sid_addr) == cell_t::string);
+
+    // cell_access test cases
+    {
+        cell_access ca = cxt.get_cell_access(inline_addr1);
+        assert(ca.get_type() == cell_t::string);
+        assert(ca.get_value_type() == cell_value_t::string);
+        assert(ca.get_string_value() == "raw inline 1");
+        assert(ca.get_string_identifier() == empty_string_id);
+    }
+
+    {
+        cell_access ca = cxt.get_cell_access(sid_addr);
+        assert(ca.get_type() == cell_t::string);
+        assert(ca.get_value_type() == cell_value_t::string);
+        assert(ca.get_string_value() == "A");
+        assert(ca.get_string_identifier() == id_a);
+    }
+
+    {
+        // walk() exposes both string block types.
+
+        std::vector<column_block_t> block_types;
+        auto cb = [&block_types](
+            col_t, row_t, row_t, const column_block_shape_t& node)
+        {
+            block_types.push_back(node.type);
+            return true;
+        };
+        abs_rc_range_t range;
+        range.first.column = 1;
+        range.last.column = 1;
+        range.first.row = 0;
+        range.last.row = 1;
+        cxt.walk(0, range, cb);
+
+        bool saw_indexed = std::find(block_types.begin(), block_types.end(),
+            column_block_t::string) != block_types.end();
+
+        bool saw_inline = std::find(block_types.begin(), block_types.end(),
+            column_block_t::inline_string) != block_types.end();
+
+        assert(saw_indexed);
+        assert(saw_inline);
+    }
+
+    {
+        // model_iterator emits std::string_view for both kinds
+
+        abs_rc_range_t range;
+        range.set_all_columns();
+        range.set_all_rows();
+        model_iterator it = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+
+        bool saw_inline_value = false;
+        bool saw_indexed_value = false;
+
+        for (; it.has(); it.next())
+        {
+            const auto& c = it.get();
+            if (c.type != cell_t::string)
+                continue;
+
+            auto sv = std::get<std::string_view>(c.value);
+            if (sv == "raw inline 1")
+                saw_inline_value = true;
+            else if (sv == "A")
+                saw_indexed_value = true;
+        }
+
+        assert(saw_inline_value);
+        assert(saw_indexed_value);
+    }
+
+    // writing the same inline text into two cells produces views into the same
+    // stored string instance
+    abs_address_t inline_addr2(0, 2, 1); // B3
+    cxt.set_string_cell(inline_addr2, "raw inline 1");
+    std::string_view sv1 = cxt.get_string_value(inline_addr1);
+    std::string_view sv2 = cxt.get_string_value(inline_addr2);
+    assert(sv1 == "raw inline 1");
+    assert(sv2 == "raw inline 1");
+    assert(sv1.data() == sv2.data());
+
+    {
+        // set_cell_values() stores strings as inline values
+
+        model_context cxt2{{10, 5}};
+        cxt2.append_sheet("values");
+        std::size_t indexed_before = cxt2.get_string_count();
+        cxt2.set_cell_values(0, {
+            { "alpha", "beta", "gamma" },
+            { "delta", "epsilon", "zeta" },
+        });
+        assert(cxt2.get_string_count() == indexed_before);
+        assert(cxt2.get_string_value(abs_address_t(0, 0, 0)) == "alpha");
+        assert(cxt2.get_string_value(abs_address_t(0, 1, 2)) == "zeta");
+    }
+}
+
 void test_model_context_named_expression()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1649,6 +1785,7 @@ int main()
     test_function_name_resolution();
     test_model_context_storage();
     test_model_context_direct_string_access();
+    test_model_context_inline_string();
     test_model_context_named_expression();
     test_model_context_iterator_horizontal();
     test_model_context_iterator_horizontal_range();
