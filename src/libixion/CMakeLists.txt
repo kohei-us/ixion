@@ -33,6 +33,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     model_context.cpp
     model_context_impl.cpp
     safe_string_pool.cpp
+    inline_string_pool.cpp
     model_iterator.cpp
     model_types.cpp
     module.cpp
