@@ -6,46 +6,25 @@
  */
 
 #pragma once
-#include "ixion/model_context.hpp"
-#include "ixion/types.hpp"
-#include "ixion/config.hpp"
-#include "ixion/dirty_cell_tracker.hpp"
+
+#include <ixion/model_context.hpp>
+#include <ixion/types.hpp>
+#include <ixion/config.hpp>
+#include <ixion/dirty_cell_tracker.hpp>
 
 #include "sheet_store.hpp"
 #include "column_store_type.hpp"
+#include "safe_string_pool.hpp"
 
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <mutex>
-#include <shared_mutex>
 #include <deque>
 
 namespace ixion { namespace detail {
 
 using sheet_stores_type = std::deque<sheet_store>;
-
-class safe_string_pool
-{
-    using string_pool_type = std::deque<std::string>;
-    using string_map_type = std::unordered_map<std::string_view, string_id_t>;
-
-    mutable std::shared_mutex m_mtx;
-    string_pool_type m_strings;
-    string_map_type m_string_map;
-    std::string m_empty_string;
-
-    string_id_t append_string_unsafe(std::string_view s);
-
-public:
-    string_id_t append_string(std::string_view s);
-    string_id_t add_string(std::string_view s);
-    const std::string* get_string(string_id_t identifier) const;
-
-    size_t size() const;
-    void dump_strings() const;
-    string_id_t get_identifier_from_string(std::string_view s) const;
-};
 
 class model_context_impl
 {
