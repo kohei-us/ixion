@@ -126,7 +126,7 @@ std::string_view cell_access::get_string_value() const
     {
         case element_type_string:
         {
-            string_id_t sid = string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+            string_id_t sid{string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second)};
             const std::string* p = mp_impl->cxt.get_string(sid);
             return p ? *p : std::string_view{};
         }
@@ -149,7 +149,7 @@ string_id_t cell_access::get_string_identifier() const
     switch (mp_impl->pos.first->type)
     {
         case element_type_string:
-            return string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+            return string_id_t{string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second)};
         default:
             ;
     }

@@ -33,6 +33,9 @@ model_iterator::cell::cell(row_t _row, col_t _col, double _v) :
 model_iterator::cell::cell(row_t _row, col_t _col, const formula_cell* _f) :
     row(_row), col(_col), type(cell_t::formula), value(_f) {}
 
+model_iterator::cell::cell(row_t _row, col_t _col, std::uint32_t _s) :
+    cell(_row, _col, string_id_t{_s}) {}
+
 bool model_iterator::cell::operator== (const cell& other) const
 {
     if (type != other.type || row != other.row || col != other.col)
@@ -94,7 +97,7 @@ class iterator_core_horizontal : public model_iterator::impl
                 break;
             case element_type_string:
                 m_current_cell.type = cell_t::string;
-                m_current_cell.value = m_current_pos->get<string_element_block>();
+                m_current_cell.value = string_id_t{m_current_pos->get<string_element_block>()};
                 break;
             case element_type_formula:
                 m_current_cell.type = cell_t::formula;
@@ -206,7 +209,7 @@ class iterator_core_vertical : public model_iterator::impl
                 break;
             case element_type_string:
                 m_current_cell.type = cell_t::string;
-                m_current_cell.value = column_store_t::get<string_element_block>(m_current_pos);
+                m_current_cell.value = string_id_t{column_store_t::get<string_element_block>(m_current_pos)};
                 break;
             case element_type_formula:
                 m_current_cell.type = cell_t::formula;

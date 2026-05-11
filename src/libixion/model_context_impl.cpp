@@ -31,7 +31,7 @@ namespace ixion { namespace detail {
 
 string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
 {
-    string_id_t str_id = m_strings.size();
+    string_id_t str_id{static_cast<string_id_t::value_type>(m_strings.size())};
     m_strings.push_back(std::string{s});
     s = m_strings.back();
     m_string_map.insert({s, str_id});
@@ -63,10 +63,10 @@ const std::string* safe_string_pool::get_string(string_id_t identifier) const
     if (identifier == empty_string_id)
         return &m_empty_string;
 
-    if (identifier >= m_strings.size())
+    if (identifier.value >= m_strings.size())
         return nullptr;
 
-    return &m_strings[identifier];
+    return &m_strings[identifier.value];
 }
 
 size_t safe_string_pool::size() const
@@ -79,8 +79,9 @@ void safe_string_pool::dump_strings() const
     {
         cout << "string count: " << m_strings.size() << endl;
         auto it = m_strings.begin(), ite = m_strings.end();
-        for (string_id_t sid = 0; it != ite; ++it, ++sid)
+        for (std::size_t i = 0; it != ite; ++it, ++i)
         {
+            string_id_t sid{static_cast<string_id_t::value_type>(i)};
             const std::string& s = *it;
             cout << "* " << sid << ": '" << s << "' (" << (void*)s.data() << ")" << endl;
         }
@@ -687,7 +688,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, std::string_
     string_id_t str_id = add_string(s);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, str_id);
+    pos_hint = col_store.set(pos_hint, addr.row, str_id.value);
 }
 
 void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
@@ -721,8 +722,8 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
         }
         case element_type_string:
         {
-            string_id_t sid = col_store.get<string_element_block>(pos);
-            std::vector<string_id_t> vs(n_dst, sid);
+            string_id_t::value_type sid = col_store.get<string_element_block>(pos);
+            std::vector<string_id_t::value_type> vs(n_dst, sid);
             pos_hint = col_store.set(pos_hint, src.row+1, vs.begin(), vs.end());
             break;
         }
@@ -749,7 +750,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, identifier);
+    pos_hint = col_store.set(pos_hint, addr.row, identifier.value);
 }
 
 formula_cell* model_context_impl::set_formula_cell(
@@ -1011,7 +1012,7 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
     switch (pos.first->type)
     {
         case element_type_string:
-            return string_element_block::at(*pos.first->data, pos.second);
+            return string_id_t{string_element_block::at(*pos.first->data, pos.second)};
         default:
             ;
     }
@@ -1027,7 +1028,7 @@ std::string_view model_context_impl::get_string_value(const abs_address_t& addr)
     {
         case element_type_string:
         {
-            string_id_t sid = string_element_block::at(*pos.first->data, pos.second);
+            string_id_t sid{string_element_block::at(*pos.first->data, pos.second)};
             const std::string* p = m_str_pool.get_string(sid);
             return p ? *p : std::string_view{};
         }

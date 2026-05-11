@@ -148,7 +148,8 @@ void session_handler::push_error(formula_error_t err)
 
 void session_handler::push_string(size_t sid)
 {
-    const string* p = mp_impl->m_context.get_string(sid);
+    const string* p = mp_impl->m_context.get_string(
+        string_id_t{static_cast<string_id_t::value_type>(sid)});
     mp_impl->m_buf << '"';
     if (p)
         mp_impl->m_buf << *p;

@@ -152,6 +152,11 @@ formula_token::formula_token(string_id_t sid) :
 {
 }
 
+formula_token::formula_token(std::uint32_t sid) :
+    formula_token(string_id_t{sid})
+{
+}
+
 formula_token::formula_token(std::string name) :
     opcode(fop_named_expression), value(std::move(name))
 {

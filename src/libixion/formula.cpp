@@ -213,7 +213,7 @@ formula_tokens_t create_formula_error_tokens(
 {
     formula_tokens_t tokens;
     tokens.emplace_back(fop_invalid_formula);
-    tokens.back().value = 2u;
+    tokens.back().value = string_id_t{2u};
 
     string_id_t sid_src_formula = cxt.add_string(src_formula);
     tokens.emplace_back(sid_src_formula);

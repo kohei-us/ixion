@@ -46,6 +46,14 @@ public:
         cell(row_t _row, col_t _col, double _v);
         cell(row_t _row, col_t _col, const formula_cell* _f);
 
+        /**
+         * Source-compatibility overload for callers written against the prior
+         * `string_id_t = uint32_t` contract. Delegates to the `string_id_t`
+         * overload. New code should pass `string_id_t{sid}` explicitly.
+         */
+        [[deprecated("pass string_id_t{sid} explicitly")]]
+        cell(row_t _row, col_t _col, std::uint32_t _s);
+
         bool operator== (const cell& other) const;
     };
 

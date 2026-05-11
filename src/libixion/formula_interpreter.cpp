@@ -309,7 +309,7 @@ const std::string& formula_interpreter::string_or_throw() const
         throw general_error("no string found for the specified string ID.");
 
     if (mp_handler)
-        mp_handler->push_string(sid);
+        mp_handler->push_string(sid.value);
 
     return *p;
 }
@@ -381,7 +381,7 @@ std::optional<stack_value> pop_stack_value(const model_context& cxt, formula_val
                 }
                 case cell_t::string:
                 {
-                    std::size_t strid = ca.get_string_identifier();
+                    string_id_t strid = ca.get_string_identifier();
                     const std::string* ps = cxt.get_string(strid);
                     if (!ps)
                     {

@@ -40,8 +40,8 @@ void test_size()
     std::cout << "* double: " << sizeof(double) << std::endl;
     std::cout << "* size_t: " << sizeof(size_t) << std::endl;
     std::cout << "* string_id_t: " << sizeof(ixion::string_id_t)
-        << " (min:" << std::numeric_limits<ixion::string_id_t>::min()
-        << "; max:" << std::numeric_limits<ixion::string_id_t>::max() << ")" << std::endl;
+        << " (min:" << ixion::string_id_t{}.value
+        << "; max:" << ixion::empty_string_id.value << ")" << std::endl;
     std::cout << "* cell_t: " << sizeof(ixion::cell_t) << std::endl;
     std::cout << "* ixion::formula_cell: " << sizeof(ixion::formula_cell) << std::endl;
     std::cout << "* ixion::formula_tokens_t: " << sizeof(ixion::formula_tokens_t) << std::endl;
@@ -353,9 +353,9 @@ void test_table_t_equality()
     IXION_TEST_FUNC_SCOPE;
 
     ixion::table_t a;
-    a.name = 1;
-    a.column_first = 2;
-    a.column_last = 3;
+    a.name = ixion::string_id_t{1};
+    a.column_first = ixion::string_id_t{2};
+    a.column_last = ixion::string_id_t{3};
     a.areas = ixion::table_area_data;
 
     ixion::table_t same = a;
@@ -363,17 +363,17 @@ void test_table_t_equality()
     assert(!(a != same));
 
     ixion::table_t diff_name = a;
-    diff_name.name = 99;
+    diff_name.name = ixion::string_id_t{99};
     assert(!(a == diff_name));
     assert(a != diff_name);
 
     ixion::table_t diff_column_first = a;
-    diff_column_first.column_first = 99;
+    diff_column_first.column_first = ixion::string_id_t{99};
     assert(!(a == diff_column_first));
     assert(a != diff_column_first);
 
     ixion::table_t diff_column_last = a;
-    diff_column_last.column_last = 99;
+    diff_column_last.column_last = ixion::string_id_t{99};
     assert(!(a == diff_column_last));
     assert(a != diff_column_last);
 
@@ -1593,7 +1593,7 @@ void test_invalid_formula_tokens()
         ixion::create_formula_error_tokens(cxt, invalid_formula, error_msg);
 
     assert(tokens[0].opcode == ixion::fop_invalid_formula);
-    assert(tokens.size() == (std::get<ixion::string_id_t>(tokens[0].value) + 1));
+    assert(tokens.size() == (std::get<ixion::string_id_t>(tokens[0].value).value + 1));
 
     assert(tokens[1].opcode == ixion::fop_string);
     ixion::string_id_t sid = std::get<ixion::string_id_t>(tokens[1].value);

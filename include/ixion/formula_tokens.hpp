@@ -124,6 +124,14 @@ struct IXION_DLLPUBLIC formula_token final
     formula_token(string_id_t sid);
 
     /**
+     * Source-compatibility overload for callers written against the prior
+     * `string_id_t = uint32_t` contract. Delegates to the `string_id_t`
+     * overload above. New code should pass `string_id_t{sid}` explicitly.
+     */
+    [[deprecated("pass string_id_t{sid} explicitly")]]
+    formula_token(std::uint32_t sid);
+
+    /**
      * Constructor for a named-expression token.  The opcode will be implicitly
      * set to fop_named_expression.
      *

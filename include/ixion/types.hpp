@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <iosfwd>
 #include <string_view>
 #include <functional>
 
@@ -34,10 +35,21 @@ using rc_t = row_t;
  * String ID type.
  *
  * All string values are converted into integer tokens. You need to call the
- * get_string() method of ixion::model_context to get the
- * actual string value.
+ * model_context::get_string() to get the actual string value.
  */
-using string_id_t = std::uint32_t;
+struct IXION_DLLPUBLIC string_id_t
+{
+    using value_type = std::uint32_t;
+    value_type value;
+
+    constexpr string_id_t() noexcept : value(0) {}
+    constexpr explicit string_id_t(value_type v) noexcept : value(v) {}
+
+    std::strong_ordering operator<=>(const string_id_t&) const;
+    bool operator==(const string_id_t&) const;
+};
+
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, string_id_t v);
 
 /**
  * Special sheet ID that represents a global scope, as opposed to a

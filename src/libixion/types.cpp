@@ -10,6 +10,7 @@
 #include "column_store_type.hpp"
 
 #include <limits>
+#include <ostream>
 #include <vector>
 
 namespace ixion {
@@ -32,7 +33,16 @@ constexpr std::string_view formula_error_names[] = {
 const sheet_t global_scope = -1;
 const sheet_t invalid_sheet = -2;
 
-const string_id_t empty_string_id = std::numeric_limits<string_id_t>::max();
+const string_id_t empty_string_id{std::numeric_limits<string_id_t::value_type>::max()};
+
+std::strong_ordering string_id_t::operator<=>(const string_id_t&) const = default;
+bool string_id_t::operator==(const string_id_t&) const = default;
+
+std::ostream& operator<<(std::ostream& os, string_id_t v)
+{
+    os << v.value;
+    return os;
+}
 
 bool is_valid_sheet(sheet_t sheet)
 {
