@@ -408,6 +408,7 @@ column_block_t map_column_block_type(const mdds::mtv::element_t mtv_type)
         { element_type_string, column_block_t::string }, // 6
         { element_type_numeric, column_block_t::numeric }, // 10
         { element_type_formula, column_block_t::formula }, // user-start (50)
+        { element_type_inline_string, column_block_t::inline_string }, // user-start + 1 (51)
     };
 
     auto it = rules.find(mtv_type);
@@ -467,6 +468,7 @@ double model_context_impl::count_range(abs_range_t range, values_t values_type) 
                         match = values_type.is_boolean();
                         break;
                     case element_type_string:
+                    case element_type_inline_string:
                         match = values_type.is_string();
                         break;
                     case element_type_empty:
@@ -610,10 +612,10 @@ void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 void model_context_impl::set_string_cell(const abs_address_t& addr, std::string_view s)
 {
     sheet_store& sheet = m_sheets.at(addr.sheet);
-    string_id_t str_id = add_string(s);
+    string_view_store interned{m_inline_str_pool.intern(s)};
     column_store_t& col_store = sheet.at(addr.column);
     column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
-    pos_hint = col_store.set(pos_hint, addr.row, str_id.value);
+    pos_hint = col_store.set(pos_hint, addr.row, interned);
 }
 
 void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
@@ -649,6 +651,13 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
         {
             string_id_t::value_type sid = col_store.get<string_element_block>(pos);
             std::vector<string_id_t::value_type> vs(n_dst, sid);
+            pos_hint = col_store.set(pos_hint, src.row+1, vs.begin(), vs.end());
+            break;
+        }
+        case element_type_inline_string:
+        {
+            string_view_store sv = col_store.get<inline_string_element_block>(pos);
+            std::vector<string_view_store> vs(n_dst, sv);
             pos_hint = col_store.set(pos_hint, src.row+1, vs.begin(), vs.end());
             break;
         }
@@ -957,6 +966,8 @@ std::string_view model_context_impl::get_string_value(const abs_address_t& addr)
             const std::string* p = m_str_pool.get_string(sid);
             return p ? *p : std::string_view{};
         }
+        case element_type_inline_string:
+            return inline_string_element_block::at(*pos.first->data, pos.second);
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*pos.first->data, pos.second);

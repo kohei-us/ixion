@@ -24,6 +24,7 @@ cell_t to_celltype(mdds::mtv::element_t mtv_type)
         case element_type_boolean:
             return cell_t::boolean;
         case element_type_string:
+        case element_type_inline_string:
             return cell_t::string;
         case element_type_formula:
             return cell_t::formula;

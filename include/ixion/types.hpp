@@ -316,6 +316,7 @@ enum class column_block_t : int
     boolean,
     numeric,
     string,
+    inline_string,
     formula
 };
 

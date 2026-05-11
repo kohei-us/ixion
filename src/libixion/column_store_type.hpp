@@ -16,6 +16,7 @@
 #include <mdds/multi_type_matrix.hpp>
 
 #include <deque>
+#include <string_view>
 
 namespace ixion {
 
@@ -26,6 +27,7 @@ constexpr mdds::mtv::element_t element_type_boolean = mdds::mtv::element_type_bo
 constexpr mdds::mtv::element_t element_type_numeric = mdds::mtv::element_type_double;
 constexpr mdds::mtv::element_t element_type_string  = mdds::mtv::element_type_uint32;
 constexpr mdds::mtv::element_t element_type_formula = mdds::mtv::element_type_user_start;
+constexpr mdds::mtv::element_t element_type_inline_string = mdds::mtv::element_type_user_start + 1;
 
 // Element block types
 
@@ -36,7 +38,32 @@ using string_element_block  = mdds::mtv::uint32_element_block;
 using formula_element_block =
     mdds::mtv::noncopyable_managed_element_block<element_type_formula, ixion::formula_cell>;
 
-MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(formula_cell, element_type_formula, nullptr, formula_element_block)
+MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(
+    formula_cell, element_type_formula, nullptr, formula_element_block)
+
+/**
+ * Thin wrapper over std::string_view in ixion namespace in order for ADL to
+ * work properly.  Using std::string_view directly would cause ADL to fail.
+ */
+struct string_view_store
+{
+    std::string_view view;
+
+    constexpr string_view_store() noexcept = default;
+    constexpr string_view_store(std::string_view v) noexcept : view(v) {}
+    constexpr operator std::string_view() const noexcept { return view; }
+};
+
+constexpr bool operator==(string_view_store lhs, string_view_store rhs) noexcept
+{
+    return lhs.view == rhs.view;
+}
+
+using inline_string_element_block =
+    mdds::mtv::default_element_block<element_type_inline_string, string_view_store>;
+
+MDDS_MTV_DEFINE_ELEMENT_CALLBACKS(
+    string_view_store, element_type_inline_string, string_view_store{}, inline_string_element_block)
 
 struct column_store_traits : mdds::mtv::default_traits
 {
@@ -44,7 +71,8 @@ struct column_store_traits : mdds::mtv::default_traits
         boolean_element_block,
         numeric_element_block,
         string_element_block,
-        formula_element_block>;
+        formula_element_block,
+        inline_string_element_block>;
 };
 
 /** Type that represents a whole column. */

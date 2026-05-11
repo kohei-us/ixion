@@ -1196,6 +1196,7 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                     {
                         case column_block_t::empty:
                         case column_block_t::string:
+                        case column_block_t::inline_string:
                         case column_block_t::unknown:
                             // non-numeric blocks get skipped.
                             break;
@@ -1289,6 +1290,7 @@ void formula_functions::fnc_or(formula_value_stack& args) const
                     {
                         case column_block_t::empty:
                         case column_block_t::string:
+                        case column_block_t::inline_string:
                         case column_block_t::unknown:
                             // non-numeric blocks get skipped.
                             break;

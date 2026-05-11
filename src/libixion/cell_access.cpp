@@ -130,6 +130,8 @@ std::string_view cell_access::get_string_value() const
             const std::string* p = mp_impl->cxt.get_string(sid);
             return p ? *p : std::string_view{};
         }
+        case element_type_inline_string:
+            return inline_string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
         case element_type_formula:
         {
             const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
