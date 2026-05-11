@@ -76,25 +76,20 @@ size_t safe_string_pool::size() const
 
 void safe_string_pool::dump_strings() const
 {
+    std::cout << "string count: " << m_strings.size() << std::endl;
+    string_id_t::value_type i = 0;
+    for (const std::string& s : m_strings)
     {
-        cout << "string count: " << m_strings.size() << endl;
-        auto it = m_strings.begin(), ite = m_strings.end();
-        for (std::size_t i = 0; it != ite; ++it, ++i)
-        {
-            string_id_t sid{static_cast<string_id_t::value_type>(i)};
-            const std::string& s = *it;
-            cout << "* " << sid << ": '" << s << "' (" << (void*)s.data() << ")" << endl;
-        }
+        std::cout << "* " << string_id_t{i} << ": '" << s
+             << "' (" << static_cast<const void*>(s.data()) << ")" << std::endl;
+        ++i;
     }
 
+    std::cout << "string map count: " << m_string_map.size() << std::endl;
+    for (const auto& [key, value] : m_string_map)
     {
-        cout << "string map count: " << m_string_map.size() << endl;
-        auto it = m_string_map.begin(), ite = m_string_map.end();
-        for (; it != ite; ++it)
-        {
-            std::string_view key = it->first;
-            cout << "* key: '" << key << "' (" << (void*)key.data() << "; " << key.size() << "), value: " << it->second << endl;
-        }
+        std::cout << std::format("* key: '{}' ({}; {}), value: {}",
+            key, static_cast<const void*>(key.data()), key.size(), value.value) << std::endl;
     }
 }
 
