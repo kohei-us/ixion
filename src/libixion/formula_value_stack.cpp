@@ -446,10 +446,8 @@ std::string formula_value_stack::pop_string()
                 }
                 case cell_t::string:
                 {
-                    const std::string* ps = m_context.get_string(m_context.get_string_identifier(addr));
-                    if (!ps)
-                        throw formula_error(formula_error_t::stack_error);
-                    return *ps;
+                    auto sv = m_context.get_string_value(addr);
+                    return std::string{sv};
                 }
                 break;
                 default:
