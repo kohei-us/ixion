@@ -40,7 +40,7 @@ string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
 
 string_id_t safe_string_pool::append_string(std::string_view s)
 {
-    std::unique_lock<std::mutex> lock(m_mtx);
+    std::unique_lock lock(m_mtx);
     return append_string_unsafe(s);
 }
 
@@ -50,10 +50,9 @@ string_id_t safe_string_pool::add_string(std::string_view s)
         // Never add an empty or invalid string.
         return empty_string_id;
 
-    std::unique_lock<std::mutex> lock(m_mtx);
-    string_map_type::iterator itr = m_string_map.find(s);
-    if (itr != m_string_map.end())
-        return itr->second;
+    std::unique_lock lock(m_mtx);
+    if (auto it = m_string_map.find(s); it != m_string_map.end())
+        return it->second;
 
     return append_string_unsafe(s);
 }
@@ -63,6 +62,7 @@ const std::string* safe_string_pool::get_string(string_id_t identifier) const
     if (identifier == empty_string_id)
         return &m_empty_string;
 
+    std::shared_lock lock(m_mtx);
     if (identifier.value >= m_strings.size())
         return nullptr;
 
@@ -71,11 +71,13 @@ const std::string* safe_string_pool::get_string(string_id_t identifier) const
 
 size_t safe_string_pool::size() const
 {
+    std::shared_lock lock(m_mtx);
     return m_strings.size();
 }
 
 void safe_string_pool::dump_strings() const
 {
+    std::shared_lock lock(m_mtx);
     std::cout << "string count: " << m_strings.size() << std::endl;
     string_id_t::value_type i = 0;
     for (const std::string& s : m_strings)
@@ -95,6 +97,7 @@ void safe_string_pool::dump_strings() const
 
 string_id_t safe_string_pool::get_identifier_from_string(std::string_view s) const
 {
+    std::shared_lock lock(m_mtx);
     string_map_type::const_iterator it = m_string_map.find(s);
     return it == m_string_map.end() ? empty_string_id : it->second;
 }

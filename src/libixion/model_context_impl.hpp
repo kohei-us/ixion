@@ -18,6 +18,7 @@
 #include <string>
 #include <unordered_map>
 #include <mutex>
+#include <shared_mutex>
 #include <deque>
 
 namespace ixion { namespace detail {
@@ -29,7 +30,7 @@ class safe_string_pool
     using string_pool_type = std::deque<std::string>;
     using string_map_type = std::unordered_map<std::string_view, string_id_t>;
 
-    std::mutex m_mtx;
+    mutable std::shared_mutex m_mtx;
     string_pool_type m_strings;
     string_map_type m_string_map;
     std::string m_empty_string;
