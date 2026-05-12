@@ -1,2 +1,2 @@
 breathe
-piccolo-theme
+sphinx-rtd-theme
