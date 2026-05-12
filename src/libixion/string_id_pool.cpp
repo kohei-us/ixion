@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "safe_string_pool.hpp"
+#include "string_id_pool.hpp"
 
 #include <format>
 #include <iostream>
@@ -13,7 +13,7 @@
 
 namespace ixion { namespace detail {
 
-string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
+string_id_t string_id_pool::append_string_unsafe(std::string_view s)
 {
     string_id_t str_id{static_cast<string_id_t::value_type>(m_strings.size())};
     m_strings.push_back(std::string{s});
@@ -22,13 +22,13 @@ string_id_t safe_string_pool::append_string_unsafe(std::string_view s)
     return str_id;
 }
 
-string_id_t safe_string_pool::append_string(std::string_view s)
+string_id_t string_id_pool::append_string(std::string_view s)
 {
     std::unique_lock lock(m_mtx);
     return append_string_unsafe(s);
 }
 
-string_id_t safe_string_pool::add_string(std::string_view s)
+string_id_t string_id_pool::add_string(std::string_view s)
 {
     if (s.empty())
         // Never add an empty or invalid string.
@@ -41,7 +41,7 @@ string_id_t safe_string_pool::add_string(std::string_view s)
     return append_string_unsafe(s);
 }
 
-const std::string* safe_string_pool::get_string(string_id_t identifier) const
+const std::string* string_id_pool::get_string(string_id_t identifier) const
 {
     if (identifier == empty_string_id)
         return &m_empty_string;
@@ -53,13 +53,13 @@ const std::string* safe_string_pool::get_string(string_id_t identifier) const
     return &m_strings[identifier.value];
 }
 
-size_t safe_string_pool::size() const
+size_t string_id_pool::size() const
 {
     std::shared_lock lock(m_mtx);
     return m_strings.size();
 }
 
-void safe_string_pool::dump_strings() const
+void string_id_pool::dump_strings() const
 {
     std::shared_lock lock(m_mtx);
     std::cout << "string count: " << m_strings.size() << std::endl;
@@ -79,7 +79,7 @@ void safe_string_pool::dump_strings() const
     }
 }
 
-string_id_t safe_string_pool::get_identifier_from_string(std::string_view s) const
+string_id_t string_id_pool::get_identifier_from_string(std::string_view s) const
 {
     std::shared_lock lock(m_mtx);
     string_map_type::const_iterator it = m_string_map.find(s);

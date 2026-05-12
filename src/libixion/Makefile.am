@@ -70,8 +70,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_context.cpp \
 	model_context_impl.hpp \
 	model_context_impl.cpp \
-	safe_string_pool.hpp \
-	safe_string_pool.cpp \
+	string_id_pool.hpp \
+	string_id_pool.cpp \
 	inline_string_pool.hpp \
 	inline_string_pool.cpp \
 	model_iterator.cpp \

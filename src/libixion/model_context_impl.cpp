@@ -314,27 +314,27 @@ void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<mo
 
 string_id_t model_context_impl::append_string(std::string_view s)
 {
-    return m_str_pool.append_string(s);
+    return m_str_id_pool.append_string(s);
 }
 
 string_id_t model_context_impl::add_string(std::string_view s)
 {
-    return m_str_pool.add_string(s);
+    return m_str_id_pool.add_string(s);
 }
 
 const std::string* model_context_impl::get_string(string_id_t identifier) const
 {
-    return m_str_pool.get_string(identifier);
+    return m_str_id_pool.get_string(identifier);
 }
 
 size_t model_context_impl::get_string_count() const
 {
-    return m_str_pool.size();
+    return m_str_id_pool.size();
 }
 
 void model_context_impl::dump_strings() const
 {
-    m_str_pool.dump_strings();
+    m_str_id_pool.dump_strings();
 }
 
 const column_store_t* model_context_impl::get_column(sheet_t sheet, col_t col) const
@@ -963,7 +963,7 @@ std::string_view model_context_impl::get_string_value(const abs_address_t& addr)
         case element_type_string:
         {
             string_id_t sid{string_element_block::at(*pos.first->data, pos.second)};
-            const std::string* p = m_str_pool.get_string(sid);
+            const std::string* p = m_str_id_pool.get_string(sid);
             return p ? *p : std::string_view{};
         }
         case element_type_inline_string:
@@ -984,7 +984,7 @@ std::string_view model_context_impl::get_string_value(const abs_address_t& addr)
 
 string_id_t model_context_impl::get_identifier_from_string(std::string_view s) const
 {
-    return m_str_pool.get_identifier_from_string(s);
+    return m_str_id_pool.get_identifier_from_string(s);
 }
 
 std::string_view model_context_impl::intern_string(std::string_view s)

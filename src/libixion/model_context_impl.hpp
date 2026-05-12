@@ -14,7 +14,7 @@
 
 #include "sheet_store.hpp"
 #include "column_store_type.hpp"
-#include "safe_string_pool.hpp"
+#include "string_id_pool.hpp"
 #include "inline_string_pool.hpp"
 
 #include <vector>
@@ -176,7 +176,7 @@ private:
 
     strings_type m_sheet_names; ///< index to sheet name map.
 
-    safe_string_pool m_str_pool;
+    string_id_pool m_str_id_pool;
     inline_string_pool m_inline_str_pool;
 
     formula_result_wait_policy_t m_formula_res_wait_policy;
