@@ -614,7 +614,7 @@ std::string_view formula_functions::get_function_name(formula_function_t oc)
     return builtin_funcs::get().find_key(oc);
 }
 
-formula_functions::formula_functions(model_context& cxt, const abs_address_t& pos) :
+formula_functions::formula_functions(const model_context& cxt, const abs_address_t& pos) :
     m_context(cxt), m_pos(pos)
 {
 }

@@ -51,7 +51,7 @@ public:
     formula_interpreter(const formula_interpreter&) = delete;
     formula_interpreter& operator= (formula_interpreter) = delete;
 
-    formula_interpreter(const formula_cell* cell, model_context& cxt);
+    formula_interpreter(const formula_cell* cell, const model_context& cxt);
     ~formula_interpreter();
 
     void set_origin(const abs_address_t& pos);
@@ -105,7 +105,7 @@ private:
 
 private:
     const formula_cell* m_parent_cell;
-    model_context& m_context;
+    const model_context& m_context;
     std::unique_ptr<iface::session_handler> mp_handler;
     abs_address_t m_pos;
 

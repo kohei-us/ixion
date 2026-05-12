@@ -47,7 +47,7 @@ const std::initializer_list<model_context::input_cell>& model_context::input_row
     return m_cells;
 }
 
-std::unique_ptr<iface::session_handler> model_context::session_handler_factory::create()
+std::unique_ptr<iface::session_handler> model_context::session_handler_factory::create() const
 {
     return std::unique_ptr<iface::session_handler>();
 }
@@ -273,7 +273,7 @@ matrix model_context::get_range_value(const abs_range_t& range) const
     return ret;
 }
 
-std::unique_ptr<iface::session_handler> model_context::create_session_handler()
+std::unique_ptr<iface::session_handler> model_context::create_session_handler() const
 {
     return mp_impl->create_session_handler();
 }

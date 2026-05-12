@@ -43,7 +43,7 @@ session_handler::factory::factory(const model_context& cxt) :
 
 session_handler::factory::~factory() {}
 
-std::unique_ptr<iface::session_handler> session_handler::factory::create()
+std::unique_ptr<iface::session_handler> session_handler::factory::create() const
 {
     return std::make_unique<session_handler>(m_context, m_show_sheet_name);
 }

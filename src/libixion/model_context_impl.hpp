@@ -68,7 +68,7 @@ public:
         return m_tracker;
     }
 
-    std::unique_ptr<iface::session_handler> create_session_handler();
+    std::unique_ptr<iface::session_handler> create_session_handler() const;
 
     void set_session_handler_factory(model_context::session_handler_factory* factory)
     {

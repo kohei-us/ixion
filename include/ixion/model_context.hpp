@@ -56,10 +56,22 @@ class IXION_DLLPUBLIC model_context final
     std::unique_ptr<detail::model_context_impl> mp_impl;
 
 public:
+    /**
+     * Constructs a new @ref iface::session_handler instance for each
+     * formula-cell evaluation.
+     *
+     * The factory indirection exists so cell calculation can run in
+     * parallel: each cell-evaluation thread asks the factory for its
+     * own handler instance, so handlers accumulate per-cell trace
+     * state without sharing mutable data across threads.  The host
+     * configures the factory once via
+     * @ref set_session_handler_factory; the model and the formula
+     * interpreter call @ref create per cell to obtain a fresh handler.
+     */
     class IXION_DLLPUBLIC session_handler_factory
     {
     public:
-        virtual std::unique_ptr<iface::session_handler> create();
+        virtual std::unique_ptr<iface::session_handler> create() const;
         virtual ~session_handler_factory();
     };
 
@@ -187,7 +199,7 @@ public:
      *
      * @return a new session handler instance.  It may be nullptr.
      */
-    std::unique_ptr<iface::session_handler> create_session_handler();
+    std::unique_ptr<iface::session_handler> create_session_handler() const;
 
     /**
      * Table interface provides access to all table ranges stored in the

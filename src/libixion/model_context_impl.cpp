@@ -580,7 +580,7 @@ void model_context_impl::set_sheet_size(const rc_size_t& sheet_size)
     m_sheet_size = sheet_size;
 }
 
-std::unique_ptr<iface::session_handler> model_context_impl::create_session_handler()
+std::unique_ptr<iface::session_handler> model_context_impl::create_session_handler() const
 {
     return mp_session_factory->create();
 }
