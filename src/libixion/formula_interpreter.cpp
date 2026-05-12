@@ -299,19 +299,16 @@ const formula_token& formula_interpreter::next_token()
     return token();
 }
 
-const std::string& formula_interpreter::string_or_throw() const
+std::string_view formula_interpreter::string_or_throw() const
 {
     assert(token().opcode == fop_string);
 
-    const string_id_t sid = std::get<string_id_t>(token().value);
-    const std::string* p = m_context.get_string(sid);
-    if (!p)
-        throw general_error("no string found for the specified string ID.");
+    std::string_view s = std::get<std::string_view>(token().value);
 
     if (mp_handler)
-        mp_handler->push_string(sid.value);
+        mp_handler->push_string(s);
 
-    return *p;
+    return s;
 }
 
 namespace {
@@ -1502,10 +1499,10 @@ void formula_interpreter::error()
 
 void formula_interpreter::literal()
 {
-    const std::string& s = string_or_throw();
+    std::string_view s = string_or_throw();
 
     next();
-    get_stack().push_string(s);
+    get_stack().push_string(std::string{s});
 }
 
 void formula_interpreter::array()
@@ -1554,7 +1551,7 @@ void formula_interpreter::array()
                         throw invalid_expression("array: invalid placement of value");
                 }
 
-                strings.emplace_back(row, col, string_or_throw());
+                strings.emplace_back(row, col, std::string{string_or_throw()});
                 values.push_back(0); // placeholder value, will be replaced
 
                 ++col;

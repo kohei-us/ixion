@@ -201,8 +201,8 @@ void formula_parser::error()
 
 void formula_parser::literal()
 {
-    string_id_t sid = m_context.add_string(std::get<std::string_view>(get_token().value));
-    m_formula_tokens.emplace_back(sid);
+    std::string_view s = m_context.intern_string(std::get<std::string_view>(get_token().value));
+    m_formula_tokens.emplace_back(s);
 }
 
 void formula_parser::value()

@@ -1732,14 +1732,10 @@ void test_invalid_formula_tokens()
     assert(tokens.size() == (std::get<ixion::string_id_t>(tokens[0].value).value + 1));
 
     assert(tokens[1].opcode == ixion::fop_string);
-    ixion::string_id_t sid = std::get<ixion::string_id_t>(tokens[1].value);
-    const std::string* s = cxt.get_string(sid);
-    assert(invalid_formula == *s);
+    assert(invalid_formula == std::get<std::string_view>(tokens[1].value));
 
     assert(tokens[2].opcode == ixion::fop_string);
-    sid = std::get<ixion::string_id_t>(tokens[2].value);
-    s = cxt.get_string(sid);
-    assert(error_msg == *s);
+    assert(error_msg == std::get<std::string_view>(tokens[2].value));
 }
 
 void test_grouped_formula_string_results()

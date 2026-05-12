@@ -137,13 +137,7 @@ void print_token(
         }
         case fop_string:
         {
-            auto sid = std::get<string_id_t>(token.value);
-            const std::string* p = cxt.get_string(sid);
-            if (p)
-                os << "\"" << *p << "\"";
-            else
-                IXION_DEBUG("failed to get a string value for the identifier value of " << sid);
-
+            os << '"' << std::get<std::string_view>(token.value) << '"';
             break;
         }
         case fop_equal:
@@ -215,11 +209,8 @@ formula_tokens_t create_formula_error_tokens(
     tokens.emplace_back(fop_invalid_formula);
     tokens.back().value = string_id_t{2u};
 
-    string_id_t sid_src_formula = cxt.add_string(src_formula);
-    tokens.emplace_back(sid_src_formula);
-
-    string_id_t sid_error = cxt.add_string(error);
-    tokens.emplace_back(sid_error);
+    tokens.emplace_back(cxt.intern_string(src_formula));
+    tokens.emplace_back(cxt.intern_string(error));
 
     return tokens;
 }

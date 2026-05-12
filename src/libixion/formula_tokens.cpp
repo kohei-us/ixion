@@ -147,13 +147,8 @@ formula_token::formula_token(double v) :
 {
 }
 
-formula_token::formula_token(string_id_t sid) :
-    opcode(fop_string), value(sid)
-{
-}
-
-formula_token::formula_token(std::uint32_t sid) :
-    formula_token(string_id_t{sid})
+formula_token::formula_token(std::string_view s) :
+    opcode(fop_string), value(s)
 {
 }
 
@@ -235,7 +230,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
     {
         case fop_string:
         {
-            os << "string token: (identifier=" << std::get<string_id_t>(ft.value) << ")";
+            os << "string token: \"" << std::get<std::string_view>(ft.value) << '"';
             break;
         }
         case fop_value:

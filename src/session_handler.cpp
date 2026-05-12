@@ -146,16 +146,9 @@ void session_handler::push_error(formula_error_t err)
     mp_impl->m_buf << get_formula_error_name(err);
 }
 
-void session_handler::push_string(size_t sid)
+void session_handler::push_string(std::string_view s)
 {
-    const string* p = mp_impl->m_context.get_string(
-        string_id_t{static_cast<string_id_t::value_type>(sid)});
-    mp_impl->m_buf << '"';
-    if (p)
-        mp_impl->m_buf << *p;
-    else
-        mp_impl->m_buf << "(null string)";
-    mp_impl->m_buf << '"';
+    mp_impl->m_buf << '"' << s << '"';
 }
 
 void session_handler::push_single_ref(const address_t& addr, const abs_address_t& pos)

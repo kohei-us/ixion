@@ -13,6 +13,7 @@
 #include "formula_tokens_fwd.hpp"
 
 #include <string>
+#include <string_view>
 #include <variant>
 
 namespace ixion {
@@ -44,7 +45,7 @@ struct IXION_DLLPUBLIC formula_token final
 {
     using value_type = std::variant<
         address_t, range_t, table_t, formula_error_t, formula_function_t,
-        double, string_id_t, std::string>;
+        double, string_id_t, std::string_view, std::string>;
 
     /**
      * Opcode that specifies the type of token.  The value of this data member
@@ -119,17 +120,11 @@ struct IXION_DLLPUBLIC formula_token final
      * Constructor for a string value token.  The opcode will be implicitly
      * set to fop_string.
      *
-     * @param sid string ID to be stored in the token.
+     * @param s string value to be stored in the token. The caller is
+     *          responsible for ensuring its bytes outlive the token (e.g.
+     *          interning through @ref model_context::intern_string).
      */
-    formula_token(string_id_t sid);
-
-    /**
-     * Source-compatibility overload for callers written against the prior
-     * `string_id_t = uint32_t` contract. Delegates to the `string_id_t`
-     * overload above. New code should pass `string_id_t{sid}` explicitly.
-     */
-    [[deprecated("pass string_id_t{sid} explicitly")]]
-    formula_token(std::uint32_t sid);
+    formula_token(std::string_view s);
 
     /**
      * Constructor for a named-expression token.  The opcode will be implicitly

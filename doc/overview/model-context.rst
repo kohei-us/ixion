@@ -68,6 +68,9 @@ as ``std::string``, char array, or string literal, and pass it to the method dir
    :end-before: //!code-end: set-string-cell-value
    :dedent: 4
 
+The string cells inserted this way will keep their values "inline"; the cells
+themselves have direct access to the values they store.
+
 The second way is to add your string to the model_context's internal string pool first which will return its
 string ID, and pass that ID to the method:
 
@@ -77,14 +80,24 @@ string ID, and pass that ID to the method:
    :end-before: //!code-end: set-string-cell-id
    :dedent: 4
 
-The model_context class has two methods for inserting a string to the string pool:
-:cpp:func:`~ixion::model_context::add_string` and :cpp:func:`~ixion::model_context::append_string`.  The
-:cpp:func:`~ixion::model_context::add_string` method checks for an existing entry with the same string value
-upon each insertion attempt, and it will not insert the new value if the value already exists in the pool.
-The :cpp:func:`~ixion::model_context::append_string` method, on the other hand, does not check the pool for
-an existing value and always inserts the value.  The :cpp:func:`~ixion::model_context::append_string` method
-is appropriate if you know all your string entries ahead of time and wish to bulk-insert them.  Otherwise
-using :cpp:func:`~ixion::model_context::add_string` is appropriate in most cases.
+The string cells inserted this way will internally only stores the IDs
+and don't have direct access to the values associated with the cells.
+
+The model_context class has two methods for inserting a string to the
+string pool: :cpp:func:`~ixion::model_context::add_string` and
+:cpp:func:`~ixion::model_context::append_string`.  The
+:cpp:func:`~ixion::model_context::add_string` method checks for an
+existing entry with the same string value upon each insertion attempt,
+and it will not insert the new value if the value already exists in the
+pool.  The :cpp:func:`~ixion::model_context::append_string` method, on
+the other hand, does not check the pool for an existing value and always
+inserts the value.
+
+The :cpp:func:`~ixion::model_context::append_string` method is
+appropriate if you know all your string entries ahead of time and wish
+to bulk-insert them.  Otherwise using
+:cpp:func:`~ixion::model_context::add_string` is appropriate in most
+cases.
 
 
 Insert a formula cell into model context
