@@ -10,18 +10,17 @@
 namespace ixion {
 
 table_handler::entry::entry() :
-    name(empty_string_id), range(abs_range_t::invalid), totals_row_count(0) {}
+    range(abs_range_t::invalid), totals_row_count(0) {}
 
 table_handler::~table_handler() {}
 
 abs_range_t table_handler::get_range(
-    const abs_address_t& pos, string_id_t column_first, string_id_t column_last,
+    const abs_address_t& pos, std::string_view column_first, std::string_view column_last,
     table_areas_t areas) const
 {
-    entries_type::const_iterator it = m_entries.begin(), it_end = m_entries.end();
-    for (; it != it_end; ++it)
+    for (const auto& node : m_entries)
     {
-        const entry& e = *it->second;
+        const entry& e = *node.second;
         if (!e.range.contains(pos))
             continue;
 
@@ -32,7 +31,7 @@ abs_range_t table_handler::get_range(
 }
 
 abs_range_t table_handler::get_range(
-    string_id_t table, string_id_t column_first, string_id_t column_last,
+    std::string_view table, std::string_view column_first, std::string_view column_last,
     table_areas_t areas) const
 {
     entries_type::const_iterator it = m_entries.find(table);
@@ -49,10 +48,10 @@ void table_handler::insert(std::unique_ptr<entry>& p)
     if (!p)
         return;
 
-    string_id_t name = p->name;
+    std::string name = p->name;
     m_entries.insert(
         entries_type::value_type(
-            name, std::unique_ptr<entry>(p.release())));
+            std::move(name), std::unique_ptr<entry>(p.release())));
 }
 
 void adjust_table_area(abs_range_t& range, const table_handler::entry& e, table_areas_t areas)
@@ -109,9 +108,10 @@ void adjust_table_area(abs_range_t& range, const table_handler::entry& e, table_
 }
 
 abs_range_t table_handler::get_column_range(
-    const entry& e, string_id_t column_first, string_id_t column_last, table_areas_t areas) const
+    const entry& e, std::string_view column_first, std::string_view /*column_last*/,
+    table_areas_t areas) const
 {
-    if (column_first == empty_string_id)
+    if (column_first.empty())
     {
         // Area specifiers only.
         abs_range_t ret = e.range;

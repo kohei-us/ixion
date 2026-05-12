@@ -112,6 +112,7 @@ public:
     string_id_t get_string_identifier(const abs_address_t& addr) const;
     std::string_view get_string_value(const abs_address_t& addr) const;
     string_id_t get_identifier_from_string(std::string_view s) const;
+    std::string_view intern_string(std::string_view s);
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 

@@ -436,6 +436,15 @@ public:
     string_id_t get_identifier_from_string(std::string_view s) const;
 
     /**
+     * Intern a string into the inline string pool and return a stable string
+     * view instance valid for the lifetime of the model.
+     *
+     * @param s String to intern.
+     * @return Stable view into pool-owned storage.
+     */
+    std::string_view intern_string(std::string_view s);
+
+    /**
      * Get an immutable iterator that lets you iterate cell values in one
      * sheet one at a time.  <i>The caller has to ensure that the model
      * content does not change for the duration of the iteration.</i>

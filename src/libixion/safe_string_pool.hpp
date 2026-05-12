@@ -17,6 +17,10 @@
 
 namespace ixion { namespace detail {
 
+/**
+ * String pool for ID-based string cells.  This pool is only to store values
+ * for the ID-based string cells.
+ */
 class safe_string_pool
 {
     using string_pool_type = std::deque<std::string>;

@@ -172,9 +172,9 @@ void formula_parser::name()
         {
             table_t table;
             formula_name_t::table_type src_table = std::get<formula_name_t::table_type>(fn.value);
-            table.name = m_context.add_string(src_table.name);
-            table.column_first = m_context.add_string(src_table.column_first);
-            table.column_last = m_context.add_string(src_table.column_last);
+            table.name = m_context.intern_string(src_table.name);
+            table.column_first = m_context.intern_string(src_table.column_first);
+            table.column_last = m_context.intern_string(src_table.column_last);
             table.areas = src_table.areas;
             m_formula_tokens.emplace_back(table);
             break;

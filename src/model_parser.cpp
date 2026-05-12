@@ -83,24 +83,22 @@ std::string_view parse_command_to_buffer(const char*& p, const char* p_end)
 
 class string_printer
 {
-    const model_context& m_cxt;
     char m_sep;
-    bool m_first;
 
 public:
-    string_printer(const model_context& cxt, char sep) :
-        m_cxt(cxt), m_sep(sep), m_first(true) {}
+    explicit string_printer(char sep) : m_sep(sep) {}
 
-    void operator() (string_id_t sid)
+    template <typename Range>
+    void print(const Range& range, std::ostream& os = std::cout) const
     {
-        if (m_first)
-            m_first = false;
-        else
-            std::cout << m_sep;
+        auto it = std::begin(range);
+        auto end = std::end(range);
+        if (it == end)
+            return;
 
-        const std::string* p = m_cxt.get_string(sid);
-        if (p)
-            std::cout << *p;
+        os << *it;
+        for (++it; it != end; ++it)
+            os << m_sep << *it;
     }
 };
 
@@ -672,7 +670,7 @@ void model_parser::parse_table()
     table_handler::entry& entry = *mp_table_entry;
 
     if (name == "name")
-        entry.name = m_context.add_string(value);
+        entry.name = std::string{value};
     else if (name == "range")
     {
         if (!mp_name_resolver)
@@ -700,9 +698,7 @@ void model_parser::push_table()
 
     table_handler::entry& entry = *mp_table_entry;
 
-    const std::string* ps = m_context.get_string(entry.name);
-    if (ps)
-        std::cout << "name: " << *ps << std::endl;
+    std::cout << "name: " << entry.name << std::endl;
 
     if (mp_name_resolver)
     {
@@ -712,9 +708,7 @@ void model_parser::push_table()
     }
 
     std::cout << "columns: ";
-    string_printer printer(m_context, ',');
-    for (string_id_t sid : entry.columns)
-        printer(sid);
+    string_printer{','}.print(entry.columns);
     std::cout << std::endl;
 
     std::cout << "totals row count: " << mp_table_entry->totals_row_count << std::endl;
@@ -833,11 +827,7 @@ void model_parser::parse_table_columns(std::string_view str)
         if (*p == ',')
         {
             // Flush the current column name buffer.
-            string_id_t col_name = empty_string_id;
-            if (!buf.empty())
-                col_name = m_context.add_string(buf);
-
-            entry.columns.push_back(col_name);
+            entry.columns.emplace_back(buf);
             buf = std::string_view{};
         }
         else
@@ -849,11 +839,7 @@ void model_parser::parse_table_columns(std::string_view str)
         }
     }
 
-    string_id_t col_name = empty_string_id;
-    if (!buf.empty())
-        col_name = m_context.add_string(buf);
-
-    entry.columns.push_back(col_name);
+    entry.columns.emplace_back(buf);
 }
 
 model_parser::parsed_assignment_type model_parser::parse_assignment()

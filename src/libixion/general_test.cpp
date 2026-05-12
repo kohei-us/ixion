@@ -355,9 +355,9 @@ void test_table_t_equality()
     IXION_TEST_FUNC_SCOPE;
 
     ixion::table_t a;
-    a.name = ixion::string_id_t{1};
-    a.column_first = ixion::string_id_t{2};
-    a.column_last = ixion::string_id_t{3};
+    a.name = "Table1";
+    a.column_first = "Col1";
+    a.column_last = "Col2";
     a.areas = ixion::table_area_data;
 
     ixion::table_t same = a;
@@ -365,17 +365,17 @@ void test_table_t_equality()
     assert(!(a != same));
 
     ixion::table_t diff_name = a;
-    diff_name.name = ixion::string_id_t{99};
+    diff_name.name = "other";
     assert(!(a == diff_name));
     assert(a != diff_name);
 
     ixion::table_t diff_column_first = a;
-    diff_column_first.column_first = ixion::string_id_t{99};
+    diff_column_first.column_first = "other";
     assert(!(a == diff_column_first));
     assert(a != diff_column_first);
 
     ixion::table_t diff_column_last = a;
-    diff_column_last.column_last = ixion::string_id_t{99};
+    diff_column_last.column_last = "other";
     assert(!(a == diff_column_last));
     assert(a != diff_column_last);
 

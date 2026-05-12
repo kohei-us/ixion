@@ -11,11 +11,7 @@
 
 namespace ixion {
 
-table_t::table_t() :
-    name(empty_string_id),
-    column_first(empty_string_id),
-    column_last(empty_string_id),
-    areas(table_area_none) {}
+table_t::table_t() : areas(table_area_none) {}
 
 bool table_t::operator== (const table_t& r) const
 {

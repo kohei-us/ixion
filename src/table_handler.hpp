@@ -13,6 +13,8 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <string>
+#include <string_view>
 
 namespace ixion {
 
@@ -23,28 +25,30 @@ public:
     /** single table entry */
     struct entry
     {
-        string_id_t name;
+        std::string name;
         abs_range_t range;
-        std::vector<string_id_t> columns;
+        std::vector<std::string> columns;
         row_t totals_row_count;
 
         entry();
     };
 
-    typedef std::map<string_id_t, std::unique_ptr<entry>> entries_type;
+    typedef std::map<std::string, std::unique_ptr<entry>, std::less<>> entries_type;
 
     virtual ~table_handler();
 
     virtual abs_range_t get_range(
-        const abs_address_t& pos, string_id_t column_first, string_id_t column_last, table_areas_t areas) const;
+        const abs_address_t& pos, std::string_view column_first, std::string_view column_last,
+        table_areas_t areas) const;
     virtual abs_range_t get_range(
-        string_id_t table, string_id_t column_first, string_id_t column_last, table_areas_t areas) const;
+        std::string_view table, std::string_view column_first, std::string_view column_last,
+        table_areas_t areas) const;
 
     void insert(std::unique_ptr<entry>& p);
 
 private:
     abs_range_t get_column_range(
-        const entry& e, string_id_t column_first, string_id_t column_last,
+        const entry& e, std::string_view column_first, std::string_view column_last,
         table_areas_t areas) const;
 
     entries_type m_entries;

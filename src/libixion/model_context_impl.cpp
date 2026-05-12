@@ -987,6 +987,11 @@ string_id_t model_context_impl::get_identifier_from_string(std::string_view s) c
     return m_str_pool.get_identifier_from_string(s);
 }
 
+std::string_view model_context_impl::intern_string(std::string_view s)
+{
+    return m_inline_str_pool.intern(s);
+}
+
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
     const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);

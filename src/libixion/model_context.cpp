@@ -391,6 +391,11 @@ string_id_t model_context::get_identifier_from_string(std::string_view s) const
     return mp_impl->get_identifier_from_string(s);
 }
 
+std::string_view model_context::intern_string(std::string_view s)
+{
+    return mp_impl->intern_string(s);
+}
+
 model_iterator model_context::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {

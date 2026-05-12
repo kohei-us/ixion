@@ -17,7 +17,7 @@
 namespace ixion { namespace detail {
 
 /**
- * String pool for inline-string cells.
+ * String pool for inline-string cells as well as other shared strings.
  */
 class inline_string_pool
 {

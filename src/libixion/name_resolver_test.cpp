@@ -539,9 +539,9 @@ void test_table_excel_a1()
 
         // Make sure we get the same name back.
         table_t tb;
-        tb.name = cxt.add_string(table.name);
-        tb.column_first = cxt.add_string(table.column_first);
-        tb.column_last = cxt.add_string(table.column_last);
+        tb.name = cxt.intern_string(table.name);
+        tb.column_first = cxt.intern_string(table.column_first);
+        tb.column_last = cxt.intern_string(table.column_last);
         tb.areas = table.areas;
         std::string original(tests[i].exp);
         std::string returned = resolver->get_name(tb);

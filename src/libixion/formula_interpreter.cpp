@@ -1467,7 +1467,7 @@ void formula_interpreter::table_ref()
         mp_handler->push_table_ref(table);
 
     abs_range_t range(abs_range_t::invalid);
-    if (table.name != empty_string_id)
+    if (!table.name.empty())
     {
         range = table_hdl->get_range(table.name, table.column_first, table.column_last, table.areas);
     }

@@ -451,16 +451,6 @@ void append_address_r1c1(
     }
 }
 
-void append_name_string(std::ostringstream& os, const model_context* cxt, string_id_t sid)
-{
-    if (!cxt)
-        return;
-
-    const std::string* p = cxt->get_string(sid);
-    if (p)
-        os << *p;
-}
-
 char append_table_areas(std::ostringstream& os, const table_t& table)
 {
     if (table.areas == table_area_all)
@@ -1202,12 +1192,12 @@ void to_relative_address(address_t& addr, const abs_address_t& pos, bool sheet)
         addr.column -= pos.column;
 }
 
-std::string to_string(const model_context* cxt, const table_t& table)
+std::string to_string(const table_t& table)
 {
     std::ostringstream os;
-    append_name_string(os, cxt, table.name);
+    os << table.name;
 
-    if (table.column_first == empty_string_id)
+    if (table.column_first.empty())
     {
         // Area specifier(s) only.
         bool headers = (table.areas & table_area_headers);
@@ -1231,7 +1221,7 @@ std::string to_string(const model_context* cxt, const table_t& table)
         if (multiple)
             os << ']';
     }
-    else if (table.column_last == empty_string_id)
+    else if (table.column_last.empty())
     {
         // single column.
         os << '[';
@@ -1249,7 +1239,7 @@ std::string to_string(const model_context* cxt, const table_t& table)
         if (multiple)
             os << '[';
 
-        append_name_string(os, cxt, table.column_first);
+        os << table.column_first;
 
         if (multiple)
             os << ']';
@@ -1268,9 +1258,9 @@ std::string to_string(const model_context* cxt, const table_t& table)
         }
 
         os << '[';
-        append_name_string(os, cxt, table.column_first);
+        os << table.column_first;
         os << "]:[";
-        append_name_string(os, cxt, table.column_last);
+        os << table.column_last;
         os << "]]";
     }
 
@@ -1510,7 +1500,7 @@ public:
 
     virtual std::string get_name(const table_t& table) const
     {
-        return to_string(mp_cxt, table);
+        return to_string(table);
     }
 
     virtual std::string get_column_name(col_t col) const
@@ -1673,7 +1663,7 @@ public:
 
     virtual std::string get_name(const table_t& table) const
     {
-        return to_string(mp_cxt, table);
+        return to_string(table);
     }
 
     virtual std::string get_column_name(col_t col) const

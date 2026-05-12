@@ -8,13 +8,15 @@
 #pragma once
 #include "types.hpp"
 
+#include <string_view>
+
 namespace ixion {
 
 struct IXION_DLLPUBLIC table_t
 {
-    string_id_t name;
-    string_id_t column_first;
-    string_id_t column_last;
+    std::string_view name;
+    std::string_view column_first;
+    std::string_view column_last;
     table_areas_t areas;
 
     table_t();
