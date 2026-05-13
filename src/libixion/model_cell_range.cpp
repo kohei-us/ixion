@@ -25,6 +25,9 @@ model_cell_range::cell::cell(row_t _row, col_t _col) :
 model_cell_range::cell::cell(row_t _row, col_t _col, bool _b) :
     row(_row), col(_col), type(cell_t::boolean), value(_b) {}
 
+model_cell_range::cell::cell(row_t _row, col_t _col, const char* _s) :
+    row(_row), col(_col), type(cell_t::string), value(std::string_view{_s}) {}
+
 model_cell_range::cell::cell(row_t _row, col_t _col, std::string_view _s) :
     row(_row), col(_col), type(cell_t::string), value(_s) {}
 
@@ -415,9 +418,9 @@ bool model_cell_range::const_iterator::operator== (const const_iterator& r) cons
     return mp_core.get() == r.mp_core.get();
 }
 
-bool model_cell_range::const_iterator::operator!= (const const_iterator& r) const
+bool model_cell_range::const_iterator::operator== (sentinel) const
 {
-    return !(*this == r);
+    return !mp_core || !mp_core->has();
 }
 
 model_cell_range::model_cell_range() : mp_impl(std::make_unique<impl>()) {}
@@ -437,9 +440,9 @@ model_cell_range::const_iterator model_cell_range::begin() const
     return const_iterator{mp_impl->make_core()};
 }
 
-model_cell_range::const_iterator model_cell_range::end() const
+model_cell_range::sentinel model_cell_range::end() const
 {
-    return const_iterator{};
+    return {};
 }
 
 model_cell_range::const_iterator model_cell_range::cbegin() const
@@ -447,9 +450,9 @@ model_cell_range::const_iterator model_cell_range::cbegin() const
     return begin();
 }
 
-model_cell_range::const_iterator model_cell_range::cend() const
+model_cell_range::sentinel model_cell_range::cend() const
 {
-    return end();
+    return {};
 }
 
 std::ostream& operator<< (std::ostream& os, const model_cell_range::cell& c)

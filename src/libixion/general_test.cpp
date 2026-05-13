@@ -27,6 +27,7 @@
 
 #include <string>
 #include <cstring>
+#include <ranges>
 #include <sstream>
 #include <thread>
 
@@ -1433,6 +1434,152 @@ void test_model_context_iterator_vertical_range()
 
 IXION_DEPRECATED_DECL_POP
 
+void test_model_context_cell_range_horizontal()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    const ixion::row_t row_size = 5;
+    const ixion::col_t col_size = 2;
+    ixion::model_context cxt{{row_size, col_size}};
+
+    ixion::abs_rc_range_t whole_range;
+    whole_range.set_all_columns();
+    whole_range.set_all_rows();
+
+    {
+        // range-for over an empty model: zero iterations, begin() == end()
+        auto cells = cxt.iterate_cells(0, ixion::rc_direction_t::horizontal, whole_range);
+        assert(cells.begin() == cells.end());
+        std::size_t count = 0;
+        for ([[maybe_unused]] const auto& c : cells)
+            ++count;
+        assert(count == 0);
+    }
+
+    cxt.append_sheet("empty sheet");
+
+    {
+        // empty sheet: every cell visited, all empty
+        std::size_t count = 0;
+        for (const auto& cell : cxt.iterate_cells(0, ixion::rc_direction_t::horizontal, whole_range))
+        {
+            assert(cell.type == ixion::cell_t::empty);
+            ++count;
+        }
+        assert(count == static_cast<std::size_t>(row_size) * col_size);
+    }
+
+    cxt.append_sheet("values");
+    // Use set_string_cell so the strings go through the string pool (ID-based
+    // storage), exercising the iterator's element_type_string branch.
+    cxt.set_string_cell(ixion::abs_address_t(1, 0, 0), "F1");
+    cxt.set_string_cell(ixion::abs_address_t(1, 0, 1), "F2");
+    cxt.set_boolean_cell(ixion::abs_address_t(1, 1, 0), true);
+    cxt.set_boolean_cell(ixion::abs_address_t(1, 1, 1), false);
+    cxt.set_numeric_cell(ixion::abs_address_t(1, 2, 0), 3.14);
+    cxt.set_numeric_cell(ixion::abs_address_t(1, 2, 1), -12.5);
+
+    std::vector<ixion::model_cell_range::cell> observed;
+    for (const auto& cell : cxt.iterate_cells(1, ixion::rc_direction_t::horizontal, whole_range))
+        observed.push_back(cell);
+
+    std::vector<ixion::model_cell_range::cell> expected =
+    {
+        // row, column, value
+        { 0, 0, "F1" },
+        { 0, 1, "F2" },
+        { 1, 0, true },
+        { 1, 1, false },
+        { 2, 0, 3.14 },
+        { 2, 1, -12.5 },
+        { 3, 0 },
+        { 3, 1 },
+        { 4, 0 },
+        { 4, 1 },
+    };
+
+    assert(observed == expected);
+}
+
+void test_model_context_cell_range_vertical()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{5, 2}};
+    cxt.append_sheet("values");
+    cxt.set_cell_values(0, {
+        { "F1", "F2" },
+        { true, false },
+        {  3.14, -12.5 },
+    });
+
+    ixion::abs_rc_range_t whole_range;
+    whole_range.set_all_columns();
+    whole_range.set_all_rows();
+
+    std::vector<ixion::model_cell_range::cell> observed;
+    for (const auto& cell : cxt.iterate_cells(0, ixion::rc_direction_t::vertical, whole_range))
+        observed.push_back(cell);
+
+    std::vector<ixion::model_cell_range::cell> expected =
+    {
+        // row, column, value
+        { 0, 0, "F1" },
+        { 1, 0, true },
+        { 2, 0, 3.14 },
+        { 3, 0 },
+        { 4, 0 },
+
+        { 0, 1, "F2" },
+        { 1, 1, false },
+        { 2, 1, -12.5 },
+        { 3, 1 },
+        { 4, 1 },
+    };
+
+    assert(observed == expected);
+}
+
+void test_model_context_cell_range_iterator_semantics()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{3, 2}};
+    cxt.append_sheet("values");
+    cxt.set_cell_values(0, {
+        { 1.0, 4.0 },
+        { 2.0, 5.0 },
+        { 3.0, 6.0 },
+    });
+
+    ixion::abs_rc_range_t whole_range;
+    whole_range.set_all_columns();
+    whole_range.set_all_rows();
+
+    auto cells = cxt.iterate_cells(0, ixion::rc_direction_t::horizontal, whole_range);
+
+    // std::ranges::distance walks begin()..end() and reports cell count.
+    assert(std::ranges::distance(cells.begin(), cells.end()) == 6);
+
+    // operator-> exposes the underlying cell.
+    auto it = cells.begin();
+    assert(it->type == ixion::cell_t::numeric);
+    assert(std::get<double>(it->value) == 1.0);
+
+    // Prefix ++ advances to the next cell in row-major order.
+    ++it;
+    assert(it != cells.end());
+    assert(std::get<double>(it->value) == 4.0);
+
+    // ++ past the last cell compares equal to end().
+    for (int i = 0; i < 5; ++i)
+        ++it;
+    assert(it == cells.end());
+
+    // The sentinel value compares equal to a past-the-end iterator.
+    assert(it == ixion::model_cell_range::sentinel{});
+}
+
 void test_model_context_iterator_named_exps()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1795,6 +1942,9 @@ int main()
     test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();
     test_model_context_iterator_vertical_range();
+    test_model_context_cell_range_horizontal();
+    test_model_context_cell_range_vertical();
+    test_model_context_cell_range_iterator_semantics();
     test_model_context_iterator_named_exps();
     test_model_context_fill_down();
     test_model_context_error_value();

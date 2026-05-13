@@ -43,6 +43,12 @@ class IXION_DLLPUBLIC model_cell_range
 public:
     class core;
 
+    /**
+     * End sentinel to allow const_iterator to remain move-only while still
+     * satisfying std::sentinel_for etc.
+     */
+    struct sentinel {};
+
     struct IXION_DLLPUBLIC cell
     {
         using value_type = std::variant<bool, double, std::string_view, const formula_cell*>;
@@ -55,6 +61,7 @@ public:
         cell();
         cell(row_t _row, col_t _col);
         cell(row_t _row, col_t _col, bool _b);
+        cell(row_t _row, col_t _col, const char* _s);
         cell(row_t _row, col_t _col, std::string_view _s);
         cell(row_t _row, col_t _col, double _v);
         cell(row_t _row, col_t _col, const formula_cell* _f);
@@ -89,7 +96,8 @@ public:
         pointer   operator->() const;
 
         bool operator== (const const_iterator& r) const;
-        bool operator!= (const const_iterator& r) const;
+
+        bool operator== (sentinel) const;
     };
 
     model_cell_range();
@@ -101,9 +109,9 @@ public:
     model_cell_range& operator= (model_cell_range&& other);
 
     const_iterator begin() const;
-    const_iterator end() const;
+    sentinel end() const;
     const_iterator cbegin() const;
-    const_iterator cend() const;
+    sentinel cend() const;
 };
 
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const model_cell_range::cell& c);

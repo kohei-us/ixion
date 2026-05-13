@@ -26,7 +26,7 @@ model_iterator& model_iterator::operator= (model_iterator&& other) = default;
 
 bool model_iterator::has() const
 {
-    return m_pos != model_cell_range::const_iterator{};
+    return m_pos != model_cell_range::sentinel{};
 }
 
 void model_iterator::next()
