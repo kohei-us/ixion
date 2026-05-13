@@ -20,6 +20,7 @@
 #include "model_types.hpp"
 #include "utils.hpp"
 #include "debug.hpp"
+#include "deprecated.hpp"
 
 #include <format>
 #include <iostream>
@@ -565,13 +566,7 @@ const detail::named_expressions_t& model_context_impl::get_named_expressions(she
     return sh.get_named_expressions();
 }
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
+IXION_DEPRECATED_DECL_PUSH
 
 model_iterator model_context_impl::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
@@ -579,11 +574,7 @@ model_iterator model_context_impl::get_model_iterator(
     return model_iterator(*this, sheet, range, dir);
 }
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
-#pragma warning(pop)
-#endif
+IXION_DEPRECATED_DECL_POP
 
 model_cell_range model_context_impl::iterate_cells(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const

@@ -6,6 +6,7 @@
  */
 
 #pragma once
+
 #include "model_cell_range.hpp"
 
 namespace ixion {

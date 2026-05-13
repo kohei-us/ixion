@@ -15,6 +15,7 @@
 #include <ixion/cell_access.hpp>
 #include <ixion/exceptions.hpp>
 
+#include "deprecated.hpp"
 #include "model_context_impl.hpp"
 
 namespace ixion {
@@ -397,13 +398,7 @@ std::string_view model_context::intern_string(std::string_view s)
     return mp_impl->intern_string(s);
 }
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
+IXION_DEPRECATED_DECL_PUSH
 
 model_iterator model_context::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
@@ -411,11 +406,7 @@ model_iterator model_context::get_model_iterator(
     return mp_impl->get_model_iterator(sheet, dir, range);
 }
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
-#pragma warning(pop)
-#endif
+IXION_DEPRECATED_DECL_POP
 
 model_cell_range model_context::iterate_cells(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const

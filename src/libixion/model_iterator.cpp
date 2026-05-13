@@ -5,13 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
+#include "deprecated.hpp"
+
+IXION_DEPRECATED_DECL_PUSH
 
 #include "ixion/model_iterator.hpp"
 
@@ -45,10 +41,6 @@ const model_iterator::cell& model_iterator::get() const
 
 } // namespace ixion
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
-#pragma warning(pop)
-#endif
+IXION_DEPRECATED_DECL_POP
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
