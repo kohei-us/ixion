@@ -1,7 +1,7 @@
 
 add_library(ixion-${IXION_API_VERSION} SHARED
     address.cpp
-    address_iterator.cpp
+    address_range.cpp
     calc_status.cpp
     cell.cpp
     cell_access.cpp

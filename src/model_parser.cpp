@@ -11,7 +11,7 @@
 #include "ixion/formula.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula_result.hpp"
-#include "ixion/address_iterator.hpp"
+#include "ixion/address_range.hpp"
 #include "ixion/dirty_cell_tracker.hpp"
 #include "ixion/cell_access.hpp"
 #include "ixion/config.hpp"
@@ -477,7 +477,7 @@ void model_parser::parse_init()
         return;
     }
 
-    abs_address_iterator iter(cell_def.pos, rc_direction_t::vertical);
+    abs_address_range iter(cell_def.pos, rc_direction_t::vertical);
 
     for (const abs_address_t& pos : iter)
     {
@@ -550,7 +550,7 @@ void model_parser::parse_edit()
         return;
     }
 
-    abs_address_iterator iter(cell_def.pos, rc_direction_t::vertical);
+    abs_address_range iter(cell_def.pos, rc_direction_t::vertical);
 
     for (const abs_address_t& pos : iter)
     {

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/address_iterator.hpp"
+#include "ixion/address_range.hpp"
 #include "ixion/address.hpp"
 #include "ixion/global.hpp"
 
@@ -162,7 +162,7 @@ using update_func_type = std::function<void(const abs_range_t&,abs_address_t&,bo
 
 } // anonymous namespace
 
-struct abs_address_iterator::impl
+struct abs_address_range::impl
 {
     const abs_range_t m_range;
     rc_direction_t m_dir;
@@ -171,7 +171,7 @@ struct abs_address_iterator::impl
         m_range(range), m_dir(dir) {}
 };
 
-struct abs_address_iterator::const_iterator::impl_node
+struct abs_address_range::const_iterator::impl_node
 {
     const abs_range_t* mp_range;
     abs_address_t m_pos;
@@ -225,83 +225,83 @@ struct abs_address_iterator::const_iterator::impl_node
     }
 };
 
-abs_address_iterator::const_iterator::const_iterator() :
+abs_address_range::const_iterator::const_iterator() :
     mp_impl(std::make_unique<impl_node>()) {}
 
-abs_address_iterator::const_iterator::const_iterator(
+abs_address_range::const_iterator::const_iterator(
     const abs_range_t& range, rc_direction_t dir, bool end) :
     mp_impl(std::make_unique<impl_node>(range, dir, end)) {}
 
-abs_address_iterator::const_iterator::const_iterator(const const_iterator& r) :
+abs_address_range::const_iterator::const_iterator(const const_iterator& r) :
     mp_impl(std::make_unique<impl_node>(*r.mp_impl)) {}
 
-abs_address_iterator::const_iterator::const_iterator(const_iterator&& r) :
+abs_address_range::const_iterator::const_iterator(const_iterator&& r) :
     mp_impl(std::move(r.mp_impl)) {}
 
-abs_address_iterator::const_iterator::~const_iterator() {}
+abs_address_range::const_iterator::~const_iterator() {}
 
-abs_address_iterator::const_iterator& abs_address_iterator::const_iterator::operator++()
+abs_address_range::const_iterator& abs_address_range::const_iterator::operator++()
 {
     mp_impl->inc();
     return *this;
 }
 
-abs_address_iterator::const_iterator abs_address_iterator::const_iterator::operator++(int)
+abs_address_range::const_iterator abs_address_range::const_iterator::operator++(int)
 {
     auto saved = *this;
     mp_impl->inc();
     return saved;
 }
 
-abs_address_iterator::const_iterator& abs_address_iterator::const_iterator::operator--()
+abs_address_range::const_iterator& abs_address_range::const_iterator::operator--()
 {
     mp_impl->dec();
     return *this;
 }
 
-abs_address_iterator::const_iterator abs_address_iterator::const_iterator::operator--(int)
+abs_address_range::const_iterator abs_address_range::const_iterator::operator--(int)
 {
     auto saved = *this;
     mp_impl->dec();
     return saved;
 }
 
-const abs_address_iterator::const_iterator::value_type& abs_address_iterator::const_iterator::operator*() const
+const abs_address_range::const_iterator::value_type& abs_address_range::const_iterator::operator*() const
 {
     return mp_impl->m_pos;
 }
 
-const abs_address_iterator::const_iterator::value_type* abs_address_iterator::const_iterator::operator->() const
+const abs_address_range::const_iterator::value_type* abs_address_range::const_iterator::operator->() const
 {
     return &mp_impl->m_pos;
 }
 
-bool abs_address_iterator::const_iterator::operator== (const const_iterator& r) const
+bool abs_address_range::const_iterator::operator== (const const_iterator& r) const
 {
     return mp_impl->equals(*r.mp_impl);
 }
 
-abs_address_iterator::abs_address_iterator(const abs_range_t& range, rc_direction_t dir) :
+abs_address_range::abs_address_range(const abs_range_t& range, rc_direction_t dir) :
     mp_impl(std::make_unique<impl>(range, dir)) {}
 
-abs_address_iterator::~abs_address_iterator() {}
+abs_address_range::~abs_address_range() {}
 
-abs_address_iterator::const_iterator abs_address_iterator::begin() const
+abs_address_range::const_iterator abs_address_range::begin() const
 {
     return cbegin();
 }
 
-abs_address_iterator::const_iterator abs_address_iterator::end() const
+abs_address_range::const_iterator abs_address_range::end() const
 {
     return cend();
 }
 
-abs_address_iterator::const_iterator abs_address_iterator::cbegin() const
+abs_address_range::const_iterator abs_address_range::cbegin() const
 {
     return const_iterator(mp_impl->m_range, mp_impl->m_dir, false);
 }
 
-abs_address_iterator::const_iterator abs_address_iterator::cend() const
+abs_address_range::const_iterator abs_address_range::cend() const
 {
     return const_iterator(mp_impl->m_range, mp_impl->m_dir, true);
 }
