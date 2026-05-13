@@ -8,6 +8,7 @@
 #include "test_global.hpp" // This must be the first header to be included.
 #include "deprecated.hpp"
 
+#include <ixion/address_range.hpp>
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/address.hpp>
 #include <ixion/formula.hpp>
@@ -1580,6 +1581,108 @@ void test_model_context_cell_range_iterator_semantics()
     assert(it == ixion::model_cell_range::sentinel{});
 }
 
+void test_abs_address_range()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    // 2 rows x 3 cols on a single sheet.
+    ixion::abs_range_t range;
+    range.first = ixion::abs_address_t(0, 0, 0);
+    range.last  = ixion::abs_address_t(0, 1, 2);
+
+    {
+        // Horizontal: row-major order.
+        std::vector<ixion::abs_address_t> observed;
+        ixion::abs_address_range rng(range, ixion::rc_direction_t::horizontal);
+        for (const auto& addr : rng)
+            observed.push_back(addr);
+
+        std::vector<ixion::abs_address_t> expected =
+        {
+            {0, 0, 0}, {0, 0, 1}, {0, 0, 2},
+            {0, 1, 0}, {0, 1, 1}, {0, 1, 2},
+        };
+
+        assert(observed == expected);
+    }
+
+    {
+        // Vertical: column-major order.
+        std::vector<ixion::abs_address_t> observed;
+        ixion::abs_address_range rng(range, ixion::rc_direction_t::vertical);
+        for (const auto& addr : rng)
+            observed.push_back(addr);
+
+        std::vector<ixion::abs_address_t> expected =
+        {
+            {0, 0, 0}, {0, 1, 0},
+            {0, 0, 1}, {0, 1, 1},
+            {0, 0, 2}, {0, 1, 2},
+        };
+
+        assert(observed == expected);
+    }
+
+    {
+        // Walking forward to end, then operator-- back to begin, visits cells
+        // in reverse order.
+        ixion::abs_address_range rng(range, ixion::rc_direction_t::horizontal);
+        auto it = rng.end();
+        std::vector<ixion::abs_address_t> observed;
+        while (it != rng.begin())
+        {
+            --it;
+            observed.push_back(*it);
+        }
+
+        std::vector<ixion::abs_address_t> expected =
+        {
+            {0, 1, 2}, {0, 1, 1}, {0, 1, 0},
+            {0, 0, 2}, {0, 0, 1}, {0, 0, 0},
+        };
+
+        assert(observed == expected);
+    }
+
+    {
+        // Multi-sheet range: iteration spans sheet boundaries.
+        ixion::abs_range_t multi;
+        multi.first = ixion::abs_address_t(0, 0, 0);
+        multi.last  = ixion::abs_address_t(1, 0, 1);
+
+        std::vector<ixion::abs_address_t> observed;
+        ixion::abs_address_range rng(multi, ixion::rc_direction_t::horizontal);
+        for (const auto& addr : rng)
+            observed.push_back(addr);
+
+        std::vector<ixion::abs_address_t> expected =
+        {
+            {0, 0, 0}, {0, 0, 1},
+            {1, 0, 0}, {1, 0, 1},
+        };
+
+        assert(observed == expected);
+    }
+
+    {
+        // operator-> matches operator*.
+        ixion::abs_address_range rng(range, ixion::rc_direction_t::horizontal);
+        auto it = rng.begin();
+        assert(it->sheet  == (*it).sheet);
+        assert(it->row    == (*it).row);
+        assert(it->column == (*it).column);
+    }
+
+    {
+        // Post-increment returns the previous position; iterator is copyable.
+        ixion::abs_address_range rng(range, ixion::rc_direction_t::horizontal);
+        auto it = rng.begin();
+        auto prev = it++;
+        assert(*prev == ixion::abs_address_t(0, 0, 0));
+        assert(*it   == ixion::abs_address_t(0, 0, 1));
+    }
+}
+
 void test_model_context_iterator_named_exps()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1945,6 +2048,7 @@ int main()
     test_model_context_cell_range_horizontal();
     test_model_context_cell_range_vertical();
     test_model_context_cell_range_iterator_semantics();
+    test_abs_address_range();
     test_model_context_iterator_named_exps();
     test_model_context_fill_down();
     test_model_context_error_value();
