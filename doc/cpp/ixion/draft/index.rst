@@ -6,54 +6,42 @@ namespace ixion::draft
 Enum
 ----
 
-array_type
-^^^^^^^^^^
-.. doxygenenum:: ixion::draft::array_type
+.. toctree::
+   :maxdepth: 1
 
+   enum-array_type.rst
 
 Type aliases
 ------------
 
-create_compute_engine_t
-^^^^^^^^^^^^^^^^^^^^^^^
-.. doxygentypedef:: ixion::draft::create_compute_engine_t
+.. toctree::
+   :maxdepth: 1
 
-destroy_compute_engine_t
-^^^^^^^^^^^^^^^^^^^^^^^^
-.. doxygentypedef:: ixion::draft::destroy_compute_engine_t
-
+   typedef-create_compute_engine_t.rst
+   typedef-destroy_compute_engine_t.rst
 
 Functions
 ---------
 
-init_modules
-^^^^^^^^^^^^
-.. doxygenfunction:: ixion::draft::init_modules()
+.. toctree::
+   :maxdepth: 1
 
-unload_module
-^^^^^^^^^^^^^
-.. doxygenfunction:: ixion::draft::unload_module(void *handler)
-
+   function-init_modules.rst
+   function-unload_module.rst
 
 Struct
 ------
 
-array
-^^^^^
-.. doxygenstruct:: ixion::draft::array
-   :members:
+.. toctree::
+   :maxdepth: 1
 
-module_def
-^^^^^^^^^^
-.. doxygenstruct:: ixion::draft::module_def
-   :members:
-
+   struct-array.rst
+   struct-module_def.rst
 
 Classes
 -------
 
-compute_engine
-^^^^^^^^^^^^^^
-.. doxygenclass:: ixion::draft::compute_engine
-   :members:
+.. toctree::
+   :maxdepth: 1
 
+   class-compute_engine.rst

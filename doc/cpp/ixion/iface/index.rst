@@ -6,13 +6,8 @@ namespace ixion::iface
 Classes
 -------
 
-session_handler
-^^^^^^^^^^^^^^^
-.. doxygenclass:: ixion::iface::session_handler
-   :members:
+.. toctree::
+   :maxdepth: 1
 
-table_handler
-^^^^^^^^^^^^^
-.. doxygenclass:: ixion::iface::table_handler
-   :members:
-
+   class-session_handler.rst
+   class-table_handler.rst

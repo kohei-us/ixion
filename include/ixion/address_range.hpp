@@ -15,6 +15,21 @@ namespace ixion {
 struct abs_range_t;
 struct abs_address_t;
 
+/**
+ * STL-compliant range that yields every @ref abs_address_t inside an
+ * @ref abs_range_t one address at a time.
+ *
+ * The iteration order is determined by @ref rc_direction_t:
+ * - @c horizontal walks row-major within each sheet (column varies fastest).
+ * - @c vertical walks column-major within each sheet (row varies fastest).
+ *
+ * In either direction, iteration visits all cells before advancing to the
+ * next sheet.
+ *
+ * The range purely walks the address space specified by the @ref abs_range_t
+ * bounds; it does not reference any sheet contents.  Use
+ * @ref model_context::iterate_cells to iterate over cell values.
+ */
 class IXION_DLLPUBLIC abs_address_range
 {
     struct impl;
