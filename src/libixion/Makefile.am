@@ -74,6 +74,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	string_id_pool.cpp \
 	inline_string_pool.hpp \
 	inline_string_pool.cpp \
+	model_cell_range.cpp \
 	model_iterator.cpp \
 	model_types.hpp \
 	model_types.cpp \

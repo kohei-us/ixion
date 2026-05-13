@@ -6,6 +6,7 @@
  */
 
 #pragma once
+
 #include "env.hpp"
 #include "formula_tokens_fwd.hpp"
 #include "types.hpp"
@@ -22,6 +23,7 @@ class formula_cell;
 class formula_name_resolver;
 class formula_result;
 class matrix;
+class model_cell_range;
 class model_iterator;
 class named_expressions_iterator;
 struct abs_address_t;
@@ -468,7 +470,22 @@ public:
      *
      * @return model iterator instance.
      */
+    [[deprecated("use iterate_cells()")]]
     model_iterator get_model_iterator(
+        sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
+
+    /**
+     * Get an STL-compliant range over cell values in one sheet.  Supports
+     * range-`for` and STL/range algorithms.  <i>The caller has to ensure that
+     * the model content does not change for the duration of the iteration.</i>
+     *
+     * @param sheet Sheet index.
+     * @param dir Direction of the iteration.
+     * @param range Range on the specified sheet to iterate over.
+     *
+     * @return Cell range instance.
+     */
+    model_cell_range iterate_cells(
         sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
 
     /**

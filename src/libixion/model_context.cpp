@@ -8,6 +8,7 @@
 #include <ixion/model_context.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/matrix.hpp>
+#include <ixion/model_cell_range.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/interface/session_handler.hpp>
 #include <ixion/named_expressions_iterator.hpp>
@@ -396,10 +397,30 @@ std::string_view model_context::intern_string(std::string_view s)
     return mp_impl->intern_string(s);
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
+
 model_iterator model_context::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {
     return mp_impl->get_model_iterator(sheet, dir, range);
+}
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
+model_cell_range model_context::iterate_cells(
+    sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
+{
+    return mp_impl->iterate_cells(sheet, dir, range);
 }
 
 named_expressions_iterator model_context::get_named_expressions_iterator() const

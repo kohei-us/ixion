@@ -155,7 +155,17 @@ public:
     const detail::named_expressions_t& get_named_expressions() const;
     const detail::named_expressions_t& get_named_expressions(sheet_t sheet) const;
 
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     model_iterator get_model_iterator(
+        sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+
+    model_cell_range iterate_cells(
         sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
 
 private:

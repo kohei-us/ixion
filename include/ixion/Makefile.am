@@ -22,6 +22,7 @@ libixion_HEADERS = \
 	global.hpp \
 	info.hpp \
 	matrix.hpp \
+	model_cell_range.hpp \
 	model_context.hpp \
 	model_iterator.hpp \
 	module.hpp \

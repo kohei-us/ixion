@@ -10,6 +10,7 @@
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/address.hpp>
 #include <ixion/formula.hpp>
+#include <ixion/model_cell_range.hpp>
 #include <ixion/model_context.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/named_expressions_iterator.hpp>
@@ -859,7 +860,14 @@ void test_model_context_inline_string()
         abs_rc_range_t range;
         range.set_all_columns();
         range.set_all_rows();
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         model_iterator it = cxt.get_model_iterator(0, rc_direction_t::vertical, range);
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
         bool saw_inline_value = false;
         bool saw_indexed_value = false;
@@ -1004,6 +1012,11 @@ void test_model_context_named_expression()
         }
     }
 }
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 bool check_model_iterator_output(
     ixion::model_iterator& iter, const std::vector<ixion::model_iterator::cell>& checks)
@@ -1424,6 +1437,10 @@ void test_model_context_iterator_vertical_range()
 
     assert(check_model_iterator_output(iter, checks));
 }
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 void test_model_context_iterator_named_exps()
 {

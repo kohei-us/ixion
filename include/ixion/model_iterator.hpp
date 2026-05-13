@@ -6,49 +6,25 @@
  */
 
 #pragma once
-#include "types.hpp"
-
-#include <memory>
-#include <iosfwd>
-#include <string_view>
-#include <variant>
+#include "model_cell_range.hpp"
 
 namespace ixion {
 
 namespace detail { class model_context_impl; }
-class formula_cell;
 struct abs_rc_range_t;
 
-class IXION_DLLPUBLIC model_iterator
+class IXION_DLLPUBLIC
+[[deprecated("use ixion::model_cell_range")]]
+model_iterator
 {
-public:
-    class impl;
-
-private:
     friend class detail::model_context_impl;
-    std::unique_ptr<model_iterator::impl> mp_impl;
+
+    model_cell_range m_range;
+    model_cell_range::const_iterator m_pos;
 
     model_iterator(const detail::model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range, rc_direction_t dir);
 public:
-
-    struct IXION_DLLPUBLIC cell
-    {
-        using value_type = std::variant<bool, double, std::string_view, const formula_cell*>;
-
-        row_t row;
-        col_t col;
-        cell_t type;
-        value_type value;
-
-        cell();
-        cell(row_t _row, col_t _col);
-        cell(row_t _row, col_t _col, bool _b);
-        cell(row_t _row, col_t _col, std::string_view _s);
-        cell(row_t _row, col_t _col, double _v);
-        cell(row_t _row, col_t _col, const formula_cell* _f);
-
-        bool operator== (const cell& other) const;
-    };
+    using cell = model_cell_range::cell;
 
     model_iterator();
     model_iterator(const model_iterator&) = delete;
@@ -64,8 +40,6 @@ public:
 
     const cell& get() const;
 };
-
-IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const model_iterator::cell& c);
 
 } // namespace ixion
 

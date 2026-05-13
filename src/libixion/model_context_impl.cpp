@@ -12,6 +12,7 @@
 #include <ixion/formula_result.hpp>
 #include <ixion/matrix.hpp>
 #include <ixion/interface/session_handler.hpp>
+#include <ixion/model_cell_range.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/exceptions.hpp>
 
@@ -564,10 +565,30 @@ const detail::named_expressions_t& model_context_impl::get_named_expressions(she
     return sh.get_named_expressions();
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
+
 model_iterator model_context_impl::get_model_iterator(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {
     return model_iterator(*this, sheet, range, dir);
+}
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
+model_cell_range model_context_impl::iterate_cells(
+    sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
+{
+    return model_cell_range(*this, sheet, range, dir);
 }
 
 void model_context_impl::set_sheet_size(const rc_size_t& sheet_size)

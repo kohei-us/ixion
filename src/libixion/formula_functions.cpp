@@ -14,7 +14,7 @@
 #include <ixion/formula_tokens.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/matrix.hpp>
-#include <ixion/model_iterator.hpp>
+#include <ixion/model_cell_range.hpp>
 #include <ixion/cell_access.hpp>
 
 #ifdef max
@@ -2102,12 +2102,8 @@ void formula_functions::fnc_textjoin(formula_value_stack& args) const
     {
         for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
         {
-            model_iterator miter = m_context.get_model_iterator(sheet, rc_direction_t::horizontal, range);
-
-            for (; miter.has(); miter.next())
+            for (const auto& cell : m_context.iterate_cells(sheet, rc_direction_t::horizontal, range))
             {
-                auto& cell = miter.get();
-
                 switch (cell.type)
                 {
                     case cell_t::string:
