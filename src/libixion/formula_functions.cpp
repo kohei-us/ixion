@@ -376,7 +376,7 @@ constexpr map_type::entry_type entries[] =
 
 const map_type& get()
 {
-    static map_type mt(entries, std::size(entries), formula_function_t::func_unknown);
+    static map_type mt(entries, formula_function_t::func_unknown);
     return mt;
 }
 
@@ -606,7 +606,7 @@ formula_function_t formula_functions::get_function_opcode(std::string_view s)
         upper.push_back(c);
     }
 
-    return builtin_funcs::get().find(upper.data(), upper.size());
+    return builtin_funcs::get().find(upper);
 }
 
 std::string_view formula_functions::get_function_name(formula_function_t oc)

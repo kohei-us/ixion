@@ -151,7 +151,7 @@ constexpr map_type::entry_type entries[] =
 
 const map_type& get()
 {
-    static map_type mt(entries, std::size(entries), type::unknown);
+    static map_type mt(entries, type::unknown);
     return mt;
 }
 
@@ -261,7 +261,7 @@ void model_parser::parse_command()
 {
     // This line contains a command.
     std::string_view buf_cmd = parse_command_to_buffer(mp_char, mp_end);
-    commands::type cmd = commands::get().find(buf_cmd.data(), buf_cmd.size());
+    commands::type cmd = commands::get().find(buf_cmd);
 
     switch (cmd)
     {
