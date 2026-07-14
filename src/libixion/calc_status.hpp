@@ -8,6 +8,8 @@
 #pragma once
 #include "ixion/formula_result.hpp"
 
+#include <atomic>
+#include <cstddef>
 #include <mutex>
 #include <condition_variable>
 
@@ -27,13 +29,25 @@ struct calc_status
     const rc_size_t group_size;
     bool circular_safe;
 
-    size_t refcount;
+    std::atomic<std::size_t> refcount;
 
-    calc_status();
-    calc_status(const rc_size_t& _group_size);
+    calc_status() : result(nullptr), circular_safe(false), refcount(0)
+    {}
 
-    void add_ref();
-    void release_ref();
+    calc_status(const rc_size_t& _group_size) :
+        result(nullptr), group_size(_group_size), circular_safe(false), refcount(0)
+    {}
+
+    void add_ref()
+    {
+        refcount.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    void release_ref()
+    {
+        if (refcount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+            delete this;
+    }
 };
 
 inline void intrusive_ptr_add_ref(calc_status* p)

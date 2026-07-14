@@ -2,7 +2,6 @@
 add_library(ixion-${IXION_API_VERSION} SHARED
     address.cpp
     address_range.cpp
-    calc_status.cpp
     cell.cpp
     cell_access.cpp
     cell_queue_manager.cpp
@@ -81,6 +80,10 @@ install(TARGETS ixion-${IXION_API_VERSION}
 
 # test programs
 
+add_executable(column-store-test EXCLUDE_FROM_ALL
+    column_store_test.cpp
+)
+
 add_executable(document-test EXCLUDE_FROM_ALL
     document_test.cpp
 )
@@ -111,6 +114,7 @@ add_executable(version-test EXCLUDE_FROM_ALL
 
 target_include_directories(compute-engine-test PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
 
+target_link_libraries(column-store-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(general-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION} ixion-test)
@@ -120,6 +124,7 @@ target_link_libraries(name-resolver-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(version-test ixion-${IXION_API_VERSION} ixion-test)
 
 add_dependencies(check
+    column-store-test
     document-test
     general-test
     ixion-test-track-deps
@@ -129,6 +134,7 @@ add_dependencies(check
     version-test
 )
 
+add_test(column-store-test column-store-test)
 add_test(document-test document-test)
 add_test(general-test general-test)
 add_test(ixion-test-track-deps ixion-test-track-deps)

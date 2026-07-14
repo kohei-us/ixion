@@ -153,7 +153,9 @@ struct IXION_DLLPUBLIC formula_token final
 };
 
 /**
- * Storage for a series of formula tokens.
+ * Storage for a series of formula tokens.  The stored tokens are immutable
+ * once the store instance is created, as one store instance may be shared
+ * between multiple formula cells.
  */
 class IXION_DLLPUBLIC formula_tokens_store
 {
@@ -167,10 +169,21 @@ class IXION_DLLPUBLIC formula_tokens_store
     void release_ref();
 
     formula_tokens_store();
+    formula_tokens_store(formula_tokens_t tokens);
 
 public:
 
+    /**
+     * Create a new store instance with no tokens.
+     */
     static formula_tokens_store_ptr_t create();
+
+    /**
+     * Create a new store instance that stores the passed tokens.
+     *
+     * @param tokens tokens to store.
+     */
+    static formula_tokens_store_ptr_t create(formula_tokens_t tokens);
 
     ~formula_tokens_store();
 
@@ -179,7 +192,6 @@ public:
 
     size_t get_reference_count() const;
 
-    formula_tokens_t& get();
     const formula_tokens_t& get() const;
 };
 

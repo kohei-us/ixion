@@ -31,16 +31,14 @@ void test_single_cell_dependency()
     // A2
     abs_address_t pos(0,1,0);
     formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "A1*2");
-    formula_tokens_store_ptr_t store = formula_tokens_store::create();
-    store->get() = std::move(tokens);
+    formula_tokens_store_ptr_t store = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(pos, store);
     register_formula_cell(cxt, pos);
 
     // A3
     pos.row = 2;
     tokens = parse_formula_string(cxt, pos, *resolver, "A2*2");
-    store = formula_tokens_store::create();
-    store->get() = std::move(tokens);
+    store = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(pos, store);
     register_formula_cell(cxt, pos);
 
@@ -76,8 +74,7 @@ void test_range_dependency()
     // C5
     abs_address_t pos(0,4,2);
     formula_tokens_t tokens = parse_formula_string(cxt, pos, *resolver, "SUM(A1:A3,C1:E1)");
-    auto ts = formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    auto ts = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
 
@@ -85,8 +82,7 @@ void test_range_dependency()
     pos.row = 9;
     pos.column = 0;
     tokens = parse_formula_string(cxt, pos, *resolver, "C5*2");
-    ts = formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    ts = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
 
@@ -129,8 +125,7 @@ void test_matrix_dependency()
     // A10
     abs_address_t pos(0,9,0);
     tokens = parse_formula_string(cxt, pos, *resolver, "C5*2");
-    auto ts = formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    auto ts = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(pos, ts);
     register_formula_cell(cxt, pos);
 

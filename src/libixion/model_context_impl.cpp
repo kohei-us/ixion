@@ -729,8 +729,7 @@ formula_cell* model_context_impl::set_formula_cell(
 void model_context_impl::set_grouped_formula_cells(
     const abs_range_t& group_range, formula_tokens_t tokens)
 {
-    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
 
     rc_size_t group_size = to_group_size(group_range);
     calc_status_ptr_t cs(new calc_status(group_size));
@@ -740,8 +739,7 @@ void model_context_impl::set_grouped_formula_cells(
 void model_context_impl::set_grouped_formula_cells(
     const abs_range_t& group_range, formula_tokens_t tokens, formula_result result)
 {
-    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
 
     rc_size_t group_size = to_group_size(group_range);
 

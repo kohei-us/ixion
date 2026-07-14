@@ -344,6 +344,25 @@ formula_cell::~formula_cell()
 {
 }
 
+std::unique_ptr<formula_cell> formula_cell::clone(calc_status_ptr_t& cs) const
+{
+    if (!cs)
+    {
+        // Create a new calc status and deep-copy its state.
+        calc_status& src_cs = *mp_impl->m_calc_status;
+        std::unique_lock<std::mutex> lock(src_cs.mtx);
+
+        cs = new calc_status(src_cs.group_size);
+        cs->circular_safe = src_cs.circular_safe;
+
+        if (src_cs.result)
+            cs->result = std::make_unique<formula_result>(*src_cs.result);
+    }
+
+    return std::make_unique<formula_cell>(
+        mp_impl->m_group_pos.row, mp_impl->m_group_pos.column, cs, mp_impl->m_tokens);
+}
+
 const formula_tokens_store_ptr_t& formula_cell::get_tokens() const
 {
     return mp_impl->m_tokens;
@@ -556,7 +575,7 @@ formula_result formula_cell::get_result_cache(formula_result_wait_policy_t polic
 
 void formula_cell::set_result_cache(formula_result result)
 {
-    mp_impl->set_single_formula_result(result);
+    mp_impl->set_single_formula_result(std::move(result));
 }
 
 formula_group_t formula_cell::get_group_properties() const

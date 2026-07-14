@@ -44,6 +44,23 @@ public:
 
     ~formula_cell();
 
+    /**
+     * Create a new instance that is a clone of this instance.  The cloned
+     * instance shares the formula token store with the source instance, and
+     * inherits the source instance's position within a group in case the
+     * source instance is grouped.
+     *
+     * @param cs calc status to assign to the cloned instance.  When it is
+     *           empty, a fresh copy of the source instance's calc status
+     *           gets created and assigned to it.  The caller can pass it to
+     *           subsequent clone() calls on the other members of the same
+     *           group, to have all of the cloned members share the same calc
+     *           status instance.
+     *
+     * @return cloned instance.
+     */
+    std::unique_ptr<formula_cell> clone(calc_status_ptr_t& cs) const;
+
     const formula_tokens_store_ptr_t& get_tokens() const;
     void set_tokens(const formula_tokens_store_ptr_t& tokens);
 

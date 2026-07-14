@@ -9,6 +9,8 @@
 #include <ixion/exceptions.hpp>
 #include <ixion/global.hpp>
 
+#include <atomic>
+#include <cstddef>
 #include <format>
 
 namespace ixion {
@@ -170,13 +172,19 @@ bool formula_token::operator== (const formula_token& r) const
 struct formula_tokens_store::impl
 {
     formula_tokens_t m_tokens;
-    size_t m_refcount;
+    std::atomic<std::size_t> m_refcount;
 
     impl() : m_refcount(0) {}
+    impl(formula_tokens_t tokens) : m_tokens(std::move(tokens)), m_refcount(0) {}
 };
 
 formula_tokens_store::formula_tokens_store() :
     mp_impl(std::make_unique<impl>())
+{
+}
+
+formula_tokens_store::formula_tokens_store(formula_tokens_t tokens) :
+    mp_impl(std::make_unique<impl>(std::move(tokens)))
 {
 }
 
@@ -189,25 +197,25 @@ formula_tokens_store_ptr_t formula_tokens_store::create()
     return formula_tokens_store_ptr_t(new formula_tokens_store);
 }
 
+formula_tokens_store_ptr_t formula_tokens_store::create(formula_tokens_t tokens)
+{
+    return formula_tokens_store_ptr_t(new formula_tokens_store(std::move(tokens)));
+}
+
 void formula_tokens_store::add_ref()
 {
-    ++mp_impl->m_refcount;
+    mp_impl->m_refcount.fetch_add(1, std::memory_order_relaxed);
 }
 
 void formula_tokens_store::release_ref()
 {
-    if (--mp_impl->m_refcount == 0)
+    if (mp_impl->m_refcount.fetch_sub(1, std::memory_order_acq_rel) == 1)
         delete this;
 }
 
 size_t formula_tokens_store::get_reference_count() const
 {
-    return mp_impl->m_refcount;
-}
-
-formula_tokens_t& formula_tokens_store::get()
-{
-    return mp_impl->m_tokens;
+    return mp_impl->m_refcount.load(std::memory_order_relaxed);
 }
 
 const formula_tokens_t& formula_tokens_store::get() const

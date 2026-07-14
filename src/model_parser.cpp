@@ -490,8 +490,7 @@ void model_parser::parse_init()
                 formula_tokens_t tokens =
                     parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
-                auto ts = formula_tokens_store::create();
-                ts->get() = std::move(tokens);
+                auto ts = formula_tokens_store::create(std::move(tokens));
                 m_context.set_formula_cell(pos, ts);
                 m_dirty_formula_cells.insert(pos);
 
@@ -572,8 +571,7 @@ void model_parser::parse_edit()
                 formula_tokens_t tokens =
                     parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
-                auto ts = formula_tokens_store::create();
-                ts->get() = std::move(tokens);
+                auto ts = formula_tokens_store::create(std::move(tokens));
                 m_context.set_formula_cell(pos, ts);
                 m_dirty_formula_cells.insert(pos);
                 register_formula_cell(m_context, pos);

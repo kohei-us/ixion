@@ -9,14 +9,19 @@
 #include "ixion/types.hpp"
 #include "ixion/cell.hpp"
 
+#include "calc_status.hpp"
+
 #include <mdds/multi_type_vector/types.hpp>
 #include <mdds/multi_type_vector/macro.hpp>
 #include <mdds/multi_type_vector/block_funcs.hpp>
 #include <mdds/multi_type_vector.hpp>
 #include <mdds/multi_type_matrix.hpp>
 
+#include <cstdint>
 #include <deque>
+#include <memory>
 #include <string_view>
+#include <unordered_map>
 
 namespace ixion {
 
@@ -40,6 +45,55 @@ using formula_element_block =
 
 MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(
     formula_cell, element_type_formula, nullptr, formula_element_block)
+
+} // namespace ixion
+
+namespace mdds { namespace mtv {
+
+/**
+ * Specialization for cloning a formula element block.
+ *
+ * Each formula cell instance stored in the block gets cloned, and the cells
+ * belonging to the same formula group share the same cloned calc status
+ * instance.
+ *
+ * Since a formula group never spans multiple columns, and the cells of a
+ * group are contiguous within a column, an entire group always gets cloned as
+ * a whole within a single block.
+ */
+template<>
+struct clone_block<ixion::formula_element_block>
+{
+    ixion::formula_element_block* operator()(const ixion::formula_element_block& src) const
+    {
+        auto dest = std::make_unique<ixion::formula_element_block>();
+        auto& dest_store = dest->store();
+        dest_store.reserve(src.store().size());
+
+        std::unordered_map<std::uintptr_t, ixion::calc_status_ptr_t> group_status;
+
+        for (const ixion::formula_cell* p : src.store())
+        {
+            if (!p)
+            {
+                dest_store.push_back(nullptr);
+                continue;
+            }
+
+            // Create a null calc status on new group identity to let the cloned
+            // formula cell create a new instance.  On second encounters it
+            // reuses the previously created calc status for the same group.
+            ixion::calc_status_ptr_t& cs = group_status[p->get_group_properties().identity];
+            dest_store.push_back(p->clone(cs).release());
+        }
+
+        return dest.release();
+    }
+};
+
+}} // namespace mdds::mtv
+
+namespace ixion {
 
 /**
  * Thin wrapper over std::string_view in ixion namespace in order for ADL to

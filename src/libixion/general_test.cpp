@@ -558,8 +558,7 @@ ixion::formula_cell* insert_formula(
     const ixion::formula_name_resolver& resolver)
 {
     auto tokens = ixion::parse_formula_string(cxt, pos, resolver, exp);
-    auto ts = ixion::formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    auto ts = ixion::formula_tokens_store::create(std::move(tokens));
     auto* p_inserted = cxt.set_formula_cell(pos, ts);
     assert(p_inserted);
     ixion::register_formula_cell(cxt, pos);
@@ -618,8 +617,7 @@ void test_model_context_storage()
         ixion::abs_address_t pos(0,3,0);
         const char* exp = "SUM(1,2,3)";
         auto tokens = ixion::parse_formula_string(cxt, pos, *resolver, exp);
-        auto ts = ixion::formula_tokens_store::create();
-        ts->get() = std::move(tokens);
+        auto ts = ixion::formula_tokens_store::create(std::move(tokens));
         ixion::formula_cell* p_inserted = cxt.set_formula_cell(pos, ts);
         assert(p_inserted);
         ixion::formula_cell* p = cxt.get_formula_cell(pos);

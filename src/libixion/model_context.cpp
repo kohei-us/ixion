@@ -126,8 +126,7 @@ void model_context::set_string_cell(const abs_address_t& addr, string_id_t ident
 
 formula_cell* model_context::set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens)
 {
-    formula_tokens_store_ptr_t ts = formula_tokens_store::create();
-    ts->get() = std::move(tokens);
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
 
     return mp_impl->set_formula_cell(addr, ts);
 }

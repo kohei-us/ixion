@@ -19,6 +19,7 @@ AM_CPPFLAGS += -DBUILD_VULKAN
 endif # BUILD_VULKAN
 
 check_PROGRAMS = \
+	column-store-test \
 	document-test \
 	general-test \
 	ixion-test-track-deps \
@@ -32,7 +33,6 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	address.cpp \
 	address_range.cpp \
 	calc_status.hpp \
-	calc_status.cpp \
 	cell.cpp \
 	cell_access.cpp \
 	column_store_type.hpp \
@@ -133,6 +133,11 @@ libixion_@IXION_API_VERSION@_la_LDFLAGS += -Wl,-rpath,'$$ORIGIN' -Wl,-rpath,'$$O
 
 endif # !WINDOWS
 
+column_store_test_SOURCES = column_store_test.cpp
+column_store_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a
+
 document_test_SOURCES = document_test.cpp
 document_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
@@ -174,6 +179,7 @@ version_test_LDADD = \
 AM_TESTS_ENVIRONMENT =
 
 TESTS = \
+	column-store-test \
 	document-test \
 	general-test \
 	ixion-test-track-deps \
