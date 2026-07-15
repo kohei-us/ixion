@@ -9,19 +9,16 @@
 #include "ixion/types.hpp"
 #include "ixion/cell.hpp"
 
-#include "calc_status.hpp"
-
 #include <mdds/multi_type_vector/types.hpp>
 #include <mdds/multi_type_vector/macro.hpp>
 #include <mdds/multi_type_vector/block_funcs.hpp>
 #include <mdds/multi_type_vector.hpp>
 #include <mdds/multi_type_matrix.hpp>
 
-#include <cstdint>
+#include <cassert>
 #include <deque>
 #include <memory>
 #include <string_view>
-#include <unordered_map>
 
 namespace ixion {
 
@@ -55,7 +52,7 @@ namespace mdds { namespace mtv {
  *
  * Each formula cell instance stored in the block gets cloned, and the cells
  * belonging to the same formula group share the same cloned calc status
- * instance.
+ * instance, which formula_cell::cloner keeps track of.
  *
  * Since a formula group never spans multiple columns, and the cells of a
  * group are contiguous within a column, an entire group always gets cloned as
@@ -70,21 +67,15 @@ struct clone_block<ixion::formula_element_block>
         auto& dest_store = dest->store();
         dest_store.reserve(src.store().size());
 
-        std::unordered_map<std::uintptr_t, ixion::calc_status_ptr_t> group_status;
+        // Use one cloner instance for the whole block, to have the cloned
+        // cells of the same group share the same cloned calc status.
+        ixion::formula_cell::cloner clone_cell;
 
         for (const ixion::formula_cell* p : src.store())
         {
-            if (!p)
-            {
-                dest_store.push_back(nullptr);
-                continue;
-            }
-
-            // Create a null calc status on new group identity to let the cloned
-            // formula cell create a new instance.  On second encounters it
-            // reuses the previously created calc status for the same group.
-            ixion::calc_status_ptr_t& cs = group_status[p->get_group_properties().identity];
-            dest_store.push_back(p->clone(cs).release());
+            // A bug-free formula element block never stores a null cell.
+            assert(p);
+            dest_store.push_back(clone_cell(*p).release());
         }
 
         return dest.release();

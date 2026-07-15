@@ -27,6 +27,7 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <unordered_map>
 
 #include "calc_status.hpp"
 
@@ -340,16 +341,33 @@ formula_cell::formula_cell(
     const formula_tokens_store_ptr_t& tokens) :
     mp_impl(std::make_unique<impl>(group_row, group_col, cs, tokens)) {}
 
-formula_cell::~formula_cell()
-{
-}
+formula_cell::~formula_cell() = default;
 
-std::unique_ptr<formula_cell> formula_cell::clone(calc_status_ptr_t& cs) const
+struct formula_cell::cloner::impl
 {
-    if (!cs)
+    /**
+     * Mapping of the source cells' calc status instances to their cloned
+     * counterparts, to have the cloned cells of the same group share the
+     * same cloned calc status instance.
+     */
+    std::unordered_map<const calc_status*, calc_status_ptr_t> m_status_map;
+};
+
+formula_cell::cloner::cloner() : mp_impl(std::make_unique<impl>()) {}
+
+formula_cell::cloner::~cloner() = default;
+
+std::unique_ptr<formula_cell> formula_cell::cloner::operator()(const formula_cell& src)
+{
+    // insert an empty calc status pointer on first encounter
+    auto [it, inserted] = mp_impl->m_status_map.try_emplace(src.mp_impl->m_calc_status.get());
+    calc_status_ptr_t& cs = it->second;
+
+    if (inserted)
     {
-        // Create a new calc status and deep-copy its state.
-        calc_status& src_cs = *mp_impl->m_calc_status;
+        // First encounter with this calc status; create a new calc status
+        // and deep-copy its state.
+        calc_status& src_cs = *src.mp_impl->m_calc_status;
         std::unique_lock<std::mutex> lock(src_cs.mtx);
 
         cs = new calc_status(src_cs.group_size);
@@ -360,7 +378,7 @@ std::unique_ptr<formula_cell> formula_cell::clone(calc_status_ptr_t& cs) const
     }
 
     return std::make_unique<formula_cell>(
-        mp_impl->m_group_pos.row, mp_impl->m_group_pos.column, cs, mp_impl->m_tokens);
+        src.mp_impl->m_group_pos.row, src.mp_impl->m_group_pos.column, cs, src.mp_impl->m_tokens);
 }
 
 const formula_tokens_store_ptr_t& formula_cell::get_tokens() const
