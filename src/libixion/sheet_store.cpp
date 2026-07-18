@@ -12,6 +12,8 @@ namespace ixion { namespace detail {
 
 sheet_store::sheet_store() = default;
 
+sheet_store::sheet_store(sheet_store&& other) = default;
+
 sheet_store::sheet_store(size_t row_size, size_t col_size)
 {
     m_pos_hints.reserve(col_size);
@@ -23,6 +25,25 @@ sheet_store::sheet_store(size_t row_size, size_t col_size)
 }
 
 sheet_store::~sheet_store() = default;
+
+sheet_store sheet_store::clone() const
+{
+    sheet_store cloned;
+
+    cloned.m_pos_hints.reserve(m_columns.size());
+    for (const column_store_t& col : m_columns)
+    {
+        cloned.m_columns.push_back(col.clone());
+        cloned.m_pos_hints.push_back(cloned.m_columns.back().begin());
+    }
+
+    // named_expression_t is move-only; reconstruct each entry with a copy of
+    // its tokens.
+    for (const auto& [name, exp] : m_named_expressions)
+        cloned.m_named_expressions.emplace(name, named_expression_t(exp.origin, exp.tokens));
+
+    return cloned;
+}
 
 }}
 

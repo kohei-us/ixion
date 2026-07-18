@@ -362,6 +362,11 @@ sheet_t model_context::append_sheet(std::string name)
     return mp_impl->append_sheet(std::move(name));
 }
 
+sheet_t model_context::append_sheet_copy(sheet_t src, std::string name)
+{
+    return mp_impl->append_sheet_copy(src, std::move(name));
+}
+
 void model_context::set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows)
 {
     mp_impl->set_cell_values(sheet, std::move(rows));

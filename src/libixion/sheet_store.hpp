@@ -20,8 +20,18 @@ public:
     typedef column_store_t::size_type size_type;
 
     sheet_store();
+    sheet_store(sheet_store&& other);
     sheet_store(size_type row_size, size_type col_size);
     ~sheet_store();
+
+    /**
+     * Create a deep copy of this sheet store.  The columns are copied via
+     * column_store_t::clone() so that the formula cells get cloned properly,
+     * and the returned store gets its own fresh set of position hints.  The
+     * named expressions are copied verbatim, i.e. their origins still
+     * reference whatever sheet the originals reference.
+     */
+    sheet_store clone() const;
 
     column_store_t& operator[](size_type n) { return m_columns[n]; }
     const column_store_t& operator[](size_type n) const { return m_columns[n]; }

@@ -260,16 +260,41 @@ sheet_t model_context_impl::append_sheet(std::string&& name)
 {
     IXION_TRACE("name='" << name << "'");
 
-    // Check if the new sheet name already exists.
-    auto it = std::ranges::find(m_sheet_names, name);
-    if (it != m_sheet_names.end())
-        throw_sheet_name_conflict(name);
+    ensure_unique_sheet_name(name);
 
     // index of the new sheet.
     sheet_t sheet_index = m_sheets.size();
 
     m_sheet_names.push_back(std::move(name));
     m_sheets.emplace_back(m_sheet_size.row, m_sheet_size.column);
+    return sheet_index;
+}
+
+sheet_t model_context_impl::append_sheet_copy(sheet_t src, std::string&& name)
+{
+    IXION_TRACE("src=" << src << "; name='" << name << "'");
+
+    if (src < 0 || m_sheets.size() <= std::size_t(src))
+        throw_invalid_sheet_index(src);
+
+    ensure_unique_sheet_name(name);
+
+    // Clone the source sheet first so that a failed clone leaves the model
+    // unmodified.
+    sheet_store cloned = m_sheets[src].clone();
+
+    // index of the new sheet.
+    sheet_t sheet_index = m_sheets.size();
+
+    // Re-anchor the sheet-local named expression origins to the new sheet.
+    for (auto& [exp_name, exp] : cloned.get_named_expressions())
+    {
+        if (exp.origin.sheet == src)
+            exp.origin.sheet = sheet_index;
+    }
+
+    m_sheet_names.push_back(std::move(name));
+    m_sheets.push_back(std::move(cloned));
     return sheet_index;
 }
 
@@ -1031,6 +1056,14 @@ formula_result model_context_impl::get_formula_result(const abs_address_t& addr)
         throw general_error("not a formula cell.");
 
     return fc->get_result_cache(m_formula_res_wait_policy);
+}
+
+void model_context_impl::ensure_unique_sheet_name(std::string_view name) const
+{
+    // Check if the new sheet name already exists.
+    auto it = std::ranges::find(m_sheet_names, name);
+    if (it != m_sheet_names.end())
+        throw_sheet_name_conflict(name);
 }
 
 abs_range_t model_context_impl::shrink_to_workbook(abs_range_t range) const

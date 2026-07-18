@@ -131,6 +131,7 @@ public:
     rc_size_t get_sheet_size() const;
     size_t get_sheet_count() const;
     sheet_t append_sheet(std::string&& name);
+    sheet_t append_sheet_copy(sheet_t src, std::string&& name);
 
     void set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows);
 
@@ -166,6 +167,12 @@ public:
 
 private:
     abs_range_t shrink_to_workbook(abs_range_t range) const;
+
+    /**
+     * Check if a new sheet name already exists, and throw a
+     * model_context_error exception if it does.
+     */
+    void ensure_unique_sheet_name(std::string_view name) const;
 
 private:
     model_context& m_parent;

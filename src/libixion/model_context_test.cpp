@@ -1437,6 +1437,135 @@ void test_volatile_function()
     assert(0.2 <= delta && delta <= 0.3);
 }
 
+void test_model_context_append_sheet_copy()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("src");
+
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    // Cell positions on the source sheet.
+    ixion::abs_address_t A1(0,0,0);
+    ixion::abs_address_t A2(0,1,0);
+    ixion::abs_address_t A3(0,2,0);
+    ixion::abs_address_t A4(0,3,0);
+    ixion::abs_address_t A5(0,4,0);
+    ixion::abs_address_t B1(0,0,1);
+    ixion::abs_range_t B1B2(0, 0, 1, 2, 1);
+
+    // Populate the source sheet with a mix of cell types.
+    cxt.set_numeric_cell(A1, 1.5);
+    cxt.set_numeric_cell(A2, 2.25);
+    cxt.set_boolean_cell(A3, true);
+    cxt.set_string_cell(A4, "note");
+
+    // Formula cell in A5 referencing A1:A2; calculate it to cache its result.
+    insert_formula(cxt, A5, "SUM(A1:A2)", *resolver);
+
+    {
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        dirty_cells.insert(A5);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    assert(cxt.get_numeric_value(A5) == 3.75);
+
+    // Grouped formula cells in B1:B2 with a pre-supplied result.
+    {
+        ixion::formula_tokens_t tokens =
+            ixion::parse_formula_string(cxt, B1B2.first, *resolver, "\"grouped\"");
+        ixion::matrix res_value(2, 1, std::string("grouped"));
+        cxt.set_grouped_formula_cells(B1B2, std::move(tokens), ixion::formula_result(std::move(res_value)));
+    }
+
+    // Sheet-local named expression whose origin is on the source sheet.
+    cxt.set_named_expression(
+        0, "answer", A1, ixion::parse_formula_string(cxt, A1, *resolver, "A1+A2"));
+
+    // Copy the source sheet.
+    ixion::sheet_t copied = cxt.append_sheet_copy(0, "copy");
+    assert(copied == 1);
+    assert(cxt.get_sheet_count() == 2);
+    assert(cxt.get_sheet_name(copied) == "copy");
+    assert(cxt.get_sheet_index("copy") == copied);
+
+    // Same cell positions on the copied sheet.
+    ixion::abs_address_t cp_A1(1,0,0);
+    ixion::abs_address_t cp_A2(1,1,0);
+    ixion::abs_address_t cp_A3(1,2,0);
+    ixion::abs_address_t cp_A4(1,3,0);
+    ixion::abs_address_t cp_A5(1,4,0);
+    ixion::abs_address_t cp_B1(1,0,1);
+    ixion::abs_address_t cp_B2(1,1,1);
+
+    // The values carry over to the copied sheet.
+    assert(cxt.get_numeric_value(cp_A1) == 1.5);
+    assert(cxt.get_numeric_value(cp_A2) == 2.25);
+    assert(cxt.get_boolean_value(cp_A3) == true);
+    assert(cxt.get_string_value(cp_A4) == "note");
+
+    // The copied formula cell is a new cell instance sharing the token store
+    // of its source cell, and its cached result carries over without a
+    // recalculation.
+    const ixion::formula_cell* fc_src = cxt.get_formula_cell(A5);
+    const ixion::formula_cell* fc_cp = cxt.get_formula_cell(cp_A5);
+    assert(fc_src && fc_cp);
+    assert(fc_src != fc_cp);
+    assert(fc_src->get_tokens().get() == fc_cp->get_tokens().get());
+    assert(cxt.get_numeric_value(cp_A5) == 3.75);
+
+    // The grouped formula cells also carry over together with their results.
+    assert(cxt.get_string_value(cp_B1) == "grouped");
+    assert(cxt.get_string_value(cp_B2) == "grouped");
+    assert(cxt.get_formula_cell(cp_B1) != cxt.get_formula_cell(B1));
+
+    // The sheet-local named expression gets copied with its origin
+    // re-anchored to the new sheet.
+    const ixion::named_expression_t* exp = cxt.get_named_expression(0, "answer");
+    assert(exp);
+    assert(exp->origin.sheet == 0);
+    exp = cxt.get_named_expression(1, "answer");
+    assert(exp);
+    assert(exp->origin.sheet == 1);
+
+    // The two sheets are independent stores; modifying one leaves the other
+    // untouched.
+    cxt.set_numeric_cell(A1, 100.0);
+    assert(cxt.get_numeric_value(cp_A1) == 1.5);
+    cxt.set_numeric_cell(cp_A2, 200.0);
+    assert(cxt.get_numeric_value(A2) == 2.25);
+
+    // Copying to a conflicting sheet name must throw.
+    try
+    {
+        cxt.append_sheet_copy(0, "copy");
+        assert(!"sheet name conflict was not thrown");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::sheet_name_conflict);
+    }
+
+    // Copying from an invalid source sheet index must throw.
+    try
+    {
+        cxt.append_sheet_copy(99, "another");
+        assert(!"invalid sheet index was not thrown");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+
+    // The failed attempts must not have added a sheet.
+    assert(cxt.get_sheet_count() == 2);
+}
+
 bool check_formula_expression(
     ixion::model_context& cxt, const ixion::formula_name_resolver& resolver, const char* p)
 {
@@ -1642,6 +1771,7 @@ int main()
     test_model_context_fill_down();
     test_model_context_error_value();
     test_model_context_rename_sheets();
+    test_model_context_append_sheet_copy();
     test_grouped_formula_string_results();
     test_volatile_function();
     test_parse_and_print_expressions();

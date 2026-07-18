@@ -413,6 +413,33 @@ public:
     sheet_t append_sheet(std::string name);
 
     /**
+     * Append a new sheet to the model as a copy of an existing sheet.  All
+     * cells of the source sheet get copied over to the new sheet.  A copied
+     * formula cell shares its formula token store with its source cell, and
+     * the cached results of the source formula cells carry over to their
+     * copied counterparts.  The sheet-local named expressions of the source
+     * sheet also get copied, with their origins re-anchored to the new sheet.
+     *
+     * Note that the formula cells of the new sheet do not get registered for
+     * dependency tracking; that remains the responsibility of the caller.
+     * Also note that a copied formula cell whose result depends on the sheet
+     * it sits on, for instance via a reference with a relative sheet
+     * component, retains the cached result of its source cell until it gets
+     * recalculated.
+     *
+     * @param src index of the sheet to copy.
+     * @param name name of the sheet to be inserted.  The caller must ensure
+     *             that it is unique within the model context, else a
+     *             model_context_error exception gets thrown.
+     *
+     * @return sheet index of the inserted sheet.
+     *
+     * @throw model_context_error when the sheet name already exists.
+     * @throw std::invalid_argument when the source sheet index is invalid.
+     */
+    sheet_t append_sheet_copy(sheet_t src, std::string name);
+
+    /**
      * A convenient way to mass-insert a range of cell values.  You can
      * use a nested initializet list representing a range of cell values.  The
      * outer list represents rows.
