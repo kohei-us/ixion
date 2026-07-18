@@ -48,37 +48,29 @@ MDDS_MTV_DEFINE_ELEMENT_CALLBACKS_PTR(
 namespace mdds { namespace mtv {
 
 /**
- * Specialization for cloning a formula element block.
+ * Specialization for cloning the formula cells stored in a formula element
+ * block.
  *
  * Each formula cell instance stored in the block gets cloned, and the cells
  * belonging to the same formula group share the same cloned calc status
- * instance, which formula_cell::cloner keeps track of.
+ * instance, which formula_cell::cloner keeps track of.  The generic
+ * clone_block uses one instance of this function object per block clone and
+ * applies it to the cells in stored order, which makes this work.
  *
  * Since a formula group never spans multiple columns, and the cells of a
  * group are contiguous within a column, an entire group always gets cloned as
  * a whole within a single block.
  */
 template<>
-struct clone_block<ixion::formula_element_block>
+struct clone_value<ixion::formula_cell*>
 {
-    ixion::formula_element_block* operator()(const ixion::formula_element_block& src) const
+    ixion::formula_cell::cloner clone_cell;
+
+    ixion::formula_cell* operator()(const ixion::formula_cell* p)
     {
-        auto dest = std::make_unique<ixion::formula_element_block>();
-        auto& dest_store = dest->store();
-        dest_store.reserve(src.store().size());
-
-        // Use one cloner instance for the whole block, to have the cloned
-        // cells of the same group share the same cloned calc status.
-        ixion::formula_cell::cloner clone_cell;
-
-        for (const ixion::formula_cell* p : src.store())
-        {
-            // A bug-free formula element block never stores a null cell.
-            assert(p);
-            dest_store.push_back(clone_cell(*p).release());
-        }
-
-        return dest.release();
+        // A bug-free formula element block never stores a null cell.
+        assert(p);
+        return clone_cell(*p).release();
     }
 };
 
