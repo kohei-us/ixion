@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	column-store-test \
 	document-test \
 	general-test \
+	model-context-test \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \
@@ -149,6 +150,11 @@ general_test_LDADD = \
 	../test/libixion-test.a \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)
 
+model_context_test_SOURCES = model_context_test.cpp
+model_context_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a
+
 name_resolver_test_SOURCES = name_resolver_test.cpp
 name_resolver_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
@@ -182,6 +188,7 @@ TESTS = \
 	column-store-test \
 	document-test \
 	general-test \
+	model-context-test \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \

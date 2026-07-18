@@ -4,5 +4,6 @@ dirty-cell-tracker-test
 document-test
 general-test
 ixion-test-track-deps
+model-context-test
 name-resolver-test
 version-test
