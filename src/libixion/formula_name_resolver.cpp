@@ -1119,7 +1119,9 @@ parse_address_result_type parse_address_excel_a1(const char*& p, const char* p_e
 {
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = true; // Excel's sheet position is always absolute.
+    // An unqualified reference always references the sheet the formula cell
+    // is on; the caller makes the sheet absolute when a sheet name is given.
+    addr.abs_sheet = false;
     addr.abs_row = false;
     addr.abs_column = false;
 
@@ -1130,7 +1132,9 @@ parse_address_result_type parse_address_excel_r1c1(const char*& p, const char* p
 {
     addr.row = 0;
     addr.column = 0;
-    addr.abs_sheet = true; // Excel's sheet position is always absolute.
+    // An unqualified reference always references the sheet the formula cell
+    // is on; the caller makes the sheet absolute when a sheet name is given.
+    addr.abs_sheet = false;
     addr.abs_row = false;
     addr.abs_column = false;
 
@@ -1374,7 +1378,7 @@ public:
         if (parse_res == valid_address && parsed_addr.row != row_unset)
         {
             // This is a single cell address.
-            to_relative_address(parsed_addr, pos, false);
+            to_relative_address(parsed_addr, pos, true);
 
             if (sheets.present)
             {
@@ -1383,7 +1387,9 @@ public:
                     // range of sheets is given. Switch to a range.
                     range_t v{parsed_addr, parsed_addr};
                     v.first.sheet = sheets.sheet1;
+                    v.first.abs_sheet = true;
                     v.last.sheet = sheets.sheet2;
+                    v.last.abs_sheet = true;
 
                     ret.value = v;
                     ret.type = formula_name_t::range_reference;
@@ -1392,6 +1398,7 @@ public:
                 {
                     // single sheet is given.
                     parsed_addr.sheet = sheets.sheet2;
+                    parsed_addr.abs_sheet = true;
                     set_cell_reference(ret, parsed_addr);
                 }
             }
@@ -1411,7 +1418,7 @@ public:
                 return ret;
 
             range_t v;
-            to_relative_address(parsed_addr, pos, false);
+            to_relative_address(parsed_addr, pos, true);
             v.first = parsed_addr;
 
             // For now, we assume the sheet index of the end address is identical
@@ -1424,7 +1431,7 @@ public:
                 return ret;
             }
 
-            to_relative_address(parsed_addr, pos, false);
+            to_relative_address(parsed_addr, pos, true);
             v.last = parsed_addr;
             v.last.sheet = v.first.sheet; // re-use the sheet index of the begin address.
 
@@ -1441,6 +1448,8 @@ public:
                     // single sheet is given
                     v.first.sheet = v.last.sheet = sheets.sheet2;
                 }
+
+                v.first.abs_sheet = v.last.abs_sheet = true;
             }
 
             ret.value = v;
@@ -1562,8 +1571,9 @@ public:
             }
         }
 
-        // Use the sheet where the cell is unless sheet name is explicitly given.
-        address_t parsed_addr(pos.sheet, 0, 0);
+        // The sheet position stays relative to the position of the formula
+        // cell unless a sheet name is explicitly given.
+        address_t parsed_addr(0, 0, 0);
         parse_address_result_type parse_res = parse_address_excel_r1c1(p, p_end, parsed_addr);
 
         switch (parse_res)
@@ -1577,7 +1587,9 @@ public:
                         // range of sheets is given. Switch to a range.
                         range_t v{parsed_addr, parsed_addr};
                         v.first.sheet = sheets.sheet1;
+                        v.first.abs_sheet = true;
                         v.last.sheet = sheets.sheet2;
+                        v.last.abs_sheet = true;
 
                         ret.value = v;
                         ret.type = formula_name_t::range_reference;
@@ -1586,6 +1598,7 @@ public:
                     {
                         // single sheet is given.
                         parsed_addr.sheet = sheets.sheet2;
+                        parsed_addr.abs_sheet = true;
                         set_cell_reference(ret, parsed_addr);
                     }
                 }
@@ -1622,6 +1635,8 @@ public:
                         // single sheet is given
                         v.first.sheet = v.last.sheet = sheets.sheet2;
                     }
+
+                    v.first.abs_sheet = v.last.abs_sheet = true;
                 }
 
                 ret.type = formula_name_t::range_reference;

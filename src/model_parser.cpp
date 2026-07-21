@@ -632,7 +632,7 @@ void model_parser::parse_result_cache()
     {
         case formula_name_t::cell_reference:
         {
-            abs_address_t pos = std::get<address_t>(fnt.value).to_abs(abs_address_t());
+            abs_address_t pos = std::get<address_t>(fnt.value).to_abs(abs_address_t(m_current_sheet,0,0));
             formula_cell* fc = m_context.get_formula_cell(pos);
             if (!fc)
             {
@@ -1049,13 +1049,13 @@ model_parser::cell_def_type model_parser::parse_cell_definition()
     {
         case formula_name_t::cell_reference:
         {
-            ret.pos.first = std::get<address_t>(fnt.value).to_abs(abs_address_t(0,0,0));
+            ret.pos.first = std::get<address_t>(fnt.value).to_abs(abs_address_t(m_current_sheet,0,0));
             ret.pos.last = ret.pos.first;
             break;
         }
         case formula_name_t::range_reference:
         {
-            ret.pos = std::get<range_t>(fnt.value).to_abs(abs_address_t(0,0,0));
+            ret.pos = std::get<range_t>(fnt.value).to_abs(abs_address_t(m_current_sheet,0,0));
             break;
         }
         default:

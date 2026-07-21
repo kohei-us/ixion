@@ -166,22 +166,26 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
         }
     }
 
-    // Check for references with a relative sheet component, including the
-    // references stored in named expressions.
+    // Check for references with a non-zero relative sheet offset, including
+    // those stored in named expressions.  A zero offset re-anchors to the
+    // copied sheet whose cells hold identical values at copy time.
     for (const formula_token* p : cell.get_ref_tokens(cxt, pos))
     {
         switch (p->opcode)
         {
             case fop_single_ref:
             {
-                if (!std::get<address_t>(p->value).abs_sheet)
+                const address_t& addr = std::get<address_t>(p->value);
+                if (!addr.abs_sheet && addr.sheet != 0)
                     return true;
                 break;
             }
             case fop_range_ref:
             {
                 const range_t& range = std::get<range_t>(p->value);
-                if (!range.first.abs_sheet || !range.last.abs_sheet)
+                if (!range.first.abs_sheet && range.first.sheet != 0)
+                    return true;
+                if (!range.last.abs_sheet && range.last.sheet != 0)
                     return true;
                 break;
             }

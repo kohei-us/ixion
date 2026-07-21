@@ -374,6 +374,28 @@ void test_excel_a1()
         assert(range.last.column == -2);
     }
 
+    {
+        // An unqualified reference is relative to the sheet of the formula
+        // cell no matter which sheet the cell sits on.
+        abs_address_t pos(2, 0, 0);
+        formula_name_t res = resolver->resolve("B2", pos);
+        auto addr = std::get<address_t>(res.value);
+        assert(res.type == formula_name_t::cell_reference);
+        assert(!addr.abs_sheet);
+        assert(addr.sheet == 0);
+        assert(addr.to_abs(pos).sheet == 2);
+    }
+
+    {
+        // A sheet-qualified reference is always absolute.
+        abs_address_t pos(2, 0, 0);
+        formula_name_t res = resolver->resolve("Two!B2", pos);
+        auto addr = std::get<address_t>(res.value);
+        assert(res.type == formula_name_t::cell_reference);
+        assert(addr.abs_sheet);
+        assert(addr.sheet == 1);
+    }
+
     // Parse name without row index.
     struct {
         const char* name; formula_name_t::name_type type;
@@ -675,12 +697,12 @@ void test_excel_r1c1()
         bool abs_row2;
         bool abs_col2;
     } range_tests[] = {
-        { "R1C1:R2C2", 0, 0, 0, 0, 1, 1, true, true, true, true, true, true },
-        { "R[-3]C[2]:R[1]C[4]", 0, -3, 2, 0, 1, 4, true, false, false, true, false, false },
-        { "R2:R4", 0, 1, column_unset, 0, 3, column_unset, true, true, false, true, true, false },
-        { "R[2]:R[4]", 0, 2, column_unset, 0, 4, column_unset, true, false, false, true, false, false },
-        { "C3:C6", 0, row_unset, 2, 0, row_unset, 5, true, false, true, true, false, true },
-        { "C[3]:C[6]", 0, row_unset, 3, 0, row_unset, 6, true, false, false, true, false, false },
+        { "R1C1:R2C2", 0, 0, 0, 0, 1, 1, false, true, true, false, true, true },
+        { "R[-3]C[2]:R[1]C[4]", 0, -3, 2, 0, 1, 4, false, false, false, false, false, false },
+        { "R2:R4", 0, 1, column_unset, 0, 3, column_unset, false, true, false, false, true, false },
+        { "R[2]:R[4]", 0, 2, column_unset, 0, 4, column_unset, false, false, false, false, false, false },
+        { "C3:C6", 0, row_unset, 2, 0, row_unset, 5, false, false, true, false, false, true },
+        { "C[3]:C[6]", 0, row_unset, 3, 0, row_unset, 6, false, false, false, false, false, false },
         { "Two!R2C2:R2C[100]", 1, 1, 1, 1, 1, 100, true, true, true, true, true, false },
         { "'A B C'!R[2]:R[4]", 2, 2, column_unset, 2, 4, column_unset, true, false, false, true, false, false },
         { 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false }
@@ -745,6 +767,28 @@ void test_excel_r1c1()
             std::cerr << "failed to compile name from range: (name expected: " << name_r1c1 << "; actual name created: " << test_name << ")" << std::endl;
             assert(false);
         }
+    }
+
+    {
+        // An unqualified reference is relative to the sheet of the formula
+        // cell no matter which sheet the cell sits on.
+        abs_address_t pos(2, 2, 3);
+        formula_name_t res = resolver->resolve("R5C10", pos);
+        auto addr = std::get<address_t>(res.value);
+        assert(res.type == formula_name_t::cell_reference);
+        assert(!addr.abs_sheet);
+        assert(addr.sheet == 0);
+        assert(addr.to_abs(pos).sheet == 2);
+    }
+
+    {
+        // A sheet-qualified reference is always absolute.
+        abs_address_t pos(2, 2, 3);
+        formula_name_t res = resolver->resolve("Two!R5C10", pos);
+        auto addr = std::get<address_t>(res.value);
+        assert(res.type == formula_name_t::cell_reference);
+        assert(addr.abs_sheet);
+        assert(addr.sheet == 1);
     }
 
     struct {

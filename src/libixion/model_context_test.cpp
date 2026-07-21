@@ -1456,6 +1456,7 @@ void test_model_context_append_sheet_copy()
     ixion::abs_address_t A7(0,6,0);
     ixion::abs_address_t B1(0,0,1);
     ixion::abs_address_t C1(0,0,2);
+    ixion::abs_address_t D1(0,0,3);
     ixion::abs_range_t B1B2(0, 0, 1, 2, 1);
 
     // Populate the source sheet with a mix of cell types.
@@ -1465,17 +1466,20 @@ void test_model_context_append_sheet_copy()
     cxt.set_string_cell(A4, "note");
 
     // Formula cell in A5 referencing A1:A2; calculate it to cache its result.
-    // Parse it in Calc A1 syntax, which keeps unqualified references
-    // sheet-relative, unlike Excel A1 which always parses the sheet
-    // component as absolute.
-    auto resolver_calc = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::calc_a1, &cxt);
-    assert(resolver_calc);
-    insert_formula(cxt, A5, "SUM(A1:A2)", *resolver_calc);
+    insert_formula(cxt, A5, "SUM(A1:A2)", *resolver);
 
     // Formula cell in A7 with a sheet-absolute reference, and one in C1
     // whose result depends on the sheet it sits on.
     insert_formula(cxt, A7, "src!A1", *resolver);
     insert_formula(cxt, C1, "SHEET()", *resolver);
+
+    // Formula cell in D1 with a non-zero relative sheet offset, like the
+    // one an unanchored sheet-qualified Calc A1 reference produces.
+    {
+        ixion::formula_tokens_t tokens;
+        tokens.emplace_back(ixion::address_t(1, 0, 0, false, true, true));
+        cxt.set_formula_cell(D1, std::move(tokens));
+    }
 
     {
         ixion::abs_range_set_t dirty_cells;
@@ -1508,23 +1512,24 @@ void test_model_context_append_sheet_copy()
     assert(cxt.get_sheet_index("copy") == copied);
 
     // Same cell positions on the copied sheet.
-    ixion::abs_address_t cp_A1(1,0,0);
-    ixion::abs_address_t cp_A2(1,1,0);
-    ixion::abs_address_t cp_A3(1,2,0);
-    ixion::abs_address_t cp_A4(1,3,0);
-    ixion::abs_address_t cp_A5(1,4,0);
-    ixion::abs_address_t cp_A7(1,6,0);
-    ixion::abs_address_t cp_B1(1,0,1);
-    ixion::abs_address_t cp_B2(1,1,1);
-    ixion::abs_address_t cp_C1(1,0,2);
+    ixion::abs_address_t cp_A1(copied,0,0);
+    ixion::abs_address_t cp_A2(copied,1,0);
+    ixion::abs_address_t cp_A3(copied,2,0);
+    ixion::abs_address_t cp_A4(copied,3,0);
+    ixion::abs_address_t cp_A5(copied,4,0);
+    ixion::abs_address_t cp_A7(copied,6,0);
+    ixion::abs_address_t cp_B1(copied,0,1);
+    ixion::abs_address_t cp_B2(copied,1,1);
+    ixion::abs_address_t cp_C1(copied,0,2);
+    ixion::abs_address_t cp_D1(copied,0,3);
 
-    // The formula cells whose results may change on the new sheet get
-    // reported: A5 (sheet-relative references) and C1 (SHEET() function),
-    // but not A7 (sheet-absolute reference) nor the B1:B2 group (no
-    // references).
+    // Only C1 (SHEET()) and D1 (non-zero relative sheet offset) get
+    // reported; A5's zero-offset references re-anchor to identical cell
+    // values, and A7's reference is sheet-absolute.
     assert(res.recalc_cells.size() == 2);
-    assert(res.recalc_cells.count(cp_A5) == 1);
     assert(res.recalc_cells.count(cp_C1) == 1);
+    assert(res.recalc_cells.count(cp_D1) == 1);
+    assert(res.recalc_cells.count(cp_A5) == 0);
     assert(res.recalc_cells.count(cp_A7) == 0);
 
     // The values carry over to the copied sheet.
