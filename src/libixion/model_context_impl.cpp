@@ -10,7 +10,9 @@
 #include <ixion/address.hpp>
 #include <ixion/cell.hpp>
 #include <ixion/formula_result.hpp>
+#include <ixion/formula_tokens.hpp>
 #include <ixion/matrix.hpp>
+#include <ixion/table.hpp>
 #include <ixion/interface/session_handler.hpp>
 #include <ixion/model_cell_range.hpp>
 #include <ixion/model_iterator.hpp>
@@ -22,6 +24,7 @@
 #include "debug.hpp"
 #include "deprecated.hpp"
 
+#include <cassert>
 #include <format>
 #include <iostream>
 #include <cstring>
@@ -123,6 +126,136 @@ void throw_sheet_name_conflict(std::string_view name)
 void throw_invalid_sheet_index(sheet_t sheet)
 {
     throw std::invalid_argument(std::format("invalid sheet index: {}", sheet));
+}
+
+/**
+ * Check if the calculated result of a formula cell may depend on which
+ * sheet the cell sits on.
+ */
+bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& cell, const abs_address_t& pos)
+{
+    const formula_tokens_store_ptr_t& ts = cell.get_tokens();
+    if (!ts)
+        return false;
+
+    for (const formula_token& t : ts->get())
+    {
+        switch (t.opcode)
+        {
+            case fop_function:
+            {
+                if (std::get<formula_function_t>(t.value) == formula_function_t::func_sheet)
+                    // SHEET function is sheet position dependent
+                    return true;
+                break;
+            }
+            case fop_table_ref:
+            {
+                if (std::get<table_t>(t.value).name.empty())
+                    // Table reference without the table name is allowed inside
+                    // a table's own body; the table itself is always named, but
+                    // the reference itself is allowed to have an empty name if
+                    // it references another cell inside the same table. Note
+                    // that these are not detected when they occur inside a
+                    // named expression.
+                    return true;
+                break;
+            }
+            default:
+                ;
+        }
+    }
+
+    // Check for references with a relative sheet component, including the
+    // references stored in named expressions.
+    for (const formula_token* p : cell.get_ref_tokens(cxt, pos))
+    {
+        switch (p->opcode)
+        {
+            case fop_single_ref:
+            {
+                if (!std::get<address_t>(p->value).abs_sheet)
+                    return true;
+                break;
+            }
+            case fop_range_ref:
+            {
+                const range_t& range = std::get<range_t>(p->value);
+                if (!range.first.abs_sheet || !range.last.abs_sheet)
+                    return true;
+                break;
+            }
+            default:
+                ;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Collect the positions of the formula cells on a copied sheet whose cached
+ * results may no longer be valid on that sheet.
+ */
+abs_range_set_t collect_recalc_cells(const model_context& cxt, const sheet_store& sheet, sheet_t sheet_index)
+{
+    abs_range_set_t recalc_cells;
+
+    for (col_t col = 0; col < col_t(sheet.size()); ++col)
+    {
+        const column_store_t& col_store = sheet[col];
+        row_t cur_row = 0;
+
+        for (auto it = col_store.cbegin(); it != col_store.cend(); cur_row += it->size, ++it)
+        {
+            if (it->type != element_type_formula)
+                continue;
+
+            // Merge consecutive hits into a single range entry per run.
+            row_t run_first = -1;
+            row_t row = cur_row;
+
+            auto cell_it = formula_element_block::cbegin(*it->data);
+            auto cell_end = formula_element_block::cend(*it->data);
+
+            while (cell_it != cell_end)
+            {
+                const formula_cell* p = *cell_it;
+                assert(p);
+
+                bool hit = is_sheet_position_dependent(cxt, *p, abs_address_t(sheet_index, row, col));
+
+                // Cells of the same formula group either all need a recalc
+                // or none of them do, so the outcome of the top-most cell
+                // covers the whole group.
+                row_t n_covered = 1;
+                formula_group_t group = p->get_group_properties();
+                if (group.grouped)
+                    n_covered = group.size.row;
+
+                assert(n_covered <= std::distance(cell_it, cell_end));
+
+                if (hit)
+                {
+                    if (run_first < 0)
+                        run_first = row;
+                }
+                else if (run_first >= 0)
+                {
+                    recalc_cells.emplace(sheet_index, run_first, col, row - run_first, 1);
+                    run_first = -1;
+                }
+
+                row += n_covered;
+                std::advance(cell_it, n_covered);
+            }
+
+            if (run_first >= 0)
+                recalc_cells.emplace(sheet_index, run_first, col, row - run_first, 1);
+        }
+    }
+
+    return recalc_cells;
 }
 
 } // anonymous namespace
@@ -270,7 +403,7 @@ sheet_t model_context_impl::append_sheet(std::string&& name)
     return sheet_index;
 }
 
-sheet_t model_context_impl::append_sheet_copy(sheet_t src, std::string&& name)
+model_context::sheet_copy_result model_context_impl::append_sheet_copy(sheet_t src, std::string&& name)
 {
     IXION_TRACE("src=" << src << "; name='" << name << "'");
 
@@ -283,19 +416,23 @@ sheet_t model_context_impl::append_sheet_copy(sheet_t src, std::string&& name)
     // unmodified.
     sheet_store cloned = m_sheets[src].clone();
 
+    model_context::sheet_copy_result res;
+
     // index of the new sheet.
-    sheet_t sheet_index = m_sheets.size();
+    res.sheet = m_sheets.size();
 
     // Re-anchor the sheet-local named expression origins to the new sheet.
     for (auto& [exp_name, exp] : cloned.get_named_expressions())
     {
         if (exp.origin.sheet == src)
-            exp.origin.sheet = sheet_index;
+            exp.origin.sheet = res.sheet;
     }
 
     m_sheet_names.push_back(std::move(name));
     m_sheets.push_back(std::move(cloned));
-    return sheet_index;
+
+    res.recalc_cells = collect_recalc_cells(m_parent, m_sheets.back(), res.sheet);
+    return res;
 }
 
 void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows)

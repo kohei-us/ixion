@@ -10,6 +10,7 @@
 #include "env.hpp"
 #include "formula_tokens_fwd.hpp"
 #include "types.hpp"
+#include "address.hpp"
 
 #include <string>
 #include <memory>
@@ -413,6 +414,26 @@ public:
     sheet_t append_sheet(std::string name);
 
     /**
+     * Result of a sheet-copy operation performed by append_sheet_copy().
+     * More attributes may get added in the future as needed.
+     */
+    struct IXION_DLLPUBLIC sheet_copy_result
+    {
+        /** Index of the newly-inserted sheet. */
+        sheet_t sheet = invalid_sheet;
+
+        /**
+         * Positions of the formula cells on the new sheet whose cached
+         * results, carried over from their source cells, may no longer be
+         * valid on the new sheet and therefore need re-calculating.
+         *
+         * Note that volatile formula cells are not included; they get
+         * re-calculated on every calculation run anyway once registered.
+         */
+        abs_range_set_t recalc_cells;
+    };
+
+    /**
      * Append a new sheet to the model as a copy of an existing sheet.  All
      * cells of the source sheet get copied over to the new sheet.  A copied
      * formula cell shares its formula token store with its source cell, and
@@ -422,22 +443,22 @@ public:
      *
      * Note that the formula cells of the new sheet do not get registered for
      * dependency tracking; that remains the responsibility of the caller.
-     * Also note that a copied formula cell whose result depends on the sheet
-     * it sits on, for instance via a reference with a relative sheet
-     * component, retains the cached result of its source cell until it gets
-     * recalculated.
+     * The formula cells whose carried-over results may no longer be valid on
+     * the new sheet get reported in the returned result object; the caller
+     * should have them re-calculated.
      *
-     * @param src index of the sheet to copy.
-     * @param name name of the sheet to be inserted.  The caller must ensure
+     * @param src Index of the sheet to copy.
+     * @param name Name of the sheet to be inserted.  The caller must ensure
      *             that it is unique within the model context, else a
      *             model_context_error exception gets thrown.
      *
-     * @return sheet index of the inserted sheet.
+     * @return Result of the copy operation, which includes the sheet index of
+     *         the inserted sheet.
      *
-     * @throw model_context_error when the sheet name already exists.
-     * @throw std::invalid_argument when the source sheet index is invalid.
+     * @throw model_context_error When the sheet name already exists.
+     * @throw std::invalid_argument When the source sheet index is invalid.
      */
-    sheet_t append_sheet_copy(sheet_t src, std::string name);
+    sheet_copy_result append_sheet_copy(sheet_t src, std::string name);
 
     /**
      * A convenient way to mass-insert a range of cell values.  You can

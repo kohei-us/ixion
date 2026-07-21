@@ -131,7 +131,7 @@ public:
     rc_size_t get_sheet_size() const;
     size_t get_sheet_count() const;
     sheet_t append_sheet(std::string&& name);
-    sheet_t append_sheet_copy(sheet_t src, std::string&& name);
+    model_context::sheet_copy_result append_sheet_copy(sheet_t src, std::string&& name);
 
     void set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows);
 

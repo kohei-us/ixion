@@ -362,7 +362,7 @@ sheet_t model_context::append_sheet(std::string name)
     return mp_impl->append_sheet(std::move(name));
 }
 
-sheet_t model_context::append_sheet_copy(sheet_t src, std::string name)
+model_context::sheet_copy_result model_context::append_sheet_copy(sheet_t src, std::string name)
 {
     return mp_impl->append_sheet_copy(src, std::move(name));
 }
