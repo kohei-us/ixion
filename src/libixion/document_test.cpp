@@ -176,6 +176,53 @@ void test_rename_sheets()
     }
 }
 
+void test_append_sheet_copy()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    document doc;
+    doc.append_sheet("src");
+    doc.set_numeric_cell("src!A1", 1.5);
+    doc.set_numeric_cell("src!A2", 2.25);
+    doc.set_formula_cell("src!B1", "SUM(A1:A2)"); // unqualified refs
+    doc.set_formula_cell("src!B2", "src!A1*2"); // sheet-qualified ref
+    doc.set_formula_cell("src!C1", "SHEET()"); // sheet-position dependent
+    doc.calculate(0);
+
+    assert(doc.get_numeric_value("src!B1") == 3.75);
+    assert(doc.get_numeric_value("src!B2") == 3.0);
+    assert(doc.get_numeric_value("src!C1") == 1.0); // SHEET() is 1-based
+
+    sheet_t copied = doc.append_sheet_copy(0, "copy");
+    assert(copied == 1);
+
+    // The results of the copied formula cells carry over without a recalc.
+    assert(doc.get_numeric_value("copy!B1") == 3.75);
+    assert(doc.get_numeric_value("copy!B2") == 3.0);
+
+    doc.calculate(0);
+
+    // SHEET() was marked for recalc and now reports the new sheet position.
+    assert(doc.get_numeric_value("copy!C1") == 2.0);
+    assert(doc.get_numeric_value("src!C1") == 1.0);
+
+    // The copied B1 references the copy's own inputs...
+    doc.set_numeric_cell("copy!A1", 100.0);
+    doc.calculate(0);
+    assert(doc.get_numeric_value("copy!B1") == 102.25);
+    assert(doc.get_numeric_value("copy!B2") == 3.0); // references src!A1
+    assert(doc.get_numeric_value("src!B1") == 3.75); // source side unaffected
+
+    // An edit on the source sheet reaches its own dependents and the copied
+    // B2, but not the re-anchored copied B1.
+    doc.set_numeric_cell("src!A1", 10.5);
+    doc.calculate(0);
+    assert(doc.get_numeric_value("src!B1") == 12.75);
+    assert(doc.get_numeric_value("src!B2") == 21.0);
+    assert(doc.get_numeric_value("copy!B2") == 21.0); // references src!A1
+    assert(doc.get_numeric_value("copy!B1") == 102.25);
+}
+
 int main()
 {
     test_basic_calc();
@@ -183,6 +230,7 @@ int main()
     test_boolean_io();
     test_custom_cell_address_syntax();
     test_rename_sheets();
+    test_append_sheet_copy();
 
     return EXIT_SUCCESS;
 }

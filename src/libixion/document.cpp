@@ -8,12 +8,15 @@
 #include "ixion/document.hpp"
 #include "ixion/global.hpp"
 #include "ixion/model_context.hpp"
+#include "ixion/model_cell_range.hpp"
 #include "ixion/formula_name_resolver.hpp"
 #include "ixion/formula.hpp"
+#include "ixion/cell.hpp"
 #include "ixion/cell_access.hpp"
 
 #include <cstring>
 #include <format>
+#include <iterator>
 
 namespace ixion {
 
@@ -95,6 +98,38 @@ struct document::impl
     void append_sheet(std::string name)
     {
         cxt.append_sheet(std::move(name));
+    }
+
+    sheet_t append_sheet_copy(sheet_t src, std::string name)
+    {
+        auto res = cxt.append_sheet_copy(src, std::move(name));
+
+        if (abs_range_t data_range = cxt.get_data_range(res.sheet); data_range.valid())
+        {
+            // The copied formula cells are new to the dependency tracker.
+            auto cells = cxt.iterate_cells(res.sheet, rc_direction_t::vertical, data_range);
+            auto it = cells.begin();
+
+            while (it != cells.end())
+            {
+                if (it->type != cell_t::formula)
+                {
+                    ++it;
+                    continue;
+                }
+
+                const auto* fc = std::get<const formula_cell*>(it->value);
+                register_formula_cell(cxt, abs_address_t(res.sheet, it->row, it->col), fc);
+
+                // Registering the top-most cell of a group registers the
+                // entire group, so skip over the rest of the group.
+                formula_group_t group = fc->get_group_properties();
+                std::advance(it, group.grouped ? group.size.row : 1);
+            }
+        }
+
+        modified_formula_cells.insert(res.recalc_cells.begin(), res.recalc_cells.end());
+        return res.sheet;
     }
 
     void set_sheet_name(sheet_t sheet, std::string name)
@@ -182,6 +217,11 @@ document::~document() {}
 void document::append_sheet(std::string name)
 {
     mp_impl->append_sheet(std::move(name));
+}
+
+sheet_t document::append_sheet_copy(sheet_t src, std::string name)
+{
+    return mp_impl->append_sheet_copy(src, std::move(name));
 }
 
 void document::set_sheet_name(sheet_t sheet, std::string name)

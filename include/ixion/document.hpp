@@ -58,6 +58,26 @@ public:
     void append_sheet(std::string name);
 
     /**
+     * Append a new sheet to the document as a copy of an existing sheet.
+     * All cells of the source sheet get copied over to the new sheet, and
+     * the calculation results of the copied formula cells carry over as
+     * well.  Those formula cells whose carried-over results may no longer
+     * be valid on the new sheet get marked for re-calculation, which the
+     * next calculate() call picks up.
+     *
+     * @param src Index of the sheet to copy.
+     * @param name Name of the sheet to be inserted.  It must be unique
+     *             within the document, else a model_context_error exception
+     *             gets thrown.
+     *
+     * @return Sheet index of the inserted sheet.
+     *
+     * @throw model_context_error When the sheet name already exists.
+     * @throw std::invalid_argument When the source sheet index is invalid.
+     */
+    sheet_t append_sheet_copy(sheet_t src, std::string name);
+
+    /**
      * Set a new name to an existing sheet.
      *
      * @param sheet 0-based sheet index.
