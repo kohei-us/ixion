@@ -1504,7 +1504,7 @@ void test_model_context_append_sheet_copy()
         0, "answer", A1, ixion::parse_formula_string(cxt, A1, *resolver, "A1+A2"));
 
     // Copy the source sheet.
-    ixion::model_context::sheet_copy_result res = cxt.append_sheet_copy(0, "copy");
+    auto res = cxt.append_sheet_copy(0, "copy");
     ixion::sheet_t copied = res.sheet;
     assert(copied == 1);
     assert(cxt.get_sheet_count() == 2);
@@ -1593,6 +1593,65 @@ void test_model_context_append_sheet_copy()
 
     // The failed attempts must not have added a sheet.
     assert(cxt.get_sheet_count() == 2);
+}
+
+void test_model_context_append_sheet_copy_no_recalc()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("base");
+    cxt.append_sheet("src");
+
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    ixion::abs_address_t base_A1(0,0,0);
+    ixion::abs_address_t A1(1,0,0);
+    ixion::abs_address_t A2(1,1,0);
+    ixion::abs_address_t B1(1,0,1);
+    ixion::abs_address_t B2(1,1,1);
+    ixion::abs_address_t B3(1,2,1);
+
+    cxt.set_numeric_cell(base_A1, 4.5);
+    cxt.set_numeric_cell(A1, 1.25);
+    cxt.set_numeric_cell(A2, 2.5);
+
+    // Formula cells with only zero-offset relative and sheet-absolute
+    // references; none of them depend on the sheet they sit on.
+    insert_formula(cxt, B1, "SUM(A1:A2)", *resolver);
+    insert_formula(cxt, B2, "base!A1*2", *resolver);
+    insert_formula(cxt, B3, "AVERAGE(A1:A2)", *resolver);
+
+    {
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        dirty_cells.insert(B1);
+        dirty_cells.insert(B2);
+        dirty_cells.insert(B3);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    assert(cxt.get_numeric_value(B1) == 3.75);
+    assert(cxt.get_numeric_value(B2) == 9.0);
+    assert(cxt.get_numeric_value(B3) == 1.875);
+
+    auto res = cxt.append_sheet_copy(1, "copy");
+    ixion::sheet_t copied = res.sheet;
+    assert(copied == 2);
+
+    // All the carried-over results remain valid on the copied sheet, so no
+    // formula cells get reported as needing a re-calculation.
+    assert(res.recalc_cells.empty());
+
+    ixion::abs_address_t cp_B1(copied,0,1);
+    ixion::abs_address_t cp_B2(copied,1,1);
+    ixion::abs_address_t cp_B3(copied,2,1);
+
+    assert(cxt.get_numeric_value(cp_B1) == 3.75);
+    assert(cxt.get_numeric_value(cp_B2) == 9.0);
+    assert(cxt.get_numeric_value(cp_B3) == 1.875);
 }
 
 bool check_formula_expression(
@@ -1801,6 +1860,7 @@ int main()
     test_model_context_error_value();
     test_model_context_rename_sheets();
     test_model_context_append_sheet_copy();
+    test_model_context_append_sheet_copy_no_recalc();
     test_grouped_formula_string_results();
     test_volatile_function();
     test_parse_and_print_expressions();
