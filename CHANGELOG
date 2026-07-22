@@ -1,3 +1,73 @@
+ixion 0.21.0
+
+* C++ API
+
+  * added model_context::append_sheet_copy() which appends a new sheet
+    to the model as a copy of an existing sheet.  It returns a result
+    object that includes the index of the new sheet as well as the
+    positions of the formula cells whose carried-over results may no
+    longer be valid on the new sheet.
+
+  * added document::append_sheet_copy() which appends a new sheet as a
+    copy of an existing sheet, and marks the affected formula cells for
+    re-calculation, to be picked up by the next calculate() call.
+
+  * formula_tokens_store is now immutable once created.  The non-const
+    variant of its get() method has been removed, and a new create()
+    overload taking a formula_tokens_t instance has been added.
+
+  * the Excel resolvers (excel_a1 and excel_r1c1) now parse a reference
+    with no explicit sheet as sheet-relative with an offset of zero,
+    i.e. it always references the sheet the formula cell is on.  Such
+    references were previously parsed as sheet-absolute.  A
+    sheet-qualified reference remains always absolute in these
+    resolvers.
+
+  * added version number macros to <ixion/version.hpp>.
+
+  * added model_context::iterate_cells() which returns a
+    model_cell_range, an STL-compliant range over the cell values of a
+    sheet.  It replaces model_iterator and get_model_iterator(), which
+    are now deprecated.
+
+  * renamed abs_address_iterator to abs_address_range.  The old name
+    remains available as a deprecated alias.
+
+  * string cell values are now stored inline in the cell storage
+    blocks.  As only the strings registered via append_string() can be
+    looked up by their identifiers, get_string_identifier() is now
+    deprecated; use get_string_value() to get the string value of a
+    cell.
+
+  * append_string() now allows empty strings to be interned.
+
+  * string_id_t is now a struct rather than a plain integer type, for
+    extra type safety.
+
+  * added three-way comparison (<=>) operator support to the address
+    and range types.
+
+  * switched to std::string_view in various public interfaces where
+    const std::string& was previously used, and table_t now stores its
+    table and column names as std::string_view.
+
+  * fixed a bug in the equality operator of table_t.
+
+* misc
+
+  * the baseline C++ version is now C++20.
+
+  * switched to mdds API version 4.0.
+
+  * dropped the boost::filesystem build dependency.
+
+  * fixed a build failure when the configure script is generated with
+    autoconf 2.72 or newer, which caused the build to use C++11 mode
+    instead of the intended C++ version.
+
+  * the hand-written CHANGELOG file is now packaged in place of the
+    generated ChangeLog file.
+
 ixion 0.20.0
 
 * C++ API
