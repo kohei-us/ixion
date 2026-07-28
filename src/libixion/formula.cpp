@@ -21,6 +21,7 @@
 #include <format>
 #include <sstream>
 #include <algorithm>
+#include <utility>
 
 namespace ixion {
 
@@ -309,7 +310,7 @@ void register_formula_cell(
 #ifdef IXION_DEBUG_UTILS
     if (cell)
     {
-        const formula_cell* check = cxt.get_formula_cell(pos);
+        const formula_cell* check = std::as_const(cxt).get_formula_cell(pos);
         if (cell != check)
         {
             throw std::runtime_error(
@@ -320,7 +321,7 @@ void register_formula_cell(
 
     if (!cell)
     {
-        cell = cxt.get_formula_cell(pos);
+        cell = std::as_const(cxt).get_formula_cell(pos);
         if (!cell)
             // Not a formula cell. Bail out.
             return;
@@ -390,7 +391,7 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
 {
     // When there is a formula cell at this position, unregister it from
     // the dependency tree.
-    formula_cell* fcell = cxt.get_formula_cell(pos);
+    const formula_cell* fcell = std::as_const(cxt).get_formula_cell(pos);
     if (!fcell)
         // Not a formula cell. Bail out.
         return;
