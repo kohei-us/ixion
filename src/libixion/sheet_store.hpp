@@ -39,7 +39,7 @@ public:
     column_store_t& at(size_type n) { return m_columns.at(n); }
     const column_store_t& at(size_type n) const { return m_columns.at(n); }
 
-    column_store_t::iterator& get_pos_hint(size_type n) { return m_pos_hints.at(n); }
+    mdds::mtv::position_hint& get_pos_hint(size_type n) { return m_pos_hints.at(n); }
 
     /**
      * Return the number of columns.
@@ -55,7 +55,7 @@ public:
 
 private:
     column_stores_t m_columns;
-    std::vector<column_store_t::iterator> m_pos_hints;
+    std::vector<mdds::mtv::position_hint> m_pos_hints;
     detail::named_expressions_t m_named_expressions;
 };
 

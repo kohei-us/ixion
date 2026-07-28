@@ -28,6 +28,7 @@
 #include <format>
 #include <iostream>
 #include <cstring>
+#include <utility>
 
 using std::cout;
 using std::endl;
@@ -56,7 +57,7 @@ void set_grouped_formula_cells_to_workbook(
     {
         col_t col = top_left.column + col_offset;
         column_store_t& col_store = sheet.at(col);
-        column_store_t::iterator& pos_hint = sheet.get_pos_hint(col);
+        mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(col);
 
         for (row_t row_offset = 0; row_offset < group_size.row; ++row_offset)
         {
@@ -767,7 +768,7 @@ void model_context_impl::empty_cell(const abs_address_t& addr)
 {
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set_empty(addr.row, addr.row);
 }
 
@@ -775,7 +776,7 @@ void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
@@ -783,7 +784,7 @@ void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 {
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, val);
 }
 
@@ -792,7 +793,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, std::string_
     sheet_store& sheet = m_sheets.at(addr.sheet);
     string_view_store interned{m_inline_str_pool.intern(s)};
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, interned);
 }
 
@@ -804,9 +805,9 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
 
     sheet_store& sheet = m_sheets.at(src.sheet);
     column_store_t& col_store = sheet.at(src.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(src.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(src.column);
 
-    column_store_t::const_position_type pos = col_store.position(pos_hint, src.row);
+    column_store_t::const_position_type pos = std::as_const(col_store).position(pos_hint, src.row);
     auto it = pos.first; // block iterator
 
     switch (it->type)
@@ -861,7 +862,7 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
 {
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     pos_hint = col_store.set(pos_hint, addr.row, identifier.value);
 }
 
@@ -872,7 +873,7 @@ formula_cell* model_context_impl::set_formula_cell(
 
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     formula_cell* p = fcell.release();
     pos_hint = col_store.set(pos_hint, addr.row, p);
     return p;
@@ -885,7 +886,7 @@ formula_cell* model_context_impl::set_formula_cell(
 
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    column_store_t::iterator& pos_hint = sheet.get_pos_hint(addr.column);
+    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
     formula_cell* p = fcell.release();
     p->set_result_cache(std::move(result));
     pos_hint = col_store.set(pos_hint, addr.row, p);
