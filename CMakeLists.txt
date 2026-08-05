@@ -6,6 +6,7 @@ set(IXION_API_VERSION_MINOR 21)
 set(IXION_API_VERSION ${IXION_API_VERSION_MAJOR}.${IXION_API_VERSION_MINOR})
 
 option(BUILD_VULKAN "Build Vulkan compute engine.")
+option(IXION_COW "Enable copy-on-write on the cell storage." ON)
 
 project(ixion VERSION 0.21.0 LANGUAGES CXX)
 set(IXION_VERSION "${ixion_VERSION}")
@@ -44,6 +45,12 @@ add_compile_definitions(
     IXION_THREADS=1
     ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
 )
+
+if(IXION_COW)
+    add_compile_definitions(IXION_COW=1)
+else()
+    add_compile_definitions(IXION_COW=0)
+endif()
 
 if(BUILD_VULKAN)
     find_package(Vulkan)

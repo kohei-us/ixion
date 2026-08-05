@@ -104,8 +104,12 @@ MDDS_MTV_DEFINE_ELEMENT_CALLBACKS(
 
 struct column_store_traits : mdds::mtv::default_traits
 {
-    // Copy-on-write sheet copies; the code supports either setting.
+    // Controlled by the build systems; disabled when built without the flag.
+#if IXION_COW
     static constexpr bool enable_cow = true;
+#else
+    static constexpr bool enable_cow = false;
+#endif
 
     using block_funcs = mdds::mtv::element_block_funcs<
         boolean_element_block,

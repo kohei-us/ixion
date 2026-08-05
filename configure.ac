@@ -59,6 +59,12 @@ AC_ARG_ENABLE([threads],
     [enable_threads=yes]
 )
 
+AC_ARG_ENABLE([cow],
+    [AS_HELP_STRING([--disable-cow], [Disable copy-on-write on the cell storage])],
+    [enable_cow="$enableval"],
+    [enable_cow=yes]
+)
+
 AC_ARG_ENABLE([vulkan],
     [AS_HELP_STRING([--enable-vulkan], [Enable vulkan compute engine])],
     [enable_vulkan="$enableval"],
@@ -163,6 +169,12 @@ AS_IF([test "x$enable_threads" != "xno"], [
         CXXFLAGS="$CXXFLAGS -DIXION_THREADS=0"
 ])
 
+AS_IF([test "x$enable_cow" != "xno"], [
+        CXXFLAGS="$CXXFLAGS -DIXION_COW=1"
+], [
+        CXXFLAGS="$CXXFLAGS -DIXION_COW=0"
+])
+
 AS_IF([test "x$enable_debug_utils" != "xno"], [
         CXXFLAGS="$CXXFLAGS -DIXION_DEBUG_UTILS"
 ])
@@ -220,6 +232,7 @@ Build configuration:
         host os:              $host_os
         python:               $enable_python
         threads:              $enable_threads
+        cow:                  $enable_cow
         vulkan:               $enable_vulkan
         log (debug)           $enable_log_debug
         log (trace)           $enable_log_trace
