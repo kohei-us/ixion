@@ -9,9 +9,27 @@
 #include "ixion/types.hpp"
 #include "column_store_type.hpp"
 
+#include <memory>
 #include <sstream>
 
 namespace ixion { namespace detail {
+
+/**
+ * Use this to ensure access to a pimpl object as const if it's wrapped inside
+ * `std::unique_ptr<T>`.
+ *
+ * If you directly access pimpl object to get its method via `mp_impl->`,
+ * it will match a non-const overload if the method being accessed has both
+ * const and non-const overloads even if the `mp_impl` itself is inside a
+ * const member method.  It's because in such a situation the const qualifier
+ * gets applied to the std::unique_ptr<T> wrapper but the wrapper itself still
+ * returns a non-const pointer of T...
+ */
+template<typename T>
+const T& cimpl(const std::unique_ptr<T>& p)
+{
+    return *p;
+}
 
 cell_t to_celltype(mdds::mtv::element_t mtv_type);
 

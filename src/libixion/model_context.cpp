@@ -17,8 +17,7 @@
 
 #include "deprecated.hpp"
 #include "model_context_impl.hpp"
-
-#include <utility>
+#include "utils.hpp"
 
 namespace ixion {
 
@@ -88,7 +87,7 @@ dirty_cell_tracker& model_context::get_cell_tracker()
 
 const dirty_cell_tracker& model_context::get_cell_tracker() const
 {
-    return mp_impl->get_cell_tracker();
+    return detail::cimpl(mp_impl).get_cell_tracker();
 }
 
 void model_context::empty_cell(const abs_address_t& addr)
@@ -216,7 +215,7 @@ const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) c
 {
     // make sure to pick the const overload of get_formula_cell; the non-const
     // one detaches the column store.
-    return std::as_const(*mp_impl).get_formula_cell(addr);
+    return detail::cimpl(mp_impl).get_formula_cell(addr);
 }
 
 formula_cell* model_context::get_formula_cell(const abs_address_t& addr)
@@ -290,7 +289,7 @@ iface::table_handler* model_context::get_table_handler()
 
 const iface::table_handler* model_context::get_table_handler() const
 {
-    return mp_impl->get_table_handler();
+    return detail::cimpl(mp_impl).get_table_handler();
 }
 
 string_id_t model_context::append_string(std::string_view s)

@@ -18,6 +18,7 @@
 #include <variant>
 
 #include "debug.hpp"
+#include "utils.hpp"
 
 namespace ixion {
 
@@ -351,7 +352,7 @@ formula_error_t formula_result::get_error() const
 
 const matrix& formula_result::get_matrix() const
 {
-    return mp_impl->get_matrix();
+    return detail::cimpl(mp_impl).get_matrix();
 }
 
 matrix& formula_result::get_matrix()
