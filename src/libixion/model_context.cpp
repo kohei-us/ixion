@@ -18,6 +18,8 @@
 #include "deprecated.hpp"
 #include "model_context_impl.hpp"
 
+#include <utility>
+
 namespace ixion {
 
 model_context::input_cell::input_cell(std::nullptr_t) : type(cell_t::empty) {}
@@ -212,7 +214,9 @@ std::string_view model_context::get_string_value(const abs_address_t& addr) cons
 
 const formula_cell* model_context::get_formula_cell(const abs_address_t& addr) const
 {
-    return mp_impl->get_formula_cell(addr);
+    // make sure to pick the const overload of get_formula_cell; the non-const
+    // one detaches the column store.
+    return std::as_const(*mp_impl).get_formula_cell(addr);
 }
 
 formula_cell* model_context::get_formula_cell(const abs_address_t& addr)

@@ -40,12 +40,36 @@ void test_column_store_clone_formula_cells()
         col.get<ixion::formula_cell*>(r)->set_result_cache(ixion::formula_result(30.0 + r));
     }
 
-    // Clone the whole store, which internally clones the formula element
-    // block.
+    // Clone the whole store.  With COW enabled this only borrows the source's
+    // element blocks.
     ixion::column_store_t cloned = col.clone();
     assert(cloned.size() == col.size());
     assert(cloned.is_empty(1));
     assert(cloned.is_empty(5));
+
+    if constexpr (ixion::column_store_traits::enable_cow)
+    {
+        assert(cloned.is_shared());
+        assert(col.is_shared());
+
+        // While sharing, both stores return the same formula cell instance.
+        assert(col.get<ixion::formula_cell*>(0) == cloned.get<ixion::formula_cell*>(0));
+
+        // Detaching clones the formula element block via formula_cell::cloner.
+        cloned.detach();
+        assert(!cloned.is_shared());
+        assert(col.get<ixion::formula_cell*>(0) != cloned.get<ixion::formula_cell*>(0));
+
+        // The source holds on to the shared store until it detaches itself.
+        assert(col.is_shared());
+    }
+    else
+    {
+        // Without COW the clone gets its own copy of the blocks up front.
+        assert(!cloned.is_shared());
+        assert(!col.is_shared());
+        assert(col.get<ixion::formula_cell*>(0) != cloned.get<ixion::formula_cell*>(0));
+    }
 
     constexpr auto wait_policy = ixion::formula_result_wait_policy_t::throw_exception;
 
@@ -100,9 +124,47 @@ void test_column_store_clone_formula_cells()
     }
 }
 
+void test_column_store_cow_implicit_detach()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    if constexpr (!ixion::column_store_traits::enable_cow)
+        return; // this scenario only exists with copy-on-write
+
+    constexpr auto wait_policy = ixion::formula_result_wait_policy_t::throw_exception;
+
+    // Simulate an edit on a copied sheet: a mutation on a borrowing store
+    // detaches it implicitly and leaves the source store unaffected.
+    ixion::column_store_t col(3);
+    col.set(0, new ixion::formula_cell(ixion::formula_tokens_store::create()));
+    col.get<ixion::formula_cell*>(0)->set_result_cache(ixion::formula_result(3.0));
+    col.set(1, 1.5);
+
+    ixion::column_store_t cloned = col.clone();
+    assert(cloned.is_shared());
+    const auto* shared_cell = cloned.get<ixion::formula_cell*>(0);
+    assert(shared_cell == col.get<ixion::formula_cell*>(0));
+
+    // Overwrite a numeric cell in the clone, which triggers a detach.
+    cloned.set(1, 99.0);
+    assert(!cloned.is_shared());
+    assert(cloned.get<double>(1) == 99.0);
+
+    // The detach re-instantiated the clone's formula cell with the cached
+    // result carried over...
+    const auto* detached_cell = cloned.get<ixion::formula_cell*>(0);
+    assert(detached_cell != shared_cell);
+    assert(detached_cell->get_result_cache(wait_policy).get_value() == 3.0);
+
+    // ...while the source store keeps the original cells and values.
+    assert(col.get<ixion::formula_cell*>(0) == shared_cell);
+    assert(col.get<double>(1) == 1.5);
+}
+
 int main()
 {
     test_column_store_clone_formula_cells();
+    test_column_store_cow_implicit_detach();
 
     return EXIT_SUCCESS;
 }

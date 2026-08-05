@@ -1183,6 +1183,8 @@ const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& ad
 formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr)
 {
     column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
+    // The non-const position() below throws while the store is shared.
+    col_store.detach();
     auto pos = col_store.position(addr.row);
 
     if (pos.first->type != element_type_formula)

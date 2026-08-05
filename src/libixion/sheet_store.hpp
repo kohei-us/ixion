@@ -25,11 +25,13 @@ public:
     ~sheet_store();
 
     /**
-     * Create a deep copy of this sheet store.  The columns are copied via
-     * column_store_t::clone() so that the formula cells get cloned properly,
-     * and the returned store gets its own fresh set of position hints.  The
-     * named expressions are copied verbatim, i.e. their origins still
-     * reference whatever sheet the originals reference.
+     * Create a copy of this sheet store.
+     *
+     * This may clone the column stores with copy-on-write enabled.
+     *
+     * The returned store gets its own fresh set of position hints. The named
+     * expressions are copied verbatim i.e. their origins still reference
+     * whatever sheet the originals reference.
      */
     sheet_store clone() const;
 

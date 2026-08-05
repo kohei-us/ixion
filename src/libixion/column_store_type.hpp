@@ -104,6 +104,9 @@ MDDS_MTV_DEFINE_ELEMENT_CALLBACKS(
 
 struct column_store_traits : mdds::mtv::default_traits
 {
+    // Copy-on-write sheet copies; the code supports either setting.
+    static constexpr bool enable_cow = true;
+
     using block_funcs = mdds::mtv::element_block_funcs<
         boolean_element_block,
         numeric_element_block,

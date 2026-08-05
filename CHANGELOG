@@ -59,6 +59,11 @@ ixion 0.21.0
 
   * switched to mdds API version 4.0.
 
+  * enabled copy-on-write on the column stores.  Copying a sheet now
+    shares the cell storage of the source sheet, and each copied
+    column makes its own private copy of the storage upon its first
+    modification.
+
   * dropped the boost::filesystem build dependency.
 
   * fixed a build failure when the configure script is generated with
