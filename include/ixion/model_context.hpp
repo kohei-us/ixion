@@ -489,6 +489,10 @@ public:
      * the cached results of the source formula cells carry over to their
      * copied counterparts.  The sheet-local named expressions of the source
      * sheet also get copied, with their origins re-anchored to the new sheet.
+     * The tables of the source sheet also get copied, with their names
+     * auto-renamed to unique names.  Note, however, that formula cells
+     * referencing a table by name keep referencing the table of the source
+     * sheet.
      *
      * Note that the formula cells of the new sheet do not get registered for
      * dependency tracking; that remains the responsibility of the caller.

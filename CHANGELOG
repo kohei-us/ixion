@@ -65,6 +65,11 @@ ixion 0.21.0
     set_table_handler() methods have been removed, as the model now
     resolves table references internally.
 
+  * model_context::append_sheet_copy() now also copies the tables of
+    the source sheet to the new sheet, with their names auto-renamed
+    to unique names.  Formula cells referencing a table by name keep
+    referencing the table of the source sheet.
+
 * misc
 
   * the baseline C++ version is now C++20.

@@ -22,6 +22,7 @@
 #include <ixion/model_context.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/named_expressions_iterator.hpp>
+#include <ixion/table.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -1654,6 +1655,212 @@ void test_model_context_append_sheet_copy_no_recalc()
     assert(cxt.get_numeric_value(cp_B3) == 1.875);
 }
 
+void test_model_context_tables()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("one");
+    cxt.append_sheet("two");
+
+    assert(!cxt.get_table("Table1"));
+    assert(cxt.get_tables(0).empty());
+
+    // Table1 in C3:D9 with a header row and one totals row.
+    ixion::table_t tab;
+    tab.name = "Table1";
+    tab.range = ixion::abs_range_t(0, 2, 2, 7, 2);
+    tab.columns = { "Category", "Value" };
+    tab.totals_row_count = 1;
+    cxt.set_table(tab);
+
+    const ixion::table_t* p = cxt.get_table("Table1");
+    assert(p);
+    assert(p->name == "Table1");
+    assert(p->range == ixion::abs_range_t(0, 2, 2, 7, 2));
+    assert(p->columns.size() == 2);
+    assert(p->columns[0] == "Category");
+    assert(p->columns[1] == "Value");
+    assert(p->totals_row_count == 1);
+
+    assert(cxt.get_tables(0).size() == 1);
+    assert(cxt.get_tables(0)[0] == p);
+    assert(cxt.get_tables(1).empty());
+
+    // Single column, data area only.
+    ixion::abs_range_t range = cxt.get_table_range("Table1", "Value", "", ixion::table_area_data);
+    assert(range == ixion::abs_range_t(0, 3, 3, 5, 1));
+
+    // Area specifiers only, using the whole table width.
+    range = cxt.get_table_range("Table1", "", "", ixion::table_area_headers);
+    assert(range == ixion::abs_range_t(0, 2, 2, 1, 2));
+
+    range = cxt.get_table_range("Table1", "", "", ixion::table_area_totals);
+    assert(range == ixion::abs_range_t(0, 8, 2, 1, 2));
+
+    // Single column, headers + data areas.
+    range = cxt.get_table_range(
+        "Table1", "Category", "", ixion::table_area_headers | ixion::table_area_data);
+    assert(range == ixion::abs_range_t(0, 2, 2, 6, 1));
+
+    // Column range, data area only.
+    range = cxt.get_table_range("Table1", "Category", "Value", ixion::table_area_data);
+    assert(range == ixion::abs_range_t(0, 3, 2, 5, 2));
+
+    // Headers + totals areas do not form a contiguous range.
+    range = cxt.get_table_range(
+        "Table1", "Value", "", ixion::table_area_headers | ixion::table_area_totals);
+    assert(!range.valid());
+
+    // No column by this name.
+    range = cxt.get_table_range("Table1", "Amount", "", ixion::table_area_data);
+    assert(!range.valid());
+
+    // The second column of a column range must not precede the first one.
+    range = cxt.get_table_range("Table1", "Value", "Category", ixion::table_area_data);
+    assert(!range.valid());
+
+    // No table by this name.
+    range = cxt.get_table_range("Table2", "Value", "", ixion::table_area_data);
+    assert(!range.valid());
+
+    // Position-based lookups; D5 is inside Table1 while A1 is not.
+    range = cxt.get_table_range(ixion::abs_address_t(0, 4, 3), "Value", "", ixion::table_area_data);
+    assert(range == ixion::abs_range_t(0, 3, 3, 5, 1));
+
+    range = cxt.get_table_range(ixion::abs_address_t(0, 0, 0), "Value", "", ixion::table_area_data);
+    assert(!range.valid());
+
+    // Totals area of a table with no totals rows.
+    tab.name = "NoTotals";
+    tab.range = ixion::abs_range_t(1, 0, 0, 4, 2);
+    tab.columns = { "A", "B" };
+    tab.totals_row_count = 0;
+    cxt.set_table(tab);
+
+    range = cxt.get_table_range("NoTotals", "", "", ixion::table_area_totals);
+    assert(!range.valid());
+
+    assert(cxt.get_tables(1).size() == 1);
+
+    // Inserting a table with an existing name should fail.
+    try
+    {
+        tab.name = "Table1";
+        tab.range = ixion::abs_range_t(1, 10, 0, 3, 2);
+        cxt.set_table(tab);
+        assert(!"model_context_error was expected for a duplicate table name");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::table_name_conflict);
+    }
+
+    // Neither should a table with an empty name, ...
+    try
+    {
+        tab.name.clear();
+        cxt.set_table(tab);
+        assert(!"std::invalid_argument was expected for an empty table name");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+
+    // ... an invalid range, ...
+    try
+    {
+        tab.name = "Table3";
+        tab.range = ixion::abs_range_t(ixion::abs_range_t::invalid);
+        cxt.set_table(tab);
+        assert(!"std::invalid_argument was expected for an invalid table range");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+
+    // ... or a range spanning multiple sheets.
+    try
+    {
+        tab.range = ixion::abs_range_t(0, 2, 2, 7, 2);
+        tab.range.last.sheet = 1;
+        cxt.set_table(tab);
+        assert(!"std::invalid_argument was expected for a multi-sheet table range");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+}
+
+void test_model_context_append_sheet_copy_tables()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("src");
+    cxt.append_sheet("other");
+
+    ixion::table_t tab;
+    tab.name = "Table1";
+    tab.range = ixion::abs_range_t(0, 2, 2, 7, 2);
+    tab.columns = { "Category", "Value" };
+    tab.totals_row_count = 1;
+    cxt.set_table(tab);
+
+    tab.name = "Table2";
+    tab.range = ixion::abs_range_t(0, 2, 5, 3, 2);
+    tab.columns = { "A", "B" };
+    tab.totals_row_count = 0;
+    cxt.set_table(tab);
+
+    // Unrelated table on another sheet, which should not get copied.
+    tab.name = "TableX";
+    tab.range = ixion::abs_range_t(1, 1, 1, 3, 2);
+    tab.columns = { "C", "D" };
+    tab.totals_row_count = 0;
+    cxt.set_table(tab);
+
+    auto res = cxt.append_sheet_copy(0, "copy");
+    ixion::sheet_t copied = res.sheet;
+    assert(copied == 2);
+
+    // The tables of the source sheet get cloned to the new sheet with
+    // auto-generated unique names.
+    assert(cxt.get_tables(copied).size() == 2);
+
+    const ixion::table_t* p = cxt.get_table("Table3");
+    assert(p);
+    assert(p->range == ixion::abs_range_t(copied, 2, 2, 7, 2));
+    assert(p->columns == std::vector<std::string>({ "Category", "Value" }));
+    assert(p->totals_row_count == 1);
+
+    p = cxt.get_table("Table4");
+    assert(p);
+    assert(p->range == ixion::abs_range_t(copied, 2, 5, 3, 2));
+    assert(p->columns == std::vector<std::string>({ "A", "B" }));
+    assert(p->totals_row_count == 0);
+
+    // The source tables remain unmodified, and the unrelated table does not
+    // get cloned.
+    p = cxt.get_table("Table1");
+    assert(p);
+    assert(p->range == ixion::abs_range_t(0, 2, 2, 7, 2));
+
+    p = cxt.get_table("Table2");
+    assert(p);
+    assert(p->range == ixion::abs_range_t(0, 2, 5, 3, 2));
+
+    assert(cxt.get_tables(0).size() == 2);
+    assert(cxt.get_tables(1).size() == 1);
+
+    // Table references should resolve against the cloned table.
+    ixion::abs_range_t range = cxt.get_table_range("Table3", "Value", "", ixion::table_area_data);
+    assert(range == ixion::abs_range_t(copied, 3, 3, 5, 1));
+}
+
 bool check_formula_expression(
     ixion::model_context& cxt, const ixion::formula_name_resolver& resolver, const char* p)
 {
@@ -1861,6 +2068,8 @@ int main()
     test_model_context_rename_sheets();
     test_model_context_append_sheet_copy();
     test_model_context_append_sheet_copy_no_recalc();
+    test_model_context_tables();
+    test_model_context_append_sheet_copy_tables();
     test_grouped_formula_string_results();
     test_volatile_function();
     test_parse_and_print_expressions();

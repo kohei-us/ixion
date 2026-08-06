@@ -461,8 +461,18 @@ model_context::sheet_copy_result model_context_impl::append_sheet_copy(sheet_t s
             exp.origin.sheet = res.sheet;
     }
 
+    // Clone the tables of the source sheet to the new sheet, with unique
+    // auto-generated names.
+    //
+    // NB: formula cells referencing a table by name keep referencing the table
+    // of the source sheet.
+    std::vector<table_t> cloned_tables = m_tables.clone_sheet_tables(src, res.sheet);
+
     m_sheet_names.push_back(std::move(name));
     m_sheets.push_back(std::move(cloned));
+
+    for (table_t& tab : cloned_tables)
+        m_tables.insert(std::move(tab));
 
     res.recalc_cells = collect_recalc_cells(m_parent, m_sheets.back(), res.sheet);
     return res;

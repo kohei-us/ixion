@@ -98,6 +98,7 @@ test_data = \
 	test/13-relational-operators-02.txt \
 	test/13-relational-operators-03.txt \
 	test/20-table-reference-01.txt \
+	test/20-table-reference-02.txt \
 	test/21-named-exp-workbook-01.txt \
 	test/21-named-exp-worksheet-01.txt \
 	test/22-formulas-with-cached-results.txt \

@@ -30,9 +30,9 @@ public:
      * within the store, and a valid range that does not span multiple
      * sheets.
      *
-     * @throw std::invalid_argument when the name is empty, the range is
+     * @throw std::invalid_argument When the name is empty, the range is
      *        invalid, or the range spans multiple sheets.
-     * @throw model_context_error when a table by the same name already
+     * @throw model_context_error When a table by the same name already
      *        exists in the store.
      */
     void insert(table_t tab);
@@ -70,8 +70,8 @@ public:
     /**
      * Create copies of all the tables on a source sheet, with their ranges
      * re-anchored to a destination sheet and their names auto-renamed to
-     * names unique both within the store and among the copies.  The copies
-     * do not get inserted into the store.
+     * next-available unique names. The copies do not get inserted into the
+     * store.
      */
     std::vector<table_t> clone_sheet_tables(sheet_t src, sheet_t dst) const;
 
