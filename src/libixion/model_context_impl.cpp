@@ -341,6 +341,35 @@ const named_expression_t* model_context_impl::get_named_expression(sheet_t sheet
     return get_named_expression(name);
 }
 
+void model_context_impl::set_table(table_t tab)
+{
+    m_tables.insert(std::move(tab));
+}
+
+const table_t* model_context_impl::get_table(std::string_view name) const
+{
+    return m_tables.get(name);
+}
+
+std::vector<const table_t*> model_context_impl::get_tables(sheet_t sheet) const
+{
+    return m_tables.get_by_sheet(sheet);
+}
+
+abs_range_t model_context_impl::get_table_range(
+    std::string_view name, std::string_view column_first,
+    std::string_view column_last, table_areas_t areas) const
+{
+    return m_tables.get_range(name, column_first, column_last, areas);
+}
+
+abs_range_t model_context_impl::get_table_range(
+    const abs_address_t& pos, std::string_view column_first,
+    std::string_view column_last, table_areas_t areas) const
+{
+    return m_tables.get_range(pos, column_first, column_last, areas);
+}
+
 sheet_t model_context_impl::get_sheet_index(std::string_view name) const
 {
     strings_type::const_iterator itr_beg = m_sheet_names.begin(), itr_end = m_sheet_names.end();

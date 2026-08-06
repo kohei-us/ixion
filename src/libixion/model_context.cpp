@@ -292,6 +292,30 @@ const iface::table_handler* model_context::get_table_handler() const
     return detail::cimpl(mp_impl).get_table_handler();
 }
 
+const table_t* model_context::get_table(std::string_view name) const
+{
+    return mp_impl->get_table(name);
+}
+
+std::vector<const table_t*> model_context::get_tables(sheet_t sheet) const
+{
+    return mp_impl->get_tables(sheet);
+}
+
+abs_range_t model_context::get_table_range(
+    std::string_view name, std::string_view column_first,
+    std::string_view column_last, table_areas_t areas) const
+{
+    return mp_impl->get_table_range(name, column_first, column_last, areas);
+}
+
+abs_range_t model_context::get_table_range(
+    const abs_address_t& pos, std::string_view column_first,
+    std::string_view column_last, table_areas_t areas) const
+{
+    return mp_impl->get_table_range(pos, column_first, column_last, areas);
+}
+
 string_id_t model_context::append_string(std::string_view s)
 {
     return mp_impl->append_string(s);
@@ -383,6 +407,11 @@ void model_context::set_session_handler_factory(session_handler_factory* factory
 void model_context::set_table_handler(iface::table_handler* handler)
 {
     mp_impl->set_table_handler(handler);
+}
+
+void model_context::set_table(table_t tab)
+{
+    mp_impl->set_table(std::move(tab));
 }
 
 size_t model_context::get_string_count() const

@@ -15,6 +15,7 @@
 #include <string>
 #include <memory>
 #include <variant>
+#include <vector>
 
 namespace ixion {
 
@@ -32,6 +33,7 @@ struct abs_range_t;
 struct abs_rc_range_t;
 struct config;
 struct named_expression_t;
+struct table_t;
 
 namespace iface {
 
@@ -216,6 +218,67 @@ public:
      */
     iface::table_handler* get_table_handler();
     const iface::table_handler* get_table_handler() const;
+
+    /**
+     * Get a table associated with the specified name.
+     *
+     * @param name Name of the table.
+     *
+     * @return Const pointer to the table if it exists, nullptr otherwise.
+     *         The pointer remains valid while the table remains in the
+     *         model.
+     */
+    const table_t* get_table(std::string_view name) const;
+
+    /**
+     * Get all tables whose ranges are on the specified sheet, sorted by
+     * name in ascending order.
+     *
+     * @param sheet 0-based index of the sheet.
+     *
+     * @return Const pointers to the tables on the specified sheet.
+     */
+    std::vector<const table_t*> get_tables(sheet_t sheet) const;
+
+    /**
+     * Resolve a named table reference to the range it references.
+     *
+     * @param name Name of the table.
+     * @param column_first Name of the first column of the reference, or an
+     *                     empty view when the reference only contains area
+     *                     specifiers.
+     * @param column_last Name of the last column of the reference, or an
+     *                    empty view for a single-column reference.
+     * @param areas Area specifier value, which may consist of one or more
+     *              values of ixion::table_area_t.
+     *
+     * @return Referenced range, or an invalid range when the reference
+     *         does not resolve.
+     */
+    abs_range_t get_table_range(
+        std::string_view name, std::string_view column_first,
+        std::string_view column_last, table_areas_t areas) const;
+
+    /**
+     * Resolve an unnamed table reference to the range it references.  The
+     * position of the referencing cell determines which table the
+     * reference is for.
+     *
+     * @param pos Position of the referencing cell.
+     * @param column_first Name of the first column of the reference, or an
+     *                     empty view when the reference only contains area
+     *                     specifiers.
+     * @param column_last Name of the last column of the reference, or an
+     *                    empty view for a single-column reference.
+     * @param areas Area specifier value, which may consist of one or more
+     *              values of ixion::table_area_t.
+     *
+     * @return Referenced range, or an invalid range when the reference
+     *         does not resolve.
+     */
+    abs_range_t get_table_range(
+        const abs_address_t& pos, std::string_view column_first,
+        std::string_view column_last, table_areas_t areas) const;
 
     /**
      * Append a new string to the string pool.  The string being passed will be
@@ -474,6 +537,22 @@ public:
     void set_session_handler_factory(session_handler_factory* factory);
 
     void set_table_handler(iface::table_handler* handler);
+
+    /**
+     * Insert a new table into the model.  A table is a 2-dimensional range
+     * of cells with named columns, referenced by table references in
+     * formula expressions.
+     *
+     * @param tab Table to insert.  It must have a non-empty name unique
+     *            within the model, and a valid range that does not span
+     *            multiple sheets.
+     *
+     * @throw std::invalid_argument When the name is empty, the range is
+     *        invalid, or the range spans multiple sheets.
+     * @throw model_context_error When a table by the same name already
+     *        exists in the model.
+     */
+    void set_table(table_t tab);
 
     size_t get_string_count() const;
 

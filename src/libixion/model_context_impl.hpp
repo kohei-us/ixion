@@ -13,6 +13,7 @@
 #include <ixion/dirty_cell_tracker.hpp>
 
 #include "sheet_store.hpp"
+#include "table_store.hpp"
 #include "column_store_type.hpp"
 #include "string_id_pool.hpp"
 #include "inline_string_pool.hpp"
@@ -125,6 +126,19 @@ public:
     const named_expression_t* get_named_expression(std::string_view name) const;
     const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const;
 
+    void set_table(table_t tab);
+
+    const table_t* get_table(std::string_view name) const;
+    std::vector<const table_t*> get_tables(sheet_t sheet) const;
+
+    abs_range_t get_table_range(
+        std::string_view name, std::string_view column_first,
+        std::string_view column_last, table_areas_t areas) const;
+
+    abs_range_t get_table_range(
+        const abs_address_t& pos, std::string_view column_first,
+        std::string_view column_last, table_areas_t areas) const;
+
     sheet_t get_sheet_index(std::string_view name) const;
     std::string_view get_sheet_name(sheet_t sheet) const;
     void set_sheet_name(sheet_t sheet, std::string name);
@@ -183,6 +197,7 @@ private:
     config m_config;
     dirty_cell_tracker m_tracker;
     iface::table_handler* mp_table_handler;
+    table_store m_tables;
     detail::named_expressions_t m_named_expressions;
 
     model_context::session_handler_factory* mp_session_factory;
