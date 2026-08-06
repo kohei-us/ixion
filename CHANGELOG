@@ -47,6 +47,9 @@ ixion 0.21.0
   * added three-way comparison (<=>) operator support to the address
     and range types.
 
+  * added an abs_range_t constructor that takes the positions of the
+    top-left and bottom-right cells of a range.
+
   * switched to std::string_view in various public interfaces where
     const std::string& was previously used, and table_t now stores its
     table and column names as std::string_view.

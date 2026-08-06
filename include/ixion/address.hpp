@@ -175,6 +175,14 @@ struct IXION_DLLPUBLIC abs_range_t
     abs_range_t(const abs_address_t& addr);
     abs_range_t(const abs_address_t& addr, row_t row_span, col_t col_span);
 
+    /**
+     * @param _first Position of the top-left cell of the range.
+     * @param _last Position of the bottom-right cell of the range.  It must
+     *              not precede the first position either row-wise or
+     *              column-wise.
+     */
+    abs_range_t(const abs_address_t& _first, const abs_address_t& _last);
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const abs_range_t& range) const;

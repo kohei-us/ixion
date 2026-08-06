@@ -1669,7 +1669,7 @@ void test_model_context_tables()
     // Table1 in C3:D9 with a header row and one totals row.
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t(0, 2, 2, 7, 2);
+    tab.range = ixion::abs_range_t({0, 2, 2}, {0, 8, 3});
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);
@@ -1677,7 +1677,7 @@ void test_model_context_tables()
     const ixion::table_t* p = cxt.get_table("Table1");
     assert(p);
     assert(p->name == "Table1");
-    assert(p->range == ixion::abs_range_t(0, 2, 2, 7, 2));
+    assert(p->range == ixion::abs_range_t({0, 2, 2}, {0, 8, 3}));
     assert(p->columns.size() == 2);
     assert(p->columns[0] == "Category");
     assert(p->columns[1] == "Value");
@@ -1689,23 +1689,23 @@ void test_model_context_tables()
 
     // Single column, data area only.
     ixion::abs_range_t range = cxt.get_table_range("Table1", "Value", "", ixion::table_area_data);
-    assert(range == ixion::abs_range_t(0, 3, 3, 5, 1));
+    assert(range == ixion::abs_range_t({0, 3, 3}, {0, 7, 3}));
 
     // Area specifiers only, using the whole table width.
     range = cxt.get_table_range("Table1", "", "", ixion::table_area_headers);
-    assert(range == ixion::abs_range_t(0, 2, 2, 1, 2));
+    assert(range == ixion::abs_range_t({0, 2, 2}, {0, 2, 3}));
 
     range = cxt.get_table_range("Table1", "", "", ixion::table_area_totals);
-    assert(range == ixion::abs_range_t(0, 8, 2, 1, 2));
+    assert(range == ixion::abs_range_t({0, 8, 2}, {0, 8, 3}));
 
     // Single column, headers + data areas.
     range = cxt.get_table_range(
         "Table1", "Category", "", ixion::table_area_headers | ixion::table_area_data);
-    assert(range == ixion::abs_range_t(0, 2, 2, 6, 1));
+    assert(range == ixion::abs_range_t({0, 2, 2}, {0, 7, 2}));
 
     // Column range, data area only.
     range = cxt.get_table_range("Table1", "Category", "Value", ixion::table_area_data);
-    assert(range == ixion::abs_range_t(0, 3, 2, 5, 2));
+    assert(range == ixion::abs_range_t({0, 3, 2}, {0, 7, 3}));
 
     // Headers + totals areas do not form a contiguous range.
     range = cxt.get_table_range(
@@ -1726,14 +1726,14 @@ void test_model_context_tables()
 
     // Position-based lookups; D5 is inside Table1 while A1 is not.
     range = cxt.get_table_range(ixion::abs_address_t(0, 4, 3), "Value", "", ixion::table_area_data);
-    assert(range == ixion::abs_range_t(0, 3, 3, 5, 1));
+    assert(range == ixion::abs_range_t({0, 3, 3}, {0, 7, 3}));
 
     range = cxt.get_table_range(ixion::abs_address_t(0, 0, 0), "Value", "", ixion::table_area_data);
     assert(!range.valid());
 
     // Totals area of a table with no totals rows.
     tab.name = "NoTotals";
-    tab.range = ixion::abs_range_t(1, 0, 0, 4, 2);
+    tab.range = ixion::abs_range_t({1, 0, 0}, {1, 3, 1});
     tab.columns = { "A", "B" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
@@ -1747,7 +1747,7 @@ void test_model_context_tables()
     try
     {
         tab.name = "Table1";
-        tab.range = ixion::abs_range_t(1, 10, 0, 3, 2);
+        tab.range = ixion::abs_range_t({1, 10, 0}, {1, 12, 1});
         cxt.set_table(tab);
         assert(!"model_context_error was expected for a duplicate table name");
     }
@@ -1784,8 +1784,7 @@ void test_model_context_tables()
     // ... or a range spanning multiple sheets.
     try
     {
-        tab.range = ixion::abs_range_t(0, 2, 2, 7, 2);
-        tab.range.last.sheet = 1;
+        tab.range = ixion::abs_range_t({0, 2, 2}, {1, 8, 3});
         cxt.set_table(tab);
         assert(!"std::invalid_argument was expected for a multi-sheet table range");
     }
@@ -1805,20 +1804,20 @@ void test_model_context_append_sheet_copy_tables()
 
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t(0, 2, 2, 7, 2);
+    tab.range = ixion::abs_range_t({0, 2, 2}, {0, 8, 3});
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);
 
     tab.name = "Table2";
-    tab.range = ixion::abs_range_t(0, 2, 5, 3, 2);
+    tab.range = ixion::abs_range_t({0, 2, 5}, {0, 4, 6});
     tab.columns = { "A", "B" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
 
     // Unrelated table on another sheet, which should not get copied.
     tab.name = "TableX";
-    tab.range = ixion::abs_range_t(1, 1, 1, 3, 2);
+    tab.range = ixion::abs_range_t({1, 1, 1}, {1, 3, 2});
     tab.columns = { "C", "D" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
@@ -1833,13 +1832,13 @@ void test_model_context_append_sheet_copy_tables()
 
     const ixion::table_t* p = cxt.get_table("Table3");
     assert(p);
-    assert(p->range == ixion::abs_range_t(copied, 2, 2, 7, 2));
+    assert(p->range == ixion::abs_range_t({copied, 2, 2}, {copied, 8, 3}));
     assert(p->columns == std::vector<std::string>({ "Category", "Value" }));
     assert(p->totals_row_count == 1);
 
     p = cxt.get_table("Table4");
     assert(p);
-    assert(p->range == ixion::abs_range_t(copied, 2, 5, 3, 2));
+    assert(p->range == ixion::abs_range_t({copied, 2, 5}, {copied, 4, 6}));
     assert(p->columns == std::vector<std::string>({ "A", "B" }));
     assert(p->totals_row_count == 0);
 
@@ -1847,18 +1846,18 @@ void test_model_context_append_sheet_copy_tables()
     // get cloned.
     p = cxt.get_table("Table1");
     assert(p);
-    assert(p->range == ixion::abs_range_t(0, 2, 2, 7, 2));
+    assert(p->range == ixion::abs_range_t({0, 2, 2}, {0, 8, 3}));
 
     p = cxt.get_table("Table2");
     assert(p);
-    assert(p->range == ixion::abs_range_t(0, 2, 5, 3, 2));
+    assert(p->range == ixion::abs_range_t({0, 2, 5}, {0, 4, 6}));
 
     assert(cxt.get_tables(0).size() == 2);
     assert(cxt.get_tables(1).size() == 1);
 
     // Table references should resolve against the cloned table.
     ixion::abs_range_t range = cxt.get_table_range("Table3", "Value", "", ixion::table_area_data);
-    assert(range == ixion::abs_range_t(copied, 3, 3, 5, 1));
+    assert(range == ixion::abs_range_t({copied, 3, 3}, {copied, 7, 3}));
 }
 
 bool check_formula_expression(

@@ -9,6 +9,7 @@
 
 #include <format>
 #include <limits>
+#include <sstream>
 
 namespace ixion {
 
@@ -229,6 +230,17 @@ abs_range_t::abs_range_t(const abs_address_t& addr, row_t row_span, col_t col_sp
 
 abs_range_t::abs_range_t(const abs_address_t& addr) :
     first(addr), last(addr) {}
+
+abs_range_t::abs_range_t(const abs_address_t& _first, const abs_address_t& _last) :
+    first(_first), last(_last)
+{
+    if (last.row < first.row || last.column < first.column)
+    {
+        std::ostringstream os;
+        os << "abs_range_t: the last position (" << last << ") precedes the first position (" << first << ")";
+        throw std::range_error(os.str());
+    }
+}
 
 std::size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 {
