@@ -23,7 +23,7 @@ namespace ixion { namespace detail {
 class table_store
 {
 public:
-    using store_type = std::map<std::string, table, std::less<>>;
+    using store_type = std::map<std::string, table_t, std::less<>>;
 
     /**
      * Insert a new table.  The table must have a non-empty name unique
@@ -35,15 +35,15 @@ public:
      * @throw model_context_error when a table by the same name already
      *        exists in the store.
      */
-    void insert(table tab);
+    void insert(table_t tab);
 
-    const table* get(std::string_view name) const;
+    const table_t* get(std::string_view name) const;
 
     /**
      * Get all tables whose ranges are on a specified sheet, sorted by name
      * in ascending order.
      */
-    std::vector<const table*> get_by_sheet(sheet_t sheet) const;
+    std::vector<const table_t*> get_by_sheet(sheet_t sheet) const;
 
     /**
      * Resolve a named table reference to the range it references.
@@ -73,7 +73,7 @@ public:
      * names unique both within the store and among the copies.  The copies
      * do not get inserted into the store.
      */
-    std::vector<table> clone_sheet_tables(sheet_t src, sheet_t dst) const;
+    std::vector<table_t> clone_sheet_tables(sheet_t src, sheet_t dst) const;
 
 private:
     store_type m_tables;

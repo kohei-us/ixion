@@ -37,7 +37,7 @@ IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const table_ref_t& ta
  * reference parts of a table via a table reference, represented by
  * ixion::table_ref_t.
  */
-struct IXION_DLLPUBLIC table
+struct IXION_DLLPUBLIC table_t
 {
     /**
      * Name of the table.  It must be non-empty and unique within the model
@@ -58,15 +58,15 @@ struct IXION_DLLPUBLIC table
     /** Number of totals rows at the bottom of the table range. */
     row_t totals_row_count;
 
-    table();
-    table(const table& other);
-    table(table&& other);
-    ~table();
+    table_t();
+    table_t(const table_t& other);
+    table_t(table_t&& other);
+    ~table_t();
 
-    table& operator=(const table& other);
-    table& operator=(table&& other);
+    table_t& operator=(const table_t& other);
+    table_t& operator=(table_t&& other);
 
-    bool operator==(const table& r) const;
+    bool operator==(const table_t& r) const;
 };
 
 }

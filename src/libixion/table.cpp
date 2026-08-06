@@ -26,15 +26,15 @@ std::ostream& operator<<(std::ostream& os, const table_ref_t& table)
     return os;
 }
 
-table::table() : range(abs_range_t::invalid), totals_row_count(0) {}
-table::table(const table& other) = default;
-table::table(table&& other) = default;
-table::~table() = default;
+table_t::table_t() : range(abs_range_t::invalid), totals_row_count(0) {}
+table_t::table_t(const table_t& other) = default;
+table_t::table_t(table_t&& other) = default;
+table_t::~table_t() = default;
 
-table& table::operator=(const table& other) = default;
-table& table::operator=(table&& other) = default;
+table_t& table_t::operator=(const table_t& other) = default;
+table_t& table_t::operator=(table_t&& other) = default;
 
-bool table::operator==(const table& r) const = default;
+bool table_t::operator==(const table_t& r) const = default;
 
 }
 
