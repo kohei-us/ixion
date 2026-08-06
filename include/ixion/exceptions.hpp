@@ -73,7 +73,8 @@ public:
         invalid_named_expression,
         sheet_name_conflict,
         sheet_size_locked,
-        not_implemented
+        not_implemented,
+        table_name_conflict
     };
 
     explicit model_context_error(std::string msg, error_type type);
