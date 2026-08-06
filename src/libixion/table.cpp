@@ -26,6 +26,16 @@ std::ostream& operator<<(std::ostream& os, const table_t& table)
     return os;
 }
 
+table::table() : range(abs_range_t::invalid), totals_row_count(0) {}
+table::table(const table& other) = default;
+table::table(table&& other) = default;
+table::~table() = default;
+
+table& table::operator=(const table& other) = default;
+table& table::operator=(table&& other) = default;
+
+bool table::operator==(const table& r) const = default;
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
