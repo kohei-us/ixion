@@ -170,7 +170,7 @@ void formula_parser::name()
         }
         case formula_name_t::table_reference:
         {
-            table_t table;
+            table_ref_t table;
             formula_name_t::table_type src_table = std::get<formula_name_t::table_type>(fn.value);
             table.name = m_context.intern_string(src_table.name);
             table.column_first = m_context.intern_string(src_table.column_first);

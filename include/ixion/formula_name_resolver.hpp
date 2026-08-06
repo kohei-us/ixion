@@ -16,7 +16,7 @@
 namespace ixion {
 
 class model_context;
-struct table_t;
+struct table_ref_t;
 
 /**
  * Structure that represents the type of a 'name' in a formula expression.
@@ -43,7 +43,7 @@ struct IXION_DLLPUBLIC formula_name_t
     };
 
     /**
-     * Table information for a table reference name.  Unlike the ixion::table_t
+     * Table information for a table reference name.  Unlike the ixion::table_ref_t
      * counterpart, we store strings as string views as the resolver doesn't
      * have access to the string pool.
      */
@@ -93,7 +93,7 @@ public:
     virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const = 0;
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
-    virtual std::string get_name(const table_t& table) const = 0;
+    virtual std::string get_name(const table_ref_t& table) const = 0;
 
     /**
      * Given a numerical representation of column position, return its

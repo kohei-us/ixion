@@ -44,7 +44,7 @@ IXION_DLLPUBLIC std::string_view get_formula_opcode_string(fopcode_t oc);
 struct IXION_DLLPUBLIC formula_token final
 {
     using value_type = std::variant<
-        address_t, range_t, table_t, formula_error_t, formula_function_t,
+        address_t, range_t, table_ref_t, formula_error_t, formula_function_t,
         double, string_id_t, std::string_view, std::string>;
 
     /**
@@ -90,7 +90,7 @@ struct IXION_DLLPUBLIC formula_token final
      *
      * @param table table reference.
      */
-    formula_token(const table_t& table);
+    formula_token(const table_ref_t& table);
 
     /**
      * Constructor for a formula function token.  The opcode will be implicitly

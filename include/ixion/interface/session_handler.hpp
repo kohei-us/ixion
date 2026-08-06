@@ -20,7 +20,7 @@ class formula_result;
 struct address_t;
 struct range_t;
 struct abs_address_t;
-struct table_t;
+struct table_ref_t;
 enum class formula_error_t : std::uint8_t;
 
 namespace iface {
@@ -41,7 +41,7 @@ public:
     virtual void push_string(std::string_view s) = 0;
     virtual void push_single_ref(const address_t& addr, const abs_address_t& pos) = 0;
     virtual void push_range_ref(const range_t& range, const abs_address_t& pos) = 0;
-    virtual void push_table_ref(const table_t& table) = 0;
+    virtual void push_table_ref(const table_ref_t& table) = 0;
     virtual void push_function(formula_function_t foc) = 0;
 };
 

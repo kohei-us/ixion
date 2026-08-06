@@ -11,14 +11,14 @@
 
 namespace ixion {
 
-table_t::table_t() : areas(table_area_none) {}
+table_ref_t::table_ref_t() : areas(table_area_none) {}
 
-bool table_t::operator== (const table_t& r) const
+bool table_ref_t::operator== (const table_ref_t& r) const
 {
     return name == r.name && column_first == r.column_first && column_last == r.column_last && areas == r.areas;
 }
 
-std::ostream& operator<<(std::ostream& os, const table_t& table)
+std::ostream& operator<<(std::ostream& os, const table_ref_t& table)
 {
     os << "(name:" << table.name << "; column-first:" << table.column_first
         << "; column-last:" << table.column_last << "; areas:0x" << std::hex

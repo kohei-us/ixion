@@ -53,6 +53,9 @@ ixion 0.21.0
 
   * fixed a bug in the equality operator of table_t.
 
+  * renamed table_t to table_ref_t, since it represents a table
+    reference in a formula expression rather than a table itself.
+
 * misc
 
   * the baseline C++ version is now C++20.

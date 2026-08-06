@@ -117,7 +117,7 @@ Struct
    struct-rc_size_t.rst
    struct-string_id_t.rst
    struct-table.rst
-   struct-table_t.rst
+   struct-table_ref_t.rst
 
 Classes
 -------

@@ -560,7 +560,7 @@ void test_table_excel_a1()
         assert(table.areas == tests[i].areas);
 
         // Make sure we get the same name back.
-        table_t tb;
+        table_ref_t tb;
         tb.name = cxt.intern_string(table.name);
         tb.column_first = cxt.intern_string(table.column_first);
         tb.column_last = cxt.intern_string(table.column_last);

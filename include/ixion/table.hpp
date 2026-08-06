@@ -16,26 +16,26 @@
 
 namespace ixion {
 
-struct IXION_DLLPUBLIC table_t
+struct IXION_DLLPUBLIC table_ref_t
 {
     std::string_view name;
     std::string_view column_first;
     std::string_view column_last;
     table_areas_t areas;
 
-    table_t();
+    table_ref_t();
 
-    bool operator== (const table_t& r) const;
+    bool operator== (const table_ref_t& r) const;
 };
 
-IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const table_t& table);
+IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, const table_ref_t& table);
 
 /**
  * Stores the data of a single table.  A table is a 2-dimensional range of
  * cells with named columns, whose range may include a header row at the top
  * and one or more totals rows at the bottom.  A formula expression may
  * reference parts of a table via a table reference, represented by
- * ixion::table_t.
+ * ixion::table_ref_t.
  */
 struct IXION_DLLPUBLIC table
 {

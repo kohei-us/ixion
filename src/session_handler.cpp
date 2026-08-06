@@ -161,7 +161,7 @@ void session_handler::push_range_ref(const range_t& range, const abs_address_t& 
     mp_impl->m_buf << mp_impl->mp_resolver->get_name(range, pos, false);
 }
 
-void session_handler::push_table_ref(const table_t& table)
+void session_handler::push_table_ref(const table_ref_t& table)
 {
     mp_impl->m_buf << mp_impl->mp_resolver->get_name(table);
 }

@@ -132,7 +132,7 @@ void print_token(
         }
         case fop_table_ref:
         {
-            const table_t& tbl = std::get<table_t>(token.value);
+            const table_ref_t& tbl = std::get<table_ref_t>(token.value);
             os << resolver.get_name(tbl);
             break;
         }

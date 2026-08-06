@@ -451,7 +451,7 @@ void append_address_r1c1(
     }
 }
 
-char append_table_areas(std::ostringstream& os, const table_t& table)
+char append_table_areas(std::ostringstream& os, const table_ref_t& table)
 {
     if (table.areas == table_area_all)
     {
@@ -1196,7 +1196,7 @@ void to_relative_address(address_t& addr, const abs_address_t& pos, bool sheet)
         addr.column -= pos.column;
 }
 
-std::string to_string(const table_t& table)
+std::string to_string(const table_ref_t& table)
 {
     std::ostringstream os;
     os << table.name;
@@ -1507,7 +1507,7 @@ public:
         return os.str();
     }
 
-    virtual std::string get_name(const table_t& table) const
+    virtual std::string get_name(const table_ref_t& table) const
     {
         return to_string(table);
     }
@@ -1676,7 +1676,7 @@ public:
         return os.str();
     }
 
-    virtual std::string get_name(const table_t& table) const
+    virtual std::string get_name(const table_ref_t& table) const
     {
         return to_string(table);
     }
@@ -1849,7 +1849,7 @@ public:
         return os.str();
     }
 
-    virtual std::string get_name(const table_t &table) const override
+    virtual std::string get_name(const table_ref_t &table) const override
     {
         // TODO : find out how Calc A1 handles table reference.
         return std::string();
@@ -2013,7 +2013,7 @@ public:
         return os.str();
     }
 
-    virtual std::string get_name(const table_t& table) const
+    virtual std::string get_name(const table_ref_t& table) const
     {
         // TODO : ODF doesn't support table reference yet.
         return std::string();

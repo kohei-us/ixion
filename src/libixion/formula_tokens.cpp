@@ -129,7 +129,7 @@ formula_token::formula_token(const range_t& range) :
 {
 }
 
-formula_token::formula_token(const table_t& table) :
+formula_token::formula_token(const table_ref_t& table) :
     opcode(fop_table_ref), value(table)
 {
 }
@@ -258,7 +258,7 @@ std::ostream& operator<< (std::ostream& os, const formula_token& ft)
         }
         case fop_table_ref:
         {
-            os << "table ref token: " << std::get<table_t>(ft.value);
+            os << "table ref token: " << std::get<table_ref_t>(ft.value);
             break;
         }
         case fop_named_expression:

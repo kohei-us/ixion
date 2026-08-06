@@ -152,7 +152,7 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
             }
             case fop_table_ref:
             {
-                if (std::get<table_t>(t.value).name.empty())
+                if (std::get<table_ref_t>(t.value).name.empty())
                     // Table reference without the table name is allowed inside
                     // a table's own body; the table itself is always named, but
                     // the reference itself is allowed to have an empty name if

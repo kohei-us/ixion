@@ -284,32 +284,32 @@ void test_table_t_equality()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    ixion::table_t a;
+    ixion::table_ref_t a;
     a.name = "Table1";
     a.column_first = "Col1";
     a.column_last = "Col2";
     a.areas = ixion::table_area_data;
 
-    ixion::table_t same = a;
+    ixion::table_ref_t same = a;
     assert(a == same);
     assert(!(a != same));
 
-    ixion::table_t diff_name = a;
+    ixion::table_ref_t diff_name = a;
     diff_name.name = "other";
     assert(!(a == diff_name));
     assert(a != diff_name);
 
-    ixion::table_t diff_column_first = a;
+    ixion::table_ref_t diff_column_first = a;
     diff_column_first.column_first = "other";
     assert(!(a == diff_column_first));
     assert(a != diff_column_first);
 
-    ixion::table_t diff_column_last = a;
+    ixion::table_ref_t diff_column_last = a;
     diff_column_last.column_last = "other";
     assert(!(a == diff_column_last));
     assert(a != diff_column_last);
 
-    ixion::table_t diff_areas = a;
+    ixion::table_ref_t diff_areas = a;
     diff_areas.areas = ixion::table_area_headers;
     assert(!(a == diff_areas));
     assert(a != diff_areas);

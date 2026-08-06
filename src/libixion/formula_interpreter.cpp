@@ -1458,7 +1458,7 @@ void formula_interpreter::table_ref()
         throw formula_error(formula_error_t::ref_result_not_available);
     }
 
-    const table_t& table = std::get<table_t>(token().value);
+    const table_ref_t& table = std::get<table_ref_t>(token().value);
 
     if (mp_handler)
         mp_handler->push_table_ref(table);
