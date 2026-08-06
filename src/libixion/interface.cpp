@@ -5,12 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ixion/interface/table_handler.hpp"
 #include "ixion/interface/session_handler.hpp"
 
 namespace ixion { namespace iface {
-
-table_handler::~table_handler() {}
 
 session_handler::~session_handler() {}
 

@@ -77,21 +77,6 @@ public:
         mp_session_factory = factory;
     }
 
-    iface::table_handler* get_table_handler()
-    {
-        return mp_table_handler;
-    }
-
-    const iface::table_handler* get_table_handler() const
-    {
-        return mp_table_handler;
-    }
-
-    void set_table_handler(iface::table_handler* handler)
-    {
-        mp_table_handler = handler;
-    }
-
     void empty_cell(const abs_address_t& addr);
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_boolean_cell(const abs_address_t& addr, bool val);
@@ -196,7 +181,6 @@ private:
 
     config m_config;
     dirty_cell_tracker m_tracker;
-    iface::table_handler* mp_table_handler;
     table_store m_tables;
     detail::named_expressions_t m_named_expressions;
 

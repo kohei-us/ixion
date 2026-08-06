@@ -14,9 +14,7 @@ ixion_parser_SOURCES = \
 	app_common.hpp \
 	app_common.cpp \
 	session_handler.hpp \
-	session_handler.cpp \
-	table_handler.hpp \
-	table_handler.cpp
+	session_handler.cpp
 
 ixion_parser_LDADD = libixion/libixion-@IXION_API_VERSION@.la \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)

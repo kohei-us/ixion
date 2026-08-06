@@ -269,7 +269,6 @@ model_context_impl::model_context_impl(model_context& parent, const rc_size_t& s
     m_parent(parent),
     m_sheet_size(sheet_size),
     m_tracker(),
-    mp_table_handler(nullptr),
     mp_session_factory(&dummy_session_handler_factory),
     m_formula_res_wait_policy(formula_result_wait_policy_t::throw_exception)
 {

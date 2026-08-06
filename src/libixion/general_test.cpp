@@ -11,7 +11,6 @@
 #include <ixion/address.hpp>
 #include <ixion/formula_tokens.hpp>
 #include <ixion/global.hpp>
-#include <ixion/interface/table_handler.hpp>
 #include <ixion/matrix.hpp>
 #include <ixion/cell.hpp>
 #include <ixion/exceptions.hpp>

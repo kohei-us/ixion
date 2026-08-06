@@ -8,7 +8,6 @@ add_executable(ixion-parser
     app_common.cpp
     model_parser.cpp
     session_handler.cpp
-    table_handler.cpp
 )
 
 add_executable(ixion-sorter

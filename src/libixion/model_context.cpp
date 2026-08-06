@@ -282,16 +282,6 @@ std::unique_ptr<iface::session_handler> model_context::create_session_handler() 
     return mp_impl->create_session_handler();
 }
 
-iface::table_handler* model_context::get_table_handler()
-{
-    return mp_impl->get_table_handler();
-}
-
-const iface::table_handler* model_context::get_table_handler() const
-{
-    return detail::cimpl(mp_impl).get_table_handler();
-}
-
 const table_t* model_context::get_table(std::string_view name) const
 {
     return mp_impl->get_table(name);
@@ -402,11 +392,6 @@ void model_context::set_cell_values(sheet_t sheet, std::initializer_list<input_r
 void model_context::set_session_handler_factory(session_handler_factory* factory)
 {
     mp_impl->set_session_handler_factory(factory);
-}
-
-void model_context::set_table_handler(iface::table_handler* handler)
-{
-    mp_impl->set_table_handler(handler);
 }
 
 void model_context::set_table(table_t tab)

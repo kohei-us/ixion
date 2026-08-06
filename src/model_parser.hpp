@@ -9,9 +9,9 @@
 #include "ixion/exceptions.hpp"
 #include "ixion/model_context.hpp"
 #include "ixion/formula_result.hpp"
+#include "ixion/table.hpp"
 
 #include "session_handler.hpp"
-#include "table_handler.hpp"
 
 #include <string>
 #include <exception>
@@ -126,9 +126,8 @@ private:
 private:
 
     model_context m_context;
-    table_handler m_table_handler;
     session_handler::factory m_session_handler_factory;
-    std::unique_ptr<table_handler::entry> mp_table_entry;
+    std::unique_ptr<table_t> mp_table_entry;
     std::unique_ptr<formula_name_resolver> mp_name_resolver;
     std::unique_ptr<named_expression_type> mp_named_expression;
     std::string m_filepath;

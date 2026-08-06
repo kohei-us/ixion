@@ -175,7 +175,6 @@ model_parser::check_error::check_error(const std::string& msg) :
 
 model_parser::model_parser(const std::string& filepath, std::size_t thread_count) :
     m_context({1048576, 1024}),
-    m_table_handler(),
     m_session_handler_factory(m_context),
     mp_table_entry(nullptr),
     mp_name_resolver(formula_name_resolver::get(formula_name_resolver_t::excel_a1, &m_context)),
@@ -191,7 +190,6 @@ model_parser::model_parser(const std::string& filepath, std::size_t thread_count
     m_print_sheet_name(false)
 {
     m_context.set_session_handler_factory(&m_session_handler_factory);
-    m_context.set_table_handler(&m_table_handler);
 
     mp_head = m_strm.data();
     mp_end = mp_head + m_strm.size();
@@ -359,7 +357,7 @@ void model_parser::parse_command()
         case commands::type::mode_table:
         {
             m_parse_mode = parse_mode_table;
-            mp_table_entry.reset(new table_handler::entry);
+            mp_table_entry.reset(new table_t);
             break;
         }
         case commands::type::mode_session:
@@ -665,7 +663,7 @@ void model_parser::parse_table()
     parsed_assignment_type res = parse_assignment();
     const auto [name, value] = res;
 
-    table_handler::entry& entry = *mp_table_entry;
+    table_t& entry = *mp_table_entry;
 
     if (name == "name")
         entry.name = std::string{value};
@@ -694,7 +692,7 @@ void model_parser::push_table()
     if (!mp_table_entry)
         return;
 
-    table_handler::entry& entry = *mp_table_entry;
+    table_t& entry = *mp_table_entry;
 
     std::cout << "name: " << entry.name << std::endl;
 
@@ -710,8 +708,8 @@ void model_parser::push_table()
     std::cout << std::endl;
 
     std::cout << "totals row count: " << mp_table_entry->totals_row_count << std::endl;
-    m_table_handler.insert(mp_table_entry);
-    assert(!mp_table_entry);
+    m_context.set_table(std::move(*mp_table_entry));
+    mp_table_entry.reset();
 }
 
 void model_parser::parse_named_expression()
@@ -815,7 +813,7 @@ void model_parser::print_dependency()
 void model_parser::parse_table_columns(std::string_view str)
 {
     assert(mp_table_entry);
-    table_handler::entry& entry = *mp_table_entry;
+    table_t& entry = *mp_table_entry;
 
     const char* p = str.data();
     const char* pend = p + str.size();

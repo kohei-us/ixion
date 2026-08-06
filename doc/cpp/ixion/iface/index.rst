@@ -10,4 +10,3 @@ Classes
    :maxdepth: 1
 
    class-session_handler.rst
-   class-table_handler.rst

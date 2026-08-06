@@ -58,6 +58,13 @@ ixion 0.21.0
     table_t name is now used by a new struct that stores the data of a
     single table.
 
+  * tables are now stored directly in model_context; use set_table()
+    to insert one, get_table() and get_tables() to access them, and
+    get_table_range() to resolve a table reference to a range.  The
+    iface::table_handler interface and the get_table_handler() and
+    set_table_handler() methods have been removed, as the model now
+    resolves table references internally.
+
 * misc
 
   * the baseline C++ version is now C++20.

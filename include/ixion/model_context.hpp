@@ -38,7 +38,6 @@ struct table_t;
 namespace iface {
 
 class session_handler;
-class table_handler;
 
 }
 
@@ -205,19 +204,6 @@ public:
      * @return a new session handler instance.  It may be nullptr.
      */
     std::unique_ptr<iface::session_handler> create_session_handler() const;
-
-    /**
-     * Table interface provides access to all table ranges stored in the
-     * document model.  A table is a 2-dimensional range of cells that include
-     * named columns.  It is used when resolving a table reference that refers
-     * to a cell or a range of cells by the table name and/or column name.
-     *
-     * @return non-null pointer to the table storage inside the model, or
-     *         nullptr if no table is present or supported by the model
-     *         implementation.
-     */
-    iface::table_handler* get_table_handler();
-    const iface::table_handler* get_table_handler() const;
 
     /**
      * Get a table associated with the specified name.
@@ -535,8 +521,6 @@ public:
     void set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows);
 
     void set_session_handler_factory(session_handler_factory* factory);
-
-    void set_table_handler(iface::table_handler* handler);
 
     /**
      * Insert a new table into the model.  A table is a 2-dimensional range

@@ -14,7 +14,6 @@
 #include <ixion/matrix.hpp>
 #include <ixion/formula.hpp>
 #include <ixion/interface/session_handler.hpp>
-#include <ixion/interface/table_handler.hpp>
 #include <ixion/config.hpp>
 #include <ixion/cell_access.hpp>
 
@@ -1451,13 +1450,6 @@ void formula_interpreter::range_ref()
 
 void formula_interpreter::table_ref()
 {
-    const iface::table_handler* table_hdl = m_context.get_table_handler();
-    if (!table_hdl)
-    {
-        IXION_DEBUG("failed to get a table_handler instance.");
-        throw formula_error(formula_error_t::ref_result_not_available);
-    }
-
     const table_ref_t& table = std::get<table_ref_t>(token().value);
 
     if (mp_handler)
@@ -1466,13 +1458,19 @@ void formula_interpreter::table_ref()
     abs_range_t range(abs_range_t::invalid);
     if (!table.name.empty())
     {
-        range = table_hdl->get_range(table.name, table.column_first, table.column_last, table.areas);
+        range = m_context.get_table_range(table.name, table.column_first, table.column_last, table.areas);
     }
     else
     {
         // Table name is not given.  Use the current cell position to infer
         // which table to use.
-        range = table_hdl->get_range(m_pos, table.column_first, table.column_last, table.areas);
+        range = m_context.get_table_range(m_pos, table.column_first, table.column_last, table.areas);
+    }
+
+    if (!range.valid())
+    {
+        IXION_DEBUG("failed to resolve a table reference");
+        throw formula_error(formula_error_t::ref_result_not_available);
     }
 
     get_stack().push_range_ref(range);
