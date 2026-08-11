@@ -306,6 +306,11 @@ abs_range_t model_context::get_table_range(
     return mp_impl->get_table_range(pos, column_first, column_last, areas);
 }
 
+abs_range_t model_context::get_table_range(const table_ref_t& ref, const abs_address_t& pos) const
+{
+    return mp_impl->get_table_range(ref, pos);
+}
+
 string_id_t model_context::append_string(std::string_view s)
 {
     return mp_impl->append_string(s);

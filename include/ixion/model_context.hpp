@@ -33,6 +33,7 @@ struct abs_range_t;
 struct abs_rc_range_t;
 struct config;
 struct named_expression_t;
+struct table_ref_t;
 struct table_t;
 
 namespace iface {
@@ -265,6 +266,20 @@ public:
     abs_range_t get_table_range(
         const abs_address_t& pos, std::string_view column_first,
         std::string_view column_last, table_areas_t areas) const;
+
+    /**
+     * Resolve a table reference to the range it references.  When the
+     * reference does not include a table name, the position of the
+     * referencing cell determines which table the reference is for.
+     *
+     * @param ref Table reference to resolve.
+     * @param pos Position of the referencing cell, only used when the
+     *            reference does not include a table name.
+     *
+     * @return Referenced range, or an invalid range when the reference
+     *         does not resolve.
+     */
+    abs_range_t get_table_range(const table_ref_t& ref, const abs_address_t& pos) const;
 
     /**
      * Append a new string to the string pool.  The string being passed will be

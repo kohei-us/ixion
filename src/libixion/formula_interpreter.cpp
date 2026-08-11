@@ -1455,17 +1455,7 @@ void formula_interpreter::table_ref()
     if (mp_handler)
         mp_handler->push_table_ref(table);
 
-    abs_range_t range(abs_range_t::invalid);
-    if (!table.name.empty())
-    {
-        range = m_context.get_table_range(table.name, table.column_first, table.column_last, table.areas);
-    }
-    else
-    {
-        // Table name is not given.  Use the current cell position to infer
-        // which table to use.
-        range = m_context.get_table_range(m_pos, table.column_first, table.column_last, table.areas);
-    }
+    abs_range_t range = m_context.get_table_range(table, m_pos);
 
     if (!range.valid())
     {

@@ -514,19 +514,7 @@ void formula_cell::check_circular(const model_context& cxt, const abs_address_t&
             }
             case fop_table_ref:
             {
-                const table_ref_t& table = std::get<table_ref_t>(t.value);
-
-                abs_range_t range(abs_range_t::invalid);
-                if (!table.name.empty())
-                {
-                    range = cxt.get_table_range(table.name, table.column_first, table.column_last, table.areas);
-                }
-                else
-                {
-                    // Table name is not given.  Use the cell position to
-                    // infer which table to use.
-                    range = cxt.get_table_range(pos, table.column_first, table.column_last, table.areas);
-                }
+                abs_range_t range = cxt.get_table_range(std::get<table_ref_t>(t.value), pos);
 
                 if (!range.valid())
                     // let the interpreter handle unresolvable table references.

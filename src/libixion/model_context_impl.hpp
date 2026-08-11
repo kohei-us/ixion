@@ -124,6 +124,8 @@ public:
         const abs_address_t& pos, std::string_view column_first,
         std::string_view column_last, table_areas_t areas) const;
 
+    abs_range_t get_table_range(const table_ref_t& ref, const abs_address_t& pos) const;
+
     sheet_t get_sheet_index(std::string_view name) const;
     std::string_view get_sheet_name(sheet_t sheet) const;
     void set_sheet_name(sheet_t sheet, std::string name);

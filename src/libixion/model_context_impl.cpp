@@ -369,6 +369,17 @@ abs_range_t model_context_impl::get_table_range(
     return m_tables.get_range(pos, column_first, column_last, areas);
 }
 
+abs_range_t model_context_impl::get_table_range(
+    const table_ref_t& ref, const abs_address_t& pos) const
+{
+    if (!ref.name.empty())
+        return m_tables.get_range(ref.name, ref.column_first, ref.column_last, ref.areas);
+
+    // Table name is not given.  Use the cell position to infer which table
+    // to use.
+    return m_tables.get_range(pos, ref.column_first, ref.column_last, ref.areas);
+}
+
 sheet_t model_context_impl::get_sheet_index(std::string_view name) const
 {
     strings_type::const_iterator itr_beg = m_sheet_names.begin(), itr_end = m_sheet_names.end();
