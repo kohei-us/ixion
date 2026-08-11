@@ -1802,29 +1802,73 @@ void test_model_context_append_sheet_copy_tables()
     cxt.append_sheet("src");
     cxt.append_sheet("other");
 
+    // Cell positions on the source sheet.
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t C3(0, 2, 2);
+    ixion::abs_address_t D9(0, 8, 3);
+    ixion::abs_address_t F3(0, 2, 5);
+    ixion::abs_address_t G5(0, 4, 6);
+
+    // Cell positions on the 'other' sheet.
+    ixion::abs_address_t other_B2(1, 1, 1);
+    ixion::abs_address_t other_C4(1, 3, 2);
+
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t({0, 2, 2}, {0, 8, 3});
+    tab.range = ixion::abs_range_t(C3, D9);
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);
 
     tab.name = "Table2";
-    tab.range = ixion::abs_range_t({0, 2, 5}, {0, 4, 6});
+    tab.range = ixion::abs_range_t(F3, G5);
     tab.columns = { "A", "B" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
 
     // Unrelated table on another sheet, which should not get copied.
     tab.name = "TableX";
-    tab.range = ixion::abs_range_t({1, 1, 1}, {1, 3, 2});
+    tab.range = ixion::abs_range_t(other_B2, other_C4);
     tab.columns = { "C", "D" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
 
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    // Populate the 'Value' column of Table1, and add formula cells with an
+    // unnamed table reference in its totals row and a named one outside it.
+    for (ixion::row_t r = 3; r <= 7; ++r)
+        cxt.set_numeric_cell({0, r, 3}, r - 2);
+
+    insert_formula(cxt, D9, "SUBTOTAL(109,[Value])", *resolver);
+    insert_formula(cxt, A1, "SUM(Table1[Value])", *resolver);
+
+    // Calculate them to cache their results.
+    {
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        dirty_cells.insert(D9);
+        dirty_cells.insert(A1);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    assert(cxt.get_numeric_value(D9) == 15.0);
+    assert(cxt.get_numeric_value(A1) == 15.0);
+
     auto res = cxt.append_sheet_copy(0, "copy");
     ixion::sheet_t copied = res.sheet;
     assert(copied == 2);
+
+    // Same cell positions on the copied sheet.
+    ixion::abs_address_t copied_A1(copied, 0, 0);
+    ixion::abs_address_t copied_C3(copied, 2, 2);
+    ixion::abs_address_t copied_D4(copied, 3, 3);
+    ixion::abs_address_t copied_D8(copied, 7, 3);
+    ixion::abs_address_t copied_D9(copied, 8, 3);
+    ixion::abs_address_t copied_F3(copied, 2, 5);
+    ixion::abs_address_t copied_G5(copied, 4, 6);
 
     // The tables of the source sheet get cloned to the new sheet with
     // auto-generated unique names.
@@ -1832,13 +1876,13 @@ void test_model_context_append_sheet_copy_tables()
 
     const ixion::table_t* p = cxt.get_table("Table3");
     assert(p);
-    assert(p->range == ixion::abs_range_t({copied, 2, 2}, {copied, 8, 3}));
+    assert(p->range == ixion::abs_range_t(copied_C3, copied_D9));
     assert(p->columns == std::vector<std::string>({ "Category", "Value" }));
     assert(p->totals_row_count == 1);
 
     p = cxt.get_table("Table4");
     assert(p);
-    assert(p->range == ixion::abs_range_t({copied, 2, 5}, {copied, 4, 6}));
+    assert(p->range == ixion::abs_range_t(copied_F3, copied_G5));
     assert(p->columns == std::vector<std::string>({ "A", "B" }));
     assert(p->totals_row_count == 0);
 
@@ -1846,18 +1890,27 @@ void test_model_context_append_sheet_copy_tables()
     // get cloned.
     p = cxt.get_table("Table1");
     assert(p);
-    assert(p->range == ixion::abs_range_t({0, 2, 2}, {0, 8, 3}));
+    assert(p->range == ixion::abs_range_t(C3, D9));
 
     p = cxt.get_table("Table2");
     assert(p);
-    assert(p->range == ixion::abs_range_t({0, 2, 5}, {0, 4, 6}));
+    assert(p->range == ixion::abs_range_t(F3, G5));
 
     assert(cxt.get_tables(0).size() == 2);
     assert(cxt.get_tables(1).size() == 1);
 
     // Table references should resolve against the cloned table.
     ixion::abs_range_t range = cxt.get_table_range("Table3", "Value", "", ixion::table_area_data);
-    assert(range == ixion::abs_range_t({copied, 3, 3}, {copied, 7, 3}));
+    assert(range == ixion::abs_range_t(copied_D4, copied_D8));
+
+    // Neither table-referencing formula cell gets flagged for recalc: the
+    // unnamed reference re-anchors to the cloned table holding identical
+    // values, and the named one keeps referencing the source table.
+    assert(res.recalc_cells.empty());
+
+    // Their cached results carry over to the copied sheet.
+    assert(cxt.get_numeric_value(copied_D9) == 15.0);
+    assert(cxt.get_numeric_value(copied_A1) == 15.0);
 }
 
 bool check_formula_expression(

@@ -150,18 +150,6 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
                     return true;
                 break;
             }
-            case fop_table_ref:
-            {
-                if (std::get<table_ref_t>(t.value).name.empty())
-                    // Table reference without the table name is allowed inside
-                    // a table's own body; the table itself is always named, but
-                    // the reference itself is allowed to have an empty name if
-                    // it references another cell inside the same table. Note
-                    // that these are not detected when they occur inside a
-                    // named expression.
-                    return true;
-                break;
-            }
             default:
                 ;
         }
@@ -190,6 +178,10 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
                     return true;
                 break;
             }
+            case fop_table_ref:
+                // Table refs need no checking: named ones keep referencing the
+                // same table, and unnamed ones re-anchor to the cloned
+                // table on the copied sheet.
             default:
                 ;
         }
