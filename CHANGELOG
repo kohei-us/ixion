@@ -73,6 +73,21 @@ ixion 0.21.0
     to unique names.  Formula cells referencing a table by name keep
     referencing the table of the source sheet.
 
+  * added a get_table_range() overload that takes a table_ref_t and
+    the position of the referencing cell.
+
+* formula interpreter
+
+  * an unimplemented formula function now yields a #NAME? error on
+    the calling cell instead of aborting the entire calculation.
+
+  * table references are now tracked as dependencies; formulas
+    referencing a table get re-calculated when cells inside the
+    referenced area are modified.
+
+  * circular dependency detection now sees through table references;
+    such cycles previously caused the calculation to hang.
+
 * misc
 
   * the baseline C++ version is now C++20.
