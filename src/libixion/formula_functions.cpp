@@ -800,7 +800,7 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             case formula_function_t::func_unknown:
             default:
             {
-                throw not_implemented_error(std::format(
+                throw formula_error(formula_error_t::name_not_found, std::format(
                     "formula function not implemented yet (name={})",
                     get_formula_function_name(oc)));
             }

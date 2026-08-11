@@ -1,0 +1,19 @@
+%% Test case for calling formula functions that are not yet implemented.
+%% They should result in #NAME? errors instead of aborting the whole
+%% calculation run.  DDE is used here since it requires a link to an
+%% external application, which makes no sense in a headless library and
+%% will therefore never be implemented.
+%mode init
+A1=DDE("server","topic","item")
+A2=A1+1
+A3=1+DDE("server","topic","item")
+A4=SUM(1,2)+DDE("server","topic","item")
+A5=SUM(1,2)
+%calc
+%mode result
+A1=#NAME?
+A2=#NAME?
+A3=#NAME?
+A4=#NAME?
+A5=3
+%check
