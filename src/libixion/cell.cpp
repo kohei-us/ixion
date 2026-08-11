@@ -512,6 +512,41 @@ void formula_cell::check_circular(const model_context& cxt, const abs_address_t&
 
                 break;
             }
+            case fop_table_ref:
+            {
+                const table_ref_t& table = std::get<table_ref_t>(t.value);
+
+                abs_range_t range(abs_range_t::invalid);
+                if (!table.name.empty())
+                {
+                    range = cxt.get_table_range(table.name, table.column_first, table.column_last, table.areas);
+                }
+                else
+                {
+                    // Table name is not given.  Use the cell position to
+                    // infer which table to use.
+                    range = cxt.get_table_range(pos, table.column_first, table.column_last, table.areas);
+                }
+
+                if (!range.valid())
+                    // let the interpreter handle unresolvable table references.
+                    break;
+
+                for (col_t col = range.first.column; col <= range.last.column; ++col)
+                {
+                    for (row_t row = range.first.row; row <= range.last.row; ++row)
+                    {
+                        abs_address_t addr(range.first.sheet, row, col);
+                        if (cxt.get_celltype(addr) != cell_t::formula)
+                            continue;
+
+                        if (!mp_impl->check_ref_for_circular_safety(*cxt.get_formula_cell(addr), addr))
+                            return;
+                    }
+                }
+
+                break;
+            }
             default:
                 ;
         }
