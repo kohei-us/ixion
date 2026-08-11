@@ -287,6 +287,18 @@ bool has_volatile(const formula_tokens_t& tokens)
     return false;
 }
 
+abs_range_t resolve_table_ref(
+    const model_context& cxt, const abs_address_t& pos, const table_ref_t& table)
+{
+    if (!table.name.empty())
+        return cxt.get_table_range(
+            table.name, table.column_first, table.column_last, table.areas);
+
+    // Table name is not given.  Use the cell position to infer which table
+    // to use.
+    return cxt.get_table_range(pos, table.column_first, table.column_last, table.areas);
+}
+
 void check_sheet_or_throw(const char* func_name, sheet_t sheet, const model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
 {
     if (is_valid_sheet(sheet))
@@ -376,6 +388,16 @@ void register_formula_cell(
                 tracker.add(src_pos, range);
                 break;
             }
+            case fop_table_ref:
+            {
+                abs_range_t range = resolve_table_ref(cxt, pos, std::get<table_ref_t>(p->value));
+                if (!range.valid())
+                    // silently ignore unresolvable table references.
+                    break;
+
+                tracker.add(src_pos, range);
+                break;
+            }
             default:
                 ; // ignore the rest.
         }
@@ -420,6 +442,16 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
             {
                 abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("unregister_formula_cell", range.first.sheet, cxt, pos, *fcell);
+                tracker.remove(pos, range);
+                break;
+            }
+            case fop_table_ref:
+            {
+                abs_range_t range = resolve_table_ref(cxt, pos, std::get<table_ref_t>(p->value));
+                if (!range.valid())
+                    // silently ignore unresolvable table references.
+                    break;
+
                 tracker.remove(pos, range);
                 break;
             }

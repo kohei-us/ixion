@@ -540,6 +540,7 @@ std::vector<const formula_token*> formula_cell::get_ref_tokens(
         {
             case fop_single_ref:
             case fop_range_ref:
+            case fop_table_ref:
                 ret.push_back(&t);
                 break;
             case fop_named_expression:
