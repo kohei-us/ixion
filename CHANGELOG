@@ -70,8 +70,10 @@ ixion 0.21.0
 
   * model_context::append_sheet_copy() now also copies the tables of
     the source sheet to the new sheet, with their names auto-renamed
-    to unique names.  Formula cells referencing a table by name keep
-    referencing the table of the source sheet.
+    to unique names.  The table references of the copied formula cells
+    and sheet-local named expressions get rewritten to reference the
+    copied tables, the same way Excel adjusts them when copying a
+    sheet.
 
   * added a get_table_range() overload that takes a table_ref_t and
     the position of the referencing cell.

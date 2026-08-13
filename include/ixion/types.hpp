@@ -264,8 +264,8 @@ struct IXION_DLLPUBLIC rc_size_t
 };
 
 /**
- * This strcuture stores information about grouped formula cells.  All
- * formula cells belonging to the same group shares the same set of values.
+ * This structure stores information about grouped formula cells.  All formula
+ * cells belonging to the same group shares the same set of values.
  */
 struct IXION_DLLPUBLIC formula_group_t
 {

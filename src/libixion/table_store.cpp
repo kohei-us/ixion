@@ -157,7 +157,7 @@ abs_range_t get_range_from_table(
  */
 std::string make_unique_name(
     std::string_view src_name, const table_store::store_type& stored,
-    const std::vector<table_t>& batch)
+    const table_store::cloned_tables_type& batch)
 {
     std::size_t pos = src_name.size();
     while (pos > 0 && std::isdigit(static_cast<unsigned char>(src_name[pos-1])))
@@ -177,9 +177,9 @@ std::string make_unique_name(
         if (stored.find(name) != stored.end())
             continue;
 
-        auto it = std::find_if(batch.begin(), batch.end(), [&name](const table_t& tab)
+        auto it = std::find_if(batch.begin(), batch.end(), [&name](const auto& entry)
         {
-            return tab.name == name;
+            return entry.second.name == name;
         });
 
         if (it == batch.end())
@@ -266,9 +266,9 @@ abs_range_t table_store::get_range(
     return abs_range_t(abs_range_t::invalid);
 }
 
-std::vector<table_t> table_store::clone_sheet_tables(sheet_t src, sheet_t dst) const
+table_store::cloned_tables_type table_store::clone_sheet_tables(sheet_t src, sheet_t dst) const
 {
-    std::vector<table_t> cloned;
+    cloned_tables_type cloned;
 
     for (const auto& [name, tab] : m_tables)
     {
@@ -279,7 +279,7 @@ std::vector<table_t> table_store::clone_sheet_tables(sheet_t src, sheet_t dst) c
         copied.name = make_unique_name(tab.name, m_tables, cloned);
         copied.range.first.sheet = dst;
         copied.range.last.sheet = dst;
-        cloned.push_back(std::move(copied));
+        cloned.emplace_back(name, std::move(copied));
     }
 
     return cloned;

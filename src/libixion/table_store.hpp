@@ -25,6 +25,9 @@ class table_store
 public:
     using store_type = std::map<std::string, table_t, std::less<>>;
 
+    /** Cloned tables paired with the names of their source tables. */
+    using cloned_tables_type = std::vector<std::pair<std::string, table_t>>;
+
     /**
      * Insert a new table.  The table must have a non-empty name unique
      * within the store, and a valid range that does not span multiple
@@ -72,8 +75,11 @@ public:
      * re-anchored to a destination sheet and their names auto-renamed to
      * next-available unique names. The copies do not get inserted into the
      * store.
+     *
+     * @return Cloned tables, each paired with the name of the table it was
+     *         cloned from.
      */
-    std::vector<table_t> clone_sheet_tables(sheet_t src, sheet_t dst) const;
+    cloned_tables_type clone_sheet_tables(sheet_t src, sheet_t dst) const;
 
 private:
     store_type m_tables;

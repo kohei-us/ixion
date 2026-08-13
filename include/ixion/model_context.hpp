@@ -505,9 +505,10 @@ public:
      * copied counterparts.  The sheet-local named expressions of the source
      * sheet also get copied, with their origins re-anchored to the new sheet.
      * The tables of the source sheet also get copied, with their names
-     * auto-renamed to unique names.  Note, however, that formula cells
-     * referencing a table by name keep referencing the table of the source
-     * sheet.
+     * auto-renamed to unique names, and the table references of the copied
+     * formula cells get rewritten to reference the copied tables.  A
+     * formula cell whose table references get rewritten receives its own
+     * new token store instead of sharing one with its source cell.
      *
      * Note that the formula cells of the new sheet do not get registered for
      * dependency tracking; that remains the responsibility of the caller.

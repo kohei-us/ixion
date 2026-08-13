@@ -28,6 +28,7 @@
 #include <format>
 #include <iostream>
 #include <cstring>
+#include <sstream>
 #include <utility>
 
 using std::cout;
@@ -179,9 +180,9 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
                 break;
             }
             case fop_table_ref:
-                // Table refs need no checking: named ones keep referencing the
-                // same table, and unnamed ones re-anchor to the cloned
-                // table on the copied sheet.
+                // Table refs need no checking: named ones get rewritten to
+                // reference the cloned table which holds identical data at
+                // copy time, and unnamed ones re-anchor to it by position.
             default:
                 ;
         }
@@ -254,6 +255,129 @@ abs_range_set_t collect_recalc_cells(const model_context& cxt, const sheet_store
 
     return recalc_cells;
 }
+
+bool has_table_ref_to_rewrite(const formula_tokens_t& tokens, const table_name_map_type& table_names)
+{
+    for (const formula_token& t : tokens)
+    {
+        if (t.opcode != fop_table_ref)
+            continue;
+
+        if (table_names.count(std::get<table_ref_t>(t.value).name))
+            return true;
+    }
+
+    return false;
+}
+
+void rewrite_table_refs(formula_tokens_t& tokens, const table_name_map_type& table_names)
+{
+    for (formula_token& t : tokens)
+    {
+        if (t.opcode != fop_table_ref)
+            continue;
+
+        table_ref_t& ref = std::get<table_ref_t>(t.value);
+        if (auto it = table_names.find(ref.name); it != table_names.end())
+            // rename the source table name to the cloned table's
+            ref.name = it->second;
+    }
+}
+
+/**
+ * Rewrites the table references of token stores per the given name mapping.
+ *
+ * A replacement gets created only when the tokens contain a table reference
+ * that needs to be adjusted, otherwise a null value is stored.
+ */
+class table_ref_rewriter
+{
+    const table_name_map_type& m_table_names;
+    std::unordered_map<const formula_tokens_store*, formula_tokens_store_ptr_t> m_replacements;
+
+public:
+    explicit table_ref_rewriter(const table_name_map_type& table_names) : m_table_names(table_names) {}
+
+    const formula_tokens_store_ptr_t& get_or_create(const formula_tokens_store_ptr_t& ts)
+    {
+        auto [it, inserted] = m_replacements.try_emplace(ts.get()); // always create null value
+        if (inserted && has_table_ref_to_rewrite(ts->get(), m_table_names))
+        {
+            // needs re-write -> store it for later replacement
+            formula_tokens_t tokens = ts->get();
+            rewrite_table_refs(tokens, m_table_names);
+            it->second = formula_tokens_store::create(std::move(tokens));
+        }
+
+        return it->second;
+    }
+};
+
+#ifdef IXION_DEBUG_UTILS
+
+/**
+ * Ensure that a table-reference rewrite did not leak into the source sheet
+ * through cell instances shared via copy-on-write: no formula cell on the
+ * source sheet may reference any of the freshly generated table names.
+ */
+void ensure_no_table_refs_to_clones(
+    const sheet_store& sheet, sheet_t sheet_index, const table_name_map_type& table_names)
+{
+    for (col_t col = 0; col < col_t(sheet.size()); ++col)
+    {
+        const column_store_t& col_store = sheet[col];
+        row_t cur_row = 0;
+
+        for (auto it = col_store.cbegin(); it != col_store.cend(); cur_row += it->size, ++it)
+        {
+            if (it->type != element_type_formula)
+                continue;
+
+            row_t row = cur_row;
+
+            auto cell_it = formula_element_block::cbegin(*it->data);
+            auto cell_end = formula_element_block::cend(*it->data);
+
+            while (cell_it != cell_end)
+            {
+                const formula_cell* p = *cell_it;
+
+                for (const formula_token& t : p->get_tokens()->get())
+                {
+                    if (t.opcode != fop_table_ref)
+                        continue;
+
+                    std::string_view ref_name = std::get<table_ref_t>(t.value).name;
+
+                    for (const auto& [src_name, new_name] : table_names)
+                    {
+                        if (ref_name == new_name)
+                        {
+                            std::ostringstream os;
+                            os << "table reference rewrite leaked into the source sheet: cell "
+                                << abs_address_t(sheet_index, row, col) << " references table '"
+                                << new_name << "' cloned from '" << src_name << "'";
+                            throw std::runtime_error(os.str());
+                        }
+                    }
+                }
+
+                // Group members share the token store; checking the top-most
+                // cell covers the whole group.
+                row_t n_covered = 1;
+                formula_group_t group = p->get_group_properties();
+                if (group.grouped)
+                    n_covered = group.size.row;
+
+                assert(n_covered <= std::distance(cell_it, cell_end));
+                row += n_covered;
+                std::advance(cell_it, n_covered);
+            }
+        }
+    }
+}
+
+#endif
 
 } // anonymous namespace
 
@@ -457,28 +581,134 @@ model_context::sheet_copy_result model_context_impl::append_sheet_copy(sheet_t s
     // index of the new sheet.
     res.sheet = m_sheets.size();
 
-    // Re-anchor the sheet-local named expression origins to the new sheet.
+    // Clone the tables to the new sheet with unique auto-generated names.
+    auto cloned_tables = m_tables.clone_sheet_tables(src, res.sheet);
+
+    // Map the names of the source tables to the names of their clones.
+    table_name_map_type table_names;
+    for (const auto& [src_name, tab] : cloned_tables)
+        table_names.emplace(src_name, m_inline_str_pool.intern(tab.name));
+
+    // Re-anchor the sheet-local named expression origins to the new sheet,
+    // and rewrite the table references in their expressions.
     for (auto& [exp_name, exp] : cloned.get_named_expressions())
     {
         if (exp.origin.sheet == src)
             exp.origin.sheet = res.sheet;
-    }
 
-    // Clone the tables of the source sheet to the new sheet, with unique
-    // auto-generated names.
-    //
-    // NB: formula cells referencing a table by name keep referencing the table
-    // of the source sheet.
-    std::vector<table_t> cloned_tables = m_tables.clone_sheet_tables(src, res.sheet);
+        rewrite_table_refs(exp.tokens, table_names);
+    }
 
     m_sheet_names.push_back(std::move(name));
     m_sheets.push_back(std::move(cloned));
 
-    for (table_t& tab : cloned_tables)
-        m_tables.insert(std::move(tab));
+    for (auto& entry : cloned_tables)
+        m_tables.insert(std::move(entry.second));
+
+    rewrite_table_refs_on_sheet(res.sheet, table_names);
 
     res.recalc_cells = collect_recalc_cells(m_parent, m_sheets.back(), res.sheet);
+
+#ifdef IXION_DEBUG_UTILS
+    ensure_no_table_refs_to_clones(m_sheets[src], src, table_names);
+#endif
+
     return res;
+}
+
+void model_context_impl::rewrite_table_refs_on_sheet(sheet_t sheet, const table_name_map_type& table_names)
+{
+    if (table_names.empty())
+        return;
+
+    table_ref_rewriter replacements(table_names);
+
+    sheet_store& sheet_st = m_sheets.at(sheet);
+
+    for (std::size_t col = 0; col < sheet_st.size(); ++col)
+    {
+        // Scan the column read-only first, so that a column with no matching
+        // cell keeps sharing its storage with the source sheet.
+        bool mutate = false;
+
+        {
+            const column_store_t& col_store = std::as_const(sheet_st)[col];
+
+            for (auto it = col_store.cbegin(); !mutate && it != col_store.cend(); ++it)
+            {
+                if (it->type != element_type_formula)
+                    continue;
+
+                auto cell_it = formula_element_block::cbegin(*it->data);
+                auto cell_end = formula_element_block::cend(*it->data);
+
+                while (cell_it != cell_end)
+                {
+                    const formula_cell* p = *cell_it;
+
+                    if (replacements.get_or_create(p->get_tokens()))
+                    {
+                        mutate = true;
+                        break;
+                    }
+
+                    // Group members share the token store; checking the
+                    // top-most cell covers the whole group.
+                    row_t n_covered = 1;
+                    formula_group_t group = p->get_group_properties();
+                    if (group.grouped)
+                        n_covered = group.size.row;
+
+                    assert(n_covered <= std::distance(cell_it, cell_end));
+                    std::advance(cell_it, n_covered);
+                }
+            }
+        }
+
+        if (!mutate)
+            // the column doesn't need to mutate
+            continue;
+
+        // Detach the column and re-fetch the cells through mutable access;
+        // the pointers from the read-only scan may point into the source sheet.
+        column_store_t& col_store = sheet_st[col];
+        col_store.detach();
+
+        for (auto it = col_store.begin(); it != col_store.end(); ++it)
+        {
+            if (it->type != element_type_formula)
+                continue;
+
+            auto cell_it = formula_element_block::begin(*it->data);
+            auto cell_end = formula_element_block::end(*it->data);
+
+            while (cell_it != cell_end)
+            {
+                formula_cell* p = *cell_it;
+
+                // Group members share the token store; resolve the
+                // replacement once for the whole group.
+                const auto& replacement = replacements.get_or_create(p->get_tokens());
+
+                row_t n_covered = 1;
+                formula_group_t group = p->get_group_properties();
+                if (group.grouped)
+                    n_covered = group.size.row;
+
+                assert(n_covered <= std::distance(cell_it, cell_end));
+
+                if (replacement)
+                {
+                    // Each cell holds its own store pointer; assign the
+                    // replacement to every cell of the group.
+                    for (row_t i = 0; i < n_covered; ++i, ++cell_it)
+                        (*cell_it)->set_tokens(replacement);
+                }
+                else
+                    std::advance(cell_it, n_covered);
+            }
+        }
+    }
 }
 
 void model_context_impl::set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows)

@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include <unordered_map>
 #include <mutex>
 #include <deque>
@@ -28,6 +29,9 @@
 namespace ixion { namespace detail {
 
 using sheet_stores_type = std::deque<sheet_store>;
+
+/** Maps source table names to the names of their clones. */
+using table_name_map_type = std::map<std::string_view, std::string_view>;
 
 class model_context_impl
 {
@@ -174,6 +178,14 @@ private:
      * model_context_error exception if it does.
      */
     void ensure_unique_sheet_name(std::string_view name) const;
+
+    /**
+     * Rewrite the table references of all the formula cells on a sheet to
+     * reference the cloned tables according to the mapping given.
+     * Only the columns containing an affected formula cell get detached from
+     * the storage they may share with the source sheet through copy-on-write.
+     */
+    void rewrite_table_refs_on_sheet(sheet_t sheet, const table_name_map_type& table_names);
 
 private:
     model_context& m_parent;

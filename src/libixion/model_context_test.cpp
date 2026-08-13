@@ -1804,6 +1804,7 @@ void test_model_context_append_sheet_copy_tables()
 
     // Cell positions on the source sheet.
     ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t B1(0, 0, 1);
     ixion::abs_address_t C3(0, 2, 2);
     ixion::abs_address_t D9(0, 8, 3);
     ixion::abs_address_t F3(0, 2, 5);
@@ -1844,6 +1845,14 @@ void test_model_context_append_sheet_copy_tables()
     insert_formula(cxt, D9, "SUBTOTAL(109,[Value])", *resolver);
     insert_formula(cxt, A1, "SUM(Table1[Value])", *resolver);
 
+    // Named reference to the table on the 'other' sheet.
+    insert_formula(cxt, B1, "SUM(TableX[C])", *resolver);
+
+    // Sheet-local named expression whose expression contains a named table
+    // reference.
+    cxt.set_named_expression(
+        0, "TableTotal", A1, ixion::parse_formula_string(cxt, A1, *resolver, "SUM(Table1[Value])"));
+
     // Calculate them to cache their results.
     {
         ixion::abs_range_set_t dirty_cells;
@@ -1863,6 +1872,7 @@ void test_model_context_append_sheet_copy_tables()
 
     // Same cell positions on the copied sheet.
     ixion::abs_address_t copied_A1(copied, 0, 0);
+    ixion::abs_address_t copied_B1(copied, 0, 1);
     ixion::abs_address_t copied_C3(copied, 2, 2);
     ixion::abs_address_t copied_D4(copied, 3, 3);
     ixion::abs_address_t copied_D8(copied, 7, 3);
@@ -1903,14 +1913,173 @@ void test_model_context_append_sheet_copy_tables()
     ixion::abs_range_t range = cxt.get_table_range("Table3", "Value", "", ixion::table_area_data);
     assert(range == ixion::abs_range_t(copied_D4, copied_D8));
 
-    // Neither table-referencing formula cell gets flagged for recalc: the
-    // unnamed reference re-anchors to the cloned table holding identical
-    // values, and the named one keeps referencing the source table.
+    // The named table reference of the copied A1 gets rewritten to reference
+    // the cloned table, in a new token store of its own.
+    const ixion::model_context& ccxt = cxt;
+    const ixion::formula_cell* fc_src = ccxt.get_formula_cell(A1);
+    const ixion::formula_cell* fc_cp = ccxt.get_formula_cell(copied_A1);
+    assert(fc_src->get_tokens().get() != fc_cp->get_tokens().get());
+    assert(ixion::print_formula_tokens(cxt, A1, *resolver, fc_src->get_tokens()->get()) == "SUM(Table1[Value])");
+    assert(ixion::print_formula_tokens(cxt, copied_A1, *resolver, fc_cp->get_tokens()->get()) == "SUM(Table3[Value])");
+
+    // The unnamed reference needs no rewriting, and neither does the
+    // reference to the table on the 'other' sheet; both cells keep sharing
+    // their token stores with their source cells.
+    fc_src = ccxt.get_formula_cell(D9);
+    fc_cp = ccxt.get_formula_cell(copied_D9);
+    assert(fc_src->get_tokens().get() == fc_cp->get_tokens().get());
+
+    fc_src = ccxt.get_formula_cell(B1);
+    fc_cp = ccxt.get_formula_cell(copied_B1);
+    assert(fc_src->get_tokens().get() == fc_cp->get_tokens().get());
+    assert(ixion::print_formula_tokens(cxt, copied_B1, *resolver, fc_cp->get_tokens()->get()) == "SUM(TableX[C])");
+
+    // The table reference inside the copied sheet-local named expression
+    // gets rewritten as well, while the source's stays put.
+    const ixion::named_expression_t* exp = cxt.get_named_expression(copied, "TableTotal");
+    assert(exp);
+    assert(ixion::print_formula_tokens(cxt, exp->origin, *resolver, exp->tokens) == "SUM(Table3[Value])");
+
+    exp = cxt.get_named_expression(0, "TableTotal");
+    assert(exp);
+    assert(ixion::print_formula_tokens(cxt, exp->origin, *resolver, exp->tokens) == "SUM(Table1[Value])");
+
+    // No table-referencing formula cell gets flagged for recalc: the cloned
+    // tables hold identical values at copy time.
     assert(res.recalc_cells.empty());
 
     // Their cached results carry over to the copied sheet.
     assert(cxt.get_numeric_value(copied_D9) == 15.0);
     assert(cxt.get_numeric_value(copied_A1) == 15.0);
+}
+
+void test_model_context_append_sheet_copy_table_groups()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("src");
+
+    ixion::abs_address_t C3(0, 2, 2);
+    ixion::abs_address_t D9(0, 8, 3);
+
+    ixion::table_t tab;
+    tab.name = "Table1";
+    tab.range = ixion::abs_range_t(C3, D9);
+    tab.columns = { "Category", "Value" };
+    tab.totals_row_count = 1;
+    cxt.set_table(tab);
+
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    // Grouped formula cells in B1:B3 with a named table reference and a
+    // pre-supplied result.
+    ixion::abs_range_t B1B3({0, 0, 1}, {0, 2, 1});
+    {
+        ixion::formula_tokens_t tokens =
+            ixion::parse_formula_string(cxt, B1B3.first, *resolver, "SUM(Table1[Value])");
+        ixion::matrix res_value(3, 1, 0.0);
+        cxt.set_grouped_formula_cells(B1B3, std::move(tokens), ixion::formula_result(std::move(res_value)));
+    }
+
+    auto res = cxt.append_sheet_copy(0, "copy");
+    ixion::sheet_t copied = res.sheet;
+
+    // All the cells of the copied group share one new token store with the
+    // table reference rewritten, while the source group is unaffected.
+    const ixion::model_context& ccxt = cxt;
+    const ixion::formula_cell* g1 = ccxt.get_formula_cell({copied, 0, 1});
+    const ixion::formula_cell* g2 = ccxt.get_formula_cell({copied, 1, 1});
+    const ixion::formula_cell* g3 = ccxt.get_formula_cell({copied, 2, 1});
+    assert(g1->get_tokens().get() == g2->get_tokens().get());
+    assert(g2->get_tokens().get() == g3->get_tokens().get());
+
+    const ixion::formula_cell* src_g1 = ccxt.get_formula_cell({0, 0, 1});
+    assert(src_g1->get_tokens().get() != g1->get_tokens().get());
+
+    assert(ixion::print_formula_tokens(
+        cxt, {copied, 0, 1}, *resolver, g1->get_tokens()->get()) == "SUM(Table2[Value])");
+    assert(ixion::print_formula_tokens(
+        cxt, {0, 0, 1}, *resolver, src_g1->get_tokens()->get()) == "SUM(Table1[Value])");
+}
+
+void test_model_context_append_sheet_copy_table_ref_divergence()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("src");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t C3(0, 2, 2);
+    ixion::abs_address_t D5(0, 4, 3);
+    ixion::abs_address_t D9(0, 8, 3);
+
+    ixion::table_t tab;
+    tab.name = "Table1";
+    tab.range = ixion::abs_range_t(C3, D9);
+    tab.columns = { "Category", "Value" };
+    tab.totals_row_count = 1;
+    cxt.set_table(tab);
+
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    // populate cells D4:D8 with {1, 2, 3, 4, 5}
+    for (ixion::row_t r = 3; r <= 7; ++r)
+        cxt.set_numeric_cell({0, r, 3}, r - 2);
+
+    insert_formula(cxt, A1, "SUM(Table1[Value])", *resolver);
+
+    {
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        dirty_cells.insert(A1);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    assert(cxt.get_numeric_value(A1) == 15.0);
+
+    auto res = cxt.append_sheet_copy(0, "copy");
+    ixion::sheet_t copied = res.sheet;
+    assert(res.recalc_cells.empty());
+
+    ixion::abs_address_t copied_A1(copied, 0, 0);
+    ixion::abs_address_t copied_D5(copied, 4, 3);
+
+    // Register the copied cell for dependency tracking, like the document
+    // layer does after a sheet copy.
+    ixion::register_formula_cell(cxt, copied_A1);
+
+    // Modify a 'Value' cell of the source table.  Only the source A1
+    // follows; the copied A1 now depends on the cloned table.
+    cxt.set_numeric_cell(D5, 100.0);
+    {
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        modified_cells.insert(D5);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    assert(cxt.get_numeric_value(A1) == 113.0);
+    assert(cxt.get_numeric_value(copied_A1) == 15.0);
+
+    // Modify the same cell inside the cloned table; now only the copied A1
+    // follows.
+    cxt.set_numeric_cell(copied_D5, 200.0);
+    {
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        modified_cells.insert(copied_D5);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    assert(cxt.get_numeric_value(A1) == 113.0);
+    assert(cxt.get_numeric_value(copied_A1) == 213.0);
 }
 
 bool check_formula_expression(
@@ -2122,6 +2291,8 @@ int main()
     test_model_context_append_sheet_copy_no_recalc();
     test_model_context_tables();
     test_model_context_append_sheet_copy_tables();
+    test_model_context_append_sheet_copy_table_groups();
+    test_model_context_append_sheet_copy_table_ref_divergence();
     test_grouped_formula_string_results();
     test_volatile_function();
     test_parse_and_print_expressions();
