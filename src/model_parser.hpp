@@ -106,6 +106,14 @@ private:
     void parse_table_columns(std::string_view str);
     void push_table();
 
+    /**
+     * Copy an existing sheet to a new sheet appended to the model.
+     *
+     * @param args Source sheet name and new sheet name, separated by a
+     *             space.
+     */
+    void copy_sheet(std::string_view args);
+
     void parse_named_expression();
     void push_named_expression();
 

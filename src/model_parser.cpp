@@ -16,6 +16,7 @@
 #include "ixion/cell_access.hpp"
 #include "ixion/config.hpp"
 #include "ixion/cell.hpp"
+#include "ixion/model_cell_range.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -116,6 +117,7 @@ enum class type
     calc,
     recalc,
     check,
+    copy_sheet,
     exit,
     push,
     mode_init,
@@ -136,6 +138,7 @@ constexpr map_type::entry_type entries[] =
     { "%",                     type::comment               },
     { "calc",                  type::calc                  },
     { "check",                 type::check                 },
+    { "copy-sheet",            type::copy_sheet            },
     { "exit",                  type::exit                  },
     { "mode edit",             type::mode_edit             },
     { "mode init",             type::mode_init             },
@@ -195,7 +198,7 @@ model_parser::model_parser(const std::string& filepath, std::size_t thread_count
     mp_end = mp_head + m_strm.size();
 }
 
-model_parser::~model_parser() {}
+model_parser::~model_parser() = default;
 
 void model_parser::parse()
 {
@@ -260,6 +263,17 @@ void model_parser::parse_command()
     // This line contains a command.
     std::string_view buf_cmd = parse_command_to_buffer(mp_char, mp_end);
     commands::type cmd = commands::get().find(buf_cmd);
+    std::string_view cmd_args;
+
+    if (cmd == commands::type::unknown)
+    {
+        // Some commands take arguments after the command name.
+        if (std::size_t pos = buf_cmd.find(' '); pos != std::string_view::npos)
+        {
+            cmd = commands::get().find(buf_cmd.substr(0, pos));
+            cmd_args = buf_cmd.substr(pos + 1);
+        }
+    }
 
     switch (cmd)
     {
@@ -298,6 +312,11 @@ void model_parser::parse_command()
         {
             // Check cell results.
             check();
+            break;
+        }
+        case commands::type::copy_sheet:
+        {
+            copy_sheet(cmd_args);
             break;
         }
         case commands::type::exit:
@@ -710,6 +729,56 @@ void model_parser::push_table()
     std::cout << "totals row count: " << mp_table_entry->totals_row_count << std::endl;
     m_context.set_table(std::move(*mp_table_entry));
     mp_table_entry.reset();
+}
+
+void model_parser::copy_sheet(std::string_view args)
+{
+    std::size_t pos = args.find(' ');
+    if (pos == std::string_view::npos)
+        throw parse_error("copy-sheet command expects the source and new sheet names as arguments");
+
+    std::string_view src_name = args.substr(0, pos);
+    std::string_view new_name = args.substr(pos + 1);
+
+    sheet_t src = m_context.get_sheet_index(src_name);
+    if (src == invalid_sheet)
+    {
+        std::ostringstream os;
+        os << "no sheet named '" << src_name << "' exists";
+        throw parse_error(os.str());
+    }
+
+    print_section_title("copying sheet");
+    std::cout << "source: " << src_name << std::endl;
+    std::cout << "new: " << new_name << std::endl;
+
+    auto res = m_context.append_sheet_copy(src, std::string{new_name});
+
+    // The copied formula cells are new to the dependency tracker.
+    if (abs_range_t data_range = m_context.get_data_range(res.sheet); data_range.valid())
+    {
+        auto cells = m_context.iterate_cells(res.sheet, rc_direction_t::vertical, data_range);
+        auto it = cells.begin();
+
+        while (it != cells.end())
+        {
+            if (it->type != cell_t::formula)
+            {
+                ++it;
+                continue;
+            }
+
+            const auto* fc = std::get<const formula_cell*>(it->value);
+            register_formula_cell(m_context, abs_address_t(res.sheet, it->row, it->col), fc);
+
+            // Registering the top-most cell of a group registers the entire
+            // group, so skip over the rest of the group.
+            formula_group_t group = fc->get_group_properties();
+            std::advance(it, group.grouped ? group.size.row : 1);
+        }
+    }
+
+    m_dirty_formula_cells.insert(res.recalc_cells.begin(), res.recalc_cells.end());
 }
 
 void model_parser::parse_named_expression()

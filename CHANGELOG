@@ -92,6 +92,9 @@ ixion 0.21.0
 
 * misc
 
+  * added a copy-sheet command to the model definition file format of
+    ixion-parser, to allow testing of sheet-copy scenarios.
+
   * the baseline C++ version is now C++20.
 
   * switched to mdds API version 4.0.

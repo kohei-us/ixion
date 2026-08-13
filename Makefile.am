@@ -21,12 +21,14 @@ test_data = \
 	test/01-inline-array-mul.txt \
 	test/01-inline-array-op-lhs.txt \
 	test/01-inline-array-op-rhs.txt \
+	test/01-error-tokens.txt \
 	test/01-inline-array-string-concat.txt \
 	test/01-inline-array.txt \
 	test/01-ranged-definitions-dups.txt \
 	test/01-simple-arithmetic.txt \
 	test/02-circular-01.txt \
 	test/02-circular-02.txt \
+	test/02-circular-03.txt \
 	test/03-expression.txt \
 	test/03-leading-signs.txt \
 	test/04-function-abs.txt \
@@ -37,6 +39,7 @@ test_data = \
 	test/04-function-columns-rows.txt \
 	test/04-function-concatenate.txt \
 	test/04-function-count-formula.txt \
+	test/04-function-iserr.txt \
 	test/04-function-count.txt \
 	test/04-function-counta-edit.txt \
 	test/04-function-counta-static-args.txt \
@@ -65,6 +68,7 @@ test_data = \
 	test/04-function-mode.txt \
 	test/04-function-n.txt \
 	test/04-function-nested.txt \
+	test/04-function-not-implemented.txt \
 	test/04-function-or.txt \
 	test/04-function-pi-int.txt \
 	test/04-function-replace.txt \
@@ -99,6 +103,8 @@ test_data = \
 	test/13-relational-operators-03.txt \
 	test/20-table-reference-01.txt \
 	test/20-table-reference-02.txt \
+	test/20-table-reference-03.txt \
+	test/20-table-reference-04.txt \
 	test/21-named-exp-workbook-01.txt \
 	test/21-named-exp-worksheet-01.txt \
 	test/22-formulas-with-cached-results.txt \
