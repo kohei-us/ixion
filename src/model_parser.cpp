@@ -62,24 +62,46 @@ bool is_separator(char c)
     return false;
 }
 
-std::string_view parse_command_to_buffer(const char*& p, const char* p_end)
+/**
+ * Tokenize a command line.  The first token is the command name, and the
+ * rest are its arguments.  Consecutive spaces are treated as a single
+ * token separator.
+ */
+std::vector<std::string_view> parse_command_to_tokens(const char*& p, const char* p_end)
 {
     ++p; // skip '%'.
-    std::size_t n = 1;
 
-    if (*p == '%')
+    if (p != p_end && *p == '%')
     {
         // This line is a comment.  Skip the rest of the line.
-        std::string_view ret{p, n}; // return it as command named '%'
+        std::string_view ret{p, 1u}; // return it as command named '%'
         while (p != p_end && *p != '\n') ++p;
-        return ret;
+        return { ret };
     }
 
-    auto* p_head = p;
-    for (++p; p != p_end && *p != '\n'; ++p)
-        ++n;
+    std::vector<std::string_view> tokens;
+    const char* p_head = nullptr;
 
-    return std::string_view{p_head, n};
+    for (; p != p_end && *p != '\n'; ++p)
+    {
+        if (*p == ' ')
+        {
+            if (p_head)
+            {
+                tokens.emplace_back(p_head, p - p_head);
+                p_head = nullptr;
+            }
+            continue;
+        }
+
+        if (!p_head)
+            p_head = p;
+    }
+
+    if (p_head)
+        tokens.emplace_back(p_head, p - p_head);
+
+    return tokens;
 }
 
 class string_printer
@@ -120,14 +142,8 @@ enum class type
     copy_sheet,
     exit,
     push,
-    mode_init,
-    mode_edit,
-    mode_result,
-    mode_result_cache,
-    mode_table,
-    mode_session,
-    mode_named_expression,
-    print_dependency,
+    mode,
+    print,
 };
 
 typedef mdds::sorted_string_map<type> map_type;
@@ -135,21 +151,15 @@ typedef mdds::sorted_string_map<type> map_type;
 // Keys must be sorted.
 constexpr map_type::entry_type entries[] =
 {
-    { "%",                     type::comment               },
-    { "calc",                  type::calc                  },
-    { "check",                 type::check                 },
-    { "copy-sheet",            type::copy_sheet            },
-    { "exit",                  type::exit                  },
-    { "mode edit",             type::mode_edit             },
-    { "mode init",             type::mode_init             },
-    { "mode named-expression", type::mode_named_expression },
-    { "mode result",           type::mode_result           },
-    { "mode result-cache",     type::mode_result_cache     },
-    { "mode session",          type::mode_session          },
-    { "mode table",            type::mode_table            },
-    { "print dependency",      type::print_dependency      },
-    { "push",                  type::push                  },
-    { "recalc",                type::recalc                },
+    { "%",          type::comment    },
+    { "calc",       type::calc       },
+    { "check",      type::check      },
+    { "copy-sheet", type::copy_sheet },
+    { "exit",       type::exit       },
+    { "mode",       type::mode       },
+    { "print",      type::print      },
+    { "push",       type::push       },
+    { "recalc",     type::recalc     },
 };
 
 const map_type& get()
@@ -159,6 +169,42 @@ const map_type& get()
 }
 
 } // namespace commands
+
+namespace modes {
+
+enum class type
+{
+    unknown,
+    edit,
+    init,
+    named_expression,
+    result,
+    result_cache,
+    session,
+    table,
+};
+
+typedef mdds::sorted_string_map<type> map_type;
+
+// Keys must be sorted.
+constexpr map_type::entry_type entries[] =
+{
+    { "edit",             type::edit             },
+    { "init",             type::init             },
+    { "named-expression", type::named_expression },
+    { "result",           type::result           },
+    { "result-cache",     type::result_cache     },
+    { "session",          type::session          },
+    { "table",            type::table            },
+};
+
+const map_type& get()
+{
+    static map_type mt(entries, type::unknown);
+    return mt;
+}
+
+} // namespace modes
 
 } // anonymous namespace
 
@@ -261,19 +307,11 @@ void model_parser::init_model()
 void model_parser::parse_command()
 {
     // This line contains a command.
-    std::string_view buf_cmd = parse_command_to_buffer(mp_char, mp_end);
-    commands::type cmd = commands::get().find(buf_cmd);
-    std::string_view cmd_args;
+    std::vector<std::string_view> tokens = parse_command_to_tokens(mp_char, mp_end);
+    if (tokens.empty())
+        throw parse_error("empty command line");
 
-    if (cmd == commands::type::unknown)
-    {
-        // Some commands take arguments after the command name.
-        if (std::size_t pos = buf_cmd.find(' '); pos != std::string_view::npos)
-        {
-            cmd = commands::get().find(buf_cmd.substr(0, pos));
-            cmd_args = buf_cmd.substr(pos + 1);
-        }
-    }
+    commands::type cmd = commands::get().find(tokens[0]);
 
     switch (cmd)
     {
@@ -316,7 +354,10 @@ void model_parser::parse_command()
         }
         case commands::type::copy_sheet:
         {
-            copy_sheet(cmd_args);
+            if (tokens.size() != 3)
+                throw parse_error("copy-sheet command expects the source and new sheet names as arguments");
+
+            copy_sheet(tokens[1], tokens[2]);
             break;
         }
         case commands::type::exit:
@@ -340,7 +381,47 @@ void model_parser::parse_command()
             }
             break;
         }
-        case commands::type::mode_init:
+        case commands::type::mode:
+        {
+            if (tokens.size() != 2)
+                throw parse_error("mode command expects the mode name as its argument");
+
+            set_mode(tokens[1]);
+            break;
+        }
+        case commands::type::print:
+        {
+            if (tokens.size() == 2 && tokens[1] == "dependency")
+            {
+                print_section_title("print dependency");
+                print_dependency();
+            }
+            else
+            {
+                std::ostringstream os;
+                os << "unknown print target";
+                if (tokens.size() > 1)
+                    os << ": " << tokens[1];
+                throw parse_error(os.str());
+            }
+            break;
+        }
+        case commands::type::unknown:
+        {
+            std::ostringstream os;
+            os << "unknown command: " << tokens[0] << std::endl;
+            throw parse_error(os.str());
+        }
+        default:
+            ;
+    }
+}
+
+void model_parser::set_mode(std::string_view name)
+{
+    switch (modes::get().find(name))
+    {
+        case modes::type::init:
         {
             print_section_title("initializing");
 
@@ -348,14 +429,14 @@ void model_parser::parse_command()
             m_print_separator = true;
             break;
         }
-        case commands::type::mode_result:
+        case modes::type::result:
         {
             // Clear any previous result values.
             m_formula_results.clear();
             m_parse_mode = parse_mode_result;
             break;
         }
-        case commands::type::mode_result_cache:
+        case modes::type::result_cache:
         {
             print_section_title("caching formula results");
 
@@ -363,7 +444,7 @@ void model_parser::parse_command()
             m_print_separator = true;
             break;
         }
-        case commands::type::mode_edit:
+        case modes::type::edit:
         {
             print_section_title("editing");
 
@@ -373,13 +454,13 @@ void model_parser::parse_command()
             m_print_separator = true;
             break;
         }
-        case commands::type::mode_table:
+        case modes::type::table:
         {
             m_parse_mode = parse_mode_table;
             mp_table_entry.reset(new table_t);
             break;
         }
-        case commands::type::mode_session:
+        case modes::type::session:
         {
             print_section_title("session");
 
@@ -387,27 +468,19 @@ void model_parser::parse_command()
             m_parse_mode = parse_mode_session;
             break;
         }
-        case commands::type::mode_named_expression:
+        case modes::type::named_expression:
         {
             m_print_separator = true;
             m_parse_mode = parse_mode_named_expression;
             mp_named_expression = std::make_unique<named_expression_type>();
             break;
         }
-        case commands::type::print_dependency:
-        {
-            print_section_title("print dependency");
-            print_dependency();
-            break;
-        }
-        case commands::type::unknown:
+        default:
         {
             std::ostringstream os;
-            os << "unknown command: " << buf_cmd << std::endl;
+            os << "unknown mode: " << name;
             throw parse_error(os.str());
         }
-        default:
-            ;
     }
 }
 
@@ -731,15 +804,8 @@ void model_parser::push_table()
     mp_table_entry.reset();
 }
 
-void model_parser::copy_sheet(std::string_view args)
+void model_parser::copy_sheet(std::string_view src_name, std::string_view new_name)
 {
-    std::size_t pos = args.find(' ');
-    if (pos == std::string_view::npos)
-        throw parse_error("copy-sheet command expects the source and new sheet names as arguments");
-
-    std::string_view src_name = args.substr(0, pos);
-    std::string_view new_name = args.substr(pos + 1);
-
     sheet_t src = m_context.get_sheet_index(src_name);
     if (src == invalid_sheet)
     {

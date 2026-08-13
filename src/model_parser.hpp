@@ -109,10 +109,17 @@ private:
     /**
      * Copy an existing sheet to a new sheet appended to the model.
      *
-     * @param args Source sheet name and new sheet name, separated by a
-     *             space.
+     * @param src_name Name of the sheet to copy.
+     * @param new_name Name of the new sheet.
      */
-    void copy_sheet(std::string_view args);
+    void copy_sheet(std::string_view src_name, std::string_view new_name);
+
+    /**
+     * Switch to a new parse mode.
+     *
+     * @param name Name of the parse mode.
+     */
+    void set_mode(std::string_view name);
 
     void parse_named_expression();
     void push_named_expression();
