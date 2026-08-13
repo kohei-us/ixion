@@ -14,6 +14,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     formula.cpp
     formula_calc.cpp
     formula_functions.cpp
+    formula_groups.cpp
     formula_function_opcode.cpp
     formula_interpreter.cpp
     formula_lexer.cpp

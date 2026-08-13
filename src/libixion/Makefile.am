@@ -49,6 +49,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	formula_function_opcode.cpp \
 	formula_functions.hpp \
 	formula_functions.cpp \
+	formula_groups.hpp \
+	formula_groups.cpp \
 	formula_interpreter.hpp \
 	formula_interpreter.cpp \
 	formula_lexer.hpp \

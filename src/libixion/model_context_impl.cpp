@@ -19,6 +19,7 @@
 #include <ixion/exceptions.hpp>
 
 #include "calc_status.hpp"
+#include "formula_groups.hpp"
 #include "model_types.hpp"
 #include "utils.hpp"
 #include "debug.hpp"
@@ -201,56 +202,42 @@ abs_range_set_t collect_recalc_cells(const model_context& cxt, const sheet_store
 
     for (col_t col = 0; col < col_t(sheet.size()); ++col)
     {
-        const column_store_t& col_store = sheet[col];
-        row_t cur_row = 0;
+        // Merge consecutive hits into a single range entry per run.
+        row_t run_first = -1;
+        row_t run_end = -1;
 
-        for (auto it = col_store.cbegin(); it != col_store.cend(); cur_row += it->size, ++it)
+        auto flush_run = [&recalc_cells, &run_first, &run_end, sheet_index, col]()
         {
-            if (it->type != element_type_formula)
-                continue;
+            if (run_first < 0)
+                return;
 
-            // Merge consecutive hits into a single range entry per run.
-            row_t run_first = -1;
-            row_t row = cur_row;
+            recalc_cells.emplace(sheet_index, run_first, col, run_end - run_first, 1);
+            run_first = -1;
+        };
 
-            auto cell_it = formula_element_block::cbegin(*it->data);
-            auto cell_end = formula_element_block::cend(*it->data);
+        for (const auto& e : get_formula_groups(sheet[col]))
+        {
+            // Cells of the same formula group either all need a recalc or
+            // none of them do, so the outcome of the top-most cell covers
+            // the whole group.
+            bool hit = is_sheet_position_dependent(cxt, *e.cells[0], abs_address_t(sheet_index, e.row, col));
 
-            while (cell_it != cell_end)
+            if (hit)
             {
-                const formula_cell* p = *cell_it;
-                assert(p);
+                if (run_first >= 0 && e.row != run_end)
+                    // A gap of non-formula cells ends the current run.
+                    flush_run();
 
-                bool hit = is_sheet_position_dependent(cxt, *p, abs_address_t(sheet_index, row, col));
+                if (run_first < 0)
+                    run_first = e.row;
 
-                // Cells of the same formula group either all need a recalc
-                // or none of them do, so the outcome of the top-most cell
-                // covers the whole group.
-                row_t n_covered = 1;
-                formula_group_t group = p->get_group_properties();
-                if (group.grouped)
-                    n_covered = group.size.row;
-
-                assert(n_covered <= std::distance(cell_it, cell_end));
-
-                if (hit)
-                {
-                    if (run_first < 0)
-                        run_first = row;
-                }
-                else if (run_first >= 0)
-                {
-                    recalc_cells.emplace(sheet_index, run_first, col, row - run_first, 1);
-                    run_first = -1;
-                }
-
-                row += n_covered;
-                std::advance(cell_it, n_covered);
+                run_end = e.row + e.size;
             }
-
-            if (run_first >= 0)
-                recalc_cells.emplace(sheet_index, run_first, col, row - run_first, 1);
+            else
+                flush_run();
         }
+
+        flush_run();
     }
 
     return recalc_cells;
@@ -325,53 +312,28 @@ void ensure_no_table_refs_to_clones(
 {
     for (col_t col = 0; col < col_t(sheet.size()); ++col)
     {
-        const column_store_t& col_store = sheet[col];
-        row_t cur_row = 0;
-
-        for (auto it = col_store.cbegin(); it != col_store.cend(); cur_row += it->size, ++it)
+        // Group members share the token store; checking the top-most cell
+        // covers the whole group.
+        for (const auto& e : get_formula_groups(sheet[col]))
         {
-            if (it->type != element_type_formula)
-                continue;
-
-            row_t row = cur_row;
-
-            auto cell_it = formula_element_block::cbegin(*it->data);
-            auto cell_end = formula_element_block::cend(*it->data);
-
-            while (cell_it != cell_end)
+            for (const formula_token& t : e.cells[0]->get_tokens()->get())
             {
-                const formula_cell* p = *cell_it;
+                if (t.opcode != fop_table_ref)
+                    continue;
 
-                for (const formula_token& t : p->get_tokens()->get())
+                std::string_view ref_name = std::get<table_ref_t>(t.value).name;
+
+                for (const auto& [src_name, new_name] : table_names)
                 {
-                    if (t.opcode != fop_table_ref)
-                        continue;
-
-                    std::string_view ref_name = std::get<table_ref_t>(t.value).name;
-
-                    for (const auto& [src_name, new_name] : table_names)
+                    if (ref_name == new_name)
                     {
-                        if (ref_name == new_name)
-                        {
-                            std::ostringstream os;
-                            os << "table reference rewrite leaked into the source sheet: cell "
-                                << abs_address_t(sheet_index, row, col) << " references table '"
-                                << new_name << "' cloned from '" << src_name << "'";
-                            throw std::runtime_error(os.str());
-                        }
+                        std::ostringstream os;
+                        os << "table reference rewrite leaked into the source sheet: cell "
+                            << abs_address_t(sheet_index, e.row, col) << " references table '"
+                            << new_name << "' cloned from '" << src_name << "'";
+                        throw std::runtime_error(os.str());
                     }
                 }
-
-                // Group members share the token store; checking the top-most
-                // cell covers the whole group.
-                row_t n_covered = 1;
-                formula_group_t group = p->get_group_properties();
-                if (group.grouped)
-                    n_covered = group.size.row;
-
-                assert(n_covered <= std::distance(cell_it, cell_end));
-                row += n_covered;
-                std::advance(cell_it, n_covered);
             }
         }
     }
@@ -631,37 +593,14 @@ void model_context_impl::rewrite_table_refs_on_sheet(sheet_t sheet, const table_
         // cell keeps sharing its storage with the source sheet.
         bool mutate = false;
 
+        // Group members share the token store; checking the top-most cell
+        // covers the whole group.
+        for (const auto& e : get_formula_groups(std::as_const(sheet_st)[col]))
         {
-            const column_store_t& col_store = std::as_const(sheet_st)[col];
-
-            for (auto it = col_store.cbegin(); !mutate && it != col_store.cend(); ++it)
+            if (replacements.get_or_create(e.cells[0]->get_tokens()))
             {
-                if (it->type != element_type_formula)
-                    continue;
-
-                auto cell_it = formula_element_block::cbegin(*it->data);
-                auto cell_end = formula_element_block::cend(*it->data);
-
-                while (cell_it != cell_end)
-                {
-                    const formula_cell* p = *cell_it;
-
-                    if (replacements.get_or_create(p->get_tokens()))
-                    {
-                        mutate = true;
-                        break;
-                    }
-
-                    // Group members share the token store; checking the
-                    // top-most cell covers the whole group.
-                    row_t n_covered = 1;
-                    formula_group_t group = p->get_group_properties();
-                    if (group.grouped)
-                        n_covered = group.size.row;
-
-                    assert(n_covered <= std::distance(cell_it, cell_end));
-                    std::advance(cell_it, n_covered);
-                }
+                mutate = true;
+                break;
             }
         }
 
@@ -674,39 +613,18 @@ void model_context_impl::rewrite_table_refs_on_sheet(sheet_t sheet, const table_
         column_store_t& col_store = sheet_st[col];
         col_store.detach();
 
-        for (auto it = col_store.begin(); it != col_store.end(); ++it)
+        for (const auto& e : get_formula_groups(col_store))
         {
-            if (it->type != element_type_formula)
+            // Group members share the token store; resolve the replacement
+            // once for the whole group.
+            const auto& replacement = replacements.get_or_create(e.cells[0]->get_tokens());
+            if (!replacement)
                 continue;
 
-            auto cell_it = formula_element_block::begin(*it->data);
-            auto cell_end = formula_element_block::end(*it->data);
-
-            while (cell_it != cell_end)
-            {
-                formula_cell* p = *cell_it;
-
-                // Group members share the token store; resolve the
-                // replacement once for the whole group.
-                const auto& replacement = replacements.get_or_create(p->get_tokens());
-
-                row_t n_covered = 1;
-                formula_group_t group = p->get_group_properties();
-                if (group.grouped)
-                    n_covered = group.size.row;
-
-                assert(n_covered <= std::distance(cell_it, cell_end));
-
-                if (replacement)
-                {
-                    // Each cell holds its own store pointer; assign the
-                    // replacement to every cell of the group.
-                    for (row_t i = 0; i < n_covered; ++i, ++cell_it)
-                        (*cell_it)->set_tokens(replacement);
-                }
-                else
-                    std::advance(cell_it, n_covered);
-            }
+            // Each cell holds its own store pointer; assign the replacement
+            // to every cell of the group.
+            for (row_t i = 0; i < e.size; ++i)
+                e.cells[i]->set_tokens(replacement);
         }
     }
 }
