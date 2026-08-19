@@ -109,6 +109,7 @@ test_data = \
 	test/21-named-exp-worksheet-01.txt \
 	test/22-formulas-with-cached-results.txt \
 	test/22-grouped-formulas-with-cached-results.txt \
+	test/23-dump-sheet.txt \
 	test/parser-test-func.sh \
 	test/parser-test-t0.sh \
 	test/parser-test-t1.sh \

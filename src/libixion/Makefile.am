@@ -64,6 +64,8 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	formula_value_stack.hpp \
 	formula_value_stack.cpp \
 	global.cpp \
+	grid_dumper.hpp \
+	grid_dumper.cpp \
 	impl_types.hpp \
 	impl_types.cpp \
 	info.cpp \

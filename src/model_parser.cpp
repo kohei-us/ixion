@@ -396,6 +396,48 @@ void model_parser::parse_command()
                 print_section_title("print dependency");
                 print_dependency();
             }
+            else if (tokens.size() >= 3 && tokens[1] == "sheet")
+            {
+                print_section_title("print sheet");
+
+                sheet_t sheet = m_context.get_sheet_index(tokens[2]);
+                if (sheet == invalid_sheet)
+                {
+                    std::ostringstream os;
+                    os << "no sheet named '" << tokens[2] << "'";
+                    throw parse_error(os.str());
+                }
+
+                sheet_dump_mode_t mode = sheet_dump_mode_t::simple;
+                auto resolver_type = formula_name_resolver_t::excel_a1;
+
+                for (auto it = tokens.begin() + 3; it != tokens.end(); ++it)
+                {
+                    if (*it == "simple")
+                        mode = sheet_dump_mode_t::simple;
+                    else if (*it == "verbose")
+                        mode = sheet_dump_mode_t::verbose;
+                    else if (*it == "a1")
+                        resolver_type = formula_name_resolver_t::excel_a1;
+                    else if (*it == "r1c1")
+                        resolver_type = formula_name_resolver_t::excel_r1c1;
+                    else
+                    {
+                        std::ostringstream os;
+                        os << "unknown print sheet option: " << *it;
+                        throw parse_error(os.str());
+                    }
+                }
+
+                auto resolver = formula_name_resolver::get(resolver_type, &m_context);
+                std::ostringstream buf;
+                m_context.dump_sheet(buf, sheet, mode, resolver.get());
+                std::string grid = buf.str();
+                if (grid.empty())
+                    std::cout << "(empty sheet)" << std::endl;
+                else
+                    std::cout << grid << std::endl;
+            }
             else
             {
                 std::ostringstream os;

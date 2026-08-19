@@ -12,6 +12,7 @@
 #include "types.hpp"
 #include "address.hpp"
 
+#include <iosfwd>
 #include <string>
 #include <memory>
 #include <variant>
@@ -561,6 +562,24 @@ public:
     size_t get_string_count() const;
 
     void dump_strings() const;
+
+    /**
+     * Dump the content of a sheet to an output stream as a human-readable
+     * text grid, primarily for debugging.  The grid spans the data area of
+     * the sheet and includes column and row headers.  An empty sheet
+     * produces no output at all.
+     *
+     * @param os Output stream to dump the sheet content to.
+     * @param sheet Index of the sheet to dump.
+     * @param mode Amount of detail to include in the output.
+     * @param resolver Name resolver that determines the column label style
+     *                 as well as the way formula expressions get printed in
+     *                 verbose mode.  When null, an Excel A1 resolver gets
+     *                 created and used internally.
+     */
+    void dump_sheet(
+        std::ostream& os, sheet_t sheet, sheet_dump_mode_t mode,
+        const formula_name_resolver* resolver = nullptr) const;
 
     /**
      * Get an integer string ID from a string value.  If the string value

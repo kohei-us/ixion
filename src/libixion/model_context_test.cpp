@@ -2082,6 +2082,145 @@ void test_model_context_append_sheet_copy_table_ref_divergence()
     assert(cxt.get_numeric_value(copied_A1) == 213.0);
 }
 
+void test_model_context_dump_sheet()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("test");
+
+    const ixion::abs_address_t A1(0, 0, 0);
+    const ixion::abs_address_t A2(0, 1, 0);
+    const ixion::abs_address_t B1(0, 0, 1);
+    const ixion::abs_address_t B2(0, 1, 1);
+    const ixion::abs_address_t C1(0, 0, 2);
+    const ixion::abs_range_t D1D3({0, 0, 3}, {0, 2, 3});
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    cxt.set_numeric_cell(A1, 1.2);
+    cxt.set_numeric_cell(A2, 3.4);
+    cxt.set_string_cell(B1, "foo");
+    cxt.set_boolean_cell(B2, true);
+
+    insert_formula(cxt, C1, "A1*2", *resolver);
+
+    {
+        // Grouped formula cells in D1:D3 with pre-computed results.
+        ixion::formula_tokens_t tokens =
+            ixion::parse_formula_string(cxt, D1D3.first, *resolver, "SUM(A$1:A$2)");
+        ixion::matrix res(3, 1, 4.6);
+        cxt.set_grouped_formula_cells(
+            D1D3, std::move(tokens), ixion::formula_result(std::move(res)));
+    }
+
+    {
+        // Calculate C1 to give it a cached result.
+        ixion::abs_range_set_t dirty_cells;
+        ixion::abs_range_set_t modified_cells;
+        dirty_cells.insert(C1);
+        auto sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, &dirty_cells);
+        ixion::calculate_sorted_cells(cxt, sorted, 0);
+    }
+
+    auto split_lines = [](const std::string& s)
+    {
+        std::vector<std::string> lines;
+        std::istringstream is(s);
+        std::string line;
+        while (std::getline(is, line))
+            lines.push_back(line);
+        return lines;
+    };
+
+    {
+        // expected output
+        //
+        // +---+-----+------+-----+-----+
+        // |   | A   | B    | C   | D   |
+        // +---+-----+------+-----+-----+
+        // | 1 | 1.2 | foo  | 2.4 | 4.6 |
+        // | 2 | 3.4 | true |     | 4.6 |
+        // | 3 |     |      |     | 4.6 |
+        // +---+-----+------+-----+-----+
+
+        std::ostringstream os;
+        cxt.dump_sheet(os, 0, ixion::sheet_dump_mode_t::simple);
+        std::string s = os.str();
+        assert(!s.ends_with('\n'));
+
+        auto lines = split_lines(s);
+        assert(lines.size() == 7);
+        assert(lines[0] == "+---+-----+------+-----+-----+");
+        assert(lines[1] == "|   | A   | B    | C   | D   |");
+        assert(lines[2] == lines[0]);
+        assert(lines[3] == "| 1 | 1.2 | foo  | 2.4 | 4.6 |");
+        assert(lines[4] == "| 2 | 3.4 | true |     | 4.6 |");
+        assert(lines[5] == "| 3 |     |      |     | 4.6 |");
+        assert(lines[6] == lines[0]);
+    }
+
+    {
+        // expected output
+        //
+        // +---+---------+----------+------------+--------------------------+
+        // |   | A       | B        | C          | D                        |
+        // +---+---------+----------+------------+--------------------------+
+        // | 1 | 1.2 [v] | foo      | A1*2 (2.4) | {SUM(A$1:A$2)}@0/3 (4.6) |
+        // | 2 | 3.4 [v] | true [b] |            | {SUM(A$1:A$2)}@1/3 (4.6) |
+        // | 3 |         |          |            | {SUM(A$1:A$2)}@2/3 (4.6) |
+        // +---+---------+----------+------------+--------------------------+
+
+        std::ostringstream os;
+        cxt.dump_sheet(os, 0, ixion::sheet_dump_mode_t::verbose);
+
+        auto lines = split_lines(os.str());
+        assert(lines.size() == 7);
+        assert(lines[0] == "+---+---------+----------+------------+--------------------------+");
+        assert(lines[1] == "|   | A       | B        | C          | D                        |");
+        assert(lines[2] == lines[0]);
+        assert(lines[3] == "| 1 | 1.2 [v] | foo      | A1*2 (2.4) | {SUM(A$1:A$2)}@0/3 (4.6) |");
+        assert(lines[4] == "| 2 | 3.4 [v] | true [b] |            | {SUM(A$1:A$2)}@1/3 (4.6) |");
+        assert(lines[5] == "| 3 |         |          |            | {SUM(A$1:A$2)}@2/3 (4.6) |");
+        assert(lines[6] == lines[0]);
+    }
+
+    {
+        // R1C1 reference display via a caller-supplied resolver.  The
+        // resolver also switches the column labels to 1-based indices.
+        //
+        // expected output
+        //
+        // +---+---------+----------+----------------+----------------------------------+
+        // |   | 1       | 2        | 3              | 4                                |
+        // +---+---------+----------+----------------+----------------------------------+
+        // | 1 | 1.2 [v] | foo      | RC[-2]*2 (2.4) | {SUM(R1C[-3]:R2C[-3])}@0/3 (4.6) |
+        // | 2 | 3.4 [v] | true [b] |                | {SUM(R1C[-3]:R2C[-3])}@1/3 (4.6) |
+        // | 3 |         |          |                | {SUM(R1C[-3]:R2C[-3])}@2/3 (4.6) |
+        // +---+---------+----------+----------------+----------------------------------+
+
+        auto r1c1 = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_r1c1, &cxt);
+        std::ostringstream os;
+        cxt.dump_sheet(os, 0, ixion::sheet_dump_mode_t::verbose, r1c1.get());
+
+        auto lines = split_lines(os.str());
+        assert(lines.size() == 7);
+        assert(lines[1] == "|   | 1       | 2        | 3              | 4                                |");
+        assert(lines[3] == "| 1 | 1.2 [v] | foo      | RC[-2]*2 (2.4) | {SUM(R1C[-3]:R2C[-3])}@0/3 (4.6) |");
+        assert(lines[4] == "| 2 | 3.4 [v] | true [b] |                | {SUM(R1C[-3]:R2C[-3])}@1/3 (4.6) |");
+    }
+
+    {
+        // An empty sheet produces empty output.
+        cxt.append_sheet("empty");
+        std::ostringstream os;
+        cxt.dump_sheet(os, 1, ixion::sheet_dump_mode_t::verbose);
+        assert(os.str().empty());
+    }
+}
+
 bool check_formula_expression(
     ixion::model_context& cxt, const ixion::formula_name_resolver& resolver, const char* p)
 {
@@ -2293,6 +2432,7 @@ int main()
     test_model_context_append_sheet_copy_tables();
     test_model_context_append_sheet_copy_table_groups();
     test_model_context_append_sheet_copy_table_ref_divergence();
+    test_model_context_dump_sheet();
     test_grouped_formula_string_results();
     test_volatile_function();
     test_parse_and_print_expressions();

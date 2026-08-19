@@ -248,6 +248,18 @@ enum class rc_direction_t
 };
 
 /**
+ * Specifies the amount of detail model_context::dump_sheet() includes in
+ * its output.
+ */
+enum class sheet_dump_mode_t
+{
+    /** Grid with the displayed cell values only. */
+    simple,
+    /** Grid with cell values plus type, formula and grouping details. */
+    verbose,
+};
+
+/**
  * This structure stores a 2-dimensional size information.
  */
 struct IXION_DLLPUBLIC rc_size_t

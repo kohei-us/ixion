@@ -16,6 +16,7 @@
 #include <ixion/exceptions.hpp>
 
 #include "deprecated.hpp"
+#include "grid_dumper.hpp"
 #include "model_context_impl.hpp"
 #include "utils.hpp"
 
@@ -412,6 +413,13 @@ size_t model_context::get_string_count() const
 void model_context::dump_strings() const
 {
     mp_impl->dump_strings();
+}
+
+void model_context::dump_sheet(
+    std::ostream& os, sheet_t sheet, sheet_dump_mode_t mode,
+    const formula_name_resolver* resolver) const
+{
+    detail::grid_dumper(*this, resolver).dump(os, sheet, mode);
 }
 
 string_id_t model_context::get_identifier_from_string(std::string_view s) const

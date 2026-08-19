@@ -78,6 +78,12 @@ ixion 0.21.0
   * added a get_table_range() overload that takes a table_ref_t and
     the position of the referencing cell.
 
+  * added model_context::dump_sheet() which dumps the content of a
+    sheet to an output stream as a human-readable text grid, either
+    with just the cell values or with additional details such as
+    formula expressions and formula groupings.  Ported from orcus's
+    flat dumper.
+
 * formula interpreter
 
   * an unimplemented formula function now yields a #NAME? error on
@@ -94,6 +100,10 @@ ixion 0.21.0
 
   * added a copy-sheet command to the model definition file format of
     ixion-parser, to allow testing of sheet-copy scenarios.
+
+  * added a sheet target to the print command of ixion-parser, which
+    prints the content of a sheet as a text grid with optional
+    verbose and r1c1 flags.
 
   * the baseline C++ version is now C++20.
 
