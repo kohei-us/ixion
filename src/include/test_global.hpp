@@ -20,6 +20,7 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <string_view>
 
 namespace ixion { namespace test {
 
@@ -35,6 +36,20 @@ private:
     std::string m_msg;
     double m_start_time;
 };
+
+/**
+ * Check the output of a test against the expected content stored in a
+ * file, and print the first differing line when they differ.  When the
+ * environment variable IXION_TEST_REGENERATE is set to a non-empty value,
+ * the file gets overwritten with the output instead.
+ *
+ * @param output Output of a test.
+ * @param expected_path Path to the file that stores the expected output.
+ *
+ * @return True if the output matches the expected content or the file got
+ *         regenerated, otherwise false.
+ */
+bool check_expected_output(std::string_view output, const std::string& expected_path);
 
 }}
 

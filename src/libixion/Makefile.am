@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/include \
 	-DIXION_BUILD \
+	-DSRCDIR=\""$(top_srcdir)"\" \
 	$(MDDS_CFLAGS) \
 	$(BOOST_CPPFLAGS)
 

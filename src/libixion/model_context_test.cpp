@@ -2125,91 +2125,30 @@ void test_model_context_dump_sheet()
         ixion::calculate_sorted_cells(cxt, sorted, 0);
     }
 
-    auto split_lines = [](const std::string& s)
     {
-        std::vector<std::string> lines;
-        std::istringstream is(s);
-        std::string line;
-        while (std::getline(is, line))
-            lines.push_back(line);
-        return lines;
-    };
-
-    {
-        // expected output
-        //
-        // +---+-----+------+-----+-----+
-        // |   | A   | B    | C   | D   |
-        // +---+-----+------+-----+-----+
-        // | 1 | 1.2 | foo  | 2.4 | 4.6 |
-        // | 2 | 3.4 | true |     | 4.6 |
-        // | 3 |     |      |     | 4.6 |
-        // +---+-----+------+-----+-----+
-
         std::ostringstream os;
         cxt.dump_sheet(os, 0, ixion::sheet_dump_mode_t::simple);
         std::string s = os.str();
         assert(!s.ends_with('\n'));
-
-        auto lines = split_lines(s);
-        assert(lines.size() == 7);
-        assert(lines[0] == "+---+-----+------+-----+-----+");
-        assert(lines[1] == "|   | A   | B    | C   | D   |");
-        assert(lines[2] == lines[0]);
-        assert(lines[3] == "| 1 | 1.2 | foo  | 2.4 | 4.6 |");
-        assert(lines[4] == "| 2 | 3.4 | true |     | 4.6 |");
-        assert(lines[5] == "| 3 |     |      |     | 4.6 |");
-        assert(lines[6] == lines[0]);
+        assert(ixion::test::check_expected_output(
+            s, SRCDIR "/test/expected/model-context/dump-sheet-simple.txt"));
     }
 
     {
-        // expected output
-        //
-        // +---+---------+----------+------------+--------------------------+
-        // |   | A       | B        | C          | D                        |
-        // +---+---------+----------+------------+--------------------------+
-        // | 1 | 1.2 [v] | foo      | A1*2 (2.4) | {SUM(A$1:A$2)}@0/3 (4.6) |
-        // | 2 | 3.4 [v] | true [b] |            | {SUM(A$1:A$2)}@1/3 (4.6) |
-        // | 3 |         |          |            | {SUM(A$1:A$2)}@2/3 (4.6) |
-        // +---+---------+----------+------------+--------------------------+
-
         std::ostringstream os;
         cxt.dump_sheet(os, 0, ixion::sheet_dump_mode_t::verbose);
-
-        auto lines = split_lines(os.str());
-        assert(lines.size() == 7);
-        assert(lines[0] == "+---+---------+----------+------------+--------------------------+");
-        assert(lines[1] == "|   | A       | B        | C          | D                        |");
-        assert(lines[2] == lines[0]);
-        assert(lines[3] == "| 1 | 1.2 [v] | foo      | A1*2 (2.4) | {SUM(A$1:A$2)}@0/3 (4.6) |");
-        assert(lines[4] == "| 2 | 3.4 [v] | true [b] |            | {SUM(A$1:A$2)}@1/3 (4.6) |");
-        assert(lines[5] == "| 3 |         |          |            | {SUM(A$1:A$2)}@2/3 (4.6) |");
-        assert(lines[6] == lines[0]);
+        assert(ixion::test::check_expected_output(
+            os.str(), SRCDIR "/test/expected/model-context/dump-sheet-verbose.txt"));
     }
 
     {
         // R1C1 reference display via a caller-supplied resolver.  The
         // resolver also switches the column labels to 1-based indices.
-        //
-        // expected output
-        //
-        // +---+---------+----------+----------------+----------------------------------+
-        // |   | 1       | 2        | 3              | 4                                |
-        // +---+---------+----------+----------------+----------------------------------+
-        // | 1 | 1.2 [v] | foo      | RC[-2]*2 (2.4) | {SUM(R1C[-3]:R2C[-3])}@0/3 (4.6) |
-        // | 2 | 3.4 [v] | true [b] |                | {SUM(R1C[-3]:R2C[-3])}@1/3 (4.6) |
-        // | 3 |         |          |                | {SUM(R1C[-3]:R2C[-3])}@2/3 (4.6) |
-        // +---+---------+----------+----------------+----------------------------------+
-
         auto r1c1 = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_r1c1, &cxt);
         std::ostringstream os;
         cxt.dump_sheet(os, 0, ixion::sheet_dump_mode_t::verbose, r1c1.get());
-
-        auto lines = split_lines(os.str());
-        assert(lines.size() == 7);
-        assert(lines[1] == "|   | 1       | 2        | 3              | 4                                |");
-        assert(lines[3] == "| 1 | 1.2 [v] | foo      | RC[-2]*2 (2.4) | {SUM(R1C[-3]:R2C[-3])}@0/3 (4.6) |");
-        assert(lines[4] == "| 2 | 3.4 [v] | true [b] |                | {SUM(R1C[-3]:R2C[-3])}@1/3 (4.6) |");
+        assert(ixion::test::check_expected_output(
+            os.str(), SRCDIR "/test/expected/model-context/dump-sheet-verbose-r1c1.txt"));
     }
 
     {

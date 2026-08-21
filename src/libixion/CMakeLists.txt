@@ -121,6 +121,8 @@ add_executable(version-test EXCLUDE_FROM_ALL
 
 target_include_directories(compute-engine-test PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
 
+target_compile_definitions(model-context-test PRIVATE SRCDIR="${PROJECT_SOURCE_DIR}")
+
 target_link_libraries(column-store-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(general-test ixion-${IXION_API_VERSION} ixion-test)
