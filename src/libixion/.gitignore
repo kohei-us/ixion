@@ -6,4 +6,5 @@ general-test
 ixion-test-track-deps
 model-context-test
 name-resolver-test
+sheet-sort-test
 version-test
