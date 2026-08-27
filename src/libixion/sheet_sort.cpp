@@ -454,6 +454,373 @@ void regroup_column(column_store_t& col, row_t row1, row_t row2)
     }
 }
 
+/**
+ * Sort the rows of a range in phases: determine the new row order once,
+ * then for each column find the formula groups the sort breaks, ungroup
+ * them, move the cells to their sorted positions, and regroup afterwards.
+ */
+class range_sorter
+{
+    /** Formula group to get ungrouped before the move. */
+    struct group_span
+    {
+        row_t row;
+        row_t size;
+    };
+
+    /** Formula group changes required in one column. */
+    struct group_changes
+    {
+        std::vector<group_span> to_ungroup;
+
+        // Rows to scan for regrouping afterwards. A group crossing the boundary
+        // of the sorted range widens it to cover its members outside the range.
+        row_t regroup_row1;
+        row_t regroup_row2;
+    };
+
+    const model_context& m_cxt;
+    sheet_store& m_store;
+    const sort_keys_t& m_keys;
+
+    row_t m_row1;
+    row_t m_row2;
+    col_t m_col1;
+    col_t m_col2;
+    row_t m_n_rows;
+
+    // permutation of the sorted rows: element i stores the source row that
+    // lands at row1 + i after the sort
+    std::vector<row_t> m_sorted_rows;
+
+    // dest_rows stores the destination position of a source row within sorted range,
+    // it stores absolute row IDs.
+    std::vector<row_t> m_dest_rows;
+
+public:
+    range_sorter(
+        const model_context& cxt, sheet_store& store,
+        const abs_rc_range_t& range, const sort_keys_t& keys);
+
+    std::vector<row_t> sort();
+
+private:
+    void compute_row_order();
+    row_t dest_row_of(row_t row) const;
+
+    void sort_column(col_t col_pos);
+    group_changes collect_group_changes(const column_store_t& col) const;
+    void ungroup(column_store_t& col, const std::vector<group_span>& to_ungroup) const;
+    std::vector<cell_slot> extract_cells(const column_store_t& col) const;
+    void place_cells_sorted(column_store_t& col, std::vector<cell_slot>& slots) const;
+};
+
+range_sorter::range_sorter(
+    const model_context& cxt, sheet_store& store,
+    const abs_rc_range_t& range, const sort_keys_t& keys) :
+    m_cxt(cxt), m_store(store), m_keys(keys),
+    m_row1(range.first.row), m_row2(range.last.row),
+    m_col1(range.first.column), m_col2(range.last.column),
+    m_n_rows(m_row2 - m_row1 + 1)
+{
+}
+
+std::vector<row_t> range_sorter::sort()
+{
+    compute_row_order();
+
+    if (std::is_sorted(m_sorted_rows.begin(), m_sorted_rows.end()))
+        // Nothing moves; leave the columns untouched to preserve any
+        // copy-on-write sharing.
+        return m_sorted_rows;
+
+    for (col_t col_pos = m_col1; col_pos <= m_col2; ++col_pos)
+        sort_column(col_pos);
+
+    return m_sorted_rows;
+}
+
+/**
+ * Determine the new row order after sorting by the key columns.
+ *
+ * Note that this does NOT apply sorting to the store.
+ *
+ * On return, m_sorted_rows stores the source row landing at each row of the
+ * range in sorted order, and m_dest_rows stores the inverse: the row each
+ * source row lands at.  Both store absolute row positions and are indexed
+ * by row offset within the range.
+ */
+void range_sorter::compute_row_order()
+{
+    const sheet_store& cstore = m_store;
+
+    // Extract the key column values and argsort the rows.
+    std::vector<std::vector<sort_value>> key_col_values;
+    key_col_values.reserve(m_keys.size());
+
+    for (const sort_key_t& key : m_keys)
+        key_col_values.push_back(fetch_key_column_values(m_cxt, cstore[key.column], m_row1, m_row2));
+
+    // write incremental sequence starting at row1
+    m_sorted_rows.resize(m_n_rows);
+    std::iota(m_sorted_rows.begin(), m_sorted_rows.end(), m_row1);
+
+    // do the sort
+    std::stable_sort(m_sorted_rows.begin(), m_sorted_rows.end(), [this, &key_col_values](row_t a, row_t b)
+    {
+        for (std::size_t k = 0; k < m_keys.size(); ++k)
+        {
+            const sort_value& va = key_col_values[k][a - m_row1];
+            const sort_value& vb = key_col_values[k][b - m_row1];
+
+            if (sort_value_less(va, vb, m_keys[k].ascending))
+                return true; // a < b
+
+            if (sort_value_less(vb, va, m_keys[k].ascending))
+                return false; // b < a
+
+            // tie, move to the next key column
+        }
+
+        return false;
+    });
+
+    // at this point, 'm_sorted_rows' stores the permutation of the sorted rows
+
+    m_dest_rows.resize(m_n_rows);
+
+    for (row_t i = 0; i < m_n_rows; ++i)
+    {
+        // from absolute row ID (m_sorted_rows[i]) to offset within sorted range (pos)
+        auto pos = m_sorted_rows[i] - m_row1;
+        m_dest_rows[pos] = m_row1 + i;
+    }
+}
+
+/**
+ * @return Row position of a source row after the sort.
+ */
+row_t range_sorter::dest_row_of(row_t row) const
+{
+    return (m_row1 <= row && row <= m_row2) ? m_dest_rows[row - m_row1] : row;
+}
+
+void range_sorter::sort_column(col_t col_pos)
+{
+    column_store_t& col = m_store[col_pos];
+
+    group_changes changes = collect_group_changes(col);
+
+    col.detach();
+
+    // Ungroup the affected groups first before applying the sort
+    ungroup(col, changes.to_ungroup);
+
+    std::vector<cell_slot> slots = extract_cells(col);
+
+    // The slots now own the formula cells fetched above; they leak if
+    // the write-back below throws before placing them all back.
+    col.release_range(m_row1, m_row2);
+
+    place_cells_sorted(col, slots);
+
+    regroup_column(col, changes.regroup_row1, changes.regroup_row2);
+
+    // The moves invalidated whatever hint the column had.
+    m_store.get_pos_hint(col_pos) = mdds::mtv::position_hint{};
+}
+
+/**
+ * Find the formula groups the sort breaks, which need to get ungrouped
+ * before the move, and the rows to scan for regrouping afterwards.
+ */
+range_sorter::group_changes range_sorter::collect_group_changes(const column_store_t& col) const
+{
+    group_changes changes;
+    changes.regroup_row1 = m_row1;
+    changes.regroup_row2 = m_row2;
+
+    for (const formula_group_entry& e : get_formula_groups(col))
+    {
+        if (e.size < 2 || m_row2 < e.row || e.row + e.size - 1 < m_row1)
+            continue; // skip non-grouped cells and groups outside the sorted range
+
+        // check if this group stays unchanged after the sort even if its
+        // position shifts.
+        bool intact = true;
+
+        for (row_t k = 1; k < e.size && intact; ++k)
+            intact = dest_row_of(e.row + k) == dest_row_of(e.row) + k;
+
+        if (!intact)
+        {
+            changes.to_ungroup.push_back({e.row, e.size});
+            changes.regroup_row1 = std::min(changes.regroup_row1, e.row);
+            changes.regroup_row2 = std::max(changes.regroup_row2, e.row + e.size - 1);
+        }
+    }
+
+    return changes;
+}
+
+/**
+ * Replace the members of the given groups with individual cells.
+ */
+void range_sorter::ungroup(column_store_t& col, const std::vector<group_span>& to_ungroup) const
+{
+    mdds::mtv::position_hint hint;
+
+    for (const group_span& g : to_ungroup)
+    {
+        // The members of a group are contiguous within one block.
+        auto pos = std::as_const(col).position(g.row);
+        assert(pos.first->type == element_type_formula);
+        formula_cell* const* cells =
+            &formula_element_block::at(*pos.first->data, pos.second);
+
+        std::vector<formula_cell*> single_cells;
+        single_cells.reserve(g.size);
+
+        for (row_t k = 0; k < g.size; ++k)
+            single_cells.push_back(make_single_cell(*cells[k]));
+
+        // overwrite the group with the individual cells
+        hint = col.set(hint, g.row, single_cells.begin(), single_cells.end());
+    }
+}
+
+/**
+ * Collect all cells in the sorted range into slots indexed by source row
+ * offset.
+ */
+std::vector<cell_slot> range_sorter::extract_cells(const column_store_t& col) const
+{
+    std::vector<cell_slot> slots(m_n_rows);
+
+    walk_blocks(col, m_row1, m_row2,
+        [&slots, this](const auto& blk, std::size_t offset, std::size_t n, row_t row)
+    {
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            cell_slot& slot = slots[row - m_row1 + i];
+
+            switch (blk.type)
+            {
+                case element_type_boolean:
+                {
+                    auto bit = boolean_element_block::cbegin(*blk.data);
+                    std::advance(bit, offset + i);
+                    slot = bool(*bit);
+                    break;
+                }
+                case element_type_numeric:
+                {
+                    slot = numeric_element_block::at(*blk.data, offset + i);
+                    break;
+                }
+                case element_type_string:
+                {
+                    slot = string_element_block::at(*blk.data, offset + i);
+                    break;
+                }
+                case element_type_inline_string:
+                {
+                    slot = inline_string_element_block::at(*blk.data, offset + i);
+                    break;
+                }
+                case element_type_formula:
+                {
+                    slot = formula_element_block::at(*blk.data, offset + i);
+                    break;
+                }
+                default:;
+            }
+        }
+    });
+
+    return slots;
+}
+
+/**
+ * Write the cells back in their sorted order, one ranged set per run of
+ * cells of the same type.
+ */
+void range_sorter::place_cells_sorted(column_store_t& col, std::vector<cell_slot>& slots) const
+{
+    // returns the slot holding the source cell given the destination row offset (0-based)
+    auto src_slot = [&slots, this](row_t dst) -> cell_slot&
+    {
+        auto src_row = m_sorted_rows[dst];
+        return slots[src_row - m_row1];
+    };
+
+    mdds::mtv::position_hint hint;
+
+    for (row_t run_start = 0; run_start < m_n_rows;)
+    {
+        row_t run_end = run_start + 1;
+
+        // determine the length of the run with the same type after the sort
+        while (run_end < m_n_rows && src_slot(run_end).index() == src_slot(run_start).index())
+            ++run_end;
+
+        row_t row = m_row1 + run_start;
+
+        if (std::holds_alternative<bool>(src_slot(run_start)))
+        {
+            std::deque<bool> buf;
+            for (row_t k = run_start; k < run_end; ++k)
+                buf.push_back(std::get<bool>(src_slot(k)));
+
+            hint = col.set(hint, row, buf.begin(), buf.end());
+        }
+        else if (std::holds_alternative<double>(src_slot(run_start)))
+        {
+            std::vector<double> buf;
+            buf.reserve(run_end - run_start);
+
+            for (row_t k = run_start; k < run_end; ++k)
+                buf.push_back(std::get<double>(src_slot(k)));
+
+            hint = col.set(hint, row, buf.begin(), buf.end());
+        }
+        else if (std::holds_alternative<std::uint32_t>(src_slot(run_start)))
+        {
+            std::vector<std::uint32_t> buf;
+            buf.reserve(run_end - run_start);
+
+            for (row_t k = run_start; k < run_end; ++k)
+                buf.push_back(std::get<std::uint32_t>(src_slot(k)));
+
+            hint = col.set(hint, row, buf.begin(), buf.end());
+        }
+        else if (std::holds_alternative<string_view_store>(src_slot(run_start)))
+        {
+            std::vector<string_view_store> buf;
+            buf.reserve(run_end - run_start);
+
+            for (row_t k = run_start; k < run_end; ++k)
+                buf.push_back(std::get<string_view_store>(src_slot(k)));
+
+            hint = col.set(hint, row, buf.begin(), buf.end());
+        }
+        else if (std::holds_alternative<formula_cell*>(src_slot(run_start)))
+        {
+            std::vector<formula_cell*> buf;
+            buf.reserve(run_end - run_start);
+
+            for (row_t k = run_start; k < run_end; ++k)
+                buf.push_back(std::get<formula_cell*>(src_slot(k)));
+
+            hint = col.set(hint, row, buf.begin(), buf.end());
+        }
+
+        // NB: an empty run needs no explicit handling
+
+        run_start = run_end;
+    }
+}
+
 } // anonymous namespace
 
 std::vector<row_t> sort_range(
@@ -483,256 +850,7 @@ std::vector<row_t> sort_range(
             throw std::invalid_argument("sort key column outside the sort range");
     }
 
-    const sheet_store& cstore = store;
-    row_t n_rows = row2 - row1 + 1;
-
-    // Extract the key column values and argsort the rows.
-    std::vector<std::vector<sort_value>> key_col_values;
-    key_col_values.reserve(keys.size());
-
-    for (const sort_key_t& key : keys)
-        key_col_values.push_back(fetch_key_column_values(cxt, cstore[key.column], row1, row2));
-
-    // write incremental sequence starting at row1
-    std::vector<row_t> sorted_rows(n_rows);
-    std::iota(sorted_rows.begin(), sorted_rows.end(), row1);
-
-    // do the sort
-    std::stable_sort(sorted_rows.begin(), sorted_rows.end(), [&keys, &key_col_values, row1](row_t a, row_t b)
-    {
-        for (std::size_t k = 0; k < keys.size(); ++k)
-        {
-            const sort_value& va = key_col_values[k][a - row1];
-            const sort_value& vb = key_col_values[k][b - row1];
-
-            if (sort_value_less(va, vb, keys[k].ascending))
-                return true; // a < b
-
-            if (sort_value_less(vb, va, keys[k].ascending))
-                return false; // b < a
-
-            // tie, move to the next key column
-        }
-
-        return false;
-    });
-
-    if (std::is_sorted(sorted_rows.begin(), sorted_rows.end()))
-        // Nothing moves; leave the columns untouched to preserve any
-        // copy-on-write sharing.
-        return sorted_rows;
-
-    // at this point, 'sorted_rows' stores the permutation of the sorted rows
-
-    // dest_rows stores the destination position of a source row within sorted range,
-    // it stores absolute row IDs.
-    std::vector<row_t> dest_rows(n_rows);
-
-    for (row_t i = 0; i < n_rows; ++i)
-    {
-        // from absolute row ID (sorted_rows[i]) to offset within sorted range (pos)
-        auto pos = sorted_rows[i] - row1;
-        dest_rows[pos] = row1 + i;
-    }
-
-    // returns the row position of a source row after the sort
-    auto dest_row_of = [&dest_rows, row1, row2](row_t row)
-    {
-        return (row1 <= row && row <= row2) ? dest_rows[row - row1] : row;
-    };
-
-    for (col_t col_pos = col1; col_pos <= col2; ++col_pos)
-    {
-        column_store_t& col = store[col_pos];
-
-        // collect all groups that need to be ungrouped.
-
-        struct group_span
-        {
-            row_t row;
-            row_t size;
-        };
-
-        std::vector<group_span> to_ungroup;
-
-        // Rows to scan for regrouping afterwards. A group crossing the boundary
-        // of the sorted range widens it to cover its members outside the range.
-        row_t regroup_row1 = row1;
-        row_t regroup_row2 = row2;
-
-        for (const formula_group_entry& e : get_formula_groups(col))
-        {
-            if (e.size < 2 || row2 < e.row || e.row + e.size - 1 < row1)
-                continue; // skip non-grouped cells and groups outside the sorted range
-
-            // check if this group stays unchanged after the sort even if its
-            // position shifts.
-            bool intact = true;
-
-            for (row_t k = 1; k < e.size && intact; ++k)
-                intact = dest_row_of(e.row + k) == dest_row_of(e.row) + k;
-
-            if (!intact)
-            {
-                to_ungroup.push_back({e.row, e.size});
-                regroup_row1 = std::min(regroup_row1, e.row);
-                regroup_row2 = std::max(regroup_row2, e.row + e.size - 1);
-            }
-        }
-
-        col.detach();
-
-        {
-            // Ungroup the affected groups first before applying the sort
-
-            mdds::mtv::position_hint hint;
-
-            for (const group_span& g : to_ungroup)
-            {
-                // The members of a group are contiguous within one block.
-                auto pos = std::as_const(col).position(g.row);
-                assert(pos.first->type == element_type_formula);
-                formula_cell* const* cells =
-                    &formula_element_block::at(*pos.first->data, pos.second);
-
-                std::vector<formula_cell*> single_cells;
-                single_cells.reserve(g.size);
-
-                for (row_t k = 0; k < g.size; ++k)
-                    single_cells.push_back(make_single_cell(*cells[k]));
-
-                // overwrite the group with the individual cells
-                hint = col.set(hint, g.row, single_cells.begin(), single_cells.end());
-            }
-        }
-
-        // collect and release all cells in the sorted range.
-        std::vector<cell_slot> slots(n_rows);
-
-        walk_blocks(std::as_const(col), row1, row2, [&slots, row1](const auto& blk, std::size_t offset, std::size_t n, row_t row)
-        {
-            for (std::size_t i = 0; i < n; ++i)
-            {
-                cell_slot& slot = slots[row - row1 + i];
-
-                switch (blk.type)
-                {
-                    case element_type_boolean:
-                    {
-                        auto bit = boolean_element_block::cbegin(*blk.data);
-                        std::advance(bit, offset + i);
-                        slot = bool(*bit);
-                        break;
-                    }
-                    case element_type_numeric:
-                    {
-                        slot = numeric_element_block::at(*blk.data, offset + i);
-                        break;
-                    }
-                    case element_type_string:
-                    {
-                        slot = string_element_block::at(*blk.data, offset + i);
-                        break;
-                    }
-                    case element_type_inline_string:
-                    {
-                        slot = inline_string_element_block::at(*blk.data, offset + i);
-                        break;
-                    }
-                    case element_type_formula:
-                    {
-                        slot = formula_element_block::at(*blk.data, offset + i);
-                        break;
-                    }
-                    default:;
-                }
-            }
-        });
-
-        // The slots now own the formula cells fetched above; they leak if
-        // the write-back below throws before placing them all back.
-        col.release_range(row1, row2);
-
-        // returns the slot holding the source cell given the destination row offset (0-based)
-        auto src_slot = [&slots, &sorted_rows, row1](row_t dst) -> cell_slot&
-        {
-            auto src_row = sorted_rows[dst];
-            return slots[src_row - row1];
-        };
-
-        mdds::mtv::position_hint hint;
-
-        for (row_t run_start = 0; run_start < n_rows;)
-        {
-            row_t run_end = run_start + 1;
-
-            // determine the length of the run with the same type after the sort
-            while (run_end < n_rows && src_slot(run_end).index() == src_slot(run_start).index())
-                ++run_end;
-
-            row_t row = row1 + run_start;
-
-            if (std::holds_alternative<bool>(src_slot(run_start)))
-            {
-                std::deque<bool> buf;
-                for (row_t k = run_start; k < run_end; ++k)
-                    buf.push_back(std::get<bool>(src_slot(k)));
-
-                hint = col.set(hint, row, buf.begin(), buf.end());
-            }
-            else if (std::holds_alternative<double>(src_slot(run_start)))
-            {
-                std::vector<double> buf;
-                buf.reserve(run_end - run_start);
-
-                for (row_t k = run_start; k < run_end; ++k)
-                    buf.push_back(std::get<double>(src_slot(k)));
-
-                hint = col.set(hint, row, buf.begin(), buf.end());
-            }
-            else if (std::holds_alternative<std::uint32_t>(src_slot(run_start)))
-            {
-                std::vector<std::uint32_t> buf;
-                buf.reserve(run_end - run_start);
-
-                for (row_t k = run_start; k < run_end; ++k)
-                    buf.push_back(std::get<std::uint32_t>(src_slot(k)));
-
-                hint = col.set(hint, row, buf.begin(), buf.end());
-            }
-            else if (std::holds_alternative<string_view_store>(src_slot(run_start)))
-            {
-                std::vector<string_view_store> buf;
-                buf.reserve(run_end - run_start);
-
-                for (row_t k = run_start; k < run_end; ++k)
-                    buf.push_back(std::get<string_view_store>(src_slot(k)));
-
-                hint = col.set(hint, row, buf.begin(), buf.end());
-            }
-            else if (std::holds_alternative<formula_cell*>(src_slot(run_start)))
-            {
-                std::vector<formula_cell*> buf;
-                buf.reserve(run_end - run_start);
-
-                for (row_t k = run_start; k < run_end; ++k)
-                    buf.push_back(std::get<formula_cell*>(src_slot(k)));
-
-                hint = col.set(hint, row, buf.begin(), buf.end());
-            }
-
-            // NB: an empty run needs no explicit handling
-
-            run_start = run_end;
-        }
-
-        regroup_column(col, regroup_row1, regroup_row2);
-
-        // The moves invalidated whatever hint the column had.
-        store.get_pos_hint(col_pos) = mdds::mtv::position_hint{};
-    }
-
-    return sorted_rows;
+    return range_sorter(cxt, store, range, keys).sort();
 }
 
 }}
