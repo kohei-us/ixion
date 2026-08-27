@@ -1254,9 +1254,11 @@ cell_value_t model_context_impl::get_cell_value_type(const abs_address_t& addr) 
 
 double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 {
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
+    return get_numeric_value(get_cell_position(addr));
+}
 
+double model_context_impl::get_numeric_value(const column_store_t::const_position_type& pos) const
+{
     switch (pos.first->type)
     {
         case element_type_numeric:
@@ -1280,9 +1282,11 @@ double model_context_impl::get_numeric_value(const abs_address_t& addr) const
 
 bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
 {
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
+    return get_boolean_value(get_cell_position(addr));
+}
 
+bool model_context_impl::get_boolean_value(const column_store_t::const_position_type& pos) const
+{
     switch (pos.first->type)
     {
         case element_type_numeric:
@@ -1306,9 +1310,11 @@ bool model_context_impl::get_boolean_value(const abs_address_t& addr) const
 
 string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr) const
 {
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
+    return get_string_identifier(get_cell_position(addr));
+}
 
+string_id_t model_context_impl::get_string_identifier(const column_store_t::const_position_type& pos) const
+{
     switch (pos.first->type)
     {
         case element_type_string:
@@ -1321,9 +1327,11 @@ string_id_t model_context_impl::get_string_identifier(const abs_address_t& addr)
 
 std::string_view model_context_impl::get_string_value(const abs_address_t& addr) const
 {
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
+    return get_string_value(get_cell_position(addr));
+}
 
+std::string_view model_context_impl::get_string_value(const column_store_t::const_position_type& pos) const
+{
     switch (pos.first->type)
     {
         case element_type_string:
@@ -1360,9 +1368,11 @@ std::string_view model_context_impl::intern_string(std::string_view s)
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const
 {
-    const column_store_t& col_store = m_sheets.at(addr.sheet).at(addr.column);
-    auto pos = col_store.position(addr.row);
+    return get_formula_cell(get_cell_position(addr));
+}
 
+const formula_cell* model_context_impl::get_formula_cell(const column_store_t::const_position_type& pos)
+{
     if (pos.first->type != element_type_formula)
         return nullptr;
 
@@ -1389,6 +1399,57 @@ formula_result model_context_impl::get_formula_result(const abs_address_t& addr)
         throw general_error("not a formula cell.");
 
     return fc->get_result_cache(m_formula_res_wait_policy);
+}
+
+sheet_view& model_context_impl::create_sheet_view(sheet_t sheet, std::string&& name)
+{
+    const sheet_store* base = fetch_sheet(sheet);
+    if (!base)
+        throw_invalid_sheet_index(sheet);
+
+    sheet_views_type& views = m_sheet_views[sheet];
+
+    if (views.contains(name))
+        throw model_context_error(
+            std::format("sheet view name '{}' already exists on sheet {}", name, sheet),
+            model_context_error::sheet_view_name_conflict);
+
+    // the constructor is private to sheet_view; this class is its friend
+    std::unique_ptr<sheet_view> view(new sheet_view(*this, sheet, name, *base));
+    sheet_view& ref = *view;
+    views.emplace(std::move(name), std::move(view));
+    return ref;
+}
+
+sheet_view* model_context_impl::get_sheet_view(sheet_t sheet, std::string_view name)
+{
+    auto it_sheet = m_sheet_views.find(sheet);
+    if (it_sheet == m_sheet_views.end())
+        return nullptr;
+
+    auto it = it_sheet->second.find(name);
+    return it == it_sheet->second.end() ? nullptr : it->second.get();
+}
+
+const sheet_view* model_context_impl::get_sheet_view(sheet_t sheet, std::string_view name) const
+{
+    auto it_sheet = m_sheet_views.find(sheet);
+    if (it_sheet == m_sheet_views.end())
+        return nullptr;
+
+    auto it = it_sheet->second.find(name);
+    return it == it_sheet->second.end() ? nullptr : it->second.get();
+}
+
+void model_context_impl::remove_sheet_view(sheet_t sheet, std::string_view name)
+{
+    auto it_sheet = m_sheet_views.find(sheet);
+    if (it_sheet == m_sheet_views.end())
+        return;
+
+    auto it = it_sheet->second.find(name);
+    if (it != it_sheet->second.end())
+        it_sheet->second.erase(it);
 }
 
 void model_context_impl::ensure_unique_sheet_name(std::string_view name) const

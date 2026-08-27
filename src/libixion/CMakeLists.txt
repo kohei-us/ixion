@@ -48,6 +48,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     utils.cpp
     sheet_sort.cpp
     sheet_store.cpp
+    sheet_view.cpp
 )
 
 if(BUILD_VULKAN)
@@ -109,6 +110,10 @@ add_executable(sheet-sort-test EXCLUDE_FROM_ALL
     formula_groups.cpp
 )
 
+add_executable(sheet-view-test EXCLUDE_FROM_ALL
+    sheet_view_test.cpp
+)
+
 add_executable(name-resolver-test EXCLUDE_FROM_ALL
     name_resolver_test.cpp
 )
@@ -138,6 +143,7 @@ target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(general-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(model-context-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(sheet-sort-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(sheet-view-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(ixion-test-track-deps ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(dirty-cell-tracker-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(compute-engine-test ixion-${IXION_API_VERSION} ixion-test)
@@ -150,6 +156,7 @@ add_dependencies(check
     general-test
     model-context-test
     sheet-sort-test
+    sheet-view-test
     ixion-test-track-deps
     dirty-cell-tracker-test
     compute-engine-test
@@ -162,6 +169,7 @@ add_test(document-test document-test)
 add_test(general-test general-test)
 add_test(model-context-test model-context-test)
 add_test(sheet-sort-test sheet-sort-test)
+add_test(sheet-view-test sheet-view-test)
 add_test(ixion-test-track-deps ixion-test-track-deps)
 add_test(dirty-cell-tracker-test dirty-cell-tracker-test)
 add_test(compute-engine-test compute-engine-test)

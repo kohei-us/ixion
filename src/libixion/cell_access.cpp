@@ -59,10 +59,7 @@ cell_value_t cell_access::get_value_type() const
 
 const formula_cell* cell_access::get_formula_cell() const
 {
-    if (mp_impl->pos.first->type != element_type_formula)
-        return nullptr;
-
-    return formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
+    return detail::model_context_impl::get_formula_cell(mp_impl->pos);
 }
 
 formula_result cell_access::get_formula_result() const
@@ -76,86 +73,22 @@ formula_result cell_access::get_formula_result() const
 
 double cell_access::get_numeric_value() const
 {
-    switch (mp_impl->pos.first->type)
-    {
-        case element_type_numeric:
-            return numeric_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-        case element_type_boolean:
-        {
-            auto it = boolean_element_block::cbegin(*mp_impl->pos.first->data);
-            std::advance(it, mp_impl->pos.second);
-            return *it ? 1.0 : 0.0;
-        }
-        case element_type_formula:
-        {
-            const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return p->get_value(mp_impl->cxt.get_formula_result_wait_policy());
-        }
-        default:
-            ;
-    }
-    return 0.0;
+    return mp_impl->cxt.mp_impl->get_numeric_value(mp_impl->pos);
 }
 
 bool cell_access::get_boolean_value() const
 {
-    switch (mp_impl->pos.first->type)
-    {
-        case element_type_numeric:
-            return numeric_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second) != 0.0 ? true : false;
-        case element_type_boolean:
-        {
-            auto it = boolean_element_block::cbegin(*mp_impl->pos.first->data);
-            std::advance(it, mp_impl->pos.second);
-            return *it;
-        }
-        case element_type_formula:
-        {
-            const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return p->get_value(mp_impl->cxt.get_formula_result_wait_policy()) == 0.0 ? false : true;
-        }
-        default:
-            ;
-    }
-    return false;
+    return mp_impl->cxt.mp_impl->get_boolean_value(mp_impl->pos);
 }
 
 std::string_view cell_access::get_string_value() const
 {
-    switch (mp_impl->pos.first->type)
-    {
-        case element_type_string:
-        {
-            string_id_t sid{string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second)};
-            const std::string* p = mp_impl->cxt.get_string(sid);
-            return p ? *p : std::string_view{};
-        }
-        case element_type_inline_string:
-            return inline_string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-        case element_type_formula:
-        {
-            const formula_cell* p = formula_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second);
-            return p->get_string(mp_impl->cxt.get_formula_result_wait_policy());
-        }
-        case element_type_empty:
-            return detail::empty_string;
-        default:
-            ;
-    }
-
-    return std::string_view{};
+    return mp_impl->cxt.mp_impl->get_string_value(mp_impl->pos);
 }
 
 string_id_t cell_access::get_string_identifier() const
 {
-    switch (mp_impl->pos.first->type)
-    {
-        case element_type_string:
-            return string_id_t{string_element_block::at(*mp_impl->pos.first->data, mp_impl->pos.second)};
-        default:
-            ;
-    }
-    return empty_string_id;
+    return mp_impl->cxt.mp_impl->get_string_identifier(mp_impl->pos);
 }
 
 formula_error_t cell_access::get_error_value() const

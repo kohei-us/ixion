@@ -14,6 +14,7 @@
 #include <ixion/named_expressions_iterator.hpp>
 #include <ixion/cell_access.hpp>
 #include <ixion/exceptions.hpp>
+#include <ixion/sheet_view.hpp>
 
 #include "deprecated.hpp"
 #include "grid_dumper.hpp"
@@ -388,6 +389,26 @@ sheet_t model_context::append_sheet(std::string name)
 model_context::sheet_copy_result model_context::append_sheet_copy(sheet_t src, std::string name)
 {
     return mp_impl->append_sheet_copy(src, std::move(name));
+}
+
+sheet_view& model_context::create_sheet_view(sheet_t sheet, std::string name)
+{
+    return mp_impl->create_sheet_view(sheet, std::move(name));
+}
+
+sheet_view* model_context::get_sheet_view(sheet_t sheet, std::string_view name)
+{
+    return mp_impl->get_sheet_view(sheet, name);
+}
+
+const sheet_view* model_context::get_sheet_view(sheet_t sheet, std::string_view name) const
+{
+    return detail::cimpl(mp_impl).get_sheet_view(sheet, name);
+}
+
+void model_context::remove_sheet_view(sheet_t sheet, std::string_view name)
+{
+    mp_impl->remove_sheet_view(sheet, name);
 }
 
 void model_context::set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows)

@@ -7,4 +7,5 @@ ixion-test-track-deps
 model-context-test
 name-resolver-test
 sheet-sort-test
+sheet-view-test
 version-test

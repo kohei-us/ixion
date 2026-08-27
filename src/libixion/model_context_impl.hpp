@@ -11,6 +11,7 @@
 #include <ixion/types.hpp>
 #include <ixion/config.hpp>
 #include <ixion/dirty_cell_tracker.hpp>
+#include <ixion/sheet_view.hpp>
 
 #include "sheet_store.hpp"
 #include "table_store.hpp"
@@ -22,6 +23,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <memory>
 #include <unordered_map>
 #include <mutex>
 #include <deque>
@@ -32,6 +34,9 @@ using sheet_stores_type = std::deque<sheet_store>;
 
 /** Maps source table names to the names of their clones. */
 using table_name_map_type = std::map<std::string_view, std::string_view>;
+
+/** Views of one sheet keyed by their names. */
+using sheet_views_type = std::map<std::string, std::unique_ptr<sheet_view>, std::less<>>;
 
 class model_context_impl
 {
@@ -138,6 +143,11 @@ public:
     sheet_t append_sheet(std::string&& name);
     model_context::sheet_copy_result append_sheet_copy(sheet_t src, std::string&& name);
 
+    sheet_view& create_sheet_view(sheet_t sheet, std::string&& name);
+    sheet_view* get_sheet_view(sheet_t sheet, std::string_view name);
+    const sheet_view* get_sheet_view(sheet_t sheet, std::string_view name) const;
+    void remove_sheet_view(sheet_t sheet, std::string_view name);
+
     void set_cell_values(sheet_t sheet, std::initializer_list<model_context::input_row>&& rows);
 
     string_id_t append_string(std::string_view s);
@@ -158,6 +168,16 @@ public:
     const sheet_store* fetch_sheet(sheet_t sheet_index) const;
 
     column_store_t::const_position_type get_cell_position(const abs_address_t& addr) const;
+
+    /**
+     * Read a cell at an already resolved column position. The address-based
+     * getters above and the sheet views share these.
+     */
+    double get_numeric_value(const column_store_t::const_position_type& pos) const;
+    bool get_boolean_value(const column_store_t::const_position_type& pos) const;
+    string_id_t get_string_identifier(const column_store_t::const_position_type& pos) const;
+    std::string_view get_string_value(const column_store_t::const_position_type& pos) const;
+    static const formula_cell* get_formula_cell(const column_store_t::const_position_type& pos);
 
     const detail::named_expressions_t& get_named_expressions() const;
     const detail::named_expressions_t& get_named_expressions(sheet_t sheet) const;
@@ -192,6 +212,9 @@ private:
 
     rc_size_t m_sheet_size;
     sheet_stores_type m_sheets;
+
+    // views per sheet index
+    std::map<sheet_t, sheet_views_type> m_sheet_views;
 
     config m_config;
     dirty_cell_tracker m_tracker;

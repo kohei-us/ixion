@@ -54,6 +54,8 @@ class model_context_impl;
  * sheets. It also stores named expressions both in global scope and
  * sheet-local scope.
  */
+class sheet_view;
+
 class IXION_DLLPUBLIC model_context final
 {
     friend class named_expressions_iterator;
@@ -529,6 +531,45 @@ public:
      * @throw std::invalid_argument When the source sheet index is invalid.
      */
     sheet_copy_result append_sheet_copy(sheet_t src, std::string name);
+
+    /**
+     * Create a named view of a sheet.  The view takes a snapshot of the
+     * current content of the sheet, and answers reads from that snapshot.
+     * The model context owns the view; the returned reference stays valid
+     * until the view gets removed or the model context gets destroyed.
+     *
+     * @param sheet Index of the sheet to create a view of.
+     * @param name Name of the view.  It must be unique among the views of the
+     *             same sheet.
+     *
+     * @return Reference to the new view.
+     *
+     * @throw model_context_error When a view of the same name already exists
+     *                            on the sheet.
+     * @throw std::invalid_argument When the sheet index is invalid.
+     */
+    sheet_view& create_sheet_view(sheet_t sheet, std::string name);
+
+    /**
+     * Get a named view of a sheet.
+     *
+     * @param sheet Index of the sheet the view belongs to.
+     * @param name Name of the view.
+     *
+     * @return Pointer to the view, or nullptr if no view of that name exists
+     *         on the sheet.
+     */
+    sheet_view* get_sheet_view(sheet_t sheet, std::string_view name);
+    const sheet_view* get_sheet_view(sheet_t sheet, std::string_view name) const;
+
+    /**
+     * Remove a named view of a sheet.  It does nothing if no view of that
+     * name exists on the sheet.
+     *
+     * @param sheet Index of the sheet the view belongs to.
+     * @param name Name of the view.
+     */
+    void remove_sheet_view(sheet_t sheet, std::string_view name);
 
     /**
      * A convenient way to mass-insert a range of cell values.  You can

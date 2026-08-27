@@ -25,6 +25,7 @@ check_PROGRAMS = \
 	general-test \
 	model-context-test \
 	sheet-sort-test \
+	sheet-view-test \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \
@@ -101,6 +102,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	sheet_sort.cpp \
 	sheet_store.hpp \
 	sheet_store.cpp \
+	sheet_view.cpp \
 	interface.cpp
 
 if BUILD_VULKAN
@@ -179,6 +181,11 @@ sheet_sort_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
 	../test/libixion-test.a
 
+sheet_view_test_SOURCES = sheet_view_test.cpp
+sheet_view_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a
+
 name_resolver_test_SOURCES = name_resolver_test.cpp
 name_resolver_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
@@ -214,6 +221,7 @@ TESTS = \
 	general-test \
 	model-context-test \
 	sheet-sort-test \
+	sheet-view-test \
 	ixion-test-track-deps \
 	compute-engine-test \
 	dirty-cell-tracker-test \
