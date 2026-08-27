@@ -13,6 +13,8 @@
 
 #include <ixion/address.hpp>
 #include <ixion/cell.hpp>
+#include <ixion/formula.hpp>
+#include <ixion/formula_name_resolver.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/formula_tokens.hpp>
 #include <ixion/model_context.hpp>
@@ -21,6 +23,7 @@
 #include <cstdlib>
 #include <memory>
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 
 namespace {
@@ -38,14 +41,45 @@ ixion::abs_rc_range_t to_range(
     return range;
 }
 
+ixion::formula_tokens_store_ptr_t make_tokens(
+    ixion::model_context& cxt, const ixion::abs_address_t& pos, std::string_view expr)
+{
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_r1c1, &cxt);
+    assert(resolver);
+
+    auto tokens = ixion::parse_formula_string(cxt, pos, *resolver, expr);
+    return ixion::formula_tokens_store::create(tokens);
+}
+
 /**
- * Set a group of formula cells sharing one calc status and one token
- * store, with cached results of 10, 20, ... in member order.
+ * Set a standalone formula cell in column B with the given expression and
+ * cached result.
+ *
+ * @param expr Formula expression in R1C1 notation.
  */
-void set_group(ixion::column_store_t& col, ixion::row_t row, ixion::row_t size)
+void set_formula(
+    ixion::model_context& cxt, ixion::column_store_t& col, ixion::row_t row,
+    std::string_view expr, double result)
+{
+    auto tokens = make_tokens(cxt, {0, row, 1}, expr);
+    auto fc = std::make_unique<ixion::formula_cell>(tokens);
+    fc->set_result_cache(result);
+    col.set(row, fc.release());
+}
+
+/**
+ * Set a group of formula cells in column B sharing one calc status and one
+ * token store, with cached results of 10, 20, ... in member order.
+ *
+ * @param expr Formula expression in R1C1 notation shared by all members.
+ */
+void set_group(
+    ixion::model_context& cxt, ixion::column_store_t& col, ixion::row_t row, ixion::row_t size,
+    std::string_view expr)
 {
     ixion::calc_status_ptr_t cs(new ixion::calc_status({size, 1}));
-    auto ts = ixion::formula_tokens_store::create();
+    auto ts = make_tokens(cxt, {0, row, 1}, expr);
 
     for (ixion::row_t k = 0; k < size; ++k)
     {
@@ -301,7 +335,7 @@ void test_sheet_sort_group_survives_slide()
     store[0].set(2, 2.0);
     store[0].set(3, 3.0);
 
-    set_group(store[1], 1, 3);
+    set_group(cxt, store[1], 1, 3, "RC[-1]*10");
     auto identity = store[1].get<ixion::formula_cell*>(1)->get_group_properties().identity;
 
     // The sort moves the group up by one row with its member order intact,
@@ -350,7 +384,7 @@ void test_sheet_sort_group_breaks_and_regroups()
     store[0].set(2, 3.0);
     store[0].set(3, 2.0);
 
-    set_group(store[1], 0, 3);
+    set_group(cxt, store[1], 0, 3, "RC[-1]*10");
     store[1].set(3, 99.0);
 
     // The sort scatters the group members out of order, which breaks the
@@ -406,7 +440,7 @@ void test_sheet_sort_group_crosses_range_boundary()
     store[0].set(4, 2.0);
     store[0].set(5, 3.0);
 
-    set_group(store[1], 0, 4);
+    set_group(cxt, store[1], 0, 4, "RC[-1]*10");
 
     // Group members at row indices 2-3 fall inside the sorted row indices 2-5
     // and get scattered, which breaks the whole group even though row indices
@@ -451,6 +485,87 @@ void test_sheet_sort_group_crosses_range_boundary()
     assert(store[1].is_empty(4));
     assert(!store[1].get<ixion::formula_cell*>(5)->get_group_properties().grouped);
     assert(formula_value(store[1], 5) == 30.0);
+}
+
+void test_sheet_sort_regroup_splits_at_different_formula()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    ixion::detail::sheet_store store(5, 2);
+
+    store[0].set(0, 5.0);
+    store[0].set(1, 4.0);
+    store[0].set(2, 2.0);
+    store[0].set(3, 1.0);
+    store[0].set(4, 3.0);
+
+    set_group(cxt, store[1], 0, 4, "RC[-1]*10");
+
+    // standalone formula cell with a different formula
+    set_formula(cxt, store[1], 4, "RC[-1]+99", 99.0);
+
+    // The sort reverses the group members and drops the different formula
+    // cell in the middle of them.
+    ixion::detail::sort_keys_t keys = {{0, true}};
+
+    // layout before sorting
+    // 0: 5.0 | 10.0 (grouped formula)
+    // 1: 4.0 | 20.0 (grouped formula)
+    // 2: 2.0 | 30.0 (grouped formula)
+    // 3: 1.0 | 40.0 (grouped formula)
+    // 4: 3.0 | 99.0 (formula)
+    std::vector<ixion::row_t> sorted_rows =
+        ixion::detail::sort_range(cxt, store, to_range(0, 0, 4, 1), keys);
+
+    std::vector<ixion::row_t> expected = {
+        3, // 1.0 | 40.0 (grouped formula)
+        2, // 2.0 | 30.0 (grouped formula)
+        4, // 3.0 | 99.0 (formula)
+        1, // 4.0 | 20.0 (grouped formula)
+        0  // 5.0 | 10.0 (grouped formula)
+    };
+    assert(sorted_rows == expected);
+
+    // The different formula cannot join a group, so the members on either
+    // side of it regroup separately.
+
+    // upper group
+    auto upper_identity = store[1].get<ixion::formula_cell*>(0)->get_group_properties().identity;
+
+    for (ixion::row_t r = 0; r <= 1; ++r)
+    {
+        const auto* fc = store[1].get<ixion::formula_cell*>(r);
+        ixion::formula_group_t group = fc->get_group_properties();
+        assert(group.grouped);
+        assert(group.size.row == 2);
+        assert(group.identity == upper_identity);
+        assert(fc->get_parent_position({0, r, 1}).row == 0);
+    }
+
+    assert(formula_value(store[1], 0) == 40.0);
+    assert(formula_value(store[1], 1) == 30.0);
+
+    // the different formula in the middle stays non-grouped
+    assert(!store[1].get<ixion::formula_cell*>(2)->get_group_properties().grouped);
+    assert(formula_value(store[1], 2) == 99.0);
+
+    // lower group
+    auto lower_identity = store[1].get<ixion::formula_cell*>(3)->get_group_properties().identity;
+    assert(lower_identity != upper_identity);
+
+    for (ixion::row_t r = 3; r <= 4; ++r)
+    {
+        const auto* fc = store[1].get<ixion::formula_cell*>(r);
+        ixion::formula_group_t group = fc->get_group_properties();
+        assert(group.grouped);
+        assert(group.size.row == 2);
+        assert(group.identity == lower_identity);
+        assert(fc->get_parent_position({0, r, 1}).row == 3);
+    }
+
+    assert(formula_value(store[1], 3) == 20.0);
+    assert(formula_value(store[1], 4) == 10.0);
 }
 
 void test_sheet_sorted_column_no_detach()
@@ -572,6 +687,7 @@ int main()
     test_sheet_sort_group_survives_slide();
     test_sheet_sort_group_breaks_and_regroups();
     test_sheet_sort_group_crosses_range_boundary();
+    test_sheet_sort_regroup_splits_at_different_formula();
     test_sheet_sorted_column_no_detach();
     test_sheet_sort_cow_detach_scope();
     test_sheet_sort_invalid_args();
