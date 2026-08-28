@@ -1112,99 +1112,13 @@ void model_context_impl::set_grouped_formula_cells(
 
 abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
 {
-    const sheet_store& cols = m_sheets.at(sheet);
-    size_t col_size = cols.size();
-    if (!col_size)
-        return abs_range_t(abs_range_t::invalid);
-
-    row_t row_size = cols[0].size();
-    if (!row_size)
+    abs_rc_range_t rc_range = m_sheets.at(sheet).get_data_range();
+    if (!rc_range.valid())
         return abs_range_t(abs_range_t::invalid);
 
     abs_range_t range;
-    range.first.column = 0;
-    range.first.row = row_size-1;
-    range.first.sheet = sheet;
-    range.last.column = -1; // if this stays -1 all columns are empty.
-    range.last.row = 0;
-    range.last.sheet = sheet;
-
-    for (size_t i = 0; i < col_size; ++i)
-    {
-        const column_store_t& col = cols[i];
-        if (col.empty())
-        {
-            if (range.last.column < 0)
-                ++range.first.column;
-            continue;
-        }
-
-        if (range.first.row > 0)
-        {
-            // First non-empty row.
-
-            column_store_t::const_iterator it = col.begin(), it_end = col.end();
-            assert(it != it_end);
-            if (it->type == element_type_empty)
-            {
-                // First block is empty.
-                row_t offset = it->size;
-                ++it;
-                if (it == it_end)
-                {
-                    // The whole column is empty.
-                    if (range.last.column < 0)
-                        ++range.first.column;
-                    continue;
-                }
-
-                assert(it->type != element_type_empty);
-                if (range.first.row > offset)
-                    range.first.row = offset;
-            }
-            else
-                // Set the first row to 0, and lock it.
-                range.first.row = 0;
-        }
-
-        if (range.last.row < (row_size-1))
-        {
-            // Last non-empty row.
-
-            column_store_t::const_reverse_iterator it = col.rbegin(), it_end = col.rend();
-            assert(it != it_end);
-            if (it->type == element_type_empty)
-            {
-                // Last block is empty.
-                size_t size_last_block = it->size;
-                ++it;
-                if (it == it_end)
-                {
-                    // The whole column is empty.
-                    if (range.last.column < 0)
-                        ++range.first.column;
-                    continue;
-                }
-
-                assert(it->type != element_type_empty);
-                row_t last_data_row = static_cast<row_t>(col.size() - size_last_block - 1);
-                if (range.last.row < last_data_row)
-                    range.last.row = last_data_row;
-            }
-            else
-                // Last block is not empty.
-                range.last.row = row_size - 1;
-        }
-
-        // Check if the column contains at least one non-empty cell.
-        if (col.block_size() > 1 || !col.is_empty(0))
-            range.last.column = i;
-    }
-
-    if (range.last.column < 0)
-        // No data column found.  The whole sheet is empty.
-        return abs_range_t(abs_range_t::invalid);
-
+    range.first = abs_address_t(sheet, rc_range.first.row, rc_range.first.column);
+    range.last = abs_address_t(sheet, rc_range.last.row, rc_range.last.column);
     return range;
 }
 

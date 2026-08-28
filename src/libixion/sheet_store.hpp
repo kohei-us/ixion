@@ -10,6 +10,8 @@
 #include "column_store_type.hpp"
 #include "model_types.hpp"
 
+#include <ixion/address.hpp>
+
 #include <vector>
 
 namespace ixion { namespace detail {
@@ -51,6 +53,14 @@ public:
     size_type size() const { return m_columns.size(); }
 
     const column_stores_t& get_columns() const { return m_columns; }
+
+    /**
+     * Get the range that spans all the non-empty cells of the sheet.
+     *
+     * @return Range spanning the non-empty cells, or an invalid range when
+     *         the sheet has no content.
+     */
+    abs_rc_range_t get_data_range() const;
 
     detail::named_expressions_t& get_named_expressions() { return m_named_expressions; }
     const detail::named_expressions_t& get_named_expressions() const { return m_named_expressions; }
