@@ -13,6 +13,7 @@
 #include <iosfwd>
 #include <string_view>
 #include <functional>
+#include <vector>
 
 namespace ixion {
 
@@ -388,6 +389,18 @@ struct IXION_DLLPUBLIC print_config
     print_config(const print_config& other);
     ~print_config();
 };
+
+/** Single sort key applied to a column within a sorted range. */
+struct sort_key_t
+{
+    /** Column the key reads its values from. */
+    col_t column;
+    /** Sort direction of the key. */
+    bool ascending = true;
+};
+
+/** Sort keys in order of precedence. */
+using sort_keys_t = std::vector<sort_key_t>;
 
 } // namespace ixion
 

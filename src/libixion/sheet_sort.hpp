@@ -20,17 +20,6 @@ namespace detail {
 
 class sheet_store;
 
-/** Single sort key applied to a column within the sorted range. */
-struct sort_key_t
-{
-    /** Column the key reads its values from. */
-    col_t column;
-    /** Sort direction of the key. */
-    bool ascending = true;
-};
-
-using sort_keys_t = std::vector<sort_key_t>;
-
 /**
  * Sort the rows of a range in place.  The rows of the range move as units
  * across all of its columns; cells outside the range never move.

@@ -55,6 +55,11 @@ public:
         return m_formula_res_wait_policy;
     }
 
+    const model_context& get_parent() const
+    {
+        return m_parent;
+    }
+
     void notify(formula_event_t event);
 
     const config& get_config() const

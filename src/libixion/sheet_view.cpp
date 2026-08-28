@@ -9,8 +9,11 @@
 #include <ixion/address.hpp>
 
 #include "model_context_impl.hpp"
+#include "sheet_sort.hpp"
 #include "sheet_store.hpp"
 #include "utils.hpp"
+
+#include <numeric>
 
 namespace ixion {
 
@@ -25,6 +28,11 @@ struct sheet_view::impl
     // share their content.
     detail::sheet_store store;
 
+    // Row mapping between this view and the base sheet, covering all the rows
+    // of the sheet.  Both stay empty, meaning identity, until the first sort.
+    std::vector<row_t> base_rows; // view row -> base row
+    std::vector<row_t> view_rows; // base row -> view row
+
     impl(const detail::model_context_impl& _cxt, sheet_t _sheet, std::string _name,
          const detail::sheet_store& base) :
         cxt(_cxt), sheet(_sheet), name(std::move(_name)), store(base.clone()) {}
@@ -32,6 +40,40 @@ struct sheet_view::impl
     column_store_t::const_position_type get_cell_position(const abs_rc_address_t& pos) const
     {
         return store.at(pos.column).position(pos.row);
+    }
+
+    row_t get_row_count() const
+    {
+        // NB: all columns of a sheet have the same size
+        return store.size() ? row_t(store[0].size()) : 0;
+    }
+
+    /**
+     * Fold the permutation of a sort into the row mapping.
+     *
+     * @param row1 First row of the sorted range.
+     * @param sorted_rows Permutation returned by the sort: element i holds
+     *                    the view row, before the sort, of the cells now at
+     *                    row1 + i.
+     */
+    void apply_permutation(row_t row1, const std::vector<row_t>& sorted_rows)
+    {
+        if (base_rows.empty())
+        {
+            base_rows.resize(get_row_count());
+            std::iota(base_rows.begin(), base_rows.end(), 0);
+        }
+
+        std::vector<row_t> prev_base_rows = base_rows;
+
+        for (std::size_t i = 0; i < sorted_rows.size(); ++i)
+            base_rows[row1 + i] = prev_base_rows[sorted_rows[i]];
+
+        // rebuild the inverse mapping
+        view_rows.resize(base_rows.size());
+
+        for (std::size_t view_row = 0; view_row < base_rows.size(); ++view_row)
+            view_rows[base_rows[view_row]] = view_row;
     }
 };
 
@@ -82,6 +124,30 @@ const formula_cell* sheet_view::get_formula_cell(const abs_rc_address_t& pos) co
 {
     auto cell_pos = mp_impl->get_cell_position(pos);
     return detail::model_context_impl::get_formula_cell(cell_pos);
+}
+
+void sheet_view::sort(const abs_rc_range_t& range, const sort_keys_t& keys)
+{
+    std::vector<row_t> sorted_rows =
+        detail::sort_range(mp_impl->cxt.get_parent(), mp_impl->store, range, keys);
+
+    mp_impl->apply_permutation(range.first.row, sorted_rows);
+}
+
+row_t sheet_view::to_base_row(row_t view_row) const
+{
+    if (mp_impl->base_rows.empty())
+        return view_row;
+
+    return mp_impl->base_rows.at(view_row);
+}
+
+row_t sheet_view::to_view_row(row_t base_row) const
+{
+    if (mp_impl->view_rows.empty())
+        return base_row;
+
+    return mp_impl->view_rows.at(base_row);
 }
 
 }

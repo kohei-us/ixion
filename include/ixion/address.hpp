@@ -240,6 +240,14 @@ struct IXION_DLLPUBLIC abs_rc_range_t
     abs_rc_range_t(const abs_rc_range_t& other);
     abs_rc_range_t(const abs_range_t& other);
 
+    /**
+     * @param _row 0-based row position of the top-left cell of the range.
+     * @param _col 0-based column position of the top-left cell of the range.
+     * @param _row_span Row length of the range.  It must be 1 or greater.
+     * @param _col_span Column length of the range.  It must be 1 or greater.
+     */
+    abs_rc_range_t(row_t _row, col_t _col, row_t _row_span, col_t _col_span);
+
     struct hash
     {
         IXION_DLLPUBLIC size_t operator() (const abs_rc_range_t& range) const;

@@ -14,6 +14,7 @@
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/formula_tokens.hpp>
+#include <ixion/matrix.hpp>
 #include <ixion/model_context.hpp>
 #include <ixion/sheet_view.hpp>
 
@@ -171,6 +172,291 @@ void test_sheet_view_snapshot()
     assert(view.get_celltype(A3) == ixion::cell_t::empty);
 }
 
+void test_sheet_view_sort()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_address_t A1{0, 0, 0};
+    const ixion::abs_address_t A2{0, 1, 0};
+    const ixion::abs_address_t A3{0, 2, 0};
+    const ixion::abs_address_t A4{0, 3, 0};
+    const ixion::abs_address_t B1{0, 0, 1};
+    const ixion::abs_address_t B2{0, 1, 1};
+    const ixion::abs_address_t B3{0, 2, 1};
+    const ixion::abs_address_t B4{0, 3, 1};
+    const ixion::abs_rc_range_t A1_B3{0, 0, 3, 2};
+
+    // layout of the base sheet
+    // 0: 3.0 | "c"
+    // 1: 1.0 | "a"
+    // 2: 2.0 | "b"
+    // 3: 9.0 | "z"   <- outside the sorted range
+    cxt.set_numeric_cell(A1, 3.0);
+    cxt.set_numeric_cell(A2, 1.0);
+    cxt.set_numeric_cell(A3, 2.0);
+    cxt.set_numeric_cell(A4, 9.0);
+    cxt.set_string_cell(B1, "c");
+    cxt.set_string_cell(B2, "a");
+    cxt.set_string_cell(B3, "b");
+    cxt.set_string_cell(B4, "z");
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    // before any sort the mapping is identity
+    assert(view.to_base_row(2) == 2);
+    assert(view.to_view_row(2) == 2);
+
+    // sort row indices 0-2 across both columns by column A
+    view.sort(A1_B3, {{0, true}});
+
+    // the view shows the sorted rows
+    assert(view.get_numeric_value(A1) == 1.0);
+    assert(view.get_numeric_value(A2) == 2.0);
+    assert(view.get_numeric_value(A3) == 3.0);
+    assert(view.get_string_value(B1) == "a");
+    assert(view.get_string_value(B2) == "b");
+    assert(view.get_string_value(B3) == "c");
+
+    // the row outside the range stays put
+    assert(view.get_numeric_value(A4) == 9.0);
+    assert(view.get_string_value(B4) == "z");
+
+    // the base sheet stays untouched
+    assert(cxt.get_numeric_value(A1) == 3.0);
+    assert(cxt.get_numeric_value(A2) == 1.0);
+    assert(cxt.get_numeric_value(A3) == 2.0);
+    assert(cxt.get_string_value(B1) == "c");
+
+    // row mapping: view row -> base row, and back
+    assert(view.to_base_row(0) == 1);
+    assert(view.to_base_row(1) == 2);
+    assert(view.to_base_row(2) == 0);
+    assert(view.to_base_row(3) == 3);
+
+    assert(view.to_view_row(1) == 0);
+    assert(view.to_view_row(2) == 1);
+    assert(view.to_view_row(0) == 2);
+    assert(view.to_view_row(3) == 3);
+}
+
+void test_sheet_view_sort_twice()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_address_t A1{0, 0, 0};
+    const ixion::abs_address_t A2{0, 1, 0};
+    const ixion::abs_address_t A3{0, 2, 0};
+    const ixion::abs_address_t B1{0, 0, 1};
+    const ixion::abs_address_t B2{0, 1, 1};
+    const ixion::abs_address_t B3{0, 2, 1};
+    const ixion::abs_rc_range_t A1_B3{0, 0, 3, 2};
+
+    // layout of the base sheet
+    // 0: 2.0 | "b"
+    // 1: 1.0 | "c"
+    // 2: 3.0 | "a"
+    cxt.set_numeric_cell(A1, 2.0);
+    cxt.set_numeric_cell(A2, 1.0);
+    cxt.set_numeric_cell(A3, 3.0);
+    cxt.set_string_cell(B1, "b");
+    cxt.set_string_cell(B2, "c");
+    cxt.set_string_cell(B3, "a");
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    // first sort by column A ascending: rows become
+    // 1: 1.0 | "c"
+    // 0: 2.0 | "b"
+    // 2: 3.0 | "a"
+    view.sort(A1_B3, {{0, true}});
+    assert(view.to_base_row(0) == 1);
+    assert(view.to_base_row(1) == 0);
+    assert(view.to_base_row(2) == 2);
+
+    // second sort by column B descending re-sorts the current content:
+    // rows become
+    // 1: 1.0 | "c"
+    // 0: 2.0 | "b"
+    // 2: 3.0 | "a"
+    // i.e. unchanged this time
+    view.sort(A1_B3, {{1, false}});
+    assert(view.get_string_value(B1) == "c");
+    assert(view.get_string_value(B2) == "b");
+    assert(view.get_string_value(B3) == "a");
+    assert(view.to_base_row(0) == 1);
+    assert(view.to_base_row(1) == 0);
+    assert(view.to_base_row(2) == 2);
+
+    // third sort by column B ascending reverses the rows; the mapping still
+    // refers to the base rows, not to the rows of the previous sort
+    // 2: 3.0 | "a"
+    // 0: 2.0 | "b"
+    // 1: 1.0 | "c"
+    view.sort(A1_B3, {{1, true}});
+    assert(view.get_string_value(B1) == "a");
+    assert(view.get_string_value(B2) == "b");
+    assert(view.get_string_value(B3) == "c");
+    assert(view.get_numeric_value(A1) == 3.0);
+    assert(view.get_numeric_value(A2) == 2.0);
+    assert(view.get_numeric_value(A3) == 1.0);
+
+    assert(view.to_base_row(0) == 2);
+    assert(view.to_base_row(1) == 0);
+    assert(view.to_base_row(2) == 1);
+    assert(view.to_view_row(2) == 0);
+    assert(view.to_view_row(0) == 1);
+    assert(view.to_view_row(1) == 2);
+}
+
+void test_sheet_view_sort_formula_group()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_address_t A1{0, 0, 0};
+    const ixion::abs_address_t A2{0, 1, 0};
+    const ixion::abs_address_t A3{0, 2, 0};
+    const ixion::abs_address_t A4{0, 3, 0};
+    const ixion::abs_address_t B1{0, 0, 1};
+    const ixion::abs_address_t B2{0, 1, 1};
+    const ixion::abs_address_t B3{0, 2, 1};
+    const ixion::abs_address_t B4{0, 3, 1};
+    const ixion::abs_rc_range_t A1_B4{0, 0, 4, 2};
+    const ixion::abs_range_t B1_B3{0, 0, 1, 3, 1};
+
+    cxt.set_numeric_cell(A1, 3.0);
+    cxt.set_numeric_cell(A2, 1.0);
+    cxt.set_numeric_cell(A3, 4.0);
+    cxt.set_numeric_cell(A4, 2.0);
+    cxt.set_string_cell(B4, "x");
+
+    {
+        // grouped formula cells B1:B3 = A*10 with cached results
+        auto resolver = ixion::formula_name_resolver::get(
+            ixion::formula_name_resolver_t::excel_a1, &cxt);
+        assert(resolver);
+
+        auto tokens = ixion::parse_formula_string(cxt, B1, *resolver, "A1*10");
+
+        ixion::matrix results(3, 1);
+        results.set(0, 0, 30.0);
+        results.set(1, 0, 10.0);
+        results.set(2, 0, 40.0);
+
+        cxt.set_grouped_formula_cells(B1_B3, std::move(tokens), ixion::formula_result(results));
+    }
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    // layout of the base sheet
+    // 0: 3.0 | 30.0 (grouped formula)
+    // 1: 1.0 | 10.0 (grouped formula)
+    // 2: 4.0 | 40.0 (grouped formula)
+    // 3: 2.0 | "x"
+    view.sort(A1_B4, {{0, true}});
+
+    // layout of the view after the sort
+    // 1: 1.0 | 10.0 (formula)
+    // 3: 2.0 | "x"
+    // 0: 3.0 | 30.0 (grouped formula)
+    // 2: 4.0 | 40.0 (grouped formula)
+    assert(view.to_base_row(0) == 1);
+    assert(view.to_base_row(1) == 3);
+    assert(view.to_base_row(2) == 0);
+    assert(view.to_base_row(3) == 2);
+
+    // the cached results travel with the rows
+    assert(view.get_numeric_value(B1) == 10.0);
+    assert(view.get_string_value(B2) == "x");
+    assert(view.get_numeric_value(B3) == 30.0);
+    assert(view.get_numeric_value(B4) == 40.0);
+
+    // the isolated member is no longer grouped
+    const ixion::formula_cell* fc = view.get_formula_cell(B1);
+    assert(fc);
+    assert(!fc->get_group_properties().grouped);
+
+    // Read the base sheet through a const reference; the non-const
+    // get_formula_cell() would detach the base column.
+    const ixion::model_context& ccxt = cxt;
+
+    // the group on the base sheet stays intact
+    const ixion::formula_cell* base_fc = ccxt.get_formula_cell(B1);
+    assert(base_fc);
+    auto base_identity = base_fc->get_group_properties().identity;
+
+    for (ixion::row_t r = 0; r <= 2; ++r)
+    {
+        base_fc = ccxt.get_formula_cell({0, r, 1});
+        assert(base_fc);
+        ixion::formula_group_t group = base_fc->get_group_properties();
+        assert(group.grouped);
+        assert(group.size.row == 3);
+        assert(group.identity == base_identity);
+    }
+
+    // the two adjacent members on the view regroup into a new group
+    for (ixion::row_t r = 2; r <= 3; ++r)
+    {
+        fc = view.get_formula_cell({r, 1});
+        assert(fc);
+        ixion::formula_group_t group = fc->get_group_properties();
+        assert(group.grouped);
+        assert(group.size.row == 2);
+        assert(group.identity != base_identity);
+        assert(fc->get_parent_position({0, r, 1}).row == 2);
+    }
+
+    // the base sheet keeps its original values
+    assert(ccxt.get_numeric_value(B1) == 30.0);
+    assert(ccxt.get_numeric_value(B2) == 10.0);
+    assert(ccxt.get_numeric_value(B3) == 40.0);
+    assert(ccxt.get_string_value(B4) == "x");
+}
+
+void test_sheet_view_sort_invalid_args()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_rc_range_t A1_B3{0, 0, 3, 2};
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    try
+    {
+        view.sort(A1_B3, {}); // no keys
+        assert(!"std::invalid_argument was expected");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+
+    try
+    {
+        view.sort(A1_B3, {{5, true}}); // key column outside the range
+        assert(!"std::invalid_argument was expected");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+
+    // a failed sort leaves the mapping identity
+    assert(view.to_base_row(1) == 1);
+}
+
 } // anonymous namespace
 
 int main()
@@ -179,6 +465,10 @@ int main()
     test_sheet_view_invalid_args();
     test_sheet_view_reads_mirror_base();
     test_sheet_view_snapshot();
+    test_sheet_view_sort();
+    test_sheet_view_sort_twice();
+    test_sheet_view_sort_formula_group();
+    test_sheet_view_sort_invalid_args();
 
     return EXIT_SUCCESS;
 }

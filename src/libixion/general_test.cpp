@@ -276,6 +276,20 @@ void test_address()
         assert(rc_range.first.column == 2);
         assert(rc_range.last.row == 3);
         assert(rc_range.last.column == 4);
+
+        // the same range built from its spans
+        ixion::abs_rc_range_t rc_range2(1, 2, 3, 3);
+        assert(rc_range2 == rc_range);
+
+        try
+        {
+            ixion::abs_rc_range_t invalid(1, 2, 0, 3);
+            assert(!"std::range_error was expected");
+        }
+        catch (const std::range_error&)
+        {
+            // expected
+        }
     }
 }
 

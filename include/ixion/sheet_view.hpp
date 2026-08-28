@@ -17,6 +17,7 @@ namespace ixion {
 
 class formula_cell;
 struct abs_rc_address_t;
+struct abs_rc_range_t;
 
 namespace detail {
 
@@ -26,9 +27,10 @@ class sheet_store;
 }
 
 /**
- * A named, read-only view of a sheet.  A view takes a snapshot of the
- * content of its base sheet when created; later edits to the base sheet do
- * not show up in the view.
+ * A named view of a sheet.  A view takes a snapshot of the content of its
+ * base sheet when created; later edits to the base sheet do not show up in
+ * the view.  The rows of the view can get sorted independently of the base
+ * sheet, and the view keeps track of which base row each of its rows shows.
  *
  * Views get created and owned by model_context via its create_sheet_view()
  * method, and stay valid until removed or until the model context gets
@@ -91,6 +93,49 @@ public:
      *         if the cell is not a formula cell.
      */
     const formula_cell* get_formula_cell(const abs_rc_address_t& pos) const;
+
+    /**
+     * Sort the rows of a range of this view in place.  The rows of the range
+     * move as units across all of its columns; the cells outside the range
+     * never move.  The base sheet stays untouched.
+     *
+     * The sort is stable, and orders cells of different types as numeric
+     * values first, then strings, then false, then true, then error values,
+     * with empty cells always last regardless of the direction.  Formula
+     * cells sort by their cached results.
+     *
+     * A later sort, such as by another key column or in the other direction,
+     * re-orders the rows as the view currently shows them, and the row
+     * mapping reported by to_base_row() and to_view_row() reflects the
+     * combined effect of all the sorts.
+     *
+     * @param range Range to sort.
+     * @param keys Sort keys in order of precedence.  Every key column must
+     *             lie within the columns of the range.
+     *
+     * @throw std::invalid_argument When the range does not fit within the
+     *        sheet, no keys are given, or a key column lies outside the
+     *        range.
+     */
+    void sort(const abs_rc_range_t& range, const sort_keys_t& keys);
+
+    /**
+     * Get the base sheet row that a row of this view shows.
+     *
+     * @param view_row Row position in this view.
+     *
+     * @return Row position in the base sheet.
+     */
+    row_t to_base_row(row_t view_row) const;
+
+    /**
+     * Get the row of this view that shows a base sheet row.
+     *
+     * @param base_row Row position in the base sheet.
+     *
+     * @return Row position in this view.
+     */
+    row_t to_view_row(row_t base_row) const;
 };
 
 }

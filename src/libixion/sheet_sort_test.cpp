@@ -114,7 +114,7 @@ void test_sheet_sort_cross_type_order()
 
     // ascending in this order: numeric, string, false, true, with the empty cell last
     const auto sorted_range = to_range(0, 0, 5, 0);
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
     std::vector<ixion::row_t> sorted_rows =
         ixion::detail::sort_range(cxt, store, sorted_range, keys);
 
@@ -190,7 +190,7 @@ void test_sheet_sort_stability()
     store[1].set(3, sid_d.value);
 
     // Rows with equal keys keep their original order.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
 
     // layout before sorting
     // 0: 2.0 | "a"
@@ -242,7 +242,7 @@ void test_sheet_sort_multi_key()
     store[1].set(3, sid_c.value);
 
     // The second key breaks the ties of the first.
-    ixion::detail::sort_keys_t keys = {{0, true}, {1, true}};
+    ixion::sort_keys_t keys = {{0, true}, {1, true}};
 
     // layout before sorting
     // 0: 1.0 | "b"
@@ -294,7 +294,7 @@ void test_sheet_sort_formula_results_travel()
         store[1].set(r, fc.release());
     }
 
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
 
     // layout before sorting: n -> numeric, f -> formula
     // 0: 3.0 [n] | 30.0 [f]
@@ -340,7 +340,7 @@ void test_sheet_sort_group_survives_slide()
 
     // The sort moves the group up by one row with its member order intact,
     // so it survives as a unit.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
 
     // layout before sorting
     // 0: 9.0 | (empty)
@@ -389,7 +389,7 @@ void test_sheet_sort_group_breaks_and_regroups()
 
     // The sort scatters the group members out of order, which breaks the
     // whole group; the two that land adjacent regroup as a sub-run.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
 
     // layout before sorting
     // 0: 4.0 | 10.0 (grouped formula)
@@ -445,7 +445,7 @@ void test_sheet_sort_group_crosses_range_boundary()
     // Group members at row indices 2-3 fall inside the sorted row indices 2-5
     // and get scattered, which breaks the whole group even though row indices
     // 0-1 lie outside the range and never move.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
 
     // layout before sorting
     // 0: (empty) | 10.0 (grouped formula)
@@ -507,7 +507,7 @@ void test_sheet_sort_regroup_splits_at_different_formula()
 
     // The sort reverses the group members and drops the different formula
     // cell in the middle of them.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
 
     // layout before sorting
     // 0: 5.0 | 10.0 (grouped formula)
@@ -582,7 +582,7 @@ void test_sheet_sorted_column_no_detach()
     auto cloned = store.clone();
 
     // Sorting already-sorted rows should leave the columns untouched.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
     std::vector<ixion::row_t> sorted_rows =
         ixion::detail::sort_range(cxt, cloned, to_range(0, 0, 2, 0), keys);
 
@@ -624,7 +624,7 @@ void test_sheet_sort_cow_detach_scope()
 
     // Sorting only the first column detaches it on the clone while the second
     // column is still sharing its storage with the source.
-    ixion::detail::sort_keys_t keys = {{0, true}};
+    ixion::sort_keys_t keys = {{0, true}};
     std::vector<ixion::row_t> sorted_rows =
         ixion::detail::sort_range(cxt, cloned, to_range(0, 0, 2, 0), keys);
 
@@ -658,7 +658,7 @@ void test_sheet_sort_invalid_args()
     ixion::model_context cxt;
     ixion::detail::sheet_store store(5, 2); // sheet is only 5 rows by 2 columns
 
-    auto expect_invalid = [&cxt, &store](const ixion::abs_rc_range_t& range, const ixion::detail::sort_keys_t& keys)
+    auto expect_invalid = [&cxt, &store](const ixion::abs_rc_range_t& range, const ixion::sort_keys_t& keys)
     {
         try
         {

@@ -310,6 +310,16 @@ abs_rc_range_t::abs_rc_range_t(const abs_rc_range_t& other) :
 abs_rc_range_t::abs_rc_range_t(const abs_range_t& other) :
     first(other.first), last(other.last) {}
 
+abs_rc_range_t::abs_rc_range_t(row_t _row, col_t _col, row_t _row_span, col_t _col_span) :
+    first(_row, _col), last(_row + _row_span - 1, _col + _col_span - 1)
+{
+    if (_row_span < 1 || _col_span < 1)
+    {
+        throw std::range_error(
+            std::format("abs_rc_range_t: invalid span (row={}; col={})", _row_span, _col_span));
+    }
+}
+
 size_t abs_rc_range_t::hash::operator() (const abs_rc_range_t& range) const
 {
     abs_rc_address_t::hash adr_hash;
