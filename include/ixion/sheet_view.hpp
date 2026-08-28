@@ -136,6 +136,24 @@ public:
      * @return Row position in this view.
      */
     row_t to_view_row(row_t base_row) const;
+
+    /**
+     * Sort the data rows of a table by one of its columns.  The header row
+     * and the totals rows of the table stay in place; only the rows of its
+     * data area move, as units across all the columns of the table.  The
+     * base sheet stays untouched.
+     *
+     * @param table_name Name of the table.  The table must lie on the base
+     *                   sheet of this view.
+     * @param column Name of the table column to sort by.
+     * @param ascending True to sort in ascending order, false to sort in
+     *                  descending order.
+     *
+     * @throw std::invalid_argument When no table of that name exists, the
+     *        table lies on another sheet, or the table has no column of that
+     *        name.
+     */
+    void sort_table(std::string_view table_name, std::string_view column, bool ascending);
 };
 
 }

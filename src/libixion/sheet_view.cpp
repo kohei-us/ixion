@@ -7,13 +7,18 @@
 
 #include <ixion/sheet_view.hpp>
 #include <ixion/address.hpp>
+#include <ixion/table.hpp>
 
 #include "model_context_impl.hpp"
 #include "sheet_sort.hpp"
 #include "sheet_store.hpp"
 #include "utils.hpp"
 
+#include <algorithm>
+#include <format>
+#include <iterator>
 #include <numeric>
+#include <stdexcept>
 
 namespace ixion {
 
@@ -148,6 +153,32 @@ row_t sheet_view::to_view_row(row_t base_row) const
         return base_row;
 
     return mp_impl->view_rows.at(base_row);
+}
+
+void sheet_view::sort_table(std::string_view table_name, std::string_view column, bool ascending)
+{
+    const table_t* tab = mp_impl->cxt.get_table(table_name);
+    if (!tab)
+        throw std::invalid_argument(std::format("no table named '{}'", table_name));
+
+    if (tab->range.first.sheet != mp_impl->sheet)
+        throw std::invalid_argument(
+            std::format("table '{}' is not on the base sheet of this view", table_name));
+
+    auto it = std::ranges::find(tab->columns, column);
+    if (it == tab->columns.end())
+        throw std::invalid_argument(
+            std::format("table '{}' has no column named '{}'", table_name, column));
+
+    col_t key_column = tab->range.first.column + std::distance(tab->columns.begin(), it);
+
+    // all the columns of the data area, excluding the header and totals rows
+    abs_range_t data_range = mp_impl->cxt.get_table_range(table_name, {}, {}, table_area_data);
+    if (!data_range.valid())
+        // the table has no data rows
+        return;
+
+    sort(data_range, {{key_column, ascending}});
 }
 
 }

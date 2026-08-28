@@ -17,10 +17,12 @@
 #include <ixion/matrix.hpp>
 #include <ixion/model_context.hpp>
 #include <ixion/sheet_view.hpp>
+#include <ixion/table.hpp>
 
 #include <cassert>
 #include <cstdlib>
 #include <stdexcept>
+#include <string_view>
 #include <utility>
 
 namespace {
@@ -457,6 +459,131 @@ void test_sheet_view_sort_invalid_args()
     assert(view.to_base_row(1) == 1);
 }
 
+void test_sheet_view_sort_table()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_address_t A1{0, 0, 0};
+    const ixion::abs_address_t A2{0, 1, 0};
+    const ixion::abs_address_t A3{0, 2, 0};
+    const ixion::abs_address_t A4{0, 3, 0};
+    const ixion::abs_address_t A5{0, 4, 0};
+    const ixion::abs_address_t B1{0, 0, 1};
+    const ixion::abs_address_t B2{0, 1, 1};
+    const ixion::abs_address_t B3{0, 2, 1};
+    const ixion::abs_address_t B4{0, 3, 1};
+    const ixion::abs_address_t B5{0, 4, 1};
+
+    // layout of the table
+    // 0: "Name"  | "Score"  <- header row
+    // 1: "bob"   | 20.0
+    // 2: "amy"   | 30.0
+    // 3: "cid"   | 10.0
+    // 4: "Total" | 60.0     <- totals row
+    cxt.set_string_cell(A1, "Name");
+    cxt.set_string_cell(B1, "Score");
+    cxt.set_string_cell(A2, "bob");
+    cxt.set_numeric_cell(B2, 20.0);
+    cxt.set_string_cell(A3, "amy");
+    cxt.set_numeric_cell(B3, 30.0);
+    cxt.set_string_cell(A4, "cid");
+    cxt.set_numeric_cell(B4, 10.0);
+    cxt.set_string_cell(A5, "Total");
+    cxt.set_numeric_cell(B5, 60.0);
+
+    ixion::table_t tab;
+    tab.name = "Scores";
+    tab.range = ixion::abs_range_t(A1, B5);
+    tab.columns = {"Name", "Score"};
+    tab.totals_row_count = 1;
+    cxt.set_table(tab);
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    view.sort_table("Scores", "Score", false);
+
+    // layout of the table after the sort
+    // 0: "Name"  | "Score"  <- header row
+    // 2: "amy"   | 30.0
+    // 1: "bob"   | 20.0
+    // 3: "cid"   | 10.0
+    // 4: "Total" | 60.0     <- totals row
+
+    // the header and totals rows stay in place
+    assert(view.get_string_value(A1) == "Name");
+    assert(view.get_string_value(B1) == "Score");
+    assert(view.get_string_value(A5) == "Total");
+    assert(view.get_numeric_value(B5) == 60.0);
+
+    // the data rows are sorted by score in descending order
+    assert(view.get_string_value(A2) == "amy");
+    assert(view.get_numeric_value(B2) == 30.0);
+    assert(view.get_string_value(A3) == "bob");
+    assert(view.get_numeric_value(B3) == 20.0);
+    assert(view.get_string_value(A4) == "cid");
+    assert(view.get_numeric_value(B4) == 10.0);
+
+    assert(view.to_base_row(0) == 0);
+    assert(view.to_base_row(1) == 2);
+    assert(view.to_base_row(2) == 1);
+    assert(view.to_base_row(3) == 3);
+    assert(view.to_base_row(4) == 4);
+
+    // the base sheet stays untouched
+    assert(cxt.get_string_value(A2) == "bob");
+    assert(cxt.get_string_value(A3) == "amy");
+    assert(cxt.get_string_value(A4) == "cid");
+}
+
+void test_sheet_view_sort_table_invalid_args()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+    cxt.append_sheet("sheet2");
+
+    ixion::table_t tab;
+    tab.name = "OnSheet2";
+    tab.range = ixion::abs_range_t({1, 0, 0}, {1, 3, 1});
+    tab.columns = {"A", "B"};
+    tab.totals_row_count = 0;
+    cxt.set_table(tab);
+
+    // table with a header row and a totals row, but no data rows
+    tab.name = "NoData";
+    tab.range = ixion::abs_range_t({0, 0, 0}, {0, 1, 1});
+    tab.columns = {"A", "B"};
+    tab.totals_row_count = 1;
+    cxt.set_table(tab);
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    auto expect_invalid = [&view](std::string_view table_name, std::string_view column)
+    {
+        try
+        {
+            view.sort_table(table_name, column, true);
+            assert(!"std::invalid_argument was expected");
+        }
+        catch (const std::invalid_argument&)
+        {
+            // expected
+        }
+    };
+
+    expect_invalid("NoSuchTable", "A"); // unknown table
+    expect_invalid("OnSheet2", "A");    // table on another sheet
+    expect_invalid("NoData", "C");      // unknown column
+
+    // sorting a table without data rows does nothing
+    view.sort_table("NoData", "A", true);
+    assert(view.to_base_row(1) == 1);
+}
+
 } // anonymous namespace
 
 int main()
@@ -469,6 +596,8 @@ int main()
     test_sheet_view_sort_twice();
     test_sheet_view_sort_formula_group();
     test_sheet_view_sort_invalid_args();
+    test_sheet_view_sort_table();
+    test_sheet_view_sort_table_invalid_args();
 
     return EXIT_SUCCESS;
 }
