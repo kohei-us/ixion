@@ -21,7 +21,9 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -584,6 +586,82 @@ void test_sheet_view_sort_table_invalid_args()
     assert(view.to_base_row(1) == 1);
 }
 
+void test_sheet_view_dump()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_address_t A1{0, 0, 0};
+    const ixion::abs_address_t A2{0, 1, 0};
+    const ixion::abs_address_t A3{0, 2, 0};
+    const ixion::abs_address_t B1{0, 0, 1};
+    const ixion::abs_address_t B2{0, 1, 1};
+    const ixion::abs_address_t B3{0, 2, 1};
+    const ixion::abs_address_t C1{0, 0, 2};
+    const ixion::abs_range_t D1_D3{0, 0, 3, 3, 1};
+    const ixion::abs_rc_range_t A1_D3{0, 0, 3, 4};
+
+    // an empty view dumps nothing
+    {
+        const ixion::sheet_view& empty_view = cxt.create_sheet_view(0, "empty");
+        std::ostringstream os;
+        empty_view.dump(os, ixion::sheet_dump_mode_t::simple);
+        assert(os.str().empty());
+    }
+
+    // layout of the base sheet
+    // 0: 3.0 | "c"   | A1*2 (6.0) | {SUM(A$1:A$3)}@0/3 (6.0)
+    // 1: 1.0 | true  |            | {SUM(A$1:A$3)}@1/3 (6.0)
+    // 2: 2.0 | "b"   |            | {SUM(A$1:A$3)}@2/3 (6.0)
+    cxt.set_numeric_cell(A1, 3.0);
+    cxt.set_numeric_cell(A2, 1.0);
+    cxt.set_numeric_cell(A3, 2.0);
+    cxt.set_string_cell(B1, "c");
+    cxt.set_boolean_cell(B2, true);
+    cxt.set_string_cell(B3, "b");
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    {
+        auto tokens = ixion::parse_formula_string(cxt, C1, *resolver, "A1*2");
+        auto ts = ixion::formula_tokens_store::create(std::move(tokens));
+        cxt.set_formula_cell(C1, ts, ixion::formula_result(6.0));
+    }
+
+    {
+        auto tokens = ixion::parse_formula_string(cxt, D1_D3.first, *resolver, "SUM(A$1:A$3)");
+        ixion::matrix results(3, 1, 6.0);
+        cxt.set_grouped_formula_cells(D1_D3, std::move(tokens), ixion::formula_result(results));
+    }
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    // Sorting by column A moves the rows to 1.0, 2.0, 3.0; the formula in C1
+    // lands on the last row and still prints as A1*2, and the group in
+    // column D gets ungrouped and regrouped as a whole in the new row order.
+    view.sort(A1_D3, {{0, true}});
+
+    {
+        std::ostringstream os;
+        view.dump(os, ixion::sheet_dump_mode_t::simple);
+        std::string s = os.str();
+        assert(!s.ends_with('\n'));
+        assert(ixion::test::check_expected_output(
+            s, SRCDIR "/test/expected/sheet-view/dump-simple.txt"));
+    }
+
+    {
+        std::ostringstream os;
+        view.dump(os, ixion::sheet_dump_mode_t::verbose);
+        assert(ixion::test::check_expected_output(
+            os.str(), SRCDIR "/test/expected/sheet-view/dump-verbose.txt"));
+    }
+}
+
 } // anonymous namespace
 
 int main()
@@ -598,6 +676,7 @@ int main()
     test_sheet_view_sort_invalid_args();
     test_sheet_view_sort_table();
     test_sheet_view_sort_table_invalid_args();
+    test_sheet_view_dump();
 
     return EXIT_SUCCESS;
 }

@@ -11,17 +11,22 @@
 
 #include <iosfwd>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace ixion {
 
+class formula_cell;
 class formula_name_resolver;
 class model_context;
+class sheet_view;
+struct abs_address_t;
 
 namespace detail {
 
 /**
  * Dumps the content of a sheet to an output stream as a human-readable
- * text grid.  Ported from orcus's flat_dumper.
+ * text grid.
  */
 class grid_dumper
 {
@@ -49,6 +54,45 @@ public:
      * @param mode Amount of detail to include in the output.
      */
     void dump(std::ostream& os, sheet_t sheet, sheet_dump_mode_t mode) const;
+
+    /**
+     * Dump the data area of a sheet view as a text grid with column and row
+     * headers, plus a column showing the base sheet row of each row.  An
+     * empty view produces no output at all.
+     *
+     * @param os Output stream to dump the view content to.
+     * @param view View to dump.
+     * @param mode Amount of detail to include in the output.
+     */
+    void dump(std::ostream& os, const sheet_view& view, sheet_dump_mode_t mode) const;
+
+private:
+    /** Cell strings of a rectangular area, in row-major order. */
+    struct grid
+    {
+        std::size_t row_count = 0;
+        std::size_t col_count = 0;
+        std::vector<std::string> cells;
+
+        // base sheet row labels, one per row; empty when not dumping a view
+        std::vector<std::string> base_row_labels;
+
+        std::string& at(std::size_t row, std::size_t col)
+        {
+            return cells[col_count * row + col];
+        }
+
+        const std::string& at(std::size_t row, std::size_t col) const
+        {
+            return cells[col_count * row + col];
+        }
+    };
+
+    std::string format_formula_cell(
+        const formula_cell& cell, const abs_address_t& parent, row_t group_offset,
+        sheet_dump_mode_t mode) const;
+
+    void print_grid(std::ostream& os, const grid& g) const;
 };
 
 }}

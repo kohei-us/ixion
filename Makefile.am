@@ -113,6 +113,8 @@ test_data = \
 	test/expected/model-context/dump-sheet-simple.txt \
 	test/expected/model-context/dump-sheet-verbose.txt \
 	test/expected/model-context/dump-sheet-verbose-r1c1.txt \
+	test/expected/sheet-view/dump-simple.txt \
+	test/expected/sheet-view/dump-verbose.txt \
 	test/parser-test-func.sh \
 	test/parser-test-t0.sh \
 	test/parser-test-t1.sh \

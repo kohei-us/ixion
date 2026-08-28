@@ -9,6 +9,7 @@
 
 #include "types.hpp"
 
+#include <iosfwd>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -16,6 +17,7 @@
 namespace ixion {
 
 class formula_cell;
+class formula_name_resolver;
 struct abs_rc_address_t;
 struct abs_rc_range_t;
 
@@ -154,6 +156,31 @@ public:
      *        name.
      */
     void sort_table(std::string_view table_name, std::string_view column, bool ascending);
+
+    /**
+     * Get the range that spans all the non-empty cells of this view.
+     *
+     * @return Range spanning the non-empty cells, or an invalid range when
+     *         the view has no content.
+     */
+    abs_rc_range_t get_data_range() const;
+
+    /**
+     * Dump the content of this view to an output stream as a human-readable
+     * text grid, in the format of model_context::dump_sheet() with an extra
+     * column showing the base sheet row of each row.  Formula expressions
+     * get printed as they read on the base sheet.
+     *
+     * @param os Output stream to dump the view content to.
+     * @param mode Amount of detail to include in the output.
+     * @param resolver Name resolver that determines the column label style
+     *                 as well as the way formula expressions get printed in
+     *                 verbose mode.  When null, an Excel A1 resolver gets
+     *                 created and used internally.
+     */
+    void dump(
+        std::ostream& os, sheet_dump_mode_t mode,
+        const formula_name_resolver* resolver = nullptr) const;
 };
 
 }

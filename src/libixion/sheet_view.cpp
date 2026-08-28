@@ -9,6 +9,7 @@
 #include <ixion/address.hpp>
 #include <ixion/table.hpp>
 
+#include "grid_dumper.hpp"
 #include "model_context_impl.hpp"
 #include "sheet_sort.hpp"
 #include "sheet_store.hpp"
@@ -179,6 +180,17 @@ void sheet_view::sort_table(std::string_view table_name, std::string_view column
         return;
 
     sort(data_range, {{key_column, ascending}});
+}
+
+abs_rc_range_t sheet_view::get_data_range() const
+{
+    return mp_impl->store.get_data_range();
+}
+
+void sheet_view::dump(
+    std::ostream& os, sheet_dump_mode_t mode, const formula_name_resolver* resolver) const
+{
+    detail::grid_dumper(mp_impl->cxt.get_parent(), resolver).dump(os, *this, mode);
 }
 
 }
