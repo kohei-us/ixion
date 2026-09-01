@@ -458,6 +458,7 @@ void regroup_column(column_store_t& col, row_t row1, row_t row2)
  * Sort the rows of a range in phases: determine the new row order once,
  * then for each column find the formula groups the sort breaks, ungroup
  * them, move the cells to their sorted positions, and regroup afterwards.
+ * A pre-computed row order can get applied in place of the sorting phase.
  */
 class range_sorter
 {
@@ -479,9 +480,12 @@ class range_sorter
         row_t regroup_row2;
     };
 
-    const model_context& m_cxt;
+    // Model context and sort keys; they stay null when a pre-computed row
+    // order gets applied instead of sorting.
+    const model_context* m_cxt;
+    const sort_keys_t* m_keys;
+
     sheet_store& m_store;
-    const sort_keys_t& m_keys;
 
     row_t m_row1;
     row_t m_row2;
@@ -502,23 +506,83 @@ public:
         const model_context& cxt, sheet_store& store,
         const abs_rc_range_t& range, const sort_keys_t& keys);
 
+    range_sorter(sheet_store& store, const abs_rc_range_t& range);
+
     std::vector<row_t> sort();
 
+    /**
+     * Move the rows of the range into a pre-computed order instead of sorting.
+     *
+     * @param sorted_rows Row order to apply, in the same form as the return
+     *                    value of sort(): element i holds the source row of the
+     *                    cells that end up at row1 + i.  It must be a
+     *                    permutation of the rows of the range.
+     */
+    void apply(std::vector<row_t> sorted_rows);
+
 private:
+    /**
+     * Determine the new row order after sorting by the key columns.
+     *
+     * Note that this does NOT apply sorting to the store.
+     *
+     * On return, m_sorted_rows stores the source row landing at each row of the
+     * range in sorted order, and m_dest_rows stores the inverse: the row each
+     * source row lands at.  Both store absolute row positions and are indexed
+     * by row offset within the range.
+     */
     void compute_row_order();
+
+    /**
+     * Build the inverse of m_sorted_rows: the destination row of each source
+     * row of the range, indexed by source row offset.
+     */
+    void build_dest_rows();
+    void move_rows();
+
+    /**
+     * @return Row position of a source row after the sort.
+     */
     row_t dest_row_of(row_t row) const;
 
     void sort_column(col_t col_pos);
+
+    /**
+     * Find the formula groups the sort breaks, which need to get ungrouped
+     * before the move, and the rows to scan for regrouping afterwards.
+     */
     group_changes collect_group_changes(const column_store_t& col) const;
+
+    /**
+     * Replace the members of the given groups with individual cells.
+     */
     void ungroup(column_store_t& col, const std::vector<group_span>& to_ungroup) const;
+
+    /**
+     * Collect all cells in the sorted range into slots indexed by source row
+     * offset.
+     */
     std::vector<cell_slot> extract_cells(const column_store_t& col) const;
+
+    /**
+     * Write the cells back in their sorted order, one ranged set per run of
+     * cells of the same type.
+     */
     void place_cells_sorted(column_store_t& col, std::vector<cell_slot>& slots) const;
 };
 
 range_sorter::range_sorter(
     const model_context& cxt, sheet_store& store,
     const abs_rc_range_t& range, const sort_keys_t& keys) :
-    m_cxt(cxt), m_store(store), m_keys(keys),
+    m_cxt(&cxt), m_keys(&keys), m_store(store),
+    m_row1(range.first.row), m_row2(range.last.row),
+    m_col1(range.first.column), m_col2(range.last.column),
+    m_n_rows(m_row2 - m_row1 + 1)
+{
+}
+
+range_sorter::range_sorter(sheet_store& store, const abs_rc_range_t& range) :
+    m_cxt(nullptr), m_keys(nullptr), m_store(store),
     m_row1(range.first.row), m_row2(range.last.row),
     m_col1(range.first.column), m_col2(range.last.column),
     m_n_rows(m_row2 - m_row1 + 1)
@@ -534,59 +598,79 @@ std::vector<row_t> range_sorter::sort()
         // copy-on-write sharing.
         return m_sorted_rows;
 
-    for (col_t col_pos = m_col1; col_pos <= m_col2; ++col_pos)
-        sort_column(col_pos);
+    move_rows();
 
     return m_sorted_rows;
 }
 
-/**
- * Determine the new row order after sorting by the key columns.
- *
- * Note that this does NOT apply sorting to the store.
- *
- * On return, m_sorted_rows stores the source row landing at each row of the
- * range in sorted order, and m_dest_rows stores the inverse: the row each
- * source row lands at.  Both store absolute row positions and are indexed
- * by row offset within the range.
- */
+void range_sorter::apply(std::vector<row_t> sorted_rows)
+{
+    assert(row_t(sorted_rows.size()) == m_n_rows);
+    m_sorted_rows = std::move(sorted_rows);
+
+    if (std::is_sorted(m_sorted_rows.begin(), m_sorted_rows.end()))
+        // Nothing moves; leave the columns untouched to preserve any
+        // copy-on-write sharing.
+        return;
+
+    build_dest_rows();
+    move_rows();
+}
+
+void range_sorter::move_rows()
+{
+    for (col_t col_pos = m_col1; col_pos <= m_col2; ++col_pos)
+        sort_column(col_pos);
+}
+
 void range_sorter::compute_row_order()
 {
+    assert(m_cxt && m_keys);
+
     const sheet_store& cstore = m_store;
+    const sort_keys_t& keys = *m_keys;
 
     // Extract the key column values and argsort the rows.
     std::vector<std::vector<sort_value>> key_col_values;
-    key_col_values.reserve(m_keys.size());
+    key_col_values.reserve(keys.size());
 
-    for (const sort_key_t& key : m_keys)
-        key_col_values.push_back(fetch_key_column_values(m_cxt, cstore[key.column], m_row1, m_row2));
+    for (const sort_key_t& key : keys)
+        key_col_values.push_back(
+            fetch_key_column_values(*m_cxt, cstore[key.column], m_row1, m_row2));
 
     // write incremental sequence starting at row1
     m_sorted_rows.resize(m_n_rows);
     std::iota(m_sorted_rows.begin(), m_sorted_rows.end(), m_row1);
 
     // do the sort
-    std::stable_sort(m_sorted_rows.begin(), m_sorted_rows.end(), [this, &key_col_values](row_t a, row_t b)
+    auto row_less = [&keys, &key_col_values, this](row_t a, row_t b)
     {
-        for (std::size_t k = 0; k < m_keys.size(); ++k)
+        for (std::size_t k = 0; k < keys.size(); ++k)
         {
             const sort_value& va = key_col_values[k][a - m_row1];
             const sort_value& vb = key_col_values[k][b - m_row1];
 
-            if (sort_value_less(va, vb, m_keys[k].ascending))
+            if (sort_value_less(va, vb, keys[k].ascending))
                 return true; // a < b
 
-            if (sort_value_less(vb, va, m_keys[k].ascending))
+            if (sort_value_less(vb, va, keys[k].ascending))
                 return false; // b < a
 
             // tie, move to the next key column
         }
 
         return false;
-    });
+    };
+
+    std::stable_sort(m_sorted_rows.begin(), m_sorted_rows.end(), row_less);
 
     // at this point, 'm_sorted_rows' stores the permutation of the sorted rows
 
+    build_dest_rows();
+}
+
+void range_sorter::build_dest_rows()
+{
     m_dest_rows.resize(m_n_rows);
 
     for (row_t i = 0; i < m_n_rows; ++i)
@@ -597,9 +681,6 @@ void range_sorter::compute_row_order()
     }
 }
 
-/**
- * @return Row position of a source row after the sort.
- */
 row_t range_sorter::dest_row_of(row_t row) const
 {
     return (m_row1 <= row && row <= m_row2) ? m_dest_rows[row - m_row1] : row;
@@ -630,10 +711,6 @@ void range_sorter::sort_column(col_t col_pos)
     m_store.get_pos_hint(col_pos) = mdds::mtv::position_hint{};
 }
 
-/**
- * Find the formula groups the sort breaks, which need to get ungrouped
- * before the move, and the rows to scan for regrouping afterwards.
- */
 range_sorter::group_changes range_sorter::collect_group_changes(const column_store_t& col) const
 {
     group_changes changes;
@@ -663,9 +740,6 @@ range_sorter::group_changes range_sorter::collect_group_changes(const column_sto
     return changes;
 }
 
-/**
- * Replace the members of the given groups with individual cells.
- */
 void range_sorter::ungroup(column_store_t& col, const std::vector<group_span>& to_ungroup) const
 {
     mdds::mtv::position_hint hint;
@@ -689,10 +763,6 @@ void range_sorter::ungroup(column_store_t& col, const std::vector<group_span>& t
     }
 }
 
-/**
- * Collect all cells in the sorted range into slots indexed by source row
- * offset.
- */
 std::vector<cell_slot> range_sorter::extract_cells(const column_store_t& col) const
 {
     std::vector<cell_slot> slots(m_n_rows);
@@ -741,10 +811,6 @@ std::vector<cell_slot> range_sorter::extract_cells(const column_store_t& col) co
     return slots;
 }
 
-/**
- * Write the cells back in their sorted order, one ranged set per run of
- * cells of the same type.
- */
 void range_sorter::place_cells_sorted(column_store_t& col, std::vector<cell_slot>& slots) const
 {
     // returns the slot holding the source cell given the destination row offset (0-based)
@@ -821,36 +887,70 @@ void range_sorter::place_cells_sorted(column_store_t& col, std::vector<cell_slot
     }
 }
 
+/**
+ * Ensure that a range lies within a sheet store, and throw a
+ * std::invalid_argument exception if it does not.
+ */
+void check_range_in_store(const sheet_store& store, const abs_rc_range_t& range)
+{
+    if (range.first.row < 0 || range.first.column < 0 ||
+        range.last.row < range.first.row || range.last.column < range.first.column)
+        throw std::invalid_argument("invalid sort range");
+
+    if (std::size_t(range.last.column) >= store.size())
+        throw std::invalid_argument("sort range extends past the last column");
+
+    if (std::size_t(range.last.row) >= store[range.first.column].size())
+        throw std::invalid_argument("sort range extends past the last row");
+}
+
 } // anonymous namespace
 
 std::vector<row_t> sort_range(
     const model_context& cxt, sheet_store& store,
     const abs_rc_range_t& range, const sort_keys_t& keys)
 {
-    row_t row1 = range.first.row;
-    row_t row2 = range.last.row;
-    col_t col1 = range.first.column;
-    col_t col2 = range.last.column;
-
-    if (row1 < 0 || col1 < 0 || row2 < row1 || col2 < col1)
-        throw std::invalid_argument("invalid sort range");
-
-    if (std::size_t(col2) >= store.size())
-        throw std::invalid_argument("sort range extends past the last column");
-
-    if (std::size_t(row2) >= store[col1].size())
-        throw std::invalid_argument("sort range extends past the last row");
+    check_range_in_store(store, range);
 
     if (keys.empty())
         throw std::invalid_argument("sort requires at least one key");
 
     for (const sort_key_t& key : keys)
     {
-        if (key.column < col1 || key.column > col2)
+        if (key.column < range.first.column || key.column > range.last.column)
             throw std::invalid_argument("sort key column outside the sort range");
     }
 
     return range_sorter(cxt, store, range, keys).sort();
+}
+
+void reorder_range(
+    sheet_store& store, const abs_rc_range_t& range, const std::vector<row_t>& row_order)
+{
+    check_range_in_store(store, range);
+
+    row_t row1 = range.first.row;
+    row_t row2 = range.last.row;
+
+    if (row_t(row_order.size()) != row2 - row1 + 1)
+        throw std::invalid_argument("row order size differs from the row count of the range");
+
+    // Ensure that the row order is a permutation of the rows of the range.
+    std::vector<bool> seen(row_order.size(), false);
+
+    for (const row_t row : row_order)
+    {
+        if (row < row1 || row2 < row)
+            throw std::invalid_argument("row order contains a row outside the range");
+
+        if (seen[row - row1])
+            throw std::invalid_argument("row order contains a duplicate row");
+
+        seen[row - row1] = true;
+    }
+
+    range_sorter sorter(store, range);
+    sorter.apply(row_order);
 }
 
 }}

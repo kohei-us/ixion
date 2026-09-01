@@ -50,6 +50,28 @@ std::vector<row_t> sort_range(
     const model_context& cxt, sheet_store& store,
     const abs_rc_range_t& range, const sort_keys_t& keys);
 
+/**
+ * Move the rows of a range into a pre-computed order.  The rows of the
+ * range move as units across all of its columns within the range. Formula
+ * groups receive the same treatment as in sort_range(): a group whose members
+ * stay contiguous and in order survives, any other affected group gets
+ * ungrouped with its members carrying their cached results, and adjacent
+ * cells sharing a formula regroup afterwards.
+ *
+ * @param store Sheet store to move the rows of.
+ * @param range Range to move the rows of.
+ * @param row_order Row order to apply, in the same form as the return
+ *                  value of sort_range(): element i holds the source row of
+ *                  the cells that end up at row range.first.row + i.  It
+ *                  must be a permutation of the rows of the range.
+ *
+ * @throw std::invalid_argument When the range does not fit within the
+ *        sheet store, or the row order is not a permutation of the rows of
+ *        the range.
+ */
+void reorder_range(
+    sheet_store& store, const abs_rc_range_t& range, const std::vector<row_t>& row_order);
+
 }}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

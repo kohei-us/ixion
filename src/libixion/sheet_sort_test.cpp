@@ -96,6 +96,7 @@ double formula_value(const ixion::column_store_t& col, ixion::row_t row)
 
 } // anonymous namespace
 
+
 void test_sheet_sort_cross_type_order()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -678,6 +679,101 @@ void test_sheet_sort_invalid_args()
     expect_invalid(to_range(3, 0, 2, 1), {{0, true}}); // inverted rows
 }
 
+void test_sheet_sort_reorder_range()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    ixion::detail::sheet_store store(4, 2);
+
+    store[0].set(0, 1.0);
+    store[0].set(1, 2.0);
+    store[0].set(2, 3.0);
+
+    set_group(cxt, store[1], 0, 3, "RC[-1]*10");
+
+    // layout before the move
+    // 0: 1.0 | 10.0 (grouped formula)
+    // 1: 2.0 | 20.0 (grouped formula)
+    // 2: 3.0 | 30.0 (grouped formula)
+    std::vector<ixion::row_t> row_order = {
+        2, // 3.0 | 30.0
+        0, // 1.0 | 10.0
+        1  // 2.0 | 20.0
+    };
+    ixion::detail::reorder_range(store, to_range(0, 0, 2, 1), row_order);
+
+    assert(store[0].get<double>(0) == 3.0);
+    assert(store[0].get<double>(1) == 1.0);
+    assert(store[0].get<double>(2) == 2.0);
+
+    // The group members end up adjacent in a new order, so they get
+    // ungrouped and regrouped as one group of 3.
+    for (ixion::row_t r = 0; r <= 2; ++r)
+    {
+        const auto* fc = store[1].get<ixion::formula_cell*>(r);
+        ixion::formula_group_t group = fc->get_group_properties();
+        assert(group.grouped);
+        assert(group.size.row == 3);
+        assert(fc->get_parent_position({0, r, 1}).row == 0);
+    }
+
+    assert(formula_value(store[1], 0) == 30.0);
+    assert(formula_value(store[1], 1) == 10.0);
+    assert(formula_value(store[1], 2) == 20.0);
+}
+
+void test_sheet_sort_reorder_range_identity()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    ixion::detail::sheet_store store(3, 1);
+
+    store[0].set(0, 1.0);
+    store[0].set(1, 2.0);
+    store[0].set(2, 3.0);
+
+    auto cloned = store.clone();
+
+    // Applying the identity order must leave the columns untouched.
+    std::vector<ixion::row_t> row_order = {0, 1, 2};
+    ixion::detail::reorder_range(cloned, to_range(0, 0, 2, 0), row_order);
+
+    if constexpr (ixion::column_store_traits::enable_cow)
+        assert(cloned[0].is_shared());
+
+    assert(cloned[0].get<double>(0) == 1.0);
+    assert(cloned[0].get<double>(1) == 2.0);
+    assert(cloned[0].get<double>(2) == 3.0);
+}
+
+void test_sheet_sort_reorder_range_invalid_args()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::detail::sheet_store store(5, 2);
+
+    auto expect_invalid = [&store](
+        const ixion::abs_rc_range_t& range, const std::vector<ixion::row_t>& row_order)
+    {
+        try
+        {
+            ixion::detail::reorder_range(store, range, row_order);
+            assert(!"std::invalid_argument was expected");
+        }
+        catch (const std::invalid_argument&)
+        {
+            // expected
+        }
+    };
+
+    expect_invalid(to_range(0, 0, 2, 1), {0, 1});       // too few rows
+    expect_invalid(to_range(0, 0, 2, 1), {0, 1, 3});    // row outside the range
+    expect_invalid(to_range(1, 0, 3, 1), {1, 1, 3});    // duplicate row
+    expect_invalid(to_range(0, 0, 5, 1), {0, 1, 2, 3, 4, 5}); // range past the last row
+}
+
 int main()
 {
     test_sheet_sort_cross_type_order();
@@ -691,6 +787,9 @@ int main()
     test_sheet_sorted_column_no_detach();
     test_sheet_sort_cow_detach_scope();
     test_sheet_sort_invalid_args();
+    test_sheet_sort_reorder_range();
+    test_sheet_sort_reorder_range_identity();
+    test_sheet_sort_reorder_range_invalid_args();
 
     return EXIT_SUCCESS;
 }
