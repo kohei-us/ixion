@@ -23,6 +23,7 @@ public:
 
     sheet_store();
     sheet_store(sheet_store&& other);
+    sheet_store& operator=(sheet_store&& other);
     sheet_store(size_type row_size, size_type col_size);
     ~sheet_store();
 

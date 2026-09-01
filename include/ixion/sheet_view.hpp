@@ -181,6 +181,16 @@ public:
     void dump(
         std::ostream& os, sheet_dump_mode_t mode,
         const formula_name_resolver* resolver = nullptr) const;
+
+    /**
+     * Replace the snapshot of this view with the current content of the
+     * base sheet, and re-apply the sorts of this view in their original
+     * order.  The rows of the view do not jump: each row keeps showing the
+     * base row it showed before, with its refreshed content, even when the
+     * refreshed content no longer matches the sort order.  Re-sorting
+     * happens only through explicit sort() and sort_table() calls.
+     */
+    void refresh();
 };
 
 }

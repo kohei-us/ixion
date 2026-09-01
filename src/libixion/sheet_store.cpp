@@ -14,6 +14,8 @@ sheet_store::sheet_store() = default;
 
 sheet_store::sheet_store(sheet_store&& other) = default;
 
+sheet_store& sheet_store::operator=(sheet_store&& other) = default;
+
 sheet_store::sheet_store(size_t row_size, size_t col_size)
 {
     for (size_t i = 0; i < col_size; ++i)

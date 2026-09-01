@@ -16,12 +16,28 @@
 #include "utils.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <format>
 #include <iterator>
 #include <numeric>
 #include <stdexcept>
+#include <vector>
 
 namespace ixion {
+
+namespace {
+
+/** One sort applied to a view, for refresh() to replay. */
+struct sort_action
+{
+    abs_rc_range_t range;
+
+    // permutation the engine returned for this sort, in the view rows of
+    // that time
+    std::vector<row_t> rows;
+};
+
+} // anonymous namespace
 
 struct sheet_view::impl
 {
@@ -38,6 +54,9 @@ struct sheet_view::impl
     // of the sheet.  Both stay empty, meaning identity, until the first sort.
     std::vector<row_t> base_rows; // view row -> base row
     std::vector<row_t> view_rows; // base row -> view row
+
+    // sorts applied to this view, in the order they were applied
+    std::vector<sort_action> sorts;
 
     impl(const detail::model_context_impl& _cxt, sheet_t _sheet, std::string _name,
          const detail::sheet_store& base) :
@@ -137,6 +156,12 @@ void sheet_view::sort(const abs_rc_range_t& range, const sort_keys_t& keys)
     std::vector<row_t> sorted_rows =
         detail::sort_range(mp_impl->cxt.get_parent(), mp_impl->store, range, keys);
 
+    if (!std::is_sorted(sorted_rows.begin(), sorted_rows.end()))
+    {
+        // remember the sort for refresh() to replay
+        mp_impl->sorts.push_back({range, sorted_rows});
+    }
+
     mp_impl->apply_permutation(range.first.row, sorted_rows);
 }
 
@@ -180,6 +205,19 @@ void sheet_view::sort_table(std::string_view table_name, std::string_view column
         return;
 
     sort(data_range, {{key_column, ascending}});
+}
+
+void sheet_view::refresh()
+{
+    const detail::sheet_store* base = mp_impl->cxt.fetch_sheet(mp_impl->sheet);
+    assert(base);
+
+    // Take a fresh snapshot of the base sheet, then re-apply the sort order of
+    // this view.
+    mp_impl->store = base->clone();
+
+    for (const sort_action& action : mp_impl->sorts)
+        detail::reorder_range(mp_impl->store, action.range, action.rows);
 }
 
 abs_rc_range_t sheet_view::get_data_range() const
