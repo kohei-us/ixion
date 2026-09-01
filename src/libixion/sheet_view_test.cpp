@@ -29,6 +29,9 @@
 
 namespace {
 
+constexpr auto asc = ixion::sort_order_t::ascending;
+constexpr auto desc = ixion::sort_order_t::descending;
+
 /**
  * Set a formula cell with the given expression and a pre-computed result.
  *
@@ -223,7 +226,7 @@ void test_sheet_view_sort()
     assert(view.to_view_row(2) == 2);
 
     // sort row indices 0-2 across both columns by column A
-    view.sort(A1_B3, {{0, true}});
+    view.sort(A1_B3, {{0, asc}});
 
     // the view shows the sorted rows
     assert(view.get_numeric_value(A1) == 1.0);
@@ -287,7 +290,7 @@ void test_sheet_view_sort_twice()
     // 1: 1.0 | "c"
     // 0: 2.0 | "b"
     // 2: 3.0 | "a"
-    view.sort(A1_B3, {{0, true}});
+    view.sort(A1_B3, {{0, asc}});
     assert(view.to_base_row(0) == 1);
     assert(view.to_base_row(1) == 0);
     assert(view.to_base_row(2) == 2);
@@ -298,7 +301,7 @@ void test_sheet_view_sort_twice()
     // 0: 2.0 | "b"
     // 2: 3.0 | "a"
     // i.e. unchanged this time
-    view.sort(A1_B3, {{1, false}});
+    view.sort(A1_B3, {{1, desc}});
     assert(view.get_string_value(B1) == "c");
     assert(view.get_string_value(B2) == "b");
     assert(view.get_string_value(B3) == "a");
@@ -311,7 +314,7 @@ void test_sheet_view_sort_twice()
     // 2: 3.0 | "a"
     // 0: 2.0 | "b"
     // 1: 1.0 | "c"
-    view.sort(A1_B3, {{1, true}});
+    view.sort(A1_B3, {{1, asc}});
     assert(view.get_string_value(B1) == "a");
     assert(view.get_string_value(B2) == "b");
     assert(view.get_string_value(B3) == "c");
@@ -374,7 +377,7 @@ void test_sheet_view_sort_formula_group()
     // 1: 1.0 | 10.0 (grouped formula)
     // 2: 4.0 | 40.0 (grouped formula)
     // 3: 2.0 | "x"
-    view.sort(A1_B4, {{0, true}});
+    view.sort(A1_B4, {{0, asc}});
 
     // layout of the view after the sort
     // 1: 1.0 | 10.0 (formula)
@@ -458,7 +461,17 @@ void test_sheet_view_sort_invalid_args()
 
     try
     {
-        view.sort(A1_B3, {{5, true}}); // key column outside the range
+        view.sort(A1_B3, {{5, asc}}); // key column outside the range
+        assert(!"std::invalid_argument was expected");
+    }
+    catch (const std::invalid_argument&)
+    {
+        // expected
+    }
+
+    try
+    {
+        view.sort(A1_B3, {{0}}); // key without a direction
         assert(!"std::invalid_argument was expected");
     }
     catch (const std::invalid_argument&)
@@ -514,7 +527,7 @@ void test_sheet_view_sort_table()
 
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
 
-    view.sort_table("Scores", "Score", false);
+    view.sort_table("Scores", "Score", desc);
 
     // layout of the table after the sort
     // 0: "Name"  | "Score"  <- header row
@@ -577,7 +590,7 @@ void test_sheet_view_sort_table_invalid_args()
     {
         try
         {
-            view.sort_table(table_name, column, true);
+            view.sort_table(table_name, column, asc);
             assert(!"std::invalid_argument was expected");
         }
         catch (const std::invalid_argument&)
@@ -591,7 +604,7 @@ void test_sheet_view_sort_table_invalid_args()
     expect_invalid("NoData", "C");      // unknown column
 
     // sorting a table without data rows does nothing
-    view.sort_table("NoData", "A", true);
+    view.sort_table("NoData", "A", asc);
     assert(view.to_base_row(1) == 1);
 }
 
@@ -649,7 +662,7 @@ void test_sheet_view_dump()
     // Sorting by column A moves the rows to 1.0, 2.0, 3.0; the formula in C1
     // lands on the last row and still prints as A1*2, and the group in
     // column D gets ungrouped and regrouped as a whole in the new row order.
-    view.sort(A1_D3, {{0, true}});
+    view.sort(A1_D3, {{0, asc}});
 
     {
         std::ostringstream os;
@@ -721,7 +734,7 @@ void test_sheet_view_refresh()
     cxt.set_string_cell(B3, "b");
 
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
-    view.sort(A1_B3, {{0, true}});
+    view.sort(A1_B3, {{0, asc}});
 
     // layout of the view after the sort
     // 0: 1.0 | "a"   <- base row 1
@@ -780,7 +793,7 @@ void test_sheet_view_refresh_formula()
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
 
     // the sort moves the formula cell from B1 to B2
-    view.sort(A1_B2, {{0, true}});
+    view.sort(A1_B2, {{0, asc}});
     assert(view.get_numeric_value(B2) == 4.0);
 
     // Replace the formula cell on the base sheet with an updated result.
@@ -823,8 +836,8 @@ void test_sheet_view_refresh_two_sorts()
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
 
     // Two sorts scoped to single columns; each permutes only its own column.
-    view.sort(A1_A3, {{0, true}});
-    view.sort(B1_B3, {{1, true}});
+    view.sort(A1_A3, {{0, asc}});
+    view.sort(B1_B3, {{1, asc}});
 
     assert(view.get_numeric_value(A1) == 1.0);
     assert(view.get_numeric_value(A2) == 2.0);

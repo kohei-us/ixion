@@ -390,13 +390,22 @@ struct IXION_DLLPUBLIC print_config
     ~print_config();
 };
 
+/** Direction of a sort. */
+enum class sort_order_t
+{
+    /** Sort direction is not specified. */
+    unspecified = 0,
+    ascending,
+    descending
+};
+
 /** Single sort key applied to a column within a sorted range. */
 struct sort_key_t
 {
     /** Column the key reads its values from. */
     col_t column;
-    /** Sort direction of the key. */
-    bool ascending = true;
+    /** Sort direction of the key.  It must be explicitly specified. */
+    sort_order_t order = sort_order_t::unspecified;
 };
 
 /** Sort keys in order of precedence. */

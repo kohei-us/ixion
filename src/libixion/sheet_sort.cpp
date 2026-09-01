@@ -151,8 +151,10 @@ sort_value to_sort_value(const formula_cell& cell, row_t row)
     return v;
 }
 
-bool sort_value_less(const sort_value& a, const sort_value& b, bool ascending)
+bool sort_value_less(const sort_value& a, const sort_value& b, sort_order_t order)
 {
+    bool ascending = order == sort_order_t::ascending;
+
     if (a.type == sort_value_type::empty)
         // An empty cell always comes last in either direction.
         return false;
@@ -650,10 +652,10 @@ void range_sorter::compute_row_order()
             const sort_value& va = key_col_values[k][a - m_row1];
             const sort_value& vb = key_col_values[k][b - m_row1];
 
-            if (sort_value_less(va, vb, keys[k].ascending))
+            if (sort_value_less(va, vb, keys[k].order))
                 return true; // a < b
 
-            if (sort_value_less(vb, va, keys[k].ascending))
+            if (sort_value_less(vb, va, keys[k].order))
                 return false; // b < a
 
             // tie, move to the next key column
@@ -919,6 +921,9 @@ std::vector<row_t> sort_range(
     {
         if (key.column < range.first.column || key.column > range.last.column)
             throw std::invalid_argument("sort key column outside the sort range");
+
+        if (key.order == sort_order_t::unspecified)
+            throw std::invalid_argument("sort key direction is not specified");
     }
 
     return range_sorter(cxt, store, range, keys).sort();

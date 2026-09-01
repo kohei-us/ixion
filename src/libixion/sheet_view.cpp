@@ -181,7 +181,7 @@ row_t sheet_view::to_view_row(row_t base_row) const
     return mp_impl->view_rows.at(base_row);
 }
 
-void sheet_view::sort_table(std::string_view table_name, std::string_view column, bool ascending)
+void sheet_view::sort_table(std::string_view table_name, std::string_view column, sort_order_t order)
 {
     const table_t* tab = mp_impl->cxt.get_table(table_name);
     if (!tab)
@@ -204,7 +204,7 @@ void sheet_view::sort_table(std::string_view table_name, std::string_view column
         // the table has no data rows
         return;
 
-    sort(data_range, {{key_column, ascending}});
+    sort(data_range, {{key_column, order}});
 }
 
 void sheet_view::refresh()

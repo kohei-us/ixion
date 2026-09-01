@@ -148,14 +148,13 @@ public:
      * @param table_name Name of the table.  The table must lie on the base
      *                   sheet of this view.
      * @param column Name of the table column to sort by.
-     * @param ascending True to sort in ascending order, false to sort in
-     *                  descending order.
+     * @param order Direction of the sort.
      *
      * @throw std::invalid_argument When no table of that name exists, the
      *        table lies on another sheet, or the table has no column of that
      *        name.
      */
-    void sort_table(std::string_view table_name, std::string_view column, bool ascending);
+    void sort_table(std::string_view table_name, std::string_view column, sort_order_t order);
 
     /**
      * Get the range that spans all the non-empty cells of this view.
