@@ -167,18 +167,24 @@ void sheet_view::sort(const abs_rc_range_t& range, const sort_keys_t& keys)
 
 row_t sheet_view::to_base_row(row_t view_row) const
 {
+    if (view_row < 0 || mp_impl->get_row_count() <= view_row)
+        throw std::out_of_range(std::format("view row {} is out of range", view_row));
+
     if (mp_impl->base_rows.empty())
         return view_row;
 
-    return mp_impl->base_rows.at(view_row);
+    return mp_impl->base_rows[view_row];
 }
 
 row_t sheet_view::to_view_row(row_t base_row) const
 {
+    if (base_row < 0 || mp_impl->get_row_count() <= base_row)
+        throw std::out_of_range(std::format("base row {} is out of range", base_row));
+
     if (mp_impl->view_rows.empty())
         return base_row;
 
-    return mp_impl->view_rows.at(base_row);
+    return mp_impl->view_rows[base_row];
 }
 
 void sheet_view::sort_table(std::string_view table_name, std::string_view column, sort_order_t order)

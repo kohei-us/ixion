@@ -88,6 +88,20 @@ ixion 0.21.0
     formula expressions and formula groupings.  Ported from orcus's
     flat dumper.
 
+  * added sheet views.  A sheet view is a named view of a sheet that
+    takes a snapshot of the sheet content when created, whose rows
+    can get sorted independently of the base sheet.  Use
+    model_context::create_sheet_view() to create one, and
+    get_sheet_view() and remove_sheet_view() to access and remove
+    one.
+
+  * added sort_order_t, sort_key_t and sort_keys_t which describe
+    the sort keys of a multi-column sort.
+
+  * added an abs_rc_range_t constructor that takes the position of
+    the top-left cell of a range and its row and column spans,
+    mirroring the equivalent abs_range_t constructor.
+
 * formula interpreter
 
   * an unimplemented formula function now yields a #NAME? error on

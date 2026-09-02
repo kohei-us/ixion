@@ -64,6 +64,9 @@ public:
      */
     std::string_view get_name() const;
 
+    /**
+     * @return Type of the cell at the specified position of the view.
+     */
     cell_t get_celltype(const abs_rc_address_t& pos) const;
 
     /**
@@ -76,6 +79,14 @@ public:
      */
     double get_numeric_value(const abs_rc_address_t& pos) const;
 
+    /**
+     * Get a boolean representation of the cell value at the specified
+     * position of the view.  A formula cell yields its cached result.
+     *
+     * @param pos Position of the cell.
+     *
+     * @return Boolean representation of the cell value.
+     */
     bool get_boolean_value(const abs_rc_address_t& pos) const;
 
     /**
@@ -103,8 +114,14 @@ public:
      *
      * The sort is stable, and orders cells of different types as numeric
      * values first, then strings, then false, then true, then error values,
-     * with empty cells always last regardless of the direction.  Formula
-     * cells sort by their cached results.
+     * with empty cells always last regardless of the direction.  String
+     * comparison is byte-wise.  Formula cells sort by their cached results;
+     * a formula cell without a cached result sorts like an empty cell.
+     *
+     * A formula group survives the sort when its members stay contiguous
+     * and in their original order; any other affected group gets ungrouped,
+     * with each member keeping its cached result.  Adjacent cells sharing a
+     * formula regroup after the sort.
      *
      * A later sort, such as by another key column or in the other direction,
      * re-orders the rows as the view currently shows them, and the row
@@ -113,11 +130,12 @@ public:
      *
      * @param range Range to sort.
      * @param keys Sort keys in order of precedence.  Every key column must
-     *             lie within the columns of the range.
+     *             lie within the columns of the range, and every key must
+     *             specify its direction.
      *
      * @throw std::invalid_argument When the range does not fit within the
-     *        sheet, no keys are given, or a key column lies outside the
-     *        range.
+     *        sheet, no keys are given, a key column lies outside the range,
+     *        or a key does not specify its direction.
      */
     void sort(const abs_rc_range_t& range, const sort_keys_t& keys);
 
@@ -127,6 +145,8 @@ public:
      * @param view_row Row position in this view.
      *
      * @return Row position in the base sheet.
+     *
+     * @throw std::out_of_range When the row position lies outside the sheet.
      */
     row_t to_base_row(row_t view_row) const;
 
@@ -136,6 +156,8 @@ public:
      * @param base_row Row position in the base sheet.
      *
      * @return Row position in this view.
+     *
+     * @throw std::out_of_range When the row position lies outside the sheet.
      */
     row_t to_view_row(row_t base_row) const;
 
@@ -143,16 +165,17 @@ public:
      * Sort the data rows of a table by one of its columns.  The header row
      * and the totals rows of the table stay in place; only the rows of its
      * data area move, as units across all the columns of the table.  The
-     * base sheet stays untouched.
+     * base sheet stays untouched.  It does nothing when the table has no
+     * data rows.
      *
      * @param table_name Name of the table.  The table must lie on the base
      *                   sheet of this view.
      * @param column Name of the table column to sort by.
-     * @param order Direction of the sort.
+     * @param order Direction of the sort.  It must not be unspecified.
      *
      * @throw std::invalid_argument When no table of that name exists, the
-     *        table lies on another sheet, or the table has no column of that
-     *        name.
+     *        table lies on another sheet, the table has no column of that
+     *        name, or the direction is unspecified.
      */
     void sort_table(std::string_view table_name, std::string_view column, sort_order_t order);
 

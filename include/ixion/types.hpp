@@ -249,8 +249,8 @@ enum class rc_direction_t
 };
 
 /**
- * Specifies the amount of detail model_context::dump_sheet() includes in
- * its output.
+ * Specifies the amount of detail model_context::dump_sheet() and
+ * sheet_view::dump() include in their output.
  */
 enum class sheet_dump_mode_t
 {

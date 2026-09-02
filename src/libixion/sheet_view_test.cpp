@@ -91,7 +91,7 @@ void test_sheet_view_invalid_args()
     ixion::model_context cxt{{100, 10}};
     cxt.append_sheet("sheet1");
 
-    cxt.create_sheet_view(0, "view1");
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
 
     try
     {
@@ -112,6 +112,33 @@ void test_sheet_view_invalid_args()
     {
         // expected
     }
+
+    // the row mapping methods reject rows outside the sheet (100 rows)
+    auto expect_out_of_range = [&view](ixion::row_t row)
+    {
+        try
+        {
+            view.to_base_row(row);
+            assert(!"std::out_of_range was expected");
+        }
+        catch (const std::out_of_range&)
+        {
+            // expected
+        }
+
+        try
+        {
+            view.to_view_row(row);
+            assert(!"std::out_of_range was expected");
+        }
+        catch (const std::out_of_range&)
+        {
+            // expected
+        }
+    };
+
+    expect_out_of_range(-1);
+    expect_out_of_range(100);
 }
 
 void test_sheet_view_reads_mirror_base()
@@ -256,6 +283,27 @@ void test_sheet_view_sort()
     assert(view.to_view_row(2) == 1);
     assert(view.to_view_row(0) == 2);
     assert(view.to_view_row(3) == 3);
+
+    // rows outside the sheet get rejected also after a sort
+    try
+    {
+        view.to_base_row(100);
+        assert(!"std::out_of_range was expected");
+    }
+    catch (const std::out_of_range&)
+    {
+        // expected
+    }
+
+    try
+    {
+        view.to_view_row(100);
+        assert(!"std::out_of_range was expected");
+    }
+    catch (const std::out_of_range&)
+    {
+        // expected
+    }
 }
 
 void test_sheet_view_sort_twice()
