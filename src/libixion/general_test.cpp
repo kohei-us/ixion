@@ -281,6 +281,11 @@ void test_address()
         ixion::abs_rc_range_t rc_range2(1, 2, 3, 3);
         assert(rc_range2 == rc_range);
 
+        // the original range built back from a sheet index and the
+        // sheet-less range
+        ixion::abs_range_t range3(1, rc_range);
+        assert(range3 == range);
+
         try
         {
             ixion::abs_rc_range_t invalid(1, 2, 0, 3);

@@ -150,6 +150,8 @@ struct IXION_DLLPUBLIC rc_address_t
     };
 };
 
+struct abs_rc_range_t;
+
 /**
  * Stores absolute range address.
  */
@@ -182,6 +184,12 @@ struct IXION_DLLPUBLIC abs_range_t
      *              column-wise.
      */
     abs_range_t(const abs_address_t& _first, const abs_address_t& _last);
+
+    /**
+     * @param _sheet 0-based index of the sheet the range is on.
+     * @param _range Range on the sheet, without a sheet index of its own.
+     */
+    abs_range_t(sheet_t _sheet, const abs_rc_range_t& _range);
 
     struct hash
     {

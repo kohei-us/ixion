@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& os, const table_ref_t& table)
     return os;
 }
 
-table_t::table_t() : range(abs_range_t::invalid), totals_row_count(0) {}
+table_t::table_t() : sheet(invalid_sheet), range(abs_rc_range_t::invalid), totals_row_count(0) {}
 table_t::table_t(const table_t& other) = default;
 table_t::table_t(table_t&& other) = default;
 table_t::~table_t() = default;

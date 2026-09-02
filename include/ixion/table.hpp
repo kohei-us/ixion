@@ -45,12 +45,14 @@ struct IXION_DLLPUBLIC table_t
      */
     std::string name;
 
+    /** 0-based index of the sheet the table is on. */
+    sheet_t sheet;
+
     /**
-     * Entire range of the table, including the header row and the totals
-     * rows if present.  It must be a valid range that does not span
-     * multiple sheets.
+     * Entire range of the table on its sheet, including the header row and
+     * the totals rows if present.  It must be a valid range.
      */
-    abs_range_t range;
+    abs_rc_range_t range;
 
     /** Names of the columns of the table in column order. */
     std::vector<std::string> columns;

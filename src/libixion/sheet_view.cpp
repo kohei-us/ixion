@@ -187,7 +187,7 @@ void sheet_view::sort_table(std::string_view table_name, std::string_view column
     if (!tab)
         throw std::invalid_argument(std::format("no table named '{}'", table_name));
 
-    if (tab->range.first.sheet != mp_impl->sheet)
+    if (tab->sheet != mp_impl->sheet)
         throw std::invalid_argument(
             std::format("table '{}' is not on the base sheet of this view", table_name));
 

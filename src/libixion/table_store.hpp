@@ -30,11 +30,10 @@ public:
 
     /**
      * Insert a new table.  The table must have a non-empty name unique
-     * within the store, and a valid range that does not span multiple
-     * sheets.
+     * within the store, a valid sheet index and a valid range.
      *
-     * @throw std::invalid_argument When the name is empty, the range is
-     *        invalid, or the range spans multiple sheets.
+     * @throw std::invalid_argument When the name is empty, the sheet index
+     *        is invalid, or the range is invalid.
      * @throw model_context_error When a table by the same name already
      *        exists in the store.
      */
@@ -43,8 +42,8 @@ public:
     const table_t* get(std::string_view name) const;
 
     /**
-     * Get all tables whose ranges are on a specified sheet, sorted by name
-     * in ascending order.
+     * Get all tables on a specified sheet, sorted by name in ascending
+     * order.
      */
     std::vector<const table_t*> get_by_sheet(sheet_t sheet) const;
 
@@ -71,7 +70,7 @@ public:
         std::string_view column_last, table_areas_t areas) const;
 
     /**
-     * Create copies of all the tables on a source sheet, with their ranges
+     * Create copies of all the tables on a source sheet, with the copies
      * re-anchored to a destination sheet and their names auto-renamed to
      * next-available unique names. The copies do not get inserted into the
      * store.

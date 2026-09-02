@@ -518,9 +518,12 @@ void test_sheet_view_sort_table()
     cxt.set_string_cell(A5, "Total");
     cxt.set_numeric_cell(B5, 60.0);
 
+    const ixion::abs_rc_range_t A1_B5{0, 0, 5, 2};
+
     ixion::table_t tab;
     tab.name = "Scores";
-    tab.range = ixion::abs_range_t(A1, B5);
+    tab.sheet = 0;
+    tab.range = A1_B5;
     tab.columns = {"Name", "Score"};
     tab.totals_row_count = 1;
     cxt.set_table(tab);
@@ -572,14 +575,16 @@ void test_sheet_view_sort_table_invalid_args()
 
     ixion::table_t tab;
     tab.name = "OnSheet2";
-    tab.range = ixion::abs_range_t({1, 0, 0}, {1, 3, 1});
+    tab.sheet = 1;
+    tab.range = ixion::abs_rc_range_t(0, 0, 4, 2); // A1:B4
     tab.columns = {"A", "B"};
     tab.totals_row_count = 0;
     cxt.set_table(tab);
 
     // table with a header row and a totals row, but no data rows
     tab.name = "NoData";
-    tab.range = ixion::abs_range_t({0, 0, 0}, {0, 1, 1});
+    tab.sheet = 0;
+    tab.range = ixion::abs_rc_range_t(0, 0, 2, 2); // A1:B2
     tab.columns = {"A", "B"};
     tab.totals_row_count = 1;
     cxt.set_table(tab);

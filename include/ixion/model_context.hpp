@@ -590,11 +590,10 @@ public:
      * formula expressions.
      *
      * @param tab Table to insert.  It must have a non-empty name unique
-     *            within the model, and a valid range that does not span
-     *            multiple sheets.
+     *            within the model, a valid sheet index and a valid range.
      *
-     * @throw std::invalid_argument When the name is empty, the range is
-     *        invalid, or the range spans multiple sheets.
+     * @throw std::invalid_argument When the name is empty, the sheet index
+     *        is invalid, or the range is invalid.
      * @throw model_context_error When a table by the same name already
      *        exists in the model.
      */

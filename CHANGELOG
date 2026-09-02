@@ -50,6 +50,9 @@ ixion 0.21.0
   * added an abs_range_t constructor that takes the positions of the
     top-left and bottom-right cells of a range.
 
+  * added an abs_range_t constructor that takes a sheet index and a
+    sheet-less abs_rc_range_t.
+
   * switched to std::string_view in various public interfaces where
     const std::string& was previously used, and table_t now stores its
     table and column names as std::string_view.
@@ -59,7 +62,8 @@ ixion 0.21.0
   * renamed table_t to table_ref_t, since it represents a table
     reference in a formula expression rather than a table itself.  The
     table_t name is now used by a new struct that stores the data of a
-    single table.
+    single table.  It stores the sheet the table is on as a sheet
+    index, and its range as a sheet-less abs_rc_range_t.
 
   * tables are now stored directly in model_context; use set_table()
     to insert one, get_table() and get_tables() to access them, and

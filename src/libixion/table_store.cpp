@@ -24,7 +24,7 @@ namespace {
  * select.  The range is set to invalid when the specified areas cannot
  * form a contiguous range or the table has no rows in the specified areas.
  */
-void adjust_row_range(abs_range_t& range, const table_t& tab, table_areas_t areas)
+void adjust_row_range(abs_rc_range_t& range, const table_t& tab, table_areas_t areas)
 {
     bool headers = (areas & table_area_headers);
     bool data = (areas & table_area_data);
@@ -48,7 +48,7 @@ void adjust_row_range(abs_range_t& range, const table_t& tab, table_areas_t area
         if (totals)
         {
             // Header + total is invalid.
-            range = abs_range_t(abs_range_t::invalid);
+            range = abs_rc_range_t(abs_rc_range_t::invalid);
             return;
         }
 
@@ -79,7 +79,7 @@ void adjust_row_range(abs_range_t& range, const table_t& tab, table_areas_t area
         if (tab.totals_row_count <= 0)
         {
             // This table has no totals rows.
-            range = abs_range_t(abs_range_t::invalid);
+            range = abs_rc_range_t(abs_rc_range_t::invalid);
             return;
         }
 
@@ -88,7 +88,7 @@ void adjust_row_range(abs_range_t& range, const table_t& tab, table_areas_t area
     }
 
     // No area specified.
-    range = abs_range_t(abs_range_t::invalid);
+    range = abs_rc_range_t(abs_rc_range_t::invalid);
 }
 
 /**
@@ -115,23 +115,23 @@ std::optional<std::size_t> find_column(const table_t& tab, std::string_view name
     return static_cast<std::size_t>(std::distance(tab.columns.cbegin(), it));
 }
 
-abs_range_t get_range_from_table(
+abs_rc_range_t get_range_from_table(
     const table_t& tab, std::string_view column_first, std::string_view column_last,
     table_areas_t areas)
 {
     if (column_first.empty())
     {
         // Area specifiers only.  Use the whole table width.
-        abs_range_t range = tab.range;
+        abs_rc_range_t range = tab.range;
         adjust_row_range(range, tab, areas);
         return range;
     }
 
     std::optional<std::size_t> col1_pos = find_column(tab, column_first, 0);
     if (!col1_pos)
-        return abs_range_t(abs_range_t::invalid);
+        return abs_rc_range_t(abs_rc_range_t::invalid);
 
-    abs_range_t range = tab.range;
+    abs_rc_range_t range = tab.range;
     range.first.column = range.last.column = tab.range.first.column + static_cast<col_t>(*col1_pos);
 
     if (!column_last.empty())
@@ -140,7 +140,7 @@ abs_range_t get_range_from_table(
         // precede the first one.
         std::optional<std::size_t> col2_pos = find_column(tab, column_last, *col1_pos);
         if (!col2_pos)
-            return abs_range_t(abs_range_t::invalid);
+            return abs_rc_range_t(abs_rc_range_t::invalid);
 
         range.last.column = tab.range.first.column + static_cast<col_t>(*col2_pos);
     }
@@ -194,15 +194,19 @@ void table_store::insert(table_t tab)
     if (tab.name.empty())
         throw std::invalid_argument("table name is empty");
 
+    if (tab.sheet < 0)
+    {
+        std::ostringstream os;
+        os << "table sheet index is invalid: " << tab.sheet;
+        throw std::invalid_argument(os.str());
+    }
+
     if (!tab.range.valid())
     {
         std::ostringstream os;
         os << "table range is invalid: " << tab.range;
         throw std::invalid_argument(os.str());
     }
-
-    if (tab.range.first.sheet != tab.range.last.sheet)
-        throw std::invalid_argument("one table can only belong to one sheet only");
 
     if (m_tables.find(tab.name) != m_tables.end())
     {
@@ -230,7 +234,7 @@ std::vector<const table_t*> table_store::get_by_sheet(sheet_t sheet) const
 
     for (const auto& [name, tab] : m_tables)
     {
-        if (tab.range.first.sheet == sheet)
+        if (tab.sheet == sheet)
             ret.push_back(&tab);
     }
 
@@ -250,7 +254,12 @@ abs_range_t table_store::get_range(
         // no table by this name found.
         return abs_range_t(abs_range_t::invalid);
 
-    return get_range_from_table(it->second, column_first, column_last, areas);
+    const table_t& tab = it->second;
+    abs_rc_range_t range = get_range_from_table(tab, column_first, column_last, areas);
+    if (!range.valid())
+        return abs_range_t(abs_range_t::invalid);
+
+    return abs_range_t(tab.sheet, range);
 }
 
 abs_range_t table_store::get_range(
@@ -259,8 +268,17 @@ abs_range_t table_store::get_range(
 {
     for (const auto& [name, tab] : m_tables)
     {
-        if (tab.range.contains(pos))
-            return get_range_from_table(tab, column_first, column_last, areas);
+        if (tab.sheet != pos.sheet)
+            continue;
+
+        if (!tab.range.contains(pos))
+            continue;
+
+        abs_rc_range_t range = get_range_from_table(tab, column_first, column_last, areas);
+        if (!range.valid())
+            return abs_range_t(abs_range_t::invalid);
+
+        return abs_range_t(tab.sheet, range);
     }
 
     return abs_range_t(abs_range_t::invalid);
@@ -272,13 +290,12 @@ table_store::cloned_tables_type table_store::clone_sheet_tables(sheet_t src, she
 
     for (const auto& [name, tab] : m_tables)
     {
-        if (tab.range.first.sheet != src)
+        if (tab.sheet != src)
             continue;
 
         table_t copied = tab;
         copied.name = make_unique_name(tab.name, m_tables, cloned);
-        copied.range.first.sheet = dst;
-        copied.range.last.sheet = dst;
+        copied.sheet = dst;
         cloned.emplace_back(name, std::move(copied));
     }
 

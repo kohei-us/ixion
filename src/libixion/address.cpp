@@ -242,6 +242,10 @@ abs_range_t::abs_range_t(const abs_address_t& _first, const abs_address_t& _last
     }
 }
 
+abs_range_t::abs_range_t(sheet_t _sheet, const abs_rc_range_t& _range) :
+    first(_sheet, _range.first.row, _range.first.column),
+    last(_sheet, _range.last.row, _range.last.column) {}
+
 std::size_t abs_range_t::hash::operator() (const abs_range_t& range) const
 {
     abs_address_t::hash adr_hash;

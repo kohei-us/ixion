@@ -1667,9 +1667,12 @@ void test_model_context_tables()
     assert(cxt.get_tables(0).empty());
 
     // Table1 in C3:D9 with a header row and one totals row.
+    const ixion::abs_rc_range_t C3_D9{2, 2, 7, 2};
+
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t({0, 2, 2}, {0, 8, 3});
+    tab.sheet = 0;
+    tab.range = C3_D9;
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);
@@ -1677,7 +1680,8 @@ void test_model_context_tables()
     const ixion::table_t* p = cxt.get_table("Table1");
     assert(p);
     assert(p->name == "Table1");
-    assert(p->range == ixion::abs_range_t({0, 2, 2}, {0, 8, 3}));
+    assert(p->sheet == 0);
+    assert(p->range == C3_D9);
     assert(p->columns.size() == 2);
     assert(p->columns[0] == "Category");
     assert(p->columns[1] == "Value");
@@ -1731,9 +1735,10 @@ void test_model_context_tables()
     range = cxt.get_table_range(ixion::abs_address_t(0, 0, 0), "Value", "", ixion::table_area_data);
     assert(!range.valid());
 
-    // Totals area of a table with no totals rows.
+    // Totals area of a table with no totals rows, in A1:B4 on sheet 1.
     tab.name = "NoTotals";
-    tab.range = ixion::abs_range_t({1, 0, 0}, {1, 3, 1});
+    tab.sheet = 1;
+    tab.range = ixion::abs_rc_range_t(0, 0, 4, 2);
     tab.columns = { "A", "B" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
@@ -1747,7 +1752,7 @@ void test_model_context_tables()
     try
     {
         tab.name = "Table1";
-        tab.range = ixion::abs_range_t({1, 10, 0}, {1, 12, 1});
+        tab.range = ixion::abs_rc_range_t(10, 0, 3, 2);
         cxt.set_table(tab);
         assert(!"model_context_error was expected for a duplicate table name");
     }
@@ -1772,7 +1777,7 @@ void test_model_context_tables()
     try
     {
         tab.name = "Table3";
-        tab.range = ixion::abs_range_t(ixion::abs_range_t::invalid);
+        tab.range = ixion::abs_rc_range_t(ixion::abs_rc_range_t::invalid);
         cxt.set_table(tab);
         assert(!"std::invalid_argument was expected for an invalid table range");
     }
@@ -1781,12 +1786,13 @@ void test_model_context_tables()
         // expected
     }
 
-    // ... or a range spanning multiple sheets.
+    // ... or an invalid sheet index.
     try
     {
-        tab.range = ixion::abs_range_t({0, 2, 2}, {1, 8, 3});
+        tab.sheet = ixion::invalid_sheet;
+        tab.range = C3_D9;
         cxt.set_table(tab);
-        assert(!"std::invalid_argument was expected for a multi-sheet table range");
+        assert(!"std::invalid_argument was expected for an invalid sheet index");
     }
     catch (const std::invalid_argument&)
     {
@@ -1805,31 +1811,32 @@ void test_model_context_append_sheet_copy_tables()
     // Cell positions on the source sheet.
     ixion::abs_address_t A1(0, 0, 0);
     ixion::abs_address_t B1(0, 0, 1);
-    ixion::abs_address_t C3(0, 2, 2);
     ixion::abs_address_t D9(0, 8, 3);
-    ixion::abs_address_t F3(0, 2, 5);
-    ixion::abs_address_t G5(0, 4, 6);
 
-    // Cell positions on the 'other' sheet.
-    ixion::abs_address_t other_B2(1, 1, 1);
-    ixion::abs_address_t other_C4(1, 3, 2);
+    // Table ranges on their sheets.
+    const ixion::abs_rc_range_t C3_D9{2, 2, 7, 2};
+    const ixion::abs_rc_range_t F3_G5{2, 5, 3, 2};
+    const ixion::abs_rc_range_t B2_C4{1, 1, 3, 2};
 
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t(C3, D9);
+    tab.sheet = 0;
+    tab.range = C3_D9;
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);
 
     tab.name = "Table2";
-    tab.range = ixion::abs_range_t(F3, G5);
+    tab.sheet = 0;
+    tab.range = F3_G5;
     tab.columns = { "A", "B" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
 
     // Unrelated table on another sheet, which should not get copied.
     tab.name = "TableX";
-    tab.range = ixion::abs_range_t(other_B2, other_C4);
+    tab.sheet = 1;
+    tab.range = B2_C4;
     tab.columns = { "C", "D" };
     tab.totals_row_count = 0;
     cxt.set_table(tab);
@@ -1873,12 +1880,9 @@ void test_model_context_append_sheet_copy_tables()
     // Same cell positions on the copied sheet.
     ixion::abs_address_t copied_A1(copied, 0, 0);
     ixion::abs_address_t copied_B1(copied, 0, 1);
-    ixion::abs_address_t copied_C3(copied, 2, 2);
     ixion::abs_address_t copied_D4(copied, 3, 3);
     ixion::abs_address_t copied_D8(copied, 7, 3);
     ixion::abs_address_t copied_D9(copied, 8, 3);
-    ixion::abs_address_t copied_F3(copied, 2, 5);
-    ixion::abs_address_t copied_G5(copied, 4, 6);
 
     // The tables of the source sheet get cloned to the new sheet with
     // auto-generated unique names.
@@ -1886,13 +1890,15 @@ void test_model_context_append_sheet_copy_tables()
 
     const ixion::table_t* p = cxt.get_table("Table3");
     assert(p);
-    assert(p->range == ixion::abs_range_t(copied_C3, copied_D9));
+    assert(p->sheet == copied);
+    assert(p->range == C3_D9);
     assert(p->columns == std::vector<std::string>({ "Category", "Value" }));
     assert(p->totals_row_count == 1);
 
     p = cxt.get_table("Table4");
     assert(p);
-    assert(p->range == ixion::abs_range_t(copied_F3, copied_G5));
+    assert(p->sheet == copied);
+    assert(p->range == F3_G5);
     assert(p->columns == std::vector<std::string>({ "A", "B" }));
     assert(p->totals_row_count == 0);
 
@@ -1900,11 +1906,13 @@ void test_model_context_append_sheet_copy_tables()
     // get cloned.
     p = cxt.get_table("Table1");
     assert(p);
-    assert(p->range == ixion::abs_range_t(C3, D9));
+    assert(p->sheet == 0);
+    assert(p->range == C3_D9);
 
     p = cxt.get_table("Table2");
     assert(p);
-    assert(p->range == ixion::abs_range_t(F3, G5));
+    assert(p->sheet == 0);
+    assert(p->range == F3_G5);
 
     assert(cxt.get_tables(0).size() == 2);
     assert(cxt.get_tables(1).size() == 1);
@@ -1960,12 +1968,13 @@ void test_model_context_append_sheet_copy_table_groups()
     ixion::model_context cxt{{100, 10}};
     cxt.append_sheet("src");
 
-    ixion::abs_address_t C3(0, 2, 2);
-    ixion::abs_address_t D9(0, 8, 3);
+    // Table1 in C3:D9 with a header row and one totals row.
+    const ixion::abs_rc_range_t C3_D9{2, 2, 7, 2};
 
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t(C3, D9);
+    tab.sheet = 0;
+    tab.range = C3_D9;
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);
@@ -2012,13 +2021,15 @@ void test_model_context_append_sheet_copy_table_ref_divergence()
     cxt.append_sheet("src");
 
     ixion::abs_address_t A1(0, 0, 0);
-    ixion::abs_address_t C3(0, 2, 2);
     ixion::abs_address_t D5(0, 4, 3);
-    ixion::abs_address_t D9(0, 8, 3);
+
+    // Table1 in C3:D9 with a header row and one totals row.
+    const ixion::abs_rc_range_t C3_D9{2, 2, 7, 2};
 
     ixion::table_t tab;
     tab.name = "Table1";
-    tab.range = ixion::abs_range_t(C3, D9);
+    tab.sheet = 0;
+    tab.range = C3_D9;
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
     cxt.set_table(tab);

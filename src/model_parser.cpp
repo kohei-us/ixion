@@ -811,7 +811,12 @@ void model_parser::parse_table()
         if (ret.type != formula_name_t::range_reference)
             throw parse_error("range of a table is expected to be given as a range reference.");
 
-        entry.range = std::get<range_t>(ret.value).to_abs(pos);
+        abs_range_t range = std::get<range_t>(ret.value).to_abs(pos);
+        if (range.first.sheet != range.last.sheet)
+            throw parse_error("range of a table must not span multiple sheets.");
+
+        entry.sheet = range.first.sheet;
+        entry.range = range;
     }
     else if (name == "columns")
         parse_table_columns(value);
@@ -832,8 +837,9 @@ void model_parser::push_table()
 
     if (mp_name_resolver)
     {
+        abs_range_t range{entry.sheet, entry.range};
         std::cout << "range: "
-            << mp_name_resolver->get_name(entry.range, abs_address_t(m_current_sheet,0,0), false)
+            << mp_name_resolver->get_name(range, abs_address_t(m_current_sheet,0,0), false)
             << std::endl;
     }
 
