@@ -15,11 +15,13 @@
 #include "sheet_store.hpp"
 #include "utils.hpp"
 
+#include <mdds/multi_type_vector.hpp>
+#include <mdds/multi_type_vector/standard_element_blocks.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <format>
 #include <iterator>
-#include <numeric>
 #include <stdexcept>
 #include <vector>
 
@@ -37,6 +39,14 @@ struct sort_action
     std::vector<row_t> rows;
 };
 
+struct row_map_traits : mdds::mtv::default_traits
+{
+    using block_funcs = mdds::mtv::element_block_funcs<mdds::mtv::int32_element_block>;
+};
+
+/** Stores a row mapping; a row with no stored value maps to itself. */
+using row_map_type = mdds::multi_type_vector<row_map_traits>;
+
 } // anonymous namespace
 
 struct sheet_view::impl
@@ -50,17 +60,18 @@ struct sheet_view::impl
     // share their content.
     detail::sheet_store store;
 
-    // Row mapping between this view and the base sheet, covering all the rows
-    // of the sheet.  Both stay empty, meaning identity, until the first sort.
-    std::vector<row_t> base_rows; // view row -> base row
-    std::vector<row_t> view_rows; // base row -> view row
+    // Row mapping between this view and the base sheet.  A row with a stored
+    // value maps to that row; a row with no stored value maps to itself.
+    row_map_type base_rows; // view row -> base row
+    row_map_type view_rows; // base row -> view row
 
     // sorts applied to this view, in the order they were applied
     std::vector<sort_action> sorts;
 
     impl(const detail::model_context_impl& _cxt, sheet_t _sheet, std::string _name,
          const detail::sheet_store& base) :
-        cxt(_cxt), sheet(_sheet), name(std::move(_name)), store(base.clone()) {}
+        cxt(_cxt), sheet(_sheet), name(std::move(_name)), store(base.clone()),
+        base_rows(get_row_count()), view_rows(get_row_count()) {}
 
     column_store_t::const_position_type get_cell_position(const abs_rc_address_t& pos) const
     {
@@ -73,6 +84,22 @@ struct sheet_view::impl
         return store.size() ? row_t(store[0].size()) : 0;
     }
 
+    row_t to_base(row_t view_row) const
+    {
+        if (base_rows.is_empty(view_row))
+            return view_row;
+
+        return base_rows.get<row_t>(view_row);
+    }
+
+    row_t to_view(row_t base_row) const
+    {
+        if (view_rows.is_empty(base_row))
+            return base_row;
+
+        return view_rows.get<row_t>(base_row);
+    }
+
     /**
      * Fold the permutation of a sort into the row mapping.
      *
@@ -83,22 +110,44 @@ struct sheet_view::impl
      */
     void apply_permutation(row_t row1, const std::vector<row_t>& sorted_rows)
     {
-        if (base_rows.empty())
+        row_t n_rows = row_t(sorted_rows.size());
+
+        // current view-to-base mapping over the sorted rows
+        std::vector<row_t> prev_base_rows(n_rows);
+        for (row_t i = 0; i < n_rows; ++i)
+            prev_base_rows[i] = to_base(row1 + i);
+
+        // fold the permutation, and store the result as one block
+        std::vector<row_t> folded(n_rows);
+        for (row_t i = 0; i < n_rows; ++i)
+            folded[i] = prev_base_rows[sorted_rows[i] - row1];
+
+        base_rows.set(row1, folded.begin(), folded.end());
+
+        // Rebuild the inverse mapping block by block; each block of base_rows
+        // holds a permutation of its own row positions.  Note that the empty
+        // segments are the segments where sort was never applied.
+        for (auto it = base_rows.cbegin(); it != base_rows.cend(); ++it)
         {
-            base_rows.resize(get_row_count());
-            std::iota(base_rows.begin(), base_rows.end(), 0);
+            if (it->type == mdds::mtv::element_type_empty)
+                continue;
+
+            row_t block_first = row_t(it->position);
+            std::vector<row_t> inverse(it->size, -1);
+
+            row_t view_row = block_first;
+            auto v = mdds::mtv::int32_element_block::begin(*it->data);
+            auto v_end = mdds::mtv::int32_element_block::end(*it->data);
+
+            for (; v != v_end; ++v, ++view_row)
+            {
+                assert(block_first <= *v && *v < block_first + row_t(it->size));
+                inverse[*v - block_first] = view_row;
+            }
+
+            assert(std::find(inverse.begin(), inverse.end(), -1) == inverse.end());
+            view_rows.set(block_first, inverse.begin(), inverse.end());
         }
-
-        std::vector<row_t> prev_base_rows = base_rows;
-
-        for (std::size_t i = 0; i < sorted_rows.size(); ++i)
-            base_rows[row1 + i] = prev_base_rows[sorted_rows[i]];
-
-        // rebuild the inverse mapping
-        view_rows.resize(base_rows.size());
-
-        for (std::size_t view_row = 0; view_row < base_rows.size(); ++view_row)
-            view_rows[base_rows[view_row]] = view_row;
     }
 };
 
@@ -160,9 +209,8 @@ void sheet_view::sort(const abs_rc_range_t& range, const sort_keys_t& keys)
     {
         // remember the sort for refresh() to replay
         mp_impl->sorts.push_back({range, sorted_rows});
+        mp_impl->apply_permutation(range.first.row, sorted_rows);
     }
-
-    mp_impl->apply_permutation(range.first.row, sorted_rows);
 }
 
 row_t sheet_view::to_base_row(row_t view_row) const
@@ -170,10 +218,7 @@ row_t sheet_view::to_base_row(row_t view_row) const
     if (view_row < 0 || mp_impl->get_row_count() <= view_row)
         throw std::out_of_range(std::format("view row {} is out of range", view_row));
 
-    if (mp_impl->base_rows.empty())
-        return view_row;
-
-    return mp_impl->base_rows[view_row];
+    return mp_impl->to_base(view_row);
 }
 
 row_t sheet_view::to_view_row(row_t base_row) const
@@ -181,10 +226,7 @@ row_t sheet_view::to_view_row(row_t base_row) const
     if (base_row < 0 || mp_impl->get_row_count() <= base_row)
         throw std::out_of_range(std::format("base row {} is out of range", base_row));
 
-    if (mp_impl->view_rows.empty())
-        return base_row;
-
-    return mp_impl->view_rows[base_row];
+    return mp_impl->to_view(base_row);
 }
 
 void sheet_view::sort_table(std::string_view table_name, std::string_view column, sort_order_t order)

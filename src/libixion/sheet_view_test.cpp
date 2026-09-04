@@ -378,6 +378,94 @@ void test_sheet_view_sort_twice()
     assert(view.to_view_row(1) == 2);
 }
 
+void test_sheet_view_sort_disjoint_ranges()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("sheet1");
+
+    const ixion::abs_address_t A3{0, 2, 0};
+    const ixion::abs_address_t A4{0, 3, 0};
+    const ixion::abs_address_t A6{0, 5, 0};
+    const ixion::abs_address_t A7{0, 6, 0};
+    const ixion::abs_address_t A8{0, 7, 0};
+    const ixion::abs_address_t A11{0, 10, 0};
+    const ixion::abs_address_t A12{0, 11, 0};
+    const ixion::abs_address_t A13{0, 12, 0};
+
+    const ixion::abs_rc_range_t A3_A4{2, 0, 2, 1};
+    const ixion::abs_rc_range_t A6_A8{5, 0, 3, 1};
+    const ixion::abs_rc_range_t A11_A13{10, 0, 3, 1};
+
+    // layout of column A (row indices 2-12)
+    //  2: 5.0
+    //  3: 4.0
+    //  5: 3.0
+    //  6: 1.0
+    //  7: 2.0
+    // 10: 30.0
+    // 11: 10.0
+    // 12: 20.0
+    cxt.set_numeric_cell(A3, 5.0);
+    cxt.set_numeric_cell(A4, 4.0);
+    cxt.set_numeric_cell(A6, 3.0);
+    cxt.set_numeric_cell(A7, 1.0);
+    cxt.set_numeric_cell(A8, 2.0);
+    cxt.set_numeric_cell(A11, 30.0);
+    cxt.set_numeric_cell(A12, 10.0);
+    cxt.set_numeric_cell(A13, 20.0);
+
+    ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
+
+    // sort row indices 5-7, away from the top of the sheet
+    view.sort(A6_A8, {{0, asc}});
+
+    assert(view.get_numeric_value(A6) == 1.0);
+    assert(view.get_numeric_value(A7) == 2.0);
+    assert(view.get_numeric_value(A8) == 3.0);
+
+    assert(view.to_base_row(5) == 6);
+    assert(view.to_base_row(6) == 7);
+    assert(view.to_base_row(7) == 5);
+    assert(view.to_view_row(6) == 5);
+    assert(view.to_view_row(7) == 6);
+    assert(view.to_view_row(5) == 7);
+
+    // the rows outside the sorted rows map to themselves
+    assert(view.to_base_row(0) == 0);
+    assert(view.to_base_row(4) == 4);
+    assert(view.to_base_row(8) == 8);
+    assert(view.to_base_row(99) == 99);
+    assert(view.to_view_row(0) == 0);
+    assert(view.to_view_row(99) == 99);
+
+    // sort a disjoint range below the sorted rows
+    view.sort(A11_A13, {{0, asc}});
+
+    assert(view.to_base_row(10) == 11);
+    assert(view.to_base_row(11) == 12);
+    assert(view.to_base_row(12) == 10);
+
+    // the rows between the two sorted ranges map to themselves
+    assert(view.to_base_row(8) == 8);
+    assert(view.to_base_row(9) == 9);
+
+    // the mapping of the first sort stays intact
+    assert(view.to_base_row(5) == 6);
+    assert(view.to_view_row(5) == 7);
+
+    // sort another disjoint range above the sorted rows
+    view.sort(A3_A4, {{0, asc}});
+
+    assert(view.to_base_row(2) == 3);
+    assert(view.to_base_row(3) == 2);
+    assert(view.to_view_row(2) == 3);
+    assert(view.to_view_row(3) == 2);
+    assert(view.to_base_row(1) == 1);
+    assert(view.to_base_row(4) == 4);
+}
+
 void test_sheet_view_sort_formula_group()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -921,6 +1009,7 @@ int main()
     test_sheet_view_snapshot();
     test_sheet_view_sort();
     test_sheet_view_sort_twice();
+    test_sheet_view_sort_disjoint_ranges();
     test_sheet_view_sort_formula_group();
     test_sheet_view_sort_invalid_args();
     test_sheet_view_sort_table();
