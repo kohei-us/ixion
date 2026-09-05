@@ -107,7 +107,8 @@ struct document::impl
         if (abs_range_t data_range = cxt.get_data_range(res.sheet); data_range.valid())
         {
             // The copied formula cells are new to the dependency tracker.
-            auto cells = cxt.iterate_cells(res.sheet, rc_direction_t::vertical, data_range);
+            auto cells = cxt.iterate_cells(
+                res.sheet, rc_direction_t::vertical, abs_rc_range_t(data_range));
             auto it = cells.begin();
 
             while (it != cells.end())

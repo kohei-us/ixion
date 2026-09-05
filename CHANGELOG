@@ -53,6 +53,9 @@ ixion 0.21.0
   * added an abs_range_t constructor that takes a sheet index and a
     sheet-less abs_rc_range_t.
 
+  * the abs_rc_range_t constructor that takes an abs_range_t is now
+    explicit, since the conversion drops the sheet index.
+
   * switched to std::string_view in various public interfaces where
     const std::string& was previously used, and table_t now stores its
     table and column names as std::string_view.

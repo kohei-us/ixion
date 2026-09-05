@@ -816,7 +816,7 @@ void model_parser::parse_table()
             throw parse_error("range of a table must not span multiple sheets.");
 
         entry.sheet = range.first.sheet;
-        entry.range = range;
+        entry.range = abs_rc_range_t(range);
     }
     else if (name == "columns")
         parse_table_columns(value);
@@ -871,7 +871,8 @@ void model_parser::copy_sheet(std::string_view src_name, std::string_view new_na
     // The copied formula cells are new to the dependency tracker.
     if (abs_range_t data_range = m_context.get_data_range(res.sheet); data_range.valid())
     {
-        auto cells = m_context.iterate_cells(res.sheet, rc_direction_t::vertical, data_range);
+        auto cells = m_context.iterate_cells(
+            res.sheet, rc_direction_t::vertical, abs_rc_range_t(data_range));
         auto it = cells.begin();
 
         while (it != cells.end())

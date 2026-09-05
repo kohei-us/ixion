@@ -277,7 +277,7 @@ void sheet_view::sort_table(std::string_view table_name, std::string_view column
         // the table has no data rows
         return;
 
-    sort(data_range, {{key_column, order}});
+    sort(abs_rc_range_t(data_range), {{key_column, order}});
 }
 
 void sheet_view::refresh()

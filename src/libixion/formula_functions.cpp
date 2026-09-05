@@ -568,8 +568,9 @@ void append_values_from_stack(
                 return true;
             };
 
+            abs_rc_range_t rc_range(range);
             for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
-                cxt.walk(sheet, range, cb);
+                cxt.walk(sheet, rc_range, cb);
 
             break;
         }
@@ -1188,7 +1189,7 @@ void formula_functions::fnc_and(formula_value_stack& args) const
             {
                 auto range = args.pop_range_ref();
                 sheet_t sheet = range.first.sheet;
-                abs_rc_range_t rc_range = range;
+                abs_rc_range_t rc_range(range);
 
                 column_block_callback_t cb = [&final_result, wait_policy](
                     col_t col, row_t row1, row_t row2, const column_block_shape_t& node)
@@ -1280,7 +1281,7 @@ void formula_functions::fnc_or(formula_value_stack& args) const
             {
                 auto range = args.pop_range_ref();
                 sheet_t sheet = range.first.sheet;
-                abs_rc_range_t rc_range = range;
+                abs_rc_range_t rc_range(range);
 
                 // We will bail out of the walk on the first positive result.
 
@@ -2100,9 +2101,10 @@ void formula_functions::fnc_textjoin(formula_value_stack& args) const
 
     for (const abs_range_t& range : ranges)
     {
+        abs_rc_range_t rc_range(range);
         for (sheet_t sheet = range.first.sheet; sheet <= range.last.sheet; ++sheet)
         {
-            for (const auto& cell : m_context.iterate_cells(sheet, rc_direction_t::horizontal, range))
+            for (const auto& cell : m_context.iterate_cells(sheet, rc_direction_t::horizontal, rc_range))
             {
                 switch (cell.type)
                 {

@@ -246,7 +246,7 @@ struct IXION_DLLPUBLIC abs_rc_range_t
     abs_rc_range_t();
     abs_rc_range_t(init_invalid);
     abs_rc_range_t(const abs_rc_range_t& other);
-    abs_rc_range_t(const abs_range_t& other);
+    explicit abs_rc_range_t(const abs_range_t& other);
 
     /**
      * @param _row 0-based row position of the top-left cell of the range.
