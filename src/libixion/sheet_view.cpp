@@ -22,6 +22,7 @@
 #include <cassert>
 #include <format>
 #include <iterator>
+#include <numeric>
 #include <stdexcept>
 #include <vector>
 
@@ -84,20 +85,24 @@ struct sheet_view::impl
         return store.size() ? row_t(store[0].size()) : 0;
     }
 
+    /** Mapped row at a position of a row mapping; an empty row maps to itself. */
+    static row_t mapped_row(const row_map_type::const_position_type& pos)
+    {
+        if (pos.first->type == mdds::mtv::element_type_empty)
+            // if it's an empty block rows aren't sorted - return the source row as-is
+            return row_t(pos.first->position + pos.second);
+
+        return mdds::mtv::int32_element_block::at(*pos.first->data, pos.second);
+    }
+
     row_t to_base(row_t view_row) const
     {
-        if (base_rows.is_empty(view_row))
-            return view_row;
-
-        return base_rows.get<row_t>(view_row);
+        return mapped_row(base_rows.position(view_row));
     }
 
     row_t to_view(row_t base_row) const
     {
-        if (view_rows.is_empty(base_row))
-            return base_row;
-
-        return view_rows.get<row_t>(base_row);
+        return mapped_row(view_rows.position(base_row));
     }
 
     /**
@@ -112,10 +117,30 @@ struct sheet_view::impl
     {
         row_t n_rows = row_t(sorted_rows.size());
 
-        // current view-to-base mapping over the sorted rows
+        // current view-to-base mapping over the sorted rows, read block by
+        // block from the block containing the first sorted row
         std::vector<row_t> prev_base_rows(n_rows);
-        for (row_t i = 0; i < n_rows; ++i)
-            prev_base_rows[i] = to_base(row1 + i);
+        row_t row2 = row1 + n_rows; // one past the last sorted row
+        auto [block, offset] = base_rows.position(row1); // offset of row1 within the block
+
+        for (row_t row = row1; row < row2; ++block)
+        {
+            // number of rows to read from this block, clipped to the sorted rows
+            row_t n_read = std::min(row_t(block->size - offset), row2 - row);
+            auto dest = prev_base_rows.begin() + (row - row1);
+
+            if (block->type == mdds::mtv::element_type_empty)
+                // sort isn't applied - use the base row indices
+                std::iota(dest, dest + n_read, row);
+            else
+            {
+                auto v = mdds::mtv::int32_element_block::begin(*block->data) + offset;
+                std::copy(v, v + n_read, dest);
+            }
+
+            row += n_read;
+            offset = 0; // the following blocks get read from their starts
+        }
 
         // fold the permutation, and store the result as one block
         std::vector<row_t> folded(n_rows);
