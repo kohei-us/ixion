@@ -20,6 +20,8 @@ Enum
    enum-formula_name_resolver_t.rst
    enum-formula_result_wait_policy_t.rst
    enum-rc_direction_t.rst
+   enum-sheet_dump_mode_t.rst
+   enum-sort_order_t.rst
    enum-table_area_t.rst
    enum-value_t.rst
 
@@ -42,6 +44,7 @@ Type aliases
    typedef-rc_t.rst
    typedef-row_t.rst
    typedef-sheet_t.rst
+   typedef-sort_keys_t.rst
    typedef-table_areas_t.rst
 
 Constants
@@ -115,6 +118,7 @@ Struct
    struct-rc_address_t.rst
    struct-rc_range_t.rst
    struct-rc_size_t.rst
+   struct-sort_key_t.rst
    struct-string_id_t.rst
    struct-table_ref_t.rst
    struct-table_t.rst
@@ -145,6 +149,7 @@ Classes
    class-named_expressions_iterator.rst
    class-not_implemented_error.rst
    class-numeric_matrix.rst
+   class-sheet_view.rst
    class-values_t.rst
 
 Child namespaces
