@@ -9,7 +9,8 @@ bin_PROGRAMS =
 EXTRA_PROGRAMS = \
 	document-simple \
 	model-context-simple \
-	cell-access
+	cell-access \
+	sheet-view
 
 document_simple_SOURCES = document_simple.cpp
 document_simple_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
@@ -20,10 +21,14 @@ model_context_simple_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 cell_access_SOURCES = cell_access.cpp
 cell_access_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 
+sheet_view_SOURCES = sheet_view.cpp
+sheet_view_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
+
 TESTS = \
 	document-simple \
 	model-context-simple \
-	cell-access
+	cell-access \
+	sheet-view
 
 distclean-local:
 	rm -rf $(TESTS)

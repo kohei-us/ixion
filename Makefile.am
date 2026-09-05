@@ -143,6 +143,7 @@ doc_data = \
 	doc/overview/document.rst \
 	doc/overview/index.rst \
 	doc/overview/model-context.rst \
+	doc/overview/sheet-view.rst \
 	doc/python/document.rst \
 	doc/python/index.rst \
 	doc/python/quickstart.rst \
