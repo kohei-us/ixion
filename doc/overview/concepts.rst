@@ -81,6 +81,8 @@ comes with resolvers for the following syntaxes, and you pick one with a
 * OpenFormula
 * ODF cell-range-address
 
+The :ref:`formula-syntax` page goes through these in detail.
+
 The resolver also works in the other direction, turning tokens back into a
 string through :cpp:func:`~ixion::print_formula_tokens`.  Since the tokens
 themselves don't depend on any particular syntax, you can parse a formula

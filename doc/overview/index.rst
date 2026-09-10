@@ -9,4 +9,5 @@ Overview
    model-context.rst
    document.rst
    cell-access.rst
+   formula-syntax.rst
    sheet-view.rst
