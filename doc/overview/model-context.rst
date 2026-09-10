@@ -6,6 +6,10 @@
 First step - creating model_context
 ===================================
 
+This page walks through the low-level API one step at a time.  If you haven't
+read the :ref:`concepts` page yet, it's worth doing so first, as it explains
+the pieces we'll be using here.
+
 Create a model context instance
 -------------------------------
 

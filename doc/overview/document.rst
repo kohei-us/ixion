@@ -14,7 +14,8 @@ formula cell registration (and un-registration), as well as to trace which cells
 have their values changed and which formula cells have been created or modified.
 This is because the :cpp:class:`~ixion::model_context` class is designed to only
 handle cell value storage, and all other operations related to formula expressions
-and formula cell (re-)calculations have to be done outside of it.
+and formula cell (re-)calculations have to be done outside of it.  The
+:ref:`concepts` page explains the reasoning behind this split.
 
 Luckily, Ixion also provides a higher level document class called
 :cpp:class:`~ixion::document` which internally uses :cpp:class:`~ixion::model_context`
