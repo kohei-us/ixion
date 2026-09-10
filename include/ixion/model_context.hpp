@@ -573,7 +573,7 @@ public:
 
     /**
      * A convenient way to mass-insert a range of cell values.  You can
-     * use a nested initializet list representing a range of cell values.  The
+     * use a nested initializer list representing a range of cell values.  The
      * outer list represents rows.
      *
      * @param sheet sheet index.

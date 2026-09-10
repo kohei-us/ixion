@@ -169,7 +169,7 @@ overhead of searching for the cell instance from the model.
 Calculate formula cell
 ----------------------
 
-Now that we have the formula cell in, let's run our first calculation.  To calcualte formula cells, you
+Now that we have the formula cell in, let's run our first calculation.  To calculate formula cells, you
 need to first specify a range of modified cells in order to query for all formula cells affected by it
 either directly or indirectly, which we refer to as "dirty" formula cells.  Since this is our initial
 calculation, we can simply specify the entire sheet to be "modified" which will effectively trigger all
@@ -364,5 +364,5 @@ Running this code should produce the following output:
     value of A10: 75
     value of A11: 12
 
-The complete source code of this example is avaiable `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/model_context_simple.cpp>`_.
+The complete source code of this example is available `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/model_context_simple.cpp>`_.
 

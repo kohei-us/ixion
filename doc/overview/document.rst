@@ -147,4 +147,4 @@ tokenization, formula cell registration, or manual tracking of modified cells.  
 looking to leverage the functionality of Ixion but don't want to deal with lower-level formula
 API, using the :cpp:class:`~ixion::document` class may be just the ticket.
 
-The complete source code of this example is avaiable `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/document_simple.cpp>`_.
+The complete source code of this example is available `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/document_simple.cpp>`_.

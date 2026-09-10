@@ -30,5 +30,5 @@ print the value of the cell as follows:
    :end-before: //!code-end: get-value
    :dedent: 4
 
-The complete source code of this example is avaiable
+The complete source code of this example is available
 `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/cell_access.cpp>`_.
