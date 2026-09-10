@@ -1,5 +1,7 @@
 .. highlight:: cpp
 
+.. _sheet-view:
+
 Sorting a sheet through a sheet view
 ====================================
 

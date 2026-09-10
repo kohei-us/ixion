@@ -140,6 +140,7 @@ doc_data = \
 	doc/environment.yml \
 	doc/index.rst \
 	doc/overview/cell-access.rst \
+	doc/overview/concepts.rst \
 	doc/overview/document.rst \
 	doc/overview/index.rst \
 	doc/overview/model-context.rst \

@@ -10,7 +10,10 @@ rtd_build = os.environ.get("READTHEDOCS", None) == "True"
 if rtd_build:
     subprocess.call("doxygen --version; doxygen doxygen.conf", shell=True)
 
-extensions = ["breathe"]
+extensions = ["breathe", "sphinx.ext.todo"]
+
+# Show the todo boxes in local builds only.
+todo_include_todos = not rtd_build
 templates_path = ["_templates"]
 source_suffix = ".rst"
 master_doc = "index"
