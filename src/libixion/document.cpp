@@ -230,6 +230,11 @@ void document::set_sheet_name(sheet_t sheet, std::string name)
     mp_impl->set_sheet_name(sheet, std::move(name));
 }
 
+const model_context& document::get_model_context() const
+{
+    return mp_impl->cxt;
+}
+
 cell_access document::get_cell_access(const cell_pos& pos) const
 {
     return mp_impl->get_cell_access(pos);

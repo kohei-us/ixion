@@ -146,6 +146,7 @@ doc_data = \
 	doc/overview/index.rst \
 	doc/overview/model-context.rst \
 	doc/overview/names-and-tables.rst \
+	doc/overview/sheet-copy.rst \
 	doc/overview/sheet-view.rst \
 	doc/python/document.rst \
 	doc/python/index.rst \

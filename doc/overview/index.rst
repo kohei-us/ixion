@@ -11,4 +11,5 @@ Overview
    cell-access.rst
    formula-syntax.rst
    names-and-tables.rst
+   sheet-copy.rst
    sheet-view.rst

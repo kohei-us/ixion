@@ -243,7 +243,8 @@ quick run-down of what they are:
   with its own result.
 
 * **Sheet copies** append a new sheet as a copy of an existing one.  The two
-  sheets share their cell storage until one of them gets modified.
+  sheets share their cell storage until one of them gets modified.  See
+  :ref:`sheet-copy`.
 
 * **Sheet views** are named snapshots of a sheet whose rows you can sort
   without touching the sheet itself.  See :ref:`sheet-view`.

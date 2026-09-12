@@ -17,6 +17,7 @@
 namespace ixion {
 
 class cell_access;
+class model_context;
 
 /**
  * Higher level document representation designed to handle both cell value
@@ -84,6 +85,14 @@ public:
      * @param name New name of a sheet.
      */
     void set_sheet_name(sheet_t sheet, std::string name);
+
+    /**
+     * Get read-only access to the underlying model context, for instance to
+     * dump the content of a sheet or to iterate over its cells.
+     *
+     * @return Model context this document stores its cells in.
+     */
+    const model_context& get_model_context() const;
 
     cell_access get_cell_access(const cell_pos& pos) const;
 
