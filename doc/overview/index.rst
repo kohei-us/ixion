@@ -10,4 +10,5 @@ Overview
    document.rst
    cell-access.rst
    formula-syntax.rst
+   names-and-tables.rst
    sheet-view.rst

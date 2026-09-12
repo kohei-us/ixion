@@ -228,11 +228,12 @@ quick run-down of what they are:
 
 * **Named expressions** are formula token sequences stored under a name,
   either globally or per sheet, which formulas can then refer to by that
-  name.
+  name.  See :ref:`names-and-tables`.
 
 * **Tables** are named rectangular ranges with named columns.  A formula can
   refer to a table by its name and column instead of by cell addresses, and
-  such references take part in dependency tracking like any other.
+  such references take part in dependency tracking like any other.  See
+  :ref:`names-and-tables`.
 
 * **Formula groups** let a range of formula cells share one set of formula
   tokens, which saves memory.  This is also how an array formula spanning

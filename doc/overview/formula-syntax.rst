@@ -11,9 +11,8 @@ formula string and those tokens.  This page looks at the syntaxes Ixion
 understands, what you can write in a formula, and how the same tokens come
 out when printed in a different syntax.
 
-The snippets on this page come from one example program, which starts by
-creating a model with three sheets and a resolver for each of the syntaxes
-we'll be using:
+Let's start by creating a model with three sheets and a resolver for each
+of the syntaxes we'll be using:
 
 .. literalinclude:: ../../doc_example/formula_syntax.cpp
    :language: C++
