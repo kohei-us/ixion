@@ -43,13 +43,13 @@ void register_formula_cells(ixion::model_context& cxt, ixion::sheet_t sheet)
 
         const auto* fc = std::get<const ixion::formula_cell*>(it->value);
         ixion::abs_address_t pos{sheet, it->row, it->col};
-        ixion::register_formula_cell(cxt, pos, fc);
 
-        // Registering the top cell of a formula group covers the whole
-        // group, so skip over the rest of its cells.
-        ixion::formula_group_t group = fc->get_group_properties();
-        if (group.grouped)
-            std::advance(it, group.size.row - 1);
+        // Registering the top-left cell of a formula group covers the whole
+        // group, so skip the other cells of the group.
+        if (fc->get_parent_position(pos) != pos)
+            continue;
+
+        ixion::register_formula_cell(cxt, pos, fc);
     }
 }
 //!code-end: register-sheet

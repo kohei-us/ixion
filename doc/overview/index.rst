@@ -12,4 +12,5 @@ Overview
    formula-syntax.rst
    names-and-tables.rst
    sheet-copy.rst
+   formula-groups.rst
    sheet-view.rst

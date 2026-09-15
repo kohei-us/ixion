@@ -300,6 +300,8 @@ struct IXION_DLLPUBLIC formula_group_t
     formula_group_t& operator= (const formula_group_t& other);
 };
 
+IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const formula_group_t& v);
+
 /**
  * Get a string representation of a formula error type.
  *

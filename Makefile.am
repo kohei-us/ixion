@@ -142,6 +142,7 @@ doc_data = \
 	doc/overview/cell-access.rst \
 	doc/overview/concepts.rst \
 	doc/overview/document.rst \
+	doc/overview/formula-groups.rst \
 	doc/overview/formula-syntax.rst \
 	doc/overview/index.rst \
 	doc/overview/model-context.rst \

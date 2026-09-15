@@ -214,9 +214,10 @@ registers each formula cell it finds:
 
 It iterates over the data range of the sheet with
 :cpp:func:`~ixion::model_context::iterate_cells`, and calls
-:cpp:func:`~ixion::register_formula_cell` on every formula cell.  A
-formula group is registered through its top cell, so the loop skips the
-rest of the group's cells.  We call it on the new sheet:
+:cpp:func:`~ixion::register_formula_cell` on every formula cell.  A formula
+group is registered through its top-left cell only, so the loop skips any cell
+that is not the parent of the group.  Refer to the :ref:`formula-groups`
+section for more details.  We call it on the new sheet:
 
 .. literalinclude:: ../../doc_example/sheet_copy.cpp
    :language: C++

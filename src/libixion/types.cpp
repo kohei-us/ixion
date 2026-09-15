@@ -75,6 +75,16 @@ formula_group_t& formula_group_t::operator= (const formula_group_t& other)
     return *this;
 }
 
+std::ostream& operator<< (std::ostream& os, const formula_group_t& v)
+{
+    std::ios::fmtflags flags = os.flags();
+    os << "(formula_group_t: grouped=" << std::boolalpha << v.grouped
+        << "; rows=" << v.size.row << "; columns=" << v.size.column
+        << "; identity=0x" << std::hex << v.identity << ")";
+    os.flags(flags);
+    return os;
+}
+
 std::string_view get_formula_error_name(formula_error_t fe)
 {
     constexpr std::string_view default_err_name = "#ERR!";

@@ -240,7 +240,7 @@ quick run-down of what they are:
   several cells is represented: the formula gets evaluated once, and each
   cell of the group shows its own element of the resulting matrix as its
   value.  From the outside, each member is still an ordinary formula cell
-  with its own result.
+  with its own result.  See :ref:`formula-groups`.
 
 * **Sheet copies** append a new sheet as a copy of an existing one.  The two
   sheets share their cell storage until one of them gets modified.  See

@@ -15,6 +15,9 @@ ixion 0.21.0
   * added document::get_model_context() which gives read-only access to
     the model context the document stores its cells in.
 
+  * added operator<< for formula_group_t which prints its state, for
+    use in debugging and diagnostics.
+
   * formula_tokens_store is now immutable once created.  The non-const
     variant of its get() method has been removed, and a new create()
     overload taking a formula_tokens_t instance has been added.

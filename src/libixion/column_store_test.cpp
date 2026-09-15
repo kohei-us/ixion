@@ -92,6 +92,7 @@ void test_column_store_clone_formula_cells()
 
         ixion::formula_group_t src_group = src->get_group_properties();
         ixion::formula_group_t dst_group = dst->get_group_properties();
+        std::cout << "source: " << src_group << "; cloned: " << dst_group << std::endl;
         assert(dst_group.grouped);
         assert(dst_group.identity != src_group.identity);
         assert(dst_group.size.row == 3);

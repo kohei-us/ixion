@@ -13,7 +13,8 @@ EXTRA_PROGRAMS = \
 	sheet-view \
 	formula-syntax \
 	names-and-tables \
-	sheet-copy
+	sheet-copy \
+	formula-groups
 
 document_simple_SOURCES = document_simple.cpp
 document_simple_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
@@ -36,6 +37,9 @@ names_and_tables_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 sheet_copy_SOURCES = sheet_copy.cpp
 sheet_copy_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 
+formula_groups_SOURCES = formula_groups.cpp
+formula_groups_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
+
 TESTS = \
 	document-simple \
 	model-context-simple \
@@ -43,7 +47,8 @@ TESTS = \
 	sheet-view \
 	formula-syntax \
 	names-and-tables \
-	sheet-copy
+	sheet-copy \
+	formula-groups
 
 distclean-local:
 	rm -rf $(TESTS)
