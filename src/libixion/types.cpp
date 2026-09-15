@@ -72,6 +72,7 @@ formula_group_t& formula_group_t::operator= (const formula_group_t& other)
 {
     size = other.size;
     identity = other.identity;
+    grouped = other.grouped;
     return *this;
 }
 

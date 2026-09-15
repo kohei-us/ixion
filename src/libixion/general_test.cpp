@@ -435,6 +435,21 @@ void test_abs_address_range()
     }
 }
 
+void test_formula_group_t_assignment()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::formula_group_t src({3, 2}, 0x1a2b, true);
+    ixion::formula_group_t dst;
+    assert(!dst.grouped);
+
+    dst = src;
+    assert(dst.size.row == 3);
+    assert(dst.size.column == 2);
+    assert(dst.identity == 0x1a2b);
+    assert(dst.grouped);
+}
+
 } // anonymous namespace
 
 int main()
@@ -450,6 +465,7 @@ int main()
     test_address();
     test_table_t_equality();
     test_abs_address_range();
+    test_formula_group_t_assignment();
 
     return EXIT_SUCCESS;
 }
