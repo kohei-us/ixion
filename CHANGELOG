@@ -18,6 +18,11 @@ ixion 0.21.0
   * added operator<< for formula_group_t which prints its state, for
     use in debugging and diagnostics.
 
+  * register_formula_cell() and unregister_formula_cell() now throw
+    formula_registration_error when given the position of a grouped
+    formula cell other than the top-left cell of its group.  Such a
+    call previously recorded incorrect dependencies silently.
+
   * the numeric and string value accessors now return the top-left
     element when a non-grouped formula cell holds a matrix result.  Such
     a cell previously caused an out-of-range error when its value was

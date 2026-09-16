@@ -109,23 +109,21 @@ struct document::impl
             // The copied formula cells are new to the dependency tracker.
             auto cells = cxt.iterate_cells(
                 res.sheet, rc_direction_t::vertical, abs_rc_range_t(data_range));
-            auto it = cells.begin();
 
-            while (it != cells.end())
+            for (const auto& cell : cells)
             {
-                if (it->type != cell_t::formula)
-                {
-                    ++it;
+                if (cell.type != cell_t::formula)
                     continue;
-                }
 
-                const auto* fc = std::get<const formula_cell*>(it->value);
-                register_formula_cell(cxt, abs_address_t(res.sheet, it->row, it->col), fc);
+                const auto* fc = std::get<const formula_cell*>(cell.value);
+                abs_address_t pos(res.sheet, cell.row, cell.col);
 
-                // Registering the top-most cell of a group registers the
-                // entire group, so skip over the rest of the group.
-                formula_group_t group = fc->get_group_properties();
-                std::advance(it, group.grouped ? group.size.row : 1);
+                // Registering the top-left cell of a group registers the
+                // entire group, so skip the other cells of the group.
+                if (fc->get_parent_position(pos) != pos)
+                    continue;
+
+                register_formula_cell(cxt, pos, fc);
             }
         }
 

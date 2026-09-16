@@ -110,6 +110,7 @@ test_data = \
 	test/22-formulas-with-cached-results.txt \
 	test/22-grouped-formulas-with-cached-results.txt \
 	test/23-dump-sheet.txt \
+	test/24-copy-sheet-array-formula.txt \
 	test/expected/model-context/dump-sheet-simple.txt \
 	test/expected/model-context/dump-sheet-verbose.txt \
 	test/expected/model-context/dump-sheet-verbose-r1c1.txt \

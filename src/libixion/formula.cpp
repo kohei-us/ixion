@@ -303,6 +303,22 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const model_cont
 }
 
 /**
+ * Throw unless the position is that of the top-left cell of the formula
+ * group the cell belongs to.  A non-grouped cell always passes.
+ */
+void check_group_parent_or_throw(
+    const char* func_name, const abs_address_t& pos, const formula_cell& cell)
+{
+    abs_address_t parent = cell.get_parent_position(pos);
+    if (parent == pos)
+        return;
+
+    throw formula_registration_error(std::format(
+        "{}: {} is not the top-left cell of its formula group starting at {}",
+        func_name, pos.get_name(), parent.get_name()));
+}
+
+/**
  * Get the range a formula cell occupies as a listener in the dependency
  * tracker.  For a grouped formula cell, it spans the whole group.
  */
@@ -368,6 +384,8 @@ void register_formula_cell(
             return;
     }
 
+    check_group_parent_or_throw("register_formula_cell", pos, *cell);
+
     dirty_cell_tracker& tracker = cxt.get_cell_tracker();
     abs_range_t src_pos = to_listener_range(pos, *cell);
 
@@ -426,6 +444,8 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
     if (!fcell)
         // Not a formula cell. Bail out.
         return;
+
+    check_group_parent_or_throw("unregister_formula_cell", pos, *fcell);
 
     dirty_cell_tracker& tracker = cxt.get_cell_tracker();
     tracker.remove_volatile(pos);

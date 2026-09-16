@@ -1475,6 +1475,50 @@ void test_ungrouped_matrix_result()
     assert(cxt.get_string_value(A2) == "top");
 }
 
+void test_register_grouped_formula_cells_non_parent()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    cxt.append_sheet("test");
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    ixion::abs_range_t D1E2({0, 0, 3}, {0, 1, 4});
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(
+        cxt, D1E2.first, *resolver, "A1:B2*10");
+    cxt.set_grouped_formula_cells(D1E2, std::move(tokens));
+
+    // Only the top-left cell of a group may be registered or unregistered.
+    ixion::abs_address_t E1(0, 0, 4);
+
+    try
+    {
+        ixion::register_formula_cell(cxt, E1);
+        assert(!"register_formula_cell() should have thrown");
+    }
+    catch (const ixion::formula_registration_error&)
+    {
+        // expected
+    }
+
+    ixion::register_formula_cell(cxt, D1E2.first);
+
+    try
+    {
+        ixion::unregister_formula_cell(cxt, E1);
+        assert(!"unregister_formula_cell() should have thrown");
+    }
+    catch (const ixion::formula_registration_error&)
+    {
+        // expected
+    }
+
+    ixion::unregister_formula_cell(cxt, D1E2.first);
+}
+
 void test_volatile_function()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -2502,6 +2546,7 @@ int main()
     test_unregister_grouped_formula_cells();
     test_unregister_formula_cell_range_refs();
     test_ungrouped_matrix_result();
+    test_register_grouped_formula_cells_non_parent();
     test_volatile_function();
     test_parse_and_print_expressions();
     test_function_name_resolution();
