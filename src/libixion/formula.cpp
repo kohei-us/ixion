@@ -302,6 +302,25 @@ void check_sheet_or_throw(const char* func_name, sheet_t sheet, const model_cont
         func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell)));
 }
 
+/**
+ * Get the range a formula cell occupies as a listener in the dependency
+ * tracker.  For a grouped formula cell, it spans the whole group.
+ */
+abs_range_t to_listener_range(const abs_address_t& pos, const formula_cell& cell)
+{
+    abs_range_t range = pos;
+
+    formula_group_t fg_props = cell.get_group_properties();
+    if (fg_props.grouped)
+    {
+        // Expand the source range for grouped formula cells.
+        range.last.column += fg_props.size.column - 1;
+        range.last.row += fg_props.size.row - 1;
+    }
+
+    return range;
+}
+
 }
 
 void register_formula_cell(
@@ -327,16 +346,8 @@ void register_formula_cell(
             return;
     }
 
-    formula_group_t fg_props = cell->get_group_properties();
     dirty_cell_tracker& tracker = cxt.get_cell_tracker();
-
-    abs_range_t src_pos = pos;
-    if (fg_props.grouped)
-    {
-        // Expand the source range for grouped formula cells.
-        src_pos.last.column += fg_props.size.column - 1;
-        src_pos.last.row += fg_props.size.row - 1;
-    }
+    abs_range_t src_pos = to_listener_range(pos, *cell);
 
     IXION_TRACE("pos=" << pos.get_name()
         << "; formula='" << detail::print_formula_expression(cxt, pos, *cell)
@@ -409,6 +420,8 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
     dirty_cell_tracker& tracker = cxt.get_cell_tracker();
     tracker.remove_volatile(pos);
 
+    abs_range_t src_pos = to_listener_range(pos, *fcell);
+
     // Go through all its existing references, and remove
     // itself as their listener.  This step is important
     // especially during partial re-calculation.
@@ -423,14 +436,14 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
             {
                 abs_address_t addr = std::get<address_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("unregister_formula_cell", addr.sheet, cxt, pos, *fcell);
-                tracker.remove(pos, addr);
+                tracker.remove(src_pos, addr);
                 break;
             }
             case fop_range_ref:
             {
                 abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("unregister_formula_cell", range.first.sheet, cxt, pos, *fcell);
-                tracker.remove(pos, range);
+                tracker.remove(src_pos, range);
                 break;
             }
             case fop_table_ref:
@@ -440,7 +453,7 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
                     // silently ignore unresolvable table references.
                     break;
 
-                tracker.remove(pos, range);
+                tracker.remove(src_pos, range);
                 break;
             }
             default:

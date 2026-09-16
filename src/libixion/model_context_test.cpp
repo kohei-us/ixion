@@ -1360,6 +1360,44 @@ ixion::formula_cell* insert_formula(
     return p;
 }
 
+void test_unregister_grouped_formula_cells()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    cxt.append_sheet("test");
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    cxt.set_cell_values(0, {
+        {1.0, 2.0},
+        {3.0, 4.0},
+    });
+
+    // Grouped formula cells in D1:E2 referencing A1:B2.
+    ixion::abs_range_t D1E2({0, 0, 3}, {0, 1, 4});
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(
+        cxt, D1E2.first, *resolver, "A1:B2*10");
+    cxt.set_grouped_formula_cells(D1E2, std::move(tokens));
+    ixion::register_formula_cell(cxt, D1E2.first);
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_range_set_t modified_cells{A1};
+
+    std::vector<ixion::abs_range_t> sorted =
+        ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
+    assert(sorted.size() == 1);
+    assert(sorted[0] == D1E2);
+
+    // Unregistering the top-left cell must remove the whole group as a listener.
+    ixion::unregister_formula_cell(cxt, D1E2.first);
+
+    sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
+    assert(sorted.empty());
+}
+
 void test_volatile_function()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -2384,6 +2422,7 @@ int main()
     test_model_context_append_sheet_copy_table_ref_divergence();
     test_model_context_dump_sheet();
     test_grouped_formula_string_results();
+    test_unregister_grouped_formula_cells();
     test_volatile_function();
     test_parse_and_print_expressions();
     test_function_name_resolution();
