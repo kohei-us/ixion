@@ -35,6 +35,7 @@
 #include <optional>
 #include <iterator>
 #include <numbers>
+#include <random>
 
 #include <mdds/sorted_string_map.hpp>
 
@@ -756,6 +757,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
             case formula_function_t::func_rept:
                 fnc_rept(args);
                 break;
+            case formula_function_t::func_rand:
+                fnc_rand(args);
+                break;
             case formula_function_t::func_right:
                 fnc_right(args);
                 break;
@@ -788,6 +792,9 @@ void formula_functions::interpret(formula_function_t oc, formula_value_stack& ar
                 break;
             case formula_function_t::func_trim:
                 fnc_trim(args);
+                break;
+            case formula_function_t::func_today:
+                fnc_today(args);
                 break;
             case formula_function_t::func_true:
                 fnc_true(args);
@@ -1156,6 +1163,17 @@ void formula_functions::fnc_pi(formula_value_stack& args) const
         throw formula_functions::invalid_arg("PI takes no arguments.");
 
     args.push_value(std::numbers::pi_v<double>);
+}
+
+void formula_functions::fnc_rand(formula_value_stack& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("RAND takes no arguments");
+
+    // One generator per thread, as a calculation may run on several threads.
+    thread_local std::mt19937_64 engine{std::random_device{}()};
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    args.push_value(dist(engine));
 }
 
 void formula_functions::fnc_int(formula_value_stack& args) const
@@ -2219,6 +2237,18 @@ void formula_functions::fnc_now(formula_value_stack& args) const
     double cur_time = get_current_time();
     cur_time /= 86400.0; // convert seconds to days.
     args.push_value(cur_time);
+}
+
+void formula_functions::fnc_today(formula_value_stack& args) const
+{
+    if (!args.empty())
+        throw formula_functions::invalid_arg("TODAY takes no arguments");
+
+    // TODO: this value is currently not accurate since we don't take into
+    // account the zero date yet.
+    double cur_time = get_current_time();
+    cur_time /= 86400.0; // convert seconds to days.
+    args.push_value(std::floor(cur_time));
 }
 
 void formula_functions::fnc_wait(formula_value_stack& args) const

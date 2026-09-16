@@ -123,6 +123,8 @@ ixion 0.21.0
 
 * formula interpreter
 
+  * implemented RAND() and TODAY().  Both are volatile, as is NOW().
+
   * an unimplemented formula function now yields a #NAME? error on
     the calling cell instead of aborting the entire calculation.
 

@@ -60,6 +60,7 @@ private:
     // category: mathematical
     void fnc_int(formula_value_stack& args) const;
     void fnc_mmult(formula_value_stack& args) const;
+    void fnc_rand(formula_value_stack& args) const;
     void fnc_subtotal(formula_value_stack& args) const;
     void fnc_sum(formula_value_stack& args) const;
 
@@ -105,6 +106,7 @@ private:
 
     // category: date & time
     void fnc_now(formula_value_stack& args) const;
+    void fnc_today(formula_value_stack& args) const;
 
     // cateogry: spreadsheet
     void fnc_column(formula_value_stack& args) const;

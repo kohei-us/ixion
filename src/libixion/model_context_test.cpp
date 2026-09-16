@@ -14,6 +14,7 @@
 #include <ixion/config.hpp>
 #include <ixion/exceptions.hpp>
 #include <ixion/formula.hpp>
+#include <ixion/global.hpp>
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/formula_tokens.hpp>
@@ -25,6 +26,7 @@
 #include <ixion/table.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <ranges>
@@ -1597,6 +1599,48 @@ void test_volatile_function()
     assert(0.2 <= delta && delta <= 0.3);
 }
 
+void test_volatile_rand_today()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    cxt.append_sheet("test");
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t A2(0, 1, 0);
+    insert_formula(cxt, A1, "RAND()", *resolver);
+    insert_formula(cxt, A2, "TODAY()", *resolver);
+
+    // Read the clock before and after, in case the day rolls over in between.
+    double day_before = std::floor(ixion::get_current_time() / 86400.0);
+
+    ixion::abs_range_set_t new_cells{A1, A2};
+    std::vector<ixion::abs_range_t> sorted = ixion::query_and_sort_dirty_cells(cxt, {}, &new_cells);
+    ixion::calculate_sorted_cells(cxt, sorted, 0);
+
+    double day_after = std::floor(ixion::get_current_time() / 86400.0);
+
+    double rand_value = cxt.get_numeric_value(A1);
+    assert(0.0 <= rand_value && rand_value < 1.0);
+
+    // TODAY() is a whole number of days, and it's the current day.
+    double today = cxt.get_numeric_value(A2);
+    assert(today == std::floor(today));
+    assert(day_before <= today && today <= day_after);
+
+    // Both are volatile: they come back dirty with nothing modified.
+    sorted = ixion::query_and_sort_dirty_cells(cxt, {}, nullptr);
+    assert(sorted.size() == 2);
+    ixion::calculate_sorted_cells(cxt, sorted, 0);
+
+    double today2 = cxt.get_numeric_value(A2);
+    assert(today <= today2 && today2 <= today + 1.0);
+}
+
 void test_model_context_append_sheet_copy()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -2548,6 +2592,7 @@ int main()
     test_ungrouped_matrix_result();
     test_register_grouped_formula_cells_non_parent();
     test_volatile_function();
+    test_volatile_rand_today();
     test_parse_and_print_expressions();
     test_function_name_resolution();
     test_invalid_formula_tokens();

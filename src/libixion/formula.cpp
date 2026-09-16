@@ -266,6 +266,8 @@ bool is_volatile(formula_function_t func)
     switch (func)
     {
         case formula_function_t::func_now:
+        case formula_function_t::func_rand:
+        case formula_function_t::func_today:
             return true;
         default:
             ;
