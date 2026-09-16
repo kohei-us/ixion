@@ -79,7 +79,37 @@ public:
     const formula_tokens_store_ptr_t& get_tokens() const;
     void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
+    /**
+     * Get the cached result as a numeric value.
+     *
+     * @param policy Action to take in case the result is not yet available.
+     *
+     * @return Numeric value of the result.
+     *
+     * @throw formula_error If the result is not convertible to a numeric
+     *                      value.
+     *
+     * @note When the result is a matrix, the value of one element is returned:
+     *       the element at the cell's position within its group for a grouped
+     *       formula cell, or the top-left element for a non-grouped formula
+     *       cell.
+     */
     double get_value(formula_result_wait_policy_t policy) const;
+
+    /**
+     * Get the cached result as a string value.
+     *
+     * @param policy Action to take in case the result is not yet available.
+     *
+     * @return String value of the result.
+     *
+     * @throw formula_error If the result is not a string value.
+     *
+     * @note When the result is a matrix, the value of one element is returned:
+     *       the element at the cell's position within its group for a grouped
+     *       formula cell, or the top-left element for a non-grouped formula
+     *       cell.
+     */
     std::string_view get_string(formula_result_wait_policy_t policy) const;
 
     void interpret(model_context& context, const abs_address_t& pos);
@@ -129,6 +159,9 @@ public:
      * @param policy action to take in case the result is not yet available.
      *
      * @return formula result.
+     *
+     * @note A non-grouped formula cell whose result is a matrix gets the
+     *       matrix back as is.
      */
     formula_result get_result_cache(formula_result_wait_policy_t policy) const;
 

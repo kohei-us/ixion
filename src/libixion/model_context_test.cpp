@@ -1435,6 +1435,46 @@ void test_unregister_formula_cell_range_refs()
     }
 }
 
+/**
+ * When a single ungrouped formula cell contains a matrix result, it should
+ * return the top-left value when asked for a single value.
+ */
+void test_ungrouped_matrix_result()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    cxt.append_sheet("test");
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    // A1 is an ordinary formula cell whose result is a matrix, and B1 references it.
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t B1(0, 0, 1);
+    ixion::abs_address_t A2(0, 1, 0);
+
+    insert_formula(cxt, A1, "{1,2;3,4}*10", *resolver);
+    insert_formula(cxt, B1, "SUM(A1)", *resolver);
+    insert_formula(cxt, A2, "{\"top\",\"right\";\"bottom\",\"corner\"}", *resolver);
+
+    ixion::abs_range_set_t new_cells{A1, B1, A2};
+    std::vector<ixion::abs_range_t> sorted = ixion::query_and_sort_dirty_cells(cxt, {}, &new_cells);
+    ixion::calculate_sorted_cells(cxt, sorted, 0);
+
+    // The cell keeps the whole matrix as its result.
+    ixion::formula_result res = cxt.get_formula_result(A1);
+    assert(res.get_type() == ixion::formula_result::result_type::matrix);
+    assert(res.get_matrix().row_size() == 2);
+    assert(res.get_matrix().col_size() == 2);
+
+    // Read as a single value, an ungrouped cell yields the top-left element.
+    assert(cxt.get_numeric_value(A1) == 10.0);
+    assert(cxt.get_numeric_value(B1) == 10.0);
+    assert(cxt.get_string_value(A2) == "top");
+}
+
 void test_volatile_function()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -2461,6 +2501,7 @@ int main()
     test_grouped_formula_string_results();
     test_unregister_grouped_formula_cells();
     test_unregister_formula_cell_range_refs();
+    test_ungrouped_matrix_result();
     test_volatile_function();
     test_parse_and_print_expressions();
     test_function_name_resolution();

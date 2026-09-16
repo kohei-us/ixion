@@ -150,11 +150,12 @@ struct formula_cell::impl
                 const matrix& m = m_calc_status->result->get_matrix();
                 row_t row_size = m.row_size();
                 col_t col_size = m.col_size();
+                rc_address_t pos = get_matrix_result_pos();
 
-                if (m_group_pos.row >= row_size || m_group_pos.column >= col_size)
+                if (pos.row >= row_size || pos.column >= col_size)
                     throw formula_error(formula_error_t::invalid_value_type);
 
-                matrix::element elem = m.get(m_group_pos.row, m_group_pos.column);
+                matrix::element elem = m.get(pos.row, pos.column);
 
                 switch (elem.type)
                 {
@@ -196,11 +197,12 @@ struct formula_cell::impl
                 const matrix& m = m_calc_status->result->get_matrix();
                 row_t row_size = m.row_size();
                 col_t col_size = m.col_size();
+                rc_address_t pos = get_matrix_result_pos();
 
-                if (m_group_pos.row >= row_size || m_group_pos.column >= col_size)
+                if (pos.row >= row_size || pos.column >= col_size)
                     throw formula_error(formula_error_t::invalid_value_type);
 
-                matrix::element elem = m.get(m_group_pos.row, m_group_pos.column);
+                matrix::element elem = m.get(pos.row, pos.column);
 
                 switch (elem.type)
                 {
@@ -232,6 +234,18 @@ struct formula_cell::impl
     bool is_grouped() const
     {
         return m_group_pos.column >= 0 && m_group_pos.row >= 0;
+    }
+
+    /**
+     * Get the position of the element to pick out of a matrix result.  An
+     * ungrouped cell holding a matrix result reads its top-left element.
+     */
+    rc_address_t get_matrix_result_pos() const
+    {
+        if (!is_grouped())
+            return rc_address_t(0, 0, false, false);
+
+        return m_group_pos;
     }
 
     bool is_group_parent() const

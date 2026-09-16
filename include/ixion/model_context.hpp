@@ -151,6 +151,11 @@ public:
      * @param addr position of the cell.
      *
      * @return numeric representation of the cell value.
+     *
+     * @note When the result is a matrix, the value of one element is returned:
+     *       the element at the cell's position within its group for a grouped
+     *       formula cell, or the top-left element for a non-grouped formula
+     *       cell.
      */
     double get_numeric_value(const abs_address_t& addr) const;
     bool get_boolean_value(const abs_address_t& addr) const;
@@ -166,11 +171,28 @@ public:
      *
      * @return pointer to a string value if the cell stores a valid string
      *         value, else nullptr.
+     *
+     * @note When the result is a matrix, the value of one element is returned:
+     *       the element at the cell's position within its group for a grouped
+     *       formula cell, or the top-left element for a non-grouped formula
+     *       cell.
      */
     std::string_view get_string_value(const abs_address_t& addr) const;
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
+    /**
+     * Get the cached result of the formula cell at the specified position.
+     * For a grouped formula cell, the result is the single value assigned to
+     * the position of the cell within its group.
+     *
+     * @param addr Position of the formula cell.
+     *
+     * @return Cached result of the formula cell.
+     *
+     * @note A non-grouped formula cell whose result is a matrix gets the
+     *       matrix back as is.
+     */
     formula_result get_formula_result(const abs_address_t& addr) const;
 
     /**

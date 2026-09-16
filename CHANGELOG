@@ -18,6 +18,11 @@ ixion 0.21.0
   * added operator<< for formula_group_t which prints its state, for
     use in debugging and diagnostics.
 
+  * the numeric and string value accessors now return the top-left
+    element when a non-grouped formula cell holds a matrix result.  Such
+    a cell previously caused an out-of-range error when its value was
+    requested.
+
   * formula_tokens_store is now immutable once created.  The non-const
     variant of its get() method has been removed, and a new create()
     overload taking a formula_tokens_t instance has been added.
