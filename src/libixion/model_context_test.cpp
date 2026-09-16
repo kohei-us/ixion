@@ -1398,6 +1398,43 @@ void test_unregister_grouped_formula_cells()
     assert(sorted.empty());
 }
 
+void test_unregister_formula_cell_range_refs()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt{{100, 20}};
+    cxt.append_sheet("test");
+
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    assert(resolver);
+
+    ixion::abs_address_t A6(0, 5, 0);
+    ixion::abs_range_set_t modified_cells{A6};
+
+    // Whole-column, whole-row and reversed range references must be
+    // unregistered the same way they were registered.
+    for (const char* formula : {"SUM(A:A)", "SUM(6:6)", "SUM(B10:A1)"})
+    {
+        ixion::abs_address_t C1(0, 0, 2);
+        ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, C1, *resolver, formula);
+        cxt.set_formula_cell(C1, std::move(tokens));
+        ixion::register_formula_cell(cxt, C1);
+
+        std::vector<ixion::abs_range_t> sorted =
+            ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
+        assert(sorted.size() == 1);
+        assert(sorted[0] == ixion::abs_range_t(C1));
+
+        ixion::unregister_formula_cell(cxt, C1);
+
+        sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
+        assert(sorted.empty());
+
+        cxt.empty_cell(C1);
+    }
+}
+
 void test_volatile_function()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -2423,6 +2460,7 @@ int main()
     test_model_context_dump_sheet();
     test_grouped_formula_string_results();
     test_unregister_grouped_formula_cells();
+    test_unregister_formula_cell_range_refs();
     test_volatile_function();
     test_parse_and_print_expressions();
     test_function_name_resolution();

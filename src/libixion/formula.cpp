@@ -321,6 +321,28 @@ abs_range_t to_listener_range(const abs_address_t& pos, const formula_cell& cell
     return range;
 }
 
+/**
+ * Normalize a range reference into the form the dependency tracker
+ * accepts: expand a whole-column or whole-row reference to the sheet
+ * size, and order the corners.
+ */
+abs_range_t to_tracked_range(const model_context& cxt, abs_range_t range)
+{
+    rc_size_t sheet_size = cxt.get_sheet_size();
+    if (range.all_columns())
+    {
+        range.first.column = 0;
+        range.last.column = sheet_size.column - 1;
+    }
+    if (range.all_rows())
+    {
+        range.first.row = 0;
+        range.last.row = sheet_size.row - 1;
+    }
+    range.reorder();
+    return range;
+}
+
 }
 
 void register_formula_cell(
@@ -372,19 +394,7 @@ void register_formula_cell(
             {
                 abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("register_formula_cell", range.first.sheet, cxt, pos, *cell);
-                rc_size_t sheet_size = cxt.get_sheet_size();
-                if (range.all_columns())
-                {
-                    range.first.column = 0;
-                    range.last.column = sheet_size.column - 1;
-                }
-                if (range.all_rows())
-                {
-                    range.first.row = 0;
-                    range.last.row = sheet_size.row - 1;
-                }
-                range.reorder();
-                tracker.add(src_pos, range);
+                tracker.add(src_pos, to_tracked_range(cxt, range));
                 break;
             }
             case fop_table_ref:
@@ -443,7 +453,7 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
             {
                 abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
                 check_sheet_or_throw("unregister_formula_cell", range.first.sheet, cxt, pos, *fcell);
-                tracker.remove(src_pos, range);
+                tracker.remove(src_pos, to_tracked_range(cxt, range));
                 break;
             }
             case fop_table_ref:
