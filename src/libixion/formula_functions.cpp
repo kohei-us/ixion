@@ -2227,16 +2227,28 @@ void formula_functions::fnc_trim(formula_value_stack& args) const
     args.push_string(os.str());
 }
 
+namespace {
+
+/**
+ * Get the current time as a spreadsheet serial value: days since the zero
+ * date of 1899-12-30, with the time of day as the fractional part.  The
+ * Unix epoch, 1970-01-01, is day 25569 in this scheme.
+ */
+double get_current_serial_time()
+{
+    constexpr double unix_epoch_serial = 25569.0;
+    double days_since_epoch = get_current_time() / 86400.0;
+    return days_since_epoch + unix_epoch_serial;
+}
+
+} // anonymous namespace
+
 void formula_functions::fnc_now(formula_value_stack& args) const
 {
     if (!args.empty())
         throw formula_functions::invalid_arg("NOW takes no arguments.");
 
-    // TODO: this value is currently not accurate since we don't take into
-    // account the zero date yet.
-    double cur_time = get_current_time();
-    cur_time /= 86400.0; // convert seconds to days.
-    args.push_value(cur_time);
+    args.push_value(get_current_serial_time());
 }
 
 void formula_functions::fnc_today(formula_value_stack& args) const
@@ -2244,11 +2256,7 @@ void formula_functions::fnc_today(formula_value_stack& args) const
     if (!args.empty())
         throw formula_functions::invalid_arg("TODAY takes no arguments");
 
-    // TODO: this value is currently not accurate since we don't take into
-    // account the zero date yet.
-    double cur_time = get_current_time();
-    cur_time /= 86400.0; // convert seconds to days.
-    args.push_value(std::floor(cur_time));
+    args.push_value(std::floor(get_current_serial_time()));
 }
 
 void formula_functions::fnc_wait(formula_value_stack& args) const

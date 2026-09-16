@@ -125,6 +125,10 @@ ixion 0.21.0
 
   * implemented RAND() and TODAY().  Both are volatile, as is NOW().
 
+  * NOW() and TODAY() now return serial values counted from the zero
+    date of 1899-12-30, as spreadsheet applications do by default.
+    NOW() previously returned the number of days since 1970-01-01.
+
   * an unimplemented formula function now yields a #NAME? error on
     the calling cell instead of aborting the entire calculation.
 

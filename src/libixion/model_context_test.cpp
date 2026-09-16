@@ -1616,13 +1616,15 @@ void test_volatile_rand_today()
     insert_formula(cxt, A2, "TODAY()", *resolver);
 
     // Read the clock before and after, in case the day rolls over in between.
-    double day_before = std::floor(ixion::get_current_time() / 86400.0);
+    // Serial values count days from 1899-12-30; the Unix epoch is day 25569.
+    constexpr double unix_epoch_serial = 25569.0;
+    double day_before = std::floor(ixion::get_current_time() / 86400.0) + unix_epoch_serial;
 
     ixion::abs_range_set_t new_cells{A1, A2};
     std::vector<ixion::abs_range_t> sorted = ixion::query_and_sort_dirty_cells(cxt, {}, &new_cells);
     ixion::calculate_sorted_cells(cxt, sorted, 0);
 
-    double day_after = std::floor(ixion::get_current_time() / 86400.0);
+    double day_after = std::floor(ixion::get_current_time() / 86400.0) + unix_epoch_serial;
 
     double rand_value = cxt.get_numeric_value(A1);
     assert(0.0 <= rand_value && rand_value < 1.0);
