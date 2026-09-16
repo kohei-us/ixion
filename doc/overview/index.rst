@@ -13,4 +13,5 @@ Overview
    names-and-tables.rst
    sheet-copy.rst
    formula-groups.rst
+   errors-and-volatile.rst
    sheet-view.rst

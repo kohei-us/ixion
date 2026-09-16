@@ -14,7 +14,8 @@ EXTRA_PROGRAMS = \
 	formula-syntax \
 	names-and-tables \
 	sheet-copy \
-	formula-groups
+	formula-groups \
+	errors-and-volatile
 
 document_simple_SOURCES = document_simple.cpp
 document_simple_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
@@ -40,6 +41,9 @@ sheet_copy_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 formula_groups_SOURCES = formula_groups.cpp
 formula_groups_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 
+errors_and_volatile_SOURCES = errors_and_volatile.cpp
+errors_and_volatile_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
+
 TESTS = \
 	document-simple \
 	model-context-simple \
@@ -48,7 +52,8 @@ TESTS = \
 	formula-syntax \
 	names-and-tables \
 	sheet-copy \
-	formula-groups
+	formula-groups \
+	errors-and-volatile
 
 distclean-local:
 	rm -rf $(TESTS)

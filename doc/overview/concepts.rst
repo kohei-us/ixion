@@ -126,7 +126,7 @@ That happens when one of the cells it references has changed, either
 directly or through some other formula cell in between, or when the formula
 cell itself is new or has been modified.  A formula cell that uses a
 *volatile* function such as ``NOW()`` is treated as dirty on every
-calculation.
+calculation.  See :ref:`errors-and-volatile`.
 
 .. note::
 
@@ -179,7 +179,7 @@ can be a number, a boolean, a string, a matrix or an error.  When you read a
 cell value through the model context, you get the cached result from the
 last calculation.  If some cells reference each other in a cycle, they all
 end up with the ``#REF!`` error while the rest of the cells calculate as
-usual.
+usual.  See :ref:`errors-and-volatile` for more on error values.
 
 
 Two levels of API
