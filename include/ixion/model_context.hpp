@@ -49,13 +49,19 @@ class model_context_impl;
 
 }
 
+class sheet_view;
+
 /**
  * This class stores all cell values of different types organized in multiple
  * sheets. It also stores named expressions both in global scope and
- * sheet-local scope.
+ * sheet-local scope, as well as tables and the dirty cell tracker used
+ * during calculation.  It holds only what the formula engine needs in
+ * order to perform a full calculation.
+ *
+ * @note Overwriting or emptying a formula cell does not remove it from the
+ *       dirty cell tracker.  Call unregister_formula_cell() on the cell
+ *       before replacing its content.
  */
-class sheet_view;
-
 class IXION_DLLPUBLIC model_context final
 {
     friend class named_expressions_iterator;
@@ -79,6 +85,12 @@ public:
     class IXION_DLLPUBLIC session_handler_factory
     {
     public:
+        /**
+         * Create a new session handler instance.  The default implementation
+         * returns nullptr, which means no handler.
+         *
+         * @return New session handler instance, or nullptr for no handler.
+         */
         virtual std::unique_ptr<iface::session_handler> create() const;
         virtual ~session_handler_factory();
     };
@@ -89,9 +101,12 @@ public:
      */
     struct IXION_DLLPUBLIC input_cell
     {
+        /** Type of the stored value, one of boolean, numeric or string. */
         using value_type = std::variant<bool, double, std::string_view>;
 
+        /** Type of the cell.  For an empty cell, the value is not used. */
         cell_t type;
+        /** Value of the cell. */
         value_type value;
 
         /** Initializes the cell to be empty. */
@@ -103,19 +118,44 @@ public:
         /** Numeric cell value. */
         input_cell(double v);
 
+        /** Copy constructor. */
         input_cell(const input_cell& other);
     };
 
+    /**
+     * One row of cell values to be passed to set_cell_values().
+     */
     class IXION_DLLPUBLIC input_row
     {
         std::initializer_list<input_cell> m_cells;
     public:
+        /**
+         * Constructor.
+         *
+         * @param cells Cell values of the row, from the first column onward.
+         */
         input_row(std::initializer_list<input_cell> cells);
 
+        /**
+         * Get the cell values of the row.
+         *
+         * @return Cell values of the row.
+         */
         const std::initializer_list<input_cell>& cells() const;
     };
 
+    /**
+     * Construct a model with the default sheet size, which is 1048576 rows
+     * by 16384 columns.
+     */
     model_context();
+
+    /**
+     * Construct a model with a custom sheet size.  All sheets in the model
+     * share the same size.
+     *
+     * @param sheet_size Number of rows and columns of each sheet.
+     */
     model_context(const rc_size_t& sheet_size);
     ~model_context();
 
@@ -133,17 +173,66 @@ public:
      */
     void notify(formula_event_t event);
 
+    /**
+     * Get the configuration of the model.
+     *
+     * @return Current configuration.
+     */
     const config& get_config() const;
+
+    /**
+     * Get the dirty cell tracker of the model, which records the
+     * dependencies between formula cells and the cells they reference.
+     *
+     * @return Dirty cell tracker.
+     */
     dirty_cell_tracker& get_cell_tracker();
+
+    /** @copydoc get_cell_tracker() */
     const dirty_cell_tracker& get_cell_tracker() const;
 
+    /**
+     * Check whether a cell is empty.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return True if the cell is empty, false otherwise.
+     */
     bool is_empty(const abs_address_t& addr) const;
+
+    /**
+     * Check whether all cells in a range are empty.  The part of the range
+     * that lies outside the sheets is ignored.
+     *
+     * @param range Range to check.
+     *
+     * @return True if the range contains no cell values, false otherwise.
+     */
     bool is_empty(const abs_range_t& range) const;
+
+    /**
+     * Get the type of a cell.  A formula cell is reported as a formula cell
+     * regardless of its result.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return Type of the cell.
+     */
     cell_t get_celltype(const abs_address_t& addr) const;
+
+    /**
+     * Get the type of the value a cell holds.  Unlike get_celltype(), a
+     * formula cell is classified by the type of its result, which may be an
+     * error type.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return Type of the cell value.
+     */
     cell_value_t get_cell_value_type(const abs_address_t& addr) const;
 
     /**
-     * Get a numeric representation of the cell value at specified position.
+     * Get a numeric representation of the cell value at the specified position.
      * If the cell at the specified position is a formula cell and its result
      * has not yet been computed, it will block until the result becomes
      * available.
@@ -158,7 +247,28 @@ public:
      *       cell.
      */
     double get_numeric_value(const abs_address_t& addr) const;
+
+    /**
+     * Get a boolean representation of the cell value at the specified position.
+     * A numeric value, or the numeric result of a formula cell, is true when
+     * it is not zero.  A string or empty cell is false.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return Boolean representation of the cell value.
+     */
     bool get_boolean_value(const abs_address_t& addr) const;
+
+    /**
+     * Get the string identifier of a string cell.  Only a cell whose string
+     * was set by its identifier, via the string_id_t overload of
+     * set_string_cell(), has one.  For any other cell, including a string
+     * cell with an inline string value, this returns empty_string_id.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return String identifier of the cell, or empty_string_id.
+     */
     string_id_t get_string_identifier(const abs_address_t& addr) const;
 
     /**
@@ -178,7 +288,33 @@ public:
      *       cell.
      */
     std::string_view get_string_value(const abs_address_t& addr) const;
+
+    /**
+     * Get the formula cell at the specified position for reading.  The cell
+     * storage is left as is, so a column that is still shared with a copied
+     * sheet stays shared.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return Pointer to the formula cell, or nullptr if the cell is not a
+     *         formula cell.  The pointer remains valid until the cell is
+     *         overwritten or emptied.
+     */
     const formula_cell* get_formula_cell(const abs_address_t& addr) const;
+
+    /**
+     * Get the formula cell at the specified position for modification.  If
+     * the column the cell is in is still shared with a copied sheet, this
+     * gives the sheet its own copy of the column first, since the returned
+     * cell may get modified.  Use the const overload when you only need to
+     * read the cell.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return Pointer to the formula cell, or nullptr if the cell is not a
+     *         formula cell.  The pointer remains valid until the cell is
+     *         overwritten or emptied.
+     */
     formula_cell* get_formula_cell(const abs_address_t& addr);
 
     /**
@@ -196,7 +332,7 @@ public:
     formula_result get_formula_result(const abs_address_t& addr) const;
 
     /**
-     * Get a named expression token set associated with specified name if
+     * Get a named expression token set associated with the specified name if
      * present.  It first searches the local sheet scope for the name, then if
      * it's not present, it searches the global scope.
      *
@@ -207,6 +343,17 @@ public:
      */
     const named_expression_t* get_named_expression(sheet_t sheet, std::string_view name) const;
 
+    /**
+     * Count the cells in a range whose values are of the specified types.  A
+     * formula cell is classified by the type of its result.  The part of the
+     * range that lies outside the sheets is ignored.
+     *
+     * @param range Range to count the cells in.  It may span multiple sheets.
+     * @param values_type Types of values to count, as a combination of
+     *                    value_t flags.
+     *
+     * @return Number of matching cells.
+     */
     double count_range(const abs_range_t& range, values_t values_type) const;
 
     /**
@@ -331,6 +478,16 @@ public:
      */
     string_id_t add_string(std::string_view s);
 
+    /**
+     * Get a string from the indexed string pool by its identifier.
+     *
+     * @param identifier Identifier of the string, as returned by
+     *                   append_string() or add_string().
+     *
+     * @return Pointer to the string, or nullptr if no string has that
+     *         identifier.  The pointer remains valid for the lifetime of the
+     *         model.
+     */
     const std::string* get_string(string_id_t identifier) const;
 
     /**
@@ -379,16 +536,73 @@ public:
      */
     size_t get_sheet_count() const;
 
+    /**
+     * Set the size of the sheets.  This is only allowed while the model has
+     * no sheets.
+     *
+     * @param sheet_size Number of rows and columns of each sheet.
+     *
+     * @throw model_context_error When the model already has a sheet.
+     */
     void set_sheet_size(const rc_size_t& sheet_size);
+
+    /**
+     * Set the configuration of the model.
+     *
+     * @param cfg New configuration.
+     */
     void set_config(const config& cfg);
 
+    /**
+     * Empty a cell, discarding whatever value it holds.
+     *
+     * @param addr Position of the cell.
+     */
     void empty_cell(const abs_address_t& addr);
 
+    /**
+     * Set a numeric value to a cell, replacing its current content.
+     *
+     * @param addr Position of the cell.
+     * @param val Numeric value.
+     */
     void set_numeric_cell(const abs_address_t& addr, double val);
+
+    /**
+     * Set a boolean value to a cell, replacing its current content.
+     *
+     * @param adr Position of the cell.
+     * @param val Boolean value.
+     */
     void set_boolean_cell(const abs_address_t& adr, bool val);
+
+    /**
+     * Set a string value to a cell, replacing its current content.  The
+     * string gets stored in the model, so the caller doesn't need to keep it
+     * alive.
+     *
+     * @param addr Position of the cell.
+     * @param s String value.
+     */
     void set_string_cell(const abs_address_t& addr, std::string_view s);
+
+    /**
+     * Set a string from the indexed string pool to a cell, replacing its
+     * current content.
+     *
+     * @param addr Position of the cell.
+     * @param identifier Identifier of the string, as returned by
+     *                   append_string() or add_string().
+     */
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
 
+    /**
+     * Get an accessor for a cell, for repeated queries on the same cell.
+     *
+     * @param addr Position of the cell.
+     *
+     * @return Accessor for the cell.
+     */
     cell_access get_cell_access(const abs_address_t& addr) const;
 
     /**
@@ -436,10 +650,43 @@ public:
      */
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
 
+    /**
+     * Set a group of formula cells sharing one set of formula tokens over a
+     * range.  This is how an array formula is stored: the tokens get
+     * interpreted once, at the top-left cell of the group, and each cell of
+     * the group takes its own element of the resulting matrix as its value.
+     * Register the group with the dirty cell tracker through its top-left
+     * cell.
+     *
+     * @param group_range Range of the group.  It must be on one sheet.
+     * @param tokens Formula tokens shared by all cells of the group.  They
+     *               are relative to the top-left cell of the group.
+     */
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 
+    /**
+     * Set a group of formula cells sharing one set of formula tokens over a
+     * range, with a cached result.
+     *
+     * @param group_range Range of the group.  It must be on one sheet.
+     * @param tokens Formula tokens shared by all cells of the group.  They
+     *               are relative to the top-left cell of the group.
+     * @param result Cached result of the group.  It must be a matrix whose
+     *               dimensions equal those of the group.
+     *
+     * @throw std::invalid_argument When the result is not a matrix, or its
+     *                              dimensions differ from those of the group.
+     */
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens, formula_result result);
 
+    /**
+     * Get the smallest range that covers all non-empty cells of a sheet.
+     *
+     * @param sheet Index of the sheet.
+     *
+     * @return Range covering the data of the sheet, or an invalid range if
+     *         the sheet has no non-empty cells.
+     */
     abs_range_t get_data_range(sheet_t sheet) const;
 
     /**
@@ -582,6 +829,8 @@ public:
      *         on the sheet.
      */
     sheet_view* get_sheet_view(sheet_t sheet, std::string_view name);
+
+    /** @copydoc get_sheet_view(sheet_t, std::string_view) */
     const sheet_view* get_sheet_view(sheet_t sheet, std::string_view name) const;
 
     /**
@@ -604,6 +853,14 @@ public:
      */
     void set_cell_values(sheet_t sheet, std::initializer_list<input_row> rows);
 
+    /**
+     * Set the factory that creates a session handler for each formula cell
+     * interpretation.  Without one, no session handler gets created.
+     *
+     * @param factory Factory to use.  The model does not take ownership; the
+     *                factory must outlive the model, or be replaced before
+     *                it gets destroyed.
+     */
     void set_session_handler_factory(session_handler_factory* factory);
 
     /**
@@ -621,8 +878,17 @@ public:
      */
     void set_table(table_t tab);
 
+    /**
+     * Get the number of strings in the indexed string pool.
+     *
+     * @return Number of strings in the pool.
+     */
     size_t get_string_count() const;
 
+    /**
+     * Print the content of the indexed string pool to standard output, for
+     * debugging.
+     */
     void dump_strings() const;
 
     /**
@@ -713,9 +979,25 @@ public:
      */
     named_expressions_iterator get_named_expressions_iterator(sheet_t sheet) const;
 
+    /**
+     * Traverse a range of a sheet one storage block at a time, column by
+     * column.  The callback gets called once for each block segment that
+     * falls inside the range, with the column, the first and last row of the
+     * segment, and the shape of the block.  Traversal stops when the callback
+     * returns false.
+     *
+     * @param sheet Index of the sheet.
+     * @param range Range to traverse.
+     * @param cb Callback to call for each block segment.
+     */
     void walk(
         sheet_t sheet, const abs_rc_range_t& range, column_block_callback_t cb) const;
 
+    /**
+     * Check whether the model has any sheets.
+     *
+     * @return True if the model has no sheets, false otherwise.
+     */
     bool empty() const;
 };
 
