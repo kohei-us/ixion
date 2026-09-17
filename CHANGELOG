@@ -49,10 +49,11 @@ ixion 0.21.0
   * renamed abs_address_iterator to abs_address_range.  The old name
     remains available as a deprecated alias.
 
-  * string cell values are now stored inline in the cell storage
-    blocks.  As only the strings registered via append_string() can be
-    looked up by their identifiers, get_string_identifier() is now
-    deprecated; use get_string_value() to get the string value of a
+  * set_string_cell() with a string value now stores the string inline
+    in the cell instead of registering it in the indexed string pool.
+    String cells set by identifier keep using the pool as before.  As
+    inline strings are not in the pool, get_identifier_from_string() is
+    now deprecated; use get_string_value() to get the string value of a
     cell.
 
   * append_string() now allows empty strings to be interned.
