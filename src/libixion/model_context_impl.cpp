@@ -719,10 +719,10 @@ const column_stores_t* model_context_impl::get_columns(sheet_t sheet) const
 
 namespace {
 
-double count_formula_block(
+std::size_t count_formula_block(
     formula_result_wait_policy_t wait_policy, const column_store_t::const_iterator& itb, size_t offset, size_t len, const values_t& vt)
 {
-    double ret = 0.0;
+    std::size_t ret = 0;
 
     // Inspect each formula cell individually.
     formula_cell** pp = &formula_element_block::at(*itb->data, offset);
@@ -775,14 +775,14 @@ column_block_t map_column_block_type(const mdds::mtv::element_t mtv_type)
 
 } // anonymous namespace
 
-double model_context_impl::count_range(abs_range_t range, values_t values_type) const
+std::size_t model_context_impl::count_range(abs_range_t range, values_t values_type) const
 {
     if (m_sheets.empty())
-        return 0.0;
+        return 0;
 
     clip_range(range, m_sheet_size);
 
-    double ret = 0.0;
+    std::size_t ret = 0;
     sheet_t last_sheet = range.last.sheet;
     if (static_cast<size_t>(last_sheet) >= m_sheets.size())
         last_sheet = m_sheets.size() - 1;

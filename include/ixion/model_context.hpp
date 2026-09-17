@@ -354,7 +354,7 @@ public:
      *
      * @return Number of matching cells.
      */
-    double count_range(const abs_range_t& range, values_t values_type) const;
+    std::size_t count_range(const abs_range_t& range, values_t values_type) const;
 
     /**
      * Obtain range value in matrix form.  Multi-sheet ranges are not

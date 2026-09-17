@@ -1050,8 +1050,8 @@ void formula_functions::fnc_countblank(formula_value_stack& args) const
         case stack_value_t::range_ref:
         {
             abs_range_t range = args.pop_range_ref();
-            double ret = m_context.count_range(range, value_empty);
-            args.push_value(ret);
+            std::size_t count = m_context.count_range(range, value_empty);
+            args.push_value(count);
             break;
         }
         default:

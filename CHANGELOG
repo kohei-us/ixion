@@ -18,6 +18,9 @@ ixion 0.21.0
   * added operator<< for formula_group_t which prints its state, for
     use in debugging and diagnostics.
 
+  * model_context::count_range() now returns std::size_t instead of
+    double.
+
   * register_formula_cell() and unregister_formula_cell() now throw
     formula_registration_error when given the position of a grouped
     formula cell other than the top-left cell of its group.  Such a
