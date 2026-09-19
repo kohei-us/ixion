@@ -16,6 +16,7 @@
 #include <ixion/exceptions.hpp>
 #include <ixion/table.hpp>
 
+#include <cmath>
 #include <string>
 
 namespace {
@@ -231,6 +232,30 @@ void test_matrix_non_numeric_values()
     elem = mtx.get(1, 1);
     assert(elem.type == ixion::matrix::element_type::boolean);
     assert(std::get<bool>(elem.value) == true);
+}
+
+void test_matrix_as_numeric()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::matrix mtx(2, 3);
+    mtx.set(0, 0, 1.5);
+    mtx.set(1, 0, true);
+    mtx.set(0, 1, false);
+    mtx.set(1, 1, ixion::formula_error_t::division_by_zero);
+    mtx.set(0, 2, std::string("text"));
+    // (1, 2) stays empty.
+
+    ixion::numeric_matrix num = mtx.as_numeric();
+    assert(num.row_size() == 2);
+    assert(num.col_size() == 3);
+
+    assert(num(0, 0) == 1.5);
+    assert(num(1, 0) == 1.0);
+    assert(num(0, 1) == 0.0);
+    assert(num(1, 1) == 0.0); // error value
+    assert(std::isnan(num(0, 2))); // string
+    assert(std::isnan(num(1, 2))); // empty
 }
 
 void test_address()
@@ -461,6 +486,7 @@ int main()
     test_formula_tokens_store();
     test_matrix();
     test_matrix_non_numeric_values();
+    test_matrix_as_numeric();
 
     test_address();
     test_table_t_equality();

@@ -9,6 +9,7 @@
 #include "ixion/global.hpp"
 #include "column_store_type.hpp"
 
+#include <algorithm>
 #include <limits>
 #include <cstring>
 #include <functional>
@@ -228,11 +229,8 @@ numeric_matrix matrix::as_numeric() const
             {
                 case mdds::mtm::element_integer:
                 {
-                    // String and error values will be handled as numeric values of 0.0.
-#ifndef __STDC_IEC_559__
-                    throw std::runtime_error("IEEE 754 is not fully supported.");
-#endif
-                    std::memset(dest, 0, sizeof(double)*node.size); // IEEE 754 defines 0.0 to be 8 zero bytes.
+                    // Error values become numeric values of 0.0.
+                    std::fill_n(dest, node.size, 0.0);
                     std::advance(dest, node.size);
                     break;
                 }
@@ -256,7 +254,7 @@ numeric_matrix matrix::as_numeric() const
                 }
                 case mdds::mtm::element_string:
                 {
-                    // Skip string blocks.
+                    // Skip string blocks, leaving their elements as NaN.
                     std::advance(dest, node.size);
                     break;
                 }
