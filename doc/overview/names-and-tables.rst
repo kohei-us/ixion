@@ -246,8 +246,9 @@ Table references
 ----------------
 
 With the table in place, formulas can refer to its parts by name.  A table
-reference names the table and a column, optionally narrowed down to one or
-more areas: ``#Data``, ``#Headers``, ``#Totals`` or ``#All``.  When no area
+reference, commonly known as a *structured reference* in spreadsheet
+applications, names the table and a column, optionally narrowed down to one
+or more areas: ``#Data``, ``#Headers``, ``#Totals`` or ``#All``.  When no area
 is given, the reference means the data rows of that column.  A formula in a
 cell that is itself inside the table can leave the table name out:
 

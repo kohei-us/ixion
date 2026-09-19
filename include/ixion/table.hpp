@@ -18,8 +18,9 @@ namespace ixion {
 
 /**
  * Reference to a part of a table in a formula expression, such as
- * <code>Table1[[#Headers],[Amount]]</code>.  The string views point into
- * the storage of the formula token the reference belongs to.
+ * <code>Table1[[#Headers],[Amount]]</code>, commonly known as a structured
+ * reference in spreadsheet applications.  The string views point into the
+ * storage of the formula token the reference belongs to.
  */
 struct IXION_DLLPUBLIC table_ref_t
 {
