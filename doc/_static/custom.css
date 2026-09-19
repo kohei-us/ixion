@@ -4,3 +4,18 @@
 .wy-table-responsive table th {
     white-space: normal;
 }
+
+/* Inline literals: the theme renders them in red at 75% size inside a
+ * bordered box.  Tone them down so names blend into the sentence. */
+.rst-content code.literal {
+    color: #404040;
+    background: #f3f4f5;
+    border: none;
+    font-size: 85%;
+}
+
+/* Inside a table the alternating row shading already sets the literals
+ * apart, and a box on top of it looks cluttered. */
+.rst-content table.docutils code.literal {
+    background: transparent;
+}
