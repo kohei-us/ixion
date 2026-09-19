@@ -233,13 +233,17 @@ public:
 
     /**
      * Get a numeric representation of the cell value at the specified position.
-     * If the cell at the specified position is a formula cell and its result
-     * has not yet been computed, it will block until the result becomes
-     * available.
+     * A boolean cell yields 1 or 0, and a string or empty cell yields 0.  For
+     * a formula cell, this is the numeric value of its result; if the result
+     * has not yet been computed, the call blocks until it becomes available
+     * while a calculation is in progress.
      *
      * @param addr position of the cell.
      *
      * @return numeric representation of the cell value.
+     *
+     * @throw formula_error If the cell is a formula cell whose result is an
+     *                      error or cannot be converted to a number.
      *
      * @note When the result is a matrix, the value of one element is returned:
      *       the element at the cell's position within its group for a grouped
@@ -256,6 +260,9 @@ public:
      * @param addr Position of the cell.
      *
      * @return Boolean representation of the cell value.
+     *
+     * @throw formula_error If the cell is a formula cell whose result is an
+     *                      error or cannot be converted to a number.
      */
     bool get_boolean_value(const abs_address_t& addr) const;
 
@@ -272,15 +279,18 @@ public:
     string_id_t get_string_identifier(const abs_address_t& addr) const;
 
     /**
-     * Get a string value associated with the cell at the specified position.
-     * It returns a valid string value only when the cell is a string cell, or
-     * is a formula cell containing a string result.  Otherwise, it returns a
-     * nullptr.
+     * Get the string value of the cell at the specified position.  A string
+     * cell yields its text whether the string is stored inline or by its
+     * identifier in the indexed string pool, and a formula cell yields its
+     * string result.
      *
-     * @param addr position of the cell.
+     * @param addr Position of the cell.
      *
-     * @return pointer to a string value if the cell stores a valid string
-     *         value, else nullptr.
+     * @return String value of the cell, or an empty view if the cell is
+     *         neither a string cell nor a formula cell.
+     *
+     * @throw formula_error If the cell is a formula cell whose result is an
+     *                      error or not a string.
      *
      * @note When the result is a matrix, the value of one element is returned:
      *       the element at the cell's position within its group for a grouped
