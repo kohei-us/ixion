@@ -40,16 +40,23 @@ using rc_t = row_t;
  */
 struct IXION_DLLPUBLIC string_id_t
 {
+    /** Underlying integer type of the identifier. */
     using value_type = std::uint32_t;
+    /** Integer value of the identifier. */
     value_type value;
 
+    /** Construct an identifier equal to empty_string_id. */
     constexpr string_id_t() noexcept : value(0) {}
+    /** Construct an identifier from its integer value. */
     constexpr explicit string_id_t(value_type v) noexcept : value(v) {}
 
+    /** Order identifiers by their integer values. */
     std::strong_ordering operator<=>(const string_id_t&) const;
+    /** Compare the integer values of two identifiers. */
     bool operator==(const string_id_t&) const;
 };
 
+/** Print the integer value of a string identifier. */
 IXION_DLLPUBLIC std::ostream& operator<<(std::ostream& os, string_id_t v);
 
 /**
@@ -143,10 +150,15 @@ class values_t
 {
     int m_val;
 public:
+    /** Construct from a combination of value_t flags. */
     values_t(int val) : m_val(val) {}
+    /** Check whether the numeric type is included. */
     bool is_numeric() const { return (m_val & value_numeric) == value_numeric; }
+    /** Check whether the boolean type is included. */
     bool is_boolean() const { return (m_val & value_boolean) == value_boolean; }
+    /** Check whether the string type is included. */
     bool is_string() const { return (m_val & value_string) == value_string; }
+    /** Check whether the empty type is included. */
     bool is_empty() const { return (m_val & value_empty) == value_empty; }
 };
 
@@ -265,14 +277,20 @@ enum class sheet_dump_mode_t
  */
 struct IXION_DLLPUBLIC rc_size_t
 {
+    /** Number of rows. */
     row_t row;
+    /** Number of columns. */
     col_t column;
 
+    /** Construct a size of zero rows and zero columns. */
     rc_size_t();
+    /** Copy constructor. */
     rc_size_t(const rc_size_t& other);
+    /** Construct a size from a row count and a column count. */
     rc_size_t(row_t _row, col_t _column);
     ~rc_size_t();
 
+    /** Copy assignment. */
     rc_size_t& operator= (const rc_size_t& other);
 };
 
@@ -292,11 +310,15 @@ struct IXION_DLLPUBLIC formula_group_t
     /** Boolean value indicating whether or not a cell is grouped.   */
     bool grouped;
 
+    /** Construct properties of a cell that is not grouped. */
     formula_group_t();
+    /** Copy constructor. */
     formula_group_t(const formula_group_t& r);
+    /** Construct properties from a group size, an identity and a grouped flag. */
     formula_group_t(const rc_size_t& _group_size, uintptr_t _identity, bool _grouped);
     ~formula_group_t();
 
+    /** Copy assignment. */
     formula_group_t& operator= (const formula_group_t& other);
 };
 
@@ -340,20 +362,29 @@ enum class column_block_t : int
  */
 struct IXION_DLLPUBLIC column_block_shape_t
 {
+    /** Row position of the first cell of the block within its column. */
     std::size_t position;
+    /** Number of cells in the block. */
     std::size_t size;
+    /** Offset within the block of the cell the traversal is at. */
     std::size_t offset;
+    /** Type of the values the block stores. */
     column_block_t type;
+    /** Opaque handle to the storage of the block. */
     column_block_handle data;
 
+    /** Construct a shape of an unknown block with no size. */
     column_block_shape_t();
 
+    /** Construct a shape from its field values. */
     column_block_shape_t(
         std::size_t _position, std::size_t _size, std::size_t _offset,
         column_block_t _type, column_block_handle _data);
 
+    /** Copy constructor. */
     column_block_shape_t(const column_block_shape_t& other);
 
+    /** Copy assignment. */
     column_block_shape_t& operator=(const column_block_shape_t& other);
 };
 
@@ -362,6 +393,7 @@ struct IXION_DLLPUBLIC column_block_shape_t
  */
 using column_block_callback_t = std::function<bool(col_t, row_t, row_t, const column_block_shape_t&)>;
 
+/** Print the fields of a column block shape, for debugging. */
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const column_block_shape_t& v);
 
 /**
@@ -383,11 +415,17 @@ enum class display_sheet_t
     only_if_different,
 };
 
+/**
+ * Options that control how formula tokens get printed as a string.
+ */
 struct IXION_DLLPUBLIC print_config
 {
+    /** When to display the sheet name of a cell or range reference. */
     display_sheet_t display_sheet = display_sheet_t::only_if_different;
 
+    /** Construct the default options. */
     print_config();
+    /** Copy constructor. */
     print_config(const print_config& other);
     ~print_config();
 };

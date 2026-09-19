@@ -21,6 +21,9 @@ ixion 0.21.0
   * model_context::count_range() now returns std::size_t instead of
     double.
 
+  * removed the circular_dependency and not_implemented values from
+    model_context_error::error_type, which were never thrown.
+
   * register_formula_cell() and unregister_formula_cell() now throw
     formula_registration_error when given the position of a grouped
     formula cell other than the top-left cell of its group.  Such a
