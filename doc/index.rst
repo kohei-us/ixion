@@ -18,6 +18,7 @@ Contents:
    :maxdepth: 1
 
    overview/index.rst
+   functions.rst
    cpp/index.rst
    python/index.rst
 

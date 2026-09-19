@@ -46,7 +46,6 @@ public:
 private:
 
     // category: statistical
-    void fnc_abs(formula_value_stack& args) const;
     void fnc_average(formula_value_stack& args) const;
     void fnc_count(formula_value_stack& args) const;
     void fnc_counta(formula_value_stack& args) const;
@@ -55,11 +54,12 @@ private:
     void fnc_median(formula_value_stack& args) const;
     void fnc_min(formula_value_stack& args) const;
     void fnc_mode(formula_value_stack& args) const;
-    void fnc_pi(formula_value_stack& args) const;
 
     // category: mathematical
+    void fnc_abs(formula_value_stack& args) const;
     void fnc_int(formula_value_stack& args) const;
     void fnc_mmult(formula_value_stack& args) const;
+    void fnc_pi(formula_value_stack& args) const;
     void fnc_rand(formula_value_stack& args) const;
     void fnc_subtotal(formula_value_stack& args) const;
     void fnc_sum(formula_value_stack& args) const;
@@ -108,7 +108,7 @@ private:
     void fnc_now(formula_value_stack& args) const;
     void fnc_today(formula_value_stack& args) const;
 
-    // cateogry: spreadsheet
+    // category: spreadsheet
     void fnc_column(formula_value_stack& args) const;
     void fnc_columns(formula_value_stack& args) const;
     void fnc_row(formula_value_stack& args) const;

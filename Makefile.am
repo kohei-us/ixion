@@ -7,10 +7,12 @@ pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
 bin_data = \
+	bin/gen-function-list.py \
 	bin/gen-gfm-release-table.sh \
 	bin/gen-spirv-shader-arrays.py \
 	bin/run-python-test-osx.sh \
-	bin/run-python.sh
+	bin/run-python.sh \
+	misc/function-specs.yaml
 
 test_data = \
 	test/00-command-exit.txt \
@@ -132,6 +134,7 @@ test_data = \
 	test/thread/function-wait-simple.txt
 
 doc_data = \
+	doc/_static/custom.css \
 	doc/conf.py \
 	doc/cpp/index.rst \
 	doc/cpp/ixion/draft/index.rst \
@@ -139,6 +142,7 @@ doc_data = \
 	doc/cpp/ixion/index.rst \
 	doc/doxygen.conf \
 	doc/environment.yml \
+	doc/functions.rst \
 	doc/index.rst \
 	doc/overview/cell-access.rst \
 	doc/overview/concepts.rst \

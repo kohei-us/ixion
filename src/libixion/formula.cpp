@@ -261,6 +261,8 @@ std::string print_formula_token(
 
 namespace {
 
+// A function added here must also get 'volatile: true' in
+// misc/function-specs.yaml.
 bool is_volatile(formula_function_t func)
 {
     switch (func)

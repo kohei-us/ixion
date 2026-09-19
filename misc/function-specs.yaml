@@ -1,5 +1,6 @@
 ---
-# Specifications of built-in functions alreay implemented in ixion.
+# Specifications of the built-in functions ixion knows about, implemented or
+# not.  bin/gen-function-list.py turns them into doc/functions.rst.
 # Keep them sorted alphabetically.
 abs:
   category: mathematical
@@ -375,7 +376,7 @@ iserr:
   category: information
   implemented: true
   note:
-    This is the same as ISERROR except when the error value is '#'N/A it returns false.
+    This is the same as ISERROR except when the error value is ``#N/A`` it returns false.
   params:
     max: 1
     min: 1
@@ -619,14 +620,16 @@ not:
     max: 1
     min: 1
   return: boolean
-  note: It triggers '#'VALUE! error on string value input.
+  note: It triggers ``#VALUE!`` error on string value input.
 now:
   category: time
   implemented: true
-  note: This function currently does not account for the zero date.
+  volatile: true
+  note: The zero date is 1899-12-30.
   params:
     max: 0
     min: 0
+  return: numeric
 nper:
   implemented: false
 npv:
@@ -685,7 +688,13 @@ quartile:
 radians:
   implemented: false
 rand:
-  implemented: false
+  category: mathematical
+  implemented: true
+  volatile: true
+  params:
+    max: 0
+    min: 0
+  return: numeric
 rank:
   implemented: false
 rate:
@@ -695,7 +704,7 @@ rawsubtract:
 regex:
   implemented: false
 replace:
-  cateogory: text
+  category: text
   implemented: true
   params:
     max: 4
@@ -772,7 +781,7 @@ sheets:
     min: null
   return: numeric
   note:
-    It triggers an '#'N/A error upon string and numeric input.  It returns the
+    It triggers an ``#N/A`` error upon string and numeric input.  It returns the
     number of sheets in the document when no arguments are given.
 sign:
   implemented: false
@@ -874,7 +883,14 @@ timevalue:
 tinv:
   implemented: false
 today:
-  implemented: false
+  category: time
+  implemented: true
+  volatile: true
+  note: The zero date is 1899-12-30.
+  params:
+    max: 0
+    min: 0
+  return: numeric
 transpose:
   implemented: false
 trend:

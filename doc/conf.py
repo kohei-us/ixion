@@ -37,6 +37,7 @@ html_theme_options = {
 }
 
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 htmlhelp_basename = "ixiondoc"
 
 latex_elements = {}

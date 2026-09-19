@@ -625,6 +625,8 @@ formula_functions::~formula_functions()
 {
 }
 
+// When implementing a function or changing its behavior, update its entry in
+// misc/function-specs.yaml, which the supported function list is built from.
 void formula_functions::interpret(formula_function_t oc, formula_value_stack& args)
 {
     try
