@@ -25,6 +25,13 @@ struct rc_address_t;
 struct calc_status;
 using calc_status_ptr_t = boost::intrusive_ptr<calc_status>;
 
+/**
+ * A formula cell.  It holds its formula tokens, which may be shared with
+ * other formula cells, and its cached result.  A formula cell may belong to a
+ * formula group, in which case all cells of the group share one set of tokens
+ * and one result as a matrix, and each cell reads its own element of that
+ * matrix.
+ */
 class IXION_DLLPUBLIC formula_cell
 {
     struct impl;
@@ -34,9 +41,20 @@ public:
     formula_cell(const formula_cell&) = delete;
     formula_cell& operator= (formula_cell) = delete;
 
+    /** Construct a formula cell with no tokens. */
     formula_cell();
+    /** Construct a formula cell that shares the specified token store. */
     formula_cell(const formula_tokens_store_ptr_t& tokens);
 
+    /**
+     * Construct a member of a formula group.  This constructor is used by
+     * model_context::set_grouped_formula_cells().
+     *
+     * @param group_row Row position of the cell within its group.
+     * @param group_col Column position of the cell within its group.
+     * @param cs Calculation status shared by all cells of the group.
+     * @param tokens Token store shared by all cells of the group.
+     */
     formula_cell(
         row_t group_row, col_t group_col,
         const calc_status_ptr_t& cs,
@@ -76,7 +94,21 @@ public:
         std::unique_ptr<formula_cell> operator()(const formula_cell& src);
     };
 
+    /**
+     * Get the store of the formula tokens of this cell.
+     *
+     * @return Pointer to the token store, which may be shared with other
+     *         formula cells.
+     */
     const formula_tokens_store_ptr_t& get_tokens() const;
+
+    /**
+     * Replace the store of the formula tokens of this cell.  The cached
+     * result is left as is, and the dependency tracker is not informed;
+     * unregister the cell before and register it again after.
+     *
+     * @param tokens Token store to use.
+     */
     void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
     /**
@@ -112,6 +144,15 @@ public:
      */
     std::string_view get_string(formula_result_wait_policy_t policy) const;
 
+    /**
+     * Interpret the formula tokens and store the result in the cell.  For a
+     * member of a formula group other than its top-left cell, this does
+     * nothing, as the top-left cell calculates the result of the whole
+     * group.
+     *
+     * @param context Model context the cell belongs to.
+     * @param pos Position of the cell.
+     */
     void interpret(model_context& context, const abs_address_t& pos);
 
     /**
@@ -173,6 +214,12 @@ public:
      */
     void set_result_cache(formula_result result);
 
+    /**
+     * Get the group properties of this cell: whether it is grouped, and if
+     * so, the size and the identity of its group.
+     *
+     * @return Group properties of the cell.
+     */
     formula_group_t get_group_properties() const;
 
     /**

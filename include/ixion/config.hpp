@@ -37,7 +37,9 @@ struct IXION_DLLPUBLIC config
      */
     int8_t output_precision;
 
+    /** Construct the default configuration. */
     config();
+    /** Copy constructor. */
     config(const config& r);
 };
 

@@ -73,17 +73,69 @@ public:
      */
     void remove_volatile(const abs_range_t& pos);
 
+    /**
+     * Get the positions of the formula cells that need re-calculating after
+     * a modification: the registered volatile cells, and the cells that
+     * directly or indirectly reference the modified cell.
+     *
+     * @param modified_cell Cell or range whose value has been modified.
+     *
+     * @return Positions of the dirty formula cells, in no particular order.
+     *         A formula group appears as a single range.
+     */
     abs_range_set_t query_dirty_cells(const abs_range_t& modified_cell) const;
 
+    /**
+     * Get the positions of the formula cells that need re-calculating after
+     * modifications: the registered volatile cells, and the cells that
+     * directly or indirectly reference any of the modified cells.
+     *
+     * @param modified_cells Cells or ranges whose values have been modified.
+     *
+     * @return Positions of the dirty formula cells, in no particular order.
+     *         A formula group appears as a single range.
+     */
     abs_range_set_t query_dirty_cells(const abs_range_set_t& modified_cells) const;
 
+    /**
+     * Get the positions of the formula cells that need re-calculating after
+     * a modification, sorted in order of dependency so that each cell comes
+     * after the cells it depends on.
+     *
+     * @param modified_cell Cell or range whose value has been modified.
+     *
+     * @return Positions of the dirty formula cells in calculation order.  A
+     *         formula group appears as a single range.
+     */
     std::vector<abs_range_t> query_and_sort_dirty_cells(const abs_range_t& modified_cell) const;
 
+    /**
+     * Get the positions of the formula cells that need re-calculating after
+     * modifications, sorted in order of dependency so that each cell comes
+     * after the cells it depends on.
+     *
+     * @param modified_cells Cells or ranges whose values have been modified.
+     * @param dirty_formula_cells Formula cells to treat as dirty regardless
+     *                            of the modifications, such as cells whose
+     *                            formulas are new or have changed.  Their
+     *                            dependents get included as well.
+     *
+     * @return Positions of the dirty formula cells in calculation order.  A
+     *         formula group appears as a single range.
+     */
     std::vector<abs_range_t> query_and_sort_dirty_cells(
         const abs_range_set_t& modified_cells, const abs_range_set_t* dirty_formula_cells = nullptr) const;
 
+    /**
+     * Get a string representation of all tracked relationships, for
+     * debugging.
+     */
     std::string to_string() const;
 
+    /**
+     * Check whether the tracker has any tracked relationship.  Registered
+     * volatile cells are not taken into account.
+     */
     bool empty() const;
 };
 

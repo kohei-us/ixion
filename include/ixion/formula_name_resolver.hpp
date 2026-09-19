@@ -32,13 +32,20 @@ struct table_ref_t;
  */
 struct IXION_DLLPUBLIC formula_name_t
 {
+    /** Kind of name. */
     enum name_type
     {
+        /** The string is not a valid name of any kind. */
         invalid = 0,
+        /** Reference to a single cell. */
         cell_reference,
+        /** Reference to a range of cells. */
         range_reference,
+        /** Reference to a table or a part of one. */
         table_reference,
+        /** Named expression. */
         named_expression,
+        /** Built-in function. */
         function,
     };
 
@@ -49,15 +56,26 @@ struct IXION_DLLPUBLIC formula_name_t
      */
     struct table_type
     {
+        /** Name of the table, or empty when the reference does not name it. */
         std::string_view name;
+        /** Name of the first column, or empty for an area-only reference. */
         std::string_view column_first;
+        /** Name of the last column, or empty for a single-column reference. */
         std::string_view column_last;
+        /** Areas covered, as a combination of table_area_t flags. */
         table_areas_t areas;
     };
 
+    /**
+     * Type of the resolved value: an address for a cell reference, a range
+     * for a range reference, a table_type for a table reference, or a
+     * function opcode for a function.  A named expression has no value.
+     */
     using value_type = std::variant<address_t, range_t, table_type, formula_function_t>;
 
+    /** Kind of name. */
     name_type type;
+    /** Resolved value, whose alternative depends on the kind of name. */
     value_type value;
 
     formula_name_t();
@@ -91,8 +109,43 @@ public:
      * @return result of the resovled reference.
      */
     virtual formula_name_t resolve(std::string_view s, const abs_address_t& pos) const = 0;
+
+    /**
+     * Get the string representation of a cell reference in the syntax of
+     * this resolver.
+     *
+     * @param addr Cell reference, whose components, if relative, are offsets
+     *             from the base position.
+     * @param pos Base cell position the relative components, if any, are
+     *            resolved against.
+     * @param sheet_name Whether to include the sheet name.
+     *
+     * @return String representation of the reference.
+     */
     virtual std::string get_name(const address_t& addr, const abs_address_t& pos, bool sheet_name) const = 0;
+
+    /**
+     * Get the string representation of a range reference in the syntax of
+     * this resolver.
+     *
+     * @param range Range reference, whose components, if relative, are
+     *              offsets from the base position.
+     * @param pos Base cell position the relative components, if any, are
+     *            resolved against.
+     * @param sheet_name Whether to include the sheet name.
+     *
+     * @return String representation of the reference.
+     */
     virtual std::string get_name(const range_t& range, const abs_address_t& pos, bool sheet_name) const = 0;
+
+    /**
+     * Get the string representation of a table reference in the syntax of
+     * this resolver.
+     *
+     * @param table Table reference.
+     *
+     * @return String representation of the reference.
+     */
     virtual std::string get_name(const table_ref_t& table) const = 0;
 
     /**

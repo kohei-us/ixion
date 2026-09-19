@@ -43,6 +43,11 @@ IXION_DLLPUBLIC std::string_view get_formula_opcode_string(fopcode_t oc);
  */
 struct IXION_DLLPUBLIC formula_token final
 {
+    /**
+     * Type of the value a token may carry.  Which alternative is in use
+     * depends on the opcode of the token; an operator token carries no
+     * value.
+     */
     using value_type = std::variant<
         address_t, range_t, table_ref_t, formula_error_t, formula_function_t,
         double, string_id_t, std::string_view, std::string>;
@@ -149,6 +154,7 @@ struct IXION_DLLPUBLIC formula_token final
 
     ~formula_token();
 
+    /** Compare the opcodes and values of two tokens. */
     bool operator== (const formula_token& r) const;
 };
 
@@ -190,8 +196,13 @@ public:
     formula_tokens_store(const formula_tokens_store&) = delete;
     formula_tokens_store& operator= (const formula_tokens_store&) = delete;
 
+    /**
+     * Get the number of formula cells and other holders currently sharing
+     * this store.
+     */
     size_t get_reference_count() const;
 
+    /** Get the stored tokens. */
     const formula_tokens_t& get() const;
 };
 
@@ -219,9 +230,12 @@ struct IXION_DLLPUBLIC named_expression_t
     /** Formula tokens. */
     formula_tokens_t tokens;
 
+    /** Construct a named expression with no tokens. */
     named_expression_t();
+    /** Construct a named expression from its origin and tokens. */
     named_expression_t(const abs_address_t& _origin, formula_tokens_t _tokens);
     named_expression_t(const named_expression_t&) = delete;
+    /** Move constructor. */
     named_expression_t(named_expression_t&& other);
     ~named_expression_t();
 };
