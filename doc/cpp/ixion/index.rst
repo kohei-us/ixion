@@ -157,5 +157,4 @@ Child namespaces
 .. toctree::
    :maxdepth: 1
 
-   draft/index.rst
    iface/index.rst
