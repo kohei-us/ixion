@@ -19,7 +19,7 @@ struct abs_address_t;
  * STL-compliant range that yields every @ref abs_address_t inside an
  * @ref abs_range_t one address at a time.
  *
- * The iteration order is determined by the @ref rc_direction_t value passed
+ * The iteration order is determined by the @c ixion::rc_direction_t value passed
  * to the constructor:
  * - @c horizontal walks row-major within each sheet (column varies fastest).
  * - @c vertical walks column-major within each sheet (row varies fastest).
