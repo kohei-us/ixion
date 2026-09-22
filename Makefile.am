@@ -177,6 +177,7 @@ distclean-local:
 
 doc-doxygen:
 	@echo "Building documentation by doxygen..."
+	@rm -rf ./doc/_doxygen
 	@cd doc && doxygen doxygen.conf
 
 doc-sphinx:
