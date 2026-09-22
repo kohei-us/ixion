@@ -143,6 +143,16 @@ doc_data = \
 	doc/doxygen.conf \
 	doc/environment.yml \
 	doc/functions.rst \
+	doc/images/concepts-api-levels.fodg \
+	doc/images/concepts-api-levels.svg \
+	doc/images/concepts-calculation.fodg \
+	doc/images/concepts-calculation.svg \
+	doc/images/concepts-cells-and-sheets.fodg \
+	doc/images/concepts-cells-and-sheets.svg \
+	doc/images/concepts-dependency-tracking.fodg \
+	doc/images/concepts-dependency-tracking.svg \
+	doc/images/concepts-formula-tokens.fodg \
+	doc/images/concepts-formula-tokens.svg \
 	doc/index.rst \
 	doc/overview/cell-access.rst \
 	doc/overview/concepts.rst \

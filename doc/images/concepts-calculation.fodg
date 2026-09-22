@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.graphics">
+ <office:font-face-decls>
+  <style:font-face style:name="DejaVu Sans" svg:font-family="&apos;DejaVu Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable"/>
+  <style:font-face style:name="Liberation Sans1" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+  <style:font-face style:name="Nimbus Mono PS" svg:font-family="&apos;Nimbus Mono PS&apos;" style:font-adornments="Regular" style:font-pitch="fixed"/>
+  <style:font-face style:name="Noto Sans" svg:font-family="&apos;Noto Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+  <style:font-face style:name="Noto Sans CJK SC" svg:font-family="&apos;Noto Sans CJK SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Noto Sans Devanagari" svg:font-family="&apos;Noto Sans Devanagari&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Noto Sans1" svg:font-family="&apos;Noto Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+ </office:font-face-decls>
+ <office:styles>
+  <draw:marker draw:name="Arrow" svg:viewBox="0 0 20 30" svg:d="M10 0l-10 30h20z"/>
+  <style:default-style style:family="graphic">
+   <style:graphic-properties svg:stroke-color="#3465a4" draw:fill-color="#729fcf" fo:wrap-option="no-wrap"/>
+   <style:text-properties style:font-name="Liberation Sans" fo:font-size="9pt" fo:language="en" fo:country="US"/>
+  </style:default-style>
+  <style:style style:name="standard" style:family="graphic">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm" svg:stroke-color="#000000" draw:fill="solid" draw:fill-color="#729fcf" fo:padding-top="0.05cm" fo:padding-bottom="0.05cm" fo:padding-left="0.08cm" fo:padding-right="0.08cm" fo:wrap-option="wrap" draw:shadow="hidden"/>
+   <style:text-properties style:font-name="Liberation Sans" fo:font-size="9pt"/>
+  </style:style>
+  <style:style style:name="Code_20_Box" style:display-name="Code Box" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#7a8794" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="middle" draw:auto-grow-height="false" draw:auto-grow-width="false" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:padding-left="0cm" fo:padding-right="0cm"/>
+  </style:style>
+  <style:style style:name="Step" style:display-name="Step" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#7a8794" draw:fill="solid" draw:fill-color="#dfe7ef" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="middle" draw:auto-grow-height="false" draw:auto-grow-width="false" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:padding-left="0cm" fo:padding-right="0cm"/>
+  </style:style>
+  <style:style style:name="Token" style:display-name="Token" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#b8c0c8" draw:fill="solid" draw:fill-color="#eceff2" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="middle" draw:auto-grow-height="false" draw:auto-grow-width="false" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:padding-left="0cm" fo:padding-right="0cm"/>
+  </style:style>
+  <style:style style:name="Flow_20_Arrow" style:display-name="Flow Arrow" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.032cm" svg:stroke-color="#4a5560" draw:fill="none" draw:marker-end="Arrow" draw:marker-end-width="0.25cm" draw:marker-end-center="false"/>
+  </style:style>
+  <style:style style:name="Annotation" style:display-name="Annotation" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none" draw:textarea-horizontal-align="left" draw:textarea-vertical-align="top" draw:auto-grow-height="true" draw:auto-grow-width="false" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:padding-left="0cm" fo:padding-right="0cm"/>
+  </style:style>
+ </office:styles>
+ <office:automatic-styles>
+<style:page-layout style:name="PM0"><style:page-layout-properties fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:page-width="14.817cm" fo:page-height="10.478cm" style:print-orientation="landscape"/></style:page-layout>
+<style:style style:name="dp1" style:family="drawing-page"><style:drawing-page-properties draw:background-size="border" draw:fill="none"/></style:style>
+<style:style style:name="P_label" style:family="paragraph"><style:paragraph-properties fo:text-align="start"/><style:text-properties style:font-name="Liberation Sans" fo:font-size="9pt" fo:color="#333333"/></style:style>
+<style:style style:name="P_center" style:family="paragraph"><style:paragraph-properties fo:text-align="center"/><style:text-properties style:font-name="Liberation Sans" fo:font-size="9pt" fo:color="#333333"/></style:style>
+<style:style style:name="P_small" style:family="paragraph"><style:paragraph-properties fo:text-align="center"/><style:text-properties style:font-name="Liberation Sans" fo:font-size="8pt" fo:color="#333333"/></style:style>
+ </office:automatic-styles>
+ <office:master-styles>
+  <draw:layer-set>
+   <draw:layer draw:name="layout"/>
+   <draw:layer draw:name="background"/>
+   <draw:layer draw:name="backgroundobjects"/>
+   <draw:layer draw:name="controls"/>
+   <draw:layer draw:name="measurelines"/>
+  </draw:layer-set>
+  <style:master-page style:name="Default" style:page-layout-name="PM0" draw:style-name="dp1"/>
+ </office:master-styles>
+ <office:body>
+  <office:drawing>
+   <draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default">
+<draw:g draw:name="inputs">
+<draw:frame draw:name="modified heading" draw:style-name="Annotation" draw:text-style-name="P_label" draw:layer="layout" svg:width="3.969cm" svg:height="0.370cm" svg:x="1.058cm" svg:y="0.370cm"><draw:text-box><text:p text:style-name="P_label">Modified cells</text:p></draw:text-box></draw:frame>
+<draw:custom-shape draw:name="modified cells" draw:style-name="Code_20_Box" draw:text-style-name="P_center" draw:layer="layout" xml:id="id1" draw:id="id1" svg:width="3.969cm" svg:height="0.794cm" svg:x="1.058cm" svg:y="0.847cm"><text:p text:style-name="P_center">A5</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:frame draw:name="modified formulas heading" draw:style-name="Annotation" draw:text-style-name="P_label" draw:layer="layout" svg:width="4.763cm" svg:height="0.370cm" svg:x="7.144cm" svg:y="0.370cm"><draw:text-box><text:p text:style-name="P_label">Modified formula cells</text:p></draw:text-box></draw:frame>
+<draw:custom-shape draw:name="modified formula cells" draw:style-name="Code_20_Box" draw:text-style-name="P_center" draw:layer="layout" xml:id="id2" draw:id="id2" svg:width="3.969cm" svg:height="0.794cm" svg:x="7.144cm" svg:y="0.847cm"><text:p text:style-name="P_center">B1</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:line draw:name="modified into query" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="3.043cm" svg:y1="1.640cm" svg:x2="5.027cm" svg:y2="2.646cm"><text:p/></draw:line>
+<draw:line draw:name="modified formulas into query" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="9.128cm" svg:y1="1.640cm" svg:x2="7.144cm" svg:y2="2.646cm"><text:p/></draw:line>
+</draw:g>
+<draw:g draw:name="query">
+<draw:custom-shape draw:name="query step" draw:style-name="Step" draw:text-style-name="P_center" draw:layer="layout" xml:id="id3" draw:id="id3" svg:width="5.292cm" svg:height="0.953cm" svg:x="3.440cm" svg:y="2.646cm"><text:p text:style-name="P_center">query_and_sort_dirty_cells()</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:custom-shape draw:name="tracker" draw:style-name="Code_20_Box" draw:text-style-name="P_center" draw:layer="layout" xml:id="id4" draw:id="id4" svg:width="3.440cm" svg:height="0.953cm" svg:x="10.583cm" svg:y="2.646cm"><text:p text:style-name="P_center">dirty_cell_tracker</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:line draw:name="tracker into query" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="10.583cm" svg:y1="3.122cm" svg:x2="8.731cm" svg:y2="3.122cm"><text:p/></draw:line>
+<draw:line draw:name="query to sorted" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="6.085cm" svg:y1="3.598cm" svg:x2="6.085cm" svg:y2="4.498cm"><text:p/></draw:line>
+</draw:g>
+<draw:g draw:name="sorted">
+<draw:custom-shape draw:name="sorted frame" draw:style-name="Code_20_Box" draw:text-style-name="P_center" draw:layer="layout" xml:id="id5" draw:id="id5" svg:width="5.292cm" svg:height="1.640cm" svg:x="3.440cm" svg:y="4.498cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:frame draw:name="sorted heading" draw:style-name="Annotation" draw:text-style-name="P_label" draw:layer="layout" svg:width="5.027cm" svg:height="0.370cm" svg:x="3.651cm" svg:y="4.604cm"><draw:text-box><text:p text:style-name="P_label">Dirty formula cells, sorted</text:p></draw:text-box></draw:frame>
+<draw:custom-shape draw:name="sorted A11" draw:style-name="Token" draw:text-style-name="P_small" draw:layer="layout" xml:id="id6" draw:id="id6" svg:width="1.164cm" svg:height="0.582cm" svg:x="4.498cm" svg:y="5.292cm"><text:p text:style-name="P_small">A11</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:line draw:name="order arrow" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="5.768cm" svg:y1="5.583cm" svg:x2="6.403cm" svg:y2="5.583cm"><text:p/></draw:line>
+<draw:custom-shape draw:name="sorted B1" draw:style-name="Token" draw:text-style-name="P_small" draw:layer="layout" xml:id="id7" draw:id="id7" svg:width="1.164cm" svg:height="0.582cm" svg:x="6.509cm" svg:y="5.292cm"><text:p text:style-name="P_small">B1</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:line draw:name="sorted to calculate" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="6.085cm" svg:y1="6.138cm" svg:x2="6.085cm" svg:y2="7.038cm"><text:p/></draw:line>
+</draw:g>
+<draw:g draw:name="calculate">
+<draw:custom-shape draw:name="calculate step" draw:style-name="Step" draw:text-style-name="P_center" draw:layer="layout" xml:id="id8" draw:id="id8" svg:width="5.292cm" svg:height="0.953cm" svg:x="3.440cm" svg:y="7.038cm"><text:p text:style-name="P_center">calculate_sorted_cells()</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:line draw:name="calculate to results" draw:style-name="Flow_20_Arrow" draw:layer="layout" svg:x1="6.085cm" svg:y1="7.990cm" svg:x2="6.085cm" svg:y2="8.890cm"><text:p/></draw:line>
+</draw:g>
+<draw:g draw:name="results">
+<draw:custom-shape draw:name="results frame" draw:style-name="Code_20_Box" draw:text-style-name="P_center" draw:layer="layout" xml:id="id9" draw:id="id9" svg:width="5.292cm" svg:height="1.323cm" svg:x="3.440cm" svg:y="8.890cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:frame draw:name="results heading" draw:style-name="Annotation" draw:text-style-name="P_label" draw:layer="layout" svg:width="5.027cm" svg:height="0.370cm" svg:x="3.651cm" svg:y="8.996cm"><draw:text-box><text:p text:style-name="P_label">Results cached in the cells</text:p></draw:text-box></draw:frame>
+<draw:custom-shape draw:name="result A11" draw:style-name="Token" draw:text-style-name="P_small" draw:layer="layout" xml:id="id10" draw:id="id10" svg:width="1.905cm" svg:height="0.582cm" svg:x="4.022cm" svg:y="9.472cm"><text:p text:style-name="P_small">A11 = 100</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+<draw:custom-shape draw:name="result B1" draw:style-name="Token" draw:text-style-name="P_small" draw:layer="layout" xml:id="id11" draw:id="id11" svg:width="1.905cm" svg:height="0.582cm" svg:x="6.244cm" svg:y="9.472cm"><text:p text:style-name="P_small">B1 = 200</text:p><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+</draw:g>
+   </draw:page>
+  </office:drawing>
+ </office:body>
+</office:document>

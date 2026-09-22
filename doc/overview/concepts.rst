@@ -24,13 +24,13 @@ rectangular block of cells is an :cpp:struct:`~ixion::abs_range_t`.  You
 append sheets by name, and the index of a sheet is simply its position in
 the model.
 
-.. todo::
+.. figure:: ../images/concepts-cells-and-sheets.svg
+   :alt: A model_context holding three sheets, with one cell and one range
+         on the first sheet picked out with their addresses.
 
-   Diagram: A model_context box holding two or three sheet grids, one cell
-   highlighted with its (sheet, row, column) address and a range outlined
-   with its top-left and bottom-right addresses.
-
-   File: images/concepts-cells-and-sheets.svg
+   A model context with three sheets.  C2 on the first sheet is the
+   address ``{0, 1, 2}``, and B3:D5 is the range from ``{0, 2, 1}`` to
+   ``{0, 4, 3}``.
 
 The model context is deliberately kept small.  It holds only what the
 formula engine needs in order to run a full calculation: the cell values,
@@ -53,13 +53,13 @@ string like ``SUM(A1:A10)``, it gets parsed once into a sequence of tokens of
 type :cpp:type:`~ixion::formula_tokens_t`, and those tokens are what the
 formula cell stores and what the interpreter runs at calculation time.
 
-.. todo::
+.. figure:: ../images/concepts-formula-tokens.svg
+   :alt: A formula string parsed into tokens held by a formula cell, then
+         printed back out as a string in another syntax.
 
-   Diagram: Round trip of a formula: string -> parse_formula_string (with
-   resolver) -> tokens stored in the formula cell -> print_formula_tokens
-   (with the same or another resolver) -> string.
-
-   File: images/concepts-formula-tokens.svg
+   The round trip of a formula.  The string is parsed with one resolver
+   into tokens, and the tokens can be printed back with the same or
+   another resolver.
 
 To parse a formula you need a :cpp:class:`~ixion::formula_name_resolver`.
 When the parser splits a formula string apart, some pieces are easy to
@@ -106,13 +106,12 @@ job is to remember which cells each formula cell references, so that when a
 cell changes, we can find the formula cells that depend on it, either directly
 or indirectly.
 
-.. todo::
+.. figure:: ../images/concepts-dependency-tracking.svg
+   :alt: A grid where A11 sums A1:A10 and B1 references A11; a change in A5
+         makes A11 dirty, and A11 in turn makes B1 dirty.
 
-   Diagram: A small grid where A11 references A1:A10 and B1 references A11;
-   arrows from each formula cell to its references, and a changed cell in A5
-   shown propagating to A11 and then B1.
-
-   File: images/concepts-dependency-tracking.svg
+   A11 references A1:A10 and B1 references A11.  When A5 changes, the
+   tracker reports A11 as dirty, and through it B1.
 
 The tracker only knows what you tell it.  After inserting a formula cell into
 the model, you *register* it with :cpp:func:`~ixion::register_formula_cell`,
@@ -147,13 +146,14 @@ sequence to
 :cpp:func:`~ixion::calculate_sorted_cells`, which interprets the formula
 cells one by one in that order and stores each result in its cell.
 
-.. todo::
+.. figure:: ../images/concepts-calculation.svg
+   :alt: The modified cells go into the dirty query, which consults the
+         tracker and yields the dirty formula cells in dependency order;
+         those go through the calculation and end up as cached results.
 
-   Diagram: Pipeline of the two steps: modified cells (and modified formula
-   cells) -> query_and_sort_dirty_cells -> sorted dirty formula cells ->
-   calculate_sorted_cells -> results cached in the cells.
-
-   File: images/concepts-calculation.svg
+   The two steps of a calculation.  The modified cells and the modified
+   formula cells go in, the dirty formula cells come out sorted, and the
+   calculation stores a result in each of them.
 
 .. note::
 
@@ -185,15 +185,14 @@ usual.  See :ref:`errors-and-volatile` for more on error values.
 Two levels of API
 -----------------
 
-.. todo::
+.. figure:: ../images/concepts-api-levels.svg
+   :alt: The application on top, document in the middle, and model_context
+         with its dirty cell tracker beside the free functions at the
+         bottom; one route goes through document, the other straight down.
 
-   Diagram: Layer stack: application on top; document in the middle; below
-   it model_context side by side with the free functions of
-   <ixion/formula.hpp>; dirty_cell_tracker inside model_context.  A second
-   arrow from the application straight to the lower layer for the low-level
-   route.
-
-   File: images/concepts-api-levels.svg
+   The two levels of the API.  An application can go through
+   :cpp:class:`~ixion::document`, or work with :cpp:class:`~ixion::model_context`
+   and the free functions directly.
 
 What we've covered so far is the low-level API: a
 :cpp:class:`~ixion::model_context` for storage, and the free functions in
