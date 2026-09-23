@@ -106,12 +106,12 @@ cell, since relative references only make sense in relation to it.  You
 don't have to print from the same position you parsed at, and we'll make use
 of that below.
 
-.. todo::
+.. figure:: ../images/formula-syntax-round-trip.svg
+   :alt: The Excel A1 string parsed into one set of tokens, and the same
+         tokens printed back in the four syntaxes.
 
-   Diagram: One set of tokens in the middle, with the four printed strings
-   fanning out from it, and the parsed Excel A1 string feeding into it.
-
-   File: images/formula-syntax-round-trip.svg
+   One parse, four prints.  The tokens hold offsets from C1 and nothing
+   else, so any resolver can print them back out.
 
 
 References
@@ -143,13 +143,12 @@ syntaxes a range can span sheets too, as in ``Sheet1:Sheet3!A1``, and in the
 Calc A1 and OpenFormula syntaxes each end of a range can carry its own sheet
 name, as in ``Sheet1.A1:Sheet3.A1``.
 
-.. todo::
+.. figure:: ../images/formula-syntax-reference-parts.svg
+   :alt: The references $Sheet1.$A$1 and Sheet1!$A$1 split into their
+         sheet, column and row parts, with each $ highlighted.
 
-   Diagram: Anatomy of a reference, ``$Sheet1.$A$1`` and ``Sheet1!$A$1``
-   side by side, with the sheet, column and row parts labelled and the
-   absolute markers highlighted.
-
-   File: images/formula-syntax-reference-parts.svg
+   The three parts of a reference in the Calc A1 and Excel A1 syntaxes.
+   In Excel A1 the sheet name alone makes the sheet part absolute.
 
 
 Sheet-relative and sheet-absolute references
@@ -196,13 +195,13 @@ moved along to ``Sheet2``, and only ``$Sheet1.A1`` stayed put.
     cell is on.  Use the :cpp:enum:`~ixion::display_sheet_t` value in
     :cpp:struct:`~ixion::print_config` to always or never print it.
 
-.. todo::
+.. figure:: ../images/formula-syntax-sheet-relative.svg
+   :alt: The formula =A1+Sheet1!A1 on Sheet1 and its copy on Sheet2; the
+         A1 reference of the copy points at Sheet2, the Sheet1!A1 reference
+         still points at Sheet1.
 
-   Diagram: Two sheets side by side; a formula cell on Sheet1 with ``A1``
-   and ``Sheet1!A1`` copied to Sheet2, arrows showing the first reference
-   following to Sheet2!A1 and the second staying on Sheet1!A1.
-
-   File: images/formula-syntax-sheet-relative.svg
+   The same Excel A1 formula on two sheets.  The unqualified ``A1`` follows
+   the formula to Sheet2, while ``Sheet1!A1`` stays pinned to Sheet1.
 
 
 Sheet names with spaces

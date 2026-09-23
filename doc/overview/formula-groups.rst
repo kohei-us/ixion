@@ -233,14 +233,14 @@ range listening on a range.  The tracker holds a single entry for the group,
 and it can only mark that entry dirty as a whole.  That's why the edit to A1
 above re-calculated all four cells.
 
-.. todo::
+.. figure:: ../images/formula-groups-storage.svg
+   :alt: The four members D1, E1, D2 and E2 as a 2x2 block with their row
+         and column offsets, bracketed on the left toward one shared token
+         store and on the right toward one shared result slot; D1 is
+         highlighted as the parent, with its own arrow writing the result.
 
-   Diagram: The four cells D1, D2, E1 and E2, each with a small offset
-   label (0/0, 1/0, 0/1, 1/1), all pointing at one shared token store
-   ``A1:B2*10`` and one shared result matrix ``{10,20;30,40}``, with D1
-   highlighted as the parent that fills the matrix.
-
-   File: images/formula-groups-storage.svg
+   What each member of the group holds.  Only the parent, D1, writes the
+   result slot; the others read their element from it.
 
 
 Matrix results without a group

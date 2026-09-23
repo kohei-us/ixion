@@ -153,6 +153,22 @@ doc_data = \
 	doc/images/concepts-dependency-tracking.svg \
 	doc/images/concepts-formula-tokens.fodg \
 	doc/images/concepts-formula-tokens.svg \
+	doc/images/formula-groups-storage.fodg \
+	doc/images/formula-groups-storage.svg \
+	doc/images/formula-syntax-reference-parts.fodg \
+	doc/images/formula-syntax-reference-parts.svg \
+	doc/images/formula-syntax-round-trip.fodg \
+	doc/images/formula-syntax-round-trip.svg \
+	doc/images/formula-syntax-sheet-relative.fodg \
+	doc/images/formula-syntax-sheet-relative.svg \
+	doc/images/names-and-tables-expansion.fodg \
+	doc/images/names-and-tables-expansion.svg \
+	doc/images/names-and-tables-table-anatomy.fodg \
+	doc/images/names-and-tables-table-anatomy.svg \
+	doc/images/sheet-copy-references.fodg \
+	doc/images/sheet-copy-references.svg \
+	doc/images/sheet-copy-storage.fodg \
+	doc/images/sheet-copy-storage.svg \
 	doc/index.rst \
 	doc/overview/cell-access.rst \
 	doc/overview/concepts.rst \

@@ -142,13 +142,13 @@ Formula cells whose references stay on their own sheet, or use absolute
 sheet references, keep their results.  Volatile formula cells are not marked
 dirty, since they get re-calculated on every run regardless.
 
-.. todo::
+.. figure:: ../images/sheet-copy-references.svg
+   :alt: The copy and src sheets side by side; on the copy, B1 and A1:A2
+         share one color, B2 and src!A1 share another with an arrow between
+         them, and C1 is marked in red.
 
-   Diagram: Sheets ``src`` and ``copy`` side by side; the copy's B1 pointing
-   at the copy's own A1:A2, the copy's B2 pointing back at src!A1, and C1
-   flagged for re-calculation.
-
-   File: images/sheet-copy-references.svg
+   What the three formula cells on the copy refer to.  Only ``C1`` needs
+   re-calculating.
 
 
 Copying with model_context
@@ -272,13 +272,12 @@ column gets its own private copy the first time either sheet modifies it.
 Copying a large sheet is therefore cheap, and the cost of the copy is paid
 gradually, only for the columns that actually diverge.
 
-.. todo::
+.. figure:: ../images/sheet-copy-storage.svg
+   :alt: Right after the copy, the columns of src and copy point at the
+         same three column blocks; after an edit to copy!B1, the copy's
+         column B points at a private block while A and C stay shared.
 
-   Diagram: Two sheets pointing at the same set of column blocks after a
-   copy; then one column duplicated after an edit on the copy, with the
-   other columns still shared.
-
-   File: images/sheet-copy-storage.svg
+   Column storage after a copy, and after the first edit on the copy.
 
 This is a build-time option.  It is on by default, and can be switched off
 with ``--disable-cow`` when configuring with autotools, or by turning off

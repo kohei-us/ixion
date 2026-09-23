@@ -88,12 +88,13 @@ when the formula is parsed, so you can define the name after the formulas that
 reference it.  A name that doesn't exist by the time the formula is calculated
 gives the ``#NAME?`` error.
 
-.. todo::
+.. figure:: ../images/names-and-tables-expansion.svg
+   :alt: The tokens of SUM(MyData) with the MyData token pointing at the
+         entry for MyData in the model's named expressions, which holds a
+         single range reference token.
 
-   Diagram: The formula ``SUM(MyData)`` as tokens, with the ``MyData`` token
-   pointing at the named expression's own tokens stored in the model.
-
-   File: images/names-and-tables-expansion.svg
+   A name token stands in for the named expression's own tokens.  The
+   lookup happens by name when the formula cell is calculated.
 
 To get a named expression back, call
 :cpp:func:`~ixion::model_context::get_named_expression`.  It returns a
@@ -211,13 +212,13 @@ A table is a rectangular range of cells with a name and named columns.  Its
 range may start with a header row and end with one or more totals rows,
 and the rows in between are the data rows.
 
-.. todo::
+.. figure:: ../images/names-and-tables-table-anatomy.svg
+   :alt: The range A1:B5 on the Inventory sheet outlined as Table1, with
+         the header row, three data rows and the totals row bracketed and
+         the columns Item and Amount named above.
 
-   Diagram: A 5x2 block labelled ``Table1`` with the header row, three data
-   rows and the totals row bracketed, and the two columns labelled ``Item``
-   and ``Amount``.
-
-   File: images/names-and-tables-table-anatomy.svg
+   The parts of a table, and how a structured reference names each of
+   them.
 
 Let's put such a block of cells on a sheet:
 
