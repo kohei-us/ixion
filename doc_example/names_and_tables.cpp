@@ -2,7 +2,7 @@
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/formula.hpp>
 #include <ixion/formula_tokens.hpp>
-#include <ixion/named_expressions_iterator.hpp>
+#include <ixion/named_expressions_range.hpp>
 #include <ixion/address.hpp>
 #include <ixion/table.hpp>
 
@@ -34,13 +34,12 @@ void calculate(ixion::model_context& cxt, const ixion::abs_range_set_t& new_form
 //!code-start: print-names
 void print_names(
     const ixion::model_context& cxt, const ixion::formula_name_resolver& resolver,
-    ixion::named_expressions_iterator iter)
+    const ixion::named_expressions_range& names)
 {
-    for (; iter.has(); iter.next())
+    for (const auto& entry : names)
     {
-        auto entry = iter.get();
-        const ixion::named_expression_t& expr = *entry.expression;
-        std::cout << "  " << *entry.name << " = "
+        const ixion::named_expression_t& expr = entry.expression;
+        std::cout << "  " << entry.name << " = "
             << ixion::print_formula_tokens(cxt, expr.origin, resolver, expr.tokens) << std::endl;
     }
 }
@@ -112,9 +111,9 @@ int main()
 
     //!code-start: iterate-names
     std::cout << "global names:" << std::endl;
-    print_names(cxt, *resolver, cxt.get_named_expressions_iterator());
+    print_names(cxt, *resolver, cxt.iterate_named_expressions());
     std::cout << "names local to Sheet2:" << std::endl;
-    print_names(cxt, *resolver, cxt.get_named_expressions_iterator(1));
+    print_names(cxt, *resolver, cxt.iterate_named_expressions(1));
     //!code-end: iterate-names
 
     //!code-start: table-data

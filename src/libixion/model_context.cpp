@@ -12,6 +12,7 @@
 #include <ixion/model_iterator.hpp>
 #include <ixion/interface/session_handler.hpp>
 #include <ixion/named_expressions_iterator.hpp>
+#include <ixion/named_expressions_range.hpp>
 #include <ixion/cell_access.hpp>
 #include <ixion/exceptions.hpp>
 #include <ixion/sheet_view.hpp>
@@ -469,6 +470,8 @@ model_cell_range model_context::iterate_cells(
     return mp_impl->iterate_cells(sheet, dir, range);
 }
 
+IXION_DEPRECATED_DECL_PUSH
+
 named_expressions_iterator model_context::get_named_expressions_iterator() const
 {
     return named_expressions_iterator(*this, -1);
@@ -477,6 +480,18 @@ named_expressions_iterator model_context::get_named_expressions_iterator() const
 named_expressions_iterator model_context::get_named_expressions_iterator(sheet_t sheet) const
 {
     return named_expressions_iterator(*this, sheet);
+}
+
+IXION_DEPRECATED_DECL_POP
+
+named_expressions_range model_context::iterate_named_expressions() const
+{
+    return mp_impl->iterate_named_expressions(global_scope);
+}
+
+named_expressions_range model_context::iterate_named_expressions(sheet_t sheet) const
+{
+    return mp_impl->iterate_named_expressions(sheet);
 }
 
 void model_context::walk(

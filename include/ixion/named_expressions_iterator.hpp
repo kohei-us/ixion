@@ -24,8 +24,14 @@ struct abs_address_t;
  * model_context::get_named_expressions_iterator().  It is a cursor: check
  * has(), read get(), then call next(), until has() returns false.  The
  * expressions are visited in the order of their names.
+ *
+ * @deprecated Use named_expressions_range, obtained from
+ *             model_context::iterate_named_expressions(), which works with
+ *             range-`for` and the standard algorithms.
  */
-class IXION_DLLPUBLIC named_expressions_iterator
+class IXION_DLLPUBLIC
+[[deprecated("use ixion::named_expressions_range")]]
+named_expressions_iterator
 {
     friend class model_context;
 

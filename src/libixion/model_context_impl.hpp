@@ -195,6 +195,8 @@ public:
     model_cell_range iterate_cells(
         sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const;
 
+    named_expressions_range iterate_named_expressions(sheet_t scope) const;
+
 private:
     abs_range_t shrink_to_workbook(abs_range_t range) const;
 

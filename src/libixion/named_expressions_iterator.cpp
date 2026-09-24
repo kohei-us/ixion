@@ -5,6 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "deprecated.hpp"
+
+IXION_DEPRECATED_DECL_PUSH
+
 #include "ixion/named_expressions_iterator.hpp"
 #include "ixion/global.hpp"
 #include "model_types.hpp"
@@ -81,5 +85,7 @@ named_expressions_iterator& named_expressions_iterator::operator= (const named_e
 }
 
 }
+
+IXION_DEPRECATED_DECL_POP
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

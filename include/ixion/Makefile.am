@@ -28,6 +28,7 @@ libixion_HEADERS = \
 	model_iterator.hpp \
 	module.hpp \
 	named_expressions_iterator.hpp \
+	named_expressions_range.hpp \
 	sheet_view.hpp \
 	table.hpp \
 	types.hpp \

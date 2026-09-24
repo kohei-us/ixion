@@ -147,6 +147,7 @@ Classes
    class-model_context_error.rst
    class-model_iterator.rst
    class-named_expressions_iterator.rst
+   class-named_expressions_range.rst
    class-not_implemented_error.rst
    class-numeric_matrix.rst
    class-sheet_view.rst

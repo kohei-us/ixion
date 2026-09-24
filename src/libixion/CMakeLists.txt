@@ -40,6 +40,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     model_types.cpp
     module.cpp
     named_expressions_iterator.cpp
+    named_expressions_range.cpp
     queue_entry.cpp
     table.cpp
     table_store.cpp

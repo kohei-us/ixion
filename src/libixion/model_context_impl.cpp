@@ -15,6 +15,7 @@
 #include <ixion/table.hpp>
 #include <ixion/interface/session_handler.hpp>
 #include <ixion/model_cell_range.hpp>
+#include <ixion/named_expressions_range.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/exceptions.hpp>
 
@@ -936,6 +937,11 @@ model_cell_range model_context_impl::iterate_cells(
     sheet_t sheet, rc_direction_t dir, const abs_rc_range_t& range) const
 {
     return model_cell_range(*this, sheet, range, dir);
+}
+
+named_expressions_range model_context_impl::iterate_named_expressions(sheet_t scope) const
+{
+    return named_expressions_range(*this, scope);
 }
 
 void model_context_impl::set_sheet_size(const rc_size_t& sheet_size)

@@ -23,6 +23,7 @@
 #include <ixion/model_context.hpp>
 #include <ixion/model_iterator.hpp>
 #include <ixion/named_expressions_iterator.hpp>
+#include <ixion/named_expressions_range.hpp>
 #include <ixion/table.hpp>
 
 #include <algorithm>
@@ -1110,6 +1111,8 @@ void test_model_context_cell_range_iterator_semantics()
     assert(it == ixion::model_cell_range::sentinel{});
 }
 
+IXION_DEPRECATED_DECL_PUSH
+
 void test_model_context_iterator_named_exps()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -1216,6 +1219,165 @@ void test_model_context_iterator_named_exps()
     };
 
     assert(validate(iter, expected));
+}
+
+IXION_DEPRECATED_DECL_POP
+
+void test_model_context_named_expressions_range()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    struct check
+    {
+        std::string name;
+        const ixion::named_expression_t* exp;
+    };
+
+    ixion::model_context cxt{{100, 10}};
+    cxt.append_sheet("test1");
+    cxt.append_sheet("test2");
+
+    // A default-constructed range is empty.
+    ixion::named_expressions_range names;
+    assert(names.empty());
+    assert(names.size() == 0);
+    assert(names.begin() == names.end());
+
+    // So is the global scope of a model with no names yet.
+    names = cxt.iterate_named_expressions();
+    assert(names.empty());
+    assert(names.begin() == names.end());
+
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::calc_a1, &cxt);
+    assert(resolver);
+
+    auto tokenize = [&](const char* p) -> ixion::formula_tokens_t
+    {
+        return ixion::parse_formula_string(cxt, ixion::abs_address_t(), *resolver, p);
+    };
+
+    auto validate = [](
+        const ixion::named_expressions_range& _names, const std::vector<check>& _expected) -> bool
+    {
+        if (_names.size() != _expected.size())
+        {
+            std::cout << "range's size() returns wrong value." << std::endl;
+            return false;
+        }
+
+        auto it = _names.begin();
+
+        for (const check& c : _expected)
+        {
+            if (it == _names.end())
+            {
+                std::cout << "range has no more element, but it is expected to." << std::endl;
+                return false;
+            }
+
+            if (c.name != it->name)
+            {
+                std::cout << "names differ: expected='" << c.name << "'; actual='" << it->name << std::endl;
+                return false;
+            }
+
+            if (c.exp != &it->expression)
+            {
+                std::cout << "expressions differ." << std::endl;
+                return false;
+            }
+
+            ++it;
+        }
+
+        if (it != _names.end())
+        {
+            std::cout << "the range has more elements, but it is not expected to." << std::endl;
+            return false;
+        }
+
+        return true;
+    };
+
+    cxt.set_named_expression("MyCalc", tokenize("(1+2)/3")); // global
+
+    std::vector<check> expected =
+    {
+        { "MyCalc", cxt.get_named_expression(0, "MyCalc") },
+    };
+
+    assert(validate(cxt.iterate_named_expressions(), expected));
+
+    cxt.set_named_expression("RefToRight", tokenize("B1")); // global
+
+    expected =
+    {
+        { "MyCalc", cxt.get_named_expression(0, "MyCalc") },
+        { "RefToRight", cxt.get_named_expression(0, "RefToRight") },
+    };
+
+    assert(validate(cxt.iterate_named_expressions(), expected));
+
+    cxt.set_named_expression(1, "MyCalc2", tokenize("(B1+C1)/D1"));
+    cxt.set_named_expression(1, "MyCalc3", tokenize("B1/(PI()*2)"));
+
+    assert(cxt.iterate_named_expressions(0).empty());
+
+    expected =
+    {
+        { "MyCalc2", cxt.get_named_expression(1, "MyCalc2") },
+        { "MyCalc3", cxt.get_named_expression(1, "MyCalc3") },
+    };
+
+    assert(validate(cxt.iterate_named_expressions(1), expected));
+
+    // Range-for visits the names in sorted order.
+    std::vector<std::string> observed;
+    for (const auto& entry : cxt.iterate_named_expressions(1))
+        observed.push_back(entry.name);
+
+    std::vector<std::string> expected_names = { "MyCalc2", "MyCalc3" };
+    assert(observed == expected_names);
+
+    // The iterator satisfies the standard forward iterator concept.
+    static_assert(std::forward_iterator<ixion::named_expressions_range::const_iterator>);
+    static_assert(std::ranges::forward_range<ixion::named_expressions_range>);
+
+    // Standard algorithms work on the range.
+    names = cxt.iterate_named_expressions();
+    assert(std::ranges::distance(names) == 2);
+
+    auto is_ref_to_right = [](const auto& entry) { return entry.name == "RefToRight"; };
+    auto found = std::ranges::find_if(names, is_ref_to_right);
+    assert(found != names.end());
+
+    // The range yields the expression stored in the model, not a copy.
+    const ixion::named_expression_t* stored = cxt.get_named_expression(0, "RefToRight");
+    assert(&found->expression == stored);
+
+    auto is_no_such_name = [](const auto& entry) { return entry.name == "NoSuchName"; };
+    auto not_found = std::find_if(names.begin(), names.end(), is_no_such_name);
+    assert(not_found == names.end());
+
+    // Copies of an iterator are independent and compare by position.
+    auto it = names.begin();
+    assert(it->name == "MyCalc");
+    auto copied = it;
+    assert(copied == it);
+
+    // Both refer to storage in the model, not to the iterator they came from.
+    assert(&it->name == &copied->name);
+    assert(&it->expression == &copied->expression);
+
+    assert(it++ == copied);
+    assert(it != copied);
+    ++copied;
+    assert(copied == it);
+    assert(it->name == "RefToRight");
+
+    // ++ past the last name compares equal to end().
+    ++it;
+    assert(it == names.end());
 }
 
 void test_model_context_fill_down()
@@ -2578,6 +2740,7 @@ int main()
     test_model_context_cell_range_vertical();
     test_model_context_cell_range_iterator_semantics();
     test_model_context_iterator_named_exps();
+    test_model_context_named_expressions_range();
     test_model_context_fill_down();
     test_model_context_error_value();
     test_model_context_rename_sheets();

@@ -170,9 +170,12 @@ wins, while ``Sheet1`` falls back to the global one.
 rule when you pass it a sheet index.
 
 To go through all the names in a scope, use
-:cpp:func:`~ixion::model_context::get_named_expressions_iterator`, with no
-argument for the global names or with a sheet index for the local ones.
-Here is a function that prints every name the iterator visits:
+:cpp:func:`~ixion::model_context::iterate_named_expressions`, with no
+argument for the global names or with a sheet index for the local ones.  It
+returns a :cpp:class:`~ixion::named_expressions_range`, which you can walk
+with a range-``for`` loop or hand to the standard algorithms.  Each entry
+gives you the name and the expression it stands for.  Here is a function
+that prints every name in a range:
 
 .. literalinclude:: ../../doc_example/names_and_tables.cpp
    :language: C++

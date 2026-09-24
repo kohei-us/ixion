@@ -29,6 +29,7 @@ class matrix;
 class model_cell_range;
 class model_iterator;
 class named_expressions_iterator;
+class named_expressions_range;
 struct abs_address_t;
 struct abs_range_t;
 struct abs_rc_range_t;
@@ -978,16 +979,45 @@ public:
 
     /**
      * Get an iterator for global named expressions.
+     *
+     * @deprecated Use iterate_named_expressions() instead.
      */
+    [[deprecated("use iterate_named_expressions()")]]
     named_expressions_iterator get_named_expressions_iterator() const;
 
     /**
      * Get an interator for sheet-local named expressions.
      *
+     * @deprecated Use iterate_named_expressions(sheet_t) instead.
+     *
      * @param sheet 0-based index of the sheet where the named expressions are
      *              stored.
      */
+    [[deprecated("use iterate_named_expressions()")]]
     named_expressions_iterator get_named_expressions_iterator(sheet_t sheet) const;
+
+    /**
+     * Get an STL-compliant range over the global named expressions.
+     * Supports range-`for` and STL/range algorithms.  <i>The caller has to
+     * ensure that the named expressions do not change for the duration of
+     * the iteration.</i>
+     *
+     * @return Range over the global named expressions.
+     */
+    named_expressions_range iterate_named_expressions() const;
+
+    /**
+     * Get an STL-compliant range over the named expressions local to one
+     * sheet.  Supports range-`for` and STL/range algorithms.  <i>The caller
+     * has to ensure that the named expressions do not change for the
+     * duration of the iteration.</i>
+     *
+     * @param sheet 0-based index of the sheet where the named expressions are
+     *              stored.
+     *
+     * @return Range over the sheet-local named expressions.
+     */
+    named_expressions_range iterate_named_expressions(sheet_t sheet) const;
 
     /**
      * Traverse a range of a sheet one storage block at a time, column by

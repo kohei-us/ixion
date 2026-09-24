@@ -52,6 +52,12 @@ ixion 0.21.0
     sheet.  It replaces model_iterator and get_model_iterator(), which
     are now deprecated.
 
+  * added model_context::iterate_named_expressions() which returns a
+    named_expressions_range, an STL-compliant range over the named
+    expressions of the global scope or of one sheet.  It replaces
+    named_expressions_iterator and get_named_expressions_iterator(),
+    which are now deprecated.
+
   * renamed abs_address_iterator to abs_address_range.  The old name
     remains available as a deprecated alias.
 

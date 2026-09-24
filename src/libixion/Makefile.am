@@ -88,6 +88,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_types.cpp \
 	module.cpp \
 	named_expressions_iterator.cpp \
+	named_expressions_range.cpp \
 	queue_entry.hpp \
 	queue_entry.cpp \
 	table.cpp \
