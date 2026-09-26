@@ -21,6 +21,7 @@ add_library(ixion-${IXION_API_VERSION} SHARED
     formula_name_resolver.cpp
     formula_opcode.cpp
     formula_parser.cpp
+    formula_registration.cpp
     formula_result.cpp
     formula_tokens.cpp
     formula_value_stack.cpp
@@ -94,6 +95,14 @@ add_executable(document-test EXCLUDE_FROM_ALL
     document_test.cpp
 )
 
+# The tested functions are internal to the library and their symbols stay
+# hidden, so their sources get compiled into the test binary directly.
+add_executable(formula-registration-test EXCLUDE_FROM_ALL
+    formula_registration_test.cpp
+    formula_registration.cpp
+    debug.cpp
+)
+
 add_executable(general-test EXCLUDE_FROM_ALL
     general_test.cpp
 )
@@ -142,6 +151,7 @@ target_compile_definitions(sheet-view-test PRIVATE SRCDIR="${PROJECT_SOURCE_DIR}
 
 target_link_libraries(column-store-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(document-test ixion-${IXION_API_VERSION} ixion-test)
+target_link_libraries(formula-registration-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(general-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(model-context-test ixion-${IXION_API_VERSION} ixion-test)
 target_link_libraries(sheet-sort-test ixion-${IXION_API_VERSION} ixion-test)
@@ -155,6 +165,7 @@ target_link_libraries(version-test ixion-${IXION_API_VERSION} ixion-test)
 add_dependencies(check
     column-store-test
     document-test
+    formula-registration-test
     general-test
     model-context-test
     sheet-sort-test
@@ -168,6 +179,7 @@ add_dependencies(check
 
 add_test(column-store-test column-store-test)
 add_test(document-test document-test)
+add_test(formula-registration-test formula-registration-test)
 add_test(general-test general-test)
 add_test(model-context-test model-context-test)
 add_test(sheet-sort-test sheet-sort-test)

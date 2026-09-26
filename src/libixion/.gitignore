@@ -2,6 +2,7 @@ column-store-test
 compute-engine-test
 dirty-cell-tracker-test
 document-test
+formula-registration-test
 general-test
 ixion-test-track-deps
 model-context-test

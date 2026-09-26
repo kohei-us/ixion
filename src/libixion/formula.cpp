@@ -16,9 +16,9 @@
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
+#include "formula_registration.hpp"
 #include "debug.hpp"
 
-#include <format>
 #include <sstream>
 #include <algorithm>
 #include <utility>
@@ -259,127 +259,9 @@ std::string print_formula_token(
     return os.str();
 }
 
-namespace {
-
-// A function added here must also get 'volatile: true' in
-// misc/function-specs.yaml.
-bool is_volatile(formula_function_t func)
-{
-    switch (func)
-    {
-        case formula_function_t::func_now:
-        case formula_function_t::func_rand:
-        case formula_function_t::func_today:
-            return true;
-        default:
-            ;
-    }
-    return false;
-}
-
-bool has_volatile(const formula_tokens_t& tokens)
-{
-    for (const auto& t : tokens)
-    {
-        if (t.opcode != fop_function)
-            continue;
-
-        auto func = std::get<formula_function_t>(t.value);
-        if (is_volatile(func))
-            return true;
-    }
-    return false;
-}
-
-void check_sheet_or_throw(const char* func_name, sheet_t sheet, const model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
-{
-    if (is_valid_sheet(sheet))
-        return;
-
-    IXION_DEBUG("invalid range reference: func=" << func_name
-        << "; pos=" << pos.get_name()
-        << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
-        << "'");
-
-    throw ixion::formula_registration_error(std::format(
-        "{}: invalid sheet index in {}: formula='{}'",
-        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell)));
-}
-
-/**
- * Throw unless the position is that of the top-left cell of the formula
- * group the cell belongs to.  A non-grouped cell always passes.
- */
-void check_group_parent_or_throw(
-    const char* func_name, const abs_address_t& pos, const formula_cell& cell)
-{
-    abs_address_t parent = cell.get_parent_position(pos);
-    if (parent == pos)
-        return;
-
-    throw formula_registration_error(std::format(
-        "{}: {} is not the top-left cell of its formula group starting at {}",
-        func_name, pos.get_name(), parent.get_name()));
-}
-
-/**
- * Get the range a formula cell occupies as a listener in the dependency
- * tracker.  For a grouped formula cell, it spans the whole group.
- */
-abs_range_t to_listener_range(const abs_address_t& pos, const formula_cell& cell)
-{
-    abs_range_t range = pos;
-
-    formula_group_t fg_props = cell.get_group_properties();
-    if (fg_props.grouped)
-    {
-        // Expand the source range for grouped formula cells.
-        range.last.column += fg_props.size.column - 1;
-        range.last.row += fg_props.size.row - 1;
-    }
-
-    return range;
-}
-
-/**
- * Normalize a range reference into the form the dependency tracker
- * accepts: expand a whole-column or whole-row reference to the sheet
- * size, and order the corners.
- */
-abs_range_t to_tracked_range(const model_context& cxt, abs_range_t range)
-{
-    rc_size_t sheet_size = cxt.get_sheet_size();
-    if (range.all_columns())
-    {
-        range.first.column = 0;
-        range.last.column = sheet_size.column - 1;
-    }
-    if (range.all_rows())
-    {
-        range.first.row = 0;
-        range.last.row = sheet_size.row - 1;
-    }
-    range.reorder();
-    return range;
-}
-
-}
-
 void register_formula_cell(
     model_context& cxt, const abs_address_t& pos, const formula_cell* cell)
 {
-#ifdef IXION_DEBUG_UTILS
-    if (cell)
-    {
-        const formula_cell* check = std::as_const(cxt).get_formula_cell(pos);
-        if (cell != check)
-        {
-            throw std::runtime_error(
-                "The cell instance passed to this call does not match the cell instance found at the specified position.");
-        }
-    }
-#endif
-
     if (!cell)
     {
         cell = std::as_const(cxt).get_formula_cell(pos);
@@ -388,56 +270,8 @@ void register_formula_cell(
             return;
     }
 
-    check_group_parent_or_throw("register_formula_cell", pos, *cell);
-
-    dirty_cell_tracker& tracker = cxt.get_cell_tracker();
-    abs_range_t src_pos = to_listener_range(pos, *cell);
-
-    IXION_TRACE("pos=" << pos.get_name()
-        << "; formula='" << detail::print_formula_expression(cxt, pos, *cell)
-        << "'");
-
-    std::vector<const formula_token*> ref_tokens = cell->get_ref_tokens(cxt, pos);
-
-    for (const formula_token* p : ref_tokens)
-    {
-        IXION_TRACE("ref token: " << detail::print_formula_token_repr(*p));
-
-        switch (p->opcode)
-        {
-            case fop_single_ref:
-            {
-                abs_address_t addr = std::get<address_t>(p->value).to_abs(pos);
-                check_sheet_or_throw("register_formula_cell", addr.sheet, cxt, pos, *cell);
-                tracker.add(src_pos, addr);
-                break;
-            }
-            case fop_range_ref:
-            {
-                abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
-                check_sheet_or_throw("register_formula_cell", range.first.sheet, cxt, pos, *cell);
-                tracker.add(src_pos, to_tracked_range(cxt, range));
-                break;
-            }
-            case fop_table_ref:
-            {
-                abs_range_t range = cxt.get_table_range(std::get<table_ref_t>(p->value), pos);
-                if (!range.valid())
-                    // silently ignore unresolvable table references.
-                    break;
-
-                tracker.add(src_pos, range);
-                break;
-            }
-            default:
-                ; // ignore the rest.
-        }
-    }
-
-    // Check if the cell is volatile.
-    const formula_tokens_store_ptr_t& ts = cell->get_tokens();
-    if (ts && has_volatile(ts->get()))
-        tracker.add_volatile(pos);
+    detail::validate_formula_registration(cxt, pos, *cell);
+    detail::apply_formula_registration(cxt, pos, *cell);
 }
 
 void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
@@ -449,51 +283,7 @@ void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
         // Not a formula cell. Bail out.
         return;
 
-    check_group_parent_or_throw("unregister_formula_cell", pos, *fcell);
-
-    dirty_cell_tracker& tracker = cxt.get_cell_tracker();
-    tracker.remove_volatile(pos);
-
-    abs_range_t src_pos = to_listener_range(pos, *fcell);
-
-    // Go through all its existing references, and remove
-    // itself as their listener.  This step is important
-    // especially during partial re-calculation.
-    std::vector<const formula_token*> ref_tokens = fcell->get_ref_tokens(cxt, pos);
-
-    for (const formula_token* p : ref_tokens)
-    {
-
-        switch (p->opcode)
-        {
-            case fop_single_ref:
-            {
-                abs_address_t addr = std::get<address_t>(p->value).to_abs(pos);
-                check_sheet_or_throw("unregister_formula_cell", addr.sheet, cxt, pos, *fcell);
-                tracker.remove(src_pos, addr);
-                break;
-            }
-            case fop_range_ref:
-            {
-                abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
-                check_sheet_or_throw("unregister_formula_cell", range.first.sheet, cxt, pos, *fcell);
-                tracker.remove(src_pos, to_tracked_range(cxt, range));
-                break;
-            }
-            case fop_table_ref:
-            {
-                abs_range_t range = cxt.get_table_range(std::get<table_ref_t>(p->value), pos);
-                if (!range.valid())
-                    // silently ignore unresolvable table references.
-                    break;
-
-                tracker.remove(src_pos, range);
-                break;
-            }
-            default:
-                ; // ignore the rest.
-        }
-    }
+    detail::remove_formula_registration(cxt, pos, *fcell);
 }
 
 abs_address_set_t query_dirty_cells(model_context& cxt, const abs_address_set_t& modified_cells)

@@ -14,6 +14,8 @@
 #include "ixion/cell.hpp"
 #include "ixion/cell_access.hpp"
 
+#include "formula_registration.hpp"
+
 #include <cstring>
 #include <format>
 #include <iterator>
@@ -105,27 +107,8 @@ struct document::impl
         auto res = cxt.append_sheet_copy(src, std::move(name));
 
         if (abs_range_t data_range = cxt.get_data_range(res.sheet); data_range.valid())
-        {
             // The copied formula cells are new to the dependency tracker.
-            auto cells = cxt.iterate_cells(
-                res.sheet, rc_direction_t::vertical, abs_rc_range_t(data_range));
-
-            for (const auto& cell : cells)
-            {
-                if (cell.type != cell_t::formula)
-                    continue;
-
-                const auto* fc = std::get<const formula_cell*>(cell.value);
-                abs_address_t pos(res.sheet, cell.row, cell.col);
-
-                // Registering the top-left cell of a group registers the
-                // entire group, so skip the other cells of the group.
-                if (fc->get_parent_position(pos) != pos)
-                    continue;
-
-                register_formula_cell(cxt, pos, fc);
-            }
-        }
+            detail::register_formula_cells(cxt, res.sheet, abs_rc_range_t(data_range));
 
         modified_formula_cells.insert(res.recalc_cells.begin(), res.recalc_cells.end());
         return res.sheet;
