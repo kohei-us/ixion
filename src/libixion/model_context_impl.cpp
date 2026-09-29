@@ -975,12 +975,17 @@ std::unique_ptr<iface::session_handler> model_context_impl::create_session_handl
     return mp_session_factory->create();
 }
 
-void model_context_impl::unregister_before_overwrite(
-    const abs_address_t& addr, const column_store_t::const_position_type& pos)
+mdds::mtv::position_hint model_context_impl::unregister_formula_cell(const abs_address_t& addr)
 {
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    const column_store_t& col_store = sheet.at(addr.column);
+    const mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
+    auto pos = col_store.position(pos_hint, addr.row);
+    mdds::mtv::position_hint found(pos.first);
+
     const formula_cell* fc = get_formula_cell(pos);
     if (!fc)
-        return;
+        return found;
 
     formula_group_t props = fc->get_group_properties();
     bool multi_cell_group = props.grouped && (1 < props.size.row || 1 < props.size.column);
@@ -994,16 +999,15 @@ void model_context_impl::unregister_before_overwrite(
     }
 
     remove_formula_registration(m_parent, addr, *fc);
+    return found;
 }
 
 void model_context_impl::empty_cell(const abs_address_t& addr)
 {
+    mdds::mtv::position_hint hint = unregister_formula_cell(addr);
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    pos_hint = col_store.set_empty(pos.first, addr.row, addr.row);
+    sheet.get_pos_hint(addr.column) = col_store.set_empty(hint, addr.row, addr.row);
 }
 
 void model_context_impl::empty_cells(const abs_range_t& range)
@@ -1027,36 +1031,40 @@ void model_context_impl::empty_cells(const abs_range_t& range)
 
 void model_context_impl::set_numeric_cell(const abs_address_t& addr, double val)
 {
-    sheet_store& sheet = m_sheets.at(addr.sheet);
-    column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    pos_hint = col_store.set(pos.first, addr.row, val);
+    mdds::mtv::position_hint hint = unregister_formula_cell(addr);
+    write_numeric_cell(hint, addr, val);
 }
 
 void model_context_impl::set_boolean_cell(const abs_address_t& addr, bool val)
 {
-    sheet_store& sheet = m_sheets.at(addr.sheet);
-    column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    pos_hint = col_store.set(pos.first, addr.row, val);
+    mdds::mtv::position_hint hint = unregister_formula_cell(addr);
+    write_boolean_cell(hint, addr, val);
 }
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, std::string_view s)
 {
-    sheet_store& sheet = m_sheets.at(addr.sheet);
-    string_view_store interned{m_inline_str_pool.intern(s)};
-    column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    pos_hint = col_store.set(pos.first, addr.row, interned);
+    mdds::mtv::position_hint hint = unregister_formula_cell(addr);
+    write_string_cell(hint, addr, s);
 }
 
 void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
+{
+    if (!n_dst)
+        // Destination cell length is 0.  Nothing to copy to.
+        return;
+
+    if (get_celltype(src) == cell_t::formula)
+        // TODO : support this.
+        throw not_implemented_error("filling down of a formula cell is not yet supported");
+
+    // The destination cells get overwritten.
+    abs_rc_range_t dst_range(src.row + 1, src.column, row_t(n_dst), 1);
+    unregister_formula_cells(m_parent, src.sheet, dst_range);
+
+    write_fill_down_cells(src, n_dst);
+}
+
+void model_context_impl::write_fill_down_cells(const abs_address_t& src, size_t n_dst)
 {
     if (!n_dst)
         // Destination cell length is 0.  Nothing to copy to.
@@ -1072,10 +1080,6 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
     if (it->type == element_type_formula)
         // TODO : support this.
         throw not_implemented_error("filling down of a formula cell is not yet supported");
-
-    // The destination cells get overwritten.
-    abs_rc_range_t dst_range(src.row + 1, src.column, row_t(n_dst), 1);
-    unregister_formula_cells(m_parent, src.sheet, dst_range);
 
     switch (it->type)
     {
@@ -1124,31 +1128,127 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
 
 void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
+    mdds::mtv::position_hint hint = unregister_formula_cell(addr);
+    write_string_cell(hint, addr, identifier);
+}
+
+#ifdef IXION_DEBUG_UTILS
+
+void model_context_impl::ensure_empty_or_throw(const abs_address_t& addr) const
+{
+    const sheet_store& sheet = m_sheets.at(addr.sheet);
+    const column_store_t& col_store = sheet.at(addr.column);
+    if (col_store.is_empty(addr.row))
+        return;
+
+    std::ostringstream os;
+    os << "a loader must not overwrite cells, but " << addr << " is not empty";
+    throw std::runtime_error(os.str());
+}
+
+void model_context_impl::ensure_empty_or_throw(const abs_range_t& range) const
+{
+    if (is_empty(range))
+        return;
+
+    std::ostringstream os;
+    os << "a loader must not overwrite cells, but " << range << " is not empty";
+    throw std::runtime_error(os.str());
+}
+
+#endif
+
+void model_context_impl::write_numeric_cell(const abs_address_t& addr, double val)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    write_numeric_cell(sheet.get_pos_hint(addr.column), addr, val);
+}
+
+void model_context_impl::write_numeric_cell(
+    mdds::mtv::position_hint hint, const abs_address_t& addr, double val)
+{
     sheet_store& sheet = m_sheets.at(addr.sheet);
     column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    pos_hint = col_store.set(pos.first, addr.row, identifier.value);
+    sheet.get_pos_hint(addr.column) = col_store.set(hint, addr.row, val);
+}
+
+void model_context_impl::write_boolean_cell(const abs_address_t& addr, bool val)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    write_boolean_cell(sheet.get_pos_hint(addr.column), addr, val);
+}
+
+void model_context_impl::write_boolean_cell(
+    mdds::mtv::position_hint hint, const abs_address_t& addr, bool val)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    column_store_t& col_store = sheet.at(addr.column);
+    sheet.get_pos_hint(addr.column) = col_store.set(hint, addr.row, val);
+}
+
+void model_context_impl::write_string_cell(const abs_address_t& addr, std::string_view s)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    write_string_cell(sheet.get_pos_hint(addr.column), addr, s);
+}
+
+void model_context_impl::write_string_cell(
+    mdds::mtv::position_hint hint, const abs_address_t& addr, std::string_view s)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    string_view_store interned{m_inline_str_pool.intern(s)};
+    column_store_t& col_store = sheet.at(addr.column);
+    sheet.get_pos_hint(addr.column) = col_store.set(hint, addr.row, interned);
+}
+
+void model_context_impl::write_string_cell(const abs_address_t& addr, string_id_t identifier)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    write_string_cell(sheet.get_pos_hint(addr.column), addr, identifier);
+}
+
+void model_context_impl::write_string_cell(
+    mdds::mtv::position_hint hint, const abs_address_t& addr, string_id_t identifier)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    column_store_t& col_store = sheet.at(addr.column);
+    sheet.get_pos_hint(addr.column) = col_store.set(hint, addr.row, identifier.value);
+}
+
+formula_cell* model_context_impl::write_formula_cell(
+    const abs_address_t& addr, std::unique_ptr<formula_cell> fcell)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    return write_formula_cell(sheet.get_pos_hint(addr.column), addr, std::move(fcell));
+}
+
+formula_cell* model_context_impl::write_formula_cell(
+    mdds::mtv::position_hint hint, const abs_address_t& addr, std::unique_ptr<formula_cell> fcell)
+{
+    sheet_store& sheet = m_sheets.at(addr.sheet);
+    column_store_t& col_store = sheet.at(addr.column);
+    formula_cell* p = fcell.release();
+    sheet.get_pos_hint(addr.column) = col_store.set(hint, addr.row, p);
+    return p;
+}
+
+formula_cell* model_context_impl::set_formula_cell(
+    const abs_address_t& addr, std::unique_ptr<formula_cell> fcell)
+{
+    // Reject the formula before touching the model.
+    std::vector<const formula_token*> ref_tokens =
+        validate_formula_registration(m_parent, addr, *fcell);
+
+    mdds::mtv::position_hint hint = unregister_formula_cell(addr);
+    formula_cell* p = write_formula_cell(hint, addr, std::move(fcell));
+    apply_formula_registration(m_parent, addr, *p, ref_tokens);
+    return p;
 }
 
 formula_cell* model_context_impl::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
-    std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
-
-    // Reject the formula before touching the model.
-    validate_formula_registration(m_parent, addr, *fcell);
-
-    sheet_store& sheet = m_sheets.at(addr.sheet);
-    column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    formula_cell* p = fcell.release();
-    pos_hint = col_store.set(pos.first, addr.row, p);
-    apply_formula_registration(m_parent, addr, *p);
-    return p;
+    return set_formula_cell(addr, std::make_unique<formula_cell>(tokens));
 }
 
 formula_cell* model_context_impl::set_formula_cell(
@@ -1156,48 +1256,18 @@ formula_cell* model_context_impl::set_formula_cell(
 {
     std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
     fcell->set_result_cache(std::move(result));
-
-    // Reject the formula before touching the model.
-    validate_formula_registration(m_parent, addr, *fcell);
-
-    sheet_store& sheet = m_sheets.at(addr.sheet);
-    column_store_t& col_store = sheet.at(addr.column);
-    mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
-    auto pos = std::as_const(col_store).position(pos_hint, addr.row);
-    unregister_before_overwrite(addr, pos);
-    formula_cell* p = fcell.release();
-    pos_hint = col_store.set(pos.first, addr.row, p);
-    apply_formula_registration(m_parent, addr, *p);
-    return p;
+    return set_formula_cell(addr, std::move(fcell));
 }
 
-void model_context_impl::set_grouped_formula_cells(
-    const abs_range_t& group_range, formula_tokens_t tokens)
+calc_status_ptr_t model_context_impl::create_group_status(const abs_range_t& group_range)
 {
-    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
-
     rc_size_t group_size = to_group_size(group_range);
-    calc_status_ptr_t cs(new calc_status(group_size));
-
-    // Reject the formula before touching the model, using a stand-in for
-    // the top-left cell of the group.
-    formula_cell parent(0, 0, cs, ts);
-    validate_formula_registration(m_parent, group_range.first, parent);
-
-    // This rejects a range covering only part of an existing formula group
-    // before anything gets modified.
-    unregister_formula_cells(m_parent, group_range.first.sheet, abs_rc_range_t(group_range));
-
-    formula_cell* p = set_grouped_formula_cells_to_workbook(
-        m_sheets, group_range.first, group_size, cs, ts);
-    apply_formula_registration(m_parent, group_range.first, *p);
+    return calc_status_ptr_t(new calc_status(group_size));
 }
 
-void model_context_impl::set_grouped_formula_cells(
-    const abs_range_t& group_range, formula_tokens_t tokens, formula_result result)
+calc_status_ptr_t model_context_impl::create_group_status(
+    const abs_range_t& group_range, formula_result result)
 {
-    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
-
     rc_size_t group_size = to_group_size(group_range);
 
     if (result.get_type() != formula_result::result_type::matrix)
@@ -1208,19 +1278,50 @@ void model_context_impl::set_grouped_formula_cells(
 
     calc_status_ptr_t cs(new calc_status(group_size));
     cs->result = std::make_unique<formula_result>(std::move(result));
+    return cs;
+}
 
+formula_cell* model_context_impl::write_formula_group(
+    const abs_range_t& group_range, const calc_status_ptr_t& cs,
+    const formula_tokens_store_ptr_t& ts)
+{
+    return set_grouped_formula_cells_to_workbook(
+        m_sheets, group_range.first, to_group_size(group_range), cs, ts);
+}
+
+void model_context_impl::set_formula_group(
+    const abs_range_t& group_range, const calc_status_ptr_t& cs,
+    const formula_tokens_store_ptr_t& ts)
+{
     // Reject the formula before touching the model, using a stand-in for
-    // the top-left cell of the group.
+    // the top-left cell of the group.  The reference tokens point into the
+    // shared token store, so they outlive the stand-in.
     formula_cell parent(0, 0, cs, ts);
-    validate_formula_registration(m_parent, group_range.first, parent);
+    std::vector<const formula_token*> ref_tokens =
+        validate_formula_registration(m_parent, group_range.first, parent);
 
     // This rejects a range covering only part of an existing formula group
     // before anything gets modified.
     unregister_formula_cells(m_parent, group_range.first.sheet, abs_rc_range_t(group_range));
 
-    formula_cell* p = set_grouped_formula_cells_to_workbook(
-        m_sheets, group_range.first, group_size, cs, ts);
-    apply_formula_registration(m_parent, group_range.first, *p);
+    formula_cell* p = write_formula_group(group_range, cs, ts);
+    apply_formula_registration(m_parent, group_range.first, *p, ref_tokens);
+}
+
+void model_context_impl::set_grouped_formula_cells(
+    const abs_range_t& group_range, formula_tokens_t tokens)
+{
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
+    calc_status_ptr_t cs = create_group_status(group_range);
+    set_formula_group(group_range, cs, ts);
+}
+
+void model_context_impl::set_grouped_formula_cells(
+    const abs_range_t& group_range, formula_tokens_t tokens, formula_result result)
+{
+    formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
+    calc_status_ptr_t cs = create_group_status(group_range, std::move(result));
+    set_formula_group(group_range, cs, ts);
 }
 
 abs_rc_range_t model_context_impl::get_data_range(sheet_t sheet) const

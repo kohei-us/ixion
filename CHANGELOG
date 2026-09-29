@@ -33,6 +33,11 @@ ixion 0.21.0
 
   * added model_context::empty_cells() which empties a range of cells.
 
+  * added model_context_loader, a replacement for model_context while
+    loading content in bulk, as when importing a file.  It sets formula
+    cells without registering them until finalize(), so they don't
+    depend on named expressions and tables being loaded first.
+
   * removed the circular_dependency and not_implemented values from
     model_context_error::error_type, which were never thrown.
 

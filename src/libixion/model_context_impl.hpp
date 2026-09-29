@@ -16,6 +16,7 @@
 #include "sheet_store.hpp"
 #include "table_store.hpp"
 #include "column_store_type.hpp"
+#include "calc_status.hpp"
 #include "string_id_pool.hpp"
 #include "inline_string_pool.hpp"
 #include "deprecated.hpp"
@@ -102,6 +103,57 @@ public:
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens, formula_result result);
+
+    /**
+     * The write_*() functions below write and nothing else: no validation,
+     * no registration, and no unregistration of whatever gets replaced.
+     * The set_*() functions above build on them; model_context_loader calls
+     * them directly.  The overloads taking a position hint write with that
+     * hint instead of the column's stored one, for a caller that has just
+     * looked the cell up.
+     */
+    void write_numeric_cell(const abs_address_t& addr, double val);
+    void write_numeric_cell(mdds::mtv::position_hint hint, const abs_address_t& addr, double val);
+    void write_boolean_cell(const abs_address_t& addr, bool val);
+    void write_boolean_cell(mdds::mtv::position_hint hint, const abs_address_t& addr, bool val);
+    void write_string_cell(const abs_address_t& addr, std::string_view s);
+    void write_string_cell(
+        mdds::mtv::position_hint hint, const abs_address_t& addr, std::string_view s);
+    void write_string_cell(const abs_address_t& addr, string_id_t identifier);
+    void write_string_cell(
+        mdds::mtv::position_hint hint, const abs_address_t& addr, string_id_t identifier);
+    void write_fill_down_cells(const abs_address_t& src, size_t n_dst);
+
+    formula_cell* write_formula_cell(
+        const abs_address_t& addr, std::unique_ptr<formula_cell> fcell);
+    formula_cell* write_formula_cell(
+        mdds::mtv::position_hint hint, const abs_address_t& addr,
+        std::unique_ptr<formula_cell> fcell);
+
+#ifdef IXION_DEBUG_UTILS
+    /** Throw unless the cell is empty; for model_context_loader's contract. */
+    void ensure_empty_or_throw(const abs_address_t& addr) const;
+    /** Throw unless every cell in the range is empty. */
+    void ensure_empty_or_throw(const abs_range_t& range) const;
+#endif
+
+    /** Write a group of formula cells, and return its top-left cell. */
+    formula_cell* write_formula_group(
+        const abs_range_t& group_range, const calc_status_ptr_t& cs,
+        const formula_tokens_store_ptr_t& ts);
+
+    /** Create the calculation status shared by the cells of a formula group. */
+    static calc_status_ptr_t create_group_status(const abs_range_t& group_range);
+
+    /**
+     * Create the calculation status shared by the cells of a formula group,
+     * with a cached result.
+     *
+     * @throw std::invalid_argument When the result is not a matrix, or its
+     *                              dimensions differ from those of the group.
+     */
+    static calc_status_ptr_t create_group_status(
+        const abs_range_t& group_range, formula_result result);
 
     abs_rc_range_t get_data_range(sheet_t sheet) const;
 
@@ -219,9 +271,25 @@ private:
      * Unregister the formula cell at a position about to be overwritten, if
      * there is one.  Throws if the cell belongs to a formula group of more
      * than one cell, which can only be overwritten as a whole.
+     *
+     * @return Position hint pointing at the block the cell is in, for the
+     *         write that follows.
      */
-    void unregister_before_overwrite(
-        const abs_address_t& addr, const column_store_t::const_position_type& pos);
+    mdds::mtv::position_hint unregister_formula_cell(const abs_address_t& addr);
+
+    /**
+     * Validate a formula cell, unregister the formula cell it replaces, write
+     * it, and register it with the dirty cell tracker.
+     */
+    formula_cell* set_formula_cell(const abs_address_t& addr, std::unique_ptr<formula_cell> fcell);
+
+    /**
+     * Validate a formula group, unregister the formula cells it replaces,
+     * write it, and register it with the dirty cell tracker.
+     */
+    void set_formula_group(
+        const abs_range_t& group_range, const calc_status_ptr_t& cs,
+        const formula_tokens_store_ptr_t& ts);
 
 private:
     model_context& m_parent;

@@ -270,8 +270,9 @@ void register_formula_cell(
             return;
     }
 
-    detail::validate_formula_registration(cxt, pos, *cell);
-    detail::apply_formula_registration(cxt, pos, *cell);
+    std::vector<const formula_token*> ref_tokens =
+        detail::validate_formula_registration(cxt, pos, *cell);
+    detail::apply_formula_registration(cxt, pos, *cell, ref_tokens);
 }
 
 void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)

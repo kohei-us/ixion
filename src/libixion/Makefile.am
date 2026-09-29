@@ -22,8 +22,8 @@ endif # BUILD_VULKAN
 check_PROGRAMS = \
 	column-store-test \
 	document-test \
-	formula-registration-test \
 	general-test \
+	model-context-loader-test \
 	model-context-test \
 	sheet-sort-test \
 	sheet-view-test \
@@ -81,6 +81,7 @@ libixion_@IXION_API_VERSION@_la_SOURCES = \
 	model_context.cpp \
 	model_context_impl.hpp \
 	model_context_impl.cpp \
+	model_context_loader.cpp \
 	string_id_pool.hpp \
 	string_id_pool.cpp \
 	inline_string_pool.hpp \
@@ -160,24 +161,16 @@ document_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
 	../test/libixion-test.a
 
-# The tested functions are internal to the library and their symbols stay
-# hidden, so their sources get compiled into the test binary directly.
-formula_registration_test_SOURCES = \
-	formula_registration_test.cpp \
-	formula_registration.cpp \
-	debug.cpp
-# Give the target its own flags so that the sources shared with the library
-# compile into their own objects.
-formula_registration_test_CPPFLAGS = $(AM_CPPFLAGS)
-formula_registration_test_LDADD = \
-	libixion-@IXION_API_VERSION@.la \
-	../test/libixion-test.a
-
 general_test_SOURCES = general_test.cpp
 general_test_LDADD = \
 	libixion-@IXION_API_VERSION@.la \
 	../test/libixion-test.a \
 	$(BOOST_PROGRAM_OPTIONS_LIBS)
+
+model_context_loader_test_SOURCES = model_context_loader_test.cpp
+model_context_loader_test_LDADD = \
+	libixion-@IXION_API_VERSION@.la \
+	../test/libixion-test.a
 
 model_context_test_SOURCES = model_context_test.cpp
 model_context_test_LDADD = \
@@ -235,8 +228,8 @@ AM_TESTS_ENVIRONMENT =
 TESTS = \
 	column-store-test \
 	document-test \
-	formula-registration-test \
 	general-test \
+	model-context-loader-test \
 	model-context-test \
 	sheet-sort-test \
 	sheet-view-test \

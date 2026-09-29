@@ -25,6 +25,7 @@ libixion_HEADERS = \
 	matrix.hpp \
 	model_cell_range.hpp \
 	model_context.hpp \
+	model_context_loader.hpp \
 	model_iterator.hpp \
 	module.hpp \
 	named_expressions_iterator.hpp \

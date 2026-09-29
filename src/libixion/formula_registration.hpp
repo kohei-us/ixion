@@ -9,16 +9,24 @@
 
 #include <ixion/address.hpp>
 
+#include <vector>
+
 namespace ixion {
 
 class formula_cell;
 class model_context;
+struct formula_token;
 
 namespace detail {
 
 /**
- * Check that a formula cell can be registered with the dependency tracker.
- * Nothing gets modified, so the cell doesn't have to be in the model yet.
+ * Check that a formula cell can be registered with the dependency tracker,
+ * and collect the references to register it with, including those reached
+ * through named expressions.  Nothing gets modified, so the cell doesn't
+ * have to be in the model yet.
+ *
+ * @return Reference tokens of the formula, to pass to
+ *         apply_formula_registration().
  *
  * @throw model_context_error If the position is that of a grouped cell other
  *                            than the top-left cell of its group
@@ -26,16 +34,17 @@ namespace detail {
  *                            formula points at an invalid sheet
  *                            (invalid_sheet_reference).
  */
-void validate_formula_registration(
+std::vector<const formula_token*> validate_formula_registration(
     const model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
 
 /**
  * Register a formula cell with the dependency tracker.  The cell must be in
- * the model at the specified position, and must have passed
- * validate_formula_registration(); nothing gets checked here.
+ * the model at the specified position, and the reference tokens must come
+ * from validate_formula_registration() on it; nothing gets checked here.
  */
 void apply_formula_registration(
-    model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
+    model_context& cxt, const abs_address_t& pos, const formula_cell& cell,
+    const std::vector<const formula_token*>& ref_tokens);
 
 /**
  * Unregister a formula cell from the dependency tracker.

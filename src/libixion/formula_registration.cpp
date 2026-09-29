@@ -76,6 +76,33 @@ void check_sheet_or_throw(
 }
 
 /**
+ * Throw if a reference token points at an invalid sheet.  Tokens other than
+ * references pass.
+ */
+void check_ref_sheet_or_throw(
+    const char* func_name, const formula_token& token, const model_context& cxt,
+    const abs_address_t& pos, const formula_cell& cell)
+{
+    switch (token.opcode)
+    {
+        case fop_single_ref:
+        {
+            abs_address_t addr = std::get<address_t>(token.value).to_abs(pos);
+            check_sheet_or_throw(func_name, addr.sheet, cxt, pos, cell);
+            break;
+        }
+        case fop_range_ref:
+        {
+            abs_range_t range = std::get<range_t>(token.value).to_abs(pos);
+            check_sheet_or_throw(func_name, range.first.sheet, cxt, pos, cell);
+            break;
+        }
+        default:
+            ; // ignore the rest.
+    }
+}
+
+/**
  * Throw unless the position is that of the top-left cell of the formula
  * group the cell belongs to.  A non-grouped cell always passes.
  */
@@ -188,37 +215,22 @@ std::vector<formula_cell_entry> collect_formula_cells(
 
 }
 
-void validate_formula_registration(
+std::vector<const formula_token*> validate_formula_registration(
     const model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
 {
     check_group_parent_or_throw("validate_formula_registration", pos, cell);
 
-    for (const formula_token* p : cell.get_ref_tokens(cxt, pos))
-    {
-        switch (p->opcode)
-        {
-            case fop_single_ref:
-            {
-                abs_address_t addr = std::get<address_t>(p->value).to_abs(pos);
-                check_sheet_or_throw(
-                    "validate_formula_registration", addr.sheet, cxt, pos, cell);
-                break;
-            }
-            case fop_range_ref:
-            {
-                abs_range_t range = std::get<range_t>(p->value).to_abs(pos);
-                check_sheet_or_throw(
-                    "validate_formula_registration", range.first.sheet, cxt, pos, cell);
-                break;
-            }
-            default:
-                ; // ignore the rest.
-        }
-    }
+    std::vector<const formula_token*> ref_tokens = cell.get_ref_tokens(cxt, pos);
+
+    for (const formula_token* p : ref_tokens)
+        check_ref_sheet_or_throw("validate_formula_registration", *p, cxt, pos, cell);
+
+    return ref_tokens;
 }
 
 void apply_formula_registration(
-    model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
+    model_context& cxt, const abs_address_t& pos, const formula_cell& cell,
+    const std::vector<const formula_token*>& ref_tokens)
 {
 #ifdef IXION_DEBUG_UTILS
     const formula_cell* check = std::as_const(cxt).get_formula_cell(pos);
@@ -237,7 +249,7 @@ void apply_formula_registration(
         << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
         << "'");
 
-    for (const formula_token* p : cell.get_ref_tokens(cxt, pos))
+    for (const formula_token* p : ref_tokens)
     {
         IXION_TRACE("ref token: " << detail::print_formula_token_repr(*p));
 
@@ -331,11 +343,17 @@ void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_rang
 
     // Validate every cell before registering any of them, so that a
     // rejected cell leaves the tracker unchanged.
-    for (const auto& [pos, fc] : entries)
-        validate_formula_registration(cxt, pos, *fc);
+    std::vector<std::vector<const formula_token*>> ref_tokens;
+    ref_tokens.reserve(entries.size());
 
     for (const auto& [pos, fc] : entries)
-        apply_formula_registration(cxt, pos, *fc);
+        ref_tokens.push_back(validate_formula_registration(cxt, pos, *fc));
+
+    for (std::size_t i = 0; i < entries.size(); ++i)
+    {
+        const auto& [pos, fc] = entries[i];
+        apply_formula_registration(cxt, pos, *fc, ref_tokens[i]);
+    }
 }
 
 void unregister_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range)

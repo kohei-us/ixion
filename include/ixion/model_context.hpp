@@ -27,6 +27,7 @@ class formula_name_resolver;
 class formula_result;
 class matrix;
 class model_cell_range;
+class model_context_loader;
 class model_iterator;
 class named_expressions_iterator;
 class named_expressions_range;
@@ -69,6 +70,7 @@ class IXION_DLLPUBLIC model_context final
 {
     friend class named_expressions_iterator;
     friend class cell_access;
+    friend class model_context_loader;
 
     std::unique_ptr<detail::model_context_impl> mp_impl;
 

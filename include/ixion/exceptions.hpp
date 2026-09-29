@@ -124,7 +124,9 @@ public:
         /** A formula references a sheet that does not exist. */
         invalid_sheet_reference,
         /** A write covers only part of a formula group. */
-        partial_formula_group
+        partial_formula_group,
+        /** A model_context_loader got finalized a second time. */
+        loader_already_finalized
     };
 
     /**

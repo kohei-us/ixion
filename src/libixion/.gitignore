@@ -2,9 +2,9 @@ column-store-test
 compute-engine-test
 dirty-cell-tracker-test
 document-test
-formula-registration-test
 general-test
 ixion-test-track-deps
+model-context-loader-test
 model-context-test
 name-resolver-test
 sheet-sort-test
