@@ -14,8 +14,6 @@
 #include "ixion/cell.hpp"
 #include "ixion/cell_access.hpp"
 
-#include "formula_registration.hpp"
-
 #include <cstring>
 #include <format>
 #include <iterator>
@@ -105,11 +103,6 @@ struct document::impl
     sheet_t append_sheet_copy(sheet_t src, std::string name)
     {
         auto res = cxt.append_sheet_copy(src, std::move(name));
-
-        if (abs_rc_range_t data_range = cxt.get_data_range(res.sheet); data_range.valid())
-            // The copied formula cells are new to the dependency tracker.
-            detail::register_formula_cells(cxt, res.sheet, data_range);
-
         modified_formula_cells.insert(res.recalc_cells.begin(), res.recalc_cells.end());
         return res.sheet;
     }
@@ -128,7 +121,6 @@ struct document::impl
     void set_numeric_cell(const cell_pos& pos, double val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
-        unregister_formula_cell(cxt, addr);
         cxt.set_numeric_cell(addr, val);
         modified_cells.insert(addr);
     }
@@ -136,7 +128,6 @@ struct document::impl
     void set_string_cell(const cell_pos& pos, std::string_view s)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
-        unregister_formula_cell(cxt, addr);
         cxt.set_string_cell(addr, s);
         modified_cells.insert(addr);
     }
@@ -144,7 +135,6 @@ struct document::impl
     void set_boolean_cell(const cell_pos& pos, bool val)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
-        unregister_formula_cell(cxt, addr);
         cxt.set_boolean_cell(addr, val);
         modified_cells.insert(addr);
     }
@@ -152,7 +142,6 @@ struct document::impl
     void empty_cell(const cell_pos& pos)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
-        unregister_formula_cell(cxt, addr);
         cxt.empty_cell(addr);
         modified_cells.insert(addr);
     }
@@ -172,10 +161,8 @@ struct document::impl
     void set_formula_cell(const cell_pos& pos, std::string_view formula)
     {
         abs_address_t addr = to_address(cxt, *resolver, pos);
-        unregister_formula_cell(cxt, addr);
         auto tokens = parse_formula_string(cxt, addr, *resolver, formula);
-        formula_cell* fc = cxt.set_formula_cell(addr, std::move(tokens));
-        register_formula_cell(cxt, addr, fc);
+        cxt.set_formula_cell(addr, std::move(tokens));
         modified_formula_cells.insert(addr);
     }
 

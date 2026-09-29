@@ -670,14 +670,12 @@ void model_parser::parse_edit()
         const abs_address_t& pos = cell_def.pos.first;
 
         m_modified_cells.insert(pos);
-        unregister_formula_cell(m_context, pos);
 
         formula_tokens_t tokens =
             parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
         m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_formula_cells.insert(cell_def.pos);
-        register_formula_cell(m_context, pos);
         return;
     }
 
@@ -686,7 +684,6 @@ void model_parser::parse_edit()
     for (const abs_address_t& pos : iter)
     {
         m_modified_cells.insert(pos);
-        unregister_formula_cell(m_context, pos);
 
         if (cell_def.value.empty())
         {
@@ -706,7 +703,6 @@ void model_parser::parse_edit()
                 auto ts = formula_tokens_store::create(std::move(tokens));
                 m_context.set_formula_cell(pos, ts);
                 m_dirty_formula_cells.insert(pos);
-                register_formula_cell(m_context, pos);
                 std::cout << get_display_cell_string(pos) << ": (f) " << cell_def.value << std::endl;
                 break;
             }
@@ -867,29 +863,6 @@ void model_parser::copy_sheet(std::string_view src_name, std::string_view new_na
     std::cout << "new: " << new_name << std::endl;
 
     auto res = m_context.append_sheet_copy(src, std::string{new_name});
-
-    // The copied formula cells are new to the dependency tracker.
-    if (abs_rc_range_t data_range = m_context.get_data_range(res.sheet); data_range.valid())
-    {
-        auto cells = m_context.iterate_cells(res.sheet, rc_direction_t::vertical, data_range);
-
-        for (const auto& cell : cells)
-        {
-            if (cell.type != cell_t::formula)
-                continue;
-
-            const auto* fc = std::get<const formula_cell*>(cell.value);
-            abs_address_t pos(res.sheet, cell.row, cell.col);
-
-            // Registering the top-left cell of a group registers the entire
-            // group, so skip the other cells of the group.
-            if (fc->get_parent_position(pos) != pos)
-                continue;
-
-            register_formula_cell(m_context, pos, fc);
-        }
-    }
-
     m_dirty_formula_cells.insert(res.recalc_cells.begin(), res.recalc_cells.end());
 }
 

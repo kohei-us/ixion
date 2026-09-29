@@ -125,10 +125,10 @@ IXION_DLLPUBLIC std::string print_formula_token(
  *             object will be fetched from the address of the cell.  But
  *             passing a pointer will save the overhead of fetching.
  *
- * @throw formula_registration_error If the position is that of a grouped
- *                                   cell other than the top-left cell of its
- *                                   group, or a reference in the formula
- *                                   points at an invalid sheet.
+ * @throw model_context_error If the position is that of a grouped cell other
+ *                            than the top-left cell of its group, or a
+ *                            reference in the formula points at an invalid
+ *                            sheet.
  */
 void IXION_DLLPUBLIC register_formula_cell(
     model_context& cxt, const abs_address_t& pos, const formula_cell* cell = nullptr);
@@ -144,10 +144,10 @@ void IXION_DLLPUBLIC register_formula_cell(
  *            cells, the position must be that of the top-left cell of that
  *            group, which unregisters the whole group.
  *
- * @throw formula_registration_error If the position is that of a grouped
- *                                   cell other than the top-left cell of its
- *                                   group, or a reference in the formula
- *                                   points at an invalid sheet.
+ * @throw model_context_error If the position is that of a grouped cell other
+ *                            than the top-left cell of its group, or a
+ *                            reference in the formula points at an invalid
+ *                            sheet.
  */
 void IXION_DLLPUBLIC unregister_formula_cell(model_context& cxt, const abs_address_t& pos);
 

@@ -24,6 +24,15 @@ ixion 0.21.0
   * model_context::get_data_range() now returns abs_rc_range_t instead
     of abs_range_t, since the sheet index is already an input.
 
+  * model_context now registers a formula cell with the dirty cell
+    tracker when the cell gets set, and unregisters it when the cell
+    gets overwritten or emptied.  Callers no longer need to call
+    register_formula_cell() and unregister_formula_cell().  A cell
+    that belongs to a formula group of more than one cell can no longer
+    be overwritten or emptied on its own.
+
+  * added model_context::empty_cells() which empties a range of cells.
+
   * removed the circular_dependency and not_implemented values from
     model_context_error::error_type, which were never thrown.
 

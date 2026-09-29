@@ -120,7 +120,11 @@ public:
         /** A table by the same name already exists. */
         table_name_conflict,
         /** A view by the same name already exists on the sheet. */
-        sheet_view_name_conflict
+        sheet_view_name_conflict,
+        /** A formula references a sheet that does not exist. */
+        invalid_sheet_reference,
+        /** A write covers only part of a formula group. */
+        partial_formula_group
     };
 
     /**

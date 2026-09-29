@@ -10,7 +10,6 @@
 
 #include <ixion/model_context.hpp>
 #include <ixion/formula.hpp>
-#include <ixion/formula_tokens.hpp>
 #include <ixion/formula_name_resolver.hpp>
 #include <ixion/dirty_cell_tracker.hpp>
 #include <ixion/exceptions.hpp>
@@ -23,7 +22,7 @@ using namespace ixion;
 namespace {
 
 /**
- * Insert a formula cell without registering it.
+ * Insert a formula cell.  The model registers it on its own.
  */
 void insert_formula(
     model_context& cxt, const formula_name_resolver& resolver, const abs_address_t& pos,
@@ -35,7 +34,7 @@ void insert_formula(
 }
 
 /**
- * Insert grouped formula cells without registering them.
+ * Insert grouped formula cells.  The model registers them on its own.
  */
 void insert_grouped_formula(
     model_context& cxt, const formula_name_resolver& resolver, const abs_range_t& range,
@@ -57,8 +56,7 @@ abs_range_set_t query_listeners_of_A1(const model_context& cxt)
 
 /**
  * Fill a model with values in A1:B2, a formula in D1 and a 2x2 formula
- * group in E1:F2, both referencing A1.  None of the formula cells get
- * registered.
+ * group in E1:F2, both referencing A1.
  */
 void populate_model(model_context& cxt, const formula_name_resolver& resolver)
 {
@@ -83,11 +81,13 @@ void test_register_range()
     model_context cxt;
     auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     populate_model(cxt, *resolver);
-    assert(cxt.get_cell_tracker().empty());
 
     abs_range_t D1(0, 0, 3);
     abs_range_t E1F2({0, 0, 4}, {0, 1, 5});
     abs_rc_range_t data_range = cxt.get_data_range(0);
+
+    detail::unregister_formula_cells(cxt, 0, data_range);
+    assert(cxt.get_cell_tracker().empty());
 
     detail::register_formula_cells(cxt, 0, data_range);
 
@@ -95,42 +95,6 @@ void test_register_range()
     assert(listeners.size() == 2);
     assert(listeners.count(D1) == 1);
     assert(listeners.count(E1F2) == 1);
-
-    detail::unregister_formula_cells(cxt, 0, data_range);
-    assert(cxt.get_cell_tracker().empty());
-}
-
-void test_register_range_invalid_cell()
-{
-    IXION_TEST_FUNC_SCOPE;
-
-    model_context cxt;
-    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
-    populate_model(cxt, *resolver);
-
-    // The parser rejects an unknown sheet name, so build a reference to
-    // the sheet before the first one by hand.  It fails validation.
-    abs_address_t D2(0, 1, 3);
-    address_t ref(-1, 0, 0, false, false, false);
-    formula_tokens_t tokens;
-    tokens.emplace_back(ref);
-    auto ts = formula_tokens_store::create(std::move(tokens));
-    cxt.set_formula_cell(D2, ts);
-
-    abs_rc_range_t data_range = cxt.get_data_range(0);
-
-    try
-    {
-        detail::register_formula_cells(cxt, 0, data_range);
-        assert(!"registration of an invalid cell should have failed");
-    }
-    catch (const formula_registration_error&)
-    {
-        // expected.
-    }
-
-    // The valid cells didn't get registered either.
-    assert(cxt.get_cell_tracker().empty());
 }
 
 void test_unregister_partial_group()
@@ -143,9 +107,7 @@ void test_unregister_partial_group()
 
     abs_range_t D1(0, 0, 3);
     abs_range_t E1F2({0, 0, 4}, {0, 1, 5});
-    abs_rc_range_t data_range = cxt.get_data_range(0);
 
-    detail::register_formula_cells(cxt, 0, data_range);
     assert(query_listeners_of_A1(cxt).size() == 2);
 
     // E1:E2 contains the top-left cell of the group, but not the whole
@@ -162,7 +124,7 @@ void test_unregister_partial_group()
             detail::unregister_formula_cells(cxt, 0, partial);
             assert(!"unregistering part of a group should have failed");
         }
-        catch (const formula_registration_error&)
+        catch (const model_context_error&)
         {
             // expected.
         }
@@ -180,7 +142,7 @@ void test_unregister_partial_group()
         detail::register_formula_cells(cxt, 0, E1E2);
         assert(!"registering part of a group should have failed");
     }
-    catch (const formula_registration_error&)
+    catch (const model_context_error&)
     {
         // expected.
     }
@@ -198,7 +160,6 @@ void test_unregister_partial_group()
 int main()
 {
     test_register_range();
-    test_register_range_invalid_cell();
     test_unregister_partial_group();
 
     return EXIT_SUCCESS;

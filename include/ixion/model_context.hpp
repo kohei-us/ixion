@@ -59,9 +59,11 @@ class sheet_view;
  * during calculation.  It holds only what the formula engine needs in
  * order to perform a full calculation.
  *
- * @note Overwriting or emptying a formula cell does not remove it from the
- *       dirty cell tracker.  Call unregister_formula_cell() on the cell
- *       before replacing its content.
+ * @note Setting a formula cell registers it with the dirty cell tracker, and
+ *       overwriting or emptying a formula cell unregisters it.  A cell that
+ *       belongs to a formula group of more than one cell cannot be
+ *       overwritten or emptied on its own; the whole group has to be
+ *       replaced or emptied at once.
  */
 class IXION_DLLPUBLIC model_context final
 {
@@ -568,14 +570,33 @@ public:
      * Empty a cell, discarding whatever value it holds.
      *
      * @param addr Position of the cell.
+     *
+     * @throw model_context_error When the cell belongs to a formula group of
+     *                            more than one cell.
      */
     void empty_cell(const abs_address_t& addr);
+
+    /**
+     * Empty a range of cells, discarding whatever values they hold.  A
+     * formula group inside the range gets emptied as a whole.
+     *
+     * @param range Range to empty.  It must be on one sheet, with all
+     *              corners set.
+     *
+     * @throw model_context_error When a formula group lies only partly
+     *                            inside the range.
+     * @throw std::invalid_argument When the range spans multiple sheets.
+     */
+    void empty_cells(const abs_range_t& range);
 
     /**
      * Set a numeric value to a cell, replacing its current content.
      *
      * @param addr Position of the cell.
      * @param val Numeric value.
+     *
+     * @throw model_context_error When the cell belongs to a formula group of
+     *                            more than one cell.
      */
     void set_numeric_cell(const abs_address_t& addr, double val);
 
@@ -584,6 +605,9 @@ public:
      *
      * @param adr Position of the cell.
      * @param val Boolean value.
+     *
+     * @throw model_context_error When the cell belongs to a formula group of
+     *                            more than one cell.
      */
     void set_boolean_cell(const abs_address_t& adr, bool val);
 
@@ -594,6 +618,9 @@ public:
      *
      * @param addr Position of the cell.
      * @param s String value.
+     *
+     * @throw model_context_error When the cell belongs to a formula group of
+     *                            more than one cell.
      */
     void set_string_cell(const abs_address_t& addr, std::string_view s);
 
@@ -604,6 +631,9 @@ public:
      * @param addr Position of the cell.
      * @param identifier Identifier of the string, as returned by
      *                   append_string() or add_string().
+     *
+     * @throw model_context_error When the cell belongs to a formula group of
+     *                            more than one cell.
      */
     void set_string_cell(const abs_address_t& addr, string_id_t identifier);
 
@@ -623,6 +653,9 @@ public:
      * @param src position of the source cell to copy the value from.
      * @param n_dst number of cells below to copy the value to.  It must be at
      *              least one.
+     *
+     * @throw model_context_error When a formula group lies only partly
+     *                            inside the destination cells.
      */
     void fill_down_cells(const abs_address_t& src, size_t n_dst);
 
@@ -633,6 +666,11 @@ public:
      * @param tokens formula tokens to put into the formula cell.
      *
      * @return pointer to the formula cell instance inserted into the model.
+     *
+     * @throw model_context_error When a reference in the formula points at an
+     *                            invalid sheet, or the cell belongs to a
+     *                            formula group of more than one cell.  The
+     *                            model stays unchanged.
      */
     formula_cell* set_formula_cell(const abs_address_t& addr, formula_tokens_t tokens);
 
@@ -645,6 +683,11 @@ public:
      * @param tokens formula tokens to put into the formula cell.
      *
      * @return pointer to the formula cell instance inserted into the model.
+     *
+     * @throw model_context_error When a reference in the formula points at an
+     *                            invalid sheet, or the cell belongs to a
+     *                            formula group of more than one cell.  The
+     *                            model stays unchanged.
      */
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens);
 
@@ -658,6 +701,11 @@ public:
      * @param result cached result of this formula cell.
      *
      * @return pointer to the formula cell instance inserted into the model.
+     *
+     * @throw model_context_error When a reference in the formula points at an
+     *                            invalid sheet, or the cell belongs to a
+     *                            formula group of more than one cell.  The
+     *                            model stays unchanged.
      */
     formula_cell* set_formula_cell(const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens, formula_result result);
 
@@ -666,12 +714,16 @@ public:
      * range.  This is how an array formula is stored: the tokens get
      * interpreted once, at the top-left cell of the group, and each cell of
      * the group takes its own element of the resulting matrix as its value.
-     * Register the group with the dirty cell tracker through its top-left
-     * cell.
+     * The group gets registered with the dirty cell tracker as a whole.
      *
      * @param group_range Range of the group.  It must be on one sheet.
      * @param tokens Formula tokens shared by all cells of the group.  They
      *               are relative to the top-left cell of the group.
+     *
+     * @throw model_context_error When a reference in the formula points at an
+     *                            invalid sheet, or an existing formula group
+     *                            lies only partly inside the range.  The
+     *                            model stays unchanged.
      */
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
 
@@ -687,6 +739,10 @@ public:
      *
      * @throw std::invalid_argument When the result is not a matrix, or its
      *                              dimensions differ from those of the group.
+     * @throw model_context_error When a reference in the formula points at an
+     *                            invalid sheet, or an existing formula group
+     *                            lies only partly inside the range.  The
+     *                            model stays unchanged.
      */
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens, formula_result result);
 
@@ -793,11 +849,10 @@ public:
      * formula cell whose table references get rewritten receives its own
      * new token store instead of sharing one with its source cell.
      *
-     * Note that the formula cells of the new sheet do not get registered for
-     * dependency tracking; that remains the responsibility of the caller.
-     * The formula cells whose carried-over results may no longer be valid on
-     * the new sheet get reported in the returned result object; the caller
-     * should have them re-calculated.
+     * The formula cells of the new sheet get registered for dependency
+     * tracking.  The formula cells whose carried-over results may no longer
+     * be valid on the new sheet get reported in the returned result object;
+     * the caller should have them re-calculated.
      *
      * @param src Index of the sheet to copy.
      * @param name Name of the sheet to be inserted.  The caller must ensure

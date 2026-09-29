@@ -160,9 +160,6 @@ PyObject* sheet_set_formula_cell(sheet* self, PyObject* args, PyObject* kwargs)
     auto ts = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(pos, ts);
 
-    // Put this formula cell in a dependency chain.
-    ixion::register_formula_cell(cxt, pos);
-
     Py_INCREF(Py_None);
     return Py_None;
 }

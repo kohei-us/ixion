@@ -92,6 +92,7 @@ public:
     }
 
     void empty_cell(const abs_address_t& addr);
+    void empty_cells(const abs_range_t& range);
     void set_numeric_cell(const abs_address_t& addr, double val);
     void set_boolean_cell(const abs_address_t& addr, bool val);
     void set_string_cell(const abs_address_t& addr, std::string_view s);
@@ -213,6 +214,14 @@ private:
      * the storage they may share with the source sheet through copy-on-write.
      */
     void rewrite_table_refs_on_sheet(sheet_t sheet, const table_name_map_type& table_names);
+
+    /**
+     * Unregister the formula cell at a position about to be overwritten, if
+     * there is one.  Throws if the cell belongs to a formula group of more
+     * than one cell, which can only be overwritten as a whole.
+     */
+    void unregister_before_overwrite(
+        const abs_address_t& addr, const column_store_t::const_position_type& pos);
 
 private:
     model_context& m_parent;

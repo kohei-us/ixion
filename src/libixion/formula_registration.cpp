@@ -69,9 +69,10 @@ void check_sheet_or_throw(
         << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
         << "'");
 
-    throw ixion::formula_registration_error(std::format(
+    throw model_context_error(std::format(
         "{}: invalid sheet index in {}: formula='{}'",
-        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell)));
+        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell)),
+        model_context_error::invalid_sheet_reference);
 }
 
 /**
@@ -85,9 +86,10 @@ void check_group_parent_or_throw(
     if (parent == pos)
         return;
 
-    throw formula_registration_error(std::format(
+    throw model_context_error(std::format(
         "{}: {} is not the top-left cell of its formula group starting at {}",
-        func_name, pos.get_name(), parent.get_name()));
+        func_name, pos.get_name(), parent.get_name()),
+        model_context_error::partial_formula_group);
 }
 
 /**
@@ -170,7 +172,7 @@ std::vector<formula_cell_entry> collect_formula_cells(
             std::ostringstream os;
             os << "collect_formula_cells: formula group " << group
                 << " lies only partly inside " << range;
-            throw formula_registration_error(os.str());
+            throw model_context_error(os.str(), model_context_error::partial_formula_group);
         }
 
         // Registering the top-left cell of a group registers the entire

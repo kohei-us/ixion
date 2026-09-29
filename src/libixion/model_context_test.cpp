@@ -12,6 +12,7 @@
 #include <ixion/cell.hpp>
 #include <ixion/cell_access.hpp>
 #include <ixion/config.hpp>
+#include <ixion/dirty_cell_tracker.hpp>
 #include <ixion/exceptions.hpp>
 #include <ixion/formula.hpp>
 #include <ixion/global.hpp>
@@ -1654,7 +1655,7 @@ void test_register_grouped_formula_cells_non_parent()
         ixion::register_formula_cell(cxt, E1);
         assert(!"register_formula_cell() should have thrown");
     }
-    catch (const ixion::formula_registration_error&)
+    catch (const ixion::model_context_error&)
     {
         // expected
     }
@@ -1666,7 +1667,7 @@ void test_register_grouped_formula_cells_non_parent()
         ixion::unregister_formula_cell(cxt, E1);
         assert(!"unregister_formula_cell() should have thrown");
     }
-    catch (const ixion::formula_registration_error&)
+    catch (const ixion::model_context_error&)
     {
         // expected
     }
@@ -2713,6 +2714,372 @@ void test_invalid_formula_tokens()
     assert(error_msg == std::get<std::string_view>(tokens[2].value));
 }
 
+/** Get the cells listening to changes in a cell. */
+ixion::abs_range_set_t listeners_of(
+    const ixion::model_context& cxt, const ixion::abs_address_t& addr)
+{
+    ixion::abs_range_set_t modified;
+    modified.emplace(addr);
+    return cxt.get_cell_tracker().query_dirty_cells(modified);
+}
+
+/** Set a formula cell from a formula string, without any manual registration. */
+ixion::formula_cell* set_formula(
+    ixion::model_context& cxt, const ixion::formula_name_resolver& resolver,
+    const ixion::abs_address_t& pos, const char* exp)
+{
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, pos, resolver, exp);
+    return cxt.set_formula_cell(pos, std::move(tokens));
+}
+
+/** Set a formula group from a formula string, without any manual registration. */
+void set_grouped_formula(
+    ixion::model_context& cxt, const ixion::formula_name_resolver& resolver,
+    const ixion::abs_range_t& range, const char* exp)
+{
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, range.first, resolver, exp);
+    cxt.set_grouped_formula_cells(range, std::move(tokens));
+}
+
+/**
+ * Build a reference to the sheet before the first one.  The parser rejects
+ * such a reference, so it has to be built by hand.
+ */
+ixion::formula_tokens_t create_invalid_sheet_ref()
+{
+    ixion::address_t ref(-1, 0, 0, false, false, false);
+    ixion::formula_tokens_t tokens;
+    tokens.emplace_back(ref);
+    return tokens;
+}
+
+/**
+ * Check that every cell of a formula group is in the model as a grouped
+ * formula cell of the group's size.
+ *
+ * @param cxt Model to check.
+ * @param group Range of the formula group.
+ */
+bool is_group_intact(const ixion::model_context& cxt, const ixion::abs_range_t& group)
+{
+    ixion::row_t row_size = group.last.row - group.first.row + 1;
+    ixion::col_t col_size = group.last.column - group.first.column + 1;
+
+    for (ixion::row_t row = group.first.row; row <= group.last.row; ++row)
+    {
+        for (ixion::col_t col = group.first.column; col <= group.last.column; ++col)
+        {
+            ixion::abs_address_t pos(group.first.sheet, row, col);
+            const ixion::formula_cell* fc = cxt.get_formula_cell(pos);
+            if (!fc)
+                return false;
+
+            ixion::formula_group_t props = fc->get_group_properties();
+            if (!props.grouped)
+                return false;
+
+            if (props.size.row != row_size || props.size.column != col_size)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Check that a cell or a formula group is the only listener of a target
+ * cell.
+ *
+ * @param cxt Model to check.
+ * @param listener Cell or formula group expected to listen.
+ * @param target Cell being listened on.
+ */
+bool is_sole_listener(
+    const ixion::model_context& cxt, const ixion::abs_range_t& listener,
+    const ixion::abs_address_t& target)
+{
+    ixion::abs_range_set_t listeners = listeners_of(cxt, target);
+    return listeners.size() == 1 && listeners.count(listener) == 1;
+}
+
+/** Check that a write gets rejected for touching only part of a formula group. */
+template<typename Write>
+bool error_as_partial_group(Write write)
+{
+    try
+    {
+        write();
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        return e.get_error_type() == ixion::model_context_error::partial_formula_group;
+    }
+
+    return false;
+}
+
+void test_auto_unregister_on_overwrite()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    cxt.append_sheet("test");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t A2(0, 1, 0);
+    ixion::abs_address_t B1(0, 0, 1);
+    cxt.set_numeric_cell(A1, 1.0);
+    cxt.set_numeric_cell(A2, 2.0);
+
+    // Setting a formula cell registers it.
+    set_formula(cxt, *resolver, B1, "A1*2");
+    assert(is_sole_listener(cxt, B1, A1));
+
+    // Each way of overwriting the cell unregisters it.
+    cxt.set_numeric_cell(B1, 5.0);
+    assert(cxt.get_cell_tracker().empty());
+
+    set_formula(cxt, *resolver, B1, "A1*2");
+    cxt.set_boolean_cell(B1, true);
+    assert(cxt.get_cell_tracker().empty());
+
+    set_formula(cxt, *resolver, B1, "A1*2");
+    cxt.set_string_cell(B1, "text");
+    assert(cxt.get_cell_tracker().empty());
+
+    set_formula(cxt, *resolver, B1, "A1*2");
+    cxt.set_string_cell(B1, cxt.add_string("pooled"));
+    assert(cxt.get_cell_tracker().empty());
+
+    set_formula(cxt, *resolver, B1, "A1*2");
+    cxt.empty_cell(B1);
+    assert(cxt.get_cell_tracker().empty());
+
+    // Replacing a formula with another one moves the listener.
+    set_formula(cxt, *resolver, B1, "A1*2");
+    set_formula(cxt, *resolver, B1, "A2*2");
+    assert(listeners_of(cxt, A1).empty());
+    assert(is_sole_listener(cxt, B1, A2));
+}
+
+void test_auto_register_rejects_invalid_sheet()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    cxt.append_sheet("test");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t B1(0, 0, 1);
+    ixion::abs_address_t C1(0, 0, 2);
+    cxt.set_numeric_cell(A1, 1.0);
+    const ixion::formula_cell* fc = set_formula(cxt, *resolver, B1, "A1*2");
+    ixion::formula_tokens_store_ptr_t old_tokens = fc->get_tokens();
+
+    // A formula referencing an invalid sheet gets rejected, and the old formula
+    // cell at B1 stays, with its dependency still tracked.
+    try
+    {
+        cxt.set_formula_cell(B1, create_invalid_sheet_ref());
+        assert(!"set_formula_cell() should have thrown");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::invalid_sheet_reference);
+    }
+
+    assert(cxt.get_formula_cell(B1) == fc);
+    assert(cxt.get_formula_cell(B1)->get_tokens() == old_tokens);
+    assert(is_sole_listener(cxt, B1, A1));
+
+    // C1 is empty, and after the failed insertion it should stay empty.
+    try
+    {
+        cxt.set_formula_cell(C1, create_invalid_sheet_ref());
+        assert(!"set_formula_cell() should have thrown");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::invalid_sheet_reference);
+    }
+
+    assert(cxt.is_empty(C1));
+
+    // Grouped formula cells get the same treatment.
+    ixion::abs_range_t C1D2({0, 0, 2}, {0, 1, 3});
+
+    try
+    {
+        cxt.set_grouped_formula_cells(C1D2, create_invalid_sheet_ref());
+        assert(!"set_grouped_formula_cells() should have thrown");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::invalid_sheet_reference);
+    }
+
+    assert(cxt.is_empty(C1D2));
+}
+
+void test_formula_group_overwrite_rules()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    cxt.append_sheet("test");
+
+    // A1:B2
+    cxt.set_cell_values(0, {
+        {1.0, 2.0},
+        {3.0, 4.0},
+    });
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_range_t D1E2({0, 0, 3}, {0, 1, 4});
+    ixion::abs_address_t D1 = D1E2.first;
+    ixion::abs_address_t E1(0, 0, 4);
+    ixion::abs_address_t E2 = D1E2.last;
+    set_grouped_formula(cxt, *resolver, D1E2, "A1:B2*2");
+
+    assert(is_group_intact(cxt, D1E2));
+    assert(is_sole_listener(cxt, D1E2, A1));
+
+    // No single-cell write may touch a member of the group, the top-left
+    // cell included.
+    assert(error_as_partial_group([&]() { cxt.set_numeric_cell(E2, 1.0); }));
+    assert(error_as_partial_group([&]() { cxt.set_numeric_cell(D1, 1.0); }));
+    assert(error_as_partial_group([&]() { cxt.set_boolean_cell(E1, true); }));
+    assert(error_as_partial_group([&]() { cxt.set_string_cell(E1, "text"); }));
+    assert(error_as_partial_group([&]() { cxt.empty_cell(E2); }));
+    assert(error_as_partial_group([&]() { set_formula(cxt, *resolver, E1, "A1*2"); }));
+    assert(is_group_intact(cxt, D1E2));
+    assert(is_sole_listener(cxt, D1E2, A1));
+
+    // A range write covering only part of the group is rejected too.
+    ixion::abs_range_t D1D2({0, 0, 3}, {0, 1, 3});
+    assert(error_as_partial_group(
+        [&]() { set_grouped_formula(cxt, *resolver, D1D2, "A1:A2*2"); }));
+    assert(error_as_partial_group([&]() { cxt.empty_cells(D1D2); }));
+    assert(is_group_intact(cxt, D1E2));
+    assert(is_sole_listener(cxt, D1E2, A1));
+
+    // A range write covering the whole group replaces it.
+    ixion::abs_range_t D1E3({0, 0, 3}, {0, 2, 4});
+    set_grouped_formula(cxt, *resolver, D1E3, "A1:B2*3");
+    assert(is_sole_listener(cxt, D1E3, A1));
+
+    // Emptying the whole group removes it from the tracker.
+    cxt.empty_cells(D1E3);
+    assert(cxt.is_empty(D1E3));
+    assert(cxt.get_cell_tracker().empty());
+
+    // A group of one cell can be overwritten like any other cell.
+    ixion::abs_range_t F1(0, 0, 5);
+    set_grouped_formula(cxt, *resolver, F1, "A1*2");
+    assert(is_sole_listener(cxt, F1, A1));
+    cxt.set_numeric_cell(F1.first, 1.0);
+    assert(cxt.get_cell_tracker().empty());
+}
+
+void test_fill_down_unregisters()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    cxt.append_sheet("test");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t A2(0, 1, 0);
+    ixion::abs_address_t A3(0, 2, 0);
+    ixion::abs_address_t C1(0, 0, 2);
+    cxt.set_numeric_cell(C1, 10.0);
+    cxt.set_numeric_cell(A1, 5.0);
+    set_formula(cxt, *resolver, A2, "C1*2");
+    set_formula(cxt, *resolver, A3, "C1*3");
+    ixion::abs_range_set_t listeners = listeners_of(cxt, C1);
+    assert(listeners.size() == 2);
+    assert(listeners.count(A2) == 1);
+    assert(listeners.count(A3) == 1);
+
+    // Filling down over formula cells unregisters them.
+    cxt.fill_down_cells(A1, 2);
+    assert(cxt.get_cell_tracker().empty());
+    assert(cxt.get_numeric_value(A2) == 5.0);
+    assert(cxt.get_numeric_value(A3) == 5.0);
+
+    // Filling down over part of a formula group is rejected.
+    ixion::abs_range_t A2A3({0, 1, 0}, {0, 2, 0});
+    set_grouped_formula(cxt, *resolver, A2A3, "C1*2");
+
+    try
+    {
+        cxt.fill_down_cells(A1, 1);
+        assert(!"fill_down_cells() should have thrown");
+    }
+    catch (const ixion::model_context_error& e)
+    {
+        assert(e.get_error_type() == ixion::model_context_error::partial_formula_group);
+    }
+
+    assert(cxt.get_formula_cell(A2));
+    assert(is_sole_listener(cxt, A2A3, C1));
+
+    // Covering the whole group works.
+    cxt.fill_down_cells(A1, 2);
+    assert(cxt.get_cell_tracker().empty());
+    assert(cxt.get_numeric_value(A2) == 5.0);
+    assert(cxt.get_numeric_value(A3) == 5.0);
+}
+
+void test_append_sheet_copy_registers_formulas()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    cxt.append_sheet("src");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t B1(0, 0, 1);
+    cxt.set_numeric_cell(A1, 1.0);
+    set_formula(cxt, *resolver, B1, "A1*2");
+
+    auto res = cxt.append_sheet_copy(0, "copy");
+
+    // The copied formula cell listens to the copy's A1 without any manual
+    // registration, and the source is unaffected.
+    ixion::abs_address_t copy_A1(res.sheet, 0, 0);
+    ixion::abs_address_t copy_B1(res.sheet, 0, 1);
+    assert(is_sole_listener(cxt, copy_B1, copy_A1));
+    assert(is_sole_listener(cxt, B1, A1));
+}
+
+void test_auto_register_volatile()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
+    cxt.append_sheet("test");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    set_formula(cxt, *resolver, A1, "NOW()");
+
+    // A volatile cell is dirty even when nothing got modified.
+    ixion::abs_range_set_t nothing_modified;
+    ixion::abs_range_set_t dirty = cxt.get_cell_tracker().query_dirty_cells(nothing_modified);
+    assert(dirty.size() == 1);
+    assert(dirty.count(A1) == 1);
+
+    cxt.empty_cell(A1);
+    dirty = cxt.get_cell_tracker().query_dirty_cells(nothing_modified);
+    assert(dirty.empty());
+}
+
 } // anonymous namespace
 
 int main()
@@ -2747,6 +3114,12 @@ int main()
     test_unregister_formula_cell_range_refs();
     test_ungrouped_matrix_result();
     test_register_grouped_formula_cells_non_parent();
+    test_auto_unregister_on_overwrite();
+    test_auto_register_rejects_invalid_sheet();
+    test_formula_group_overwrite_rules();
+    test_fill_down_unregisters();
+    test_append_sheet_copy_registers_formulas();
+    test_auto_register_volatile();
     test_volatile_function();
     test_volatile_rand_today();
     test_parse_and_print_expressions();

@@ -20,10 +20,11 @@ namespace detail {
  * Check that a formula cell can be registered with the dependency tracker.
  * Nothing gets modified, so the cell doesn't have to be in the model yet.
  *
- * @throw formula_registration_error If the position is that of a grouped
- *                                   cell other than the top-left cell of its
- *                                   group, or a reference in the formula
- *                                   points at an invalid sheet.
+ * @throw model_context_error If the position is that of a grouped cell other
+ *                            than the top-left cell of its group
+ *                            (partial_formula_group), or a reference in the
+ *                            formula points at an invalid sheet
+ *                            (invalid_sheet_reference).
  */
 void validate_formula_registration(
     const model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
@@ -39,10 +40,11 @@ void apply_formula_registration(
 /**
  * Unregister a formula cell from the dependency tracker.
  *
- * @throw formula_registration_error If the position is that of a grouped
- *                                   cell other than the top-left cell of its
- *                                   group, or a reference in the formula
- *                                   points at an invalid sheet.
+ * @throw model_context_error If the position is that of a grouped cell other
+ *                            than the top-left cell of its group
+ *                            (partial_formula_group), or a reference in the
+ *                            formula points at an invalid sheet
+ *                            (invalid_sheet_reference).
  */
 void remove_formula_registration(
     model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
@@ -55,9 +57,9 @@ void remove_formula_registration(
  * @param sheet Index of the sheet the range is on.
  * @param range Range with all corners set.
  *
- * @throw formula_registration_error If a formula group lies only partly
- *                                   inside the range, or a cell fails
- *                                   validation.
+ * @throw model_context_error If a formula group lies only partly inside the
+ *                            range (partial_formula_group), or a cell fails
+ *                            validation (invalid_sheet_reference).
  */
 void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range);
 
@@ -68,8 +70,8 @@ void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_rang
  * @param sheet Index of the sheet the range is on.
  * @param range Range with all corners set.
  *
- * @throw formula_registration_error If a formula group lies only partly
- *                                   inside the range.
+ * @throw model_context_error If a formula group lies only partly inside the
+ *                            range (partial_formula_group).
  */
 void unregister_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range);
 

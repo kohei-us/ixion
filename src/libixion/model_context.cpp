@@ -98,6 +98,11 @@ void model_context::empty_cell(const abs_address_t& addr)
     mp_impl->empty_cell(addr);
 }
 
+void model_context::empty_cells(const abs_range_t& range)
+{
+    mp_impl->empty_cells(range);
+}
+
 void model_context::set_numeric_cell(const abs_address_t& addr, double val)
 {
     mp_impl->set_numeric_cell(addr, val);
