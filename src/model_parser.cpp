@@ -869,10 +869,9 @@ void model_parser::copy_sheet(std::string_view src_name, std::string_view new_na
     auto res = m_context.append_sheet_copy(src, std::string{new_name});
 
     // The copied formula cells are new to the dependency tracker.
-    if (abs_range_t data_range = m_context.get_data_range(res.sheet); data_range.valid())
+    if (abs_rc_range_t data_range = m_context.get_data_range(res.sheet); data_range.valid())
     {
-        auto cells = m_context.iterate_cells(
-            res.sheet, rc_direction_t::vertical, abs_rc_range_t(data_range));
+        auto cells = m_context.iterate_cells(res.sheet, rc_direction_t::vertical, data_range);
 
         for (const auto& cell : cells)
         {

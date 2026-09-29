@@ -21,6 +21,9 @@ ixion 0.21.0
   * model_context::count_range() now returns std::size_t instead of
     double.
 
+  * model_context::get_data_range() now returns abs_rc_range_t instead
+    of abs_range_t, since the sheet index is already an input.
+
   * removed the circular_dependency and not_implemented values from
     model_context_error::error_type, which were never thrown.
 

@@ -186,37 +186,32 @@ void test_model_context_storage()
         ixion::model_context cxt;
         cxt.append_sheet("test");
 
-        ixion::abs_range_t area = cxt.get_data_range(0);
+        ixion::abs_rc_range_t area = cxt.get_data_range(0);
         assert(!area.valid());
 
         cxt.set_numeric_cell(ixion::abs_address_t(0, 6, 5), 1.1);
         area = cxt.get_data_range(0);
         assert(area.first == area.last);
-        assert(area.first.sheet == 0);
         assert(area.first.row == 6);
         assert(area.first.column == 5);
 
         cxt.set_numeric_cell(ixion::abs_address_t(0, 2, 3), 1.1);
         area = cxt.get_data_range(0);
-        assert(area.first.sheet == 0);
         assert(area.first.row == 2);
         assert(area.first.column == 3);
-        assert(area.last.sheet == 0);
         assert(area.last.row == 6);
         assert(area.last.column == 5);
 
         cxt.set_numeric_cell(ixion::abs_address_t(0, 7, 1), 1.1);
         area = cxt.get_data_range(0);
-        assert(area.first.sheet == 0);
         assert(area.first.row == 2);
         assert(area.first.column == 1);
-        assert(area.last.sheet == 0);
         assert(area.last.row == 7);
         assert(area.last.column == 5);
 
         // This shouldn't change the data range.
         cxt.set_numeric_cell(ixion::abs_address_t(0, 5, 5), 1.1);
-        ixion::abs_range_t test = cxt.get_data_range(0);
+        ixion::abs_rc_range_t test = cxt.get_data_range(0);
         assert(test == area);
     }
 
@@ -231,12 +226,10 @@ void test_model_context_storage()
             for (ixion::col_t col = 0; col < col_size; ++col)
                 cxt.set_numeric_cell(ixion::abs_address_t(0,row,col), 1.0);
 
-        ixion::abs_range_t test = cxt.get_data_range(0);
+        ixion::abs_rc_range_t test = cxt.get_data_range(0);
 
-        assert(test.first.sheet == 0);
         assert(test.first.row == 0);
         assert(test.first.column == 0);
-        assert(test.last.sheet == 0);
         assert(test.last.row == row_size-1);
         assert(test.last.column == col_size-1);
     }
@@ -250,12 +243,10 @@ void test_model_context_storage()
         cxt.set_numeric_cell(ixion::abs_address_t(0,row_size-1,0), 1.0);
         cxt.set_numeric_cell(ixion::abs_address_t(0,row_size/2,col_size/2), 1.0);
 
-        ixion::abs_range_t test = cxt.get_data_range(0);
+        ixion::abs_rc_range_t test = cxt.get_data_range(0);
 
-        assert(test.first.sheet == 0);
         assert(test.first.row == 0);
         assert(test.first.column == 0);
-        assert(test.last.sheet == 0);
         assert(test.last.row == row_size-1);
         assert(test.last.column == col_size/2);
     }

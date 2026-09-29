@@ -159,7 +159,7 @@ void model_context::set_grouped_formula_cells(
     mp_impl->set_grouped_formula_cells(group_range, std::move(tokens), std::move(result));
 }
 
-abs_range_t model_context::get_data_range(sheet_t sheet) const
+abs_rc_range_t model_context::get_data_range(sheet_t sheet) const
 {
     return mp_impl->get_data_range(sheet);
 }

@@ -1116,16 +1116,9 @@ void model_context_impl::set_grouped_formula_cells(
     set_grouped_formula_cells_to_workbook(m_sheets, group_range.first, group_size, cs, ts);
 }
 
-abs_range_t model_context_impl::get_data_range(sheet_t sheet) const
+abs_rc_range_t model_context_impl::get_data_range(sheet_t sheet) const
 {
-    abs_rc_range_t rc_range = m_sheets.at(sheet).get_data_range();
-    if (!rc_range.valid())
-        return abs_range_t(abs_range_t::invalid);
-
-    abs_range_t range;
-    range.first = abs_address_t(sheet, rc_range.first.row, rc_range.first.column);
-    range.last = abs_address_t(sheet, rc_range.last.row, rc_range.last.column);
-    return range;
+    return m_sheets.at(sheet).get_data_range();
 }
 
 bool model_context_impl::is_empty(const abs_address_t& addr) const

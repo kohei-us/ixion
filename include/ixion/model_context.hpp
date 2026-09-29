@@ -698,7 +698,7 @@ public:
      * @return Range covering the data of the sheet, or an invalid range if
      *         the sheet has no non-empty cells.
      */
-    abs_range_t get_data_range(sheet_t sheet) const;
+    abs_rc_range_t get_data_range(sheet_t sheet) const;
 
     /**
      * Set a named expression associated with a string name in the global

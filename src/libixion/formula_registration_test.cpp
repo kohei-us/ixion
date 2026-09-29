@@ -87,7 +87,7 @@ void test_register_range()
 
     abs_range_t D1(0, 0, 3);
     abs_range_t E1F2({0, 0, 4}, {0, 1, 5});
-    abs_rc_range_t data_range(cxt.get_data_range(0));
+    abs_rc_range_t data_range = cxt.get_data_range(0);
 
     detail::register_formula_cells(cxt, 0, data_range);
 
@@ -117,7 +117,7 @@ void test_register_range_invalid_cell()
     auto ts = formula_tokens_store::create(std::move(tokens));
     cxt.set_formula_cell(D2, ts);
 
-    abs_rc_range_t data_range(cxt.get_data_range(0));
+    abs_rc_range_t data_range = cxt.get_data_range(0);
 
     try
     {
@@ -143,7 +143,7 @@ void test_unregister_partial_group()
 
     abs_range_t D1(0, 0, 3);
     abs_range_t E1F2({0, 0, 4}, {0, 1, 5});
-    abs_rc_range_t data_range(cxt.get_data_range(0));
+    abs_rc_range_t data_range = cxt.get_data_range(0);
 
     detail::register_formula_cells(cxt, 0, data_range);
     assert(query_listeners_of_A1(cxt).size() == 2);

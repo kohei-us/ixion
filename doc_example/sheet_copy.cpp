@@ -29,12 +29,11 @@ void calculate(ixion::model_context& cxt, const ixion::abs_range_set_t& dirty_fo
 // Register every formula cell on a sheet with the dependency tracker.
 void register_formula_cells(ixion::model_context& cxt, ixion::sheet_t sheet)
 {
-    ixion::abs_range_t data_range = cxt.get_data_range(sheet);
+    ixion::abs_rc_range_t data_range = cxt.get_data_range(sheet);
     if (!data_range.valid())
         return; // empty sheet
 
-    auto cells = cxt.iterate_cells(
-        sheet, ixion::rc_direction_t::vertical, ixion::abs_rc_range_t(data_range));
+    auto cells = cxt.iterate_cells(sheet, ixion::rc_direction_t::vertical, data_range);
 
     for (auto it = cells.begin(); it != cells.end(); ++it)
     {

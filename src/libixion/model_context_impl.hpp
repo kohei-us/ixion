@@ -102,7 +102,7 @@ public:
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens);
     void set_grouped_formula_cells(const abs_range_t& group_range, formula_tokens_t tokens, formula_result result);
 
-    abs_range_t get_data_range(sheet_t sheet) const;
+    abs_rc_range_t get_data_range(sheet_t sheet) const;
 
     bool is_empty(const abs_address_t& addr) const;
     bool is_empty(abs_range_t range) const;

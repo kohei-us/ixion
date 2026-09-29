@@ -123,7 +123,7 @@ std::string grid_dumper::format_formula_cell(
 
 void grid_dumper::dump(std::ostream& os, sheet_t sheet, sheet_dump_mode_t mode) const
 {
-    abs_range_t data_range = m_cxt.get_data_range(sheet);
+    abs_rc_range_t data_range = m_cxt.get_data_range(sheet);
     if (!data_range.valid())
         // The sheet has no content; empty in, empty out.
         return;

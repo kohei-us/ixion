@@ -106,9 +106,9 @@ struct document::impl
     {
         auto res = cxt.append_sheet_copy(src, std::move(name));
 
-        if (abs_range_t data_range = cxt.get_data_range(res.sheet); data_range.valid())
+        if (abs_rc_range_t data_range = cxt.get_data_range(res.sheet); data_range.valid())
             // The copied formula cells are new to the dependency tracker.
-            detail::register_formula_cells(cxt, res.sheet, abs_rc_range_t(data_range));
+            detail::register_formula_cells(cxt, res.sheet, data_range);
 
         modified_formula_cells.insert(res.recalc_cells.begin(), res.recalc_cells.end());
         return res.sheet;
