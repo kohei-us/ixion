@@ -8,7 +8,6 @@
 #pragma once
 #include "ixion/exceptions.hpp"
 #include "ixion/model_context.hpp"
-#include "ixion/model_context_loader.hpp"
 #include "ixion/formula_result.hpp"
 #include "ixion/table.hpp"
 
@@ -136,24 +135,12 @@ private:
 
     void check();
 
-    /**
-     * Get the loader for the formula cells of the initial model, creating
-     * it on first use.
-     */
-    model_context_loader& get_loader();
-
-    /**
-     * Register the formula cells loaded so far, if any are pending.
-     */
-    void finalize_loader();
-
     std::string get_display_cell_string(const abs_address_t& pos) const;
     std::string get_display_range_string(const abs_range_t& pos) const;
 
 private:
 
     model_context m_context;
-    std::unique_ptr<model_context_loader> mp_loader;
     session_handler::factory m_session_handler_factory;
     std::unique_ptr<table_t> mp_table_entry;
     std::unique_ptr<formula_name_resolver> mp_name_resolver;

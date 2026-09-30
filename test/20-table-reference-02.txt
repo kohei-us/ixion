@@ -1,4 +1,10 @@
 %% Table reference test for column ranges spanning multiple columns.
+%mode table
+name=Table1
+range=B2:C5
+columns=V1,V2
+totals-row-count=0
+%push
 %mode init
 B2@V1
 C2@V2
@@ -11,12 +17,6 @@ C5:6
 E1=SUM(Table1[[V1]:[V2]])
 E2=COUNTA(Table1[[#All],[V1]:[V2]])
 E3=SUM(Table1[[#Headers],[#Data],[V2]])
-%mode table
-name=Table1
-range=B2:C5
-columns=V1,V2
-totals-row-count=0
-%push
 %calc
 %mode result
 E1=21

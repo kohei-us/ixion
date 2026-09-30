@@ -1,5 +1,11 @@
 %% Table references get rewritten to reference the cloned table when a
 %% sheet is copied.
+%mode table
+name=Table1
+range=C3:D9
+columns=Category,Value
+totals-row-count=1
+%push
 %mode init
 C3@Category
 C4@A
@@ -16,12 +22,6 @@ D7:4
 D8:5
 D9=SUBTOTAL(109,[Value])
 A1=SUM(Table1[Value])
-%mode table
-name=Table1
-range=C3:D9
-columns=Category,Value
-totals-row-count=1
-%push
 %calc
 %mode result
 D9=15

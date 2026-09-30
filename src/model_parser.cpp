@@ -304,23 +304,6 @@ void model_parser::init_model()
         m_context.append_sheet("sheet");
 }
 
-model_context_loader& model_parser::get_loader()
-{
-    if (!mp_loader)
-        mp_loader = std::make_unique<model_context_loader>(m_context);
-
-    return *mp_loader;
-}
-
-void model_parser::finalize_loader()
-{
-    if (!mp_loader)
-        return;
-
-    mp_loader->finalize();
-    mp_loader.reset();
-}
-
 void model_parser::parse_command()
 {
     // This line contains a command.
@@ -340,8 +323,6 @@ void model_parser::parse_command()
             print_section_title("calculating");
 
             // Perform full calculation on all currently stored formula cells.
-            finalize_loader();
-
             abs_range_set_t empty;
             std::vector<abs_range_t> sorted_cells =
                 query_and_sort_dirty_cells(m_context, empty, &m_dirty_formula_cells);
@@ -354,8 +335,6 @@ void model_parser::parse_command()
 
             // Perform partial recalculation only on those formula cells that
             // need recalculation.
-            finalize_loader();
-
             std::vector<abs_range_t> sorted_cells =
                 query_and_sort_dirty_cells(m_context, m_modified_cells, &m_dirty_formula_cells);
 
@@ -618,7 +597,7 @@ void model_parser::parse_init()
         formula_tokens_t tokens =
             parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
-        get_loader().set_grouped_formula_cells(cell_def.pos, std::move(tokens));
+        m_context.set_grouped_formula_cells(cell_def.pos, std::move(tokens));
         m_dirty_formula_cells.insert(cell_def.pos);
 
         std::cout << "{" << get_display_range_string(cell_def.pos) << "}: (m) " << cell_def.value << std::endl;
@@ -639,7 +618,7 @@ void model_parser::parse_init()
                     parse_formula_string(m_context, pos, *mp_name_resolver, cell_def.value);
 
                 auto ts = formula_tokens_store::create(std::move(tokens));
-                get_loader().set_formula_cell(pos, ts);
+                m_context.set_formula_cell(pos, ts);
                 m_dirty_formula_cells.insert(pos);
 
                 std::cout << get_display_cell_string(pos) << ": (f) " << cell_def.value << std::endl;

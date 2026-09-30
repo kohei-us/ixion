@@ -1,5 +1,11 @@
 %% Basic table reference test.  Set C3:D9 to be a table range with 2 columns
 %% 'Category' and 'Value'.
+%mode table
+name=Table1
+range=C3:D9
+columns=Category,Value
+totals-row-count=1
+%push
 %mode init
 C3@Category
 C4@A
@@ -19,12 +25,6 @@ E1=SUM(Table1[Value])
 E2=COUNTA(Table1[#Headers])
 E3=COUNTA(Table1[[#Headers],[Category]])
 E4=COUNTA(Table1[[#Headers],[#Data],[Category]])
-%mode table
-name=Table1
-range=C3:D9
-columns=Category,Value
-totals-row-count=1
-%push
 %calc
 %mode result
 D9=15

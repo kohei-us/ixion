@@ -7,6 +7,18 @@ insert-sheet:Sheet1
 insert-sheet:Sheet2
 current-sheet:Sheet1
 %% --------------------------------------------------------------------------
+%mode named-expression
+name=MyRange
+expression=Sheet1!$A$1:$A$5
+origin=Sheet1!$A$1
+%push
+%% --------------------------------------------------------------------------
+%mode named-expression
+name=MyRange2
+expression=Sheet1!$A$1:$B$5
+origin=Sheet1!$A$1
+%push
+%% --------------------------------------------------------------------------
 %mode init
 A1:1
 A2:2
@@ -20,18 +32,6 @@ B4:9
 B5:10
 A7=SUM(MyRange)
 B7=SUM(MyRange2)
-%% --------------------------------------------------------------------------
-%mode named-expression
-name=MyRange
-expression=Sheet1!$A$1:$A$5
-origin=Sheet1!$A$1
-%push
-%% --------------------------------------------------------------------------
-%mode named-expression
-name=MyRange2
-expression=Sheet1!$A$1:$B$5
-origin=Sheet1!$A$1
-%push
 %% --------------------------------------------------------------------------
 %calc
 %% --------------------------------------------------------------------------

@@ -10,6 +10,20 @@ insert-sheet:Sheet2
 current-sheet:Sheet1
 display-sheet-name:true
 %% --------------------------------------------------------------------------
+%mode named-expression
+name=MyLocalRange
+scope=Sheet1
+expression=Sheet1!$A$1:$A$5
+origin=Sheet1!$A$1
+%push
+%% --------------------------------------------------------------------------
+%mode named-expression
+name=MyLocalRange
+scope=Sheet2
+expression=Sheet2!$A$4:$B$5
+origin=Sheet2!$A$1
+%push
+%% --------------------------------------------------------------------------
 %mode init
 A1:1
 A2:2
@@ -38,20 +52,6 @@ B3:80
 B4:90
 B5:100
 B7=SUM(MyLocalRange)
-%% --------------------------------------------------------------------------
-%mode named-expression
-name=MyLocalRange
-scope=Sheet1
-expression=Sheet1!$A$1:$A$5
-origin=Sheet1!$A$1
-%push
-%% --------------------------------------------------------------------------
-%mode named-expression
-name=MyLocalRange
-scope=Sheet2
-expression=Sheet2!$A$4:$B$5
-origin=Sheet2!$A$1
-%push
 %% --------------------------------------------------------------------------
 %calc
 %% --------------------------------------------------------------------------

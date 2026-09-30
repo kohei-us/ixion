@@ -2,6 +2,12 @@
 %% references the data area of Table1 which contains D6, which in turn
 %% references E1, forming a cycle.  D9 is not part of the cycle but
 %% references the data area containing D6, so the error propagates to it.
+%mode table
+name=Table1
+range=C3:D9
+columns=Category,Value
+totals-row-count=1
+%push
 %mode init
 C3@Category
 C4@A
@@ -19,12 +25,6 @@ D8:5
 D9=SUBTOTAL(109,[Value])
 E1=SUM(Table1[Value])
 E2=COUNTA(Table1[#Headers])
-%mode table
-name=Table1
-range=C3:D9
-columns=Category,Value
-totals-row-count=1
-%push
 %calc
 %mode result
 D6=#REF!
