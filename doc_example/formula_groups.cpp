@@ -57,12 +57,11 @@ int main()
     dump(cxt);
     //!code-end: create-group
 
-    //!code-start: register-calculate
-    ixion::register_formula_cell(cxt, D1E2.first);
+    //!code-start: calculate-group
     calculate(cxt, {}, {D1E2});
 
     dump(cxt);
-    //!code-end: register-calculate
+    //!code-end: calculate-group
 
     //!code-start: inspect
     const ixion::formula_cell* D1 = cxt.get_formula_cell(D1E2.first);
@@ -118,7 +117,6 @@ int main()
     ixion::abs_address_t Sheet1_G1{0, 0, 6};
     tokens = ixion::parse_formula_string(cxt, Sheet1_G1, *resolver, "{1,2;3,4}*10");
     cxt.set_formula_cell(Sheet1_G1, std::move(tokens));
-    ixion::register_formula_cell(cxt, Sheet1_G1);
     calculate(cxt, {}, {Sheet1_G1});
 
     dump(cxt);

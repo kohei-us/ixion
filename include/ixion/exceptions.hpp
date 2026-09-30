@@ -89,20 +89,6 @@ public:
 };
 
 /**
- * Exception thrown by register_formula_cell() and unregister_formula_cell()
- * when a formula cell cannot be registered with or unregistered from the
- * dirty cell tracker, for instance when the position is not the top-left
- * cell of its formula group.
- */
-class IXION_DLLPUBLIC formula_registration_error : public general_error
-{
-public:
-    /** Construct an exception with a message. */
-    explicit formula_registration_error(std::string_view msg);
-    virtual ~formula_registration_error() override;
-};
-
-/**
  * This exception is thrown typically from the ixion::model_context class.
  */
 class IXION_DLLPUBLIC model_context_error: public general_error

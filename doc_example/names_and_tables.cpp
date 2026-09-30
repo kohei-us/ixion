@@ -16,8 +16,6 @@ void set_formula(
 {
     ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, pos, resolver, formula);
     cxt.set_formula_cell(pos, std::move(tokens));
-
-    ixion::register_formula_cell(cxt, pos);
 }
 //!code-end: set-formula
 

@@ -15,7 +15,6 @@ void set_formula(
 {
     ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, pos, resolver, formula);
     cxt.set_formula_cell(pos, std::move(tokens));
-    ixion::register_formula_cell(cxt, pos);
 }
 
 void calculate(ixion::model_context& cxt, const ixion::abs_range_set_t& dirty_formula_cells)
@@ -24,34 +23,6 @@ void calculate(ixion::model_context& cxt, const ixion::abs_range_set_t& dirty_fo
         ixion::query_and_sort_dirty_cells(cxt, {}, &dirty_formula_cells);
     ixion::calculate_sorted_cells(cxt, sorted, 0);
 }
-
-//!code-start: register-sheet
-// Register every formula cell on a sheet with the dependency tracker.
-void register_formula_cells(ixion::model_context& cxt, ixion::sheet_t sheet)
-{
-    ixion::abs_rc_range_t data_range = cxt.get_data_range(sheet);
-    if (!data_range.valid())
-        return; // empty sheet
-
-    auto cells = cxt.iterate_cells(sheet, ixion::rc_direction_t::vertical, data_range);
-
-    for (auto it = cells.begin(); it != cells.end(); ++it)
-    {
-        if (it->type != ixion::cell_t::formula)
-            continue;
-
-        const auto* fc = std::get<const ixion::formula_cell*>(it->value);
-        ixion::abs_address_t pos{sheet, it->row, it->col};
-
-        // Registering the top-left cell of a formula group covers the whole
-        // group, so skip the other cells of the group.
-        if (fc->get_parent_position(pos) != pos)
-            continue;
-
-        ixion::register_formula_cell(cxt, pos, fc);
-    }
-}
-//!code-end: register-sheet
 
 void copy_with_document()
 {
@@ -134,10 +105,6 @@ void copy_with_model_context()
     cxt.dump_sheet(std::cout, res.sheet, ixion::sheet_dump_mode_t::verbose);
     std::cout << std::endl;
     //!code-end: cxt-copy
-
-    //!code-start: cxt-register
-    register_formula_cells(cxt, res.sheet);
-    //!code-end: cxt-register
 
     //!code-start: cxt-recalc
     ixion::abs_address_t copy_C1{res.sheet, 0, 2};

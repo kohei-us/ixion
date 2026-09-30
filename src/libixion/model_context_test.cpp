@@ -618,13 +618,11 @@ void test_model_context_iterator_horizontal()
     assert(p);
     const ixion::formula_tokens_t& t = p->get_tokens()->get();
     assert(t.size() == 8); // there should be 8 tokens.
-    ixion::register_formula_cell(cxt, pos, p);
     modified_cells.insert(pos);
 
     pos.column = 1;
     tokens = ixion::parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
-    p = cxt.set_formula_cell(pos, std::move(tokens));
-    ixion::register_formula_cell(cxt, pos, p);
+    cxt.set_formula_cell(pos, std::move(tokens));
     modified_cells.insert(pos);
 
     // Calculate the formula cells.
@@ -805,13 +803,11 @@ void test_model_context_iterator_vertical()
     ixion::abs_address_t pos(1, 3, 0);
     auto tokens = ixion::parse_formula_string(cxt, pos, *resolver, "SUM(1, 2, 3)");
     cxt.set_formula_cell(pos, std::move(tokens));
-    ixion::register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
 
     pos.column = 1;
     tokens = ixion::parse_formula_string(cxt, pos, *resolver, "5 + 6 - 7");
     cxt.set_formula_cell(pos, std::move(tokens));
-    ixion::register_formula_cell(cxt, pos);
     modified_cells.insert(pos);
 
     // Calculate the formula cells.
@@ -1509,7 +1505,6 @@ ixion::formula_cell* insert_formula(
     auto ts = ixion::formula_tokens_store::create(std::move(tokens));
     auto* p_inserted = cxt.set_formula_cell(pos, ts);
     assert(p_inserted);
-    ixion::register_formula_cell(cxt, pos);
     auto* p = cxt.get_formula_cell(pos);
     assert(p);
     assert(p == p_inserted);
@@ -1537,7 +1532,6 @@ void test_unregister_grouped_formula_cells()
     ixion::formula_tokens_t tokens = ixion::parse_formula_string(
         cxt, D1E2.first, *resolver, "A1:B2*10");
     cxt.set_grouped_formula_cells(D1E2, std::move(tokens));
-    ixion::register_formula_cell(cxt, D1E2.first);
 
     ixion::abs_address_t A1(0, 0, 0);
     ixion::abs_range_set_t modified_cells{A1};
@@ -1547,14 +1541,14 @@ void test_unregister_grouped_formula_cells()
     assert(sorted.size() == 1);
     assert(sorted[0] == D1E2);
 
-    // Unregistering the top-left cell must remove the whole group as a listener.
-    ixion::unregister_formula_cell(cxt, D1E2.first);
+    // Emptying the group must remove the whole group as a listener.
+    cxt.empty_cells(D1E2);
 
     sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
     assert(sorted.empty());
 }
 
-void test_unregister_formula_cell_range_refs()
+void test_unregister_range_refs_on_empty()
 {
     IXION_TEST_FUNC_SCOPE;
 
@@ -1575,19 +1569,16 @@ void test_unregister_formula_cell_range_refs()
         ixion::abs_address_t C1(0, 0, 2);
         ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, C1, *resolver, formula);
         cxt.set_formula_cell(C1, std::move(tokens));
-        ixion::register_formula_cell(cxt, C1);
 
         std::vector<ixion::abs_range_t> sorted =
             ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
         assert(sorted.size() == 1);
         assert(sorted[0] == ixion::abs_range_t(C1));
 
-        ixion::unregister_formula_cell(cxt, C1);
+        cxt.empty_cell(C1);
 
         sorted = ixion::query_and_sort_dirty_cells(cxt, modified_cells, nullptr);
         assert(sorted.empty());
-
-        cxt.empty_cell(C1);
     }
 }
 
@@ -1629,50 +1620,6 @@ void test_ungrouped_matrix_result()
     assert(cxt.get_numeric_value(A1) == 10.0);
     assert(cxt.get_numeric_value(B1) == 10.0);
     assert(cxt.get_string_value(A2) == "top");
-}
-
-void test_register_grouped_formula_cells_non_parent()
-{
-    IXION_TEST_FUNC_SCOPE;
-
-    ixion::model_context cxt;
-    cxt.append_sheet("test");
-
-    auto resolver = ixion::formula_name_resolver::get(
-        ixion::formula_name_resolver_t::excel_a1, &cxt);
-    assert(resolver);
-
-    ixion::abs_range_t D1E2({0, 0, 3}, {0, 1, 4});
-    ixion::formula_tokens_t tokens = ixion::parse_formula_string(
-        cxt, D1E2.first, *resolver, "A1:B2*10");
-    cxt.set_grouped_formula_cells(D1E2, std::move(tokens));
-
-    // Only the top-left cell of a group may be registered or unregistered.
-    ixion::abs_address_t E1(0, 0, 4);
-
-    try
-    {
-        ixion::register_formula_cell(cxt, E1);
-        assert(!"register_formula_cell() should have thrown");
-    }
-    catch (const ixion::model_context_error&)
-    {
-        // expected
-    }
-
-    ixion::register_formula_cell(cxt, D1E2.first);
-
-    try
-    {
-        ixion::unregister_formula_cell(cxt, E1);
-        assert(!"unregister_formula_cell() should have thrown");
-    }
-    catch (const ixion::model_context_error&)
-    {
-        // expected
-    }
-
-    ixion::unregister_formula_cell(cxt, D1E2.first);
 }
 
 void test_volatile_function()
@@ -2419,10 +2366,6 @@ void test_model_context_append_sheet_copy_table_ref_divergence()
     ixion::abs_address_t copied_A1(copied, 0, 0);
     ixion::abs_address_t copied_D5(copied, 4, 3);
 
-    // Register the copied cell for dependency tracking, like the document
-    // layer does after a sheet copy.
-    ixion::register_formula_cell(cxt, copied_A1);
-
     // Modify a 'Value' cell of the source table.  Only the source A1
     // follows; the copied A1 now depends on the cloned table.
     cxt.set_numeric_cell(D5, 100.0);
@@ -3111,9 +3054,8 @@ int main()
     test_model_context_dump_sheet();
     test_grouped_formula_string_results();
     test_unregister_grouped_formula_cells();
-    test_unregister_formula_cell_range_refs();
+    test_unregister_range_refs_on_empty();
     test_ungrouped_matrix_result();
-    test_register_grouped_formula_cells_non_parent();
     test_auto_unregister_on_overwrite();
     test_auto_register_rejects_invalid_sheet();
     test_formula_group_overwrite_rules();

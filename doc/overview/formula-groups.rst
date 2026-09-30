@@ -89,8 +89,8 @@ parameter since we'll need them further down:
 
 .. literalinclude:: ../../doc_example/formula_groups.cpp
    :language: C++
-   :start-after: //!code-start: register-calculate
-   :end-before: //!code-end: register-calculate
+   :start-after: //!code-start: calculate-group
+   :end-before: //!code-end: calculate-group
    :dedent: 4
 
 .. code-block:: text

@@ -75,13 +75,6 @@ formula_error_t formula_error::get_error() const
     return mp_impl->error;
 }
 
-formula_registration_error::formula_registration_error(std::string_view msg)
-{
-    set_message(std::format("formula_registration_error: {}", msg));
-}
-
-formula_registration_error::~formula_registration_error() {}
-
 file_not_found::file_not_found(std::string_view fpath)
 {
     set_message(std::format("specified file not found: {}", fpath));

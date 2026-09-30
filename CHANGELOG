@@ -26,8 +26,9 @@ ixion 0.21.0
 
   * model_context now registers a formula cell with the dirty cell
     tracker when the cell gets set, and unregisters it when the cell
-    gets overwritten or emptied.  Callers no longer need to call
-    register_formula_cell() and unregister_formula_cell().  A cell
+    gets overwritten or emptied.  register_formula_cell(),
+    unregister_formula_cell(), formula_registration_error and
+    formula_cell::set_tokens() are removed from the public API.  A cell
     that belongs to a formula group of more than one cell can no longer
     be overwritten or emptied on its own.
 

@@ -150,24 +150,10 @@ have the tokens, you can finally pass them to your model_context instance via
    :end-before: //!code-end: set-formula-tokens
    :dedent: 4
 
-There is a few things to note. First, you need to *move* your tokens to the method since instances of
-type :cpp:type:`ixion::formula_tokens_t` are non-copyable and only movable.  Second, the method returns
-a pointer to the formula cell instance that just got inserted into the model. We are saving it here
-to use it in the next step below.
-
-When inserting a formula cell, you need to "register" it so that the model can record its reference
-dependencies via :cpp:func:`~ixion::register_formula_cell`:
-
-.. literalinclude:: ../../doc_example/model_context_simple.cpp
-   :language: C++
-   :start-after: //!code-start: register-formula-cell
-   :end-before: //!code-end: register-formula-cell
-   :dedent: 4
-
-Without registering formula cells, you won't be able to determine which formula cells to re-calculate
-for given modified cells.  Here we are passing the pointer to the formula cell returned from the previous
-call.  This is optional, and you can pass a ``nullptr`` instead. But by passing it you will avoid the
-overhead of searching for the cell instance from the model.
+Note that you need to *move* your tokens to the method since instances of type
+:cpp:type:`ixion::formula_tokens_t` are non-copyable and only movable.  Setting a formula cell also
+registers it with the model's dependency tracker, so the model can tell which formula cells to
+re-calculate for given modified cells.
 
 
 Calculate formula cell
@@ -255,16 +241,8 @@ Let's go through this step by step.  First, create new tokens to insert:
    :dedent: 4
 
 This time we are inserting the formula **AVERAGE(A1:A10)** in A11 to overwrite the previous one
-**SUM(A1:A10)**.  Before inserting these tokens, first unregister the current formula cell:
-
-.. literalinclude:: ../../doc_example/model_context_simple.cpp
-   :language: C++
-   :start-after: //!code-start: unregister-a11
-   :end-before: //!code-end: unregister-a11
-   :dedent: 4
-
-This will remove the dependency information of the old formula from the model's internal tracker.
-Once that's done, the rest is the same as inserting a new formula:
+**SUM(A1:A10)**.  Overwriting a formula cell is the same as inserting a new one; the model drops the
+dependency information of the old formula and records that of the new one:
 
 .. literalinclude:: ../../doc_example/model_context_simple.cpp
    :language: C++

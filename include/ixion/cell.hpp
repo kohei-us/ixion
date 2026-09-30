@@ -15,6 +15,8 @@
 
 namespace ixion {
 
+namespace detail { class model_context_impl; }
+
 class formula_result;
 class formula_cell;
 class model_context;
@@ -34,8 +36,18 @@ using calc_status_ptr_t = boost::intrusive_ptr<calc_status>;
  */
 class IXION_DLLPUBLIC formula_cell
 {
+    friend class detail::model_context_impl;
+
     struct impl;
     std::unique_ptr<impl> mp_impl;
+
+    /**
+     * Replace the store of the formula tokens of this cell.  The cached
+     * result is left as is, and the dependency tracker is not informed.
+     *
+     * @param tokens Token store to use.
+     */
+    void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
 public:
     formula_cell(const formula_cell&) = delete;
@@ -101,15 +113,6 @@ public:
      *         formula cells.
      */
     const formula_tokens_store_ptr_t& get_tokens() const;
-
-    /**
-     * Replace the store of the formula tokens of this cell.  The cached
-     * result is left as is, and the dependency tracker is not informed;
-     * unregister the cell before and register it again after.
-     *
-     * @param tokens Token store to use.
-     */
-    void set_tokens(const formula_tokens_store_ptr_t& tokens);
 
     /**
      * Get the cached result as a numeric value.

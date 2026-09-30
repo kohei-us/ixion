@@ -83,13 +83,8 @@ int main(int argc, char** argv)
 
     //!code-start: set-formula-tokens
     // Set the tokens into the model.
-    const ixion::formula_cell* cell = cxt.set_formula_cell(A11, std::move(tokens));
+    cxt.set_formula_cell(A11, std::move(tokens));
     //!code-end: set-formula-tokens
-
-    //!code-start: register-formula-cell
-    // Register this formula cell for automatic dependency tracking.
-    ixion::register_formula_cell(cxt, A11, cell);
-    //!code-end: register-formula-cell
 
     // Build a set of modified cells, to determine which formula cells depend
     // on them eithe directly or indirectly.  Since we are performing initial
@@ -127,15 +122,9 @@ int main(int argc, char** argv)
     tokens = ixion::parse_formula_string(cxt, A11, *resolver, "AVERAGE(A1:A10)");
     //!code-end: parse-formula-a11
 
-    //!code-start: unregister-a11
-    // Before overwriting, make sure to UN-register the old cell.
-    ixion::unregister_formula_cell(cxt, A11);
-    //!code-end: unregister-a11
-
     //!code-start: update-formula-a11
-    // Set and register the new formula cell.
-    cell = cxt.set_formula_cell(A11, std::move(tokens));
-    ixion::register_formula_cell(cxt, A11, cell);
+    // Set the new formula cell.
+    cxt.set_formula_cell(A11, std::move(tokens));
     //!code-end: update-formula-a11
 
     //!code-start: sort-a11

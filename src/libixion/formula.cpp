@@ -16,12 +16,10 @@
 #include "formula_lexer.hpp"
 #include "formula_parser.hpp"
 #include "formula_functions.hpp"
-#include "formula_registration.hpp"
 #include "debug.hpp"
 
 #include <sstream>
 #include <algorithm>
-#include <utility>
 
 namespace ixion {
 
@@ -257,34 +255,6 @@ std::string print_formula_token(
     std::ostringstream os;
     print_token(config, cxt, pos, resolver, token, os);
     return os.str();
-}
-
-void register_formula_cell(
-    model_context& cxt, const abs_address_t& pos, const formula_cell* cell)
-{
-    if (!cell)
-    {
-        cell = std::as_const(cxt).get_formula_cell(pos);
-        if (!cell)
-            // Not a formula cell. Bail out.
-            return;
-    }
-
-    std::vector<const formula_token*> ref_tokens =
-        detail::validate_formula_registration(cxt, pos, *cell);
-    detail::apply_formula_registration(cxt, pos, *cell, ref_tokens);
-}
-
-void unregister_formula_cell(model_context& cxt, const abs_address_t& pos)
-{
-    // When there is a formula cell at this position, unregister it from
-    // the dependency tree.
-    const formula_cell* fcell = std::as_const(cxt).get_formula_cell(pos);
-    if (!fcell)
-        // Not a formula cell. Bail out.
-        return;
-
-    detail::remove_formula_registration(cxt, pos, *fcell);
 }
 
 abs_address_set_t query_dirty_cells(model_context& cxt, const abs_address_set_t& modified_cells)

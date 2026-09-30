@@ -202,31 +202,9 @@ re-calculating:
 The dump of the new sheet shows everything carried over as is, including
 the result of C1, which is the one cell reported for re-calculation.
 
-The formula cells of the new sheet are not registered with the dependency
-tracker; that part is left to you to handle, the same way it is when you
-insert a formula cell yourself.  Here is a function that walks a sheet and
-registers each formula cell it finds:
-
-.. literalinclude:: ../../doc_example/sheet_copy.cpp
-   :language: C++
-   :start-after: //!code-start: register-sheet
-   :end-before: //!code-end: register-sheet
-
-It iterates over the data range of the sheet with
-:cpp:func:`~ixion::model_context::iterate_cells`, and calls
-:cpp:func:`~ixion::register_formula_cell` on every formula cell.  A formula
-group is registered through its top-left cell only, so the loop skips any cell
-that is not the parent of the group.  Refer to the :ref:`formula-groups`
-section for more details.  We call it on the new sheet:
-
-.. literalinclude:: ../../doc_example/sheet_copy.cpp
-   :language: C++
-   :start-after: //!code-start: cxt-register
-   :end-before: //!code-end: cxt-register
-   :dedent: 4
-
-Finally, the reported cells go into a calculation as the dirty formula
-cells:
+The formula cells of the new sheet are registered with the dependency
+tracker as part of the copy.  The reported cells go into a calculation as
+the dirty formula cells:
 
 .. literalinclude:: ../../doc_example/sheet_copy.cpp
    :language: C++
