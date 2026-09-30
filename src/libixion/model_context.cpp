@@ -66,7 +66,22 @@ model_context::model_context() :
 model_context::model_context(const rc_size_t& sheet_size) :
     mp_impl(std::make_unique<detail::model_context_impl>(*this, sheet_size)) {}
 
+model_context::model_context(model_context&& other) :
+    mp_impl(std::move(other.mp_impl))
+{
+    if (mp_impl)
+        mp_impl->set_parent(*this);
+}
+
 model_context::~model_context() = default;
+
+model_context& model_context::operator=(model_context&& other)
+{
+    mp_impl = std::move(other.mp_impl);
+    if (mp_impl)
+        mp_impl->set_parent(*this);
+    return *this;
+}
 
 formula_result_wait_policy_t model_context::get_formula_result_wait_policy() const
 {

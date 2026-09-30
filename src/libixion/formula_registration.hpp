@@ -14,10 +14,11 @@
 namespace ixion {
 
 class formula_cell;
-class model_context;
 struct formula_token;
 
 namespace detail {
+
+class model_context_impl;
 
 /**
  * Check that a formula cell can be registered with the dependency tracker,
@@ -35,7 +36,7 @@ namespace detail {
  *                            (invalid_sheet_reference).
  */
 std::vector<const formula_token*> validate_formula_registration(
-    const model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
+    const model_context_impl& cxt, const abs_address_t& pos, const formula_cell& cell);
 
 /**
  * Register a formula cell with the dependency tracker.  The cell must be in
@@ -43,7 +44,7 @@ std::vector<const formula_token*> validate_formula_registration(
  * from validate_formula_registration() on it; nothing gets checked here.
  */
 void apply_formula_registration(
-    model_context& cxt, const abs_address_t& pos, const formula_cell& cell,
+    model_context_impl& cxt, const abs_address_t& pos, const formula_cell& cell,
     const std::vector<const formula_token*>& ref_tokens);
 
 /**
@@ -56,7 +57,7 @@ void apply_formula_registration(
  *                            (invalid_sheet_reference).
  */
 void remove_formula_registration(
-    model_context& cxt, const abs_address_t& pos, const formula_cell& cell);
+    model_context_impl& cxt, const abs_address_t& pos, const formula_cell& cell);
 
 /**
  * Register all formula cells in a range, each group once at its top-left
@@ -70,7 +71,7 @@ void remove_formula_registration(
  *                            range (partial_formula_group), or a cell fails
  *                            validation (invalid_sheet_reference).
  */
-void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range);
+void register_formula_cells(model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range);
 
 /**
  * Unregister all formula cells in a range, each group once at its top-left
@@ -82,7 +83,7 @@ void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_rang
  * @throw model_context_error If a formula group lies only partly inside the
  *                            range (partial_formula_group).
  */
-void unregister_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range);
+void unregister_formula_cells(model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range);
 
 }}
 

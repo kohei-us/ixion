@@ -148,7 +148,8 @@ void throw_invalid_sheet_index(sheet_t sheet)
  * Check if the calculated result of a formula cell may depend on which
  * sheet the cell sits on.
  */
-bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& cell, const abs_address_t& pos)
+bool is_sheet_position_dependent(
+    const model_context_impl& cxt, const formula_cell& cell, const abs_address_t& pos)
 {
     const formula_tokens_store_ptr_t& ts = cell.get_tokens();
     if (!ts)
@@ -173,7 +174,7 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
     // Check for references with a non-zero relative sheet offset, including
     // those stored in named expressions.  A zero offset re-anchors to the
     // copied sheet whose cells hold identical values at copy time.
-    for (const formula_token* p : cell.get_ref_tokens(cxt, pos))
+    for (const formula_token* p : cxt.get_ref_tokens(cell, pos))
     {
         switch (p->opcode)
         {
@@ -209,7 +210,8 @@ bool is_sheet_position_dependent(const model_context& cxt, const formula_cell& c
  * Collect the positions of the formula cells on a copied sheet whose cached
  * results may no longer be valid on that sheet.
  */
-abs_range_set_t collect_recalc_cells(const model_context& cxt, const sheet_store& sheet, sheet_t sheet_index)
+abs_range_set_t collect_recalc_cells(
+    const model_context_impl& cxt, const sheet_store& sheet, sheet_t sheet_index)
 {
     abs_range_set_t recalc_cells;
 
@@ -584,9 +586,9 @@ model_context::sheet_copy_result model_context_impl::append_sheet_copy(sheet_t s
 
     // The copied formula cells are new to the dependency tracker.
     if (abs_rc_range_t data_range = m_sheets.back().get_data_range(); data_range.valid())
-        register_formula_cells(m_parent, res.sheet, data_range);
+        register_formula_cells(*this, res.sheet, data_range);
 
-    res.recalc_cells = collect_recalc_cells(m_parent, m_sheets.back(), res.sheet);
+    res.recalc_cells = collect_recalc_cells(*this, m_sheets.back(), res.sheet);
 
 #ifdef IXION_DEBUG_UTILS
     ensure_no_table_refs_to_clones(m_sheets[src], src, table_names);
@@ -998,7 +1000,7 @@ mdds::mtv::position_hint model_context_impl::unregister_formula_cell(const abs_a
             addr.get_name(), parent.get_name()), model_context_error::partial_formula_group);
     }
 
-    remove_formula_registration(m_parent, addr, *fc);
+    remove_formula_registration(*this, addr, *fc);
     return found;
 }
 
@@ -1017,7 +1019,7 @@ void model_context_impl::empty_cells(const abs_range_t& range)
 
     // This rejects a range covering only part of a formula group before
     // anything gets modified.
-    unregister_formula_cells(m_parent, range.first.sheet, abs_rc_range_t(range));
+    unregister_formula_cells(*this, range.first.sheet, abs_rc_range_t(range));
 
     sheet_store& sheet = m_sheets.at(range.first.sheet);
 
@@ -1059,7 +1061,7 @@ void model_context_impl::fill_down_cells(const abs_address_t& src, size_t n_dst)
 
     // The destination cells get overwritten.
     abs_rc_range_t dst_range(src.row + 1, src.column, row_t(n_dst), 1);
-    unregister_formula_cells(m_parent, src.sheet, dst_range);
+    unregister_formula_cells(*this, src.sheet, dst_range);
 
     write_fill_down_cells(src, n_dst);
 }
@@ -1237,11 +1239,11 @@ formula_cell* model_context_impl::set_formula_cell(
 {
     // Reject the formula before touching the model.
     std::vector<const formula_token*> ref_tokens =
-        validate_formula_registration(m_parent, addr, *fcell);
+        validate_formula_registration(*this, addr, *fcell);
 
     mdds::mtv::position_hint hint = unregister_formula_cell(addr);
     formula_cell* p = write_formula_cell(hint, addr, std::move(fcell));
-    apply_formula_registration(m_parent, addr, *p, ref_tokens);
+    apply_formula_registration(*this, addr, *p, ref_tokens);
     return p;
 }
 
@@ -1298,14 +1300,14 @@ void model_context_impl::set_formula_group(
     // shared token store, so they outlive the stand-in.
     formula_cell parent(0, 0, cs, ts);
     std::vector<const formula_token*> ref_tokens =
-        validate_formula_registration(m_parent, group_range.first, parent);
+        validate_formula_registration(*this, group_range.first, parent);
 
     // This rejects a range covering only part of an existing formula group
     // before anything gets modified.
-    unregister_formula_cells(m_parent, group_range.first.sheet, abs_rc_range_t(group_range));
+    unregister_formula_cells(*this, group_range.first.sheet, abs_rc_range_t(group_range));
 
     formula_cell* p = write_formula_group(group_range, cs, ts);
-    apply_formula_registration(m_parent, group_range.first, *p, ref_tokens);
+    apply_formula_registration(*this, group_range.first, *p, ref_tokens);
 }
 
 void model_context_impl::set_grouped_formula_cells(
@@ -1485,6 +1487,12 @@ string_id_t model_context_impl::get_identifier_from_string(std::string_view s) c
 std::string_view model_context_impl::intern_string(std::string_view s)
 {
     return m_inline_str_pool.intern(s);
+}
+
+std::vector<const formula_token*> model_context_impl::get_ref_tokens(
+    const formula_cell& cell, const abs_address_t& pos) const
+{
+    return cell.get_ref_tokens(m_parent, pos);
 }
 
 const formula_cell* model_context_impl::get_formula_cell(const abs_address_t& addr) const

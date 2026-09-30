@@ -245,7 +245,7 @@ void model_context_loader::finalize()
             "finalize() can only be called once", model_context_error::loader_already_finalized);
 
     mp_impl->finalized = true;
-    model_context& cxt = mp_impl->cxt;
+    detail::model_context_impl& cxt = *mp_impl->cxt.mp_impl;
 
     // A loader never overwrites cells, so every position still holds the
     // formula cell it got.
@@ -254,7 +254,7 @@ void model_context_loader::finalize()
 
     for (const abs_address_t& pos : mp_impl->formula_cells_to_register)
     {
-        const formula_cell* fc = std::as_const(cxt).get_formula_cell(pos);
+        const formula_cell* fc = cxt.get_formula_cell(pos);
         assert(fc);
         assert(fc->get_parent_position(pos) == pos);
         cells.emplace_back(pos, fc);

@@ -162,7 +162,23 @@ public:
      * @param sheet_size Number of rows and columns of each sheet.
      */
     model_context(const rc_size_t& sheet_size);
+
+    /**
+     * Move constructor.  The moved-from model can only be destroyed or
+     * assigned to afterwards.
+     *
+     * @param other Model to move from.
+     */
+    model_context(model_context&& other);
     ~model_context();
+
+    /**
+     * Move assignment.  The moved-from model can only be destroyed or
+     * assigned to afterwards.
+     *
+     * @param other Model to move from.
+     */
+    model_context& operator=(model_context&& other);
 
     /**
      * Query the current policy on what to do when a formula cell result is

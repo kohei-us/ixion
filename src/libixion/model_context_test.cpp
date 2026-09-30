@@ -3023,6 +3023,41 @@ void test_auto_register_volatile()
     assert(dirty.empty());
 }
 
+void test_model_context_move()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context src;
+    auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &src);
+    src.append_sheet("test");
+
+    ixion::abs_address_t A1(0, 0, 0);
+    ixion::abs_address_t B1(0, 0, 1);
+    ixion::abs_address_t C1(0, 0, 2);
+    src.set_numeric_cell(A1, 1.0);
+    set_formula(src, *resolver, B1, "A1*2");
+    assert(is_sole_listener(src, B1, A1));
+
+    // Move-constructing takes the content and the tracker along.
+    ixion::model_context moved(std::move(src));
+    assert(moved.get_numeric_value(A1) == 1.0);
+    assert(is_sole_listener(moved, B1, A1));
+
+    // The moved-to model registers new cells with its own tracker.  The
+    // resolver still points at the moved-from model, so make a new one.
+    resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &moved);
+    set_formula(moved, *resolver, C1, "A1*3");
+    assert(listeners_of(moved, A1).size() == 2);
+
+    // Move-assigning replaces the content of the target.
+    ixion::model_context target;
+    target.append_sheet("other");
+    target = std::move(moved);
+    assert(target.get_sheet_name(0) == "test");
+    assert(target.get_numeric_value(A1) == 1.0);
+    assert(listeners_of(target, A1).size() == 2);
+}
+
 } // anonymous namespace
 
 int main()
@@ -3062,6 +3097,7 @@ int main()
     test_fill_down_unregisters();
     test_append_sheet_copy_registers_formulas();
     test_auto_register_volatile();
+    test_model_context_move();
     test_volatile_function();
     test_volatile_rand_today();
     test_parse_and_print_expressions();

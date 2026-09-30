@@ -28,6 +28,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <deque>
+#include <functional>
 
 namespace ixion { namespace detail {
 
@@ -60,6 +61,18 @@ public:
     {
         return m_parent;
     }
+
+    void set_parent(model_context& parent)
+    {
+        m_parent = parent;
+    }
+
+    /**
+     * Get the reference tokens of a formula cell, expanding the named
+     * expressions it uses.
+     */
+    std::vector<const formula_token*> get_ref_tokens(
+        const formula_cell& cell, const abs_address_t& pos) const;
 
     void notify(formula_event_t event);
 
@@ -292,7 +305,7 @@ private:
         const formula_tokens_store_ptr_t& ts);
 
 private:
-    model_context& m_parent;
+    std::reference_wrapper<model_context> m_parent;
 
     rc_size_t m_sheet_size;
     sheet_stores_type m_sheets;

@@ -6,6 +6,7 @@
  */
 
 #include "formula_registration.hpp"
+#include "model_context_impl.hpp"
 #include "debug.hpp"
 
 #include <ixion/cell.hpp>
@@ -58,7 +59,7 @@ bool has_volatile(const formula_tokens_t& tokens)
 }
 
 void check_sheet_or_throw(
-    const char* func_name, sheet_t sheet, const model_context& cxt,
+    const char* func_name, sheet_t sheet, const model_context_impl& cxt,
     const abs_address_t& pos, const formula_cell& cell)
 {
     if (is_valid_sheet(sheet))
@@ -66,12 +67,12 @@ void check_sheet_or_throw(
 
     IXION_DEBUG("invalid range reference: func=" << func_name
         << "; pos=" << pos.get_name()
-        << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
+        << "; formula='" << detail::print_formula_expression(cxt.get_parent(), pos, cell)
         << "'");
 
     throw model_context_error(std::format(
         "{}: invalid sheet index in {}: formula='{}'",
-        func_name, pos.get_name(), detail::print_formula_expression(cxt, pos, cell)),
+        func_name, pos.get_name(), detail::print_formula_expression(cxt.get_parent(), pos, cell)),
         model_context_error::invalid_sheet_reference);
 }
 
@@ -80,7 +81,7 @@ void check_sheet_or_throw(
  * references pass.
  */
 void check_ref_sheet_or_throw(
-    const char* func_name, const formula_token& token, const model_context& cxt,
+    const char* func_name, const formula_token& token, const model_context_impl& cxt,
     const abs_address_t& pos, const formula_cell& cell)
 {
     switch (token.opcode)
@@ -143,7 +144,7 @@ abs_range_t to_listener_range(const abs_address_t& pos, const formula_cell& cell
  * accepts: expand a whole-column or whole-row reference to the sheet
  * size, and order the corners.
  */
-abs_range_t to_tracked_range(const model_context& cxt, abs_range_t range)
+abs_range_t to_tracked_range(const model_context_impl& cxt, abs_range_t range)
 {
     rc_size_t sheet_size = cxt.get_sheet_size();
     if (range.all_columns())
@@ -178,7 +179,7 @@ using formula_cell_entry = std::pair<abs_address_t, const formula_cell*>;
  * cell.  Throws if a group lies only partly inside the range.
  */
 std::vector<formula_cell_entry> collect_formula_cells(
-    const model_context& cxt, sheet_t sheet, const abs_rc_range_t& range)
+    const model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range)
 {
     std::vector<formula_cell_entry> entries;
 
@@ -216,11 +217,11 @@ std::vector<formula_cell_entry> collect_formula_cells(
 }
 
 std::vector<const formula_token*> validate_formula_registration(
-    const model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
+    const model_context_impl& cxt, const abs_address_t& pos, const formula_cell& cell)
 {
     check_group_parent_or_throw("validate_formula_registration", pos, cell);
 
-    std::vector<const formula_token*> ref_tokens = cell.get_ref_tokens(cxt, pos);
+    std::vector<const formula_token*> ref_tokens = cxt.get_ref_tokens(cell, pos);
 
     for (const formula_token* p : ref_tokens)
         check_ref_sheet_or_throw("validate_formula_registration", *p, cxt, pos, cell);
@@ -229,7 +230,7 @@ std::vector<const formula_token*> validate_formula_registration(
 }
 
 void apply_formula_registration(
-    model_context& cxt, const abs_address_t& pos, const formula_cell& cell,
+    model_context_impl& cxt, const abs_address_t& pos, const formula_cell& cell,
     const std::vector<const formula_token*>& ref_tokens)
 {
 #ifdef IXION_DEBUG_UTILS
@@ -246,7 +247,7 @@ void apply_formula_registration(
     abs_range_t src_pos = to_listener_range(pos, cell);
 
     IXION_TRACE("pos=" << pos.get_name()
-        << "; formula='" << detail::print_formula_expression(cxt, pos, cell)
+        << "; formula='" << detail::print_formula_expression(cxt.get_parent(), pos, cell)
         << "'");
 
     for (const formula_token* p : ref_tokens)
@@ -289,7 +290,7 @@ void apply_formula_registration(
 }
 
 void remove_formula_registration(
-    model_context& cxt, const abs_address_t& pos, const formula_cell& cell)
+    model_context_impl& cxt, const abs_address_t& pos, const formula_cell& cell)
 {
     check_group_parent_or_throw("remove_formula_registration", pos, cell);
 
@@ -301,7 +302,7 @@ void remove_formula_registration(
     // Go through all its existing references, and remove itself as their
     // listener.  This step is important especially during partial
     // re-calculation.
-    for (const formula_token* p : cell.get_ref_tokens(cxt, pos))
+    for (const formula_token* p : cxt.get_ref_tokens(cell, pos))
     {
 
         switch (p->opcode)
@@ -337,7 +338,7 @@ void remove_formula_registration(
     }
 }
 
-void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range)
+void register_formula_cells(model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range)
 {
     std::vector<formula_cell_entry> entries = collect_formula_cells(cxt, sheet, range);
 
@@ -356,7 +357,7 @@ void register_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_rang
     }
 }
 
-void unregister_formula_cells(model_context& cxt, sheet_t sheet, const abs_rc_range_t& range)
+void unregister_formula_cells(model_context_impl& cxt, sheet_t sheet, const abs_rc_range_t& range)
 {
     std::vector<formula_cell_entry> entries = collect_formula_cells(cxt, sheet, range);
 
