@@ -113,12 +113,9 @@ or indirectly.
    A11 references A1:A10 and B1 references A11.  When A5 changes, the
    tracker reports A11 as dirty, and through it B1.
 
-The tracker only knows what you tell it.  After inserting a formula cell into
-the model, you *register* it with :cpp:func:`~ixion::register_formula_cell`,
-which walks through the reference tokens of the formula and records each one.
-Before overwriting or removing a formula cell, you *unregister* it with
-:cpp:func:`~ixion::unregister_formula_cell` so that its old references get
-dropped.
+The model keeps the tracker up to date on its own.  When you set a formula
+cell, it walks through the reference tokens of the formula and records each
+one; when you overwrite or empty a formula cell, it drops the old references.
 
 A formula cell whose result needs to be re-calculated is said to be *dirty*.
 That happens when one of the cells it references has changed, either
@@ -129,9 +126,11 @@ calculation.  See :ref:`errors-and-volatile`.
 
 .. note::
 
-    Registering a formula cell that has no references is harmless, and so is
-    unregistering a cell that was never registered.  When in doubt, register
-    every formula cell you insert and unregister every cell you overwrite.
+    The references get recorded at the moment you set the formula cell, so a
+    named expression or table the formula refers to has to exist by then.
+    When you load a file that stores its formula cells first,
+    :cpp:class:`~ixion::model_context_loader` lets you set them all before
+    the names and tables, and records the references once everything is in.
 
 
 Calculation

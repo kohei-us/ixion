@@ -137,10 +137,8 @@ that is the same for all the cells of one group.  It can be streamed to an
 output stream, which prints all of that in one go.
 :cpp:func:`~ixion::formula_cell::get_parent_position` maps a cell's
 position to that of the top-left cell of its group; for a cell that is not
-grouped it returns the position you passed in.  This is what the sheet
-walker on the :ref:`sheet-copy` page uses to tell the cell to register
-from the ones to skip.  Here we go through all four cells and compare each
-one against D1:
+grouped it returns the position you passed in.  Here we go through all four
+cells and compare each one against D1:
 
 .. literalinclude:: ../../doc_example/formula_groups.cpp
    :language: C++

@@ -90,11 +90,9 @@ Functions
    function-print_formula_tokens-2.rst
    function-query_and_sort_dirty_cells.rst
    function-query_dirty_cells.rst
-   function-register_formula_cell.rst
    function-to_bool.rst
    function-to_double.rst
    function-to_formula_error_type.rst
-   function-unregister_formula_cell.rst
 
 Struct
 ------
@@ -137,7 +135,6 @@ Classes
    class-formula_cell.rst
    class-formula_error.rst
    class-formula_name_resolver.rst
-   class-formula_registration_error.rst
    class-formula_result.rst
    class-formula_tokens_store.rst
    class-general_error.rst
@@ -145,6 +142,7 @@ Classes
    class-model_cell_range.rst
    class-model_context.rst
    class-model_context_error.rst
+   class-model_context_loader.rst
    class-model_iterator.rst
    class-named_expressions_iterator.rst
    class-named_expressions_range.rst

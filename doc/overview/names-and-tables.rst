@@ -22,10 +22,9 @@ define two helper functions.  The first one puts a formula into a cell:
    :start-after: //!code-start: set-formula
    :end-before: //!code-end: set-formula
 
-It parses the formula string into tokens, stores them in the cell, and
-registers the cell with the dependency tracker so that the model knows which
-cells it references.  The second one calculates a set of newly inserted
-formula cells:
+It parses the formula string into tokens and stores them in the cell; the
+model records which cells the formula references as part of that.  The
+second one calculates a set of newly inserted formula cells:
 
 .. literalinclude:: ../../doc_example/names_and_tables.cpp
    :language: C++
@@ -200,12 +199,13 @@ And here it is applied to both scopes:
 
 .. note::
 
-    :cpp:func:`~ixion::register_formula_cell` looks through named
-    expressions when it records a formula cell's references, so a change to
-    a cell that a name refers to marks the dependent formula cells dirty as
-    usual.  Redefining the name itself is another matter: the formula cells
-    that use it still hold the references recorded from the old definition
-    until you unregister and register them again.
+    The model looks through named expressions when it records a formula
+    cell's references, so a change to a cell that a name refers to marks the
+    dependent formula cells dirty as usual.  That also means a name has to
+    be defined before the formula cells that use it get set.  Redefining the
+    name afterwards is another matter: the formula cells that use it still
+    hold the references recorded from the old definition until you set them
+    again.
 
 
 Tables

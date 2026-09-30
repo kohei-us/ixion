@@ -115,8 +115,7 @@ The output says:
 
     value of A11: 5.5
 
-which looks right.  Note that, unlike the previous example, there is no need to un-register
-and register cell A11 before and after the edit.
+which looks right.
 
 Lastly, let's insert into cell A10 a new formula that contains no references to other cells.
 As this will trigger a re-calculation of cell A11, we will check the values of both A10

@@ -184,10 +184,8 @@ was modified, and so are the cells that depend on it:
     B5 follows A5: true
 
 The two dirty cells are A5 and its dependent B5.  Volatility is recorded
-when the cell is registered, since :cpp:func:`~ixion::register_formula_cell`
-is what looks at the formula's tokens, so a volatile formula cell you
-forget to register behaves like any other unregistered cell and never
-comes back dirty on its own.
+when the cell is set, at the same time as its references, and from then on
+the cell comes back dirty on every calculation.
 
 
 Results that aren't there yet
