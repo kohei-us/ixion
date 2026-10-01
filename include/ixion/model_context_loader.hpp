@@ -26,10 +26,10 @@ class formula_name_resolver;
 class formula_result;
 
 /**
- * Loads content into a model in bulk, as when importing a file.  It takes
- * the place of model_context for the duration of the load, and defers work
- * that the model_context setters do on every call until finalize(), where
- * the content only becomes consistent at the end of the load.
+ * Loads content into a new model, optimized for bulk loading.  It takes the
+ * place of model_context for the duration of the load: it owns the model,
+ * defers the work that the model_context setters do on every call until
+ * finalize(), and hands the loaded model out from there.
  *
  * The setters write and nothing else.  A formula cell doesn't get validated
  * or registered with the dirty cell tracker until finalize(), so the
@@ -40,10 +40,10 @@ class formula_result;
  *       they replace, so overwriting a cell through the loader is an error.
  *       Every sheet a formula references must exist when the formula gets
  *       set, and every named expression and table it references must exist
- *       when finalize() gets called.  Don't calculate the model before
- *       finalize(), and use one loader at a time per model.  The destructor
- *       doesn't finalize; the formula cells of a loader that never got
- *       finalized stay unregistered.
+ *       when finalize() gets called.  A successful finalize() ends the
+ *       load: every call on the loader afterwards throws
+ *       model_context_error (loader_already_finalized).  A loader destroyed
+ *       without finalize() takes the model with it.
  */
 class IXION_DLLPUBLIC model_context_loader
 {
@@ -51,22 +51,29 @@ class IXION_DLLPUBLIC model_context_loader
     std::unique_ptr<impl> mp_impl;
 
 public:
-    model_context_loader() = delete;
     model_context_loader(const model_context_loader&) = delete;
     model_context_loader& operator=(const model_context_loader&) = delete;
 
     /**
-     * Constructor.
-     *
-     * @param cxt Model to load formula cells into.  It must outlive the
-     *            loader.
+     * Construct a loader with a new model of the default sheet size, which
+     * is 1048576 rows by 16384 columns.
      */
-    explicit model_context_loader(model_context& cxt);
+    model_context_loader();
+
+    /**
+     * Construct a loader with a new model of a custom sheet size.  All
+     * sheets in the model share the same size.
+     *
+     * @param sheet_size Number of rows and columns of each sheet.
+     */
+    explicit model_context_loader(const rc_size_t& sheet_size);
+
     ~model_context_loader();
 
     /**
      * Create a formula name resolver of the requested type on the model
-     * being loaded.
+     * being loaded.  The resolver becomes invalid once finalize() has handed
+     * the model out; create a new one on the returned model.
      *
      * @param type Type of formula name resolver being requested.
      *
@@ -86,9 +93,6 @@ public:
      */
     formula_tokens_t parse_formula_string(
         const abs_address_t& pos, const formula_name_resolver& resolver, std::string_view formula);
-
-    /** @copydoc model_context::set_sheet_size(const rc_size_t&) */
-    void set_sheet_size(const rc_size_t& sheet_size);
 
     /** @copydoc model_context::append_sheet(std::string) */
     sheet_t append_sheet(std::string name);
@@ -244,19 +248,22 @@ public:
 
     /**
      * Register the formula cells set through the loader with the dirty cell
-     * tracker.  This ends the load; call it once.
+     * tracker, and hand the loaded model out.  This ends the load.
      *
      * Every cell gets validated before any of them gets registered, so a
-     * rejected cell leaves the tracker unchanged.  The rejected cell itself
-     * stays in the model.
+     * rejected cell leaves the tracker unchanged.  The model stays in the
+     * loader.
+     *
+     * @return The loaded model.
      *
      * @throw model_context_error When a reference in a formula, including
      *                            one reached through a named expression,
      *                            points at an invalid sheet
-     *                            (invalid_sheet_reference), or when called a
-     *                            second time (loader_already_finalized).
+     *                            (invalid_sheet_reference), or when the
+     *                            model has already been handed out
+     *                            (loader_already_finalized).
      */
-    void finalize();
+    model_context finalize();
 };
 
 }
