@@ -128,10 +128,9 @@ calculation.  See :ref:`errors-and-volatile`.
 
     The references get recorded at the moment you set the formula cell, so a
     named expression or table the formula refers to has to exist by then.
-    When you load a file that stores its formula cells first,
-    :cpp:class:`~ixion::model_context_loader` lets you set them all before
-    the names and tables, and records the references once everything is in.
-    See :ref:`model-context-loader`.
+    When you bulk-load a model, :cpp:class:`~ixion::model_context_loader`
+    records the references once everything is in, so the order the content
+    comes in matters less.  See :ref:`model-context-loader`.
 
 
 Calculation
