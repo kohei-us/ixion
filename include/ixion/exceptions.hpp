@@ -112,7 +112,9 @@ public:
         /** A write covers only part of a formula group. */
         partial_formula_group,
         /** A model_context_loader got used after it handed its model out. */
-        loader_already_finalized
+        loader_already_finalized,
+        /** A model_context_loader got asked to write to a cell that is not empty. */
+        loader_cell_not_empty
     };
 
     /**

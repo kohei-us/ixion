@@ -131,6 +131,7 @@ calculation.  See :ref:`errors-and-volatile`.
     When you load a file that stores its formula cells first,
     :cpp:class:`~ixion::model_context_loader` lets you set them all before
     the names and tables, and records the references once everything is in.
+    See :ref:`model-context-loader`.
 
 
 Calculation

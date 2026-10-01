@@ -7,6 +7,7 @@ Overview
 
    concepts.rst
    model-context.rst
+   model-context-loader.rst
    document.rst
    cell-access.rst
    formula-syntax.rst

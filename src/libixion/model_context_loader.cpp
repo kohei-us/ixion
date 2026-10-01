@@ -132,43 +132,37 @@ string_id_t model_context_loader::add_string(std::string_view s)
 
 void model_context_loader::set_numeric_cell(const abs_address_t& addr, double val)
 {
-#ifdef IXION_DEBUG_UTILS
-    mp_impl->get_model_impl().ensure_empty_or_throw(addr);
-#endif
-    mp_impl->get_model_impl().write_numeric_cell(addr, val);
+    detail::model_context_impl& cxt = mp_impl->get_model_impl();
+    mdds::mtv::position_hint hint = cxt.ensure_empty_or_throw(addr);
+    cxt.write_numeric_cell(hint, addr, val);
 }
 
 void model_context_loader::set_boolean_cell(const abs_address_t& addr, bool val)
 {
-#ifdef IXION_DEBUG_UTILS
-    mp_impl->get_model_impl().ensure_empty_or_throw(addr);
-#endif
-    mp_impl->get_model_impl().write_boolean_cell(addr, val);
+    detail::model_context_impl& cxt = mp_impl->get_model_impl();
+    mdds::mtv::position_hint hint = cxt.ensure_empty_or_throw(addr);
+    cxt.write_boolean_cell(hint, addr, val);
 }
 
 void model_context_loader::set_string_cell(const abs_address_t& addr, std::string_view s)
 {
-#ifdef IXION_DEBUG_UTILS
-    mp_impl->get_model_impl().ensure_empty_or_throw(addr);
-#endif
-    mp_impl->get_model_impl().write_string_cell(addr, s);
+    detail::model_context_impl& cxt = mp_impl->get_model_impl();
+    mdds::mtv::position_hint hint = cxt.ensure_empty_or_throw(addr);
+    cxt.write_string_cell(hint, addr, s);
 }
 
 void model_context_loader::set_string_cell(const abs_address_t& addr, string_id_t identifier)
 {
-#ifdef IXION_DEBUG_UTILS
-    mp_impl->get_model_impl().ensure_empty_or_throw(addr);
-#endif
-    mp_impl->get_model_impl().write_string_cell(addr, identifier);
+    detail::model_context_impl& cxt = mp_impl->get_model_impl();
+    mdds::mtv::position_hint hint = cxt.ensure_empty_or_throw(addr);
+    cxt.write_string_cell(hint, addr, identifier);
 }
 
 void model_context_loader::fill_down_cells(const abs_address_t& src, std::size_t n_dst)
 {
-#ifdef IXION_DEBUG_UTILS
-    mp_impl->get_model_impl().ensure_empty_or_throw(
-        abs_range_t(src.sheet, src.row + 1, src.column, row_t(n_dst), 1));
-#endif
-    mp_impl->get_model_impl().write_fill_down_cells(src, n_dst);
+    detail::model_context_impl& cxt = mp_impl->get_model_impl();
+    cxt.ensure_empty_or_throw(abs_range_t(src.sheet, src.row + 1, src.column, row_t(n_dst), 1));
+    cxt.write_fill_down_cells(src, n_dst);
 }
 
 void model_context_loader::set_cell_values(
@@ -215,10 +209,8 @@ formula_cell* model_context_loader::set_formula_cell(
     const abs_address_t& addr, const formula_tokens_store_ptr_t& tokens)
 {
     detail::model_context_impl& cxt = mp_impl->get_model_impl();
-#ifdef IXION_DEBUG_UTILS
-    cxt.ensure_empty_or_throw(addr);
-#endif
-    formula_cell* p = cxt.write_formula_cell(addr, std::make_unique<formula_cell>(tokens));
+    mdds::mtv::position_hint hint = cxt.ensure_empty_or_throw(addr);
+    formula_cell* p = cxt.write_formula_cell(hint, addr, std::make_unique<formula_cell>(tokens));
     mp_impl->formula_cells_to_register.push_back(addr);
     return p;
 }
@@ -229,10 +221,8 @@ formula_cell* model_context_loader::set_formula_cell(
     detail::model_context_impl& cxt = mp_impl->get_model_impl();
     std::unique_ptr<formula_cell> fcell = std::make_unique<formula_cell>(tokens);
     fcell->set_result_cache(std::move(result));
-#ifdef IXION_DEBUG_UTILS
-    cxt.ensure_empty_or_throw(addr);
-#endif
-    formula_cell* p = cxt.write_formula_cell(addr, std::move(fcell));
+    mdds::mtv::position_hint hint = cxt.ensure_empty_or_throw(addr);
+    formula_cell* p = cxt.write_formula_cell(hint, addr, std::move(fcell));
     mp_impl->formula_cells_to_register.push_back(addr);
     return p;
 }
@@ -243,9 +233,7 @@ void model_context_loader::set_grouped_formula_cells(
     detail::model_context_impl& cxt = mp_impl->get_model_impl();
     formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
     calc_status_ptr_t cs = detail::model_context_impl::create_group_status(group_range);
-#ifdef IXION_DEBUG_UTILS
     cxt.ensure_empty_or_throw(group_range);
-#endif
     cxt.write_formula_group(group_range, cs, ts);
     mp_impl->formula_cells_to_register.push_back(group_range.first);
 }
@@ -257,9 +245,7 @@ void model_context_loader::set_grouped_formula_cells(
     formula_tokens_store_ptr_t ts = formula_tokens_store::create(std::move(tokens));
     calc_status_ptr_t cs =
         detail::model_context_impl::create_group_status(group_range, std::move(result));
-#ifdef IXION_DEBUG_UTILS
     cxt.ensure_empty_or_throw(group_range);
-#endif
     cxt.write_formula_group(group_range, cs, ts);
     mp_impl->formula_cells_to_register.push_back(group_range.first);
 }

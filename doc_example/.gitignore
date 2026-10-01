@@ -3,6 +3,7 @@ document-simple
 errors-and-volatile
 formula-groups
 formula-syntax
+model-context-loader
 model-context-simple
 names-and-tables
 sheet-copy

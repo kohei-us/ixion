@@ -94,31 +94,40 @@ void test_value_setters()
     assert(cxt.get_string_value(D2) == "appended");
 }
 
-#ifdef IXION_DEBUG_UTILS
-
-void test_overwrite_rejected_in_debug_builds()
+void test_overwrite_rejected()
 {
     IXION_TEST_FUNC_SCOPE;
 
     model_context_loader loader;
+    auto resolver = loader.create_name_resolver(formula_name_resolver_t::excel_a1);
     loader.append_sheet("test");
 
     abs_address_t A1(0, 0, 0);
+    abs_range_t A1B2(0, 0, 0, 2, 2);
     loader.set_numeric_cell(A1, 1.0);
 
-    // A loader never overwrites a cell; debug builds enforce it.
+    // A loader never overwrites a cell.
     try
     {
         loader.set_numeric_cell(A1, 2.0);
         assert(!"overwriting a cell should have thrown");
     }
-    catch (const std::runtime_error&)
+    catch (const model_context_error& e)
     {
-        // expected.
+        assert(e.get_error_type() == model_context_error::loader_cell_not_empty);
+    }
+
+    // Nor does a group write touch a range that isn't empty.
+    try
+    {
+        loader.set_grouped_formula_cells(A1B2, loader.parse_formula_string(A1, *resolver, "1"));
+        assert(!"writing a group over a cell should have thrown");
+    }
+    catch (const model_context_error& e)
+    {
+        assert(e.get_error_type() == model_context_error::loader_cell_not_empty);
     }
 }
-
-#endif
 
 void test_names_after_formulas()
 {
@@ -264,9 +273,7 @@ void test_finalize_rejects_invalid_name_reference()
 int main()
 {
     test_value_setters();
-#ifdef IXION_DEBUG_UTILS
-    test_overwrite_rejected_in_debug_builds();
-#endif
+    test_overwrite_rejected();
     test_names_after_formulas();
     test_cached_results();
     test_finalize_rejects_invalid_reference();

@@ -15,7 +15,8 @@ EXTRA_PROGRAMS = \
 	names-and-tables \
 	sheet-copy \
 	formula-groups \
-	errors-and-volatile
+	errors-and-volatile \
+	model-context-loader
 
 document_simple_SOURCES = document_simple.cpp
 document_simple_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
@@ -44,6 +45,9 @@ formula_groups_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 errors_and_volatile_SOURCES = errors_and_volatile.cpp
 errors_and_volatile_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
 
+model_context_loader_SOURCES = model_context_loader.cpp
+model_context_loader_LDADD = ../src/libixion/libixion-@IXION_API_VERSION@.la
+
 TESTS = \
 	document-simple \
 	model-context-simple \
@@ -53,7 +57,8 @@ TESTS = \
 	names-and-tables \
 	sheet-copy \
 	formula-groups \
-	errors-and-volatile
+	errors-and-volatile \
+	model-context-loader
 
 distclean-local:
 	rm -rf $(TESTS)

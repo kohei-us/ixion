@@ -1134,18 +1134,21 @@ void model_context_impl::set_string_cell(const abs_address_t& addr, string_id_t 
     write_string_cell(hint, addr, identifier);
 }
 
-#ifdef IXION_DEBUG_UTILS
-
-void model_context_impl::ensure_empty_or_throw(const abs_address_t& addr) const
+mdds::mtv::position_hint model_context_impl::ensure_empty_or_throw(const abs_address_t& addr)
 {
-    const sheet_store& sheet = m_sheets.at(addr.sheet);
+    sheet_store& sheet = m_sheets.at(addr.sheet);
     const column_store_t& col_store = sheet.at(addr.column);
-    if (col_store.is_empty(addr.row))
-        return;
+    const mdds::mtv::position_hint& pos_hint = sheet.get_pos_hint(addr.column);
+    auto pos = col_store.position(pos_hint, addr.row);
 
-    std::ostringstream os;
-    os << "a loader must not overwrite cells, but " << addr << " is not empty";
-    throw std::runtime_error(os.str());
+    if (pos.first->type != element_type_empty)
+    {
+        std::ostringstream os;
+        os << "a loader must not overwrite cells, but " << addr << " is not empty";
+        throw model_context_error(os.str(), model_context_error::loader_cell_not_empty);
+    }
+
+    return mdds::mtv::position_hint(pos.first);
 }
 
 void model_context_impl::ensure_empty_or_throw(const abs_range_t& range) const
@@ -1155,10 +1158,8 @@ void model_context_impl::ensure_empty_or_throw(const abs_range_t& range) const
 
     std::ostringstream os;
     os << "a loader must not overwrite cells, but " << range << " is not empty";
-    throw std::runtime_error(os.str());
+    throw model_context_error(os.str(), model_context_error::loader_cell_not_empty);
 }
-
-#endif
 
 void model_context_impl::write_numeric_cell(const abs_address_t& addr, double val)
 {

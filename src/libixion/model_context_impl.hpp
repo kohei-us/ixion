@@ -143,12 +143,13 @@ public:
         mdds::mtv::position_hint hint, const abs_address_t& addr,
         std::unique_ptr<formula_cell> fcell);
 
-#ifdef IXION_DEBUG_UTILS
-    /** Throw unless the cell is empty; for model_context_loader's contract. */
-    void ensure_empty_or_throw(const abs_address_t& addr) const;
+    /**
+     * Throw unless the cell is empty; for model_context_loader's contract.
+     * Returns the position hint of the block it found, to write with.
+     */
+    mdds::mtv::position_hint ensure_empty_or_throw(const abs_address_t& addr);
     /** Throw unless every cell in the range is empty. */
     void ensure_empty_or_throw(const abs_range_t& range) const;
-#endif
 
     /** Write a group of formula cells, and return its top-left cell. */
     formula_cell* write_formula_group(

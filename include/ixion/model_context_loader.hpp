@@ -36,8 +36,8 @@ class formula_result;
  * formula cells don't depend on the named expressions and tables they
  * reference being loaded first.
  *
- * @note Each cell gets written at most once: the setters don't look at what
- *       they replace, so overwriting a cell through the loader is an error.
+ * @note Each cell gets written at most once: a setter aimed at a cell that
+ *       isn't empty throws model_context_error (loader_cell_not_empty).
  *       Every sheet a formula references must exist when the formula gets
  *       set, and every named expression and table it references must exist
  *       when finalize() gets called.  A successful finalize() ends the
