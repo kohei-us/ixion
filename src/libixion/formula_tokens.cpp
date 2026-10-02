@@ -232,6 +232,8 @@ named_expression_t::named_expression_t(named_expression_t&& other) :
 
 named_expression_t::~named_expression_t() {}
 
+named_expression_t& named_expression_t::operator=(named_expression_t&& other) = default;
+
 std::ostream& operator<< (std::ostream& os, const formula_token& ft)
 {
     switch (ft.opcode)

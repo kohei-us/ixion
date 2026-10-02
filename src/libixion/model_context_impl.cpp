@@ -388,12 +388,8 @@ void model_context_impl::set_named_expression(
     check_named_exp_name_or_throw(name.data(), name.size());
 
     IXION_TRACE("named expression: name='" << name << "'");
-    m_named_expressions.insert(
-        detail::named_expressions_t::value_type(
-            std::move(name),
-            named_expression_t(origin, std::move(expr))
-        )
-    );
+    m_named_expressions.insert_or_assign(
+        std::move(name), named_expression_t(origin, std::move(expr)));
 }
 
 void model_context_impl::set_named_expression(
@@ -403,12 +399,7 @@ void model_context_impl::set_named_expression(
 
     detail::named_expressions_t& ns = m_sheets.at(sheet).get_named_expressions();
     IXION_TRACE("named expression: name='" << name << "'");
-    ns.insert(
-        detail::named_expressions_t::value_type(
-            std::move(name),
-            named_expression_t(origin, std::move(expr))
-        )
-    );
+    ns.insert_or_assign(std::move(name), named_expression_t(origin, std::move(expr)));
 }
 
 const named_expression_t* model_context_impl::get_named_expression(std::string_view name) const

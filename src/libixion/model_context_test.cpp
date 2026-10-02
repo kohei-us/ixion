@@ -564,6 +564,32 @@ bool check_model_iterator_output(
     return true;
 }
 
+void test_model_context_named_expression_redefine()
+{
+    IXION_TEST_FUNC_SCOPE;
+
+    ixion::model_context cxt;
+    cxt.append_sheet("test");
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
+    ixion::abs_address_t A1(0, 0, 0);
+
+    // The second definition replaces the first, in both scopes.
+    cxt.set_named_expression("MyName", ixion::parse_formula_string(cxt, A1, *resolver, "$A$1"));
+    cxt.set_named_expression("MyName", ixion::parse_formula_string(cxt, A1, *resolver, "$B$1"));
+
+    const ixion::named_expression_t* exp = cxt.get_named_expression(0, "MyName");
+    assert(exp);
+    assert(ixion::print_formula_tokens(cxt, A1, *resolver, exp->tokens) == "$B$1");
+
+    cxt.set_named_expression(0, "Local", ixion::parse_formula_string(cxt, A1, *resolver, "$A$2"));
+    cxt.set_named_expression(0, "Local", ixion::parse_formula_string(cxt, A1, *resolver, "$B$2"));
+
+    exp = cxt.get_named_expression(0, "Local");
+    assert(exp);
+    assert(ixion::print_formula_tokens(cxt, A1, *resolver, exp->tokens) == "$B$2");
+}
+
 void test_model_context_iterator_horizontal()
 {
     IXION_TEST_FUNC_SCOPE;
@@ -3068,6 +3094,7 @@ int main()
     test_model_context_direct_string_access();
     test_model_context_inline_string();
     test_model_context_named_expression();
+    test_model_context_named_expression_redefine();
     test_model_context_iterator_horizontal();
     test_model_context_iterator_horizontal_range();
     test_model_context_iterator_vertical();

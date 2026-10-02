@@ -238,6 +238,10 @@ struct IXION_DLLPUBLIC named_expression_t
     /** Move constructor. */
     named_expression_t(named_expression_t&& other);
     ~named_expression_t();
+
+    named_expression_t& operator=(const named_expression_t&) = delete;
+    /** Move assignment. */
+    named_expression_t& operator=(named_expression_t&& other);
 };
 
 IXION_DLLPUBLIC std::ostream& operator<< (std::ostream& os, const formula_token& ft);

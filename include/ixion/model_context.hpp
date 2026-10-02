@@ -776,7 +776,7 @@ public:
 
     /**
      * Set a named expression associated with a string name in the global
-     * scope.
+     * scope.  An existing expression by the same name gets replaced.
      *
      * @param name name of the expression.
      * @param expr formula tokens to use for the named expression.
@@ -785,7 +785,7 @@ public:
 
     /**
      * Set a named expression associated with a string name in the global
-     * scope.
+     * scope.  An existing expression by the same name gets replaced.
      *
      * @param name name of the expression.
      * @param origin position of the origin cell.  Origin cell is relevant
@@ -797,7 +797,7 @@ public:
 
     /**
      * Set a named expression associated with a string name in a sheet-local
-     * scope.
+     * scope.  An existing expression by the same name gets replaced.
      *
      * @param sheet 0-based index of the sheet to register this expression
      *              with.
@@ -808,7 +808,7 @@ public:
 
     /**
      * Set a named expression associated with a string name in a sheet-local
-     * scope.
+     * scope.  An existing expression by the same name gets replaced.
      *
      * @param sheet 0-based index of the sheet to register this expression
      *              with.
