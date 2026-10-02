@@ -14,22 +14,22 @@ checks what it replaces, validates a formula and records its references
 right away.
 
 :cpp:class:`~ixion::model_context_loader` is a stand-in for
-:cpp:class:`~ixion::model_context` optimized for bulk loading.  It creates
-and owns a new model, its setters only write, and the validation and the
-recording of references happen once, in
-:cpp:func:`~ixion::model_context_loader::finalize`, which then hands the
-finished model to you.  Validating everything at the end also loosens the
-order the content has to come in: you can load the cells first and the rest,
-such as named expressions and tables, afterwards, or the other way around.
+:cpp:class:`~ixion::model_context` optimized for bulk loading.  It wraps a
+model you own for the duration of the load, its setters only write, and the
+validation and the recording of references happen once, in
+:cpp:func:`~ixion::model_context_loader::finalize`.  After that the loader
+has done its job and you can discard it.  Validating everything at the end
+also loosens the order the content has to come in: you can load the cells
+first and the rest, such as named expressions and tables, afterwards, or the
+other way around.
 
 
 Create a loader
 ---------------
 
-A loader gets constructed the way a :cpp:class:`~ixion::model_context` does,
-with the default sheet size or a custom one.  Since the model lives inside
-the loader, you append the sheets and create the name resolver through the
-loader too:
+You create the model and a name resolver on it as usual, then hand the
+model to the loader.  From here on you talk to the loader, starting with the
+sheets:
 
 .. literalinclude:: ../../doc_example/model_context_loader.cpp
    :language: C++
@@ -72,13 +72,13 @@ call on the model:
    :dedent: 4
 
 
-Finalize and take the model
----------------------------
+Finalize
+--------
 
 Once everything is in, call
 :cpp:func:`~ixion::model_context_loader::finalize`.  It validates every
-formula cell set through the loader, records their references with the
-dirty cell tracker, and returns the model:
+formula cell set through the loader and records their references with the
+dirty cell tracker:
 
 .. literalinclude:: ../../doc_example/model_context_loader.cpp
    :language: C++
@@ -86,20 +86,10 @@ dirty cell tracker, and returns the model:
    :end-before: //!code-end: finalize
    :dedent: 4
 
-This ends the load.  The loader has nothing left in it, and any further call
-on it throws.  The name resolver you created through the loader points at
-the model that just moved out, so it's no good any more either; create a new
-one on the returned model if you need to parse more formulas.
-
-.. warning::
-
-    A name resolver created through the loader becomes invalid once
-    :cpp:func:`~ixion::model_context_loader::finalize` has returned the
-    model.  Create a new one on the returned model instead.
-
-From here on, the model is an ordinary :cpp:class:`~ixion::model_context`.
-The results you loaded are readable right away, and the references are in
-place, so a change to a cell propagates the usual way:
+This ends the load: any further call on the loader throws, and you can let
+it go.  The model is yours to use as usual.  The results you loaded are
+readable right away, and the references are in place, so a change to a cell
+propagates the usual way:
 
 .. literalinclude:: ../../doc_example/model_context_loader.cpp
    :language: C++
@@ -132,6 +122,10 @@ extra responsibilities:
 * You define every named expression and table a formula references before
   you call :cpp:func:`~ixion::model_context_loader::finalize`, since that
   is where the references get resolved and dependencies get recorded.
+
+* You leave the cells alone while the loader works on the model: don't
+  modify or calculate them through :cpp:class:`~ixion::model_context` until
+  :cpp:func:`~ixion::model_context_loader::finalize` has run.
 
 The complete source code of this example is available
 `here <https://gitlab.com/ixion/ixion/-/blob/master/doc_example/model_context_loader.cpp>`_.

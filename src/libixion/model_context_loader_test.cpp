@@ -57,8 +57,8 @@ void test_value_setters()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    rc_size_t sheet_size(10, 5);
-    model_context_loader loader(sheet_size);
+    model_context cxt;
+    model_context_loader loader(cxt);
     sheet_t sheet = loader.append_sheet("test");
     assert(sheet == 0);
 
@@ -81,10 +81,8 @@ void test_value_setters()
     loader.set_string_cell(B3, loader.add_string("pooled"));
     loader.set_string_cell(D2, loader.append_string("appended"));
     loader.fill_down_cells(C1, 1);
-    model_context cxt = loader.finalize();
+    loader.finalize();
 
-    assert(cxt.get_sheet_size().row == sheet_size.row);
-    assert(cxt.get_sheet_size().column == sheet_size.column);
     assert(cxt.get_numeric_value(B1) == 2.0);
     assert(cxt.get_numeric_value(C1) == 5.0);
     assert(cxt.get_numeric_value(C2) == 5.0);
@@ -98,8 +96,9 @@ void test_overwrite_rejected()
 {
     IXION_TEST_FUNC_SCOPE;
 
-    model_context_loader loader;
-    auto resolver = loader.create_name_resolver(formula_name_resolver_t::excel_a1);
+    model_context cxt;
+    model_context_loader loader(cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     loader.append_sheet("test");
 
     abs_address_t A1(0, 0, 0);
@@ -120,7 +119,7 @@ void test_overwrite_rejected()
     // Nor does a group write touch a range that isn't empty.
     try
     {
-        loader.set_grouped_formula_cells(A1B2, loader.parse_formula_string(A1, *resolver, "1"));
+        loader.set_grouped_formula_cells(A1B2, parse_formula_string(cxt, A1, *resolver, "1"));
         assert(!"writing a group over a cell should have thrown");
     }
     catch (const model_context_error& e)
@@ -133,21 +132,23 @@ void test_names_after_formulas()
 {
     IXION_TEST_FUNC_SCOPE;
 
+    model_context cxt;
+
     abs_address_t A1(0, 0, 0);
     abs_address_t B1(0, 0, 1);
 
-    model_context_loader loader;
-    auto resolver = loader.create_name_resolver(formula_name_resolver_t::excel_a1);
+    model_context_loader loader(cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     loader.append_sheet("test");
     loader.set_numeric_cell(A1, 1.0);
 
     // The formula uses a name that doesn't exist yet.
-    loader.set_formula_cell(B1, loader.parse_formula_string(B1, *resolver, "MyName*2"));
+    loader.set_formula_cell(B1, parse_formula_string(cxt, B1, *resolver, "MyName*2"));
 
     // The name arrives after the formula.
-    loader.set_named_expression("MyName", loader.parse_formula_string(A1, *resolver, "$A$1"));
+    loader.set_named_expression("MyName", parse_formula_string(cxt, A1, *resolver, "$A$1"));
 
-    model_context cxt = loader.finalize();
+    loader.finalize();
     assert(is_sole_listener(cxt, B1, A1));
 
     // finalize() ends the load.
@@ -176,12 +177,14 @@ void test_cached_results()
 {
     IXION_TEST_FUNC_SCOPE;
 
+    model_context cxt;
+
     abs_address_t A1(0, 0, 0);
     abs_address_t C1(0, 0, 2);
     abs_range_t D1E2({0, 0, 3}, {0, 1, 4});
 
-    model_context_loader loader;
-    auto resolver = loader.create_name_resolver(formula_name_resolver_t::excel_a1);
+    model_context_loader loader(cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     sheet_t sheet = loader.append_sheet("test");
 
     // A1:B2
@@ -190,15 +193,15 @@ void test_cached_results()
         {3.0, 4.0},
     });
 
-    auto ts = formula_tokens_store::create(loader.parse_formula_string(C1, *resolver, "A1*2"));
+    auto ts = formula_tokens_store::create(parse_formula_string(cxt, C1, *resolver, "A1*2"));
     loader.set_formula_cell(C1, ts, formula_result(2.0));
 
     matrix group_result(2, 2, 5.0);
     loader.set_grouped_formula_cells(
-        D1E2, loader.parse_formula_string(D1E2.first, *resolver, "A1:B2*2"),
+        D1E2, parse_formula_string(cxt, D1E2.first, *resolver, "A1:B2*2"),
         formula_result(std::move(group_result)));
 
-    model_context cxt = loader.finalize();
+    loader.finalize();
 
     // The cached results are readable without a calculation.
     assert(cxt.get_numeric_value(C1) == 2.0);
@@ -214,18 +217,20 @@ void test_finalize_rejects_invalid_reference()
 {
     IXION_TEST_FUNC_SCOPE;
 
+    model_context cxt;
+
     abs_address_t A1(0, 0, 0);
     abs_address_t B1(0, 0, 1);
     abs_address_t C1(0, 0, 2);
 
-    model_context_loader loader;
-    auto resolver = loader.create_name_resolver(formula_name_resolver_t::excel_a1);
+    model_context_loader loader(cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     loader.append_sheet("test");
     loader.set_numeric_cell(A1, 1.0);
 
     // A reference to an invalid sheet only gets rejected at finalize().
     loader.set_formula_cell(B1, create_invalid_sheet_ref());
-    loader.set_formula_cell(C1, loader.parse_formula_string(C1, *resolver, "A1*2"));
+    loader.set_formula_cell(C1, parse_formula_string(cxt, C1, *resolver, "A1*2"));
 
     try
     {
@@ -236,22 +241,27 @@ void test_finalize_rejects_invalid_reference()
     {
         assert(e.get_error_type() == model_context_error::invalid_sheet_reference);
     }
+
+    // Nothing got registered, the valid cell included.
+    assert(cxt.get_cell_tracker().empty());
 }
 
 void test_finalize_rejects_invalid_name_reference()
 {
     IXION_TEST_FUNC_SCOPE;
 
+    model_context cxt;
+
     abs_address_t A1(0, 0, 0);
     abs_address_t B1(0, 0, 1);
     abs_address_t C1(0, 0, 2);
 
-    model_context_loader loader;
-    auto resolver = loader.create_name_resolver(formula_name_resolver_t::excel_a1);
+    model_context_loader loader(cxt);
+    auto resolver = formula_name_resolver::get(formula_name_resolver_t::excel_a1, &cxt);
     loader.append_sheet("test");
     loader.set_numeric_cell(A1, 1.0);
-    loader.set_formula_cell(B1, loader.parse_formula_string(B1, *resolver, "MyName*2"));
-    loader.set_formula_cell(C1, loader.parse_formula_string(C1, *resolver, "A1*2"));
+    loader.set_formula_cell(B1, parse_formula_string(cxt, B1, *resolver, "MyName*2"));
+    loader.set_formula_cell(C1, parse_formula_string(cxt, C1, *resolver, "A1*2"));
 
     // The name resolves to a reference to an invalid sheet, which only
     // shows at finalize().
@@ -266,6 +276,9 @@ void test_finalize_rejects_invalid_name_reference()
     {
         assert(e.get_error_type() == model_context_error::invalid_sheet_reference);
     }
+
+    // Nothing got registered, the valid cell included.
+    assert(cxt.get_cell_tracker().empty());
 }
 
 }

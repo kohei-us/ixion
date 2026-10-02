@@ -12,10 +12,12 @@
 int main()
 {
     //!code-start: create-loader
-    ixion::model_context_loader loader;
-    loader.append_sheet("Sheet1");
+    ixion::model_context cxt;
+    auto resolver = ixion::formula_name_resolver::get(
+        ixion::formula_name_resolver_t::excel_a1, &cxt);
 
-    auto resolver = loader.create_name_resolver(ixion::formula_name_resolver_t::excel_a1);
+    ixion::model_context_loader loader(cxt);
+    loader.append_sheet("Sheet1");
     //!code-end: create-loader
 
     //!code-start: values
@@ -30,23 +32,23 @@ int main()
     ixion::abs_address_t C1{0, 0, 2};
     ixion::abs_address_t C2{0, 1, 2};
 
-    ixion::formula_tokens_t tokens = loader.parse_formula_string(C1, *resolver, "SUM(MyData)");
+    ixion::formula_tokens_t tokens = ixion::parse_formula_string(cxt, C1, *resolver, "SUM(MyData)");
     loader.set_formula_cell(
         C1, ixion::formula_tokens_store::create(std::move(tokens)), ixion::formula_result(66.0));
 
-    tokens = loader.parse_formula_string(C2, *resolver, "A1+B1");
+    tokens = ixion::parse_formula_string(cxt, C2, *resolver, "A1+B1");
     loader.set_formula_cell(
         C2, ixion::formula_tokens_store::create(std::move(tokens)), ixion::formula_result(11.0));
     //!code-end: formulas
 
     //!code-start: name
     ixion::abs_address_t A1{0, 0, 0};
-    tokens = loader.parse_formula_string(A1, *resolver, "$A$1:$B$3");
+    tokens = ixion::parse_formula_string(cxt, A1, *resolver, "$A$1:$B$3");
     loader.set_named_expression("MyData", A1, std::move(tokens));
     //!code-end: name
 
     //!code-start: finalize
-    ixion::model_context cxt = loader.finalize();
+    loader.finalize();
     //!code-end: finalize
 
     //!code-start: use-model

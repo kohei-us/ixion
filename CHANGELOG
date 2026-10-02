@@ -34,11 +34,10 @@ ixion 0.21.0
 
   * added model_context::empty_cells() which empties a range of cells.
 
-  * added model_context_loader, a replacement for model_context
-    optimized for bulk loading.  It owns a new model, sets formula cells
-    without registering them until finalize(), so they don't depend on
-    named expressions and tables being loaded first, and hands the model
-    out from finalize().
+  * added model_context_loader, a load-time wrapper on model_context
+    optimized for bulk loading.  It sets formula cells without
+    registering them until finalize(), so they don't depend on named
+    expressions and tables being loaded first.
 
   * model_context is now movable.
 

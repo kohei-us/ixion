@@ -10,7 +10,6 @@
 #include <ixion/cell.hpp>
 #include <ixion/formula_result.hpp>
 #include <ixion/formula.hpp>
-#include <ixion/formula_name_resolver.hpp>
 #include <ixion/exceptions.hpp>
 #include <ixion/formula_tokens.hpp>
 #include <ixion/table.hpp>
@@ -27,24 +26,24 @@ namespace ixion {
 
 struct model_context_loader::impl
 {
-    model_context cxt;
+    model_context& cxt;
 
     /** Top-left positions of the formula cells, which wait to be registered. */
     std::vector<abs_address_t> formula_cells_to_register;
 
-    impl() = default;
-    impl(const rc_size_t& sheet_size) : cxt(sheet_size) {}
+    bool finalized = false;
 
-    /** finalize() moves the model out, which leaves it without an impl. */
+    impl(model_context& _cxt) : cxt(_cxt) {}
+
     void ensure_not_finalized() const
     {
-        if (!cxt.mp_impl)
+        if (finalized)
             throw model_context_error(
                 "the loader has already been finalized",
                 model_context_error::loader_already_finalized);
     }
 
-    /** Model being loaded.  It's gone once finalize() has handed it out. */
+    /** Model being loaded; off limits once finalize() has run. */
     const model_context& get_model() const
     {
         ensure_not_finalized();
@@ -63,29 +62,12 @@ struct model_context_loader::impl
     }
 };
 
-model_context_loader::model_context_loader() :
-    mp_impl(std::make_unique<impl>())
-{
-}
-
-model_context_loader::model_context_loader(const rc_size_t& sheet_size) :
-    mp_impl(std::make_unique<impl>(sheet_size))
+model_context_loader::model_context_loader(model_context& cxt) :
+    mp_impl(std::make_unique<impl>(cxt))
 {
 }
 
 model_context_loader::~model_context_loader() = default;
-
-std::unique_ptr<formula_name_resolver> model_context_loader::create_name_resolver(
-    formula_name_resolver_t type) const
-{
-    return formula_name_resolver::get(type, &mp_impl->get_model());
-}
-
-formula_tokens_t model_context_loader::parse_formula_string(
-    const abs_address_t& pos, const formula_name_resolver& resolver, std::string_view formula)
-{
-    return ixion::parse_formula_string(mp_impl->get_model(), pos, resolver, formula);
-}
 
 sheet_t model_context_loader::append_sheet(std::string name)
 {
@@ -250,9 +232,10 @@ void model_context_loader::set_grouped_formula_cells(
     mp_impl->formula_cells_to_register.push_back(group_range.first);
 }
 
-model_context model_context_loader::finalize()
+void model_context_loader::finalize()
 {
     detail::model_context_impl& cxt = mp_impl->get_model_impl();
+    mp_impl->finalized = true;
 
     // A loader never overwrites cells, so every position still holds the
     // formula cell it got.
@@ -280,8 +263,6 @@ model_context model_context_loader::finalize()
         const auto& [pos, fc] = cells[i];
         detail::apply_formula_registration(cxt, pos, *fc, ref_tokens[i]);
     }
-
-    return std::move(mp_impl->cxt);
 }
 
 }

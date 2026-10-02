@@ -22,14 +22,13 @@
 namespace ixion {
 
 class formula_cell;
-class formula_name_resolver;
 class formula_result;
 
 /**
- * Loads content into a new model, optimized for bulk loading.  It takes the
- * place of model_context for the duration of the load: it owns the model,
- * defers the work that the model_context setters do on every call until
- * finalize(), and hands the loaded model out from there.
+ * Loads content into a model in bulk.  It's a load-time wrapper on a model
+ * the caller owns: it takes the place of model_context for the duration of
+ * the load, defers the work that the model_context setters do on every call
+ * until finalize(), and can be discarded once the load is done.
  *
  * The setters write and nothing else.  A formula cell doesn't get validated
  * or registered with the dirty cell tracker until finalize(), so the
@@ -38,12 +37,17 @@ class formula_result;
  *
  * @note Each cell gets written at most once: a setter aimed at a cell that
  *       isn't empty throws model_context_error (loader_cell_not_empty).
+ *       The model itself doesn't have to be empty, and more content can be
+ *       loaded later with a new loader on the same model.
  *       Every sheet a formula references must exist when the formula gets
  *       set, and every named expression and table it references must exist
- *       when finalize() gets called.  A successful finalize() ends the
- *       load: every call on the loader afterwards throws
- *       model_context_error (loader_already_finalized).  A loader destroyed
- *       without finalize() takes the model with it.
+ *       when finalize() gets called.  Don't modify cells or calculate the
+ *       model through model_context while a loader is working on it, and
+ *       use one loader at a time per model.  finalize() ends the load:
+ *       every call on the loader afterwards throws model_context_error
+ *       (loader_already_finalized).  The destructor doesn't finalize; the
+ *       formula cells of a loader that never got finalized stay
+ *       unregistered.
  */
 class IXION_DLLPUBLIC model_context_loader
 {
@@ -51,48 +55,17 @@ class IXION_DLLPUBLIC model_context_loader
     std::unique_ptr<impl> mp_impl;
 
 public:
+    model_context_loader() = delete;
     model_context_loader(const model_context_loader&) = delete;
     model_context_loader& operator=(const model_context_loader&) = delete;
 
     /**
-     * Construct a loader with a new model of the default sheet size, which
-     * is 1048576 rows by 16384 columns.
-     */
-    model_context_loader();
-
-    /**
-     * Construct a loader with a new model of a custom sheet size.  All
-     * sheets in the model share the same size.
+     * Constructor.
      *
-     * @param sheet_size Number of rows and columns of each sheet.
+     * @param cxt Model to load into.  It must outlive the loader.
      */
-    explicit model_context_loader(const rc_size_t& sheet_size);
-
+    explicit model_context_loader(model_context& cxt);
     ~model_context_loader();
-
-    /**
-     * Create a formula name resolver of the requested type on the model
-     * being loaded.  The resolver becomes invalid once finalize() has handed
-     * the model out; create a new one on the returned model.
-     *
-     * @param type Type of formula name resolver being requested.
-     *
-     * @return Formula name resolver instance.
-     */
-    std::unique_ptr<formula_name_resolver> create_name_resolver(formula_name_resolver_t type) const;
-
-    /**
-     * Parse a raw formula expression string into formula tokens, against
-     * the model being loaded.
-     *
-     * @param pos Address of the cell that has the formula expression.
-     * @param resolver Name resolver object used to resolve name tokens.
-     * @param formula Raw formula expression string to parse.
-     *
-     * @return Formula tokens representing the parsed formula expression.
-     */
-    formula_tokens_t parse_formula_string(
-        const abs_address_t& pos, const formula_name_resolver& resolver, std::string_view formula);
 
     /** @copydoc model_context::append_sheet(std::string) */
     sheet_t append_sheet(std::string name);
@@ -248,22 +221,19 @@ public:
 
     /**
      * Register the formula cells set through the loader with the dirty cell
-     * tracker, and hand the loaded model out.  This ends the load.
+     * tracker.  This ends the load; call it once.
      *
      * Every cell gets validated before any of them gets registered, so a
-     * rejected cell leaves the tracker unchanged.  The model stays in the
-     * loader.
-     *
-     * @return The loaded model.
+     * rejected cell leaves the tracker unchanged.  The rejected cell itself
+     * stays in the model.
      *
      * @throw model_context_error When a reference in a formula, including
      *                            one reached through a named expression,
      *                            points at an invalid sheet
-     *                            (invalid_sheet_reference), or when the
-     *                            model has already been handed out
-     *                            (loader_already_finalized).
+     *                            (invalid_sheet_reference), or when called a
+     *                            second time (loader_already_finalized).
      */
-    model_context finalize();
+    void finalize();
 };
 
 }
