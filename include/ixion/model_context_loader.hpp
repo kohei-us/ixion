@@ -39,15 +39,18 @@ class formula_result;
  *       isn't empty throws model_context_error (loader_cell_not_empty).
  *       The model itself doesn't have to be empty, and more content can be
  *       loaded later with a new loader on the same model.
- *       Every sheet a formula references must exist when the formula gets
+ *
+ * @note Every sheet a formula references must exist when the formula gets
  *       set, and every named expression and table it references must exist
- *       when finalize() gets called.  Don't modify cells or calculate the
- *       model through model_context while a loader is working on it, and
- *       use one loader at a time per model.  finalize() ends the load:
- *       every call on the loader afterwards throws model_context_error
- *       (loader_already_finalized).  The destructor doesn't finalize; the
- *       formula cells of a loader that never got finalized stay
- *       unregistered.
+ *       when finalize() gets called.
+ *
+ * @note Don't modify cells or calculate the model through model_context while
+ *       a loader is working on it, and use one loader at a time per model.
+ *
+ * @note finalize() ends the load: every call on the loader afterwards throws
+ *       model_context_error (loader_already_finalized). The destructor
+ *       doesn't finalize; the formula cells of a loader that never got
+ *       finalized stay unregistered.
  */
 class IXION_DLLPUBLIC model_context_loader
 {
