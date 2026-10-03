@@ -158,7 +158,7 @@ At the :cpp:class:`~ixion::model_context` level the same operation comes in
 two parts, because the model context stores cells but doesn't drive
 calculation.  To keep the code short, we'll reuse the two helper functions
 introduced on the :ref:`names-and-tables` page: ``set_formula()``, which
-parses a formula, stores it in a cell and registers the cell, and
+parses a formula and stores it in a cell, and
 ``calculate()``, which calculates a given set of dirty formula cells.  With
 those in place, let's build a sheet similar to the one above:
 
@@ -202,9 +202,9 @@ re-calculating:
 The dump of the new sheet shows everything carried over as is, including
 the result of C1, which is the one cell reported for re-calculation.
 
-The formula cells of the new sheet are registered with the dependency
-tracker as part of the copy.  The reported cells go into a calculation as
-the dirty formula cells:
+The dependencies of the new sheet's formula cells are tracked as part of
+the copy.  The reported cells go into a calculation as the dirty formula
+cells:
 
 .. literalinclude:: ../../doc_example/sheet_copy.cpp
    :language: C++

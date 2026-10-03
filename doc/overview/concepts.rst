@@ -195,16 +195,16 @@ Two levels of API
 
 What we've covered so far is the low-level API: a
 :cpp:class:`~ixion::model_context` for storage, and the free functions in
-``<ixion/formula.hpp>`` for parsing, registration and calculation.  At this
+``<ixion/formula.hpp>`` for parsing and calculation.  At this
 level you keep track of which cells were modified and drive each step
 yourself.  The :ref:`use-model-context` page shows what that looks like in
 practice.
 
 The :cpp:class:`~ixion::document` class sits on top of a model context and
 takes care of that bookkeeping for you.  It parses formula strings with a
-resolver you choose at construction, registers and unregisters formula cells
-as you set them, remembers which cells you've touched, and runs both
-calculation steps when you call :cpp:func:`~ixion::document::calculate`.
+resolver you choose at construction, remembers which cells you've touched,
+and runs both calculation steps when you call
+:cpp:func:`~ixion::document::calculate`.
 As a convenience, you can also address cells with strings like
 ``"Sheet1!A1"`` instead of an :cpp:struct:`~ixion::abs_address_t`.  The
 :ref:`use-document` page builds the same example on top of it.

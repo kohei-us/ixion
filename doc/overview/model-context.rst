@@ -151,9 +151,9 @@ have the tokens, you can finally pass them to your model_context instance via
    :dedent: 4
 
 Note that you need to *move* your tokens to the method since instances of type
-:cpp:type:`ixion::formula_tokens_t` are non-copyable and only movable.  Setting a formula cell also
-registers it with the model's dependency tracker, so the model can tell which formula cells to
-re-calculate for given modified cells.
+:cpp:type:`ixion::formula_tokens_t` are non-copyable and only movable.  Once the formula cell is
+set, the model tracks its dependencies, so it can tell which formula cells to re-calculate for
+given modified cells.
 
 
 Calculate formula cell
@@ -229,8 +229,7 @@ Modify formula cell
 -------------------
 
 Let's say you need to overwrite the formula in A11 to something else.  The steps you need to take
-are very similar to the steps for inserting a brand-new formula cell, the only difference being
-that you need to "unregister" the old formula cell before overwriting it.
+are the same as the steps for inserting a brand-new formula cell.
 
 Let's go through this step by step.  First, create new tokens to insert:
 
@@ -283,12 +282,12 @@ You should see the following output when finished:
     value of A11: 5.5
 
 
-Formula cell with no references
--------------------------------
+Overwrite a value cell with a formula cell
+------------------------------------------
 
-Next example shows a scenario where you want to overwrite a cell in A10, which
-currently stores a numeric value, with a formula cell that references no other
-cells.  Let's add the new formula cell first:
+Next, let's overwrite A10, which currently stores a numeric value, with a
+formula cell.  The formula we use here references no other cells, but that
+makes no difference to how you set it:
 
 .. literalinclude:: ../../doc_example/model_context_simple.cpp
    :language: C++
@@ -296,25 +295,11 @@ cells.  Let's add the new formula cell first:
    :end-before: //!code-end: overwrite-a10
    :dedent: 4
 
-Here, we are not registering this cell since it contains no references hence it
-does not need to be tracked by dependency tracker.  Also, since the previous
-cell in A10 is not a formula cell, there is no cell to unregister.
+The model tracks the dependencies of the new formula cell, and drops those of
+the cell it replaced if that was a formula cell.  You don't need to do
+anything beyond calling :cpp:func:`~ixion::model_context::set_formula_cell`.
 
-.. warning::
-
-    Technically speaking, every formula cell that contains references to other
-    cells or contains at least one volatile function needs to be registered.
-    Since registering a formula cell that doesn't need to be registered is
-    entirely harmless (albeit a slight overhead), it's generally a good idea to
-    register every new formula cell regardless of its content.
-
-    Likewise, unregistering a formula cell that didn't need to be registered
-    (or wasn't registered) is entirely harmless.  Even unregistering a cell
-    that didn't contain a formula cell is harmless, and essentially does
-    nothing.  As such, it's probably a good idea to unregister a cell whenever
-    a new cell value is being placed.
-
-Let's obtain all formula cells in need to re-calculation:
+Let's obtain all formula cells in need of re-calculation:
 
 .. literalinclude:: ../../doc_example/model_context_simple.cpp
    :language: C++

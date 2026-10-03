@@ -149,7 +149,6 @@ int main(int argc, char** argv)
     tokens = ixion::parse_formula_string(cxt, A10, *resolver, "(100+50)/2");
     cxt.set_formula_cell(A10, std::move(tokens));
     //!code-end: overwrite-a10
-    // No need to register this cell since it does not reference any other cells.
 
     //!code-start: a10-dirty-cells
     modified_formula_cells = { A10 };

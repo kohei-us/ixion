@@ -75,9 +75,9 @@ dimensions of the group, or the call throws.
 Calculating a group
 -------------------
 
-A group is registered with the dependency tracker and calculated through
-its top-left cell.  Registering that one cell registers the whole group,
-and the calculation of that one cell fills in the results of all the
+A group is tracked and calculated through its top-left cell.  The
+dependency tracker holds the whole group under that one cell, and the
+calculation of that one cell fills in the results of all the
 members.  We'll use a ``calculate()`` helper like the one from the
 :ref:`names-and-tables` page, with the modified cells added as a
 parameter since we'll need them further down:
@@ -219,13 +219,13 @@ within the group.  The member at offset zero in both directions is the
 tokens.  It does so once, at its own position, and stores the resulting
 matrix in the shared slot.  The other members never calculate anything;
 when their value is requested, they look up the element of that matrix at
-their own offset.  This is why registering and calculating go through the
+their own offset.  This is why tracking and calculating go through the
 top-left cell, why the formula prints relative to the top-left cell for
 every member, and why a cached result supplied up front has to be a matrix
 of the group's size.
 
-On the dependency side, registering the parent records the range of the whole
-group, D1:E2 in our example, as the listener of the referenced range A1:B2.  A
+On the dependency side, the tracker records the range of the whole group,
+D1:E2 in our example, as the listener of the referenced range A1:B2.  A
 single formula cell listening on a range is the common case; here it is a
 range listening on a range.  The tracker holds a single entry for the group,
 and it can only mark that entry dirty as a whole.  That's why the edit to A1
