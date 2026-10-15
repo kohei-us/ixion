@@ -55,11 +55,12 @@ namespace mdds { namespace mtv {
  * belonging to the same formula group share the same cloned calc status
  * instance, which formula_cell::cloner keeps track of.  The generic
  * clone_block uses one instance of this function object per block clone and
- * applies it to the cells in stored order, which makes this work.
+ * applies it to the cells in stored order, which keeps a group intact within
+ * a column.
  *
- * Since a formula group never spans multiple columns, and the cells of a
- * group are contiguous within a column, an entire group always gets cloned as
- * a whole within a single block.
+ * A formula group may span multiple columns.  To keep such a group intact,
+ * one instance of this function object must be passed to the clone or detach
+ * of every column of the group; see sheet_store::clone().
  */
 template<>
 struct clone_value<ixion::formula_cell*>

@@ -113,6 +113,8 @@ test_data = \
 	test/22-grouped-formulas-with-cached-results.txt \
 	test/23-dump-sheet.txt \
 	test/24-copy-sheet-array-formula.txt \
+	test/25-copy-sheet-multi-column-group.txt \
+	test/26-copy-sheet-multi-column-group-on-copy.txt \
 	test/expected/model-context/dump-sheet-simple.txt \
 	test/expected/model-context/dump-sheet-verbose.txt \
 	test/expected/model-context/dump-sheet-verbose-r1c1.txt \

@@ -30,7 +30,10 @@ public:
     /**
      * Create a copy of this sheet store.
      *
-     * This may clone the column stores with copy-on-write enabled.
+     * With copy-on-write enabled the cloned columns borrow the blocks of the
+     * originals, except the columns holding a formula group that spans
+     * multiple columns, which get detached right away so that the group
+     * stays intact on both sides.
      *
      * The returned store gets its own fresh set of position hints. The named
      * expressions are copied verbatim i.e. their origins still reference

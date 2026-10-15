@@ -7,8 +7,31 @@
 
 #include <ixion/global.hpp>
 #include "sheet_store.hpp"
+#include "formula_groups.hpp"
 
 namespace ixion { namespace detail {
+
+namespace {
+
+/**
+ * Check whether a column holds a formula group that spans multiple columns.
+ */
+bool has_multi_column_group(const column_store_t& col)
+{
+    for (const formula_group_entry& entry : get_formula_groups(col))
+    {
+        formula_group_t group = entry.cells[0]->get_group_properties();
+        if (!group.grouped)
+            continue;
+
+        if (group.size.column > 1)
+            return true;
+    }
+
+    return false;
+}
+
+} // anonymous namespace
 
 sheet_store::sheet_store() = default;
 
@@ -125,8 +148,21 @@ sheet_store sheet_store::clone() const
 {
     sheet_store cloned;
 
+    // One cloner for the whole sheet, so that the cells of a formula group
+    // spanning multiple columns end up sharing one cloned calc status.
+    mdds::mtv::clone_value<formula_cell*> cloner;
+
     for (const column_store_t& col : m_columns)
-        cloned.m_columns.push_back(col.clone());
+    {
+        column_store_t cloned_col = col.clone(cloner);
+
+        // Detach the columns of a multi-column group now, while the shared
+        // cloner is around; a later lazy detach would split the group.
+        if (cloned_col.is_shared() && has_multi_column_group(col))
+            cloned_col.detach(cloner);
+
+        cloned.m_columns.push_back(std::move(cloned_col));
+    }
 
     cloned.m_pos_hints.resize(m_columns.size()); // default-constructed hints
 

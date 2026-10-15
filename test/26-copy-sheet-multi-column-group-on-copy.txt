@@ -1,0 +1,29 @@
+%% Issue #82: copying a sheet splits a multi-column formula group.
+%% Same as the previous test but the edit is made on the copy, where the
+%% split happens at copy time even without copy-on-write.
+%mode session
+insert-sheet:src
+%mode init
+A1=1
+B1=2
+A2=3
+B2=4
+{D1:E2}{=A1:B2*10}
+%calc
+%mode result
+D1=10
+E1=20
+D2=30
+E2=40
+%check
+%copy-sheet src copy
+%mode edit
+copy!B1:200
+%recalc
+%mode result
+copy!D1=10
+copy!E1=2000
+copy!D2=30
+copy!E2=40
+%check
+%exit

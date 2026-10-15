@@ -1,0 +1,29 @@
+%% Issue #82: copying a sheet splits a multi-column formula group.
+%% After the copy, editing a cell referenced by the non-top-left column of
+%% the group must still re-calculate that column on the source sheet.
+%mode session
+insert-sheet:src
+%mode init
+A1=1
+B1=2
+A2=3
+B2=4
+{D1:E2}{=A1:B2*10}
+%calc
+%mode result
+D1=10
+E1=20
+D2=30
+E2=40
+%check
+%copy-sheet src copy
+%mode edit
+src!B1:200
+%recalc
+%mode result
+src!D1=10
+src!E1=2000
+src!D2=30
+src!E2=40
+%check
+%exit
