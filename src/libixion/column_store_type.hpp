@@ -19,6 +19,7 @@
 #include <deque>
 #include <memory>
 #include <string_view>
+#include <tuple>
 
 namespace ixion {
 
@@ -127,13 +128,16 @@ using column_store_t = mdds::multi_type_vector<column_store_traits>;
 using column_stores_t = std::deque<column_store_t>;
 
 /**
- * The integer element blocks are used to store string ID's.  The actual
- * string element blocks are not used in the matrix store in ixion.
+ * The integer element blocks are used to store error values.  The string
+ * element blocks store the actual string values.
  */
 struct matrix_store_traits
 {
-    typedef mdds::mtv::int64_element_block integer_element_block;
-    typedef mdds::mtv::string_element_block string_element_block;
+    using numeric_element_block = mdds::mtv::double_element_block;
+    using element_blocks = std::tuple<
+        mdds::mtv::boolean_element_block,
+        mdds::mtv::int64_element_block,
+        mdds::mtv::string_element_block>;
 };
 
 using matrix_store_t = mdds::multi_type_matrix<matrix_store_traits>;

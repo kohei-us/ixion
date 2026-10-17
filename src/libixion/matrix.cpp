@@ -109,20 +109,23 @@ matrix& matrix::operator= (matrix other)
 
 bool matrix::is_numeric() const
 {
-    return mp_impl->m_data.numeric();
+    return mp_impl->m_data.all_of<
+        matrix_store_t::numeric_block_type,
+        mdds::mtv::boolean_element_block,
+        mdds::mtv::int64_element_block>();
 }
 
 bool matrix::get_boolean(size_t row, size_t col) const
 {
-    return mp_impl->m_data.get_boolean(row, col);
+    return get_numeric(row, col) != 0.0;
 }
 
 bool matrix::is_numeric(size_t row, size_t col) const
 {
     switch (mp_impl->m_data.get_type(row, col))
     {
-        case mdds::mtm::element_numeric:
-        case mdds::mtm::element_boolean:
+        case matrix_store_t::element_numeric:
+        case mdds::mtv::element_type_boolean:
             return true;
         default:
             ;
@@ -133,7 +136,21 @@ bool matrix::is_numeric(size_t row, size_t col) const
 
 double matrix::get_numeric(size_t row, size_t col) const
 {
-    return mp_impl->m_data.get_numeric(row, col);
+    auto pos = mp_impl->m_data.position(row, col);
+
+    switch (mp_impl->m_data.get_type(pos))
+    {
+        case matrix_store_t::element_numeric:
+            return mp_impl->m_data.get_numeric(pos);
+        case mdds::mtv::element_type_boolean:
+            return mp_impl->m_data.get<bool>(pos) ? 1.0 : 0.0;
+        case mdds::mtv::element_type_int64:
+            return mp_impl->m_data.get<int64_t>(pos);
+        default:
+            ;
+    }
+
+    return 0.0;
 }
 
 void matrix::set(size_t row, size_t col, double val)
@@ -162,16 +179,18 @@ matrix::element matrix::get(size_t row, size_t col) const
     element me;
     me.type = element_type::empty;
 
-    switch (mp_impl->m_data.get_type(row, col))
+    auto pos = mp_impl->m_data.position(row, col);
+
+    switch (mp_impl->m_data.get_type(pos))
     {
-        case mdds::mtm::element_numeric:
+        case matrix_store_t::element_numeric:
             me.type = element_type::numeric;
-            me.value = mp_impl->m_data.get_numeric(row, col);
+            me.value = mp_impl->m_data.get_numeric(pos);
             break;
-        case mdds::mtm::element_integer:
+        case mdds::mtv::element_type_int64:
         {
             // This is an error value, which must be negative.
-            auto v = mp_impl->m_data.get_integer(row, col);
+            auto v = mp_impl->m_data.get<int64_t>(pos);
             if (v >= 0)
                 break;
 
@@ -179,16 +198,17 @@ matrix::element matrix::get(size_t row, size_t col) const
             me.value = static_cast<formula_error_t>(-v);
             break;
         }
-        case mdds::mtm::element_string:
+        case mdds::mtv::element_type_string:
         {
+            // The view must reference the stored string, not a copy.
             me.type = element_type::string;
-            me.value = mp_impl->m_data.get_string(row, col);
+            me.value = mp_impl->m_data.get_ref<std::string>(pos);
             break;
         }
-        case mdds::mtm::element_boolean:
+        case mdds::mtv::element_type_boolean:
         {
             me.type = element_type::boolean;
-            me.value = mp_impl->m_data.get_boolean(row, col);
+            me.value = mp_impl->m_data.get<bool>(pos);
             break;
         }
         default:
@@ -227,16 +247,16 @@ numeric_matrix matrix::as_numeric() const
 
             switch (node.type)
             {
-                case mdds::mtm::element_integer:
+                case mdds::mtv::element_type_int64:
                 {
                     // Error values become numeric values of 0.0.
                     std::fill_n(dest, node.size, 0.0);
                     std::advance(dest, node.size);
                     break;
                 }
-                case mdds::mtm::element_boolean:
+                case mdds::mtv::element_type_boolean:
                 {
-                    using block_type = matrix_store_t::boolean_block_type;
+                    using block_type = mdds::mtv::boolean_element_block;
                     auto it  = block_type::begin(*node.data);
                     auto ite = block_type::end(*node.data);
 
@@ -244,7 +264,7 @@ numeric_matrix matrix::as_numeric() const
                         *dest++ = *it ? 1.0 : 0.0;
                     break;
                 }
-                case mdds::mtm::element_numeric:
+                case matrix_store_t::element_numeric:
                 {
                     using block_type = matrix_store_t::numeric_block_type;
                     const double* src = &block_type::at(*node.data, 0);
@@ -252,7 +272,7 @@ numeric_matrix matrix::as_numeric() const
                     std::advance(dest, node.size);
                     break;
                 }
-                case mdds::mtm::element_string:
+                case mdds::mtv::element_type_string:
                 {
                     // Skip string blocks, leaving their elements as NaN.
                     std::advance(dest, node.size);
