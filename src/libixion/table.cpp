@@ -7,7 +7,7 @@
 
 #include <ixion/table.hpp>
 
-#include <iomanip>
+#include <format>
 
 namespace ixion {
 
@@ -21,8 +21,8 @@ bool table_ref_t::operator== (const table_ref_t& r) const
 std::ostream& operator<<(std::ostream& os, const table_ref_t& table)
 {
     os << "(name:" << table.name << "; column-first:" << table.column_first
-        << "; column-last:" << table.column_last << "; areas:0x" << std::hex
-        << std::setw(2) << std::setfill('0') << table.areas << ")";
+        << "; column-last:" << table.column_last << "; areas:0x"
+        << std::format("{:02x}", table.areas) << ")";
     return os;
 }
 
