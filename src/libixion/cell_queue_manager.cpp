@@ -112,7 +112,7 @@ struct formula_cell_queue::impl
 
     impl(model_context& cxt, std::vector<queue_entry>&& cells, size_t thread_count) :
         m_context(cxt),
-        m_cells(cells),
+        m_cells(std::move(cells)),
         m_thread_count(thread_count) {}
 
     void thread_launch(interpreter_queue* queue)

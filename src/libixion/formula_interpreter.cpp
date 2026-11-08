@@ -809,43 +809,43 @@ void compare_matrix_to_value(formula_value_stack& vs, fopcode_t oc, const matrix
         case fop_plus:
         {
             matrix res = operate_all_elements<add_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_equal:
         {
             matrix res = operate_all_elements<equal_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_not_equal:
         {
             matrix res = operate_all_elements<not_equal_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_less:
         {
             matrix res = operate_all_elements<less_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_less_equal:
         {
             matrix res = operate_all_elements<less_equal_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_greater:
         {
             matrix res = operate_all_elements<greater_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_greater_equal:
         {
             matrix res = operate_all_elements<greater_equal_op>(mtx, val);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         default:
@@ -860,49 +860,49 @@ void compare_value_to_matrix(formula_value_stack& vs, fopcode_t oc, double val, 
         case fop_minus:
         {
             matrix res = operate_all_elements<sub_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_plus:
         {
             matrix res = operate_all_elements<add_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_equal:
         {
             matrix res = operate_all_elements<equal_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_not_equal:
         {
             matrix res = operate_all_elements<not_equal_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_less:
         {
             matrix res = operate_all_elements<less_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_less_equal:
         {
             matrix res = operate_all_elements<less_equal_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_greater:
         {
             matrix res = operate_all_elements<greater_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         case fop_greater_equal:
         {
             matrix res = operate_all_elements<greater_equal_op>(val, mtx);
-            vs.push_matrix(res);
+            vs.push_matrix(std::move(res));
             break;
         }
         default:

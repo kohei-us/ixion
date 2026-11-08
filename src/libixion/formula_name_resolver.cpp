@@ -1728,9 +1728,9 @@ public:
         func_append_sheet_name_type func_append_sheet_name) :
         formula_name_resolver(),
         mp_cxt(cxt),
-        m_func_parse_address(func_parse_address),
-        m_func_append_address(func_append_address),
-        m_func_append_sheet_name(func_append_sheet_name) {}
+        m_func_parse_address(std::move(func_parse_address)),
+        m_func_append_address(std::move(func_append_address)),
+        m_func_append_sheet_name(std::move(func_append_sheet_name)) {}
 
     virtual formula_name_t resolve(std::string_view s, const abs_address_t &pos) const override
     {

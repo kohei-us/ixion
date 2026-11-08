@@ -732,12 +732,12 @@ void model_parser::parse_result()
     if (itr == m_formula_results.end())
     {
         // This cell doesn't exist yet.
-        auto r = m_formula_results.insert(model_parser::results_type::value_type(name_s, fres));
+        auto r = m_formula_results.insert(model_parser::results_type::value_type(name_s, std::move(fres)));
         if (!r.second)
             throw model_parser::parse_error("failed to insert a new result.");
     }
     else
-        itr->second = fres;
+        itr->second = std::move(fres);
 }
 
 void model_parser::parse_result_cache()

@@ -116,7 +116,7 @@ int main (int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    auto print_help = [desc]()
+    auto print_help = [&desc]()
     {
         cout << "Usage: ixion-formula-tokenizer [options] FORMULA_EXPRESSION" << endl
             << endl

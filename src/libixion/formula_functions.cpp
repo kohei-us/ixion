@@ -1265,7 +1265,7 @@ void formula_functions::fnc_and(formula_value_stack& args) const
                     return final_result; // returning false will end the walk.
                 };
 
-                m_context.walk(sheet, rc_range, cb);
+                m_context.walk(sheet, rc_range, std::move(cb));
                 break;
             }
             default:
@@ -1360,7 +1360,7 @@ void formula_functions::fnc_or(formula_value_stack& args) const
                     return !this_result; // returning false will end the walk.
                 };
 
-                m_context.walk(sheet, rc_range, cb);
+                m_context.walk(sheet, rc_range, std::move(cb));
                 break;
             }
             default:
@@ -1815,7 +1815,7 @@ void formula_functions::fnc_mid(formula_value_stack& args) const
 
     std::string truncated;
     std::ranges::copy(it_head, it_end, std::back_inserter(truncated));
-    args.push_string(truncated);
+    args.push_string(std::move(truncated));
 }
 
 void formula_functions::fnc_concatenate(formula_value_stack& args) const
@@ -1955,7 +1955,7 @@ void formula_functions::fnc_replace(formula_value_stack& args) const
     it = std::next(content.begin(), pos_bytes);
     std::ranges::copy(it, content.end(), std::back_inserter(content_new));
 
-    args.push_string(content_new);
+    args.push_string(std::move(content_new));
 }
 
 void formula_functions::fnc_rept(formula_value_stack& args) const
