@@ -227,8 +227,6 @@ struct formula_cell::impl
                 );
             }
         }
-
-        return std::string_view{};
     }
 
     bool is_grouped() const
