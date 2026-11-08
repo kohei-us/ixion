@@ -1014,7 +1014,7 @@ std::ostream& operator<<(std::ostream& os, const matrix::element& e)
             os << std::get<std::string_view>(e.value);
             break;
         case matrix::element_type::boolean:
-            os << std::boolalpha << std::get<bool>(e.value);
+            os << (std::get<bool>(e.value) ? "true" : "false");
             break;
         case matrix::element_type::error:
         case matrix::element_type::empty:
