@@ -26,13 +26,10 @@ namespace {
 
 bool check_address_by_sheet_bounds(const model_context* cxt, const address_t& pos)
 {
-    rc_size_t ss(row_upper_bound, column_upper_bound);
-
-    if (cxt && pos.sheet >= 0 && size_t(pos.sheet) < cxt->get_sheet_count())
-    {
-        // Make sure the address is within the sheet size.
-        ss = cxt->get_sheet_size();
-    }
+    // Make sure the address is within the sheet size.
+    const bool sheet_known = cxt && pos.sheet >= 0 && size_t(pos.sheet) < cxt->get_sheet_count();
+    const rc_size_t ss = sheet_known
+        ? cxt->get_sheet_size() : rc_size_t(row_upper_bound, column_upper_bound);
 
     row_t row_check = pos.row >= 0 ? pos.row : -pos.row;
 
