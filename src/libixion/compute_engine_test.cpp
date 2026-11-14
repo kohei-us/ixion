@@ -109,7 +109,7 @@ int main()
     REGISTER_TEST(test_create_vulkan);
 #endif
 
-    for (auto test : tests)
+    for (const auto& test : tests)
     {
         cout << "--------------------------" << endl;
         cout << "  " << test.first << endl;
