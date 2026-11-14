@@ -1204,8 +1204,7 @@ void test_model_context_iterator_named_exps()
         { "MyCalc", cxt.get_named_expression(0, "MyCalc") },
     };
 
-    iter = cxt.get_named_expressions_iterator();
-    assert(validate(iter, expected));
+    assert(validate(cxt.get_named_expressions_iterator(), expected));
 
     cxt.set_named_expression("RefToRight", tokenize("B1"));
 
@@ -1215,8 +1214,7 @@ void test_model_context_iterator_named_exps()
         { "RefToRight", cxt.get_named_expression(0, "RefToRight") },
     };
 
-    iter = cxt.get_named_expressions_iterator();
-    assert(validate(iter, expected));
+    assert(validate(cxt.get_named_expressions_iterator(), expected));
 
     cxt.set_named_expression(1, "MyCalc2", tokenize("(B1+C1)/D1"));
     cxt.set_named_expression(1, "MyCalc3", tokenize("B1/(PI()*2)"));
@@ -1224,15 +1222,13 @@ void test_model_context_iterator_named_exps()
     iter = cxt.get_named_expressions_iterator(0);
     assert(!iter.has());
 
-    iter = cxt.get_named_expressions_iterator(1);
-
     expected =
     {
         { "MyCalc2", cxt.get_named_expression(1, "MyCalc2") },
         { "MyCalc3", cxt.get_named_expression(1, "MyCalc3") },
     };
 
-    assert(validate(iter, expected));
+    assert(validate(cxt.get_named_expressions_iterator(1), expected));
 }
 
 IXION_DEPRECATED_DECL_POP
@@ -2123,7 +2119,7 @@ void test_model_context_tables()
     {
         tab.sheet = ixion::invalid_sheet;
         tab.range = C3_D9;
-        cxt.set_table(tab);
+        cxt.set_table(std::move(tab));
         assert(!"std::invalid_argument was expected for an invalid sheet index");
     }
     catch (const std::invalid_argument&)
@@ -2171,7 +2167,7 @@ void test_model_context_append_sheet_copy_tables()
     tab.range = B2_C4;
     tab.columns = { "C", "D" };
     tab.totals_row_count = 0;
-    cxt.set_table(tab);
+    cxt.set_table(std::move(tab));
 
     auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -2309,7 +2305,7 @@ void test_model_context_append_sheet_copy_table_groups()
     tab.range = C3_D9;
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
-    cxt.set_table(tab);
+    cxt.set_table(std::move(tab));
 
     auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);
@@ -2364,7 +2360,7 @@ void test_model_context_append_sheet_copy_table_ref_divergence()
     tab.range = C3_D9;
     tab.columns = { "Category", "Value" };
     tab.totals_row_count = 1;
-    cxt.set_table(tab);
+    cxt.set_table(std::move(tab));
 
     auto resolver = ixion::formula_name_resolver::get(ixion::formula_name_resolver_t::excel_a1, &cxt);
     assert(resolver);

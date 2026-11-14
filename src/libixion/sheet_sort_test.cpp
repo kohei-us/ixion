@@ -51,8 +51,7 @@ ixion::formula_tokens_store_ptr_t make_tokens(
         ixion::formula_name_resolver_t::excel_r1c1, &cxt);
     assert(resolver);
 
-    auto tokens = ixion::parse_formula_string(cxt, pos, *resolver, expr);
-    return ixion::formula_tokens_store::create(tokens);
+    return ixion::formula_tokens_store::create(ixion::parse_formula_string(cxt, pos, *resolver, expr));
 }
 
 /**

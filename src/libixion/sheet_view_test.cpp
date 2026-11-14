@@ -503,7 +503,7 @@ void test_sheet_view_sort_formula_group()
         results.set(1, 0, 10.0);
         results.set(2, 0, 40.0);
 
-        cxt.set_grouped_formula_cells(B1_B3, std::move(tokens), ixion::formula_result(results));
+        cxt.set_grouped_formula_cells(B1_B3, std::move(tokens), ixion::formula_result(std::move(results)));
     }
 
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
@@ -662,7 +662,7 @@ void test_sheet_view_sort_table()
     tab.range = A1_B5;
     tab.columns = {"Name", "Score"};
     tab.totals_row_count = 1;
-    cxt.set_table(tab);
+    cxt.set_table(std::move(tab));
 
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
 
@@ -723,7 +723,7 @@ void test_sheet_view_sort_table_invalid_args()
     tab.range = ixion::abs_rc_range_t(0, 0, 2, 2); // A1:B2
     tab.columns = {"A", "B"};
     tab.totals_row_count = 1;
-    cxt.set_table(tab);
+    cxt.set_table(std::move(tab));
 
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
 
@@ -794,8 +794,7 @@ void test_sheet_view_dump()
         assert(resolver);
 
         auto tokens = ixion::parse_formula_string(cxt, D1_D3.first, *resolver, "SUM(A$1:A$3)");
-        ixion::matrix results(3, 1, 6.0);
-        cxt.set_grouped_formula_cells(D1_D3, std::move(tokens), ixion::formula_result(results));
+        cxt.set_grouped_formula_cells(D1_D3, std::move(tokens), ixion::formula_result(ixion::matrix(3, 1, 6.0)));
     }
 
     ixion::sheet_view& view = cxt.create_sheet_view(0, "view1");
