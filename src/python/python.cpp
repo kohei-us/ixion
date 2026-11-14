@@ -141,7 +141,7 @@ struct PyModuleDef moduledef =
 
 extern "C" {
 
-IXION_DLLPUBLIC PyObject* PyInit_ixion()
+IXION_MOD_EXPORT PyObject* PyInit_ixion()
 {
     PyTypeObject* doc_type = ixion::python::get_document_type();
     if (PyType_Ready(doc_type) < 0)
