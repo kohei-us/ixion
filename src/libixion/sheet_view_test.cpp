@@ -118,7 +118,7 @@ void test_sheet_view_invalid_args()
     {
         try
         {
-            view.to_base_row(row);
+            (void)view.to_base_row(row);
             assert(!"std::out_of_range was expected");
         }
         catch (const std::out_of_range&)
@@ -128,7 +128,7 @@ void test_sheet_view_invalid_args()
 
         try
         {
-            view.to_view_row(row);
+            (void)view.to_view_row(row);
             assert(!"std::out_of_range was expected");
         }
         catch (const std::out_of_range&)
@@ -287,7 +287,7 @@ void test_sheet_view_sort()
     // rows outside the sheet get rejected also after a sort
     try
     {
-        view.to_base_row(100);
+        (void)view.to_base_row(100);
         assert(!"std::out_of_range was expected");
     }
     catch (const std::out_of_range&)
@@ -297,7 +297,7 @@ void test_sheet_view_sort()
 
     try
     {
-        view.to_view_row(100);
+        (void)view.to_view_row(100);
         assert(!"std::out_of_range was expected");
     }
     catch (const std::out_of_range&)
