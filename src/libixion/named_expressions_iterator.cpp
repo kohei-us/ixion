@@ -84,6 +84,12 @@ named_expressions_iterator& named_expressions_iterator::operator= (const named_e
     return *this;
 }
 
+named_expressions_iterator& named_expressions_iterator::operator= (named_expressions_iterator&& other)
+{
+    mp_impl = std::move(other.mp_impl);
+    return *this;
+}
+
 }
 
 IXION_DEPRECATED_DECL_POP

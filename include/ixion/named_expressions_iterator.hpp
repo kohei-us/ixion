@@ -74,6 +74,9 @@ public:
 
     /** Copy assignment. */
     named_expressions_iterator& operator= (const named_expressions_iterator& other);
+
+    /** Move assignment. */
+    named_expressions_iterator& operator= (named_expressions_iterator&& other);
 };
 
 }
