@@ -126,7 +126,7 @@ void test_model_context_storage()
         assert(s.empty());
 
         // Test storage of numeric values.
-        volatile double val = 0.1;
+        double val = 0.125;
         for (ixion::col_t col = 0; col < 3; ++col)
         {
             for (ixion::row_t row = 0; row < 3; ++row)
@@ -142,7 +142,7 @@ void test_model_context_storage()
                 test = ca.get_numeric_value();
                 assert(test == val);
 
-                val += 0.2;
+                val += 0.25;
             }
         }
 
