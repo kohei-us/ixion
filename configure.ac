@@ -215,7 +215,6 @@ AC_CONFIG_FILES([Makefile
                  include/ixion/Makefile
                  include/ixion/version.hpp
                  include/ixion/interface/Makefile
-                 misc/libixion.spec
                  src/Makefile
                  src/include/Makefile
                  src/libixion/Makefile

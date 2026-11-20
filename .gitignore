@@ -33,5 +33,4 @@ stamp-h1
 tags
 test-driver
 bin/env.sh
-misc/libixion.spec
 libixion-*.*.*.tar.*
