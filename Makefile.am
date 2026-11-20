@@ -139,9 +139,115 @@ doc_data = \
 	doc/_static/custom.css \
 	doc/conf.py \
 	doc/cpp/index.rst \
-	doc/cpp/ixion/draft/index.rst \
+	doc/cpp/ixion/class-abs_address_range.rst \
+	doc/cpp/ixion/class-cell_access.rst \
+	doc/cpp/ixion/class-dirty_cell_tracker.rst \
+	doc/cpp/ixion/class-document.rst \
+	doc/cpp/ixion/class-file_not_found.rst \
+	doc/cpp/ixion/class-formula_cell.rst \
+	doc/cpp/ixion/class-formula_error.rst \
+	doc/cpp/ixion/class-formula_name_resolver.rst \
+	doc/cpp/ixion/class-formula_result.rst \
+	doc/cpp/ixion/class-formula_tokens_store.rst \
+	doc/cpp/ixion/class-general_error.rst \
+	doc/cpp/ixion/class-matrix.rst \
+	doc/cpp/ixion/class-model_cell_range.rst \
+	doc/cpp/ixion/class-model_context.rst \
+	doc/cpp/ixion/class-model_context_error.rst \
+	doc/cpp/ixion/class-model_context_loader.rst \
+	doc/cpp/ixion/class-model_iterator.rst \
+	doc/cpp/ixion/class-named_expressions_iterator.rst \
+	doc/cpp/ixion/class-named_expressions_range.rst \
+	doc/cpp/ixion/class-not_implemented_error.rst \
+	doc/cpp/ixion/class-numeric_matrix.rst \
+	doc/cpp/ixion/class-sheet_view.rst \
+	doc/cpp/ixion/class-values_t.rst \
+	doc/cpp/ixion/enum-cell_t.rst \
+	doc/cpp/ixion/enum-cell_value_t.rst \
+	doc/cpp/ixion/enum-column_block_t.rst \
+	doc/cpp/ixion/enum-display_sheet_t.rst \
+	doc/cpp/ixion/enum-fopcode_t.rst \
+	doc/cpp/ixion/enum-formula_error_t.rst \
+	doc/cpp/ixion/enum-formula_event_t.rst \
+	doc/cpp/ixion/enum-formula_function_t.rst \
+	doc/cpp/ixion/enum-formula_name_resolver_t.rst \
+	doc/cpp/ixion/enum-formula_result_wait_policy_t.rst \
+	doc/cpp/ixion/enum-rc_direction_t.rst \
+	doc/cpp/ixion/enum-sheet_dump_mode_t.rst \
+	doc/cpp/ixion/enum-sort_order_t.rst \
+	doc/cpp/ixion/enum-table_area_t.rst \
+	doc/cpp/ixion/enum-value_t.rst \
+	doc/cpp/ixion/function-calculate_sorted_cells.rst \
+	doc/cpp/ixion/function-create_formula_error_tokens.rst \
+	doc/cpp/ixion/function-get_api_version_major.rst \
+	doc/cpp/ixion/function-get_api_version_minor.rst \
+	doc/cpp/ixion/function-get_current_time.rst \
+	doc/cpp/ixion/function-get_formula_error_name.rst \
+	doc/cpp/ixion/function-get_formula_function_name.rst \
+	doc/cpp/ixion/function-get_formula_function_opcode.rst \
+	doc/cpp/ixion/function-get_formula_opcode_name.rst \
+	doc/cpp/ixion/function-get_formula_opcode_string.rst \
+	doc/cpp/ixion/function-get_version_major.rst \
+	doc/cpp/ixion/function-get_version_micro.rst \
+	doc/cpp/ixion/function-get_version_minor.rst \
+	doc/cpp/ixion/function-intrusive_ptr_add_ref.rst \
+	doc/cpp/ixion/function-intrusive_ptr_release.rst \
+	doc/cpp/ixion/function-is_valid_sheet.rst \
+	doc/cpp/ixion/function-parse_formula_string.rst \
+	doc/cpp/ixion/function-print_formula_token-2.rst \
+	doc/cpp/ixion/function-print_formula_token.rst \
+	doc/cpp/ixion/function-print_formula_tokens-2.rst \
+	doc/cpp/ixion/function-print_formula_tokens.rst \
+	doc/cpp/ixion/function-query_and_sort_dirty_cells.rst \
+	doc/cpp/ixion/function-query_dirty_cells.rst \
+	doc/cpp/ixion/function-to_bool.rst \
+	doc/cpp/ixion/function-to_double.rst \
+	doc/cpp/ixion/function-to_formula_error_type.rst \
+	doc/cpp/ixion/iface/class-session_handler.rst \
 	doc/cpp/ixion/iface/index.rst \
 	doc/cpp/ixion/index.rst \
+	doc/cpp/ixion/struct-abs_address_t.rst \
+	doc/cpp/ixion/struct-abs_range_t.rst \
+	doc/cpp/ixion/struct-abs_rc_address_t.rst \
+	doc/cpp/ixion/struct-abs_rc_range_t.rst \
+	doc/cpp/ixion/struct-address_t.rst \
+	doc/cpp/ixion/struct-column_block_shape_t.rst \
+	doc/cpp/ixion/struct-config.rst \
+	doc/cpp/ixion/struct-formula_group_t.rst \
+	doc/cpp/ixion/struct-formula_name_t.rst \
+	doc/cpp/ixion/struct-formula_token.rst \
+	doc/cpp/ixion/struct-named_expression_t.rst \
+	doc/cpp/ixion/struct-print_config.rst \
+	doc/cpp/ixion/struct-range_t.rst \
+	doc/cpp/ixion/struct-rc_address_t.rst \
+	doc/cpp/ixion/struct-rc_range_t.rst \
+	doc/cpp/ixion/struct-rc_size_t.rst \
+	doc/cpp/ixion/struct-sort_key_t.rst \
+	doc/cpp/ixion/struct-string_id_t.rst \
+	doc/cpp/ixion/struct-table_ref_t.rst \
+	doc/cpp/ixion/struct-table_t.rst \
+	doc/cpp/ixion/typedef-abs_address_iterator.rst \
+	doc/cpp/ixion/typedef-abs_address_set_t.rst \
+	doc/cpp/ixion/typedef-abs_range_set_t.rst \
+	doc/cpp/ixion/typedef-abs_rc_range_set_t.rst \
+	doc/cpp/ixion/typedef-calc_status_ptr_t.rst \
+	doc/cpp/ixion/typedef-col_t.rst \
+	doc/cpp/ixion/typedef-column_block_callback_t.rst \
+	doc/cpp/ixion/typedef-column_block_handle.rst \
+	doc/cpp/ixion/typedef-formula_tokens_store_ptr_t.rst \
+	doc/cpp/ixion/typedef-formula_tokens_t.rst \
+	doc/cpp/ixion/typedef-rc_t.rst \
+	doc/cpp/ixion/typedef-row_t.rst \
+	doc/cpp/ixion/typedef-sheet_t.rst \
+	doc/cpp/ixion/typedef-sort_keys_t.rst \
+	doc/cpp/ixion/typedef-table_areas_t.rst \
+	doc/cpp/ixion/variable-column_unset.rst \
+	doc/cpp/ixion/variable-column_upper_bound.rst \
+	doc/cpp/ixion/variable-empty_string_id.rst \
+	doc/cpp/ixion/variable-global_scope.rst \
+	doc/cpp/ixion/variable-invalid_sheet.rst \
+	doc/cpp/ixion/variable-row_unset.rst \
+	doc/cpp/ixion/variable-row_upper_bound.rst \
 	doc/doxygen.conf \
 	doc/environment.yml \
 	doc/functions.rst \
@@ -179,6 +285,7 @@ doc_data = \
 	doc/overview/formula-groups.rst \
 	doc/overview/formula-syntax.rst \
 	doc/overview/index.rst \
+	doc/overview/model-context-loader.rst \
 	doc/overview/model-context.rst \
 	doc/overview/names-and-tables.rst \
 	doc/overview/sheet-copy.rst \

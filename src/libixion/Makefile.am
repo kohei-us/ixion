@@ -119,7 +119,8 @@ ixion_@IXION_API_VERSION@_vulkan_la_SOURCES = \
 	compute_engine_vulkan.hpp \
 	compute_engine_vulkan.cpp \
 	vulkan_obj.hpp \
-	vulkan_obj.cpp
+	vulkan_obj.cpp \
+	vulkan_spirv_blobs.inl
 
 ixion_@IXION_API_VERSION@_vulkan_la_LDFLAGS = \
 	-module -avoid-version -export-symbols-regex \
@@ -134,6 +135,8 @@ ixion_@IXION_API_VERSION@_vulkan_la_CPPFLAGS = \
 	$(VULKAN_CPPFLAGS)
 
 endif # BUILD_VULKAN
+
+EXTRA_DIST = shaders/fibonacci.comp
 
 if IXION_THREADS
 
